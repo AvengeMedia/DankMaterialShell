@@ -26,6 +26,14 @@ PanelWindow {
         right: true
         bottom: true
     }
+    
+    // Click outside to dismiss overlay
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            root.batteryPopupVisible = false
+        }
+    }
         
     Rectangle {
         width: Math.min(380, parent.width - Theme.spacingL * 2)
@@ -39,6 +47,14 @@ PanelWindow {
         
         opacity: root.batteryPopupVisible ? 1.0 : 0.0
         scale: root.batteryPopupVisible ? 1.0 : 0.85
+        
+        // Prevent click-through to background
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                // Consume the click to prevent it from reaching the background
+            }
+        }
         
         Behavior on opacity {
             NumberAnimation {

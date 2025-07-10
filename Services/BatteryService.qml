@@ -7,18 +7,19 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
+    // Battery properties
     property bool batteryAvailable: false
     property int batteryLevel: 0
-    property string batteryStatus: "Unknown"  // "Charging", "Discharging", "Full", "Not charging", "Unknown"
-    property int timeRemaining: 0  // minutes
+    property string batteryStatus: "Unknown"
+    property int timeRemaining: 0
     property bool isCharging: false
     property bool isLowBattery: false
-    property int batteryHealth: 100  // percentage
+    property int batteryHealth: 100
     property string batteryTechnology: "Unknown"
     property int cycleCount: 0
-    property int batteryCapacity: 0  // mAh
+    property int batteryCapacity: 0
     property var powerProfiles: []
-    property string activePowerProfile: "balanced"
+    property string activePowerProfile: ""
     
     // Check if battery is available
     Process {
@@ -238,12 +239,13 @@ Singleton {
         }
     }
     
-    // Update battery status every 30 seconds
+    
+    // Update timer
     Timer {
         interval: 30000
         running: root.batteryAvailable
         repeat: true
-        triggeredOnStart: false
+        triggeredOnStart: true
         onTriggered: {
             batteryStatusChecker.running = true
             powerProfilesChecker.running = true

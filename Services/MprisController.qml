@@ -145,7 +145,6 @@ Singleton {
         running: true
         repeat: true
         onTriggered: {
-            console.log(`[MprisController] Players: ${Mpris.players.length}, Active: ${activePlayer?.identity || 'none'}, Playing: ${isPlaying}`)
             if (activePlayer) {
                 console.log(`  Track: ${activePlayer.trackTitle || 'Unknown'} by ${activePlayer.trackArtist || 'Unknown'}`)
                 console.log(`  State: ${activePlayer.playbackState}`)

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -600,69 +601,6 @@ PanelWindow {
                     }
                 }
                 
-                // Category dropdown
-                Rectangle {
-                    width: 200
-                    height: Math.min(250, categories.length * 40 + activeTheme.spacingM * 2)
-                    radius: activeTheme.cornerRadiusLarge
-                    color: activeTheme.surfaceContainer
-                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
-                    border.width: 1
-                    visible: showCategories
-                    z: 100
-                    
-                    // Drop shadow
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: -2
-                        color: "transparent"
-                        radius: parent.radius + 2
-                        border.color: Qt.rgba(0, 0, 0, 0.1)
-                        border.width: 1
-                        z: -1
-                    }
-                    
-                    ScrollView {
-                        anchors.fill: parent
-                        anchors.margins: activeTheme.spacingS
-                        clip: true
-                        
-                        ListView {
-                            model: categories
-                            spacing: 4
-                            
-                            delegate: Rectangle {
-                                width: ListView.view.width
-                                height: 36
-                                radius: activeTheme.cornerRadiusSmall
-                                color: catArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : "transparent"
-                                
-                                Text {
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: activeTheme.spacingM
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: modelData
-                                    font.pixelSize: activeTheme.fontSizeMedium
-                                    color: selectedCategory === modelData ? activeTheme.primary : activeTheme.surfaceText
-                                    font.weight: selectedCategory === modelData ? Font.Medium : Font.Normal
-                                }
-                                
-                                MouseArea {
-                                    id: catArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        selectedCategory = modelData
-                                        showCategories = false
-                                        updateFilteredModel()
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
                 // App grid/list container
                 Rectangle {
                     width: parent.width
@@ -715,32 +653,41 @@ PanelWindow {
                                             height: 56
                                             anchors.verticalCenter: parent.verticalCenter
                                             
-                                            IconImage {
+                                            Loader {
                                                 anchors.fill: parent
-                                                source: Quickshell.iconPath(model.icon, "application-x-executable")
-                                                smooth: true
-                                                visible: status === Image.Ready
+                                                sourceComponent: model.icon ? iconComponent : fallbackComponent
                                                 
-                                                onStatusChanged: {
-                                                    if (status === Image.Error && model.name.includes("Avahi")) {
-                                                        console.log("Avahi icon failed to load:", model.icon, "->", source)
+                                                Component {
+                                                    id: iconComponent
+                                                    IconImage {
+                                                        source: model.icon ? Quickshell.iconPath(model.icon) : ""
+                                                        smooth: true
+                                                        asynchronous: true
+                                                        
+                                                        onStatusChanged: {
+                                                            if (status === Image.Error || status === Image.Null) {
+                                                                parent.sourceComponent = fallbackComponent
+                                                            }
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            
-                                            // Fallback for missing icons
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !parent.children[0].visible
-                                                color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.3)
-                                                radius: activeTheme.cornerRadiusLarge
                                                 
-                                                Text {
-                                                    anchors.centerIn: parent
-                                                    text: model.name ? model.name.charAt(0).toUpperCase() : "A"
-                                                    font.pixelSize: activeTheme.iconSizeLarge
-                                                    color: activeTheme.surfaceVariantText
-                                                    font.weight: Font.Medium
+                                                Component {
+                                                    id: fallbackComponent
+                                                    Rectangle {
+                                                        color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.1)
+                                                        radius: activeTheme.cornerRadiusLarge
+                                                        border.width: 1
+                                                        border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.2)
+                                                        
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: model.name ? model.name.charAt(0).toUpperCase() : "A"
+                                                            font.pixelSize: 28
+                                                            color: activeTheme.primary
+                                                            font.weight: Font.Bold
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -801,8 +748,8 @@ PanelWindow {
                                 // Center the grid content
                                 property int columnsCount: Math.floor(width / cellWidth)
                                 property int remainingSpace: width - (columnsCount * cellWidth)
-                                anchors.leftMargin: Math.max(activeTheme.spacingS, remainingSpace / 2)
-                                anchors.rightMargin: anchors.leftMargin
+                                leftMargin: Math.max(activeTheme.spacingS, remainingSpace / 2)
+                                rightMargin: leftMargin
                                 
                                 model: filteredModel
                                 
@@ -832,32 +779,41 @@ PanelWindow {
                                             height: iconSize
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             
-                                            IconImage {
+                                            Loader {
                                                 anchors.fill: parent
-                                                source: Quickshell.iconPath(model.icon, "application-x-executable")
-                                                smooth: true
-                                                visible: status === Image.Ready
+                                                sourceComponent: model.icon ? gridIconComponent : gridFallbackComponent
                                                 
-                                                onStatusChanged: {
-                                                    if (status === Image.Error && model.name.includes("Avahi")) {
-                                                        console.log("Avahi grid icon failed to load:", model.icon, "->", source)
+                                                Component {
+                                                    id: gridIconComponent
+                                                    IconImage {
+                                                        source: model.icon ? Quickshell.iconPath(model.icon) : ""
+                                                        smooth: true
+                                                        asynchronous: true
+                                                        
+                                                        onStatusChanged: {
+                                                            if (status === Image.Error || status === Image.Null) {
+                                                                parent.sourceComponent = gridFallbackComponent
+                                                            }
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            
-                                            // Fallback for missing icons
-                                            Rectangle {
-                                                anchors.fill: parent
-                                                visible: !parent.children[0].visible
-                                                color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.3)
-                                                radius: activeTheme.cornerRadiusLarge
                                                 
-                                                Text {
-                                                    anchors.centerIn: parent
-                                                    text: model.name ? model.name.charAt(0).toUpperCase() : "A"
-                                                    font.pixelSize: activeTheme.iconSizeLarge
-                                                    color: activeTheme.surfaceVariantText
-                                                    font.weight: Font.Medium
+                                                Component {
+                                                    id: gridFallbackComponent
+                                                    Rectangle {
+                                                        color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.1)
+                                                        radius: activeTheme.cornerRadiusLarge
+                                                        border.width: 1
+                                                        border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.2)
+                                                        
+                                                        Text {
+                                                            anchors.centerIn: parent
+                                                            text: model.name ? model.name.charAt(0).toUpperCase() : "A"
+                                                            font.pixelSize: parent.parent.parent.iconSize / 2
+                                                            color: activeTheme.primary
+                                                            font.weight: Font.Bold
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -886,6 +842,80 @@ PanelWindow {
                                             launcher.launchApp(model.exec)
                                             launcher.hide()
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Category dropdown overlay - now positioned absolutely
+                Rectangle {
+                    id: categoryDropdown
+                    width: 200
+                    height: Math.min(250, categories.length * 40 + activeTheme.spacingM * 2)
+                    radius: activeTheme.cornerRadiusLarge
+                    color: activeTheme.surfaceContainer
+                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+                    border.width: 1
+                    visible: showCategories
+                    z: 1000
+                    
+                    // Position it below the category button
+                    anchors.top: parent.top
+                    anchors.topMargin: 140 + (searchField.text.length === 0 ? 0 : -40)
+                    anchors.left: parent.left
+                    
+                    // Drop shadow
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: -4
+                        color: "transparent"
+                        radius: parent.radius + 4
+                        z: -1
+                        
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                            radius: 8
+                            samples: 16
+                            color: Qt.rgba(0, 0, 0, 0.2)
+                        }
+                    }
+                    
+                    ScrollView {
+                        anchors.fill: parent
+                        anchors.margins: activeTheme.spacingS
+                        clip: true
+                        
+                        ListView {
+                            model: categories
+                            spacing: 4
+                            
+                            delegate: Rectangle {
+                                width: ListView.view.width
+                                height: 36
+                                radius: activeTheme.cornerRadiusSmall
+                                color: catArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : "transparent"
+                                
+                                Text {
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: activeTheme.spacingM
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: modelData
+                                    font.pixelSize: activeTheme.fontSizeMedium
+                                    color: selectedCategory === modelData ? activeTheme.primary : activeTheme.surfaceText
+                                    font.weight: selectedCategory === modelData ? Font.Medium : Font.Normal
+                                }
+                                
+                                MouseArea {
+                                    id: catArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        selectedCategory = modelData
+                                        showCategories = false
+                                        updateFilteredModel()
                                     }
                                 }
                             }

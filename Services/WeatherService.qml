@@ -79,36 +79,48 @@ Singleton {
     
     Process {
         id: weatherFetcher
-        command: ["bash", "-c", "curl -s 'wttr.in/?format=j1' | jq '{current: .current_condition[0], location: .nearest_area[0], astronomy: .weather[0].astronomy[0]}'"]
+        command: ["bash", "-c", "curl -s 'wttr.in/?format=j1'"]
         running: false
         
         stdout: StdioCollector {
             onStreamFinished: {
-                if (text.trim() && text.trim().startsWith("{")) {
-                    try {
-                        let parsedData = JSON.parse(text.trim())
-                        if (parsedData.current && parsedData.location) {
-                            root.weather = {
-                                available: true,
-                                temp: parseInt(parsedData.current.temp_C || 0),
-                                tempF: parseInt(parsedData.current.temp_F || 0),
-                                city: parsedData.location.areaName[0]?.value || "Unknown",
-                                wCode: parsedData.current.weatherCode || "113", 
-                                humidity: parseInt(parsedData.current.humidity || 0),
-                                wind: (parsedData.current.windspeedKmph || 0) + " km/h",
-                                sunrise: parsedData.astronomy?.sunrise || "06:00",
-                                sunset: parsedData.astronomy?.sunset || "18:00",
-                                uv: parseInt(parsedData.current.uvIndex || 0),
-                                pressure: parseInt(parsedData.current.pressure || 0)
-                            }
-                            console.log("Weather updated:", root.weather.city, root.weather.temp + "°C")
-                        }
-                    } catch (e) {
-                        console.warn("Failed to parse weather data:", e.message)
-                        root.weather.available = false
-                    }
-                } else {
+                const raw = text.trim()
+                if (!raw || raw[0] !== "{") {
                     console.warn("No valid weather data received")
+                    root.weather.available = false
+                    return
+                }
+
+                try {
+                    const data = JSON.parse(raw)
+
+                    const current   = data.current_condition?.[0]   || {}
+                    const location  = data.nearest_area?.[0]        || {}
+                    const astronomy = data.weather?.[0]?.astronomy?.[0] || {}
+
+                    if (!Object.keys(current).length || !Object.keys(location).length) {
+                        throw new Error("Required fields missing")
+                    }
+
+                    root.weather = {
+                        available: true,
+                        temp: Number(current.temp_C)       || 0,
+                        tempF: Number(current.temp_F)      || 0,
+                        city:   location.areaName?.[0]?.value || "Unknown",
+                        wCode:  current.weatherCode        || "113",
+                        humidity: Number(current.humidity) || 0,
+                        wind:     `${current.windspeedKmph || 0} km/h`,
+                        sunrise:  astronomy.sunrise || "06:00",
+                        sunset:   astronomy.sunset  || "18:00",
+                        uv:       Number(current.uvIndex)  || 0,
+                        pressure: Number(current.pressure) || 0
+                    }
+
+                    console.log("Weather updated:", root.weather.city,
+                                `${root.weather.temp}°C`)
+
+                } catch (e) {
+                    console.warn("Failed to parse weather data:", e.message)
                     root.weather.available = false
                 }
             }

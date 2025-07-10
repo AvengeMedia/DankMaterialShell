@@ -34,6 +34,11 @@ ShellRoot {
     property bool hasActiveMedia: activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist)
     property bool controlCenterVisible: false
     property bool batteryPopupVisible: false
+    property bool powerMenuVisible: false
+    property bool powerConfirmVisible: false
+    property string powerConfirmAction: ""
+    property string powerConfirmTitle: ""
+    property string powerConfirmMessage: ""
     
     // Network properties from NetworkService
     property string networkStatus: NetworkService.networkStatus
@@ -259,6 +264,8 @@ ShellRoot {
         id: globalInputDialog
     }
     BatteryControlPopup {}
+    PowerMenuPopup {}
+    PowerConfirmDialog {}
     
     // Application and clipboard components
     AppLauncher {

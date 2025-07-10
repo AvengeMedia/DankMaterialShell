@@ -804,7 +804,11 @@ PanelWindow {
                         }
                     }
                 }
+                
+                // Power Button
+                PowerButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
         }
     }
-    

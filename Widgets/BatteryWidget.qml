@@ -8,53 +8,33 @@ Rectangle {
     
     property bool batteryPopupVisible: false
     
-    width: Theme.barHeight - Theme.spacingS
-    height: Theme.barHeight - Theme.spacingS
-    radius: Theme.cornerRadiusSmall
-    color: batteryArea.containsMouse ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08) : "transparent"
+    width: 48
+    height: 32
+    radius: Theme.cornerRadius
+    color: batteryArea.containsMouse || batteryPopupVisible ? 
+           Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 
+           Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
     visible: BatteryService.batteryAvailable
     
-    Row {
-        anchors.centerIn: parent
-        spacing: Theme.spacingXS
-        
-        // Battery icon
-        Text {
-            text: BatteryService.getBatteryIcon()
-            font.family: Theme.iconFont
-            font.pixelSize: Theme.iconSize
-            color: {
-                if (!BatteryService.batteryAvailable) return Theme.surfaceText
-                if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
-                if (BatteryService.isCharging) return Theme.primary
-                return Theme.surfaceText
-            }
-            anchors.verticalCenter: parent.verticalCenter
-            
-            // Subtle animation for charging
-            RotationAnimation on rotation {
-                running: BatteryService.isCharging
-                loops: Animation.Infinite
-                from: 0
-                to: 360
-                duration: 8000
-                easing.type: Easing.Linear
-            }
+    // Battery icon - Material Design icons already show level visually
+    Text {
+        text: BatteryService.getBatteryIcon()
+        font.family: Theme.iconFont
+        font.pixelSize: Theme.iconSize
+        color: {
+            if (!BatteryService.batteryAvailable) return Theme.surfaceText
+            if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
+            if (BatteryService.isCharging) return Theme.primary
+            return Theme.surfaceText
         }
+        anchors.centerIn: parent
         
-        // Battery percentage
-        Text {
-            text: BatteryService.batteryLevel + "%"
-            font.pixelSize: Theme.fontSizeSmall
-            color: {
-                if (!BatteryService.batteryAvailable) return Theme.surfaceText
-                if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
-                if (BatteryService.isCharging) return Theme.primary
-                return Theme.surfaceText
-            }
-            font.weight: Font.Medium
-            anchors.verticalCenter: parent.verticalCenter
-            visible: BatteryService.batteryAvailable
+        // Subtle pulse animation for charging
+        SequentialAnimation on opacity {
+            running: BatteryService.isCharging
+            loops: Animation.Infinite
+            NumberAnimation { to: 0.6; duration: 1000; easing.type: Easing.InOutQuad }
+            NumberAnimation { to: 1.0; duration: 1000; easing.type: Easing.InOutQuad }
         }
     }
     
