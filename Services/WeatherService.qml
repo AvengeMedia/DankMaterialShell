@@ -21,6 +21,62 @@ Singleton {
         pressure: 0
     })
     
+    // Weather icon mapping (based on wttr.in weather codes)
+    property var weatherIcons: ({
+        "113": "clear_day",
+        "116": "partly_cloudy_day", 
+        "119": "cloud",
+        "122": "cloud",
+        "143": "foggy",
+        "176": "rainy",
+        "179": "rainy",
+        "182": "rainy",
+        "185": "rainy",
+        "200": "thunderstorm",
+        "227": "cloudy_snowing",
+        "230": "snowing_heavy",
+        "248": "foggy",
+        "260": "foggy",
+        "263": "rainy",
+        "266": "rainy",
+        "281": "rainy",
+        "284": "rainy",
+        "293": "rainy",
+        "296": "rainy",
+        "299": "rainy",
+        "302": "weather_hail",
+        "305": "rainy",
+        "308": "weather_hail",
+        "311": "rainy",
+        "314": "rainy",
+        "317": "rainy",
+        "320": "cloudy_snowing",
+        "323": "cloudy_snowing",
+        "326": "cloudy_snowing",
+        "329": "snowing_heavy",
+        "332": "snowing_heavy",
+        "335": "snowing_heavy",
+        "338": "snowing_heavy",
+        "350": "rainy",
+        "353": "rainy",
+        "356": "weather_hail",
+        "359": "weather_hail",
+        "362": "rainy",
+        "365": "weather_hail",
+        "368": "cloudy_snowing",
+        "371": "snowing_heavy",
+        "374": "weather_hail",
+        "377": "weather_hail",
+        "386": "thunderstorm",
+        "389": "thunderstorm",
+        "392": "snowing_heavy",
+        "395": "snowing_heavy"
+    })
+    
+    function getWeatherIcon(code) {
+        return weatherIcons[code] || "cloud"
+    }
+    
     Process {
         id: weatherFetcher
         command: ["bash", "-c", "curl -s 'wttr.in/?format=j1' | jq '{current: .current_condition[0], location: .nearest_area[0], astronomy: .weather[0].astronomy[0]}'"]

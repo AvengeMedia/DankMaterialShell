@@ -384,7 +384,7 @@ PanelWindow {
                         
                         // Weather icon when no media but weather available
                         Text {
-                            text: root.weatherIcons[root.weather.wCode] || "clear_day"
+                            text: WeatherService.getWeatherIcon(root.weather.wCode)
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize - 2
                             color: Theme.surfaceText
@@ -700,6 +700,11 @@ PanelWindow {
                             easing.type: Theme.standardEasing
                         }
                     }
+                }
+                
+                // Battery Widget
+                BatteryWidget {
+                    anchors.verticalCenter: parent.verticalCenter
                 }
                 
                 // Control Center Indicators

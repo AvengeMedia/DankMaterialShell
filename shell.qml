@@ -33,6 +33,7 @@ ShellRoot {
     property MprisPlayer activePlayer: MprisController.activePlayer
     property bool hasActiveMedia: activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist)
     property bool controlCenterVisible: false
+    property bool batteryPopupVisible: false
     
     // Network properties from NetworkService
     property string networkStatus: NetworkService.networkStatus
@@ -67,6 +68,65 @@ ShellRoot {
     property string wifiConnectionStatus: ""
     property bool wifiAutoRefreshEnabled: false
     
+    // Notification action handling - ALWAYS invoke action if exists
+    function handleNotificationClick(notifObj) {
+        console.log("Handling notification click for:", notifObj.appName)
+        
+        // ALWAYS try to invoke the action first (this is what real notifications do)
+        if (notifObj.notification && notifObj.actions && notifObj.actions.length > 0) {
+            // Look for "default" action first, then fallback to first action
+            let defaultAction = notifObj.actions.find(action => action.identifier === "default") || notifObj.actions[0]
+            if (defaultAction) {
+                console.log("Invoking notification action:", defaultAction.text, "identifier:", defaultAction.identifier)
+                attemptInvokeAction(notifObj.id, defaultAction.identifier)
+                return
+            }
+        }
+        
+        // If no action exists, check for URLs in notification text
+        let notificationText = (notifObj.summary || "") + " " + (notifObj.body || "")
+        let urlRegex = /(https?:\/\/[^\s]+)/g
+        let urls = notificationText.match(urlRegex)
+        
+        if (urls && urls.length > 0) {
+            console.log("Opening URL from notification:", urls[0])
+            Qt.openUrlExternally(urls[0])
+            return
+        }
+        
+        console.log("No action or URL found, notification will just dismiss")
+    }
+    
+    // Helper function to invoke notification actions (based on EXAMPLE)
+    function attemptInvokeAction(notifId, actionIdentifier) {
+        console.log("Attempting to invoke action:", actionIdentifier, "for notification:", notifId)
+        
+        // Find the notification in the server's tracked notifications
+        let trackedNotifications = notificationServer.trackedNotifications.values
+        let serverNotification = trackedNotifications.find(notif => notif.id === notifId)
+        
+        if (serverNotification) {
+            let action = serverNotification.actions.find(action => action.identifier === actionIdentifier)
+            if (action) {
+                console.log("Invoking action:", action.text)
+                action.invoke()
+            } else {
+                console.warn("Action not found:", actionIdentifier)
+            }
+        } else {
+            console.warn("Notification not found in server:", notifId, "Available IDs:", trackedNotifications.map(n => n.id))
+            // Try to find by any available action
+            if (trackedNotifications.length > 0) {
+                let latestNotif = trackedNotifications[trackedNotifications.length - 1]
+                let action = latestNotif.actions.find(action => action.identifier === actionIdentifier)
+                if (action) {
+                    console.log("Using latest notification for action")
+                    action.invoke()
+                }
+            }
+        }
+    }
+    
     // Screen size breakpoints for responsive design
     property real screenWidth: Screen.width
     property bool isSmallScreen: screenWidth < 1200
@@ -79,57 +139,6 @@ ShellRoot {
     // Weather configuration
     property bool useFahrenheit: true  // Default to Fahrenheit
     
-    // Weather icon mapping (based on wttr.in weather codes)
-    property var weatherIcons: ({
-        "113": "clear_day",
-        "116": "partly_cloudy_day", 
-        "119": "cloud",
-        "122": "cloud",
-        "143": "foggy",
-        "176": "rainy",
-        "179": "rainy",
-        "182": "rainy",
-        "185": "rainy",
-        "200": "thunderstorm",
-        "227": "cloudy_snowing",
-        "230": "snowing_heavy",
-        "248": "foggy",
-        "260": "foggy",
-        "263": "rainy",
-        "266": "rainy",
-        "281": "rainy",
-        "284": "rainy",
-        "293": "rainy",
-        "296": "rainy",
-        "299": "rainy",
-        "302": "weather_hail",
-        "305": "rainy",
-        "308": "weather_hail",
-        "311": "rainy",
-        "314": "rainy",
-        "317": "rainy",
-        "320": "cloudy_snowing",
-        "323": "cloudy_snowing",
-        "326": "cloudy_snowing",
-        "329": "snowing_heavy",
-        "332": "snowing_heavy",
-        "335": "snowing_heavy",
-        "338": "snowing_heavy",
-        "350": "rainy",
-        "353": "rainy",
-        "356": "weather_hail",
-        "359": "weather_hail",
-        "362": "rainy",
-        "365": "weather_hail",
-        "368": "cloudy_snowing",
-        "371": "snowing_heavy",
-        "374": "weather_hail",
-        "377": "weather_hail",
-        "386": "thunderstorm",
-        "389": "thunderstorm",
-        "392": "snowing_heavy",
-        "395": "snowing_heavy"
-    })
     
     // WiFi Auto-refresh Timer
     Timer {
@@ -172,7 +181,10 @@ ShellRoot {
             
             console.log("New notification from:", notification.appName || "Unknown", "Summary:", notification.summary || "No summary")
             
-            // Create notification object with correct properties
+            // CRITICAL: Mark notification as tracked so it stays in server list for actions
+            notification.tracked = true
+            
+            // Create notification object with correct properties (based on EXAMPLE)
             var notifObj = {
                 "id": notification.id,
                 "appName": notification.appName || "App",
@@ -181,7 +193,13 @@ ShellRoot {
                 "timestamp": new Date(),
                 "appIcon": notification.appIcon || notification.icon || "",
                 "icon": notification.icon || "",
-                "image": notification.image || ""
+                "image": notification.image || "",
+                "actions": notification.actions ? notification.actions.map(action => ({
+                    "identifier": action.identifier,
+                    "text": action.text
+                })) : [],
+                "urgency": notification.urgency ? notification.urgency.toString() : "normal",
+                "notification": notification  // Keep reference for action handling
             }
             
             // Add to history (prepend to show newest first)
@@ -237,6 +255,10 @@ ShellRoot {
     NotificationHistoryPopup {}
     ControlCenterPopup {}
     WifiPasswordDialog {}
+    InputDialog {
+        id: globalInputDialog
+    }
+    BatteryControlPopup {}
     
     // Application and clipboard components
     AppLauncher {

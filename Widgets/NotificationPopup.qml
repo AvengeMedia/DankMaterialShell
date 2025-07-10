@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import "../Common"
+import "../Common/Utilities.js" as Utils
 
 PanelWindow {
     id: notificationPopup
@@ -36,8 +37,7 @@ PanelWindow {
         
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-        border.width: 1
+        border.width: 0  // Remove border completely
         
         opacity: root.showNotificationPopup ? 1.0 : 0.0
         
@@ -47,24 +47,58 @@ PanelWindow {
         
         MouseArea {
             anchors.fill: parent
-            onClicked: Utils.hideNotificationPopup()
+            anchors.rightMargin: 36  // Don't overlap with close button
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            
+            onClicked: {
+                console.log("Popup clicked!")
+                if (root.activeNotification) {
+                    root.handleNotificationClick(root.activeNotification)
+                    // Remove notification from history entirely
+                    for (let i = 0; i < notificationHistory.count; i++) {
+                        if (notificationHistory.get(i).id === root.activeNotification.id) {
+                            notificationHistory.remove(i)
+                            break
+                        }
+                    }
+                }
+                // Always hide popup after click
+                Utils.hideNotificationPopup()
+            }
         }
         
-        // Close button with cursor pointer
-        Text {
+        // Close button with hover styling
+        Rectangle {
+            width: 28
+            height: 28
+            radius: 14
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.margins: 8
-            text: "×"
-            font.pixelSize: 16
-            color: Theme.surfaceText
+            color: closeButtonArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) : "transparent"
+            
+            Text {
+                anchors.centerIn: parent
+                text: "close"
+                font.family: Theme.iconFont
+                font.pixelSize: 16
+                color: closeButtonArea.containsMouse ? Theme.error : Theme.surfaceText
+            }
             
             MouseArea {
+                id: closeButtonArea
                 anchors.fill: parent
-                anchors.margins: -4
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: Utils.hideNotificationPopup()
+            }
+            
+            Behavior on color {
+                ColorAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
+                }
             }
         }
         
@@ -75,81 +109,89 @@ PanelWindow {
             anchors.rightMargin: 32
             spacing: 12
             
-            // Notification icon using reference pattern
+            // Notification icon based on EXAMPLE NotificationAppIcon pattern
             Rectangle {
-                width: 40
-                height: 40
-                radius: 8
-                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                width: 48
+                height: 48
+                radius: width / 2  // Fully rounded like EXAMPLE
+                color: Theme.primaryContainer
                 anchors.verticalCenter: parent.verticalCenter
                 
-                // Fallback material icon when no app icon
+                // Material icon fallback (when no app icon)
                 Loader {
-                    active: !root.activeNotification || root.activeNotification.appIcon === ""
+                    active: !root.activeNotification || !root.activeNotification.appIcon || root.activeNotification.appIcon === ""
                     anchors.fill: parent
                     sourceComponent: Text {
                         anchors.centerIn: parent
                         text: "notifications"
                         font.family: Theme.iconFont
                         font.pixelSize: 20
-                        color: Theme.primary
+                        color: Theme.primaryText
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
                 
-                // App icon when no notification image
+                // App icon (when no notification image)
                 Loader {
-                    active: root.activeNotification && root.activeNotification.appIcon !== "" && (root.activeNotification.image === "" || !root.activeNotification.image)
-                    anchors.fill: parent
-                    anchors.margins: 4
+                    active: root.activeNotification && root.activeNotification.appIcon !== "" && (!root.activeNotification.image || root.activeNotification.image === "")
+                    anchors.centerIn: parent
                     sourceComponent: IconImage {
-                        anchors.fill: parent
+                        width: 32
+                        height: 32
                         asynchronous: true
                         source: {
-                            if (!root.activeNotification) return ""
-                            let iconPath = root.activeNotification.appIcon
-                            // Skip file:// URLs as they're usually screenshots/images, not icons
-                            if (iconPath && iconPath.startsWith("file://")) return ""
-                            return iconPath ? Quickshell.iconPath(iconPath, "image-missing") : ""
+                            if (!root.activeNotification || !root.activeNotification.appIcon) return ""
+                            let appIcon = root.activeNotification.appIcon
+                            // Handle file:// URLs directly
+                            if (appIcon.startsWith("file://") || appIcon.startsWith("/")) {
+                                return appIcon
+                            }
+                            // Otherwise treat as icon name
+                            return Quickshell.iconPath(appIcon, "image-missing")
                         }
                     }
                 }
                 
-                // Notification image with rounded corners
+                // Notification image (like Discord user avatar) - PRIORITY
                 Loader {
                     active: root.activeNotification && root.activeNotification.image !== ""
                     anchors.fill: parent
                     sourceComponent: Item {
                         anchors.fill: parent
-                        clip: true
                         
-                        Rectangle {
+                        Image {
+                            id: notifImage
                             anchors.fill: parent
-                            radius: 8
-                            color: "transparent"
-                            clip: true
+                            readonly property int size: parent.width
                             
-                            Image {
-                                id: notifImage
-                                anchors.fill: parent
-                                source: root.activeNotification ? root.activeNotification.image : ""
-                                fillMode: Image.PreserveAspectCrop
-                                cache: false
-                                antialiasing: true
-                                asynchronous: true
-                                smooth: true
-                                
-                                // Ensure minimum size and proper scaling
-                                sourceSize.width: 64
-                                sourceSize.height: 64
-                                
-                                onStatusChanged: {
-                                    if (status === Image.Error) {
-                                        console.warn("Failed to load notification image:", source)
-                                    } else if (status === Image.Ready) {
-                                        console.log("Notification image loaded:", source, "size:", sourceSize)
-                                    }
+                            source: root.activeNotification ? root.activeNotification.image : ""
+                            fillMode: Image.PreserveAspectCrop
+                            cache: false
+                            antialiasing: true
+                            asynchronous: true
+                            smooth: true
+                            
+                            // Proper sizing like EXAMPLE
+                            width: size
+                            height: size
+                            sourceSize.width: size
+                            sourceSize.height: size
+                            
+                            layer.enabled: true
+                            layer.effect: OpacityMask {
+                                maskSource: Rectangle {
+                                    width: notifImage.size
+                                    height: notifImage.size
+                                    radius: notifImage.size / 2  // Fully rounded
+                                }
+                            }
+                            
+                            onStatusChanged: {
+                                if (status === Image.Error) {
+                                    console.warn("Failed to load notification image:", source)
+                                } else if (status === Image.Ready) {
+                                    console.log("Notification image loaded:", source, "size:", sourceSize.width + "x" + sourceSize.height)
                                 }
                             }
                         }
@@ -159,12 +201,18 @@ PanelWindow {
                             active: root.activeNotification && root.activeNotification.appIcon !== ""
                             anchors.bottom: parent.bottom
                             anchors.right: parent.right
-                            anchors.margins: 2
                             sourceComponent: IconImage {
                                 width: 16
                                 height: 16
                                 asynchronous: true
-                                source: root.activeNotification ? Quickshell.iconPath(root.activeNotification.appIcon, "image-missing") : ""
+                                source: {
+                                    if (!root.activeNotification || !root.activeNotification.appIcon) return ""
+                                    let appIcon = root.activeNotification.appIcon
+                                    if (appIcon.startsWith("file://") || appIcon.startsWith("/")) {
+                                        return appIcon
+                                    }
+                                    return Quickshell.iconPath(appIcon, "image-missing")
+                                }
                             }
                         }
                     }
@@ -173,7 +221,7 @@ PanelWindow {
             
             // Text content
             Column {
-                width: parent.width - 52
+                width: parent.width - 68
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 4
                 

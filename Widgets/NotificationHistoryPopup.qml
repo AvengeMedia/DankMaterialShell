@@ -159,69 +159,88 @@ PanelWindow {
                             anchors.margins: Theme.spacingM
                             spacing: Theme.spacingM
                             
-                            // Notification icon using reference pattern
+                            // Notification icon based on EXAMPLE NotificationAppIcon pattern
                             Rectangle {
-                                width: 32
-                                height: 32
-                                radius: Theme.cornerRadius
-                                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                                width: 48
+                                height: 48
+                                radius: width / 2  // Fully rounded like EXAMPLE
+                                color: Theme.primaryContainer
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                // Fallback material icon when no app icon
+                                // Material icon fallback (when no app icon)
                                 Loader {
                                     active: !model.appIcon || model.appIcon === ""
                                     anchors.fill: parent
                                     sourceComponent: Text {
                                         anchors.centerIn: parent
-                                        text: model.appName ? model.appName.charAt(0).toUpperCase() : "notifications"
-                                        font.family: model.appName ? "Roboto" : Theme.iconFont
-                                        font.pixelSize: model.appName ? Theme.fontSizeMedium : 16
-                                        color: Theme.primary
-                                        font.weight: Font.Medium
+                                        text: "notifications"
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: 20
+                                        color: Theme.primaryText
                                         horizontalAlignment: Text.AlignHCenter
                                         verticalAlignment: Text.AlignVCenter
                                     }
                                 }
                                 
-                                // App icon when no notification image
+                                // App icon (when no notification image)
                                 Loader {
                                     active: model.appIcon && model.appIcon !== "" && (!model.image || model.image === "")
-                                    anchors.fill: parent
-                                    anchors.margins: 3
+                                    anchors.centerIn: parent
                                     sourceComponent: IconImage {
-                                        anchors.fill: parent
-                                        anchors.margins: 4
+                                        width: 32
+                                        height: 32
                                         asynchronous: true
                                         source: {
                                             if (!model.appIcon) return ""
-                                            // Skip file:// URLs as they're usually screenshots/images, not icons
-                                            if (model.appIcon.startsWith("file://")) return ""
+                                            // Handle file:// URLs directly
+                                            if (model.appIcon.startsWith("file://") || model.appIcon.startsWith("/")) {
+                                                return model.appIcon
+                                            }
+                                            // Otherwise treat as icon name
                                             return Quickshell.iconPath(model.appIcon, "image-missing")
                                         }
                                     }
                                 }
                                 
-                                // Notification image with rounded corners
+                                // Notification image (like Discord user avatar) - PRIORITY
                                 Loader {
                                     active: model.image && model.image !== ""
                                     anchors.fill: parent
                                     sourceComponent: Item {
                                         anchors.fill: parent
+                                        
                                         Image {
                                             id: historyNotifImage
                                             anchors.fill: parent
+                                            readonly property int size: parent.width
+                                            
                                             source: model.image || ""
                                             fillMode: Image.PreserveAspectCrop
                                             cache: false
                                             antialiasing: true
                                             asynchronous: true
+                                            smooth: true
+                                            
+                                            // Proper sizing like EXAMPLE
+                                            width: size
+                                            height: size
+                                            sourceSize.width: size
+                                            sourceSize.height: size
                                             
                                             layer.enabled: true
                                             layer.effect: OpacityMask {
                                                 maskSource: Rectangle {
-                                                    width: historyNotifImage.width
-                                                    height: historyNotifImage.height
-                                                    radius: Theme.cornerRadius
+                                                    width: historyNotifImage.size
+                                                    height: historyNotifImage.size
+                                                    radius: historyNotifImage.size / 2  // Fully rounded
+                                                }
+                                            }
+                                            
+                                            onStatusChanged: {
+                                                if (status === Image.Error) {
+                                                    console.warn("Failed to load notification image:", source)
+                                                } else if (status === Image.Ready) {
+                                                    console.log("Notification image loaded:", source, "size:", sourceSize.width + "x" + sourceSize.height)
                                                 }
                                             }
                                         }
@@ -231,12 +250,17 @@ PanelWindow {
                                             active: model.appIcon && model.appIcon !== ""
                                             anchors.bottom: parent.bottom
                                             anchors.right: parent.right
-                                            anchors.margins: 2
                                             sourceComponent: IconImage {
-                                                width: 12
-                                                height: 12
+                                                width: 16
+                                                height: 16
                                                 asynchronous: true
-                                                source: model.appIcon ? Quickshell.iconPath(model.appIcon, "image-missing") : ""
+                                                source: {
+                                                    if (!model.appIcon) return ""
+                                                    if (model.appIcon.startsWith("file://") || model.appIcon.startsWith("/")) {
+                                                        return model.appIcon
+                                                    }
+                                                    return Quickshell.iconPath(model.appIcon, "image-missing")
+                                                }
                                             }
                                         }
                                     }
@@ -286,6 +310,11 @@ PanelWindow {
                             cursorShape: Qt.PointingHandCursor
                             
                             onClicked: {
+                                // Try to handle notification click if it has actions
+                                if (model && root.handleNotificationClick) {
+                                    root.handleNotificationClick(model)
+                                }
+                                // Remove from history after handling
                                 notificationHistory.remove(index)
                             }
                         }
@@ -300,10 +329,9 @@ PanelWindow {
                 }
                 
                 // Empty state - properly centered
-                Rectangle {
+                Item {
                     anchors.fill: parent
                     visible: notificationHistory.count === 0
-                    color: "transparent"
                     
                     Column {
                         anchors.centerIn: parent

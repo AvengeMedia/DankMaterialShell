@@ -16,3 +16,6 @@ WifiPasswordDialog 1.0 WifiPasswordDialog.qml
 AppLauncher 1.0 AppLauncher.qml
 ClipboardHistory 1.0 ClipboardHistory.qml
 CustomSlider 1.0 CustomSlider.qml
+InputDialog 1.0 InputDialog.qml
+BatteryWidget 1.0 BatteryWidget.qml
+BatteryControlPopup 1.0 BatteryControlPopup.qml

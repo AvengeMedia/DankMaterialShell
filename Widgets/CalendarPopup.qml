@@ -6,6 +6,7 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Services.Mpris
 import "../Common"
+import "../Services"
 
 PanelWindow {
     id: calendarPopup
@@ -285,7 +286,7 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         
                         Text {
-                            text: root.weatherIcons[root.weather.wCode] || "clear_day"
+                            text: WeatherService.getWeatherIcon(root.weather.wCode)
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize + 4
                             color: Theme.primary
