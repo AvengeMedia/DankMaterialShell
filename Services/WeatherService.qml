@@ -1,11 +1,11 @@
-pragma Singleton
-
 import QtQuick
 import Quickshell
 import Quickshell.Io
+pragma Singleton
+pragma ComponentBehavior: Bound
 
-QtObject {
-    id: weatherService
+Singleton {
+    id: root
     
     property var weather: ({
         available: false,
@@ -32,7 +32,7 @@ QtObject {
                     try {
                         let parsedData = JSON.parse(text.trim())
                         if (parsedData.current && parsedData.location) {
-                            weatherService.weather = {
+                            root.weather = {
                                 available: true,
                                 temp: parseInt(parsedData.current.temp_C || 0),
                                 tempF: parseInt(parsedData.current.temp_F || 0),
@@ -45,15 +45,15 @@ QtObject {
                                 uv: parseInt(parsedData.current.uvIndex || 0),
                                 pressure: parseInt(parsedData.current.pressure || 0)
                             }
-                            console.log("Weather updated:", weatherService.weather.city, weatherService.weather.temp + "°C")
+                            console.log("Weather updated:", root.weather.city, root.weather.temp + "°C")
                         }
                     } catch (e) {
                         console.warn("Failed to parse weather data:", e.message)
-                        weatherService.weather.available = false
+                        root.weather.available = false
                     }
                 } else {
                     console.warn("No valid weather data received")
-                    weatherService.weather.available = false
+                    root.weather.available = false
                 }
             }
         }
@@ -61,7 +61,7 @@ QtObject {
         onExited: (exitCode) => {
             if (exitCode !== 0) {
                 console.warn("Weather fetch failed with exit code:", exitCode)
-                weatherService.weather.available = false
+                root.weather.available = false
             }
         }
     }

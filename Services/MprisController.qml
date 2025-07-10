@@ -1,11 +1,10 @@
-pragma Singleton
-pragma ComponentBehavior: Bound
-
-import QtQml.Models
 import QtQuick
+import QtQml.Models
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
+pragma Singleton
+pragma ComponentBehavior: Bound
 
 /**
  * A service that provides easy access to the active Mpris player.

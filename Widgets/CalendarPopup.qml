@@ -1,0 +1,562 @@
+import QtQuick
+import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
+import Quickshell
+import Quickshell.Widgets
+import Quickshell.Wayland
+import Quickshell.Services.Mpris
+import "../Common"
+
+PanelWindow {
+    id: calendarPopup
+    
+    visible: root.calendarVisible
+    
+    implicitWidth: 320
+    implicitHeight: 400
+    
+    WlrLayershell.layer: WlrLayershell.Overlay
+    WlrLayershell.exclusiveZone: -1
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    
+    color: "transparent"
+    
+    anchors {
+        top: true
+        left: true
+        right: true
+        bottom: true
+    }
+    
+    property date displayDate: new Date()
+    property date selectedDate: new Date()
+    
+    Rectangle {
+        width: 400
+        height: root.hasActiveMedia ? 580 : (root.weather.available ? 480 : 400)
+        x: (parent.width - width) / 2
+        y: Theme.barHeight + Theme.spacingS
+        color: Theme.surfaceContainer
+        radius: Theme.cornerRadiusLarge
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.width: 1
+        
+        opacity: root.calendarVisible ? 1.0 : 0.0
+        scale: root.calendarVisible ? 1.0 : 0.85
+        
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
+        }
+        
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
+        }
+        
+        Column {
+            anchors.fill: parent
+            anchors.margins: Theme.spacingL
+            spacing: Theme.spacingM
+            
+            // Media Player (when active)
+            Rectangle {
+                visible: root.hasActiveMedia
+                width: parent.width
+                height: 180
+                radius: Theme.cornerRadius
+                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                border.width: 1
+                
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingM
+                    spacing: Theme.spacingS
+                    
+                    Row {
+                        width: parent.width
+                        height: 100
+                        spacing: Theme.spacingM
+                        
+                        Rectangle {
+                            width: 100
+                            height: 100
+                            radius: Theme.cornerRadius
+                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                            
+                            Item {
+                                anchors.fill: parent
+                                clip: true
+                                
+                                Image {
+                                    anchors.fill: parent
+                                    source: root.activePlayer?.trackArtUrl || ""
+                                    fillMode: Image.PreserveAspectCrop
+                                    smooth: true
+                                }
+                                
+                                Rectangle {
+                                    anchors.fill: parent
+                                    visible: parent.children[0].status !== Image.Ready
+                                    color: "transparent"
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "album"
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: 48
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+                            }
+                        }
+                        
+                        Column {
+                            width: parent.width - 100 - Theme.spacingM
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Text {
+                                text: root.activePlayer?.trackTitle || "Unknown Track"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Bold
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: root.activePlayer?.trackArtist || "Unknown Artist"
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: root.activePlayer?.trackAlbum || ""
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                                width: parent.width
+                                elide: Text.ElideRight
+                                visible: text.length > 0
+                            }
+                        }
+                    }
+                    
+                    // Progress bar
+                    Rectangle {
+                        width: parent.width
+                        height: 6
+                        radius: 3
+                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                        
+                        Rectangle {
+                            width: parent.width * (root.activePlayer?.position / Math.max(root.activePlayer?.length || 1, 1))
+                            height: parent.height
+                            radius: parent.radius
+                            color: Theme.primary
+                            
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: 200
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
+                        }
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            
+                            onClicked: (mouse) => {
+                                if (root.activePlayer && root.activePlayer.length > 0) {
+                                    const ratio = mouse.x / width
+                                    const newPosition = ratio * root.activePlayer.length
+                                    console.log("Seeking to position:", newPosition, "ratio:", ratio, "canSeek:", root.activePlayer.canSeek)
+                                    if (root.activePlayer.canSeek) {
+                                        root.activePlayer.position = newPosition
+                                    } else {
+                                        console.log("Player does not support seeking")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Control buttons
+                    Row {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.spacingL
+                        
+                        Rectangle {
+                            width: 36
+                            height: 36
+                            radius: 18
+                            color: prevBtnAreaCal.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12) : "transparent"
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "skip_previous"
+                                font.family: Theme.iconFont
+                                font.pixelSize: 20
+                                color: Theme.surfaceText
+                            }
+                            
+                            MouseArea {
+                                id: prevBtnAreaCal
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.activePlayer?.previous()
+                            }
+                        }
+                        
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 20
+                            color: Theme.primary
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: root.activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
+                                font.family: Theme.iconFont
+                                font.pixelSize: 24
+                                color: Theme.background
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.activePlayer?.togglePlaying()
+                            }
+                        }
+                        
+                        Rectangle {
+                            width: 36
+                            height: 36
+                            radius: 18
+                            color: nextBtnAreaCal.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12) : "transparent"
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "skip_next"
+                                font.family: Theme.iconFont
+                                font.pixelSize: 20
+                                color: Theme.surfaceText
+                            }
+                            
+                            MouseArea {
+                                id: nextBtnAreaCal
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.activePlayer?.next()
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Weather header (when available and no media)
+            Rectangle {
+                visible: root.weather.available && !root.hasActiveMedia
+                width: parent.width
+                height: 80
+                radius: Theme.cornerRadius
+                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                border.width: 1
+                
+                Row {
+                    anchors.centerIn: parent
+                    spacing: Theme.spacingL
+                    
+                    // Weather icon and temp
+                    Column {
+                        spacing: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Text {
+                            text: root.weatherIcons[root.weather.wCode] || "clear_day"
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize + 4
+                            color: Theme.primary
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        Text {
+                            text: (root.useFahrenheit ? root.weather.tempF : root.weather.temp) + "°" + (root.useFahrenheit ? "F" : "C")
+                            font.pixelSize: Theme.fontSizeLarge
+                            color: Theme.surfaceText
+                            font.weight: Font.Bold
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.useFahrenheit = !root.useFahrenheit
+                            }
+                        }
+                        
+                        Text {
+                            text: root.weather.city
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    // Weather details grid
+                    Grid {
+                        columns: 2
+                        spacing: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Row {
+                            spacing: Theme.spacingXS
+                            Text {
+                                text: "humidity_low"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: root.weather.humidity + "%"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                        
+                        Row {
+                            spacing: Theme.spacingXS
+                            Text {
+                                text: "air"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: root.weather.wind
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                        
+                        Row {
+                            spacing: Theme.spacingXS
+                            Text {
+                                text: "wb_twilight"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: root.weather.sunrise
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                        
+                        Row {
+                            spacing: Theme.spacingXS
+                            Text {
+                                text: "bedtime"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: root.weather.sunset
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Row {
+                width: parent.width
+                height: 40
+                
+                Rectangle {
+                    width: 40
+                    height: 40
+                    radius: Theme.cornerRadius
+                    color: prevMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "chevron_left"
+                        font.family: Theme.iconFont
+                        font.pixelSize: Theme.iconSize
+                        color: Theme.primary
+                        font.weight: Theme.iconFontWeight
+                    }
+                    
+                    MouseArea {
+                        id: prevMonthArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        
+                        onClicked: {
+                            let newDate = new Date(calendarPopup.displayDate)
+                            newDate.setMonth(newDate.getMonth() - 1)
+                            calendarPopup.displayDate = newDate
+                        }
+                    }
+                }
+                
+                Text {
+                    width: parent.width - 80
+                    height: 40
+                    text: Qt.formatDate(calendarPopup.displayDate, "MMMM yyyy")
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.surfaceText
+                    font.weight: Font.Medium
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+                
+                Rectangle {
+                    width: 40
+                    height: 40
+                    radius: Theme.cornerRadius
+                    color: nextMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "chevron_right"
+                        font.family: Theme.iconFont
+                        font.pixelSize: Theme.iconSize
+                        color: Theme.primary
+                        font.weight: Theme.iconFontWeight
+                    }
+                    
+                    MouseArea {
+                        id: nextMonthArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        
+                        onClicked: {
+                            let newDate = new Date(calendarPopup.displayDate)
+                            newDate.setMonth(newDate.getMonth() + 1)
+                            calendarPopup.displayDate = newDate
+                        }
+                    }
+                }
+            }
+            
+            Row {
+                width: parent.width
+                height: 32
+                
+                Repeater {
+                    model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                    
+                    Rectangle {
+                        width: parent.width / 7
+                        height: 32
+                        color: "transparent"
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                            font.weight: Font.Medium
+                        }
+                    }
+                }
+            }
+            
+            Grid {
+                width: parent.width
+                height: root.hasActiveMedia ? parent.height - 300 : (root.weather.available ? parent.height - 200 : parent.height - 120)
+                columns: 7
+                rows: 6
+                
+                property date firstDay: {
+                    let date = new Date(calendarPopup.displayDate.getFullYear(), calendarPopup.displayDate.getMonth(), 1)
+                    let dayOfWeek = date.getDay()
+                    date.setDate(date.getDate() - dayOfWeek)
+                    return date
+                }
+                
+                Repeater {
+                    model: 42
+                    
+                    Rectangle {
+                        width: parent.width / 7
+                        height: parent.height / 6
+                        
+                        property date dayDate: {
+                            let date = new Date(parent.firstDay)
+                            date.setDate(date.getDate() + index)
+                            return date
+                        }
+                        
+                        property bool isCurrentMonth: dayDate.getMonth() === calendarPopup.displayDate.getMonth()
+                        property bool isToday: dayDate.toDateString() === new Date().toDateString()
+                        property bool isSelected: dayDate.toDateString() === calendarPopup.selectedDate.toDateString()
+                        
+                        color: isSelected ? Theme.primary :
+                               isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
+                               dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                        
+                        radius: Theme.cornerRadiusSmall
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: dayDate.getDate()
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: isSelected ? Theme.surface :
+                                   isToday ? Theme.primary :
+                                   isCurrentMonth ? Theme.surfaceText : 
+                                   Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            font.weight: isToday || isSelected ? Font.Medium : Font.Normal
+                        }
+                        
+                        MouseArea {
+                            id: dayArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            
+                            onClicked: {
+                                calendarPopup.selectedDate = dayDate
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    MouseArea {
+        anchors.fill: parent
+        z: -1
+        onClicked: {
+            root.calendarVisible = false
+        }
+    }
+}

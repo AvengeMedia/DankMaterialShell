@@ -1,0 +1,4 @@
+module Common
+
+singleton Theme 1.0 Theme.qml
+Utilities 1.0 Utilities.js

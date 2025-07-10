@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
+import "../Common"
 
 PanelWindow {
     id: clipboardHistory
@@ -563,7 +564,6 @@ PanelWindow {
                 if (line.trim()) {
                     clipboardHistory.clipboardEntries.push(line)
                     clipboardModel.append({"entry": line})
-                    console.log("ClipboardHistory: Adding entry:", line.substring(0, 50) + "...")
                 }
             }
         }
@@ -576,7 +576,6 @@ PanelWindow {
         
         onExited: (exitCode) => {
             if (exitCode === 0) {
-                console.log("ClipboardHistory: Loaded", clipboardModel.count, "entries")
                 updateFilteredModel()
             } else {
                 console.warn("ClipboardHistory: Failed to load clipboard history")
