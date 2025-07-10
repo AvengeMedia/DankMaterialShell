@@ -215,18 +215,28 @@ ShellRoot {
         "395": "snowing"
     })
 
-    // Top bar
-    PanelWindow {
-        id: topBar
-        
-        anchors {
-            top: true
-            left: true
-            right: true
-        }
-        
-        implicitHeight: theme.barHeight
-        color: "transparent"
+    // Top bar - one instance per screen
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            id: topBar
+            
+            // modelData contains the screen from Quickshell.screens
+            property var modelData
+            screen: modelData
+            
+            // Get the screen name (e.g., "DP-1", "DP-2")
+            property string screenName: modelData.name
+            
+            anchors {
+                top: true
+                left: true
+                right: true
+            }
+            
+            implicitHeight: theme.barHeight
+            color: "transparent"
         
         Rectangle {
             anchors.fill: parent
@@ -341,11 +351,10 @@ ShellRoot {
                         command: ["niri", "msg", "workspaces"]
                         running: true
                         
-                        stdout: SplitParser {
-                            splitMarker: "\n"
-                            onRead: (data) => {
-                                if (data.trim()) {
-                                    workspaceSwitcher.parseWorkspaceOutput(data.trim())
+                        stdout: StdioCollector {
+                            onStreamFinished: {
+                                if (text && text.trim()) {
+                                    workspaceSwitcher.parseWorkspaceOutput(text.trim())
                                 }
                             }
                         }
@@ -357,6 +366,7 @@ ShellRoot {
                         let focusedOutput = ""
                         let focusedWorkspace = 1
                         let outputWorkspaces = {}
+                        
                         
                         for (const line of lines) {
                             if (line.startsWith('Output "')) {
@@ -386,12 +396,37 @@ ShellRoot {
                             }
                         }
                         
-                        currentWorkspace = focusedWorkspace
-                        
-                        if (focusedOutput && outputWorkspaces[focusedOutput]) {
-                            workspaceList = outputWorkspaces[focusedOutput]
+                        // Show workspaces for THIS screen only
+                        if (topBar.screenName && outputWorkspaces[topBar.screenName]) {
+                            workspaceList = outputWorkspaces[topBar.screenName]
+                            
+                            // Always track the active workspace for this display
+                            // Parse all lines to find which workspace is active on this display
+                            let thisDisplayActiveWorkspace = 1
+                            let inThisOutput = false
+                            
+                            for (const line of lines) {
+                                if (line.startsWith('Output "')) {
+                                    const outputMatch = line.match(/Output "(.+)"/)
+                                    inThisOutput = outputMatch && outputMatch[1] === topBar.screenName
+                                    continue
+                                }
+                                
+                                if (inThisOutput && line.trim() && line.match(/^\s*\*\s*(\d+)$/)) {
+                                    const wsMatch = line.match(/^\s*\*\s*(\d+)$/)
+                                    if (wsMatch) {
+                                        thisDisplayActiveWorkspace = parseInt(wsMatch[1])
+                                        break
+                                    }
+                                }
+                            }
+                            
+                            currentWorkspace = thisDisplayActiveWorkspace
+                            console.log("Monitor", topBar.screenName, "active workspace:", thisDisplayActiveWorkspace)
                         } else {
+                            // Fallback if screen name not found
                             workspaceList = [1, 2]
+                            currentWorkspace = 1
                         }
                     }
                     
@@ -444,12 +479,11 @@ ShellRoot {
                                     cursorShape: Qt.PointingHandCursor
                                     
                                     onClicked: {
-                                        switchProcess.command = ["niri", "msg", "action", "focus-workspace", modelData.toString()]
-                                        switchProcess.running = true
-                                        workspaceSwitcher.currentWorkspace = modelData
-                                        Qt.callLater(() => {
-                                            workspaceQuery.running = true
-                                        })
+                                        // Set target workspace and focus monitor first
+                                        console.log("Clicking workspace", modelData, "on monitor", topBar.screenName)
+                                        workspaceSwitcher.targetWorkspace = modelData
+                                        focusMonitorProcess.command = ["niri", "msg", "action", "focus-monitor", topBar.screenName]
+                                        focusMonitorProcess.running = true
                                     }
                                 }
                             }
@@ -459,7 +493,30 @@ ShellRoot {
                     Process {
                         id: switchProcess
                         running: false
+                        
+                        onExited: {
+                            // Update current workspace and refresh query
+                            workspaceSwitcher.currentWorkspace = workspaceSwitcher.targetWorkspace
+                            Qt.callLater(() => {
+                                workspaceQuery.running = true
+                            })
+                        }
                     }
+                    
+                    Process {
+                        id: focusMonitorProcess
+                        running: false
+                        
+                        onExited: {
+                            // After focusing the monitor, switch to the workspace
+                            Qt.callLater(() => {
+                                switchProcess.command = ["niri", "msg", "action", "focus-workspace", workspaceSwitcher.targetWorkspace.toString()]
+                                switchProcess.running = true
+                            })
+                        }
+                    }
+                    
+                    property int targetWorkspace: 1
                 }
             }
             
@@ -954,6 +1011,7 @@ ShellRoot {
             }
         }
     }
+    }  // End of Variants for topBar
     
     PanelWindow {
         id: calendarPopup
