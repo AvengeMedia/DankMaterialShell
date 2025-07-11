@@ -549,7 +549,7 @@ PanelWindow {
                                         root.currentTrayItem = trayItem
                                         
                                         // Simple positioning: right side of screen, below the panel
-                                        root.trayMenuX = rightSection.x + rightSection.width - 180 - Theme.spacingL
+                                        root.trayMenuX = rightSection.x + rightSection.width - 400 - Theme.spacingL
                                         root.trayMenuY = Theme.barHeight + Theme.spacingS
                                         
                                         console.log("Showing menu at:", root.trayMenuX, root.trayMenuY)
