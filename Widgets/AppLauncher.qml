@@ -263,10 +263,25 @@ PanelWindow {
             source: _iconName ? Quickshell.iconPath(_iconName, "") : ""
             smooth: true
             asynchronous: true
+            
             onStatusChanged: {
-                if (status === Image.Error || status === Image.Null || !source) {
+                // Image.Null = 0, Image.Ready = 1, Image.Loading = 2, Image.Error = 3
+                if (status === Image.Error || 
+                    status === Image.Null || 
+                    (!source && _iconName)) {
                     // defer the swap to avoid re‑entrancy in Loader
                     Qt.callLater(() => img.parent.sourceComponent = fallbackComponent)
+                }
+            }
+            
+            // Add timeout fallback for stuck loading icons
+            Timer {
+                interval: 3000  // 3 second timeout
+                running: img.status === Image.Loading
+                onTriggered: {
+                    if (img.status === Image.Loading) {
+                        Qt.callLater(() => img.parent.sourceComponent = fallbackComponent)
+                    }
                 }
             }
         }
