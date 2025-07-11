@@ -61,8 +61,8 @@ PanelWindow {
         }
         
         Column {
-            anchors.fill: parent
-            anchors.margins: Theme.spacingL
+            anchors.centerIn: parent
+            width: parent.width - Theme.spacingL * 2
             spacing: Theme.spacingL
             
             // Title

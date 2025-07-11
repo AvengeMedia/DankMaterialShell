@@ -2,15 +2,17 @@
 set -euo pipefail
 
 img=$1
+# Convert to absolute path to fix symlink issues
+img=$(realpath "$img")
 
 QS_DIR="$HOME/quickshell"
 mkdir -p "$QS_DIR"
 LINK="$QS_DIR/current_wallpaper"
+
 ln -sf -- "$img" "$LINK"
 swaybg -m fill -i "$LINK" & disown
 
 json="$(matugen image "$img" --json hex)"
-
 get() { jq -r "$1" <<<"$json"; }
 
 bg=$(get '.colors.dark.background')
@@ -34,27 +36,26 @@ inverse_b=$(get '.colors.light.inverse_primary')
 cat >"$QS_DIR/generated_niri_colors.kdl" <<EOF
 // AUTO-GENERATED on $(date)
 layout {
-    border {
-        active-color   "$primary"
-        inactive-color "$secondary"
-    }
-    focus-ring {
-        active-color   "$inverse"
-    }
-    background-color "$bg"
+    border {
+        active-color   "$primary"
+        inactive-color "$secondary"
+    }
+    focus-ring {
+        active-color   "$inverse"
+    }
+    background-color "$bg"
 }
 EOF
-echo "→ Niri colours:   $QS_DIR/generated_niri_colors.kdl"
+
+echo "→ Niri colours:   $QS_DIR/generated_niri_colors.kdl"
 
 cat >"$QS_DIR/generated_ghostty_colors.conf" <<EOF
 # AUTO-GENERATED on $(date)
-
 background = $bg
 foreground = $fg
 cursor-color = $inverse
 selection-background = $secondary
 selection-foreground = #ffffff
-
 palette = 0=$bg
 palette = 1=$error
 palette = 2=$tertiary
@@ -72,7 +73,8 @@ palette = 13=$tertiary_ctr_b
 palette = 14=$inverse_b
 palette = 15=$fg_b
 EOF
-echo "→ Ghostty theme:  $QS_DIR/generated_ghostty_colors.conf"
-echo "   (use in ghostty:  theme = $QS_DIR/generated_ghostty_colors.conf )"
+
+echo "→ Ghostty theme:  $QS_DIR/generated_ghostty_colors.conf"
+echo "   (use in ghostty:  theme = $QS_DIR/generated_ghostty_colors.conf )"
 
 niri msg action do-screen-transition --delay-ms 100

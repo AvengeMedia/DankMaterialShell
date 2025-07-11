@@ -1051,6 +1051,8 @@ PanelWindow {
                                             cursorShape: Qt.PointingHandCursor
                                             
                                             onClicked: {
+                                                console.log("Clicked audio device:", JSON.stringify(modelData))
+                                                console.log("Device name to set:", modelData.name)
                                                 AudioService.setAudioSink(modelData.name)
                                             }
                                         }

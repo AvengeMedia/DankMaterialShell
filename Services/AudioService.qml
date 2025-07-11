@@ -29,42 +29,66 @@ Singleton {
     
     Process {
         id: audioSinkLister
-        command: ["bash", "-c", "pactl list sinks | grep -E '^Sink #|device.description|Name:' | paste - - - | sed 's/Sink #//g' | sed 's/Name: //g' | sed 's/device.description = //g' | sed 's/\"//g'"]
+        command: ["pactl", "list", "sinks"]
         running: true
         
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text.trim()) {
+                    console.log("Parsing pactl sink output...")
                     let sinks = []
                     let lines = text.trim().split('\n')
                     
+                    let currentSink = null
+                    
                     for (let line of lines) {
-                        let parts = line.split('\t')
-                        if (parts.length >= 3) {
-                            let id = parts[0].trim()
-                            let name = parts[1].trim()
-                            let description = parts[2].trim()
-                            
-                            // Use description as display name if available, fallback to name processing
-                            let displayName = description
-                            if (!description || description === name) {
-                                if (name.includes("analog-stereo")) displayName = "Built-in Speakers"
-                                else if (name.includes("bluez")) displayName = "Bluetooth Audio"
-                                else if (name.includes("usb")) displayName = "USB Audio"
-                                else if (name.includes("hdmi")) displayName = "HDMI Audio"
-                                else if (name.includes("easyeffects")) displayName = "EasyEffects"
-                                else displayName = name
+                        line = line.trim()
+                        
+                        // New sink starts
+                        if (line.startsWith('Sink #')) {
+                            if (currentSink && currentSink.name && currentSink.id) {
+                                sinks.push(currentSink)
                             }
                             
-                            sinks.push({
-                                id: id,
-                                name: name,
-                                displayName: displayName,
-                                active: false // Will be determined by default sink
-                            })
+                            let sinkId = line.replace('Sink #', '').trim()
+                            currentSink = {
+                                id: sinkId,
+                                name: "",
+                                displayName: "",
+                                description: "",
+                                active: false
+                            }
+                        }
+                        // Get the Name field  
+                        else if (line.startsWith('Name: ') && currentSink) {
+                            currentSink.name = line.replace('Name: ', '').trim()
+                        }
+                        // Get description
+                        else if (line.includes('device.description = ') && currentSink) {
+                            currentSink.description = line.replace('device.description = ', '').replace(/"/g, '').trim()
                         }
                     }
                     
+                    // Add the last sink
+                    if (currentSink && currentSink.name && currentSink.id) {
+                        sinks.push(currentSink)
+                    }
+                    
+                    // Process display names
+                    for (let sink of sinks) {
+                        let displayName = sink.description
+                        if (!displayName || displayName === sink.name) {
+                            if (sink.name.includes("analog-stereo")) displayName = "Built-in Speakers"
+                            else if (sink.name.includes("bluez")) displayName = "Bluetooth Audio"
+                            else if (sink.name.includes("usb")) displayName = "USB Audio"
+                            else if (sink.name.includes("hdmi")) displayName = "HDMI Audio"
+                            else if (sink.name.includes("easyeffects")) displayName = "EasyEffects"
+                            else displayName = sink.name
+                        }
+                        sink.displayName = displayName
+                    }
+                    
+                    console.log("Final audio sinks:", JSON.stringify(sinks, null, 2))
                     root.audioSinks = sinks
                     defaultSinkChecker.running = true
                 }
@@ -112,16 +136,28 @@ Singleton {
     }
     
     function setAudioSink(sinkName) {
-        let sinkSetProcess = Qt.createQmlObject('
-            import Quickshell.Io
-            Process {
-                command: ["pactl", "set-default-sink", "' + sinkName + '"]
-                running: true
-                onExited: {
-                    defaultSinkChecker.running = true
-                    audioSinkLister.running = true
-                }
+        console.log("Setting audio sink to:", sinkName)
+        
+        // Use a more reliable approach instead of Qt.createQmlObject
+        sinkSetProcess.command = ["pactl", "set-default-sink", sinkName]
+        sinkSetProcess.running = true
+    }
+    
+    // Dedicated process for setting audio sink
+    Process {
+        id: sinkSetProcess
+        running: false
+        
+        onExited: (exitCode) => {
+            console.log("Audio sink change exit code:", exitCode)
+            if (exitCode === 0) {
+                console.log("Audio sink changed successfully")
+                // Refresh current sink and list
+                defaultSinkChecker.running = true
+                audioSinkLister.running = true
+            } else {
+                console.error("Failed to change audio sink")
             }
-        ', root)
+        }
     }
 }
