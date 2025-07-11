@@ -15,14 +15,20 @@ Singleton {
                                         ? _homeUrl.substring(7)
                                         : _homeUrl
     readonly property string wallpaperPath: homeDir + "/quickshell/current_wallpaper"
+    readonly property string notifyPath: homeDir + "/quickshell/wallpaper_changed"
 
     property bool   matugenAvailable: false
     property string matugenJson:      ""
     property var    matugenColors:    ({})
+    property bool   extractionRequested: false
 
     Component.onCompleted: {
         console.log("Colors.qml → home =", homeDir)
-        matugenCheck.running = true          // kick off the chain
+        // Don't automatically run color extraction - only when requested
+        matugenCheck.running = true          // Just check if matugen is available
+        
+        // Start monitoring for wallpaper changes
+        wallpaperMonitorTimer.start()
     }
 
     /* ────────────────  availability checks ──────────────── */
@@ -38,7 +44,12 @@ Singleton {
                 Theme.rootObj.wallpaperErrorStatus = "matugen_missing"
                 return
             }
-            fileChecker.running = true
+            
+            // If extraction was requested, continue the process
+            if (extractionRequested) {
+                console.log("Continuing with color extraction")
+                fileChecker.running = true
+            }
         }
     }
 
@@ -87,8 +98,46 @@ Singleton {
         stderr: StdioCollector { id: matugenErr }
     }
 
+    /* ────────────────  wallpaper change monitor ──────────────── */
+    property string lastWallpaperTimestamp: ""
+    
+    Timer {
+        id: wallpaperMonitorTimer
+        interval: 1000  // Check every second
+        repeat: true
+        
+        onTriggered: {
+            wallpaperNotifyMonitor.reload()
+        }
+    }
+    
+    FileView {
+        id: wallpaperNotifyMonitor
+        path: "file://" + notifyPath
+        
+        onLoaded: {
+            var timestamp = wallpaperNotifyMonitor.text()
+            if (timestamp && timestamp !== lastWallpaperTimestamp) {
+                console.log("Wallpaper change detected - updating dynamic theme")
+                lastWallpaperTimestamp = timestamp
+                
+                // Only update if we're currently using dynamic theme
+                if (typeof Theme !== "undefined" && Theme.isDynamicTheme) {
+                    console.log("Triggering color extraction due to wallpaper change")
+                    extractColors()
+                }
+            }
+        }
+        
+        onLoadFailed: {
+            // File doesn't exist yet, this is normal
+        }
+    }
+
     /* ────────────────  public helper ──────────────── */
     function extractColors() {
+        console.log("Colors.extractColors() called, matugenAvailable:", matugenAvailable)
+        extractionRequested = true
         if (matugenAvailable)
             fileChecker.running = true
         else

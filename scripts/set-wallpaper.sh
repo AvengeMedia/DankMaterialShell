@@ -78,3 +78,8 @@ echo "→ Ghostty theme:  $QS_DIR/generated_ghostty_colors.conf"
 echo "   (use in ghostty:  theme = $QS_DIR/generated_ghostty_colors.conf )"
 
 niri msg action do-screen-transition --delay-ms 100
+
+# Notify running shell about wallpaper change (for dynamic theme updates)
+NOTIFY_FILE="$QS_DIR/wallpaper_changed"
+echo "$(date '+%s')" > "$NOTIFY_FILE"
+echo "→ Shell notified: $NOTIFY_FILE"

@@ -30,13 +30,19 @@ QtObject {
     // Handle successful color extraction
     function onColorsUpdated() {
         console.log("Colors updated successfully - switching to dynamic theme")
-        currentThemeIndex = 10
-        isDynamicTheme = true
-        console.log("Dynamic theme activated. Theme.primary should now be:", primary)
         
-        // Save preference after successful switch
-        if (typeof Prefs !== "undefined") {
-            Prefs.setTheme(currentThemeIndex, isDynamicTheme)
+        // Only switch to dynamic theme if we're already in dynamic mode
+        if (isDynamicTheme) {
+            currentThemeIndex = 10
+            isDynamicTheme = true
+            console.log("Dynamic theme activated. Theme.primary should now be:", primary)
+            
+            // Save preference after successful switch
+            if (typeof Prefs !== "undefined") {
+                Prefs.setTheme(currentThemeIndex, isDynamicTheme)
+            }
+        } else {
+            console.log("Color extraction completed, but staying with static theme")
         }
     }
     
@@ -225,7 +231,10 @@ QtObject {
         if (isDynamic && themeIndex === 10) {
             console.log("Attempting to switch to dynamic theme - checking colors first")
             
-            // Don't change theme yet - wait for color extraction to succeed
+            // Set dynamic theme flag immediately so onColorsUpdated works
+            isDynamicTheme = true
+            
+            // Don't change theme index yet - wait for color extraction to succeed
             if (typeof Colors !== "undefined") {
                 console.log("Calling Colors.extractColors()")
                 Colors.extractColors()

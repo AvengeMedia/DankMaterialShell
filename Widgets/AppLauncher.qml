@@ -934,13 +934,19 @@ PanelWindow {
         function start(exec) {
             // Clean up exec command (remove field codes)
             var cleanExec = exec.replace(/%[fFuU]/g, "").trim()
-            command = ["sh", "-c", cleanExec]
+            console.log("Launching app - Original:", exec, "Cleaned:", cleanExec)
+            
+            // Use setsid to fully detach from shell session
+            command = ["setsid", "sh", "-c", cleanExec]
             running = true
         }
         
-        onExited: {
+        onExited: (exitCode) => {
             if (exitCode !== 0) {
                 console.log("Failed to launch application, exit code:", exitCode)
+                console.log("Command was:", command)
+            } else {
+                console.log("App launch command completed successfully")
             }
         }
     }
