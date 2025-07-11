@@ -7,6 +7,7 @@ import Quickshell.Wayland
 import Quickshell.Io
 import "../Common"
 
+// Fixed version – icon loaders now swap to fallback components instead of showing the magenta checkerboard
 PanelWindow {
     id: launcher
     
@@ -239,6 +240,54 @@ PanelWindow {
         apps.forEach(app => {
             filteredModel.append(app)
         })
+    }
+
+    /* ----------------------------------------------------------------------------
+     *  LOADER UTILITIES
+     * ---------------------------------------------------------------------------- */
+    /** Returns an IconImage component or the fallback badge depending on availability. */
+    function makeIconLoader(iconName, appName, fallbackId) {
+        return Qt.createComponent("", {
+            "anchors.fill": parent,
+            "_iconName": iconName,
+            "_appName": appName,
+            "sourceComponent": iconComponent
+        })
+    }
+
+    Component {
+        id: iconComponent
+        IconImage {
+            id: img
+            anchors.fill: parent
+            source: _iconName ? Quickshell.iconPath(_iconName, "") : ""
+            smooth: true
+            asynchronous: true
+            onStatusChanged: {
+                if (status === Image.Error || status === Image.Null || !source) {
+                    // defer the swap to avoid re‑entrancy in Loader
+                    Qt.callLater(() => img.parent.sourceComponent = fallbackComponent)
+                }
+            }
+        }
+    }
+
+    Component {
+        id: fallbackComponent
+        Rectangle {
+            color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.10)
+            radius: activeTheme.cornerRadiusLarge
+            border.width: 1
+            border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.20)
+
+            Text {
+                anchors.centerIn: parent
+                text: _appName ? _appName.charAt(0).toUpperCase() : "A"
+                font.pixelSize: 28
+                color: activeTheme.primary
+                font.weight: Font.Bold
+            }
+        }
     }
 
     // Main launcher panel with enhanced design
@@ -607,244 +656,53 @@ PanelWindow {
                     height: parent.height - searchContainer.height - (searchField.text.length === 0 ? 128 : 60) - parent.spacing * 3
                     color: "transparent"
                     
+                    // List view scroll container
                     ScrollView {
                         anchors.fill: parent
                         clip: true
+                        visible: viewMode === "list"
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                         
-                        Item {
-                            anchors.fill: parent
+                        ListView {
+                            id: appList
+                            width: parent.width
+                            anchors.margins: activeTheme.spacingS
+                            spacing: activeTheme.spacingS
                             
-                            // List view
-                            ListView {
-                                id: appList
-                                anchors.fill: parent
-                                anchors.margins: activeTheme.spacingS
-                                spacing: activeTheme.spacingS
-                                visible: viewMode === "list"
-                                
-                                model: filteredModel
-                                
-                                delegate: Rectangle {
-                                    width: appList.width
-                                    height: 72
-                                    radius: activeTheme.cornerRadiusLarge
-                                    
-                                    color: appMouseArea.hovered ? 
-                                        Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : 
-                                        Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
-                                    
-                                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
-                                    border.width: 1
-                                    
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: activeTheme.shortDuration
-                                            easing.type: activeTheme.standardEasing
-                                        }
-                                    }
-                                    
-                                    Row {
-                                        anchors.fill: parent
-                                        anchors.margins: activeTheme.spacingM
-                                        spacing: activeTheme.spacingL
-                                        
-                                        Item {
-                                            width: 56
-                                            height: 56
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            
-                                            Loader {
-                                                anchors.fill: parent
-                                                sourceComponent: model.icon ? iconComponent : fallbackComponent
-                                                
-                                                Component {
-                                                    id: iconComponent
-                                                    IconImage {
-                                                        source: model.icon ? Quickshell.iconPath(model.icon) : ""
-                                                        smooth: true
-                                                        asynchronous: true
-                                                        
-                                                        onStatusChanged: {
-                                                            if (status === Image.Error || status === Image.Null) {
-                                                                parent.sourceComponent = fallbackComponent
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                Component {
-                                                    id: fallbackComponent
-                                                    Rectangle {
-                                                        color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.1)
-                                                        radius: activeTheme.cornerRadiusLarge
-                                                        border.width: 1
-                                                        border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.2)
-                                                        
-                                                        Text {
-                                                            anchors.centerIn: parent
-                                                            text: model.name ? model.name.charAt(0).toUpperCase() : "A"
-                                                            font.pixelSize: 28
-                                                            color: activeTheme.primary
-                                                            font.weight: Font.Bold
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        Column {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            width: parent.width - 56 - activeTheme.spacingL
-                                            spacing: activeTheme.spacingXS
-                                            
-                                            Text {
-                                                width: parent.width
-                                                text: model.name
-                                                font.pixelSize: activeTheme.fontSizeLarge
-                                                color: activeTheme.surfaceText
-                                                font.weight: Font.Medium
-                                                elide: Text.ElideRight
-                                            }
-                                            
-                                            Text {
-                                                width: parent.width
-                                                text: model.comment || "Application"
-                                                font.pixelSize: activeTheme.fontSizeMedium
-                                                color: activeTheme.surfaceVariantText
-                                                elide: Text.ElideRight
-                                                visible: model.comment && model.comment.length > 0
-                                            }
-                                        }
-                                    }
-                                    
-                                    MouseArea {
-                                        id: appMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        
-                                        onClicked: {
-                                            launcher.launchApp(model.exec)
-                                            launcher.hide()
-                                        }
-                                    }
-                                }
-                            }
+                            model: filteredModel
+                            delegate: listDelegate
+                        }
+                    }
+                
+                    // Grid view scroll container  
+                    ScrollView {
+                        anchors.fill: parent
+                        clip: true
+                        visible: viewMode === "grid"
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                        
+                        GridView {
+                            id: appGrid
+                            width: parent.width
+                            anchors.margins: activeTheme.spacingS
                             
-                            // Grid view
-                            GridView {
-                                id: appGrid
-                                anchors.fill: parent
-                                anchors.margins: activeTheme.spacingS
-                                
-                                // Responsive cell sizes based on screen width
-                                property int baseCellWidth: Math.max(100, Math.min(140, width / 8))
-                                property int baseCellHeight: baseCellWidth + 20
-                                
-                                cellWidth: baseCellWidth
-                                cellHeight: baseCellHeight
-                                visible: viewMode === "grid"
-                                
-                                // Center the grid content
-                                property int columnsCount: Math.floor(width / cellWidth)
-                                property int remainingSpace: width - (columnsCount * cellWidth)
-                                leftMargin: Math.max(activeTheme.spacingS, remainingSpace / 2)
-                                rightMargin: leftMargin
-                                
-                                model: filteredModel
-                                
-                                delegate: Rectangle {
-                                    width: appGrid.cellWidth - 8
-                                    height: appGrid.cellHeight - 8
-                                    radius: activeTheme.cornerRadiusLarge
-                                    color: gridAppArea.hovered ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : 
-                                          Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
-                                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
-                                    border.width: 1
-                                    
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: activeTheme.shortDuration
-                                            easing.type: activeTheme.standardEasing
-                                        }
-                                    }
-                                    
-                                    Column {
-                                        anchors.centerIn: parent
-                                        spacing: activeTheme.spacingS
-                                        
-                                        Item {
-                                            property int iconSize: Math.min(56, Math.max(32, appGrid.cellWidth * 0.6))
-                                            width: iconSize
-                                            height: iconSize
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            
-                                            Loader {
-                                                anchors.fill: parent
-                                                sourceComponent: model.icon ? gridIconComponent : gridFallbackComponent
-                                                
-                                                Component {
-                                                    id: gridIconComponent
-                                                    IconImage {
-                                                        source: model.icon ? Quickshell.iconPath(model.icon) : ""
-                                                        smooth: true
-                                                        asynchronous: true
-                                                        
-                                                        onStatusChanged: {
-                                                            if (status === Image.Error || status === Image.Null) {
-                                                                parent.sourceComponent = gridFallbackComponent
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                Component {
-                                                    id: gridFallbackComponent
-                                                    Rectangle {
-                                                        color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.1)
-                                                        radius: activeTheme.cornerRadiusLarge
-                                                        border.width: 1
-                                                        border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.2)
-                                                        
-                                                        Text {
-                                                            anchors.centerIn: parent
-                                                            text: model.name ? model.name.charAt(0).toUpperCase() : "A"
-                                                            font.pixelSize: parent.parent.parent.iconSize / 2
-                                                            color: activeTheme.primary
-                                                            font.weight: Font.Bold
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        Text {
-                                            anchors.horizontalCenter: parent.horizontalCenter
-                                            width: 88
-                                            text: model.name
-                                            font.pixelSize: activeTheme.fontSizeSmall
-                                            color: activeTheme.surfaceText
-                                            font.weight: Font.Medium
-                                            elide: Text.ElideRight
-                                            horizontalAlignment: Text.AlignHCenter
-                                            maximumLineCount: 2
-                                            wrapMode: Text.WordWrap
-                                        }
-                                    }
-                                    
-                                    MouseArea {
-                                        id: gridAppArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        
-                                        onClicked: {
-                                            launcher.launchApp(model.exec)
-                                            launcher.hide()
-                                        }
-                                    }
-                                }
-                            }
+                            // Responsive cell sizes based on screen width
+                            property int baseCellWidth: Math.max(100, Math.min(140, width / 8))
+                            property int baseCellHeight: baseCellWidth + 20
+                            
+                            cellWidth: baseCellWidth
+                            cellHeight: baseCellHeight
+                            
+                            // Center the grid content
+                            property int columnsCount: Math.floor(width / cellWidth)
+                            property int remainingSpace: width - (columnsCount * cellWidth)
+                            leftMargin: Math.max(activeTheme.spacingS, remainingSpace / 2)
+                            rightMargin: leftMargin
+                            
+                            model: filteredModel
+                            delegate: gridDelegate
                         }
                     }
                 }
@@ -886,6 +744,8 @@ PanelWindow {
                         anchors.fill: parent
                         anchors.margins: activeTheme.spacingS
                         clip: true
+                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                         
                         ListView {
                             model: categories
@@ -921,6 +781,133 @@ PanelWindow {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    // List delegate with new loader
+    Component {
+        id: listDelegate
+        Rectangle {
+            width: appList.width
+            height: 72
+            radius: activeTheme.cornerRadiusLarge
+            color: appMouseArea.hovered ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08)
+                                         : Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
+            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
+            border.width: 1
+
+            Row {
+                anchors.fill: parent
+                anchors.margins: activeTheme.spacingM
+                spacing: activeTheme.spacingL
+
+                Item {
+                    width: 56
+                    height: 56
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Loader {
+                        id: listIconLoader
+                        anchors.fill: parent
+                        property string _iconName: model.icon
+                        property string _appName: model.name
+                        sourceComponent: iconComponent
+                    }
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 56 - activeTheme.spacingL
+                    spacing: activeTheme.spacingXS
+
+                    Text {
+                        width: parent.width
+                        text: model.name
+                        font.pixelSize: activeTheme.fontSizeLarge
+                        color: activeTheme.surfaceText
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                    }
+
+                    Text {
+                        width: parent.width
+                        text: model.comment || "Application"
+                        font.pixelSize: activeTheme.fontSizeMedium
+                        color: activeTheme.surfaceVariantText
+                        elide: Text.ElideRight
+                        visible: model.comment && model.comment.length > 0
+                    }
+                }
+            }
+
+            MouseArea {
+                id: appMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    launcher.launchApp(model.exec)
+                    launcher.hide()
+                }
+            }
+        }
+    }
+
+    // Grid delegate with new loader (uses dynamic icon size)
+    Component {
+        id: gridDelegate
+        Rectangle {
+            width: appGrid.cellWidth - 8
+            height: appGrid.cellHeight - 8
+            radius: activeTheme.cornerRadiusLarge
+            color: gridAppArea.hovered ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08)
+                                       : Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
+            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
+            border.width: 1
+
+            Column {
+                anchors.centerIn: parent
+                spacing: activeTheme.spacingS
+
+                Item {
+                    property int iconSize: Math.min(56, Math.max(32, appGrid.cellWidth * 0.6))
+                    width: iconSize
+                    height: iconSize
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    Loader {
+                        id: gridIconLoader
+                        anchors.fill: parent
+                        property string _iconName: model.icon
+                        property string _appName: model.name
+                        sourceComponent: iconComponent
+                    }
+                }
+
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 88
+                    text: model.name
+                    font.pixelSize: activeTheme.fontSizeSmall
+                    color: activeTheme.surfaceText
+                    font.weight: Font.Medium
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
+                    maximumLineCount: 2
+                    wrapMode: Text.WordWrap
+                }
+            }
+
+            MouseArea {
+                id: gridAppArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    launcher.launchApp(model.exec)
+                    launcher.hide()
                 }
             }
         }
