@@ -8,6 +8,7 @@ Singleton {
     
     property int themeIndex: 0
     property bool themeIsDynamic: false
+    property var recentlyUsedApps: []
     
     readonly property string configDir: Qt.resolvedUrl("file://" + Quickshell.env("HOME") + "/.config/DankMaterialDark")
     readonly property string configFile: configDir + "/settings.json"
@@ -56,7 +57,8 @@ Singleton {
                     var settings = JSON.parse(content)
                     themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0
                     themeIsDynamic = settings.themeIsDynamic !== undefined ? settings.themeIsDynamic : false
-                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic)
+                    recentlyUsedApps = settings.recentlyUsedApps || []
+                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "recentApps:", recentlyUsedApps.length)
                 } else {
                     console.log("Settings file is empty")
                 }
@@ -78,14 +80,15 @@ Singleton {
     function saveSettings() {
         var settings = {
             themeIndex: themeIndex,
-            themeIsDynamic: themeIsDynamic
+            themeIsDynamic: themeIsDynamic,
+            recentlyUsedApps: recentlyUsedApps
         }
         
         var content = JSON.stringify(settings, null, 2)
         
         writeProcess.command = ["sh", "-c", "echo '" + content + "' > '" + Quickshell.env("HOME") + "/.config/DankMaterialDark/settings.json'"]
         writeProcess.running = true
-        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic)
+        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "recentApps:", recentlyUsedApps.length)
     }
     
     function applyStoredTheme() {
@@ -107,5 +110,31 @@ Singleton {
         themeIndex = index
         themeIsDynamic = isDynamic
         saveSettings()
+    }
+    
+    function addRecentApp(app) {
+        var existingIndex = -1
+        for (var i = 0; i < recentlyUsedApps.length; i++) {
+            if (recentlyUsedApps[i].exec === app.exec) {
+                existingIndex = i
+                break
+            }
+        }
+        
+        if (existingIndex >= 0) {
+            recentlyUsedApps.splice(existingIndex, 1)
+        }
+        
+        recentlyUsedApps.unshift(app)
+        
+        if (recentlyUsedApps.length > 10) {
+            recentlyUsedApps = recentlyUsedApps.slice(0, 10)
+        }
+        
+        saveSettings()
+    }
+    
+    function getRecentApps() {
+        return recentlyUsedApps
     }
 }

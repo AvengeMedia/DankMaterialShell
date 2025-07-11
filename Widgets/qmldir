@@ -24,3 +24,4 @@ PowerConfirmDialog 1.0 PowerConfirmDialog.qml
 ThemePicker 1.0 ThemePicker.qml
 CpuMonitorWidget 1.0 CpuMonitorWidget.qml
 RamMonitorWidget 1.0 RamMonitorWidget.qml
+SpotlightLauncher 1.0 SpotlightLauncher.qml

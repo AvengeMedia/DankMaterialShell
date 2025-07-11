@@ -213,11 +213,13 @@ PanelWindow {
             spacing: activeTheme.spacingL
             
             // Title and actions
-            Row {
+            Item {
                 width: parent.width
                 height: 40
                 
                 Text {
+                    id: titleText
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Clipboard History"
                     font.pixelSize: activeTheme.fontSizeLarge + 4
@@ -225,69 +227,67 @@ PanelWindow {
                     color: activeTheme.surfaceText
                 }
                 
-                Item { 
-                    width: parent.width - 180 - (clearAllButton.visible ? 48 : 0)
-                    height: 1 
-                }
-                
-                // Clear all button
-                Rectangle {
-                    id: clearAllButton
-                    width: 40
-                    height: 32
-                    radius: activeTheme.cornerRadius
-                    color: clearArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
+                Row {
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: clipboardModel.count > 0
+                    spacing: activeTheme.spacingS
                     
-                    Text {
-                        anchors.centerIn: parent
-                        text: "delete_sweep"
-                        font.family: activeTheme.iconFont
-                        font.pixelSize: activeTheme.iconSize
-                        color: clearArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
+                    // Clear all button
+                    Rectangle {
+                        id: clearAllButton
+                        width: 40
+                        height: 32
+                        radius: activeTheme.cornerRadius
+                        color: clearArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
+                        visible: clipboardModel.count > 0
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "delete_sweep"
+                            font.family: activeTheme.iconFont
+                            font.pixelSize: activeTheme.iconSize
+                            color: clearArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
+                        }
+                        
+                        MouseArea {
+                            id: clearArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: clearAll()
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: activeTheme.shortDuration }
+                        }
                     }
                     
-                    MouseArea {
-                        id: clearArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: clearAll()
-                    }
-                    
-                    Behavior on color {
-                        ColorAnimation { duration: activeTheme.shortDuration }
-                    }
-                }
-                
-                // Close button  
-                Rectangle {
-                    width: 40
-                    height: 32
-                    radius: activeTheme.cornerRadius
-                    color: closeArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.rightMargin: 4
-                    
-                    Text {
-                        anchors.centerIn: parent
-                        text: "close"
-                        font.family: activeTheme.iconFont
-                        font.pixelSize: activeTheme.iconSize
-                        color: closeArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
-                    }
-                    
-                    MouseArea {
-                        id: closeArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: clipboardHistory.hide()
-                    }
-                    
-                    Behavior on color {
-                        ColorAnimation { duration: activeTheme.shortDuration }
+                    // Close button  
+                    Rectangle {
+                        width: 40
+                        height: 32
+                        radius: activeTheme.cornerRadius
+                        color: closeArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "close"
+                            font.family: activeTheme.iconFont
+                            font.pixelSize: activeTheme.iconSize
+                            color: closeArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
+                        }
+                        
+                        MouseArea {
+                            id: closeArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: clipboardHistory.hide()
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: activeTheme.shortDuration }
+                        }
                     }
                 }
             }
@@ -614,6 +614,7 @@ PanelWindow {
             if (exitCode === 0) {
                 clipboardHistory.clipboardEntries = []
                 clipboardModel.clear()
+                updateFilteredModel()
             }
         }
     }
@@ -621,6 +622,28 @@ PanelWindow {
     Keys.onPressed: (event) => {
         if (event.key === Qt.Key_Escape) {
             hide()
+        }
+    }
+    
+    IpcHandler {
+        target: "clipboard"
+        
+        function open() {
+            console.log("ClipboardHistory: IPC open() called")
+            clipboardHistory.show()
+            return "CLIPBOARD_OPEN_SUCCESS"
+        }
+        
+        function close() {
+            console.log("ClipboardHistory: IPC close() called")
+            clipboardHistory.hide()
+            return "CLIPBOARD_CLOSE_SUCCESS"
+        }
+        
+        function toggle() {
+            console.log("ClipboardHistory: IPC toggle() called")
+            clipboardHistory.toggle()
+            return "CLIPBOARD_TOGGLE_SUCCESS"
         }
     }
 }

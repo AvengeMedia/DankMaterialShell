@@ -305,6 +305,10 @@ ShellRoot {
         theme: Theme
     }
     
+    SpotlightLauncher {
+        id: spotlightLauncher
+    }
+    
     ClipboardHistory {
         id: clipboardHistoryPopup
         theme: Theme
