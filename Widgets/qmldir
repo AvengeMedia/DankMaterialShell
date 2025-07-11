@@ -10,7 +10,6 @@ CalendarPopup 1.0 CalendarPopup.qml
 TrayMenuPopup 1.0 TrayMenuPopup.qml
 NotificationPopup 1.0 NotificationPopup.qml
 NotificationHistoryPopup 1.0 NotificationHistoryPopup.qml
-ControlCenterPopup 1.0 ControlCenterPopup.qml
 WifiPasswordDialog 1.0 WifiPasswordDialog.qml
 AppLauncher 1.0 AppLauncher.qml
 ClipboardHistory 1.0 ClipboardHistory.qml

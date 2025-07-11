@@ -13,6 +13,7 @@ import Quickshell.Services.Mpris
 import "Services"
 import "Widgets"
 import "Widgets/CenterCommandCenter"
+import "Widgets/ControlCenter"
 import "Common"
 import "Common/Utilities.js" as Utils
 
