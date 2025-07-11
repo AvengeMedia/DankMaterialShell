@@ -22,3 +22,4 @@ BatteryControlPopup 1.0 BatteryControlPopup.qml
 PowerButton 1.0 PowerButton.qml
 PowerMenuPopup 1.0 PowerMenuPopup.qml
 PowerConfirmDialog 1.0 PowerConfirmDialog.qml
+ThemePicker 1.0 ThemePicker.qml

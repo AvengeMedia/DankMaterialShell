@@ -7,35 +7,21 @@ Rectangle {
     property var theme
     property var root
     
-    width: Math.max(120, launcherRow.implicitWidth + theme.spacingM * 2)
+    width: 40
     height: 32
     radius: theme.cornerRadius
     color: launcherArea.containsMouse ? Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.12) : Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.08)
     anchors.verticalCenter: parent.verticalCenter
     
-    Row {
-        id: launcherRow
+    Text {
         anchors.centerIn: parent
-        spacing: theme.spacingS
-        
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.osLogo || "apps"
-            font.family: root.osLogo ? "NerdFont" : theme.iconFont
-            font.pixelSize: root.osLogo ? theme.iconSize - 2 : theme.iconSize - 2
-            font.weight: theme.iconFontWeight
-            color: theme.surfaceText
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-        
-        Text {
-            anchors.verticalCenter: parent.verticalCenter
-            text: "Applications"
-            font.pixelSize: theme.fontSizeMedium
-            font.weight: Font.Medium
-            color: theme.surfaceText
-        }
+        text: root.osLogo || "apps"
+        font.family: root.osLogo ? "NerdFont" : theme.iconFont
+        font.pixelSize: root.osLogo ? theme.iconSize - 2 : theme.iconSize - 2
+        font.weight: theme.iconFontWeight
+        color: theme.surfaceText
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
     }
     
     MouseArea {

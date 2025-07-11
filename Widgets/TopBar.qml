@@ -76,36 +76,21 @@ PanelWindow {
                 
                 Rectangle {
                     id: archLauncher
-                    width: Math.max(120, launcherRow.implicitWidth + Theme.spacingM * 2)
+                    width: 40
                     height: 32
                     radius: Theme.cornerRadius
                     color: launcherArea.containsMouse ? Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.12) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
                     anchors.verticalCenter: parent.verticalCenter
                     
-                    Row {
-                        id: launcherRow
+                    Text {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingS
-                        
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: root.osLogo || "apps"  // Use OS logo if detected, fallback to apps icon
-                            font.family: root.osLogo ? "NerdFont" : Theme.iconFont
-                            font.pixelSize: root.osLogo ? Theme.iconSize - 2 : Theme.iconSize - 2
-                            font.weight: Theme.iconFontWeight
-                            color: Theme.surfaceText
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-                        }
-                        
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: root.isSmallScreen ? "Apps" : "Applications"
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            visible: !root.isSmallScreen || width > 60
-                        }
+                        text: root.osLogo || "apps"  // Use OS logo if detected, fallback to apps icon
+                        font.family: root.osLogo ? "NerdFont" : Theme.iconFont
+                        font.pixelSize: root.osLogo ? Theme.iconSize - 2 : Theme.iconSize - 2
+                        font.weight: Theme.iconFontWeight
+                        color: Theme.surfaceText
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
                     }
                     
                     MouseArea {
@@ -613,40 +598,40 @@ PanelWindow {
                 }
                 
                 // Color Picker Button
-                Rectangle {
-                    width: 40
-                    height: 32
-                    radius: Theme.cornerRadius
-                    color: colorPickerArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
-                    anchors.verticalCenter: parent.verticalCenter
+                // Rectangle {
+                //     width: 40
+                //     height: 32
+                //     radius: Theme.cornerRadius
+                //     color: colorPickerArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
+                //     anchors.verticalCenter: parent.verticalCenter
                     
-                    Text {
-                        anchors.centerIn: parent
-                        text: "colorize"  // Material icon for color picker
-                        font.family: Theme.iconFont
-                        font.pixelSize: Theme.iconSize - 6
-                        font.weight: Theme.iconFontWeight
-                        color: Theme.surfaceText
-                    }
+                //     Text {
+                //         anchors.centerIn: parent
+                //         text: "colorize"  // Material icon for color picker
+                //         font.family: Theme.iconFont
+                //         font.pixelSize: Theme.iconSize - 6
+                //         font.weight: Theme.iconFontWeight
+                //         color: Theme.surfaceText
+                //     }
                     
-                    MouseArea {
-                        id: colorPickerArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
+                //     MouseArea {
+                //         id: colorPickerArea
+                //         anchors.fill: parent
+                //         hoverEnabled: true
+                //         cursorShape: Qt.PointingHandCursor
                         
-                        onClicked: {
-                            ColorPickerService.pickColor()
-                        }
-                    }
+                //         onClicked: {
+                //             ColorPickerService.pickColor()
+                //         }
+                //     }
                     
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
-                        }
-                    }
-                }
+                //     Behavior on color {
+                //         ColorAnimation {
+                //             duration: Theme.shortDuration
+                //             easing.type: Theme.standardEasing
+                //         }
+                //     }
+                // }
                 
                 // Notification Center Button
                 Rectangle {

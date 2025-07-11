@@ -1537,6 +1537,23 @@ PanelWindow {
                                         }
                                     }
                                 }
+
+                                // Theme Picker
+                                Column {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
+                                    
+                                    Text {
+                                        text: "Theme"
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                    }
+                                    
+                                    ThemePicker {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+                                }
                             }
                         }
                     }
