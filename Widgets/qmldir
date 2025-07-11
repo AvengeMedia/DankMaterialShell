@@ -1,5 +1,4 @@
 TopBar 1.0 TopBar.qml
-TopBarSimple 1.0 TopBarSimple.qml
 AppLauncherButton 1.0 AppLauncherButton.qml
 WorkspaceSwitcher 1.0 WorkspaceSwitcher.qml
 ClockWidget 1.0 ClockWidget.qml
