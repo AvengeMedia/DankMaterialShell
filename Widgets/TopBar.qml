@@ -27,47 +27,74 @@ PanelWindow {
         right: true
     }
     
-    implicitHeight: Theme.barHeight
+    implicitHeight: Theme.barHeight - 4
     color: "transparent"
         
-        Rectangle {
+        // Floating panel container with margins
+        Item {
             anchors.fill: parent
-            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
+            anchors.margins: 2
+            anchors.topMargin: 6
+            anchors.bottomMargin: 0
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
             
             Rectangle {
                 anchors.fill: parent
-                color: "transparent"
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                border.width: 1
-            }
-            
-            Rectangle {
-                anchors.fill: parent
-                color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.08)
+                radius: Theme.cornerRadiusXLarge
+                color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.75)
                 
-                SequentialAnimation on opacity {
-                    running: true
-                    loops: Animation.Infinite
-                    NumberAnimation {
-                        to: 0.12
-                        duration: Theme.extraLongDuration
-                        easing.type: Theme.standardEasing
-                    }
-                    NumberAnimation {
-                        to: 0.06
-                        duration: Theme.extraLongDuration
-                        easing.type: Theme.standardEasing
+                // Material 3 elevation shadow
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    horizontalOffset: 0
+                    verticalOffset: 4
+                    radius: 16
+                    samples: 33
+                    color: Qt.rgba(0, 0, 0, 0.15)
+                    transparentBorder: true
+                }
+                
+                // Subtle border for definition
+                Rectangle {
+                    anchors.fill: parent
+                    color: "transparent"
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                    border.width: 1
+                    radius: parent.radius
+                }
+                
+                // Subtle surface tint overlay with animation
+                Rectangle {
+                    anchors.fill: parent
+                    color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
+                    radius: parent.radius
+                    
+                    SequentialAnimation on opacity {
+                        running: true
+                        loops: Animation.Infinite
+                        NumberAnimation {
+                            to: 0.08
+                            duration: Theme.extraLongDuration
+                            easing.type: Theme.standardEasing
+                        }
+                        NumberAnimation {
+                            to: 0.02
+                            duration: Theme.extraLongDuration
+                            easing.type: Theme.standardEasing
+                        }
                     }
                 }
             }
-        }
-        
-        Item {
-            anchors.fill: parent
-            anchors.leftMargin: Theme.spacingL
-            anchors.rightMargin: Theme.spacingL
             
-            Row {
+            Item {
+                anchors.fill: parent
+                anchors.leftMargin: Theme.spacingM
+                anchors.rightMargin: Theme.spacingM
+                anchors.topMargin: Theme.spacingXS
+                anchors.bottomMargin: Theme.spacingXS
+                
+                Row {
                 id: leftSection
                 height: parent.height
                 spacing: Theme.spacingXS
@@ -795,3 +822,4 @@ PanelWindow {
             }
         }
     }
+}
