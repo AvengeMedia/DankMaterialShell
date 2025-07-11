@@ -70,7 +70,7 @@ PanelWindow {
             Row {
                 id: leftSection
                 height: parent.height
-                spacing: Theme.spacingL
+                spacing: Theme.spacingXS
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 
@@ -86,11 +86,9 @@ PanelWindow {
                         anchors.centerIn: parent
                         text: root.osLogo || "apps"  // Use OS logo if detected, fallback to apps icon
                         font.family: root.osLogo ? "NerdFont" : Theme.iconFont
-                        font.pixelSize: root.osLogo ? Theme.iconSize - 2 : Theme.iconSize - 2
+                        font.pixelSize: Theme.iconSize - 6
                         font.weight: Theme.iconFontWeight
                         color: Theme.surfaceText
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
                     }
                     
                     MouseArea {
