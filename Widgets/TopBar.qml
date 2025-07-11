@@ -621,6 +621,15 @@ PanelWindow {
                         }
                     }
                 }
+
+                // System Monitor Widgets
+                CpuMonitorWidget {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                RamMonitorWidget {
+                    anchors.verticalCenter: parent.verticalCenter  
+                }
                 
                 // Color Picker Button
                 // Rectangle {
