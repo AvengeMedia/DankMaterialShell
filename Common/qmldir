@@ -1,4 +1,6 @@
 module Common
 
 singleton Theme 1.0 Theme.qml
+singleton Colors 1.0 Colors.qml
+singleton Prefs 1.0 Prefs.qml
 Utilities 1.0 Utilities.js

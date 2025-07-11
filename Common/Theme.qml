@@ -1,9 +1,44 @@
 import QtQuick
+import Quickshell
+import Quickshell.Io
 pragma Singleton
 pragma ComponentBehavior: Bound
 
 QtObject {
     id: root
+    
+    // Reference to the main shell root for calling functions
+    property var rootObj: null
+    
+    // Apply saved theme on startup
+    Component.onCompleted: {
+        console.log("Theme Component.onCompleted")
+        
+        // Connect to Colors signal
+        if (typeof Colors !== "undefined") {
+            Colors.colorsUpdated.connect(root.onColorsUpdated)
+        }
+        
+        Qt.callLater(() => {
+            if (typeof Prefs !== "undefined") {
+                console.log("Theme applying saved preferences:", Prefs.themeIndex, Prefs.themeIsDynamic)
+                switchTheme(Prefs.themeIndex, Prefs.themeIsDynamic, false)  // Don't save during startup
+            }
+        })
+    }
+    
+    // Handle successful color extraction
+    function onColorsUpdated() {
+        console.log("Colors updated successfully - switching to dynamic theme")
+        currentThemeIndex = 10
+        isDynamicTheme = true
+        console.log("Dynamic theme activated. Theme.primary should now be:", primary)
+        
+        // Save preference after successful switch
+        if (typeof Prefs !== "undefined") {
+            Prefs.setTheme(currentThemeIndex, isDynamicTheme)
+        }
+    }
     
     // Theme definitions with complete Material 3 expressive color palettes
     property var themes: [
@@ -179,33 +214,50 @@ QtObject {
         }
     ]
     
-    // Current theme index
+    // Current theme index (10 = Auto/Dynamic)
     property int currentThemeIndex: 0
+    property bool isDynamicTheme: false
     
     // Function to switch themes
-    function switchTheme(themeIndex) {
-        if (themeIndex >= 0 && themeIndex < themes.length) {
+    function switchTheme(themeIndex, isDynamic = false, savePrefs = true) {
+        console.log("Theme.switchTheme called:", themeIndex, isDynamic, "savePrefs:", savePrefs)
+        
+        if (isDynamic && themeIndex === 10) {
+            console.log("Attempting to switch to dynamic theme - checking colors first")
+            
+            // Don't change theme yet - wait for color extraction to succeed
+            if (typeof Colors !== "undefined") {
+                console.log("Calling Colors.extractColors()")
+                Colors.extractColors()
+            } else {
+                console.error("Colors singleton not available")
+            }
+        } else if (themeIndex >= 0 && themeIndex < themes.length) {
             currentThemeIndex = themeIndex
-            // Simple persistence - store in a property
-            // In a real application, you might use Qt.labs.settings or another persistence mechanism
+            isDynamicTheme = false
+        }
+        
+        // Save preference (unless this is a startup restoration)
+        if (savePrefs && typeof Prefs !== "undefined") {
+            Prefs.setTheme(currentThemeIndex, isDynamicTheme)
         }
     }
     
     // Dynamic color properties that change based on current theme
-    property color primary: themes[currentThemeIndex].primary
-    property color primaryText: themes[currentThemeIndex].primaryText
-    property color primaryContainer: themes[currentThemeIndex].primaryContainer
-    property color secondary: themes[currentThemeIndex].secondary
-    property color surface: themes[currentThemeIndex].surface
-    property color surfaceText: themes[currentThemeIndex].surfaceText
-    property color surfaceVariant: themes[currentThemeIndex].surfaceVariant
-    property color surfaceVariantText: themes[currentThemeIndex].surfaceVariantText
-    property color surfaceTint: themes[currentThemeIndex].surfaceTint
-    property color background: themes[currentThemeIndex].background
-    property color backgroundText: themes[currentThemeIndex].backgroundText
-    property color outline: themes[currentThemeIndex].outline
-    property color surfaceContainer: themes[currentThemeIndex].surfaceContainer
-    property color surfaceContainerHigh: themes[currentThemeIndex].surfaceContainerHigh
+    property color primary: isDynamicTheme ? Colors.accentHi : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primary : themes[0].primary)
+    property color primaryText: isDynamicTheme ? Colors.primaryText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primaryText : themes[0].primaryText)
+    property color primaryContainer: isDynamicTheme ? Colors.primaryContainer : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primaryContainer : themes[0].primaryContainer)
+    property color secondary: isDynamicTheme ? Colors.accentLo : (currentThemeIndex < themes.length ? themes[currentThemeIndex].secondary : themes[0].secondary)
+    property color surface: isDynamicTheme ? Colors.surface : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surface : themes[0].surface)
+    property color surfaceText: isDynamicTheme ? Colors.surfaceText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceText : themes[0].surfaceText)
+    property color surfaceVariant: isDynamicTheme ? Colors.surfaceVariant : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceVariant : themes[0].surfaceVariant)
+    property color surfaceVariantText: isDynamicTheme ? Colors.surfaceVariantText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceVariantText : themes[0].surfaceVariantText)
+    property color surfaceTint: isDynamicTheme ? Colors.surfaceTint : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceTint : themes[0].surfaceTint)
+    property color background: isDynamicTheme ? Colors.background : (currentThemeIndex < themes.length ? themes[currentThemeIndex].background : themes[0].background)
+    property color backgroundText: isDynamicTheme ? Colors.backgroundText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].backgroundText : themes[0].backgroundText)
+    property color outline: isDynamicTheme ? Colors.outline : (currentThemeIndex < themes.length ? themes[currentThemeIndex].outline : themes[0].outline)
+    property color surfaceContainer: isDynamicTheme ? Colors.surfaceContainer : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceContainer : themes[0].surfaceContainer)
+    property color surfaceContainerHigh: isDynamicTheme ? Colors.surfaceContainerHigh : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceContainerHigh : themes[0].surfaceContainerHigh)
     
     // Static colors that don't change with themes
     property color archBlue: "#1793D1"

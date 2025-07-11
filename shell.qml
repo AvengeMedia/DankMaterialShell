@@ -18,6 +18,11 @@ import "Common/Utilities.js" as Utils
 ShellRoot {
     id: root
     
+    Component.onCompleted: {
+        // Make root accessible to Theme singleton for error handling
+        Theme.rootObj = root
+    }
+    
     property bool calendarVisible: false
     property bool showTrayMenu: false
     property real trayMenuX: 0
@@ -72,6 +77,9 @@ ShellRoot {
     property string wifiPasswordInput: ""
     property string wifiConnectionStatus: ""
     property bool wifiAutoRefreshEnabled: false
+    
+    // Wallpaper error status
+    property string wallpaperErrorStatus: ""
     
     // Notification action handling - ALWAYS invoke action if exists
     function handleNotificationClick(notifObj) {
@@ -165,6 +173,24 @@ ShellRoot {
         onTriggered: {
             root.wifiConnectionStatus = ""
         }
+    }
+    
+    // Wallpaper Error Status Timer
+    Timer {
+        id: wallpaperErrorTimer
+        interval: 5000  // 5 seconds
+        running: false
+        repeat: false
+        onTriggered: {
+            root.wallpaperErrorStatus = ""
+        }
+    }
+    
+    // Function to show wallpaper error
+    function showWallpaperError() {
+        console.log("showWallpaperError called - setting error status")
+        root.wallpaperErrorStatus = "error"
+        wallpaperErrorTimer.restart()
     }
     
     // Notification Server
