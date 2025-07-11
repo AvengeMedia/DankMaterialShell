@@ -29,6 +29,104 @@ PanelWindow {
     
     implicitHeight: Theme.barHeight - 4
     color: "transparent"
+    
+    // Audio visualization data
+    property list<real> audioLevels: [0, 0, 0, 0]
+    
+    // Real-time audio visualization using cava (with fallback)
+    property bool cavaAvailable: false
+    
+    Process {
+        id: cavaCheck
+        command: ["which", "cava"]
+        running: true
+        onExited: (exitCode) => {
+            topBar.cavaAvailable = exitCode === 0
+            if (topBar.cavaAvailable) {
+                console.log("cava found - creating config and enabling real audio visualization")
+                configWriter.running = true
+            } else {
+                console.log("cava not found - using fallback animation")
+                fallbackTimer.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
+            }
+        }
+    }
+    
+    // Create temporary config file for cava
+    Process {
+        id: configWriter
+        running: topBar.cavaAvailable
+        command: [
+            "sh", "-c", 
+            `cat > /tmp/quickshell_cava_config << 'EOF'
+[general]
+mode = normal
+framerate = 30
+autosens = 0
+sensitivity = 50
+bars = 4
+
+[output]
+method = raw
+raw_target = /dev/stdout
+data_format = ascii
+channels = mono
+mono_option = average
+
+[smoothing]
+noise_reduction = 20
+EOF`
+        ]
+        
+        onExited: {
+            // Start cava after config is written
+            if (topBar.cavaAvailable) {
+                cavaProcess.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
+            }
+        }
+    }
+
+    Process {
+        id: cavaProcess
+        running: false
+        command: ["cava", "-p", "/tmp/quickshell_cava_config"]
+        
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: data => {
+                if (data.trim()) {
+                    // Parse semicolon-separated values from cava
+                    let points = data.split(";").map(p => parseFloat(p.trim())).filter(p => !isNaN(p))
+                    if (points.length >= 4) {
+                        topBar.audioLevels = [points[0], points[1], points[2], points[3]]
+                    }
+                }
+            }
+        }
+        
+        onRunningChanged: {
+            if (!running) {
+                topBar.audioLevels = [0, 0, 0, 0]
+            }
+        }
+    }
+    
+    // Fallback animation when cava is not available
+    Timer {
+        id: fallbackTimer
+        running: false
+        interval: 100
+        repeat: true
+        onTriggered: {
+            // Generate smooth random values for fallback (0-100 range)
+            topBar.audioLevels = [
+                Math.random() * 40 + 10,  // 10-50
+                Math.random() * 60 + 20,  // 20-80
+                Math.random() * 50 + 15,  // 15-65
+                Math.random() * 35 + 20   // 20-55
+            ]
+        }
+    }
         
         // Floating panel container with margins
         Item {
@@ -362,20 +460,46 @@ PanelWindow {
                         visible: root.hasActiveMedia || root.weather.available
                         anchors.verticalCenter: parent.verticalCenter
                         
-                        // Music icon when media is playing
-                        Text {
-                            text: "music_note"
-                            font.family: Theme.iconFont
-                            font.pixelSize: Theme.iconSize - 2
-                            color: Theme.primary
+                        // Animated equalizer when media is playing
+                        Item {
+                            width: 20
+                            height: Theme.iconSize
                             anchors.verticalCenter: parent.verticalCenter
                             visible: root.hasActiveMedia
                             
-                            SequentialAnimation on scale {
-                                running: root.activePlayer?.playbackState === MprisPlaybackState.Playing
-                                loops: Animation.Infinite
-                                NumberAnimation { to: 1.1; duration: 500 }
-                                NumberAnimation { to: 1.0; duration: 500 }
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 2
+                                
+                                Repeater {
+                                    model: 4
+                                    
+                                    Rectangle {
+                                        width: 3
+                                        height: {
+                                            if (root.activePlayer?.playbackState === MprisPlaybackState.Playing && topBar.audioLevels.length > index) {
+                                                // Scale and compress audio data for better visual range
+                                                const rawLevel = topBar.audioLevels[index] || 0
+                                                // Use square root to compress high values and expand low values
+                                                const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100
+                                                const maxHeight = Theme.iconSize - 2
+                                                const minHeight = 3
+                                                return minHeight + (scaledLevel / 100) * (maxHeight - minHeight)
+                                            }
+                                            return 3 // Minimum height when not playing
+                                        }
+                                        radius: 1.5
+                                        color: Theme.primary
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        
+                                        Behavior on height {
+                                            NumberAnimation {
+                                                duration: 80  // Slightly slower for smoother movement
+                                                easing.type: Easing.OutQuad
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                         

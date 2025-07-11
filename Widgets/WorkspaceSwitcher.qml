@@ -12,7 +12,7 @@ Rectangle {
     width: Math.max(120, workspaceRow.implicitWidth + theme.spacingL * 2)
     height: 32
     radius: theme.cornerRadiusLarge
-    color: Qt.rgba(theme.surfaceContainerHigh.r, theme.surfaceContainerHigh.g, theme.surfaceContainerHigh.b, 0.8)
+    color: Qt.rgba(theme.secondary.r, theme.secondary.g, theme.secondary.b, 0.08)
     anchors.verticalCenter: parent.verticalCenter
     
     property int currentWorkspace: 1

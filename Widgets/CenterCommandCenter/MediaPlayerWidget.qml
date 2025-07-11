@@ -19,33 +19,135 @@ Rectangle {
     border.color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.2)
     border.width: 1
     
-    // Timer to update MPRIS position
-    property bool justSeeked: false
-    property real seekTargetPosition: 0
+    // Constants and helpers - all microseconds
+    readonly property real oneSecondUs: 1000000.0
     
+    function asSec(us) { return us / oneSecondUs }
+    function ratio() { return trackLenUs > 0 ? uiPosUs / trackLenUs : 0 }
+    
+    function normalizeLength(lenRaw) {
+        // If length < 86 400 it's almost certainly seconds (24 h upper bound).
+        // Convert to µs; otherwise return as-is.
+        return (lenRaw > 0 && lenRaw < 86400) ? lenRaw * oneSecondUs : lenRaw;
+    }
+    
+    
+    // Call seek() in safe 5-second chunks so every player obeys.
+    function chunkedSeek(offsetUs) {
+        if (Math.abs(offsetUs) < 5 * oneSecondUs) {   // ≤5 s? single shot.
+            activePlayer.seek(offsetUs);
+            return;
+        }
+        
+        const step = 5 * oneSecondUs;                 // 5 s
+        let remaining = offsetUs;
+        let safety    = 0;                            // avoid infinite loops
+        while (Math.abs(remaining) > step && safety < 40) {   // max 200 s
+            activePlayer.seek(Math.sign(remaining) * step);
+            remaining -= Math.sign(remaining) * step;
+            safety++;
+        }
+        if (remaining !== 0) activePlayer.seek(remaining);
+    }
+    
+    // Returns a guaranteed-valid object-path for the current track.
+    function trackPath() {
+        const md = activePlayer.metadata || {};
+        // Spec: "/org/mpris/MediaPlayer2/Track/NNN"
+        if (typeof md["mpris:trackid"] === "string" &&
+            md["mpris:trackid"].length > 1 && md["mpris:trackid"].startsWith("/"))
+            return md["mpris:trackid"];
+
+        // Nothing reliable?  Fall back to the *current* playlist entry object if exposed
+        if (activePlayer.currentTrackPath)      return activePlayer.currentTrackPath;
+
+        // Absolute last resort—return null so caller knows SetPosition will fail
+        return null;
+    }
+    
+    // Position tracking - all microseconds
+    property real uiPosUs: 0
+    property real backendPosUs: 0
+    property real trackLenUs: 0
+    property double backendStamp: Date.now()    // wall-clock of last update in ms
+    
+    // Optimistic timer
     Timer {
-        id: positionTimer
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing && !justSeeked
-        interval: 1000
+        id: tickTimer
+        interval: 50            // 20 fps feels smooth, cheap
         repeat: true
+        running: activePlayer?.playbackState === MprisPlaybackState.Playing
         onTriggered: {
-            if (activePlayer) {
-                activePlayer.positionChanged()
-            }
+            if (trackLenUs <= 0) return;
+            const projected = backendPosUs + (Date.now() - backendStamp) * 1000.0;
+            uiPosUs = Math.min(projected, trackLenUs);   // never exceed track end
         }
     }
     
-    // Timer to resume position updates after seeking
-    Timer {
-        id: seekCooldownTimer
-        interval: 1000  // Reduced from 2000
-        repeat: false
-        onTriggered: {
-            justSeeked = false
-            // Force position update after seek
-            if (activePlayer) {
-                activePlayer.positionChanged()
-            }
+    // --- 500-ms poll to keep external moves in sync -------------------
+    // Timer {
+    //     id: pollTimer
+    //     interval: 500             // ms
+    //     repeat: true
+    //     running: true             // always on; cost is negligible
+    //     onTriggered: {
+    //         if (!activePlayer || trackLenUs <= 0) return;
+
+    //         const polledUs = activePlayer.position;   // property read
+    //         // Compare in percent to avoid false positives
+    //         if (Math.abs((polledUs - backendPosUs) / trackLenUs) > 0.01) { // >1 % jump
+    //             backendPosUs = polledUs;
+    //             backendStamp = Date.now();
+    //             uiPosUs      = polledUs;      // snap instantly
+    //         }
+    //     }
+    // }
+    
+    // Initialize when player changes
+    onActivePlayerChanged: {
+        if (activePlayer) {
+            backendPosUs = activePlayer.position || 0
+            trackLenUs = normalizeLength(activePlayer.length || 0)
+            backendStamp = Date.now()
+            uiPosUs = backendPosUs
+            console.log(`player change → len ${asSec(trackLenUs)} s, pos ${asSec(uiPosUs)} s`)
+        } else {
+            backendPosUs = 0
+            trackLenUs = 0
+            backendStamp = Date.now()
+            uiPosUs = 0
+        }
+    }
+    
+    // Backend events
+    Connections {
+        target: activePlayer
+        
+        function onPositionChanged() {
+            const posUs = activePlayer.position
+            backendPosUs = posUs
+            backendStamp = Date.now()
+            uiPosUs = posUs                 // snap immediately on tick
+        }
+        
+        function onSeeked(pos) {
+            backendPosUs = pos
+            backendStamp = Date.now()
+            uiPosUs = backendPosUs
+        }
+        
+        function onPostTrackChanged() {
+            backendPosUs = activePlayer?.position || 0
+            trackLenUs = normalizeLength(activePlayer?.length || 0)
+            backendStamp = Date.now()
+            uiPosUs = backendPosUs
+        }
+        
+        function onTrackTitleChanged() {
+            backendPosUs = activePlayer?.position || 0
+            trackLenUs = normalizeLength(activePlayer?.length || 0)
+            backendStamp = Date.now()
+            uiPosUs = backendPosUs
         }
     }
     
@@ -129,7 +231,7 @@ Rectangle {
             }
         }
         
-        // Simple progress bar - click to seek only
+        // Progress bar
         Rectangle {
             width: parent.width
             height: 6
@@ -137,16 +239,12 @@ Rectangle {
             color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
             
             Rectangle {
-                width: {
-                    if (!activePlayer || !activePlayer.length || activePlayer.length === 0) return 0
-                    
-                    // Use seek target position if we just seeked
-                    const currentPos = justSeeked ? seekTargetPosition : activePlayer.position
-                    return Math.max(0, Math.min(parent.width, parent.width * (currentPos / activePlayer.length)))
-                }
+                id: progressFill
                 height: parent.height
                 radius: parent.radius
                 color: theme.primary
+                
+                width: parent.width * ratio()
             }
             
             MouseArea {
@@ -154,20 +252,20 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 
                 onClicked: (mouse) => {
-                    if (activePlayer && activePlayer.length > 0 && activePlayer.canSeek) {
-                        const ratio = mouse.x / width
-                        const targetPosition = Math.floor(ratio * activePlayer.length)
-                        const currentPosition = activePlayer.position || 0
-                        const seekOffset = targetPosition - currentPosition
-                        console.log("Simple seek - offset:", seekOffset, "target:", targetPosition, "current:", currentPosition)
-                        
-                        // Store target position for visual feedback
-                        seekTargetPosition = targetPosition
-                        justSeeked = true
-                        seekCooldownTimer.restart()
-                        
-                        activePlayer.seek(seekOffset)
+                    if (!activePlayer || !activePlayer.canSeek || trackLenUs <= 0) return
+                    
+                    const targetUs = (mouse.x / width) * trackLenUs
+                    const offset = targetUs - backendPosUs
+                    
+                    if (typeof activePlayer.setPosition === "function") {
+                        activePlayer.setPosition(trackPath() || "/", Math.round(targetUs))
+                        console.log(`SetPosition → ${asSec(targetUs)} s`)
+                    } else {
+                        chunkedSeek(offset)                          // <-- use helper
+                        console.log(`chunkedSeek → ${asSec(offset/oneSecondUs)} s`)
                     }
+                    
+                    uiPosUs = backendPosUs = targetUs
                 }
             }
         }
@@ -201,16 +299,15 @@ Rectangle {
                         if (!activePlayer) return
                         
                         // >8 s → jump to start, otherwise previous track
-                        if (activePlayer.position > 8000000) {
-                            console.log("Jumping to start - current position:", activePlayer.position)
-                            
-                            // Store target position for visual feedback
-                            seekTargetPosition = 0
-                            justSeeked = true
-                            seekCooldownTimer.restart()
-                            
-                            // Seek to the beginning
-                            activePlayer.seek(-activePlayer.position)
+                        if (uiPosUs > 8 * oneSecondUs && activePlayer.canSeek) {
+                            if (typeof activePlayer.setPosition === "function") {
+                                activePlayer.setPosition(trackPath() || "/", 0)
+                                console.log("Back → SetPosition 0 µs")
+                            } else {
+                                chunkedSeek(-backendPosUs)                   // <-- use helper
+                                console.log("Back → chunkedSeek to 0")
+                            }
+                            uiPosUs = backendPosUs = 0
                         } else {
                             activePlayer.previous()
                         }

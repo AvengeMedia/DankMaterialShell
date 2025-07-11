@@ -13,7 +13,7 @@ Rectangle {
     radius: theme.cornerRadius
     color: clockMouseArea.containsMouse && root.hasActiveMedia ? 
            Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12) :
-           Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.08)
+           Qt.rgba(theme.secondary.r, theme.secondary.g, theme.secondary.b, 0.08)
     
     Behavior on color {
         ColorAnimation {
@@ -57,12 +57,41 @@ Rectangle {
                         visible: parent.children[0].status !== Image.Ready
                         color: "transparent"
                         
-                        Text {
+                        // Animated equalizer bars
+                        Row {
                             anchors.centerIn: parent
-                            text: "music_note"
-                            font.family: theme.iconFont
-                            font.pixelSize: theme.iconSize
-                            color: theme.surfaceVariantText
+                            spacing: 2
+                            
+                            Repeater {
+                                model: 5
+                                
+                                Rectangle {
+                                    property real targetHeight: root.activePlayer?.playbackState === MprisPlaybackState.Playing ? 
+                                        4 + Math.random() * 12 : 4
+                                    
+                                    width: 3
+                                    height: targetHeight
+                                    radius: 1.5
+                                    color: theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    Behavior on height {
+                                        NumberAnimation {
+                                            duration: 100 + index * 50
+                                            easing.type: Easing.OutQuad
+                                        }
+                                    }
+                                    
+                                    Timer {
+                                        running: root.activePlayer?.playbackState === MprisPlaybackState.Playing
+                                        interval: 150 + index * 30
+                                        repeat: true
+                                        onTriggered: {
+                                            parent.targetHeight = 4 + Math.random() * 12
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
