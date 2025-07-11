@@ -11,6 +11,11 @@ Singleton {
     property var audioSinks: []
     property string currentAudioSink: ""
     
+    // Microphone properties
+    property int micLevel: 50
+    property var audioSources: []
+    property string currentAudioSource: ""
+    
     // Real Audio Control
     Process {
         id: volumeChecker
@@ -27,6 +32,22 @@ Singleton {
         }
     }
     
+    // Microphone level checker
+    Process {
+        id: micLevelChecker
+        command: ["bash", "-c", "pactl get-source-volume @DEFAULT_SOURCE@ | grep -o '[0-9]*%' | head -1 | tr -d '%'"]
+        running: true
+        
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: (data) => {
+                if (data.trim()) {
+                    root.micLevel = Math.min(100, parseInt(data.trim()) || 50)
+                }
+            }
+        }
+    }
+    
     Process {
         id: audioSinkLister
         command: ["pactl", "list", "sinks"]
@@ -35,7 +56,6 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text.trim()) {
-                    console.log("Parsing pactl sink output...")
                     let sinks = []
                     let lines = text.trim().split('\n')
                     
@@ -88,9 +108,63 @@ Singleton {
                         sink.displayName = displayName
                     }
                     
-                    console.log("Final audio sinks:", JSON.stringify(sinks, null, 2))
                     root.audioSinks = sinks
                     defaultSinkChecker.running = true
+                }
+            }
+        }
+    }
+    
+    // Audio source (microphone) lister
+    Process {
+        id: audioSourceLister
+        command: ["pactl", "list", "sources"]
+        running: true
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    let sources = []
+                    let lines = text.trim().split('\n')
+                    
+                    let currentSource = null
+                    
+                    for (let line of lines) {
+                        line = line.trim()
+                        
+                        // New source starts
+                        if (line.startsWith('Source #')) {
+                            if (currentSource && currentSource.name && currentSource.id) {
+                                sources.push(currentSource)
+                            }
+                            currentSource = {
+                                id: line.replace('Source #', '').replace(':', ''),
+                                name: '',
+                                displayName: '',
+                                active: false
+                            }
+                        }
+                        // Source name
+                        else if (line.startsWith('Name: ') && currentSource) {
+                            currentSource.name = line.replace('Name: ', '')
+                        }
+                        // Description (display name)
+                        else if (line.startsWith('Description: ') && currentSource) {
+                            let desc = line.replace('Description: ', '')
+                            currentSource.displayName = desc
+                        }
+                    }
+                    
+                    // Add the last source
+                    if (currentSource && currentSource.name && currentSource.id) {
+                        sources.push(currentSource)
+                    }
+                    
+                    // Filter out monitor sources (we want actual input devices)
+                    sources = sources.filter(source => !source.name.includes('.monitor'))
+                    
+                    root.audioSources = sources
+                    defaultSourceChecker.running = true
                 }
             }
         }
@@ -106,7 +180,6 @@ Singleton {
             onRead: (data) => {
                 if (data.trim()) {
                     root.currentAudioSink = data.trim()
-                    console.log("Default audio sink:", root.currentAudioSink)
                     
                     // Update active status in audioSinks
                     let updatedSinks = []
@@ -124,6 +197,34 @@ Singleton {
         }
     }
     
+    // Default source (microphone) checker
+    Process {
+        id: defaultSourceChecker
+        command: ["pactl", "get-default-source"]
+        running: false
+        
+        stdout: SplitParser {
+            splitMarker: "\n"
+            onRead: (data) => {
+                if (data.trim()) {
+                    root.currentAudioSource = data.trim()
+                    
+                    // Update active status in audioSources
+                    let updatedSources = []
+                    for (let source of root.audioSources) {
+                        updatedSources.push({
+                            id: source.id,
+                            name: source.name,
+                            displayName: source.displayName,
+                            active: source.name === root.currentAudioSource
+                        })
+                    }
+                    root.audioSources = updatedSources
+                }
+            }
+        }
+    }
+    
     function setVolume(percentage) {
         let volumeSetProcess = Qt.createQmlObject('
             import Quickshell.Io
@@ -131,6 +232,17 @@ Singleton {
                 command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "' + percentage + '%"]
                 running: true
                 onExited: volumeChecker.running = true
+            }
+        ', root)
+    }
+    
+    function setMicLevel(percentage) {
+        let micSetProcess = Qt.createQmlObject('
+            import Quickshell.Io
+            Process {
+                command: ["pactl", "set-source-volume", "@DEFAULT_SOURCE@", "' + percentage + '%"]
+                running: true
+                onExited: micLevelChecker.running = true
             }
         ', root)
     }
@@ -158,6 +270,41 @@ Singleton {
             } else {
                 console.error("Failed to change audio sink")
             }
+        }
+    }
+    
+    function setAudioSource(sourceName) {
+        console.log("Setting audio source to:", sourceName)
+        
+        sourceSetProcess.command = ["pactl", "set-default-source", sourceName]
+        sourceSetProcess.running = true
+    }
+    
+    // Dedicated process for setting audio source
+    Process {
+        id: sourceSetProcess
+        running: false
+        
+        onExited: (exitCode) => {
+            console.log("Audio source change exit code:", exitCode)
+            if (exitCode === 0) {
+                console.log("Audio source changed successfully")
+                // Refresh current source and list
+                defaultSourceChecker.running = true
+                audioSourceLister.running = true
+            } else {
+                console.error("Failed to change audio source")
+            }
+        }
+    }
+    
+    // Timer to refresh audio devices regularly (catches new Bluetooth devices)
+    Timer {
+        interval: 4000          // 4s refresh to catch new BT devices
+        running: true; repeat: true
+        onTriggered: {
+            audioSinkLister.running = true
+            audioSourceLister.running = true
         }
     }
 }

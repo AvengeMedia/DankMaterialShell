@@ -12,6 +12,7 @@ import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import "Services"
 import "Widgets"
+import "Widgets/CenterCommandCenter"
 import "Common"
 import "Common/Utilities.js" as Utils
 
@@ -64,6 +65,11 @@ ShellRoot {
     property int volumeLevel: AudioService.volumeLevel
     property var audioSinks: AudioService.audioSinks
     property string currentAudioSink: AudioService.currentAudioSink
+    
+    // Microphone properties from AudioService
+    property int micLevel: AudioService.micLevel
+    property var audioSources: AudioService.audioSources
+    property string currentAudioSource: AudioService.currentAudioSource
     
     // Bluetooth properties from BluetoothService
     property var bluetoothDevices: BluetoothService.bluetoothDevices
@@ -280,7 +286,7 @@ ShellRoot {
     }
     
     // Global popup windows
-    CalendarPopup {}
+    CenterCommandCenter {}
     TrayMenuPopup {}
     NotificationPopup {}
     NotificationHistoryPopup {}

@@ -27,16 +27,15 @@ Singleton {
             target: modelData
 
             Component.onCompleted: {
-                console.log("MPRIS Player connected:", modelData.identity)
                 if (root.trackedPlayer == null || modelData.isPlaying) {
                     root.trackedPlayer = modelData
                 }
             }
 
             Component.onDestruction: {
-                if (root.trackedPlayer == null || !root.trackedPlayer.isPlaying) {
+                if (root.trackedPlayer == null || root.trackedPlayer.playbackState !== MprisPlaybackState.Playing) {
                     for (const player of Mpris.players.values) {
-                        if (player.playbackState.isPlaying) {
+                        if (player.playbackState === MprisPlaybackState.Playing) {
                             root.trackedPlayer = player
                             break
                         }
@@ -73,7 +72,6 @@ Singleton {
     onActivePlayerChanged: this.updateTrack()
 
     function updateTrack() {
-        console.log(`MPRIS Track Update: ${this.activePlayer?.trackTitle ?? ""} : ${this.activePlayer?.trackArtist}`)
         this.activeTrack = {
             uniqueId: this.activePlayer?.uniqueId ?? 0,
             artUrl: this.activePlayer?.trackArtUrl ?? "",
@@ -86,7 +84,7 @@ Singleton {
         this.__reverse = false
     }
 
-    property bool isPlaying: this.activePlayer && this.activePlayer.isPlaying
+    property bool isPlaying: this.activePlayer && this.activePlayer.playbackState === MprisPlaybackState.Playing
     property bool canTogglePlaying: this.activePlayer?.canTogglePlaying ?? false
     function togglePlaying() {
         if (this.canTogglePlaying) this.activePlayer.togglePlaying()
@@ -128,7 +126,6 @@ Singleton {
 
     function setActivePlayer(player) {
         const targetPlayer = player ?? Mpris.players[0]
-        console.log(`[Mpris] Active player ${targetPlayer} << ${activePlayer}`)
 
         if (targetPlayer && this.activePlayer) {
             this.__reverse = Mpris.players.indexOf(targetPlayer) < Mpris.players.indexOf(this.activePlayer)
@@ -139,22 +136,4 @@ Singleton {
         this.trackedPlayer = targetPlayer
     }
 
-    // Debug timer
-    Timer {
-        interval: 3000
-        running: true
-        repeat: true
-        onTriggered: {
-            if (activePlayer) {
-                console.log(`  Track: ${activePlayer.trackTitle || 'Unknown'} by ${activePlayer.trackArtist || 'Unknown'}`)
-                console.log(`  State: ${activePlayer.playbackState}`)
-            } else if (Mpris.players.length === 0) {
-                console.log("  No MPRIS players detected. Try:")
-                console.log("    - mpv --script-opts=mpris-title='{{media-title}}' file.mp3")
-                console.log("    - firefox/chromium (YouTube, Spotify Web)")
-                console.log("    - vlc file.mp3")
-                console.log("  Check available players: busctl --user list | grep mpris")
-            }
-        }
-    }
 }
