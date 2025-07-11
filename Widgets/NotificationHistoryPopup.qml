@@ -213,13 +213,15 @@ PanelWindow {
                                             id: historyNotifImage
                                             anchors.fill: parent
                                             readonly property int size: parent.width
+                                            property bool imageValid: true
                                             
                                             source: model.image || ""
                                             fillMode: Image.PreserveAspectCrop
-                                            cache: false
+                                            cache: true  // Enable caching for history
                                             antialiasing: true
                                             asynchronous: true
                                             smooth: true
+                                            visible: imageValid
                                             
                                             // Proper sizing like EXAMPLE
                                             width: size
@@ -238,16 +240,36 @@ PanelWindow {
                                             
                                             onStatusChanged: {
                                                 if (status === Image.Error) {
-                                                    console.warn("Failed to load notification image:", source)
+                                                    console.warn("Failed to load notification history image:", source)
+                                                    imageValid = false
                                                 } else if (status === Image.Ready) {
-                                                    console.log("Notification image loaded:", source, "size:", sourceSize.width + "x" + sourceSize.height)
+                                                    console.log("Notification history image loaded:", source, "size:", sourceSize.width + "x" + sourceSize.height)
+                                                    imageValid = true
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Fallback to app icon when primary image fails
+                                        Loader {
+                                            active: !historyNotifImage.imageValid && model.appIcon && model.appIcon !== ""
+                                            anchors.centerIn: parent
+                                            sourceComponent: IconImage {
+                                                width: 32
+                                                height: 32
+                                                asynchronous: true
+                                                source: {
+                                                    if (!model.appIcon) return ""
+                                                    if (model.appIcon.startsWith("file://") || model.appIcon.startsWith("/")) {
+                                                        return model.appIcon
+                                                    }
+                                                    return Quickshell.iconPath(model.appIcon, "image-missing")
                                                 }
                                             }
                                         }
                                         
                                         // Small app icon overlay when showing notification image
                                         Loader {
-                                            active: model.appIcon && model.appIcon !== ""
+                                            active: historyNotifImage.imageValid && model.appIcon && model.appIcon !== ""
                                             anchors.bottom: parent.bottom
                                             anchors.right: parent.right
                                             sourceComponent: IconImage {
