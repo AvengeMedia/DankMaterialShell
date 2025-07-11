@@ -115,21 +115,29 @@ Singleton {
                     root.isLowBattery = root.batteryLevel <= 20
                 }
             } else if (line.includes('state:') || line.includes('status:')) {
-                if (line.includes('charging')) {
+                let statusPart = line.split(':')[1]?.trim().toLowerCase() || line
+                console.log("Raw battery status line:", line, "extracted status:", statusPart)
+                
+                if (statusPart === 'charging') {
                     root.batteryStatus = "Charging"
                     root.isCharging = true
-                } else if (line.includes('discharging')) {
+                    console.log("Battery is charging")
+                } else if (statusPart === 'discharging') {
                     root.batteryStatus = "Discharging"
                     root.isCharging = false
-                } else if (line.includes('full')) {
+                    console.log("Battery is discharging")
+                } else if (statusPart === 'full') {
                     root.batteryStatus = "Full"
                     root.isCharging = false
-                } else if (line.includes('not charging')) {
+                    console.log("Battery is full")
+                } else if (statusPart === 'not charging') {
                     root.batteryStatus = "Not charging"
                     root.isCharging = false
+                    console.log("Battery is not charging")
                 } else {
-                    root.batteryStatus = "Unknown"
+                    root.batteryStatus = statusPart.charAt(0).toUpperCase() + statusPart.slice(1) || "Unknown"
                     root.isCharging = false
+                    console.log("Battery status unknown:", statusPart)
                 }
             } else if (line.includes('time to')) {
                 let match = line.match(/(\d+):(\d+)/)

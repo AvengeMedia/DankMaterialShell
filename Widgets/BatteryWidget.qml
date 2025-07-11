@@ -8,7 +8,7 @@ Rectangle {
     
     property bool batteryPopupVisible: false
     
-    width: 48
+    width: 70  // Increased width to accommodate percentage text
     height: 32
     radius: Theme.cornerRadius
     color: batteryArea.containsMouse || batteryPopupVisible ? 
@@ -16,25 +16,44 @@ Rectangle {
            Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
     visible: BatteryService.batteryAvailable
     
-    // Battery icon - Material Design icons already show level visually
-    Text {
-        text: BatteryService.getBatteryIcon()
-        font.family: Theme.iconFont
-        font.pixelSize: Theme.iconSize
-        color: {
-            if (!BatteryService.batteryAvailable) return Theme.surfaceText
-            if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
-            if (BatteryService.isCharging) return Theme.primary
-            return Theme.surfaceText
-        }
+    Row {
         anchors.centerIn: parent
+        spacing: 4
         
-        // Subtle pulse animation for charging
-        SequentialAnimation on opacity {
-            running: BatteryService.isCharging
-            loops: Animation.Infinite
-            NumberAnimation { to: 0.6; duration: 1000; easing.type: Easing.InOutQuad }
-            NumberAnimation { to: 1.0; duration: 1000; easing.type: Easing.InOutQuad }
+        // Battery icon - Material Design icons already show level visually
+        Text {
+            text: BatteryService.getBatteryIcon()
+            font.family: Theme.iconFont
+            font.pixelSize: Theme.iconSize - 6
+            color: {
+                if (!BatteryService.batteryAvailable) return Theme.surfaceText
+                if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
+                if (BatteryService.isCharging) return Theme.primary
+                return Theme.surfaceText
+            }
+            anchors.verticalCenter: parent.verticalCenter
+            
+            // Subtle pulse animation for charging
+            SequentialAnimation on opacity {
+                running: BatteryService.isCharging
+                loops: Animation.Infinite
+                NumberAnimation { to: 0.6; duration: 1000; easing.type: Easing.InOutQuad }
+                NumberAnimation { to: 1.0; duration: 1000; easing.type: Easing.InOutQuad }
+            }
+        }
+        
+        // Battery percentage text
+        Text {
+            text: BatteryService.batteryLevel + "%"
+            font.pixelSize: Theme.fontSizeSmall
+            font.weight: Font.Medium
+            color: {
+                if (!BatteryService.batteryAvailable) return Theme.surfaceText
+                if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
+                if (BatteryService.isCharging) return Theme.primary
+                return Theme.surfaceText
+            }
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
     

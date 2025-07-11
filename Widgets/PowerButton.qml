@@ -16,7 +16,7 @@ Rectangle {
     Text {
         text: "power_settings_new"
         font.family: Theme.iconFont
-        font.pixelSize: Theme.iconSize
+        font.pixelSize: Theme.iconSize - 6
         color: powerArea.containsMouse || root.powerMenuVisible ? Theme.error : Theme.surfaceText
         anchors.centerIn: parent
     }
