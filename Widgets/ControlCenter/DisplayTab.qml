@@ -56,55 +56,110 @@ ScrollView {
                 font.weight: Font.Medium
             }
             
-            // Night mode toggle
-            Rectangle {
+            // Mode toggles row (Night Mode + Light/Dark Mode)
+            Row {
                 width: parent.width
-                height: 50
-                radius: Theme.cornerRadius
-                color: displayTab.nightModeEnabled ? 
-                    Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
-                    (nightModeToggle.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
-                border.color: displayTab.nightModeEnabled ? Theme.primary : "transparent"
-                border.width: displayTab.nightModeEnabled ? 1 : 0
+                spacing: Theme.spacingM
                 
-                Row {
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: Theme.spacingM
+                // Night mode toggle
+                Rectangle {
+                    width: (parent.width - Theme.spacingM) / 2
+                    height: 50
+                    radius: Theme.cornerRadius
+                    color: displayTab.nightModeEnabled ? 
+                        Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
+                        (nightModeToggle.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
+                    border.color: displayTab.nightModeEnabled ? Theme.primary : "transparent"
+                    border.width: displayTab.nightModeEnabled ? 1 : 0
                     
-                    Text {
-                        text: displayTab.nightModeEnabled ? "nightlight" : "dark_mode"
-                        font.family: Theme.iconFont
-                        font.pixelSize: Theme.iconSize
-                        color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+                        
+                        Text {
+                            text: displayTab.nightModeEnabled ? "nightlight" : "dark_mode"
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize
+                            color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        Text {
+                            text: "Night Mode"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
                     }
                     
-                    Text {
-                        text: "Night Mode" + (displayTab.nightModeEnabled ? " (On)" : "")
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.verticalCenter: parent.verticalCenter
+                    MouseArea {
+                        id: nightModeToggle
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        
+                        onClicked: {
+                            if (displayTab.nightModeEnabled) {
+                                // Disable night mode - kill any running color temperature processes
+                                nightModeDisableProcess.running = true
+                                displayTab.nightModeEnabled = false
+                            } else {
+                                // Enable night mode using wlsunset or redshift
+                                nightModeEnableProcess.running = true
+                                displayTab.nightModeEnabled = true
+                            }
+                        }
                     }
                 }
                 
-                MouseArea {
-                    id: nightModeToggle
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                // Light/Dark mode toggle
+                Rectangle {
+                    width: (parent.width - Theme.spacingM) / 2
+                    height: 50
+                    radius: Theme.cornerRadius
+                    color: Theme.isLightMode ? 
+                        Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
+                        (lightModeToggle.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
+                    border.color: Theme.isLightMode ? Theme.primary : "transparent"
+                    border.width: Theme.isLightMode ? 1 : 0
                     
-                    onClicked: {
-                        if (displayTab.nightModeEnabled) {
-                            // Disable night mode - kill any running color temperature processes
-                            nightModeDisableProcess.running = true
-                            displayTab.nightModeEnabled = false
-                        } else {
-                            // Enable night mode using wlsunset or redshift
-                            nightModeEnableProcess.running = true
-                            displayTab.nightModeEnabled = true
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingXS
+                        
+                        Text {
+                            text: Theme.isLightMode ? "light_mode" : "palette"
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize
+                            color: Theme.isLightMode ? Theme.primary : Theme.surfaceText
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                        
+                        Text {
+                            text: Theme.isLightMode ? "Light Mode" : "Dark Mode"
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.isLightMode ? Theme.primary : Theme.surfaceText
+                            font.weight: Font.Medium
+                            anchors.horizontalCenter: parent.horizontalCenter
+                        }
+                    }
+                    
+                    MouseArea {
+                        id: lightModeToggle
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        
+                        onClicked: {
+                            Theme.toggleLightMode()
+                        }
+                    }
+                    
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                 }

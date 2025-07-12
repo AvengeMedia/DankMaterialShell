@@ -184,6 +184,12 @@ Column {
             }
         }
         
+        // Spacer for better visual separation
+        Item {
+            width: 1
+            height: Theme.spacingM
+        }
+        
         // Auto theme button - prominent oval below the grid
         Rectangle {
             width: 120

@@ -21,7 +21,8 @@ QtObject {
         
         Qt.callLater(() => {
             if (typeof Prefs !== "undefined") {
-                console.log("Theme applying saved preferences:", Prefs.themeIndex, Prefs.themeIsDynamic)
+                console.log("Theme applying saved preferences:", Prefs.themeIndex, Prefs.themeIsDynamic, "lightMode:", Prefs.isLightMode)
+                isLightMode = Prefs.isLightMode
                 switchTheme(Prefs.themeIndex, Prefs.themeIsDynamic, false)  // Don't save during startup
             }
         })
@@ -219,10 +220,185 @@ QtObject {
             surfaceContainerHigh: "#2b2221"
         }
     ]
+
+    // Light theme variants
+    property var lightThemes: [
+        {
+            name: "Blue Light",
+            primary: "#1976d2",
+            primaryText: "#ffffff", 
+            primaryContainer: "#e3f2fd",
+            secondary: "#42a5f5",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#1976d2",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Deep Blue Light",
+            primary: "#0061a4",
+            primaryText: "#ffffff",
+            primaryContainer: "#cfe5ff",
+            secondary: "#1976d2",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#0061a4",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Purple Light",
+            primary: "#6750A4",
+            primaryText: "#ffffff",
+            primaryContainer: "#EADDFF",
+            secondary: "#625B71",
+            surface: "#FFFBFE",
+            surfaceText: "#1C1B1F",
+            surfaceVariant: "#E7E0EC",
+            surfaceVariantText: "#49454F",
+            surfaceTint: "#6750A4",
+            background: "#FFFBFE",
+            backgroundText: "#1C1B1F",
+            outline: "#79747E",
+            surfaceContainer: "#F3EDF7",
+            surfaceContainerHigh: "#ECE6F0"
+        },
+        {
+            name: "Green Light",
+            primary: "#2e7d32",
+            primaryText: "#ffffff",
+            primaryContainer: "#e8f5e8",
+            secondary: "#4caf50",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#2e7d32",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Orange Light",
+            primary: "#e65100",
+            primaryText: "#ffffff",
+            primaryContainer: "#ffecb3",
+            secondary: "#ff9800",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#e65100",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Red Light",
+            primary: "#d32f2f",
+            primaryText: "#ffffff",
+            primaryContainer: "#ffebee",
+            secondary: "#f44336",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#d32f2f",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Cyan Light",
+            primary: "#0097a7",
+            primaryText: "#ffffff",
+            primaryContainer: "#e0f2f1",
+            secondary: "#00bcd4",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#0097a7",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Pink Light",
+            primary: "#c2185b",
+            primaryText: "#ffffff",
+            primaryContainer: "#fce4ec",
+            secondary: "#e91e63",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#c2185b",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Amber Light",
+            primary: "#ff8f00",
+            primaryText: "#000000",
+            primaryContainer: "#fff8e1",
+            secondary: "#ffc107",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#ff8f00",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        },
+        {
+            name: "Coral Light",
+            primary: "#8c1d18",
+            primaryText: "#ffffff",
+            primaryContainer: "#ffdad6",
+            secondary: "#ff5449",
+            surface: "#fefefe",
+            surfaceText: "#1a1c1e",
+            surfaceVariant: "#e7e0ec",
+            surfaceVariantText: "#49454f",
+            surfaceTint: "#8c1d18",
+            background: "#fefefe",
+            backgroundText: "#1a1c1e",
+            outline: "#79747e",
+            surfaceContainer: "#f3f3f3",
+            surfaceContainerHigh: "#ececec"
+        }
+    ]
     
     // Current theme index (10 = Auto/Dynamic)
     property int currentThemeIndex: 0
     property bool isDynamicTheme: false
+    property bool isLightMode: false
     
     // Function to switch themes
     function switchTheme(themeIndex, isDynamic = false, savePrefs = true) {
@@ -252,21 +428,44 @@ QtObject {
         }
     }
     
+    // Function to toggle light/dark mode
+    function toggleLightMode(savePrefs = true) {
+        console.log("Theme.toggleLightMode called, current isLightMode:", isLightMode)
+        isLightMode = !isLightMode
+        console.log("Light mode toggled to:", isLightMode)
+        
+        // Save preference
+        if (savePrefs && typeof Prefs !== "undefined") {
+            Prefs.setLightMode(isLightMode)
+        }
+    }
+    
+    // Helper function to get current theme array
+    function getCurrentThemeArray() {
+        return isLightMode ? lightThemes : themes
+    }
+    
+    // Helper function to get current theme
+    function getCurrentTheme() {
+        var themeArray = getCurrentThemeArray()
+        return currentThemeIndex < themeArray.length ? themeArray[currentThemeIndex] : themeArray[0]
+    }
+
     // Dynamic color properties that change based on current theme
-    property color primary: isDynamicTheme ? Colors.accentHi : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primary : themes[0].primary)
-    property color primaryText: isDynamicTheme ? Colors.primaryText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primaryText : themes[0].primaryText)
-    property color primaryContainer: isDynamicTheme ? Colors.primaryContainer : (currentThemeIndex < themes.length ? themes[currentThemeIndex].primaryContainer : themes[0].primaryContainer)
-    property color secondary: isDynamicTheme ? Colors.accentLo : (currentThemeIndex < themes.length ? themes[currentThemeIndex].secondary : themes[0].secondary)
-    property color surface: isDynamicTheme ? Colors.surface : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surface : themes[0].surface)
-    property color surfaceText: isDynamicTheme ? Colors.surfaceText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceText : themes[0].surfaceText)
-    property color surfaceVariant: isDynamicTheme ? Colors.surfaceVariant : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceVariant : themes[0].surfaceVariant)
-    property color surfaceVariantText: isDynamicTheme ? Colors.surfaceVariantText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceVariantText : themes[0].surfaceVariantText)
-    property color surfaceTint: isDynamicTheme ? Colors.surfaceTint : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceTint : themes[0].surfaceTint)
-    property color background: isDynamicTheme ? Colors.background : (currentThemeIndex < themes.length ? themes[currentThemeIndex].background : themes[0].background)
-    property color backgroundText: isDynamicTheme ? Colors.backgroundText : (currentThemeIndex < themes.length ? themes[currentThemeIndex].backgroundText : themes[0].backgroundText)
-    property color outline: isDynamicTheme ? Colors.outline : (currentThemeIndex < themes.length ? themes[currentThemeIndex].outline : themes[0].outline)
-    property color surfaceContainer: isDynamicTheme ? Colors.surfaceContainer : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceContainer : themes[0].surfaceContainer)
-    property color surfaceContainerHigh: isDynamicTheme ? Colors.surfaceContainerHigh : (currentThemeIndex < themes.length ? themes[currentThemeIndex].surfaceContainerHigh : themes[0].surfaceContainerHigh)
+    property color primary: isDynamicTheme ? Colors.accentHi : getCurrentTheme().primary
+    property color primaryText: isDynamicTheme ? Colors.primaryText : getCurrentTheme().primaryText
+    property color primaryContainer: isDynamicTheme ? Colors.primaryContainer : getCurrentTheme().primaryContainer
+    property color secondary: isDynamicTheme ? Colors.accentLo : getCurrentTheme().secondary
+    property color surface: isDynamicTheme ? Colors.surface : getCurrentTheme().surface
+    property color surfaceText: isDynamicTheme ? Colors.surfaceText : getCurrentTheme().surfaceText
+    property color surfaceVariant: isDynamicTheme ? Colors.surfaceVariant : getCurrentTheme().surfaceVariant
+    property color surfaceVariantText: isDynamicTheme ? Colors.surfaceVariantText : getCurrentTheme().surfaceVariantText
+    property color surfaceTint: isDynamicTheme ? Colors.surfaceTint : getCurrentTheme().surfaceTint
+    property color background: isDynamicTheme ? Colors.background : getCurrentTheme().background
+    property color backgroundText: isDynamicTheme ? Colors.backgroundText : getCurrentTheme().backgroundText
+    property color outline: isDynamicTheme ? Colors.outline : getCurrentTheme().outline
+    property color surfaceContainer: isDynamicTheme ? Colors.surfaceContainer : getCurrentTheme().surfaceContainer
+    property color surfaceContainerHigh: isDynamicTheme ? Colors.surfaceContainerHigh : getCurrentTheme().surfaceContainerHigh
     
     // Static colors that don't change with themes
     property color archBlue: "#1793D1"

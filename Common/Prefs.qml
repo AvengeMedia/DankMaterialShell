@@ -8,6 +8,7 @@ Singleton {
     
     property int themeIndex: 0
     property bool themeIsDynamic: false
+    property bool isLightMode: false
     property var recentlyUsedApps: []
     
     readonly property string configDir: Qt.resolvedUrl("file://" + Quickshell.env("HOME") + "/.config/DankMaterialDark")
@@ -57,8 +58,9 @@ Singleton {
                     var settings = JSON.parse(content)
                     themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0
                     themeIsDynamic = settings.themeIsDynamic !== undefined ? settings.themeIsDynamic : false
+                    isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
                     recentlyUsedApps = settings.recentlyUsedApps || []
-                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "recentApps:", recentlyUsedApps.length)
+                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "recentApps:", recentlyUsedApps.length)
                 } else {
                     console.log("Settings file is empty")
                 }
@@ -81,6 +83,7 @@ Singleton {
         var settings = {
             themeIndex: themeIndex,
             themeIsDynamic: themeIsDynamic,
+            isLightMode: isLightMode,
             recentlyUsedApps: recentlyUsedApps
         }
         
@@ -88,7 +91,7 @@ Singleton {
         
         writeProcess.command = ["sh", "-c", "echo '" + content + "' > '" + Quickshell.env("HOME") + "/.config/DankMaterialDark/settings.json'"]
         writeProcess.running = true
-        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "recentApps:", recentlyUsedApps.length)
+        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "recentApps:", recentlyUsedApps.length)
     }
     
     function applyStoredTheme() {
@@ -109,6 +112,12 @@ Singleton {
         console.log("Prefs setTheme called - themeIndex:", index, "isDynamic:", isDynamic)
         themeIndex = index
         themeIsDynamic = isDynamic
+        saveSettings()
+    }
+    
+    function setLightMode(lightMode) {
+        console.log("Prefs setLightMode called - isLightMode:", lightMode)
+        isLightMode = lightMode
         saveSettings()
     }
     
