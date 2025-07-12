@@ -342,6 +342,23 @@ ShellRoot {
     SettingsPopup {
         id: settingsPopup
         settingsVisible: root.settingsVisible
+        
+        // Use a more direct approach for two-way binding
+        onSettingsVisibleChanged: {
+            if (settingsVisible !== root.settingsVisible) {
+                root.settingsVisible = settingsVisible
+            }
+        }
+        
+        // Also listen to root changes
+        Connections {
+            target: root
+            function onSettingsVisibleChanged() {
+                if (settingsPopup.settingsVisible !== root.settingsVisible) {
+                    settingsPopup.settingsVisible = root.settingsVisible
+                }
+            }
+        }
     }
     
     // Application and clipboard components

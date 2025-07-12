@@ -53,6 +53,7 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         border.width: 1
         
+        // Simple opacity and scale control tied directly to settingsVisible
         opacity: settingsPopup.settingsVisible ? 1.0 : 0.0
         scale: settingsPopup.settingsVisible ? 1.0 : 0.95
         
