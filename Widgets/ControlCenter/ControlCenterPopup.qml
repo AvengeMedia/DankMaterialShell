@@ -34,7 +34,14 @@ PanelWindow {
     
     Rectangle {
         width: Math.min(600, parent.width - Theme.spacingL * 2)
-        height: Math.min(500, parent.height - Theme.barHeight - Theme.spacingS * 2)
+        height: {
+            let baseHeight = Math.min(500, parent.height - Theme.barHeight - Theme.spacingS * 2)
+            // Expand container when power menu is open
+            if (controlCenterPopup.powerOptionsExpanded) {
+                baseHeight += 70 // Extra space for power options
+            }
+            return baseHeight
+        }
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.surfaceContainer
@@ -53,6 +60,13 @@ PanelWindow {
         }
         
         Behavior on scale {
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
+        }
+        
+        Behavior on height {
             NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing

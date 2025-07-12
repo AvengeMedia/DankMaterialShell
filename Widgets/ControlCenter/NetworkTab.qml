@@ -135,43 +135,41 @@ Item {
                 // Ethernet status card
                 Rectangle {
                     width: parent.width
-                    height: 100
+                    height: 60
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
-                    border.color: networkTab.networkStatus === "ethernet" ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                    border.width: networkTab.networkStatus === "ethernet" ? 2 : 1
+                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                    border.color: networkTab.networkStatus === "ethernet" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) : "transparent"
+                    border.width: networkTab.networkStatus === "ethernet" ? 1 : 0
                     
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingS
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingM
                         
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: Theme.spacingM
+                        Text {
+                            text: "lan"
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize
+                            color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        
+                        Column {
+                            spacing: 2
+                            anchors.verticalCenter: parent.verticalCenter
                             
                             Text {
-                                text: "lan"
-                                font.family: Theme.iconFont
-                                font.pixelSize: Theme.iconSizeLarge
+                                text: "Ethernet"
+                                font.pixelSize: Theme.fontSizeMedium
                                 color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
+                                font.weight: Font.Medium
                             }
                             
-                            Column {
-                                spacing: 2
-                                
-                                Text {
-                                    text: "Ethernet"
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surfaceText
-                                    font.weight: Font.Medium
-                                }
-                                
-                                Text {
-                                    text: networkTab.networkStatus === "ethernet" ? "Connected" : "Disconnected"
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                }
+                            Text {
+                                text: networkTab.networkStatus === "ethernet" ? "Connected" : "Disconnected"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                             }
                         }
                     }

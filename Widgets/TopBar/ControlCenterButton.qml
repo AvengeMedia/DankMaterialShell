@@ -49,6 +49,17 @@ Rectangle {
             visible: true
         }
         
+        // Bluetooth Icon (when available and enabled) - moved next to network
+        Text {
+            text: "bluetooth"
+            font.family: Theme.iconFont
+            font.pixelSize: Theme.iconSize - 8
+            font.weight: Theme.iconFontWeight
+            color: root.bluetoothEnabled ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            anchors.verticalCenter: parent.verticalCenter
+            visible: root.bluetoothAvailable && root.bluetoothEnabled
+        }
+        
         // Audio Icon
         Text {
             text: root.volumeLevel === 0 ? "volume_off" : 
@@ -70,17 +81,6 @@ Rectangle {
             color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
             visible: false // TODO: Add mic detection
-        }
-        
-        // Bluetooth Icon (when available and enabled)
-        Text {
-            text: "bluetooth"
-            font.family: Theme.iconFont
-            font.pixelSize: Theme.iconSize - 8
-            font.weight: Theme.iconFontWeight
-            color: root.bluetoothEnabled ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
-            anchors.verticalCenter: parent.verticalCenter
-            visible: root.bluetoothAvailable && root.bluetoothEnabled
         }
     }
     
