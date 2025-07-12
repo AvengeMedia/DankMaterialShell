@@ -14,6 +14,7 @@ Item {
     property bool showValue: true
     
     signal sliderValueChanged(int newValue)
+    signal sliderDragFinished(int finalValue)
     
     height: 80
     
@@ -131,6 +132,12 @@ Item {
                             let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
                             slider.value = newValue
                             slider.sliderValueChanged(newValue)
+                        }
+                    }
+                    
+                    onReleased: {
+                        if (slider.enabled) {
+                            slider.sliderDragFinished(slider.value)
                         }
                     }
                 }

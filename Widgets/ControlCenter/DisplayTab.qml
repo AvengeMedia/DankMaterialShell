@@ -205,6 +205,10 @@ ScrollView {
                     onSliderValueChanged: (newValue) => {
                         let transparencyValue = newValue / 100.0
                         displayTab.topBarTransparency = transparencyValue
+                    }
+                    
+                    onSliderDragFinished: (finalValue) => {
+                        let transparencyValue = finalValue / 100.0
                         Prefs.setTopBarTransparency(transparencyValue)
                     }
                 }
