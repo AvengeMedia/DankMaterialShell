@@ -8,7 +8,7 @@ Rectangle {
     
     signal clockClicked()
     
-    width: clockRow.implicitWidth + Theme.spacingM
+    width: clockRow.implicitWidth + Theme.spacingS * 2
     height: 30
     radius: Theme.cornerRadius
     color: clockMouseArea.containsMouse ? 

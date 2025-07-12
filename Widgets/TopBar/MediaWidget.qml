@@ -11,7 +11,7 @@ Rectangle {
     signal clicked()
     
     visible: hasActiveMedia
-    width: hasActiveMedia ? Math.min(200, mediaText.implicitWidth + Theme.spacingS + 48) : 0
+    width: hasActiveMedia ? Math.min(200, mediaText.implicitWidth + Theme.spacingS * 2 + 20 + Theme.spacingXS) : 0
     height: 30
     radius: Theme.cornerRadius
     color: mediaArea.containsMouse ? 
