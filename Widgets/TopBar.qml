@@ -300,15 +300,11 @@ EOF`
                     Connections {
                         target: NiriWorkspaceService
                         function onAllWorkspacesChanged() {
-                            var oldCurrent = workspaceSwitcher.currentWorkspace
                             workspaceSwitcher.workspaceList = workspaceSwitcher.getDisplayWorkspaces()
                             workspaceSwitcher.currentWorkspace = workspaceSwitcher.getDisplayActiveWorkspace()
-                            console.log("DEBUG: TopBar onAllWorkspacesChanged for", topBar.screenName, "- current workspace:", oldCurrent, "→", workspaceSwitcher.currentWorkspace)
                         }
                         function onFocusedWorkspaceIndexChanged() {
-                            var oldCurrent = workspaceSwitcher.currentWorkspace
                             workspaceSwitcher.currentWorkspace = workspaceSwitcher.getDisplayActiveWorkspace()
-                            console.log("DEBUG: TopBar onFocusedWorkspaceIndexChanged for", topBar.screenName, "- current workspace:", oldCurrent, "→", workspaceSwitcher.currentWorkspace)
                         }
                         function onNiriAvailableChanged() {
                             if (NiriWorkspaceService.niriAvailable) {
@@ -329,6 +325,7 @@ EOF`
                             Rectangle {
                                 property bool isActive: modelData === workspaceSwitcher.currentWorkspace
                                 property bool isHovered: mouseArea.containsMouse
+                                property int sequentialNumber: index + 1  // 1-based sequential number per monitor
                                 
                                 
                                 width: isActive ? Theme.spacingXL + Theme.spacingS : Theme.spacingL
@@ -359,13 +356,8 @@ EOF`
                                     cursorShape: Qt.PointingHandCursor
                                     
                                     onClicked: {
-                                        // Use NiriWorkspaceService for workspace switching
-                                        if (NiriWorkspaceService.niriAvailable) {
-                                            NiriWorkspaceService.switchToWorkspaceByNumber(modelData)
-                                        } else {
-                                            // Fallback for when service isn't ready
-                                            Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", modelData.toString()])
-                                        }
+                                        // Use sequential workspace number directly - niri focus-workspace uses 1,2,3,etc per monitor
+                                        Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", sequentialNumber.toString()])
                                     }
                                 }
                             }

@@ -241,18 +241,27 @@ Singleton {
         return switchToWorkspace(workspace.id)
     }
     
-    function switchToWorkspaceByNumber(number) {
+    function switchToWorkspaceByNumber(number, output) {
         if (!niriAvailable) return false
         
-        // Find workspace by number (1-based)
-        var workspace = allWorkspaces.find(w => (w.idx + 1) === number)
-        if (workspace) {
+        var targetOutput = output || currentOutput
+        if (!targetOutput) {
+            console.warn("NiriWorkspaceService: No output specified for workspace switching")
+            return false
+        }
+        
+        // Get workspaces for the target output, sorted by idx
+        var outputWorkspaces = allWorkspaces.filter(w => w.output === targetOutput).sort((a, b) => a.idx - b.idx)
+        
+        // Use sequential index (number is 1-based, array is 0-based)
+        if (number >= 1 && number <= outputWorkspaces.length) {
+            var workspace = outputWorkspaces[number - 1]
+            console.log("DEBUG: Switching to workspace ID", workspace.id, "for sequential number", number, "on", targetOutput)
             return switchToWorkspace(workspace.id)
         }
         
-        // If not found, try to switch by number directly
-        Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", number.toString()])
-        return true
+        console.warn("NiriWorkspaceService: No workspace", number, "found on output", targetOutput)
+        return false
     }
     
     function getWorkspaceByIndex(index) {
