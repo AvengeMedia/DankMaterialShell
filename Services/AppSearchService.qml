@@ -12,8 +12,21 @@ Singleton {
     property var applicationsByName: ({})
     property var applicationsByExec: ({})
     property bool ready: false
+    property int refreshInterval: 10000
+    
+    Timer {
+        id: refreshTimer
+        interval: root.refreshInterval
+        repeat: true
+        running: true
+        onTriggered: root.refreshApplications()
+    }
     
     Component.onCompleted: {
+        loadApplications()
+    }
+    
+    function refreshApplications() {
         loadApplications()
     }
     
@@ -23,9 +36,6 @@ Singleton {
         // Debug: Check what properties are available
         if (allApps.length > 0) {
             var firstApp = allApps[0]
-            console.log("AppSearchService: Sample DesktopEntry properties:")
-            console.log("  name:", firstApp.name)
-            console.log("  id:", firstApp.id)
             if (firstApp.exec !== undefined) console.log("  exec:", firstApp.exec)
             if (firstApp.execString !== undefined) console.log("  execString:", firstApp.execString)
             if (firstApp.executable !== undefined) console.log("  executable:", firstApp.executable)
