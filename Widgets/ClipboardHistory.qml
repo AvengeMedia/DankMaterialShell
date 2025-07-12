@@ -9,42 +9,11 @@ import "../Common"
 PanelWindow {
     id: clipboardHistory
     
-    property var theme
     property bool isVisible: false
+    property int totalCount: 0
     
-    // Default theme fallback
-    property var defaultTheme: QtObject {
-        property color primary: "#D0BCFF"
-        property color background: "#10121E"
-        property color surfaceContainer: "#1D1B20"
-        property color surfaceText: "#E6E0E9"
-        property color surfaceVariant: "#49454F"
-        property color surfaceVariantText: "#CAC4D0"
-        property color outline: "#938F99"
-        property color error: "#F2B8B5"
-        property real cornerRadius: 12
-        property real cornerRadiusLarge: 16
-        property real cornerRadiusXLarge: 24
-        property real cornerRadiusSmall: 8
-        property real spacingXS: 4
-        property real spacingS: 8
-        property real spacingM: 12
-        property real spacingL: 16
-        property real spacingXL: 24
-        property real fontSizeLarge: 16
-        property real fontSizeMedium: 14
-        property real fontSizeSmall: 12
-        property real iconSize: 24
-        property real iconSizeLarge: 32
-        property string iconFont: "Material Symbols Rounded"
-        property int iconFontWeight: Font.Normal
-        property int shortDuration: 150
-        property int mediumDuration: 300
-        property int standardEasing: Easing.OutCubic
-        property int emphasizedEasing: Easing.OutQuart
-    }
-    
-    property var activeTheme: theme || defaultTheme
+    // Use the global Theme singleton
+    property var activeTheme: Theme
     
     // Window properties
     color: "transparent"
@@ -85,6 +54,8 @@ PanelWindow {
                 }
             }
         }
+        // Update total count
+        clipboardHistory.totalCount = filteredClipboardModel.count
     }
     
     function toggle() {
@@ -221,7 +192,7 @@ PanelWindow {
                     id: titleText
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Clipboard History"
+                    text: "Clipboard History" + (clipboardHistory.totalCount > 0 ? ` (${clipboardHistory.totalCount})` : "")
                     font.pixelSize: activeTheme.fontSizeLarge + 4
                     font.weight: Font.Bold
                     color: activeTheme.surfaceText
@@ -239,7 +210,7 @@ PanelWindow {
                         height: 32
                         radius: activeTheme.cornerRadius
                         color: clearArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
-                        visible: clipboardModel.count > 0
+                        visible: clipboardHistory.totalCount > 0
                         
                         Text {
                             anchors.centerIn: parent
@@ -379,11 +350,29 @@ PanelWindow {
                         
                         property string entryType: getEntryType(model.entry)
                         property string entryPreview: getEntryPreview(model.entry)
+                        property int entryIndex: index + 1
                         
                         Row {
                             anchors.fill: parent
                             anchors.margins: activeTheme.spacingM
                             spacing: activeTheme.spacingL
+                            
+                            // Index number
+                            Rectangle {
+                                width: 24
+                                height: 24
+                                radius: 12
+                                color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.2)
+                                anchors.verticalCenter: parent.verticalCenter
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: entryIndex.toString()
+                                    font.pixelSize: activeTheme.fontSizeSmall
+                                    font.weight: Font.Bold
+                                    color: activeTheme.primary
+                                }
+                            }
                             
                             // Entry type icon
                             Rectangle {
@@ -412,7 +401,7 @@ PanelWindow {
                             Column {
                                 id: contentColumn
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - 100
+                                width: parent.width - 140  // Adjusted for index number
                                 spacing: activeTheme.spacingXS
                                 
                                 Text {
@@ -524,7 +513,7 @@ PanelWindow {
                 Column {
                     anchors.centerIn: parent
                     spacing: activeTheme.spacingL
-                    visible: filteredClipboardModel.count === 0
+                    visible: clipboardHistory.totalCount === 0
                     
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
