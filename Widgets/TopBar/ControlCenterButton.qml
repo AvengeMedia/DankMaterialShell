@@ -15,7 +15,7 @@ Rectangle {
     signal clicked()
     
     width: Math.max(80, controlIndicators.implicitWidth + Theme.spacingS * 2)
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: controlCenterArea.containsMouse || root.isActive ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 

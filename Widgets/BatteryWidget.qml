@@ -9,7 +9,7 @@ Rectangle {
     property bool batteryPopupVisible: false
     
     width: 70  // Increased width to accommodate percentage text
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: batteryArea.containsMouse || batteryPopupVisible ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 

@@ -10,7 +10,7 @@ Rectangle {
     property bool showIcon: true
     
     width: 55
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: cpuArea.containsMouse ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 

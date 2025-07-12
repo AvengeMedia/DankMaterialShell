@@ -6,7 +6,7 @@ Rectangle {
     id: powerButton
     
     width: 48
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: powerArea.containsMouse || root.powerMenuVisible ? 
            Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.16) : 

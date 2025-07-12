@@ -9,9 +9,9 @@ Rectangle {
     property string screenName: ""
     
     width: Math.max(120, workspaceRow.implicitWidth + Theme.spacingL * 2)
-    height: 32
+    height: 30
     radius: Theme.cornerRadiusLarge
-    color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.8)
+    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
     visible: NiriWorkspaceService.niriAvailable
     
     property int currentWorkspace: getDisplayActiveWorkspace()
@@ -86,8 +86,8 @@ Rectangle {
                 property bool isHovered: mouseArea.containsMouse
                 property int sequentialNumber: index + 1
                 
-                width: isActive ? Theme.spacingXL + Theme.spacingS : Theme.spacingL
-                height: Theme.spacingS
+                width: isActive ? Theme.spacingXL + Theme.spacingM : Theme.spacingL + Theme.spacingXS
+                height: Theme.spacingM
                 radius: height / 2
                 color: isActive ? Theme.primary : 
                        isHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5) :

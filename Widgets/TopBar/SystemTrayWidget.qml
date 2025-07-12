@@ -8,7 +8,7 @@ Rectangle {
     signal menuRequested(var menu, var item, real x, real y)
     
     width: Math.max(40, systemTrayRow.implicitWidth + Theme.spacingS * 2)
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
     visible: systemTrayRow.children.length > 0

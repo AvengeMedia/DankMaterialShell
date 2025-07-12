@@ -9,7 +9,7 @@ Rectangle {
     signal clicked()
     
     width: 40
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: notificationArea.containsMouse || root.isActive ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 

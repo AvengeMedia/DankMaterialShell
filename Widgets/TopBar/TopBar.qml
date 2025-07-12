@@ -208,7 +208,7 @@ PanelWindow {
                 
                 Rectangle {
                     width: 40
-                    height: 32
+                    height: 30
                     radius: Theme.cornerRadius
                     color: clipboardArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
                     anchors.verticalCenter: parent.verticalCenter

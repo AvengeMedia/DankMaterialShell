@@ -28,7 +28,7 @@ Rectangle {
             return Math.min(baseWidth, parent.width - Theme.spacingL * 2)
         }
     }
-    height: 32
+    height: 30
     radius: Theme.cornerRadius
     color: clockMouseArea.containsMouse ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
