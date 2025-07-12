@@ -283,6 +283,47 @@ ShellRoot {
         model: Quickshell.screens
         delegate: TopBar {
             modelData: item
+            
+            // Connect shell properties
+            hasActiveMedia: root.hasActiveMedia
+            activePlayer: root.activePlayer
+            weatherAvailable: root.weather.available
+            weatherCode: root.weather.wCode
+            weatherTemp: root.weather.temp
+            weatherTempF: root.weather.tempF
+            useFahrenheit: root.useFahrenheit
+            osLogo: root.osLogo
+            networkStatus: root.networkStatus
+            wifiSignalStrength: root.wifiSignalStrength
+            volumeLevel: root.volumeLevel
+            bluetoothAvailable: root.bluetoothAvailable
+            bluetoothEnabled: root.bluetoothEnabled
+            notificationHistoryVisible: root.notificationHistoryVisible
+            notificationCount: notificationHistory.count
+            controlCenterVisible: root.controlCenterVisible
+            calendarVisible: root.calendarVisible
+            
+            // Connect tray menu properties
+            showTrayMenu: root.showTrayMenu
+            currentTrayMenu: root.currentTrayMenu
+            currentTrayItem: root.currentTrayItem
+            trayMenuX: root.trayMenuX
+            trayMenuY: root.trayMenuY
+            
+            // Connect clipboard
+            onClipboardRequested: {
+                clipboardHistoryPopup.toggle()
+            }
+            
+            // Property change handlers
+            onCalendarVisibleChanged: root.calendarVisible = calendarVisible
+            onControlCenterVisibleChanged: root.controlCenterVisible = controlCenterVisible
+            onNotificationHistoryVisibleChanged: root.notificationHistoryVisible = notificationHistoryVisible
+            onShowTrayMenuChanged: root.showTrayMenu = showTrayMenu
+            onCurrentTrayMenuChanged: root.currentTrayMenu = currentTrayMenu
+            onCurrentTrayItemChanged: root.currentTrayItem = currentTrayItem
+            onTrayMenuXChanged: root.trayMenuX = trayMenuX
+            onTrayMenuYChanged: root.trayMenuY = trayMenuY
         }
     }
     

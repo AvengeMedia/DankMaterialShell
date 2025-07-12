@@ -1,4 +1,4 @@
-TopBar 1.0 TopBar.qml
+TopBar 1.0 TopBar/TopBar.qml
 TrayMenuPopup 1.0 TrayMenuPopup.qml
 NotificationPopup 1.0 NotificationPopup.qml
 NotificationHistoryPopup 1.0 NotificationHistoryPopup.qml
