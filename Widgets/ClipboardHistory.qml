@@ -19,6 +19,9 @@ PanelWindow {
     color: "transparent"
     visible: isVisible
     
+    // Confirmation dialog state
+    property bool showClearConfirmation: false
+    
     anchors {
         top: true
         left: true
@@ -77,6 +80,14 @@ PanelWindow {
         clipboardHistory.isVisible = false
         searchField.focus = false
         searchField.text = ""
+        
+        // Clean up temporary image files
+        cleanupTempFiles()
+    }
+    
+    function cleanupTempFiles() {
+        cleanupProcess.command = ["sh", "-c", "rm -f /tmp/clipboard_preview_*.png"]
+        cleanupProcess.running = true
     }
     
     function refreshClipboard() {
@@ -87,12 +98,16 @@ PanelWindow {
         const entryId = entry.split('\t')[0]
         copyProcess.command = ["sh", "-c", `cliphist decode ${entryId} | wl-copy`]
         copyProcess.running = true
+        
+        // Simply hide the clipboard interface
+        console.log("ClipboardHistory: Entry copied, hiding interface")
         hide()
     }
     
     function deleteEntry(entry) {
-        const entryId = entry.split('\t')[0]
-        deleteProcess.command = ["cliphist", "delete-query", entryId]
+        // Use the full entry line for deletion
+        console.log("Deleting entry:", entry)
+        deleteProcess.command = ["sh", "-c", `echo '${entry.replace(/'/g, "'\\''")}' | cliphist delete`]
         deleteProcess.running = true
     }
     
@@ -105,9 +120,20 @@ PanelWindow {
         let content = entry.replace(/^\s*\d+\s+/, "")
         
         // Handle different content types
-        if (content.includes("image/")) {
-            const match = content.match(/(\d+)x(\d+)/)
-            return match ? `Image ${match[1]}×${match[2]}` : "Image"
+        if (content.includes("image/") || content.includes("binary data") || /\.(png|jpg|jpeg|gif|bmp|webp)/i.test(content)) {
+            // Extract dimensions if available
+            const dimensionMatch = content.match(/(\d+)x(\d+)/)
+            if (dimensionMatch) {
+                return `Image ${dimensionMatch[1]}×${dimensionMatch[2]}`
+            }
+            
+            // Extract file type if available  
+            const typeMatch = content.match(/\b(png|jpg|jpeg|gif|bmp|webp)\b/i)
+            if (typeMatch) {
+                return `Image (${typeMatch[1].toUpperCase()})`
+            }
+            
+            return "Image"
         }
         
         // Truncate long text
@@ -119,7 +145,13 @@ PanelWindow {
     }
     
     function getEntryType(entry) {
-        if (entry.includes("image/")) return "image"
+        // Improved image detection
+        if (entry.includes("image/") || 
+            entry.includes("binary data") || 
+            /\.(png|jpg|jpeg|gif|bmp|webp)/i.test(entry) ||
+            /\b(png|jpg|jpeg|gif|bmp|webp)\b/i.test(entry)) {
+            return "image"
+        }
         if (entry.length > 200) return "long_text"
         return "text"
     }
@@ -148,7 +180,7 @@ PanelWindow {
     // Main clipboard container
     Rectangle {
         id: clipboardContainer
-        width: Math.min(600, parent.width - 200)
+        width: Math.min(500, parent.width - 200)
         height: Math.min(500, parent.height - 100)
         anchors.centerIn: parent
         
@@ -209,7 +241,7 @@ PanelWindow {
                         width: 40
                         height: 32
                         radius: activeTheme.cornerRadius
-                        color: clearArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
+                        color: clearArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : "transparent"
                         visible: clipboardHistory.totalCount > 0
                         
                         Text {
@@ -217,7 +249,7 @@ PanelWindow {
                             text: "delete_sweep"
                             font.family: activeTheme.iconFont
                             font.pixelSize: activeTheme.iconSize
-                            color: clearArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
+                            color: clearArea.containsMouse ? activeTheme.primary : activeTheme.surfaceText
                         }
                         
                         MouseArea {
@@ -225,7 +257,7 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: clearAll()
+                            onClicked: showClearConfirmation = true
                         }
                         
                         Behavior on color {
@@ -238,14 +270,14 @@ PanelWindow {
                         width: 40
                         height: 32
                         radius: activeTheme.cornerRadius
-                        color: closeArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
+                        color: closeArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : "transparent"
                         
                         Text {
                             anchors.centerIn: parent
                             text: "close"
                             font.family: activeTheme.iconFont
                             font.pixelSize: activeTheme.iconSize
-                            color: closeArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
+                            color: closeArea.containsMouse ? activeTheme.primary : activeTheme.surfaceText
                         }
                         
                         MouseArea {
@@ -334,13 +366,46 @@ PanelWindow {
                 anchors.fill: parent
                 clip: true
                 
+                // Improve scrolling responsiveness
+                ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                ScrollBar.vertical.width: 12
+                ScrollBar.vertical.minimumSize: 0.1  // Minimum scrollbar handle size
+                
+                // Enable faster scrolling
+                wheelEnabled: true
+                
                 ListView {
                     id: clipboardList
                     model: filteredClipboardModel
                     spacing: activeTheme.spacingS
                     
+                    // Improve scrolling performance
+                    cacheBuffer: 100
+                    boundsBehavior: Flickable.StopAtBounds
+                    
+                    // Make mouse wheel scrolling more responsive
+                    property real wheelStepSize: 60
+                    
+                    MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.NoButton
+                        
+                        onWheel: (wheel) => {
+                            var delta = wheel.angleDelta.y
+                            var steps = delta / 120  // Standard wheel step
+                            clipboardList.contentY -= steps * clipboardList.wheelStepSize
+                            
+                            // Ensure we stay within bounds
+                            if (clipboardList.contentY < 0) {
+                                clipboardList.contentY = 0
+                            } else if (clipboardList.contentY > clipboardList.contentHeight - clipboardList.height) {
+                                clipboardList.contentY = Math.max(0, clipboardList.contentHeight - clipboardList.height)
+                            }
+                        }
+                    }
+                    
                     delegate: Rectangle {
-                        width: clipboardList.width
+                        width: clipboardList.width - 16  // Account for scrollbar space
                         height: Math.max(60, contentColumn.implicitHeight + activeTheme.spacingM * 2)
                         radius: activeTheme.cornerRadius
                         color: entryArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : 
@@ -374,122 +439,144 @@ PanelWindow {
                                 }
                             }
                             
-                            // Entry type icon
-                            Rectangle {
-                                width: 36
-                                height: 36
-                                radius: activeTheme.cornerRadius
-                                color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12)
+                            // Entry content
+                            Row {
                                 anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width - 80  // Adjusted for index number and delete button
+                                spacing: activeTheme.spacingM
+                                
+                                // Image preview - actual image display for images
+                                Rectangle {
+                                    width: entryType === "image" ? 48 : 0
+                                    height: entryType === "image" ? 36 : 0
+                                    radius: activeTheme.cornerRadiusSmall
+                                    color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.1)
+                                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+                                    border.width: 1
+                                    visible: entryType === "image"
+                                    clip: true
+                                    
+                                    property string entryId: model.entry ? model.entry.split('\t')[0] : ""
+                                    property string tempImagePath: "/tmp/clipboard_preview_" + entryId + ".png"
+                                    
+                                    // Actual image preview using cliphist decode
+                                    Image {
+                                        id: imagePreview
+                                        anchors.fill: parent
+                                        anchors.margins: 1
+                                        fillMode: Image.PreserveAspectCrop
+                                        asynchronous: true
+                                        cache: false
+                                        source: parent.entryType === "image" && parent.entryId ? "file://" + parent.tempImagePath : ""
+                                        
+                                        Component.onCompleted: {
+                                            console.log("Image preview initializing for entry:", parent.entryId, "path:", parent.tempImagePath)
+                                            if (parent.entryType === "image" && parent.entryId) {
+                                                // Simple approach: use shell redirection to write to file
+                                                imageDecodeProcess.entryId = parent.entryId
+                                                imageDecodeProcess.tempPath = parent.tempImagePath
+                                                imageDecodeProcess.imagePreview = imagePreview
+                                                imageDecodeProcess.command = ["sh", "-c", `cliphist decode ${parent.entryId} > "${parent.tempImagePath}" 2>/dev/null`]
+                                                imageDecodeProcess.running = true
+                                            }
+                                        }
+                                        
+                                        onStatusChanged: {
+                                            console.log("Image preview status changed:", status, "for path:", source)
+                                            if (status === Image.Error) {
+                                                console.warn("Failed to load image from:", source)
+                                            } else if (status === Image.Ready) {
+                                                console.log("Successfully loaded image:", source)
+                                            }
+                                        }
+                                        
+                                        // Fallback icon when image fails to load or is loading
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: imagePreview.status === Image.Loading ? "hourglass_empty" : 
+                                                  imagePreview.status === Image.Error ? "broken_image" : "photo"
+                                            font.family: activeTheme.iconFont
+                                            font.pixelSize: imagePreview.status === Image.Loading ? 14 : 18
+                                            color: imagePreview.status === Image.Error ? activeTheme.error : activeTheme.primary
+                                            visible: imagePreview.status !== Image.Ready
+                                            
+                                            SequentialAnimation on opacity {
+                                                running: imagePreview.status === Image.Loading
+                                                loops: Animation.Infinite
+                                                NumberAnimation { to: 0.3; duration: 500 }
+                                                NumberAnimation { to: 1.0; duration: 500 }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Column {
+                                    id: contentColumn
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - (entryType === "image" ? 60 : 0)
+                                    spacing: activeTheme.spacingXS
+                                    
+                                    Text {
+                                        text: {
+                                            switch (entryType) {
+                                                case "image": return "Image • " + entryPreview
+                                                case "long_text": return "Long Text"
+                                                default: return "Text"
+                                            }
+                                        }
+                                        font.pixelSize: activeTheme.fontSizeSmall
+                                        color: activeTheme.primary
+                                        font.weight: Font.Medium
+                                        width: parent.width
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: entryPreview
+                                        font.pixelSize: activeTheme.fontSizeMedium
+                                        color: activeTheme.surfaceText
+                                        width: parent.width
+                                        wrapMode: Text.WordWrap
+                                        maximumLineCount: entryType === "long_text" ? 3 : 1
+                                        elide: Text.ElideRight
+                                        visible: true  // Show preview for all entry types including images
+                                    }
+                                }
+                            }
+                            
+                            // Actions - Single centered delete button
+                            Rectangle {
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: 32
+                                height: 32
+                                radius: activeTheme.cornerRadius
+                                color: deleteArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : "transparent"
+                                z: 100  // Ensure it's above other elements
                                 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: {
-                                        switch (entryType) {
-                                            case "image": return "image"
-                                            case "long_text": return "subject"
-                                            default: return "content_paste"
-                                        }
-                                    }
+                                    text: "delete"
                                     font.family: activeTheme.iconFont
                                     font.pixelSize: activeTheme.iconSize - 4
-                                    color: activeTheme.primary
-                                }
-                            }
-                            
-                            // Entry content
-                            Column {
-                                id: contentColumn
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width - 140  // Adjusted for index number
-                                spacing: activeTheme.spacingXS
-                                
-                                Text {
-                                    text: {
-                                        switch (entryType) {
-                                            case "image": return "Image • " + entryPreview
-                                            case "long_text": return "Long Text"
-                                            default: return "Text"
-                                        }
-                                    }
-                                    font.pixelSize: activeTheme.fontSizeSmall
-                                    color: activeTheme.primary
-                                    font.weight: Font.Medium
-                                    width: parent.width
-                                    elide: Text.ElideRight
+                                    color: deleteArea.containsMouse ? activeTheme.primary : activeTheme.surfaceText
                                 }
                                 
-                                Text {
-                                    text: entryPreview
-                                    font.pixelSize: activeTheme.fontSizeMedium
-                                    color: activeTheme.surfaceText
-                                    width: parent.width
-                                    wrapMode: Text.WordWrap
-                                    maximumLineCount: entryType === "long_text" ? 3 : 2
-                                    elide: Text.ElideRight
-                                    visible: entryType !== "image"
-                                }
-                            }
-                            
-                            // Actions
-                            Column {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: activeTheme.spacingXS
-                                
-                                // Copy button
-                                Rectangle {
-                                    width: 28
-                                    height: 28
-                                    radius: activeTheme.cornerRadiusSmall
-                                    color: copyArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : "transparent"
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "content_copy"
-                                        font.family: activeTheme.iconFont
-                                        font.pixelSize: activeTheme.iconSize - 8
-                                        color: copyArea.containsMouse ? activeTheme.primary : activeTheme.surfaceText
-                                    }
-                                    
-                                    MouseArea {
-                                        id: copyArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: copyEntry(model.entry)
-                                    }
-                                    
-                                    Behavior on color {
-                                        ColorAnimation { duration: activeTheme.shortDuration }
+                                MouseArea {
+                                    id: deleteArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    z: 101  // Ensure click area is above everything
+                                    onClicked: (mouse) => {
+                                        console.log("Delete clicked for entry:", model.entry)
+                                        deleteEntry(model.entry)
+                                        // Prevent the click from propagating to the entry area
+                                        mouse.accepted = true
                                     }
                                 }
                                 
-                                // Delete button
-                                Rectangle {
-                                    width: 28
-                                    height: 28
-                                    radius: activeTheme.cornerRadiusSmall
-                                    color: deleteArea.containsMouse ? Qt.rgba(activeTheme.error.r, activeTheme.error.g, activeTheme.error.b, 0.12) : "transparent"
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "delete"
-                                        font.family: activeTheme.iconFont
-                                        font.pixelSize: activeTheme.iconSize - 8
-                                        color: deleteArea.containsMouse ? activeTheme.error : activeTheme.surfaceText
-                                    }
-                                    
-                                    MouseArea {
-                                        id: deleteArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: deleteEntry(model.entry)
-                                    }
-                                    
-                                    Behavior on color {
-                                        ColorAnimation { duration: activeTheme.shortDuration }
-                                    }
+                                Behavior on color {
+                                    ColorAnimation { duration: activeTheme.shortDuration }
                                 }
                             }
                         }
@@ -497,6 +584,7 @@ PanelWindow {
                         MouseArea {
                             id: entryArea
                             anchors.fill: parent
+                            anchors.rightMargin: 40  // Leave space for delete button
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             
@@ -539,9 +627,187 @@ PanelWindow {
                 }
             }
         }
+        
+        // Clear All Confirmation Dialog
+        Rectangle {
+            anchors.fill: parent
+            color: Qt.rgba(0, 0, 0, 0.4)
+            visible: showClearConfirmation
+            z: 999
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked: clipboardHistory.showClearConfirmation = false
+            }
+        }
+        
+        Rectangle {
+            anchors.centerIn: parent
+            width: 350
+            height: 200  // Increased height for better spacing
+            radius: activeTheme.cornerRadiusLarge
+            color: activeTheme.surfaceContainer
+            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.3)
+            border.width: 1
+            visible: showClearConfirmation
+            z: 1000
+            
+            Column {
+                anchors.centerIn: parent
+                spacing: activeTheme.spacingL
+                width: parent.width - 40
+                
+                // Add top padding
+                Item {
+                    width: 1
+                    height: activeTheme.spacingM
+                }
+                
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "warning"
+                    font.family: activeTheme.iconFont
+                    font.pixelSize: activeTheme.iconSizeLarge
+                    color: activeTheme.error
+                }
+                
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "Clear All Clipboard History?"
+                    font.pixelSize: activeTheme.fontSizeLarge
+                    font.weight: Font.Bold
+                    color: activeTheme.surfaceText
+                    horizontalAlignment: Text.AlignHCenter
+                }
+                
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: "This action cannot be undone. All clipboard entries will be permanently deleted."
+                    font.pixelSize: activeTheme.fontSizeMedium
+                    color: Qt.rgba(activeTheme.surfaceText.r, activeTheme.surfaceText.g, activeTheme.surfaceText.b, 0.7)
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                }
+                
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: activeTheme.spacingM
+                    
+                    // Cancel button
+                    Rectangle {
+                        width: 100
+                        height: 40
+                        radius: activeTheme.cornerRadius
+                        color: cancelArea.containsMouse ? 
+                               Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : 
+                               "transparent"
+                        border.color: activeTheme.primary
+                        border.width: 1
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            font.pixelSize: activeTheme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: activeTheme.primary
+                        }
+                        
+                        MouseArea {
+                            id: cancelArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: clipboardHistory.showClearConfirmation = false
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: activeTheme.shortDuration }
+                        }
+                    }
+                    
+                    // Clear button
+                    Rectangle {
+                        width: 100
+                        height: 40
+                        radius: activeTheme.cornerRadius
+                        color: confirmArea.containsMouse ? 
+                               Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.8) : 
+                               activeTheme.primary
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Clear All"
+                            font.pixelSize: activeTheme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: activeTheme.surface
+                        }
+                        
+                        MouseArea {
+                            id: confirmArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                clipboardHistory.showClearConfirmation = false
+                                clearAll()
+                            }
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: activeTheme.shortDuration }
+                        }
+                    }
+                }
+                
+                // Add some bottom padding
+                Item {
+                    width: 1
+                    height: activeTheme.spacingM
+                }
+            }
+        }
     }
     
     // Clipboard processes
+    Process {
+        id: cleanupProcess
+        running: false
+        
+        onExited: (exitCode) => {
+            if (exitCode === 0) {
+                console.log("Temporary image files cleaned up")
+            }
+        }
+    }
+    
+    Process {
+        id: imageDecodeProcess
+        running: false
+        
+        property string entryId: ""
+        property string tempPath: ""
+        property var imagePreview: null
+        
+        onExited: (exitCode) => {
+            console.log("Image decode process exited with code:", exitCode, "for entry:", entryId)
+            if (exitCode === 0 && imagePreview && tempPath) {
+                console.log("Image decoded successfully to:", tempPath)
+                // Force the Image component to reload
+                Qt.callLater(function() {
+                    imagePreview.source = ""
+                    imagePreview.source = "file://" + tempPath
+                })
+            } else {
+                console.warn("Failed to decode clipboard image for entry:", entryId)
+            }
+        }
+        
+        onStarted: {
+            console.log("Starting image decode for entry:", entryId, "to path:", tempPath)
+        }
+    }
+    
     Process {
         id: clipboardProcess
         command: ["cliphist", "list"]
