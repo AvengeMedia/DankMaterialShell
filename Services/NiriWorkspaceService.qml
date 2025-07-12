@@ -149,15 +149,12 @@ Singleton {
     }
     
     function handleWorkspaceActivated(data) {
-        console.log("DEBUG: WorkspaceActivated event - ID:", data.id, "focused:", data.focused)
-        
         // Update focused workspace
         focusedWorkspaceId = data.id
         focusedWorkspaceIndex = allWorkspaces.findIndex(w => w.id === data.id)
         
         if (focusedWorkspaceIndex >= 0) {
             var activatedWs = allWorkspaces[focusedWorkspaceIndex]
-            console.log("DEBUG: Found workspace - idx:", activatedWs.idx + 1, "output:", activatedWs.output, "was_active:", activatedWs.is_active)
             
             // Update workspace states properly
             // First, deactivate all workspaces on this output
@@ -173,7 +170,6 @@ Singleton {
             allWorkspaces[focusedWorkspaceIndex].is_focused = data.focused || false
             
             currentOutput = activatedWs.output || ""
-            console.log("DEBUG: Activated workspace", activatedWs.idx + 1, "on", currentOutput)
             
             updateCurrentOutputWorkspaces()
         } else {
@@ -256,7 +252,6 @@ Singleton {
         // Use sequential index (number is 1-based, array is 0-based)
         if (number >= 1 && number <= outputWorkspaces.length) {
             var workspace = outputWorkspaces[number - 1]
-            console.log("DEBUG: Switching to workspace ID", workspace.id, "for sequential number", number, "on", targetOutput)
             return switchToWorkspace(workspace.id)
         }
         

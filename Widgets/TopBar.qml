@@ -701,41 +701,6 @@ EOF`
                     anchors.verticalCenter: parent.verticalCenter  
                 }
                 
-                // Color Picker Button
-                // Rectangle {
-                //     width: 40
-                //     height: 32
-                //     radius: Theme.cornerRadius
-                //     color: colorPickerArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
-                //     anchors.verticalCenter: parent.verticalCenter
-                    
-                //     Text {
-                //         anchors.centerIn: parent
-                //         text: "colorize"  // Material icon for color picker
-                //         font.family: Theme.iconFont
-                //         font.pixelSize: Theme.iconSize - 6
-                //         font.weight: Theme.iconFontWeight
-                //         color: Theme.surfaceText
-                //     }
-                    
-                //     MouseArea {
-                //         id: colorPickerArea
-                //         anchors.fill: parent
-                //         hoverEnabled: true
-                //         cursorShape: Qt.PointingHandCursor
-                        
-                //         onClicked: {
-                //             ColorPickerService.pickColor()
-                //         }
-                //     }
-                    
-                //     Behavior on color {
-                //         ColorAnimation {
-                //             duration: Theme.shortDuration
-                //             easing.type: Theme.standardEasing
-                //         }
-                //     }
-                // }
                 
                 // Notification Center Button
                 Rectangle {

@@ -1,12 +1,4 @@
 TopBar 1.0 TopBar.qml
-AppLauncherButton 1.0 AppLauncherButton.qml
-WorkspaceSwitcher 1.0 WorkspaceSwitcher.qml
-ClockWidget 1.0 ClockWidget.qml
-SystemTrayWidget 1.0 SystemTrayWidget.qml
-ClipboardButton 1.0 ClipboardButton.qml
-ColorPickerButton 1.0 ColorPickerButton.qml
-NotificationButton 1.0 NotificationButton.qml
-CalendarPopup 1.0 CalendarPopup.qml
 TrayMenuPopup 1.0 TrayMenuPopup.qml
 NotificationPopup 1.0 NotificationPopup.qml
 NotificationHistoryPopup 1.0 NotificationHistoryPopup.qml
