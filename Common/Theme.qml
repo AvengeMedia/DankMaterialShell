@@ -10,7 +10,7 @@ QtObject {
     // Reference to the main shell root for calling functions
     property var rootObj: null
     
-    // Apply saved theme on startup
+    // Initialize theme system
     Component.onCompleted: {
         console.log("Theme Component.onCompleted")
         
@@ -19,13 +19,7 @@ QtObject {
             Colors.colorsUpdated.connect(root.onColorsUpdated)
         }
         
-        Qt.callLater(() => {
-            if (typeof Prefs !== "undefined") {
-                console.log("Theme applying saved preferences:", Prefs.themeIndex, Prefs.themeIsDynamic, "lightMode:", Prefs.isLightMode)
-                isLightMode = Prefs.isLightMode
-                switchTheme(Prefs.themeIndex, Prefs.themeIsDynamic, false)  // Don't save during startup
-            }
-        })
+        console.log("Theme initialized, waiting for Prefs to load settings and apply theme")
     }
     
     // Handle successful color extraction

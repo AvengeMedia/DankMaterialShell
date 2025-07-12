@@ -2,7 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -298,10 +298,8 @@ ShellRoot {
             volumeLevel: root.volumeLevel
             bluetoothAvailable: root.bluetoothAvailable
             bluetoothEnabled: root.bluetoothEnabled
-            notificationHistoryVisible: root.notificationHistoryVisible
+            shellRoot: root
             notificationCount: notificationHistory.count
-            controlCenterVisible: root.controlCenterVisible
-            calendarVisible: root.calendarVisible
             
             // Connect tray menu properties
             showTrayMenu: root.showTrayMenu
@@ -315,10 +313,7 @@ ShellRoot {
                 clipboardHistoryPopup.toggle()
             }
             
-            // Property change handlers
-            onCalendarVisibleChanged: root.calendarVisible = calendarVisible
-            onControlCenterVisibleChanged: root.controlCenterVisible = controlCenterVisible
-            onNotificationHistoryVisibleChanged: root.notificationHistoryVisible = notificationHistoryVisible
+            
             onShowTrayMenuChanged: root.showTrayMenu = showTrayMenu
             onCurrentTrayMenuChanged: root.currentTrayMenu = currentTrayMenu
             onCurrentTrayItemChanged: root.currentTrayItem = currentTrayItem

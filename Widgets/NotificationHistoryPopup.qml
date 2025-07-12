@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -230,7 +230,8 @@ PanelWindow {
                                             sourceSize.height: size
                                             
                                             layer.enabled: true
-                                            layer.effect: OpacityMask {
+                                            layer.effect: MultiEffect {
+                                                maskEnabled: true
                                                 maskSource: Rectangle {
                                                     width: historyNotifImage.size
                                                     height: historyNotifImage.size

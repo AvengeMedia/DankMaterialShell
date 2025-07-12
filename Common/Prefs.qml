@@ -17,7 +17,7 @@ Singleton {
     
     Component.onCompleted: {
         loadSettings()
-        Qt.callLater(applyStoredTheme)
+        // Theme will be applied after settings file is loaded in onLoaded handler
     }
     
     Process {
@@ -64,16 +64,22 @@ Singleton {
                         (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
                     recentlyUsedApps = settings.recentlyUsedApps || []
                     console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
+                    
+                    // Apply the theme immediately after loading settings
+                    applyStoredTheme()
                 } else {
-                    console.log("Settings file is empty")
+                    console.log("Settings file is empty - applying default theme")
+                    applyStoredTheme()
                 }
             } catch (e) {
                 console.log("Could not parse settings, using defaults:", e)
+                applyStoredTheme()
             }
         }
         
         onLoadFailed: (error) => {
             console.log("Settings file not found, using defaults. Error:", error)
+            applyStoredTheme()
         }
     }
     
@@ -99,13 +105,15 @@ Singleton {
     }
     
     function applyStoredTheme() {
-        console.log("Applying stored theme:", themeIndex, themeIsDynamic)
+        console.log("Applying stored theme:", themeIndex, themeIsDynamic, "lightMode:", isLightMode)
         
         if (typeof Theme !== "undefined") {
+            Theme.isLightMode = isLightMode
             Theme.switchTheme(themeIndex, themeIsDynamic, false)
         } else {
             Qt.callLater(() => {
                 if (typeof Theme !== "undefined") {
+                    Theme.isLightMode = isLightMode
                     Theme.switchTheme(themeIndex, themeIsDynamic, false)
                 }
             })

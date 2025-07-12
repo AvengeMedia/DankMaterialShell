@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -124,17 +124,18 @@ PanelWindow {
             }
         } else {
             // Search with category filter
-            var baseApps = selectedCategory === "All" ? 
-                AppSearchService.applications : 
-                AppSearchService.getAppsInCategory(selectedCategory)
-            var searchResults = AppSearchService.searchApplications(searchField.text)
-            
             if (selectedCategory === "All") {
-                // For "All" category, show all search results without limit
-                apps = searchResults.filter(app => baseApps.includes(app))
+                // For "All" category, search all apps without limit
+                apps = AppSearchService.searchApplications(searchField.text)
             } else {
-                // For specific categories, still apply limit
-                apps = searchResults.filter(app => baseApps.includes(app)).slice(0, maxResults)
+                // For specific categories, filter search results by category
+                var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
+                var allSearchResults = AppSearchService.searchApplications(searchField.text)
+                
+                // Filter search results to only include apps from the selected category
+                apps = allSearchResults.filter(searchApp => {
+                    return categoryApps.some(categoryApp => categoryApp.name === searchApp.name)
+                }).slice(0, maxResults)
             }
         }
         
@@ -240,7 +241,14 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
         border.width: 1
         layer.enabled: true
-        layer.effect: DropShadow { radius: 32; samples: 64; color: Qt.rgba(0,0,0,0.3); horizontalOffset:0; verticalOffset:8 }
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowHorizontalOffset: 0
+            shadowVerticalOffset: 8
+            shadowBlur: 1.0  // radius/32
+            shadowColor: Qt.rgba(0, 0, 0, 0.3)
+            shadowOpacity: 0.3
+        }
         transform: Scale { origin.x: width/2; origin.y: height/2; xScale: spotlightOpen?1:0.9; yScale: spotlightOpen?1:0.9;
             Behavior on xScale { NumberAnimation { duration: Theme.mediumDuration; easing.type: Easing.OutBack; easing.overshoot:1.1 } }
             Behavior on yScale { NumberAnimation { duration: Theme.mediumDuration; easing.type: Easing.OutBack; easing.overshoot:1.1 } }
@@ -379,8 +387,8 @@ PanelWindow {
                             verticalAlignment: Text.AlignVCenter
                             focus: spotlightOpen
                             selectByMouse: true
-                            onTextChanged: updateFilteredApps
-                            Keys.onPressed: { 
+                            onTextChanged: updateFilteredApps()
+                            Keys.onPressed: (event) => { 
                                 if(event.key === Qt.Key_Escape) { hide(); event.accepted = true }
                                 else if(event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { launchSelected(); event.accepted = true }
                                 else if(event.key === Qt.Key_Down) { selectNext(); event.accepted = true }

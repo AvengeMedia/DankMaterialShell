@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -639,10 +639,13 @@ PanelWindow {
                         z: -1
                         
                         layer.enabled: true
-                        layer.effect: DropShadow {
-                            radius: 8
-                            samples: 16
-                            color: Qt.rgba(0, 0, 0, 0.2)
+                        layer.effect: MultiEffect {
+                            shadowEnabled: true
+                            shadowHorizontalOffset: 0
+                            shadowVerticalOffset: 0
+                            shadowBlur: 0.25  // radius/32
+                            shadowColor: Qt.rgba(0, 0, 0, 0.2)
+                            shadowOpacity: 0.2
                         }
                     }
                     

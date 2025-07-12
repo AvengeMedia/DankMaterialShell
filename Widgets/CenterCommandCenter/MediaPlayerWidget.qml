@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Mpris
 import "../../Common"
@@ -19,103 +19,32 @@ Rectangle {
     border.color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.2)
     border.width: 1
     
-    // Constants and helpers - all microseconds
-    readonly property real oneSecondUs: 1000000.0
+    property real currentPosition: 0
     
-    function asSec(us) { return us / oneSecondUs }
-    function ratio() { return trackLenUs > 0 ? uiPosUs / trackLenUs : 0 }
-    
-    function normalizeLength(lenRaw) {
-        // If length < 86 400 it's almost certainly seconds (24 h upper bound).
-        // Convert to µs; otherwise return as-is.
-        return (lenRaw > 0 && lenRaw < 86400) ? lenRaw * oneSecondUs : lenRaw;
+    // Simple progress ratio calculation
+    function ratio() { 
+        return activePlayer && activePlayer.length > 0 ? currentPosition / activePlayer.length : 0 
     }
     
-    
-    // Call seek() in safe 5-second chunks so every player obeys.
-    function chunkedSeek(offsetUs) {
-        if (Math.abs(offsetUs) < 5 * oneSecondUs) {   // ≤5 s? single shot.
-            activePlayer.seek(offsetUs);
-            return;
-        }
-        
-        const step = 5 * oneSecondUs;                 // 5 s
-        let remaining = offsetUs;
-        let safety    = 0;                            // avoid infinite loops
-        while (Math.abs(remaining) > step && safety < 40) {   // max 200 s
-            activePlayer.seek(Math.sign(remaining) * step);
-            remaining -= Math.sign(remaining) * step;
-            safety++;
-        }
-        if (remaining !== 0) activePlayer.seek(remaining);
-    }
-    
-    // Returns a guaranteed-valid object-path for the current track.
-    function trackPath() {
-        const md = activePlayer.metadata || {};
-        // Spec: "/org/mpris/MediaPlayer2/Track/NNN"
-        if (typeof md["mpris:trackid"] === "string" &&
-            md["mpris:trackid"].length > 1 && md["mpris:trackid"].startsWith("/"))
-            return md["mpris:trackid"];
-
-        // Nothing reliable?  Fall back to the *current* playlist entry object if exposed
-        if (activePlayer.currentTrackPath)      return activePlayer.currentTrackPath;
-
-        // Absolute last resort—return null so caller knows SetPosition will fail
-        return null;
-    }
-    
-    // Position tracking - all microseconds
-    property real uiPosUs: 0
-    property real backendPosUs: 0
-    property real trackLenUs: 0
-    property double backendStamp: Date.now()    // wall-clock of last update in ms
-    
-    // Optimistic timer
+    // Updates progress bar every second
     Timer {
-        id: tickTimer
-        interval: 50            // 20 fps feels smooth, cheap
+        id: positionTimer
+        interval: 1000
+        running: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing && activePlayer.length > 0 && !progressMouseArea.isSeeking
         repeat: true
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing
         onTriggered: {
-            if (trackLenUs <= 0) return;
-            const projected = backendPosUs + (Date.now() - backendStamp) * 1000.0;
-            uiPosUs = Math.min(projected, trackLenUs);   // never exceed track end
+            if (activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing && !progressMouseArea.isSeeking) {
+                currentPosition = activePlayer.position
+            }
         }
     }
-    
-    // --- 500-ms poll to keep external moves in sync -------------------
-    // Timer {
-    //     id: pollTimer
-    //     interval: 500             // ms
-    //     repeat: true
-    //     running: true             // always on; cost is negligible
-    //     onTriggered: {
-    //         if (!activePlayer || trackLenUs <= 0) return;
-
-    //         const polledUs = activePlayer.position;   // property read
-    //         // Compare in percent to avoid false positives
-    //         if (Math.abs((polledUs - backendPosUs) / trackLenUs) > 0.01) { // >1 % jump
-    //             backendPosUs = polledUs;
-    //             backendStamp = Date.now();
-    //             uiPosUs      = polledUs;      // snap instantly
-    //         }
-    //     }
-    // }
     
     // Initialize when player changes
     onActivePlayerChanged: {
         if (activePlayer) {
-            backendPosUs = activePlayer.position || 0
-            trackLenUs = normalizeLength(activePlayer.length || 0)
-            backendStamp = Date.now()
-            uiPosUs = backendPosUs
-            console.log(`player change → len ${asSec(trackLenUs)} s, pos ${asSec(uiPosUs)} s`)
+            currentPosition = activePlayer.position || 0
         } else {
-            backendPosUs = 0
-            trackLenUs = 0
-            backendStamp = Date.now()
-            uiPosUs = 0
+            currentPosition = 0
         }
     }
     
@@ -124,30 +53,17 @@ Rectangle {
         target: activePlayer
         
         function onPositionChanged() {
-            const posUs = activePlayer.position
-            backendPosUs = posUs
-            backendStamp = Date.now()
-            uiPosUs = posUs                 // snap immediately on tick
-        }
-        
-        function onSeeked(pos) {
-            backendPosUs = pos
-            backendStamp = Date.now()
-            uiPosUs = backendPosUs
+            if (!progressMouseArea.isSeeking) {
+                currentPosition = activePlayer.position
+            }
         }
         
         function onPostTrackChanged() {
-            backendPosUs = activePlayer?.position || 0
-            trackLenUs = normalizeLength(activePlayer?.length || 0)
-            backendStamp = Date.now()
-            uiPosUs = backendPosUs
+            currentPosition = activePlayer?.position || 0
         }
         
         function onTrackTitleChanged() {
-            backendPosUs = activePlayer?.position || 0
-            trackLenUs = normalizeLength(activePlayer?.length || 0)
-            backendStamp = Date.now()
-            uiPosUs = backendPosUs
+            currentPosition = activePlayer?.position || 0
         }
     }
     
@@ -233,6 +149,7 @@ Rectangle {
         
         // Progress bar
         Rectangle {
+            id: progressBarBackground
             width: parent.width
             height: 6
             radius: 3
@@ -245,27 +162,72 @@ Rectangle {
                 color: theme.primary
                 
                 width: parent.width * ratio()
+                
+                Behavior on width {
+                    NumberAnimation { duration: 100 }
+                }
+            }
+            
+            // Drag handle
+            Rectangle {
+                id: progressHandle
+                width: 12
+                height: 12
+                radius: 6
+                color: theme.primary
+                border.color: Qt.lighter(theme.primary, 1.3)
+                border.width: 1
+                
+                x: Math.max(0, Math.min(parent.width - width, progressFill.width - width/2))
+                anchors.verticalCenter: parent.verticalCenter
+                
+                visible: activePlayer && activePlayer.length > 0
+                scale: progressMouseArea.containsMouse || progressMouseArea.pressed ? 1.2 : 1.0
+                
+                Behavior on scale {
+                    NumberAnimation { duration: 150 }
+                }
             }
             
             MouseArea {
+                id: progressMouseArea
                 anchors.fill: parent
+                hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                enabled: activePlayer && activePlayer.length > 0 && activePlayer.canSeek
                 
-                onClicked: (mouse) => {
-                    if (!activePlayer || !activePlayer.canSeek || trackLenUs <= 0) return
-                    
-                    const targetUs = (mouse.x / width) * trackLenUs
-                    const offset = targetUs - backendPosUs
-                    
-                    if (typeof activePlayer.setPosition === "function") {
-                        activePlayer.setPosition(trackPath() || "/", Math.round(targetUs))
-                        console.log(`SetPosition → ${asSec(targetUs)} s`)
-                    } else {
-                        chunkedSeek(offset)                          // <-- use helper
-                        console.log(`chunkedSeek → ${asSec(offset/oneSecondUs)} s`)
+                property bool isSeeking: false
+                
+                onClicked: function(mouse) {
+                    if (activePlayer && activePlayer.length > 0) {
+                        let ratio = mouse.x / width
+                        let seekPosition = ratio * activePlayer.length
+                        activePlayer.position = seekPosition
+                        currentPosition = seekPosition
                     }
-                    
-                    uiPosUs = backendPosUs = targetUs
+                }
+                
+                onPressed: function(mouse) {
+                    isSeeking = true
+                    if (activePlayer && activePlayer.length > 0) {
+                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                        let seekPosition = ratio * activePlayer.length
+                        activePlayer.position = seekPosition
+                        currentPosition = seekPosition
+                    }
+                }
+                
+                onReleased: {
+                    isSeeking = false
+                }
+                
+                onPositionChanged: function(mouse) {
+                    if (pressed && activePlayer && activePlayer.length > 0) {
+                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                        let seekPosition = ratio * activePlayer.length
+                        activePlayer.position = seekPosition
+                        currentPosition = seekPosition
+                    }
                 }
             }
         }
@@ -299,15 +261,9 @@ Rectangle {
                         if (!activePlayer) return
                         
                         // >8 s → jump to start, otherwise previous track
-                        if (uiPosUs > 8 * oneSecondUs && activePlayer.canSeek) {
-                            if (typeof activePlayer.setPosition === "function") {
-                                activePlayer.setPosition(trackPath() || "/", 0)
-                                console.log("Back → SetPosition 0 µs")
-                            } else {
-                                chunkedSeek(-backendPosUs)                   // <-- use helper
-                                console.log("Back → chunkedSeek to 0")
-                            }
-                            uiPosUs = backendPosUs = 0
+                        if (currentPosition > 8 && activePlayer.canSeek) {
+                            activePlayer.position = 0
+                            currentPosition = 0
                         } else {
                             activePlayer.previous()
                         }

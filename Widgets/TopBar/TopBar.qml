@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -44,15 +44,12 @@ PanelWindow {
     property bool bluetoothAvailable: false
     property bool bluetoothEnabled: false
     
+    // Shell reference to access root properties directly
+    property var shellRoot: null
+    
     // Notification properties
-    property bool notificationHistoryVisible: false
     property int notificationCount: 0
     
-    // Control center properties
-    property bool controlCenterVisible: false
-    
-    // Calendar properties
-    property bool calendarVisible: false
     
     // Clipboard properties
     signal clipboardRequested()
@@ -63,6 +60,7 @@ PanelWindow {
     property var currentTrayItem: null
     property real trayMenuX: 0
     property real trayMenuY: 0
+    
     
     // Proxy objects for external connections
     
@@ -107,13 +105,13 @@ PanelWindow {
             color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBar.backgroundTransparency)
             
             layer.enabled: true
-            layer.effect: DropShadow {
-                horizontalOffset: 0
-                verticalOffset: 4
-                radius: 16
-                samples: 33
-                color: Qt.rgba(0, 0, 0, 0.15)
-                transparentBorder: true
+            layer.effect: MultiEffect {
+                shadowEnabled: true
+                shadowHorizontalOffset: 0
+                shadowVerticalOffset: 4
+                shadowBlur: 0.5  // radius/32, adjusted for visual match
+                shadowColor: Qt.rgba(0, 0, 0, 0.15)
+                shadowOpacity: 0.15
             }
             
             Rectangle {
@@ -183,7 +181,9 @@ PanelWindow {
                 useFahrenheit: topBar.useFahrenheit
                 
                 onClockClicked: {
-                    topBar.calendarVisible = !topBar.calendarVisible
+                    if (topBar.shellRoot) {
+                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
+                    }
                 }
                 
                 // Insert audio visualization into the clock widget placeholder
@@ -263,9 +263,11 @@ PanelWindow {
                 NotificationCenterButton {
                     anchors.verticalCenter: parent.verticalCenter
                     hasUnread: topBar.notificationCount > 0
-                    isActive: topBar.notificationHistoryVisible
+                    isActive: topBar.shellRoot ? topBar.shellRoot.notificationHistoryVisible : false
                     onClicked: {
-                        topBar.notificationHistoryVisible = !topBar.notificationHistoryVisible
+                        if (topBar.shellRoot) {
+                            topBar.shellRoot.notificationHistoryVisible = !topBar.shellRoot.notificationHistoryVisible
+                        }
                     }
                 }
                 
@@ -281,13 +283,15 @@ PanelWindow {
                     volumeLevel: topBar.volumeLevel
                     bluetoothAvailable: topBar.bluetoothAvailable
                     bluetoothEnabled: topBar.bluetoothEnabled
-                    isActive: topBar.controlCenterVisible
+                    isActive: topBar.shellRoot ? topBar.shellRoot.controlCenterVisible : false
                     
                     onClicked: {
-                        topBar.controlCenterVisible = !topBar.controlCenterVisible
-                        if (topBar.controlCenterVisible) {
-                            WifiService.scanWifi()
-                            BluetoothService.scanDevices()
+                        if (topBar.shellRoot) {
+                            topBar.shellRoot.controlCenterVisible = !topBar.shellRoot.controlCenterVisible
+                            if (topBar.shellRoot.controlCenterVisible) {
+                                WifiService.scanWifi()
+                                BluetoothService.scanDevices()
+                            }
                         }
                     }
                 }

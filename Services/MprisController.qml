@@ -136,4 +136,24 @@ Singleton {
         this.trackedPlayer = targetPlayer
     }
 
+    // Seeking support
+    property bool canSeek: this.activePlayer?.canSeek ?? false
+    property real position: this.activePlayer?.position ?? 0
+    property real length: this.activePlayer?.length ?? 0
+    
+    function seek(offsetUs) {
+        if (this.canSeek && this.activePlayer) {
+            this.activePlayer.seek(offsetUs)
+        }
+    }
+    
+    function setPosition(trackId, positionUs) {
+        if (this.canSeek && this.activePlayer && typeof this.activePlayer.setPosition === "function") {
+            this.activePlayer.setPosition(trackId, positionUs)
+        } else if (this.canSeek && this.activePlayer) {
+            // Fallback to setting position property
+            this.activePlayer.position = positionUs
+        }
+    }
+
 }
