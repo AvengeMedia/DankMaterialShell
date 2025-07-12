@@ -1,4 +1,5 @@
 import QtQuick
+import QtCore
 import Quickshell
 import Quickshell.Io
 pragma Singleton
@@ -7,7 +8,7 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    property string configDir: (Quickshell.env["XDG_CONFIG_HOME"] || Quickshell.env["HOME"] + "/.config") + "/DankMaterialShell"
+    property string configDir: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell"
     property string recentAppsFile: configDir + "/recentApps.json"
     property int maxRecentApps: 10
     property var recentApps: []

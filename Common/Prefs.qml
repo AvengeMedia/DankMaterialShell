@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick
+import QtCore
 import Quickshell
 import Quickshell.Io
 
@@ -12,69 +13,19 @@ Singleton {
     property real topBarTransparency: 0.75
     property var recentlyUsedApps: []
     
-    readonly property string configDir: Qt.resolvedUrl("file://" + Quickshell.env("HOME") + "/.config/DankMaterialDark")
-    readonly property string configFile: configDir + "/settings.json"
     
-    Component.onCompleted: {
-        loadSettings()
-        // Theme will be applied after settings file is loaded in onLoaded handler
-    }
-    
-    Process {
-        id: mkdirProcess
-        running: false
-        
-        onExited: (exitCode) => {
-            if (exitCode === 0) {
-                console.log("Config directory created successfully")
-            }
-            // Reload settings file after directory creation completes
-            settingsFileView.reload()
-        }
-    }
-    
-    Process {
-        id: writeProcess
-        running: false
-        
-        onExited: (exitCode) => {
-            if (exitCode === 0) {
-                console.log("Settings saved successfully")
-            } else {
-                console.error("Failed to save settings, exit code:", exitCode)
-            }
-        }
-    }
+    Component.onCompleted: loadSettings()
     
     FileView {
-        id: settingsFileView
-        path: "file://" + Quickshell.env("HOME") + "/.config/DankMaterialDark/settings.json"
+        id: settingsFile
+        path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
+        blockLoading: true
+        blockWrites: true
+        watchChanges: true
         
         onLoaded: {
             console.log("Settings file loaded successfully")
-            try {
-                var content = settingsFileView.text()
-                console.log("Settings file content:", content)
-                if (content && content.trim()) {
-                    var settings = JSON.parse(content)
-                    themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0
-                    themeIsDynamic = settings.themeIsDynamic !== undefined ? settings.themeIsDynamic : false
-                    isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
-                    topBarTransparency = settings.topBarTransparency !== undefined ? 
-                        (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
-                    recentlyUsedApps = settings.recentlyUsedApps || []
-                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
-                    
-                    // Apply the theme immediately after loading settings
-                    applyStoredTheme()
-                } else {
-                    console.log("Settings file is empty - applying default theme")
-                    applyStoredTheme()
-                }
-            } catch (e) {
-                console.log("Could not parse settings, using defaults:", e)
-                applyStoredTheme()
-            }
+            parseSettings(settingsFile.text())
         }
         
         onLoadFailed: (error) => {
@@ -84,23 +35,41 @@ Singleton {
     }
     
     function loadSettings() {
-        mkdirProcess.command = ["mkdir", "-p", Quickshell.env("HOME") + "/.config/DankMaterialDark"]
-        mkdirProcess.running = true        
+        parseSettings(settingsFile.text())
+    }
+    
+    function parseSettings(content) {
+        try {
+            console.log("Settings file content:", content)
+            if (content && content.trim()) {
+                var settings = JSON.parse(content)
+                themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0
+                themeIsDynamic = settings.themeIsDynamic !== undefined ? settings.themeIsDynamic : false
+                isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
+                topBarTransparency = settings.topBarTransparency !== undefined ? 
+                    (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
+                recentlyUsedApps = settings.recentlyUsedApps || []
+                console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
+                
+                applyStoredTheme()
+            } else {
+                console.log("Settings file is empty - applying default theme")
+                applyStoredTheme()
+            }
+        } catch (e) {
+            console.log("Could not parse settings, using defaults:", e)
+            applyStoredTheme()
+        }
     }
     
     function saveSettings() {
-        var settings = {
-            themeIndex: themeIndex,
-            themeIsDynamic: themeIsDynamic,
-            isLightMode: isLightMode,
-            topBarTransparency: topBarTransparency,
-            recentlyUsedApps: recentlyUsedApps
-        }
-        
-        var content = JSON.stringify(settings, null, 2)
-        
-        writeProcess.command = ["sh", "-c", "echo '" + content + "' > '" + Quickshell.env("HOME") + "/.config/DankMaterialDark/settings.json'"]
-        writeProcess.running = true
+        settingsFile.setText(JSON.stringify({
+            themeIndex,
+            themeIsDynamic,
+            isLightMode,
+            topBarTransparency,
+            recentlyUsedApps
+        }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
     
