@@ -128,6 +128,9 @@ Item {
             visible: networkTab.networkSubTab === 0
             clip: true
             
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            
             Column {
                 width: parent.width
                 spacing: Theme.spacingL
@@ -278,6 +281,9 @@ Item {
             height: parent.height - 48
             visible: networkTab.networkSubTab === 1
             clip: true
+            
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
             
             Column {
                 width: parent.width
