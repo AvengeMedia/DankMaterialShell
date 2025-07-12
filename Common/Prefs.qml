@@ -9,6 +9,7 @@ Singleton {
     property int themeIndex: 0
     property bool themeIsDynamic: false
     property bool isLightMode: false
+    property real topBarTransparency: 0.75
     property var recentlyUsedApps: []
     
     readonly property string configDir: Qt.resolvedUrl("file://" + Quickshell.env("HOME") + "/.config/DankMaterialDark")
@@ -59,8 +60,10 @@ Singleton {
                     themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0
                     themeIsDynamic = settings.themeIsDynamic !== undefined ? settings.themeIsDynamic : false
                     isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
+                    topBarTransparency = settings.topBarTransparency !== undefined ? 
+                        (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
                     recentlyUsedApps = settings.recentlyUsedApps || []
-                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "recentApps:", recentlyUsedApps.length)
+                    console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 } else {
                     console.log("Settings file is empty")
                 }
@@ -84,6 +87,7 @@ Singleton {
             themeIndex: themeIndex,
             themeIsDynamic: themeIsDynamic,
             isLightMode: isLightMode,
+            topBarTransparency: topBarTransparency,
             recentlyUsedApps: recentlyUsedApps
         }
         
@@ -91,7 +95,7 @@ Singleton {
         
         writeProcess.command = ["sh", "-c", "echo '" + content + "' > '" + Quickshell.env("HOME") + "/.config/DankMaterialDark/settings.json'"]
         writeProcess.running = true
-        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "recentApps:", recentlyUsedApps.length)
+        console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
     
     function applyStoredTheme() {
@@ -118,6 +122,12 @@ Singleton {
     function setLightMode(lightMode) {
         console.log("Prefs setLightMode called - isLightMode:", lightMode)
         isLightMode = lightMode
+        saveSettings()
+    }
+    
+    function setTopBarTransparency(transparency) {
+        console.log("Prefs setTopBarTransparency called - topBarTransparency:", transparency)
+        topBarTransparency = transparency
         saveSettings()
     }
     

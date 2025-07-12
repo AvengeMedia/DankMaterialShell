@@ -19,6 +19,16 @@ PanelWindow {
     screen: modelData
     property string screenName: modelData.name
     
+    // Transparency property for the top bar background
+    property real backgroundTransparency: Prefs.topBarTransparency
+    
+    Connections {
+        target: Prefs
+        function onTopBarTransparencyChanged() {
+            topBar.backgroundTransparency = Prefs.topBarTransparency
+        }
+    }
+    
     // Properties exposed to shell
     property bool hasActiveMedia: false
     property var activePlayer: null
@@ -94,7 +104,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             radius: Theme.cornerRadiusXLarge
-            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.75)
+            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBar.backgroundTransparency)
             
             layer.enabled: true
             layer.effect: DropShadow {
