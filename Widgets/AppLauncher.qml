@@ -525,7 +525,7 @@ PanelWindow {
                         anchors.fill: parent
                         clip: true
                         visible: viewMode === "list"
-                        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                        ScrollBar.vertical.policy: ScrollBar.AlwaysOn
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                         
                         ListView {
@@ -536,6 +536,27 @@ PanelWindow {
                             
                             model: filteredModel
                             delegate: listDelegate
+                            
+                            // Make mouse wheel scrolling more responsive
+                            property real wheelStepSize: 60
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                
+                                onWheel: (wheel) => {
+                                    var delta = wheel.angleDelta.y
+                                    var steps = delta / 120  // Standard wheel step
+                                    appList.contentY -= steps * appList.wheelStepSize
+                                    
+                                    // Ensure we stay within bounds
+                                    if (appList.contentY < 0) {
+                                        appList.contentY = 0
+                                    } else if (appList.contentY > appList.contentHeight - appList.height) {
+                                        appList.contentY = Math.max(0, appList.contentHeight - appList.height)
+                                    }
+                                }
+                            }
                         }
                     }
                 
@@ -567,6 +588,27 @@ PanelWindow {
                             
                             model: filteredModel
                             delegate: gridDelegate
+                            
+                            // Make mouse wheel scrolling more responsive
+                            property real wheelStepSize: 60
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                
+                                onWheel: (wheel) => {
+                                    var delta = wheel.angleDelta.y
+                                    var steps = delta / 120  // Standard wheel step
+                                    appGrid.contentY -= steps * appGrid.wheelStepSize
+                                    
+                                    // Ensure we stay within bounds
+                                    if (appGrid.contentY < 0) {
+                                        appGrid.contentY = 0
+                                    } else if (appGrid.contentY > appGrid.contentHeight - appGrid.height) {
+                                        appGrid.contentY = Math.max(0, appGrid.contentHeight - appGrid.height)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -614,6 +656,27 @@ PanelWindow {
                         ListView {
                             model: categories
                             spacing: 4
+                            
+                            // Make mouse wheel scrolling more responsive
+                            property real wheelStepSize: 60
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                
+                                onWheel: (wheel) => {
+                                    var delta = wheel.angleDelta.y
+                                    var steps = delta / 120  // Standard wheel step
+                                    parent.contentY -= steps * parent.wheelStepSize
+                                    
+                                    // Ensure we stay within bounds
+                                    if (parent.contentY < 0) {
+                                        parent.contentY = 0
+                                    } else if (parent.contentY > parent.contentHeight - parent.height) {
+                                        parent.contentY = Math.max(0, parent.contentHeight - parent.height)
+                                    }
+                                }
+                            }
                             
                             delegate: Rectangle {
                                 width: ListView.view.width
