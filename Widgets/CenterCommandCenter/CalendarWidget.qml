@@ -1,6 +1,8 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import "../../Common"
+import "../../Services"
 
 Column {
     id: calendarWidget
@@ -10,6 +12,46 @@ Column {
     property date selectedDate: new Date()
     
     spacing: theme.spacingM
+    
+    // Load events when display date changes
+    onDisplayDateChanged: {
+        loadEventsForMonth()
+    }
+    
+    // Load events when calendar service becomes available
+    Connections {
+        target: CalendarService
+        enabled: CalendarService !== null
+        function onKhalAvailableChanged() {
+            if (CalendarService && CalendarService.khalAvailable) {
+                loadEventsForMonth()
+            }
+        }
+    }
+    
+    Component.onCompleted: {
+        console.log("CalendarWidget: Component completed, CalendarService available:", !!CalendarService)
+        if (CalendarService) {
+            console.log("CalendarWidget: khal available:", CalendarService.khalAvailable)
+        }
+        loadEventsForMonth()
+    }
+    
+    function loadEventsForMonth() {
+        if (!CalendarService || !CalendarService.khalAvailable) return
+        
+        // Calculate date range with padding
+        let firstDay = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1)
+        let dayOfWeek = firstDay.getDay()
+        let startDate = new Date(firstDay)
+        startDate.setDate(startDate.getDate() - dayOfWeek - 7) // Extra week padding
+        
+        let lastDay = new Date(displayDate.getFullYear(), displayDate.getMonth() + 1, 0)
+        let endDate = new Date(lastDay)
+        endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()) + 7) // Extra week padding
+        
+        CalendarService.loadEvents(startDate, endDate)
+    }
     
     // Month navigation header
     Row {
@@ -156,6 +198,64 @@ Column {
                            isCurrentMonth ? theme.surfaceText : 
                            Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.4)
                     font.weight: isToday || isSelected ? Font.Medium : Font.Normal
+                }
+                
+                // Event indicator - full-width elegant bar
+                Rectangle {
+                    id: eventIndicator
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: 2
+                    height: 3
+                    radius: 1.5
+                    visible: CalendarService && CalendarService.khalAvailable && CalendarService.hasEventsForDate(dayDate)
+                    
+                    // Dynamic color based on state with opacity
+                    color: {
+                        if (isSelected) {
+                            // Use a lighter tint of primary for selected state
+                            return Qt.lighter(theme.primary, 1.3)
+                        } else if (isToday) {
+                            return theme.primary
+                        } else {
+                            return theme.primary
+                        }
+                    }
+                    
+                    opacity: {
+                        if (isSelected) {
+                            return 0.9
+                        } else if (isToday) {
+                            return 0.8
+                        } else {
+                            return 0.6
+                        }
+                    }
+                    
+                    // Subtle animation on hover
+                    scale: dayArea.containsMouse ? 1.05 : 1.0
+                    
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: theme.shortDuration
+                            easing.type: theme.standardEasing
+                        }
+                    }
+                    
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: theme.shortDuration
+                            easing.type: theme.standardEasing
+                        }
+                    }
+                    
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: theme.shortDuration
+                            easing.type: theme.standardEasing
+                        }
+                    }
                 }
                 
                 MouseArea {

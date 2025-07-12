@@ -69,19 +69,23 @@ PanelWindow {
         function calculateHeight() {
             let contentHeight = theme.spacingM * 2 // margins
             
-            // Calculate widget heights - media widget is always present
+            // Main row with widgets and calendar
             let widgetHeight = 160  // Media widget always present
             if (weather?.available) {
                 widgetHeight += (weather ? 140 : 80) + theme.spacingM
             }
-            
-            // Calendar height is always 300
             let calendarHeight = 300
+            let mainRowHeight = Math.max(widgetHeight, calendarHeight)
             
-            // Take the max of widgets and calendar
-            contentHeight += Math.max(widgetHeight, calendarHeight)
+            contentHeight += mainRowHeight + theme.spacingM // Add spacing between main row and events
             
-            return Math.min(contentHeight, parent.height * 0.85)
+            // Add events widget height - dynamically calculated
+            if (CalendarService && CalendarService.khalAvailable) {
+                let eventsHeight = eventsWidget.height || 120 // Use actual widget height or fallback
+                contentHeight += eventsHeight
+            }
+            
+            return Math.min(contentHeight, parent.height * 0.9)
         }
         
         color: theme.surfaceContainer
@@ -123,6 +127,18 @@ PanelWindow {
         opacity: root.calendarVisible ? 1.0 : 0.0
         scale: root.calendarVisible ? 1.0 : 0.92
         
+        // Update height when calendar service events change
+        Connections {
+            target: CalendarService
+            enabled: CalendarService !== null
+            function onEventsByDateChanged() {
+                mainContainer.height = mainContainer.calculateHeight()
+            }
+            function onKhalAvailableChanged() {
+                mainContainer.height = mainContainer.calculateHeight()
+            }
+        }
+        
         Behavior on opacity {
             NumberAnimation {
                 duration: theme.longDuration
@@ -144,44 +160,72 @@ PanelWindow {
             }
         }
         
-        Row {
+        Column {
             anchors.fill: parent
             anchors.margins: theme.spacingM
             spacing: theme.spacingM
             
-            // Left section for widgets
-            Column {
-                id: leftWidgets
-                width: hasAnyWidgets ? parent.width * 0.45 : 0
-                height: childrenRect.height
+            // Main row with widgets and calendar
+            Row {
+                width: parent.width
+                height: {
+                    let widgetHeight = 160  // Media widget always present
+                    if (weather?.available) {
+                        widgetHeight += (weather ? 140 : 80) + theme.spacingM
+                    }
+                    let calendarHeight = 300
+                    return Math.max(widgetHeight, calendarHeight)
+                }
                 spacing: theme.spacingM
-                visible: hasAnyWidgets
-                anchors.top: parent.top
                 
-                property bool hasAnyWidgets: true || weather?.available  // Always show media widget
-                
-                MediaPlayerWidget {
-                    visible: true  // Always visible - shows placeholder when no media
-                    width: parent.width
-                    height: 160
-                    theme: centerCommandCenter.theme
+                // Left section for widgets
+                Column {
+                    id: leftWidgets
+                    width: hasAnyWidgets ? parent.width * 0.45 : 0
+                    height: childrenRect.height
+                    spacing: theme.spacingM
+                    visible: hasAnyWidgets
+                    anchors.top: parent.top
+                    
+                    property bool hasAnyWidgets: true || weather?.available  // Always show media widget
+                    
+                    MediaPlayerWidget {
+                        visible: true  // Always visible - shows placeholder when no media
+                        width: parent.width
+                        height: 160
+                        theme: centerCommandCenter.theme
+                    }
+                    
+                    WeatherWidget {
+                        visible: weather?.available
+                        width: parent.width
+                        height: weather ? 140 : 80
+                        theme: centerCommandCenter.theme
+                        weather: centerCommandCenter.weather
+                        useFahrenheit: centerCommandCenter.useFahrenheit
+                    }
                 }
                 
-                WeatherWidget {
-                    visible: weather?.available
-                    width: parent.width
-                    height: weather ? 140 : 80
+                // Right section for calendar
+                CalendarWidget {
+                    id: calendarWidget
+                    width: leftWidgets.hasAnyWidgets ? parent.width * 0.55 - theme.spacingL : parent.width
+                    height: parent.height
                     theme: centerCommandCenter.theme
-                    weather: centerCommandCenter.weather
-                    useFahrenheit: centerCommandCenter.useFahrenheit
                 }
             }
             
-            // Right section for calendar
-            CalendarWidget {
-                width: leftWidgets.hasAnyWidgets ? parent.width * 0.55 - theme.spacingL : parent.width
-                height: parent.height
+            // Full-width events widget below
+            EventsWidget {
+                id: eventsWidget
+                width: parent.width
                 theme: centerCommandCenter.theme
+                selectedDate: calendarWidget.selectedDate
+                
+                // Update container height when events widget height changes
+                onHeightChanged: {
+                    mainContainer.height = mainContainer.calculateHeight()
+                }
             }
         }
     }

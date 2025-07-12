@@ -78,6 +78,10 @@ ShellRoot {
     // Brightness properties from BrightnessService
     property int brightnessLevel: BrightnessService.brightnessLevel
     
+    // Calendar properties from CalendarService
+    property bool calendarAvailable: CalendarService.khalAvailable
+    property var calendarEvents: CalendarService.eventsByDate
+    
     // WiFi password dialog
     property bool wifiPasswordDialogVisible: false
     property string wifiPasswordSSID: ""
