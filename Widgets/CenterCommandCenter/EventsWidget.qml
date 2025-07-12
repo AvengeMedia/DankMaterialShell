@@ -237,10 +237,11 @@ Rectangle {
                                             if (modelData.allDay) {
                                                 return "All day"
                                             } else {
-                                                let startTime = Qt.formatTime(modelData.start, "h:mm AP")
+                                                let timeFormat = Prefs.use24HourClock ? "H:mm" : "h:mm AP"
+                                                let startTime = Qt.formatTime(modelData.start, timeFormat)
                                                 if (modelData.start.toDateString() !== modelData.end.toDateString() || 
                                                     modelData.start.getTime() !== modelData.end.getTime()) {
-                                                    return startTime + " – " + Qt.formatTime(modelData.end, "h:mm AP")
+                                                    return startTime + " – " + Qt.formatTime(modelData.end, timeFormat)
                                                 }
                                                 return startTime
                                             }

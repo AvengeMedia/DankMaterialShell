@@ -9,7 +9,6 @@ Rectangle {
     property string weatherCode: ""
     property int weatherTemp: 0
     property int weatherTempF: 0
-    property bool useFahrenheit: false
     
     signal clicked()
     
@@ -49,7 +48,7 @@ Rectangle {
         }
         
         Text {
-            text: (useFahrenheit ? weatherTempF : weatherTemp) + "°"
+            text: (Prefs.useFahrenheit ? weatherTempF : weatherTemp) + "°" + (Prefs.useFahrenheit ? "F" : "C")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             font.weight: Font.Medium

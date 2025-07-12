@@ -9,7 +9,6 @@ Rectangle {
     
     property var theme: Theme
     property var weather
-    property bool useFahrenheit: false
     
     width: parent.width
     height: parent.height
@@ -80,7 +79,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Text {
-                        text: weather ? ((useFahrenheit ? weather.tempF : weather.temp) + "°" + (useFahrenheit ? "F" : "C")) : ""
+                        text: weather ? ((Prefs.useFahrenheit ? weather.tempF : weather.temp) + "°" + (Prefs.useFahrenheit ? "F" : "C")) : ""
                         font.pixelSize: theme.fontSizeXLarge
                         color: theme.surfaceText
                         font.weight: Font.Light
@@ -89,7 +88,7 @@ Rectangle {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: if (weather) useFahrenheit = !useFahrenheit
+                            onClicked: if (weather) Prefs.setTemperatureUnit(!Prefs.useFahrenheit)
                             enabled: weather !== null
                         }
                     }

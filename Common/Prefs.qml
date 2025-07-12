@@ -13,6 +13,11 @@ Singleton {
     property real topBarTransparency: 0.75
     property var recentlyUsedApps: []
     
+    // New global preferences
+    property bool use24HourClock: true
+    property bool useFahrenheit: false
+    property bool nightModeEnabled: false
+    
     
     Component.onCompleted: loadSettings()
     
@@ -49,6 +54,9 @@ Singleton {
                 topBarTransparency = settings.topBarTransparency !== undefined ? 
                     (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
                 recentlyUsedApps = settings.recentlyUsedApps || []
+                use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
+                useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
+                nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
                 console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 
                 applyStoredTheme()
@@ -68,7 +76,10 @@ Singleton {
             themeIsDynamic,
             isLightMode,
             topBarTransparency,
-            recentlyUsedApps
+            recentlyUsedApps,
+            use24HourClock,
+            useFahrenheit,
+            nightModeEnabled
         }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
@@ -132,5 +143,24 @@ Singleton {
     
     function getRecentApps() {
         return recentlyUsedApps
+    }
+    
+    // New preference setters
+    function setClockFormat(use24Hour) {
+        console.log("Prefs setClockFormat called - use24HourClock:", use24Hour)
+        use24HourClock = use24Hour
+        saveSettings()
+    }
+    
+    function setTemperatureUnit(fahrenheit) {
+        console.log("Prefs setTemperatureUnit called - useFahrenheit:", fahrenheit)
+        useFahrenheit = fahrenheit
+        saveSettings()
+    }
+    
+    function setNightModeEnabled(enabled) {
+        console.log("Prefs setNightModeEnabled called - nightModeEnabled:", enabled)
+        nightModeEnabled = enabled
+        saveSettings()
     }
 }

@@ -46,6 +46,7 @@ ShellRoot {
     property string powerConfirmAction: ""
     property string powerConfirmTitle: ""
     property string powerConfirmMessage: ""
+    property bool settingsVisible: false
     
     // Network properties from NetworkService
     property string networkStatus: NetworkService.networkStatus
@@ -161,7 +162,6 @@ ShellRoot {
     property var weather: WeatherService.weather
     
     // Weather configuration
-    property bool useFahrenheit: true  // Default to Fahrenheit
     
     
     // WiFi Auto-refresh Timer
@@ -295,7 +295,6 @@ ShellRoot {
             weatherCode: root.weather.wCode
             weatherTemp: root.weather.temp
             weatherTempF: root.weather.tempF
-            useFahrenheit: root.useFahrenheit
             osLogo: root.osLogo
             networkStatus: root.networkStatus
             wifiSignalStrength: root.wifiSignalStrength
@@ -339,6 +338,11 @@ ShellRoot {
     BatteryControlPopup {}
     PowerMenuPopup {}
     PowerConfirmDialog {}
+    
+    SettingsPopup {
+        id: settingsPopup
+        settingsVisible: root.settingsVisible
+    }
     
     // Application and clipboard components
     AppLauncher {

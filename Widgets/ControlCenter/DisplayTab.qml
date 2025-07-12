@@ -11,21 +11,6 @@ ScrollView {
     id: displayTab
     clip: true
     
-    // These should be bound from parent
-    property bool nightModeEnabled: false
-    property real topBarTransparency: Prefs.topBarTransparency // Default transparency value
-    
-    Component.onCompleted: {
-        // Sync with stored transparency value on startup
-        topBarTransparency = Prefs.topBarTransparency
-    }
-    
-    Connections {
-        target: Prefs
-        function onTopBarTransparencyChanged() {
-            displayTab.topBarTransparency = Prefs.topBarTransparency
-        }
-    }
     
     Column {
         width: parent.width
@@ -79,28 +64,28 @@ ScrollView {
                     width: (parent.width - Theme.spacingM) / 2
                     height: 50
                     radius: Theme.cornerRadius
-                    color: displayTab.nightModeEnabled ? 
+                    color: Prefs.nightModeEnabled ? 
                         Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
                         (nightModeToggle.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
-                    border.color: displayTab.nightModeEnabled ? Theme.primary : "transparent"
-                    border.width: displayTab.nightModeEnabled ? 1 : 0
+                    border.color: Prefs.nightModeEnabled ? Theme.primary : "transparent"
+                    border.width: Prefs.nightModeEnabled ? 1 : 0
                     
                     Column {
                         anchors.centerIn: parent
                         spacing: Theme.spacingXS
                         
                         Text {
-                            text: displayTab.nightModeEnabled ? "nightlight" : "dark_mode"
+                            text: Prefs.nightModeEnabled ? "nightlight" : "dark_mode"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
+                            color: Prefs.nightModeEnabled ? Theme.primary : Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         
                         Text {
                             text: "Night Mode"
                             font.pixelSize: Theme.fontSizeSmall
-                            color: displayTab.nightModeEnabled ? Theme.primary : Theme.surfaceText
+                            color: Prefs.nightModeEnabled ? Theme.primary : Theme.surfaceText
                             font.weight: Font.Medium
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
@@ -113,14 +98,14 @@ ScrollView {
                         cursorShape: Qt.PointingHandCursor
                         
                         onClicked: {
-                            if (displayTab.nightModeEnabled) {
+                            if (Prefs.nightModeEnabled) {
                                 // Disable night mode - kill any running color temperature processes
                                 nightModeDisableProcess.running = true
-                                displayTab.nightModeEnabled = false
+                                Prefs.setNightModeEnabled(false)
                             } else {
                                 // Enable night mode using wlsunset or redshift
                                 nightModeEnableProcess.running = true
-                                displayTab.nightModeEnabled = true
+                                Prefs.setNightModeEnabled(true)
                             }
                         }
                     }
@@ -194,7 +179,7 @@ ScrollView {
                 CustomSlider {
                     width: parent.width - (Theme.spacingM * 2)
                     anchors.horizontalCenter: parent.horizontalCenter
-                    value: Math.round(displayTab.topBarTransparency * 100)
+                    value: Math.round(Prefs.topBarTransparency * 100)
                     minimum: 0
                     maximum: 100
                     leftIcon: "opacity"
@@ -204,7 +189,7 @@ ScrollView {
                     
                     onSliderValueChanged: (newValue) => {
                         let transparencyValue = newValue / 100.0
-                        displayTab.topBarTransparency = transparencyValue
+                        // Update live preview
                     }
                     
                     onSliderDragFinished: (finalValue) => {
@@ -229,7 +214,7 @@ ScrollView {
                 spacing: Theme.spacingS
                 
                 Text {
-                    text: "Theme"
+                    text: "Theme Color"
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceText
                     font.weight: Font.Medium
@@ -251,7 +236,7 @@ ScrollView {
         onExited: (exitCode) => {
             if (exitCode !== 0) {
                 console.warn("Failed to enable night mode")
-                displayTab.nightModeEnabled = false
+                Prefs.setNightModeEnabled(false)
             }
         }
     }

@@ -28,7 +28,7 @@ Rectangle {
         spacing: Theme.spacingS
         
         Text {
-            text: Qt.formatTime(root.currentDate, "h:mm AP")
+            text: Prefs.use24HourClock ? Qt.formatTime(root.currentDate, "H:mm") : Qt.formatTime(root.currentDate, "h:mm AP")
             font.pixelSize: Theme.fontSizeMedium
             color: Theme.surfaceText
             font.weight: Font.Medium

@@ -16,3 +16,6 @@ ThemePicker 1.0 ThemePicker.qml
 CpuMonitorWidget 1.0 CpuMonitorWidget.qml
 RamMonitorWidget 1.0 RamMonitorWidget.qml
 SpotlightLauncher 1.0 SpotlightLauncher.qml
+SettingsPopup 1.0 SettingsPopup.qml
+SettingsSection 1.0 SettingsSection.qml
+SettingsToggle 1.0 SettingsToggle.qml

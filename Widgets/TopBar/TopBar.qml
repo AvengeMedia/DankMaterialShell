@@ -36,7 +36,6 @@ PanelWindow {
     property string weatherCode: ""
     property int weatherTemp: 0
     property int weatherTempF: 0
-    property bool useFahrenheit: false
     property string osLogo: ""
     property string networkStatus: "disconnected"
     property string wifiSignalStrength: "good"
@@ -204,7 +203,6 @@ PanelWindow {
                 weatherCode: topBar.weatherCode
                 weatherTemp: topBar.weatherTemp
                 weatherTempF: topBar.weatherTempF
-                useFahrenheit: topBar.useFahrenheit
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -311,11 +309,6 @@ PanelWindow {
                             }
                         }
                     }
-                }
-                
-                // Power Button
-                PowerButton {
-                    anchors.verticalCenter: parent.verticalCenter
                 }
             }
         }

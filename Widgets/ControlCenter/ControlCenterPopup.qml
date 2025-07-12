@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -29,7 +30,7 @@ PanelWindow {
     }
     
     property int currentTab: 0 // 0: Network, 1: Audio, 2: Bluetooth, 3: Display
-    property bool nightModeEnabled: false
+    property bool powerOptionsExpanded: false
     
     Rectangle {
         width: Math.min(600, parent.width - Theme.spacingL * 2)
@@ -63,23 +64,403 @@ PanelWindow {
             anchors.margins: Theme.spacingL
             spacing: Theme.spacingM
             
-            // Header with tabs
+            // Elegant User Header
             Column {
                 width: parent.width
-                spacing: Theme.spacingM
+                spacing: Theme.spacingL
                 
-                Row {
+                // User Info Section - Jony Ive inspired
+                Rectangle {
                     width: parent.width
-                    height: 32
+                    height: 90
+                    radius: Theme.cornerRadiusLarge
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                    border.width: 1
                     
-                    Text {
-                        text: "Control Center"
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
+                    Row {
+                        anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingL
+                        anchors.rightMargin: Theme.spacingL
+                        spacing: Theme.spacingL
+                        
+                        // Profile Picture
+                        Rectangle {
+                            width: 54
+                            height: 54
+                            radius: 27
+                            color: Theme.primary
+                            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                            border.width: 2
+                            
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 2
+                                source: UserInfoService.profilePicture
+                                fillMode: Image.PreserveAspectCrop
+                                visible: UserInfoService.profileAvailable
+                                smooth: true
+                                
+                                layer.enabled: true
+                                layer.effect: MultiEffect {
+                                    maskEnabled: true
+                                    maskSource: Rectangle {
+                                        width: parent.width
+                                        height: parent.height
+                                        radius: width / 2
+                                        visible: false
+                                    }
+                                }
+                            }
+                            
+                            // Fallback icon when no profile picture
+                            Text {
+                                anchors.centerIn: parent
+                                text: "person"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.iconSize + 4
+                                color: Theme.onPrimary
+                                visible: !UserInfoService.profileAvailable
+                            }
+                        }
+                        
+                        // User Info Text
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingXS
+                            
+                            Text {
+                                text: UserInfoService.fullName || UserInfoService.username || "User"
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.surfaceText
+                                font.weight: Font.Medium
+                            }
+                            
+                            Text {
+                                text: "Uptime: " + (UserInfoService.uptime || "Unknown")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                font.weight: Font.Normal
+                            }
+                        }
                     }
                     
+                    // Action Buttons - Power and Settings
+                    Row {
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.rightMargin: Theme.spacingL
+                        spacing: Theme.spacingS
+                        
+                        // Power Button
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 20
+                            color: powerButton.containsMouse || controlCenterPopup.powerOptionsExpanded ? 
+                                   Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) :
+                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                            
+                            Rectangle {
+                                anchors.centerIn: parent
+                                width: parent.width
+                                height: parent.height
+                                radius: parent.radius
+                                color: "transparent"
+                                clip: true
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: controlCenterPopup.powerOptionsExpanded ? "expand_less" : "power_settings_new"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize - 2
+                                    color: powerButton.containsMouse || controlCenterPopup.powerOptionsExpanded ? Theme.error : Theme.surfaceText
+                                    
+                                    Behavior on text {
+                                        // Smooth icon transition
+                                        SequentialAnimation {
+                                            NumberAnimation {
+                                                target: parent
+                                                property: "opacity"
+                                                to: 0.0
+                                                duration: Theme.shortDuration / 2
+                                                easing.type: Theme.standardEasing
+                                            }
+                                            PropertyAction { target: parent; property: "text" }
+                                            NumberAnimation {
+                                                target: parent
+                                                property: "opacity"
+                                                to: 1.0
+                                                duration: Theme.shortDuration / 2
+                                                easing.type: Theme.standardEasing
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            MouseArea {
+                                id: powerButton
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                
+                                onClicked: {
+                                    controlCenterPopup.powerOptionsExpanded = !controlCenterPopup.powerOptionsExpanded
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                        
+                        // Settings Button
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: 20
+                            color: settingsButton.containsMouse ? 
+                                   Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
+                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "settings"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.iconSize - 2
+                                color: Theme.surfaceText
+                            }
+                            
+                            MouseArea {
+                                id: settingsButton
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                
+                                onClicked: {
+                                    root.controlCenterVisible = false
+                                    root.settingsVisible = true
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Animated Collapsible Power Options (moved here for better integration)
+                Rectangle {
+                    width: parent.width
+                    height: controlCenterPopup.powerOptionsExpanded ? 60 : 0
+                    radius: Theme.cornerRadius
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                    border.width: controlCenterPopup.powerOptionsExpanded ? 1 : 0
+                    opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
+                    clip: true
+                    
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                    
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                    
+                    Behavior on border.width {
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                    
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingL
+                        opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
+                        
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.emphasizedEasing
+                            }
+                        }
+                        
+                        // Logout
+                        Rectangle {
+                            width: 100
+                            height: 34
+                            radius: Theme.cornerRadius
+                            color: logoutButton.containsMouse ? 
+                                   Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12) :
+                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                            
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                
+                                Text {
+                                    text: "logout"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: logoutButton.containsMouse ? Theme.warning : Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Logout"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: logoutButton.containsMouse ? Theme.warning : Theme.surfaceText
+                                    font.weight: Font.Medium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            MouseArea {
+                                id: logoutButton
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                
+                                onClicked: {
+                                    controlCenterPopup.powerOptionsExpanded = false
+                                    root.powerConfirmAction = "logout"
+                                    root.powerConfirmTitle = "Logout"
+                                    root.powerConfirmMessage = "Are you sure you want to logout?"
+                                    root.powerConfirmVisible = true
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                        
+                        // Reboot
+                        Rectangle {
+                            width: 100
+                            height: 34
+                            radius: Theme.cornerRadius
+                            color: rebootButton.containsMouse ? 
+                                   Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12) :
+                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                            
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                
+                                Text {
+                                    text: "restart_alt"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: rebootButton.containsMouse ? Theme.warning : Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Restart"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: rebootButton.containsMouse ? Theme.warning : Theme.surfaceText
+                                    font.weight: Font.Medium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            MouseArea {
+                                id: rebootButton
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                
+                                onClicked: {
+                                    controlCenterPopup.powerOptionsExpanded = false
+                                    root.powerConfirmAction = "reboot"
+                                    root.powerConfirmTitle = "Restart"
+                                    root.powerConfirmMessage = "Are you sure you want to restart?"
+                                    root.powerConfirmVisible = true
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                        
+                        // Shutdown
+                        Rectangle {
+                            width: 100
+                            height: 34
+                            radius: Theme.cornerRadius
+                            color: shutdownButton.containsMouse ? 
+                                   Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) :
+                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                            
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                
+                                Text {
+                                    text: "power_settings_new"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: shutdownButton.containsMouse ? Theme.error : Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Shutdown"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: shutdownButton.containsMouse ? Theme.error : Theme.surfaceText
+                                    font.weight: Font.Medium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            MouseArea {
+                                id: shutdownButton
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                
+                                onClicked: {
+                                    controlCenterPopup.powerOptionsExpanded = false
+                                    root.powerConfirmAction = "poweroff"
+                                    root.powerConfirmTitle = "Shutdown"
+                                    root.powerConfirmMessage = "Are you sure you want to shutdown?"
+                                    root.powerConfirmVisible = true
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                    }
                 }
                 
                 // Tab buttons
@@ -166,9 +547,31 @@ PanelWindow {
             // Tab content area
             Rectangle {
                 width: parent.width
-                height: parent.height - 120
+                height: {
+                    // More generous height calculation - use most of the available space
+                    let baseHeight = parent.height
+                    
+                    // Subtract only the essential fixed elements
+                    baseHeight -= 90 + Theme.spacingL  // User header + spacing
+                    baseHeight -= 40 + Theme.spacingM  // Tab buttons + spacing
+                    baseHeight -= Theme.spacingM       // Bottom spacing
+                    
+                    // Subtract power options height when expanded
+                    if (controlCenterPopup.powerOptionsExpanded) {
+                        baseHeight -= 60 + Theme.spacingL
+                    }
+                    
+                    return Math.max(300, baseHeight) // Higher minimum height for better content display
+                }
                 radius: Theme.cornerRadius
                 color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
+                
+                Behavior on height {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
                 
                 // Network Tab
                 NetworkTab {
@@ -228,13 +631,6 @@ PanelWindow {
                     anchors.margins: Theme.spacingM
                     visible: controlCenterPopup.currentTab === 3
                     
-                    // Bind properties from parent
-                    nightModeEnabled: controlCenterPopup.nightModeEnabled
-                    
-                    // Sync night mode state back to parent
-                    onNightModeEnabledChanged: {
-                        controlCenterPopup.nightModeEnabled = nightModeEnabled
-                    }
                 }
             }
         }

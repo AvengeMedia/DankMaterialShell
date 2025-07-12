@@ -170,8 +170,7 @@ PanelWindow {
         let command = []
         switch(action) {
             case "logout":
-                // Try multiple logout commands for different environments
-                command = ["bash", "-c", "loginctl terminate-user $USER || pkill -KILL -u $USER || gnome-session-quit --force || xfce4-session-logout --logout || i3-msg exit || swaymsg exit || niri msg quit"]
+                command = ["niri", "msg", "action", "quit", "-s"]
                 break
             case "suspend":
                 command = ["systemctl", "suspend"]

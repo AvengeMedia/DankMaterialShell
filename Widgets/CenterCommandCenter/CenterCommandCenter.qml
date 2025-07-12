@@ -14,7 +14,6 @@ PanelWindow {
     property var theme: Theme
     property bool hasActiveMedia: root.hasActiveMedia
     property var weather: root.weather
-    property bool useFahrenheit: false
     
     property bool showMediaPlayer: hasActiveMedia || hideMediaTimer.running
     
@@ -202,7 +201,6 @@ PanelWindow {
                         height: weather ? 140 : 80
                         theme: centerCommandCenter.theme
                         weather: centerCommandCenter.weather
-                        useFahrenheit: centerCommandCenter.useFahrenheit
                     }
                 }
                 
