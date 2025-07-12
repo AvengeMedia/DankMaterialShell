@@ -39,7 +39,7 @@ PanelWindow {
         width: Math.min(320, parent.width - Theme.spacingL * 2)
         height: 320  // Fixed height to prevent cropping
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
-        y: Theme.barHeight + Theme.spacingS
+        y: Theme.barHeight + Theme.spacingXS
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusLarge
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)

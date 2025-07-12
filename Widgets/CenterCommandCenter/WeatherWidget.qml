@@ -42,7 +42,7 @@ Rectangle {
             Column {
                 anchors.centerIn: parent
                 spacing: theme.spacingS
-                visible: !weather
+                visible: !weather || !weather.available
                 
                 Text {
                     text: "cloud_off"

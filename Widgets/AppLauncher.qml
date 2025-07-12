@@ -159,7 +159,7 @@ PanelWindow {
         anchors {
             top: parent.top
             left: parent.left
-            topMargin: 50
+            topMargin: Theme.barHeight + Theme.spacingXS
             leftMargin: Theme.spacingL
         }
         

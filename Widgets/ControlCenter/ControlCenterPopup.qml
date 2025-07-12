@@ -35,7 +35,7 @@ PanelWindow {
         width: Math.min(600, parent.width - Theme.spacingL * 2)
         height: Math.min(500, parent.height - Theme.barHeight - Theme.spacingS * 2)
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
-        y: Theme.barHeight + Theme.spacingS
+        y: Theme.barHeight + Theme.spacingXS
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusLarge
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
@@ -80,69 +80,6 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
-                    Item { width: parent.width - 300; height: 1 }
-                    
-                    // Calendar status indicator
-                    Rectangle {
-                        width: 100
-                        height: 24
-                        radius: Theme.cornerRadiusSmall
-                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.16)
-                        anchors.verticalCenter: parent.verticalCenter
-                        visible: CalendarService && CalendarService.khalAvailable
-                        
-                        Row {
-                            anchors.centerIn: parent
-                            spacing: Theme.spacingXS
-                            
-                            Text {
-                                text: "event"
-                                font.family: Theme.iconFont
-                                font.pixelSize: Theme.iconSize - 6
-                                color: Theme.primary
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            
-                            Text {
-                                id: todayEventsText
-                                property var todayEvents: []
-                                text: todayEvents.length === 0 ? "No events today" : 
-                                      todayEvents.length === 1 ? "1 event today" : 
-                                      todayEvents.length + " events today"
-                                
-                                function updateTodayEvents() {
-                                    if (CalendarService && CalendarService.khalAvailable) {
-                                        todayEvents = CalendarService.getEventsForDate(new Date())
-                                    } else {
-                                        todayEvents = []
-                                    }
-                                }
-                                
-                                Component.onCompleted: {
-                                    console.log("ControlCenter: Calendar status text initialized, CalendarService available:", !!CalendarService)
-                                    if (CalendarService) {
-                                        console.log("ControlCenter: khal available:", CalendarService.khalAvailable)
-                                    }
-                                    updateTodayEvents()
-                                }
-                                font.pixelSize: Theme.fontSizeXS
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                                
-                                // Update when events change or khal becomes available
-                                Connections {
-                                    target: CalendarService
-                                    enabled: CalendarService !== null
-                                    function onEventsByDateChanged() {
-                                        todayEventsText.updateTodayEvents()
-                                    }
-                                    function onKhalAvailableChanged() {
-                                        todayEventsText.updateTodayEvents()
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
                 
                 // Tab buttons

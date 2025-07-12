@@ -149,6 +149,7 @@ Rectangle {
                     id: eventsList
                     anchors.fill: parent
                     anchors.margins: theme.spacingM
+                    anchors.topMargin: theme.spacingM + 2
                     visible: hasEvents
                     clip: true
                     spacing: theme.spacingS
