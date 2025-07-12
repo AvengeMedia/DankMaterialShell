@@ -172,27 +172,44 @@ PanelWindow {
             ClockWidget {
                 id: clockWidget
                 anchors.centerIn: parent
-                hasActiveMedia: topBar.hasActiveMedia
-                activePlayer: topBar.activePlayer
-                weatherAvailable: topBar.weatherAvailable
-                weatherCode: topBar.weatherCode
-                weatherTemp: topBar.weatherTemp
-                weatherTempF: topBar.weatherTempF
-                useFahrenheit: topBar.useFahrenheit
                 
                 onClockClicked: {
                     if (topBar.shellRoot) {
                         topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
                     }
                 }
+            }
+            
+            MediaWidget {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: clockWidget.left
+                anchors.rightMargin: Theme.spacingS
+                activePlayer: topBar.activePlayer
+                hasActiveMedia: topBar.hasActiveMedia
                 
-                // Insert audio visualization into the clock widget placeholder
-                AudioVisualization {
-                    parent: clockWidget.children[0].children[0].children[0] // Row -> Row (media info) -> Item (placeholder)
-                    anchors.fill: parent
-                    hasActiveMedia: topBar.hasActiveMedia
-                    activePlayer: topBar.activePlayer
-                    visible: topBar.hasActiveMedia
+                onClicked: {
+                    if (topBar.shellRoot) {
+                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
+                    }
+                }
+            }
+            
+            WeatherWidget {
+                id: weatherWidget
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: clockWidget.right
+                anchors.leftMargin: Theme.spacingS
+                
+                weatherAvailable: topBar.weatherAvailable
+                weatherCode: topBar.weatherCode
+                weatherTemp: topBar.weatherTemp
+                weatherTempF: topBar.weatherTempF
+                useFahrenheit: topBar.useFahrenheit
+                
+                onClicked: {
+                    if (topBar.shellRoot) {
+                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
+                    }
                 }
             }
             

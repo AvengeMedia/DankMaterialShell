@@ -13,11 +13,21 @@ Rectangle {
     property var theme: Theme
     
     width: parent.width
-    height: 160  // Reduced height to prevent overflow
-    radius: theme.cornerRadius
-    color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.08)
-    border.color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.2)
+    height: parent.height
+    radius: theme.cornerRadiusLarge
+    color: Qt.rgba(theme.surfaceContainer.r, theme.surfaceContainer.g, theme.surfaceContainer.b, 0.4)
+    border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
     border.width: 1
+    
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowHorizontalOffset: 0
+        shadowVerticalOffset: 2
+        shadowBlur: 0.5
+        shadowColor: Qt.rgba(0, 0, 0, 0.1)
+        shadowOpacity: 0.1
+    }
     
     property real currentPosition: 0
     
@@ -68,81 +78,109 @@ Rectangle {
     }
     
     Column {
-        anchors.fill: parent
-        anchors.margins: theme.spacingM
+        anchors.centerIn: parent
+        width: parent.width - theme.spacingM * 2
         spacing: theme.spacingM
         
-        // Album art and track info
-        Row {
+        // Show different content based on whether we have active media
+        Item {
             width: parent.width
-            height: 70  // Reduced height
-            spacing: theme.spacingM
+            height: 80
             
-            // Album Art
-            Rectangle {
-                width: 70
-                height: 70
-                radius: theme.cornerRadius
-                color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
+            // Placeholder when no media
+            Column {
+                anchors.centerIn: parent
+                spacing: theme.spacingS
+                visible: !activePlayer || !activePlayer.trackTitle || activePlayer.trackTitle === ""
                 
-                Item {
-                    anchors.fill: parent
-                    clip: true
-                    
-                    Image {
-                        id: albumArt
-                        anchors.fill: parent
-                        source: activePlayer?.trackArtUrl || ""
-                        fillMode: Image.PreserveAspectCrop
-                        smooth: true
-                    }
-                    
-                    Rectangle {
-                        anchors.fill: parent
-                        visible: albumArt.status !== Image.Ready
-                        color: "transparent"
-                        
-                        Text {
-                            anchors.centerIn: parent
-                            text: "album"
-                            font.family: theme.iconFont
-                            font.pixelSize: 28
-                            color: theme.surfaceVariantText
-                        }
-                    }
+                Text {
+                    text: "music_note"
+                    font.family: theme.iconFont
+                    font.pixelSize: theme.iconSize + 8
+                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                Text {
+                    text: "No Media Playing"
+                    font.pixelSize: theme.fontSizeMedium
+                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
             
-            // Track Info
-            Column {
-                width: parent.width - 70 - theme.spacingM
-                spacing: theme.spacingXS
-                anchors.verticalCenter: parent.verticalCenter
+            // Normal media info when playing
+            Row {
+                anchors.fill: parent
+                spacing: theme.spacingM
+                visible: activePlayer && activePlayer.trackTitle && activePlayer.trackTitle !== ""
                 
-                Text {
-                    text: activePlayer?.trackTitle || "Unknown Track"
-                    font.pixelSize: theme.fontSizeMedium
-                    font.weight: Font.Bold
-                    color: theme.surfaceText
-                    width: parent.width
-                    elide: Text.ElideRight
+                // Album Art
+                Rectangle {
+                    width: 80
+                    height: 80
+                    radius: theme.cornerRadius
+                    color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
+                    
+                    Item {
+                        anchors.fill: parent
+                        clip: true
+                        
+                        Image {
+                            id: albumArt
+                            anchors.fill: parent
+                            source: activePlayer?.trackArtUrl || ""
+                            fillMode: Image.PreserveAspectCrop
+                            smooth: true
+                        }
+                        
+                        Rectangle {
+                            anchors.fill: parent
+                            visible: albumArt.status !== Image.Ready
+                            color: "transparent"
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "album"
+                                font.family: theme.iconFont
+                                font.pixelSize: 28
+                                color: theme.surfaceVariantText
+                            }
+                        }
+                    }
                 }
                 
-                Text {
-                    text: activePlayer?.trackArtist || "Unknown Artist"
-                    font.pixelSize: theme.fontSizeSmall
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.8)
-                    width: parent.width
-                    elide: Text.ElideRight
-                }
-                
-                Text {
-                    text: activePlayer?.trackAlbum || ""
-                    font.pixelSize: theme.fontSizeSmall
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.6)
-                    width: parent.width
-                    elide: Text.ElideRight
-                    visible: text.length > 0
+                // Track Info
+                Column {
+                    width: parent.width - 80 - theme.spacingM
+                    spacing: theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Text {
+                        text: activePlayer?.trackTitle || "Unknown Track"
+                        font.pixelSize: theme.fontSizeMedium
+                        font.weight: Font.Bold
+                        color: theme.surfaceText
+                        width: parent.width
+                        elide: Text.ElideRight
+                    }
+                    
+                    Text {
+                        text: activePlayer?.trackArtist || "Unknown Artist"
+                        font.pixelSize: theme.fontSizeSmall
+                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.8)
+                        width: parent.width
+                        elide: Text.ElideRight
+                    }
+                    
+                    Text {
+                        text: activePlayer?.trackAlbum || ""
+                        font.pixelSize: theme.fontSizeSmall
+                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.6)
+                        width: parent.width
+                        elide: Text.ElideRight
+                        visible: text.length > 0
+                    }
                 }
             }
         }
@@ -154,6 +192,7 @@ Rectangle {
             height: 6
             radius: 3
             color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
+            visible: activePlayer !== null
             
             Rectangle {
                 id: progressFill
@@ -232,10 +271,11 @@ Rectangle {
             }
         }
         
-        // Control buttons - compact to fit
+        // Control buttons - always visible
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: theme.spacingL
+            visible: activePlayer !== null
             
             // Previous button  
             Rectangle {

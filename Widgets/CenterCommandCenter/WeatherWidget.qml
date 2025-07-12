@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import "../../Common"
 import "../../Services"
 
@@ -11,57 +12,104 @@ Rectangle {
     property bool useFahrenheit: false
     
     width: parent.width
-    height: 80
-    radius: theme.cornerRadius
-    color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.08)
-    border.color: Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.2)
+    height: parent.height
+    radius: theme.cornerRadiusLarge
+    color: Qt.rgba(theme.surfaceContainer.r, theme.surfaceContainer.g, theme.surfaceContainer.b, 0.4)
+    border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
     border.width: 1
     
-    Row {
-        anchors.centerIn: parent
-        spacing: theme.spacingL
+    layer.enabled: true
+    layer.effect: MultiEffect {
+        shadowEnabled: true
+        shadowHorizontalOffset: 0
+        shadowVerticalOffset: 2
+        shadowBlur: 0.5
+        shadowColor: Qt.rgba(0, 0, 0, 0.1)
+        shadowOpacity: 0.1
+    }
+    
+    Column {
+        anchors.fill: parent
+        anchors.margins: theme.spacingL
+        spacing: theme.spacingM
         
-        // Weather icon and temp
-        Column {
-            spacing: 2
-            anchors.verticalCenter: parent.verticalCenter
+        // Show different content based on whether we have weather data
+        Item {
+            width: parent.width
+            height: 60
             
-            Text {
-                text: WeatherService.getWeatherIcon(weather.wCode)
-                font.family: theme.iconFont
-                font.pixelSize: theme.iconSize + 4
-                color: theme.primary
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-            
-            Text {
-                text: (useFahrenheit ? weather.tempF : weather.temp) + "°" + (useFahrenheit ? "F" : "C")
-                font.pixelSize: theme.fontSizeLarge
-                color: theme.surfaceText
-                font.weight: Font.Bold
-                anchors.horizontalCenter: parent.horizontalCenter
+            // Placeholder when no weather
+            Column {
+                anchors.centerIn: parent
+                spacing: theme.spacingS
+                visible: !weather
                 
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: useFahrenheit = !useFahrenheit
+                Text {
+                    text: "cloud_off"
+                    font.family: theme.iconFont
+                    font.pixelSize: theme.iconSize + 8
+                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                Text {
+                    text: "No Weather Data"
+                    font.pixelSize: theme.fontSizeMedium
+                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                    anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
             
-            Text {
-                text: weather.city
-                font.pixelSize: theme.fontSizeSmall
-                color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
-                anchors.horizontalCenter: parent.horizontalCenter
+            // Normal weather info when available
+            Row {
+                anchors.fill: parent
+                spacing: theme.spacingL
+                visible: weather
+                
+                // Weather icon
+                Text {
+                    text: weather ? WeatherService.getWeatherIcon(weather.wCode) : ""
+                    font.family: theme.iconFont
+                    font.pixelSize: theme.iconSize + 8
+                    color: theme.primary
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Column {
+                    spacing: theme.spacingXS
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Text {
+                        text: weather ? ((useFahrenheit ? weather.tempF : weather.temp) + "°" + (useFahrenheit ? "F" : "C")) : ""
+                        font.pixelSize: theme.fontSizeXLarge
+                        color: theme.surfaceText
+                        font.weight: Font.Light
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: if (weather) useFahrenheit = !useFahrenheit
+                            enabled: weather !== null
+                        }
+                    }
+                    
+                    Text {
+                        text: weather ? weather.city : ""
+                        font.pixelSize: theme.fontSizeMedium
+                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                        visible: text.length > 0
+                    }
+                }
             }
         }
         
         // Weather details grid
         Grid {
             columns: 2
-            spacing: theme.spacingS
-            anchors.verticalCenter: parent.verticalCenter
+            spacing: theme.spacingM
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: weather !== null
             
             Row {
                 spacing: theme.spacingXS
@@ -73,7 +121,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather.humidity + "%"
+                    text: weather ? weather.humidity + "%" : "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -90,7 +138,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather.wind
+                    text: weather ? weather.wind : "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -107,7 +155,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather.sunrise
+                    text: weather ? weather.sunrise : "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -124,7 +172,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather.sunset
+                    text: weather ? weather.sunset : "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter

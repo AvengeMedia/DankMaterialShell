@@ -71,10 +71,8 @@ Singleton {
         
         stdout: StdioCollector {
             onStreamFinished: {
-                console.log("SystemMonitorService: CPU usage raw data:", text.trim())
                 if (text.trim()) {
                     root.cpuUsage = parseFloat(text.trim())
-                    console.log("SystemMonitorService: CPU usage set to:", root.cpuUsage)
                 }
             }
         }
@@ -94,7 +92,6 @@ Singleton {
         
         stdout: StdioCollector {
             onStreamFinished: {
-                console.log("SystemMonitorService: Memory usage raw data:", text.trim())
                 if (text.trim()) {
                     const parts = text.trim().split(" ")
                     root.memoryUsage = parseFloat(parts[0])
@@ -102,7 +99,6 @@ Singleton {
                     root.usedMemory = parseFloat(parts[2])
                     root.availableMemory = parseFloat(parts[3])
                     root.freeMemory = root.totalMemory - root.usedMemory
-                    console.log("SystemMonitorService: Memory usage set to:", root.memoryUsage)
                 }
             }
         }
