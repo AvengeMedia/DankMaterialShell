@@ -8,10 +8,31 @@ Rectangle {
     property var activePlayer: null
     property bool hasActiveMedia: false
     
+    // Add a stable visibility property that doesn't flicker during track changes
+    property bool stableVisible: false
+    
     signal clicked()
     
-    visible: hasActiveMedia
-    width: hasActiveMedia ? Math.min(280, mediaRow.implicitWidth + Theme.spacingS * 2) : 0
+    // Use a timer to stabilize visibility during track changes
+    Timer {
+        id: visibilityTimer
+        interval: 1000 // 1 second delay before hiding
+        onTriggered: root.stableVisible = root.hasActiveMedia
+    }
+    
+    onHasActiveMediaChanged: {
+        if (hasActiveMedia) {
+            // Show immediately when media becomes available
+            stableVisible = true
+            visibilityTimer.stop()
+        } else {
+            // Delay hiding to avoid flicker during track changes
+            visibilityTimer.restart()
+        }
+    }
+    
+    visible: stableVisible
+    width: stableVisible ? Math.min(280, mediaRow.implicitWidth + Theme.spacingS * 2) : 0
     height: 30
     radius: Theme.cornerRadius
     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
@@ -54,7 +75,10 @@ Rectangle {
                 width: 140
                 
                 text: {
-                    if (!activePlayer) return "Unknown Track"
+                    // Handle the case when activePlayer is temporarily null during track changes
+                    if (!activePlayer || !activePlayer.trackTitle) {
+                        return "Loading..."
+                    }
                     
                     // Check if it's web media by looking at player identity
                     let identity = activePlayer.identity || ""
@@ -108,7 +132,8 @@ Rectangle {
                 radius: 10
                 anchors.verticalCenter: parent.verticalCenter
                 color: prevArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                visible: activePlayer && activePlayer.canGoPrevious
+                visible: stableVisible
+                opacity: (activePlayer && activePlayer.canGoPrevious) ? 1.0 : 0.3
                 
                 Text {
                     anchors.centerIn: parent
@@ -136,6 +161,8 @@ Rectangle {
                 radius: 12
                 anchors.verticalCenter: parent.verticalCenter
                 color: activePlayer?.playbackState === 1 ? Theme.primary : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                visible: stableVisible
+                opacity: activePlayer ? 1.0 : 0.3
                 
                 Text {
                     anchors.centerIn: parent
@@ -162,7 +189,8 @@ Rectangle {
                 radius: 10
                 anchors.verticalCenter: parent.verticalCenter
                 color: nextArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                visible: activePlayer && activePlayer.canGoNext
+                visible: stableVisible
+                opacity: (activePlayer && activePlayer.canGoNext) ? 1.0 : 0.3
                 
                 Text {
                     anchors.centerIn: parent
