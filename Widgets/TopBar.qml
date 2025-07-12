@@ -242,100 +242,79 @@ EOF`
                     radius: Theme.cornerRadiusLarge
                     color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.8)
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: NiriWorkspaceService.niriAvailable
                     
-                    property int currentWorkspace: 1
-                    property var workspaceList: []
                     
-                    Process {
-                        id: workspaceQuery
-                        command: ["niri", "msg", "workspaces"]
-                        running: true
+                    // Use reactive properties from NiriWorkspaceService
+                    property int currentWorkspace: getDisplayActiveWorkspace()
+                    property var workspaceList: getDisplayWorkspaces()
+                    
+                    
+                    
+                    // Get workspaces for this display
+                    function getDisplayWorkspaces() {
+                        // Always return something for now, even if service isn't ready
+                        if (!NiriWorkspaceService.niriAvailable || NiriWorkspaceService.allWorkspaces.length === 0) {
+                            return [1, 2] // Fallback
+                        }
                         
-                        stdout: StdioCollector {
-                            onStreamFinished: {
-                                if (text && text.trim()) {
-                                    workspaceSwitcher.parseWorkspaceOutput(text.trim())
-                                }
+                        if (!topBar.screenName) {
+                            return NiriWorkspaceService.getCurrentOutputWorkspaceNumbers()
+                        }
+                        
+                        // Filter workspaces for this specific display
+                        var displayWorkspaces = []
+                        for (var i = 0; i < NiriWorkspaceService.allWorkspaces.length; i++) {
+                            var ws = NiriWorkspaceService.allWorkspaces[i]
+                            if (ws.output === topBar.screenName) {
+                                displayWorkspaces.push(ws.idx + 1) // Convert to 1-based
                             }
                         }
+                        
+                        return displayWorkspaces.length > 0 ? displayWorkspaces : [1, 2]
                     }
                     
-                    function parseWorkspaceOutput(data) {
-                        const lines = data.split('\n')
-                        let currentOutputName = ""
-                        let focusedOutput = ""
-                        let focusedWorkspace = 1
-                        let outputWorkspaces = {}
+                    // Get active workspace for this display
+                    function getDisplayActiveWorkspace() {
+                        // Always return something for now, even if service isn't ready
+                        if (!NiriWorkspaceService.niriAvailable || NiriWorkspaceService.allWorkspaces.length === 0) {
+                            return 1 // Fallback
+                        }
                         
+                        if (!topBar.screenName) {
+                            return NiriWorkspaceService.getCurrentWorkspaceNumber()
+                        }
                         
-                        for (const line of lines) {
-                            if (line.startsWith('Output "')) {
-                                const outputMatch = line.match(/Output "(.+)"/)
-                                if (outputMatch) {
-                                    currentOutputName = outputMatch[1]
-                                    outputWorkspaces[currentOutputName] = []
-                                }
-                                continue
-                            }
-                            
-                            if (line.trim() && line.match(/^\s*\*?\s*(\d+)$/)) {
-                                const wsMatch = line.match(/^\s*(\*?)\s*(\d+)$/)
-                                if (wsMatch) {
-                                    const isActive = wsMatch[1] === '*'
-                                    const wsNum = parseInt(wsMatch[2])
-                                    
-                                    if (currentOutputName && outputWorkspaces[currentOutputName]) {
-                                        outputWorkspaces[currentOutputName].push(wsNum)
-                                    }
-                                    
-                                    if (isActive) {
-                                        focusedOutput = currentOutputName
-                                        focusedWorkspace = wsNum
-                                    }
-                                }
+                        // Find active workspace for this display (is_active, not is_focused)
+                        for (var i = 0; i < NiriWorkspaceService.allWorkspaces.length; i++) {
+                            var ws = NiriWorkspaceService.allWorkspaces[i]
+                            if (ws.output === topBar.screenName && ws.is_active) {
+                                return ws.idx + 1 // Convert to 1-based
                             }
                         }
                         
-                        // Show workspaces for THIS screen only
-                        if (topBar.screenName && outputWorkspaces[topBar.screenName]) {
-                            workspaceList = outputWorkspaces[topBar.screenName]
-                            
-                            // Always track the active workspace for this display
-                            // Parse all lines to find which workspace is active on this display
-                            let thisDisplayActiveWorkspace = 1
-                            let inThisOutput = false
-                            
-                            for (const line of lines) {
-                                if (line.startsWith('Output "')) {
-                                    const outputMatch = line.match(/Output "(.+)"/)
-                                    inThisOutput = outputMatch && outputMatch[1] === topBar.screenName
-                                    continue
-                                }
-                                
-                                if (inThisOutput && line.trim() && line.match(/^\s*\*\s*(\d+)$/)) {
-                                    const wsMatch = line.match(/^\s*\*\s*(\d+)$/)
-                                    if (wsMatch) {
-                                        thisDisplayActiveWorkspace = parseInt(wsMatch[1])
-                                        break
-                                    }
-                                }
-                            }
-                            
-                            currentWorkspace = thisDisplayActiveWorkspace
-                            // console.log("Monitor", topBar.screenName, "active workspace:", thisDisplayActiveWorkspace)
-                        } else {
-                            // Fallback if screen name not found
-                            workspaceList = [1, 2]
-                            currentWorkspace = 1
-                        }
+                        return 1
                     }
                     
-                    Timer {
-                        interval: 500
-                        running: true
-                        repeat: true
-                        onTriggered: {
-                            workspaceQuery.running = true
+                    // React to workspace changes
+                    Connections {
+                        target: NiriWorkspaceService
+                        function onAllWorkspacesChanged() {
+                            var oldCurrent = workspaceSwitcher.currentWorkspace
+                            workspaceSwitcher.workspaceList = workspaceSwitcher.getDisplayWorkspaces()
+                            workspaceSwitcher.currentWorkspace = workspaceSwitcher.getDisplayActiveWorkspace()
+                            console.log("DEBUG: TopBar onAllWorkspacesChanged for", topBar.screenName, "- current workspace:", oldCurrent, "→", workspaceSwitcher.currentWorkspace)
+                        }
+                        function onFocusedWorkspaceIndexChanged() {
+                            var oldCurrent = workspaceSwitcher.currentWorkspace
+                            workspaceSwitcher.currentWorkspace = workspaceSwitcher.getDisplayActiveWorkspace()
+                            console.log("DEBUG: TopBar onFocusedWorkspaceIndexChanged for", topBar.screenName, "- current workspace:", oldCurrent, "→", workspaceSwitcher.currentWorkspace)
+                        }
+                        function onNiriAvailableChanged() {
+                            if (NiriWorkspaceService.niriAvailable) {
+                                workspaceSwitcher.workspaceList = workspaceSwitcher.getDisplayWorkspaces()
+                                workspaceSwitcher.currentWorkspace = workspaceSwitcher.getDisplayActiveWorkspace()
+                            }
                         }
                     }
                     
@@ -350,6 +329,7 @@ EOF`
                             Rectangle {
                                 property bool isActive: modelData === workspaceSwitcher.currentWorkspace
                                 property bool isHovered: mouseArea.containsMouse
+                                
                                 
                                 width: isActive ? Theme.spacingXL + Theme.spacingS : Theme.spacingL
                                 height: Theme.spacingS
@@ -379,44 +359,18 @@ EOF`
                                     cursorShape: Qt.PointingHandCursor
                                     
                                     onClicked: {
-                                        // Set target workspace and focus monitor first
-                                        console.log("Clicking workspace", modelData, "on monitor", topBar.screenName)
-                                        workspaceSwitcher.targetWorkspace = modelData
-                                        focusMonitorProcess.command = ["niri", "msg", "action", "focus-monitor", topBar.screenName]
-                                        focusMonitorProcess.running = true
+                                        // Use NiriWorkspaceService for workspace switching
+                                        if (NiriWorkspaceService.niriAvailable) {
+                                            NiriWorkspaceService.switchToWorkspaceByNumber(modelData)
+                                        } else {
+                                            // Fallback for when service isn't ready
+                                            Quickshell.execDetached(["niri", "msg", "action", "focus-workspace", modelData.toString()])
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    
-                    Process {
-                        id: switchProcess
-                        running: false
-                        
-                        onExited: {
-                            // Update current workspace and refresh query
-                            workspaceSwitcher.currentWorkspace = workspaceSwitcher.targetWorkspace
-                            Qt.callLater(() => {
-                                workspaceQuery.running = true
-                            })
-                        }
-                    }
-                    
-                    Process {
-                        id: focusMonitorProcess
-                        running: false
-                        
-                        onExited: {
-                            // After focusing the monitor, switch to the workspace
-                            Qt.callLater(() => {
-                                switchProcess.command = ["niri", "msg", "action", "focus-workspace", workspaceSwitcher.targetWorkspace.toString()]
-                                switchProcess.running = true
-                            })
-                        }
-                    }
-                    
-                    property int targetWorkspace: 1
                 }
             }
             
