@@ -223,7 +223,7 @@ EOF`
                         cursorShape: Qt.PointingHandCursor
                         
                         onClicked: {
-                            appLauncher.toggle()
+                            LauncherService.toggleAppLauncher()
                         }
                     }
                     

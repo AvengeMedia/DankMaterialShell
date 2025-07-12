@@ -6,35 +6,18 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
 import "../Common"
+import "../Services"
 
 PanelWindow {
     id: spotlightLauncher
     
     property bool spotlightOpen: false
-    property var currentApp: ({})
-    property var allApps: []
     property var recentApps: []
     property var filteredApps: []
     property int selectedIndex: 0
     property int maxResults: 12
-    property var categories: ["All"]
+    property var categories: AppSearchService.getAllCategories()
     property string selectedCategory: "All"
-    property var appCategories: ({
-        "AudioVideo": "Media",
-        "Audio": "Media", 
-        "Video": "Media",
-        "Development": "Development",
-        "TextEditor": "Development",
-        "Education": "Education",
-        "Game": "Games",
-        "Graphics": "Graphics",
-        "Network": "Internet",
-        "Office": "Office",
-        "Science": "Science",
-        "Settings": "Settings",
-        "System": "System",
-        "Utility": "Utilities"
-    })
     
     anchors {
         top: true
@@ -84,80 +67,67 @@ PanelWindow {
     }
     
     function loadRecentApps() {
-        recentApps = Prefs.getRecentApps()
+        recentApps = PreferencesService.getRecentApps()
     }
     
     function updateFilteredApps() {
         filteredApps = []
         selectedIndex = 0
         
-        var apps = allApps
-        
-        // Filter by category first
-        if (selectedCategory !== "All") {
-            apps = apps.filter(app => {
-                return app.categories.some(cat => appCategories[cat] === selectedCategory)
-            })
-        }
+        var apps = []
         
         if (searchField.text.length === 0) {
-            // Show recent apps first, then all apps, limited to maxResults
+            // Show recent apps first, then all apps from category
+            var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
             var combined = []
             
-            // Add recent apps first
+            // Add recent apps first if they match category
             recentApps.forEach(recentApp => {
-                var found = apps.find(app => app.exec === recentApp.exec)
+                var found = categoryApps.find(app => app.exec === recentApp.exec)
                 if (found) {
                     combined.push(found)
                 }
             })
             
-            // Add remaining apps not in recent, sorted alphabetically
-            var remaining = apps.filter(app => {
+            // Add remaining apps not in recent
+            var remaining = categoryApps.filter(app => {
                 return !recentApps.some(recentApp => recentApp.exec === app.exec)
-            }).sort((a, b) => a.name.localeCompare(b.name))
+            })
             
             combined = combined.concat(remaining)
-            filteredApps = combined.slice(0, maxResults)
+            apps = combined.slice(0, maxResults)
         } else {
-            var query = searchField.text.toLowerCase()
-            var matches = []
-            
-            for (var i = 0; i < apps.length; i++) {
-                var app = apps[i]
-                var name = app.name.toLowerCase()
-                var comment = (app.comment || "").toLowerCase()
-                
-                if (name.includes(query) || comment.includes(query)) {
-                    var score = 0
-                    if (name.startsWith(query)) score += 100
-                    if (name.includes(query)) score += 50
-                    if (comment.includes(query)) score += 25
-                    
-                    matches.push({
-                        name: app.name,
-                        exec: app.exec,
-                        icon: app.icon,
-                        comment: app.comment,
-                        categories: app.categories,
-                        score: score
-                    })
-                }
-            }
-            
-            matches.sort(function(a, b) { return b.score - a.score })
-            filteredApps = matches.slice(0, maxResults)
+            // Search with category filter
+            var baseApps = selectedCategory === "All" ? 
+                AppSearchService.applications : 
+                AppSearchService.getAppsInCategory(selectedCategory)
+            var searchResults = AppSearchService.searchApplications(searchField.text)
+            apps = searchResults.filter(app => baseApps.includes(app)).slice(0, maxResults)
         }
         
+        // Convert to our format
+        filteredApps = apps.map(app => ({
+            name: app.name,
+            exec: app.execString || "",
+            icon: app.icon || "application-x-executable",
+            comment: app.comment || "",
+            categories: app.categories || [],
+            desktopEntry: app
+        }))
+        
         filteredModel.clear()
-        for (var i = 0; i < filteredApps.length; i++) {
-            filteredModel.append(filteredApps[i])
-        }
+        filteredApps.forEach(app => filteredModel.append(app))
     }
     
     function launchApp(app) {
-        Prefs.addRecentApp(app)
-        appLauncher.start(app.exec)
+        PreferencesService.addRecentApp(app)
+        if (app.desktopEntry) {
+            AppSearchService.launchApp(app.desktopEntry)
+        } else {
+            var cleanExec = app.exec.replace(/%[fFuU]/g, "").trim()
+            console.log("Spotlight: Launching app directly:", cleanExec)
+            Quickshell.execDetached(["sh", "-c", cleanExec])
+        }
         hide()
     }
     
@@ -181,96 +151,18 @@ PanelWindow {
     
     ListModel { id: filteredModel }
     
-    Process {
-        id: desktopScanner
-        command: ["sh", "-c", `
-            for dir in "/usr/share/applications/" "/usr/local/share/applications/" "$HOME/.local/share/applications/" "/run/current-system/sw/share/applications/"; do
-                if [ -d "$dir" ]; then
-                    find "$dir" -name "*.desktop" 2>/dev/null | while read file; do
-                        echo "===FILE:$file"
-                        sed -n '/^\\[Desktop Entry\\]/,/^\\[.*\\]/{/^\\[Desktop Entry\\]/d; /^\\[.*\\]/q; /^Name=/p; /^Exec=/p; /^Icon=/p; /^Hidden=/p; /^NoDisplay=/p; /^Categories=/p; /^Comment=/p}' "$file" 2>/dev/null || true
-                    done
-                fi
-            done
-        `]
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (line) => {
-                if (line.startsWith("===FILE:")) {
-                    if (currentApp.name && currentApp.exec && !currentApp.hidden && !currentApp.noDisplay) {
-                        allApps.push({
-                            name: currentApp.name,
-                            exec: currentApp.exec,
-                            icon: currentApp.icon || "application-x-executable",
-                            comment: currentApp.comment || "",
-                            categories: currentApp.categories || []
-                        })
-                    }
-                    currentApp = { name: "", exec: "", icon: "", comment: "", categories: [], hidden: false, noDisplay: false }
-                } else if (line.startsWith("Name=")) {
-                    currentApp.name = line.substring(5)
-                } else if (line.startsWith("Exec=")) {
-                    currentApp.exec = line.substring(5)
-                } else if (line.startsWith("Icon=")) {
-                    currentApp.icon = line.substring(5)
-                } else if (line.startsWith("Comment=")) {
-                    currentApp.comment = line.substring(8)
-                } else if (line.startsWith("Categories=")) {
-                    currentApp.categories = line.substring(11).split(";").filter(cat => cat.length > 0)
-                } else if (line === "Hidden=true") {
-                    currentApp.hidden = true
-                } else if (line === "NoDisplay=true") {
-                    currentApp.noDisplay = true
+    Connections {
+        target: AppSearchService
+        function onReadyChanged() {
+            if (AppSearchService.ready) {
+                categories = AppSearchService.getAllCategories()
+                if (spotlightOpen) {
+                    updateFilteredApps()
                 }
-            }
-        }
-        
-        onExited: {
-            if (currentApp.name && currentApp.exec && !currentApp.hidden && !currentApp.noDisplay) {
-                allApps.push({
-                    name: currentApp.name,
-                    exec: currentApp.exec,
-                    icon: currentApp.icon || "application-x-executable",
-                    comment: currentApp.comment || "",
-                    categories: currentApp.categories || []
-                })
-            }
-            
-            // Extract unique categories
-            var uniqueCategories = new Set(["All"])
-            allApps.forEach(app => {
-                app.categories.forEach(cat => {
-                    if (appCategories[cat]) {
-                        uniqueCategories.add(appCategories[cat])
-                    }
-                })
-            })
-            categories = Array.from(uniqueCategories)
-            
-            console.log("Spotlight: Loaded", allApps.length, "applications with", categories.length, "categories")
-            if (spotlightOpen) {
-                updateFilteredApps()
             }
         }
     }
     
-    Process {
-        id: appLauncher
-        
-        function start(exec) {
-            var cleanExec = exec.replace(/%[fFuU]/g, "").trim()
-            console.log("Spotlight: Launching app:", cleanExec)
-            command = ["setsid", "sh", "-c", cleanExec]
-            running = true
-        }
-        
-        onExited: (exitCode) => {
-            if (exitCode !== 0) {
-                console.log("Spotlight: Failed to launch application, exit code:", exitCode)
-            }
-        }
-    }
     
     Rectangle {
         anchors.fill: parent
@@ -609,6 +501,8 @@ PanelWindow {
     
     Component.onCompleted: {
         console.log("SpotlightLauncher: Component.onCompleted called - component loaded successfully!")
-        desktopScanner.running = true
+        if (AppSearchService.ready) {
+            categories = AppSearchService.getAllCategories()
+        }
     }
 }

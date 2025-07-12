@@ -6,46 +6,12 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
 import "../Common"
+import "../Services"
 
-// Fixed version – icon loaders now swap to fallback components instead of showing the magenta checkerboard
 PanelWindow {
     id: launcher
     
-    property var theme
     property bool isVisible: false
-    
-    // Default theme fallback
-    property var defaultTheme: QtObject {
-        property color primary: "#D0BCFF"
-        property color background: "#10121E"
-        property color surfaceContainer: "#1D1B20"
-        property color surfaceText: "#E6E0E9"
-        property color surfaceVariant: "#49454F"
-        property color surfaceVariantText: "#CAC4D0"
-        property color outline: "#938F99"
-        property real cornerRadius: 12
-        property real cornerRadiusLarge: 16
-        property real cornerRadiusXLarge: 24
-        property real spacingXS: 4
-        property real spacingS: 8
-        property real spacingM: 12
-        property real spacingL: 16
-        property real spacingXL: 24
-        property real fontSizeLarge: 16
-        property real fontSizeMedium: 14
-        property real fontSizeSmall: 12
-        property real iconSize: 24
-        property real iconSizeLarge: 32
-        property real barHeight: 48
-        property string iconFont: "Material Symbols Rounded"
-        property int iconFontWeight: Font.Normal
-        property int shortDuration: 150
-        property int mediumDuration: 300
-        property int standardEasing: Easing.OutCubic
-        property int emphasizedEasing: Easing.OutQuart
-    }
-    
-    property var activeTheme: theme || defaultTheme
     
     // Full screen overlay setup for proper focus
     anchors {
@@ -64,44 +30,15 @@ PanelWindow {
     visible: isVisible
     color: "transparent"
     
-    // Enhanced app management
-    property var currentApp: ({})
-    property var allApps: []
-    property var categories: ["All"]
+    // App management
+    property var categories: AppSearchService.getAllCategories()
     property string selectedCategory: "All"
     property var recentApps: []
     property var pinnedApps: ["firefox", "code", "terminal", "file-manager"]
     property bool showCategories: false
     property string viewMode: "list" // "list" or "grid"
-    property var appCategories: ({
-        "AudioVideo": "Media",
-        "Audio": "Media", 
-        "Video": "Media",
-        "Development": "Development",
-        "TextEditor": "Development",
-        "IDE": "Development",
-        "Programming": "Development",
-        "Education": "Education", 
-        "Game": "Games",
-        "Graphics": "Graphics",
-        "Photography": "Graphics",
-        "Network": "Internet",
-        "WebBrowser": "Internet",
-        "Office": "Office",
-        "WordProcessor": "Office",
-        "Spreadsheet": "Office",
-        "Presentation": "Office",
-        "Science": "Science",
-        "Settings": "Settings",
-        "System": "System",
-        "Utility": "Utilities",
-        "Accessories": "Utilities",
-        "FileManager": "Utilities",
-        "TerminalEmulator": "Utilities"
-    })
     
     ListModel { id: filteredModel }
-    ListModel { id: categoryModel }
     
     // Background dim with click to close
     Rectangle {
@@ -112,8 +49,8 @@ PanelWindow {
         
         Behavior on opacity {
             NumberAnimation {
-                duration: activeTheme.shortDuration
-                easing.type: activeTheme.standardEasing
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
             }
         }
         
@@ -124,183 +61,90 @@ PanelWindow {
         }
     }
     
-    // Desktop applications scanning
-    Process {
-        id: desktopScanner
-        command: ["sh", "-c", `
-            for dir in "/usr/share/applications/" "/usr/local/share/applications/" "$HOME/.local/share/applications/" "/run/current-system/sw/share/applications/"; do
-                if [ -d "$dir" ]; then
-                    find "$dir" -name "*.desktop" 2>/dev/null | while read file; do
-                        echo "===FILE:$file"
-                        sed -n '/^\\[Desktop Entry\\]/,/^\\[.*\\]/{/^\\[Desktop Entry\\]/d; /^\\[.*\\]/q; /^Name=/p; /^Exec=/p; /^Icon=/p; /^Hidden=/p; /^NoDisplay=/p; /^Categories=/p; /^Comment=/p}' "$file" 2>/dev/null || true
-                    done
-                fi
-            done
-        `]
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (line) => {
-                if (line.startsWith("===FILE:")) {
-                    // Save previous app if valid
-                    if (currentApp.name && currentApp.exec && !currentApp.hidden && !currentApp.noDisplay) {
-                        allApps.push({
-                            name: currentApp.name,
-                            exec: currentApp.exec,
-                            icon: currentApp.icon || "application-x-executable",
-                            comment: currentApp.comment || "",
-                            categories: currentApp.categories || []
-                        })
-                    }
-                    // Start new app
-                    currentApp = { name: "", exec: "", icon: "", comment: "", categories: [], hidden: false, noDisplay: false }
-                } else if (line.startsWith("Name=")) {
-                    currentApp.name = line.substring(5)
-                } else if (line.startsWith("Exec=")) {
-                    currentApp.exec = line.substring(5)
-                } else if (line.startsWith("Icon=")) {
-                    currentApp.icon = line.substring(5)
-                } else if (line.startsWith("Comment=")) {
-                    currentApp.comment = line.substring(8)
-                } else if (line.startsWith("Categories=")) {
-                    currentApp.categories = line.substring(11).split(";").filter(cat => cat.length > 0)
-                } else if (line === "Hidden=true") {
-                    currentApp.hidden = true
-                } else if (line === "NoDisplay=true") {
-                    currentApp.noDisplay = true
-                }
+    Connections {
+        target: AppSearchService
+        function onReadyChanged() {
+            if (AppSearchService.ready) {
+                categories = AppSearchService.getAllCategories()
+                updateFilteredModel()
             }
         }
-        
-        onExited: {
-            // Save last app
-            if (currentApp.name && currentApp.exec && !currentApp.hidden && !currentApp.noDisplay) {
-                allApps.push({
-                    name: currentApp.name,
-                    exec: currentApp.exec,
-                    icon: currentApp.icon || "application-x-executable",
-                    comment: currentApp.comment || "",
-                    categories: currentApp.categories || []
-                })
-            }
-            
-            // Extract unique categories
-            let uniqueCategories = new Set(["All"])
-            allApps.forEach(app => {
-                app.categories.forEach(cat => {
-                    if (appCategories[cat]) {
-                        uniqueCategories.add(appCategories[cat])
-                    }
-                })
-            })
-            categories = Array.from(uniqueCategories)
-            
-            console.log("Loaded", allApps.length, "applications with", categories.length, "categories")
-            updateFilteredModel()
+    }
+    
+    Connections {
+        target: LauncherService
+        function onShowAppLauncher() {
+            launcher.show()
+        }
+        function onHideAppLauncher() {
+            launcher.hide()
+        }
+        function onToggleAppLauncher() {
+            launcher.toggle()
         }
     }
     
     function updateFilteredModel() {
         filteredModel.clear()
         
-        let apps = allApps
+        var apps = []
         
-        // Filter by category
-        if (selectedCategory !== "All") {
-            apps = apps.filter(app => {
-                return app.categories.some(cat => appCategories[cat] === selectedCategory)
-            })
-        }
-        
-        // Filter by search
+        // Get apps based on category and search
         if (searchField.text.length > 0) {
-            const query = searchField.text.toLowerCase()
-            apps = apps.filter(app => {
-                return app.name.toLowerCase().includes(query) || 
-                       (app.comment && app.comment.toLowerCase().includes(query))
-            }).sort((a, b) => {
-                // Sort by relevance
-                const aName = a.name.toLowerCase()
-                const bName = b.name.toLowerCase()
-                const aStartsWith = aName.startsWith(query)
-                const bStartsWith = bName.startsWith(query)
-                
-                if (aStartsWith && !bStartsWith) return -1
-                if (!aStartsWith && bStartsWith) return 1
-                return aName.localeCompare(bName)
-            })
-        }
-        
-        // Sort alphabetically if no search
-        if (searchField.text.length === 0) {
-            apps.sort((a, b) => a.name.localeCompare(b.name))
+            // Search across all apps or category
+            var baseApps = selectedCategory === "All" ? 
+                AppSearchService.applications : 
+                AppSearchService.getAppsInCategory(selectedCategory)
+            apps = AppSearchService.searchApplications(searchField.text).filter(app => 
+                baseApps.includes(app)
+            )
+        } else {
+            // Just category filter
+            apps = AppSearchService.getAppsInCategory(selectedCategory)
         }
         
         // Add to model
         apps.forEach(app => {
-            filteredModel.append(app)
-        })
-    }
-
-    /* ----------------------------------------------------------------------------
-     *  LOADER UTILITIES
-     * ---------------------------------------------------------------------------- */
-    /** Returns an IconImage component or the fallback badge depending on availability. */
-    function makeIconLoader(iconName, appName, fallbackId) {
-        return Qt.createComponent("", {
-            "anchors.fill": parent,
-            "_iconName": iconName,
-            "_appName": appName,
-            "sourceComponent": iconComponent
+            filteredModel.append({
+                name: app.name,
+                exec: app.execString || "",
+                icon: app.icon || "application-x-executable",
+                comment: app.comment || "",
+                categories: app.categories || [],
+                desktopEntry: app
+            })
         })
     }
 
     Component {
         id: iconComponent
-        IconImage {
-            id: img
-            anchors.fill: parent
-            source: _iconName ? Quickshell.iconPath(_iconName, "") : ""
-            smooth: true
-            asynchronous: true
+        Item {
+            property var appData: parent.modelData || {}
             
-            onStatusChanged: {
-                // Image.Null = 0, Image.Ready = 1, Image.Loading = 2, Image.Error = 3
-                if (status === Image.Error || 
-                    status === Image.Null || 
-                    (!source && _iconName)) {
-                    // defer the swap to avoid re‑entrancy in Loader
-                    Qt.callLater(() => img.parent.sourceComponent = fallbackComponent)
-                }
+            IconImage {
+                id: iconImg
+                anchors.fill: parent
+                source: appData.icon ? Quickshell.iconPath(appData.icon, "") : ""
+                smooth: true
+                asynchronous: true
+                visible: status === Image.Ready
             }
             
-            // Add timeout fallback for stuck loading icons
-            Timer {
-                interval: 3000  // 3 second timeout
-                running: img.status === Image.Loading
-                onTriggered: {
-                    if (img.status === Image.Loading) {
-                        Qt.callLater(() => img.parent.sourceComponent = fallbackComponent)
-                    }
+            Rectangle {
+                anchors.fill: parent
+                visible: !iconImg.visible
+                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.10)
+                radius: Theme.cornerRadiusLarge
+                border.width: 1
+                border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.20)
+
+                Text {
+                    anchors.centerIn: parent
+                    text: appData.name ? appData.name.charAt(0).toUpperCase() : "A"
+                    font.pixelSize: 28
+                    color: Theme.primary
+                    font.weight: Font.Bold
                 }
-            }
-        }
-    }
-
-    Component {
-        id: fallbackComponent
-        Rectangle {
-            color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.10)
-            radius: activeTheme.cornerRadiusLarge
-            border.width: 1
-            border.color: Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.20)
-
-            Text {
-                anchors.centerIn: parent
-                text: _appName ? _appName.charAt(0).toUpperCase() : "A"
-                font.pixelSize: 28
-                color: activeTheme.primary
-                font.weight: Font.Bold
             }
         }
     }
@@ -316,11 +160,11 @@ PanelWindow {
             top: parent.top
             left: parent.left
             topMargin: 50
-            leftMargin: activeTheme.spacingL
+            leftMargin: Theme.spacingL
         }
         
-        color: Qt.rgba(activeTheme.surfaceContainer.r, activeTheme.surfaceContainer.g, activeTheme.surfaceContainer.b, 0.98)
-        radius: activeTheme.cornerRadiusXLarge
+        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
+        radius: Theme.cornerRadiusXLarge
         
         // Material 3 elevation with multiple layers
         Rectangle {
@@ -346,7 +190,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             color: "transparent"
-            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.12)
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
             border.width: 1
             radius: parent.radius
             z: -1
@@ -363,7 +207,7 @@ PanelWindow {
                 
                 Behavior on xScale {
                     NumberAnimation {
-                        duration: activeTheme.mediumDuration
+                        duration: Theme.mediumDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.2
                     }
@@ -371,7 +215,7 @@ PanelWindow {
                 
                 Behavior on yScale {
                     NumberAnimation {
-                        duration: activeTheme.mediumDuration
+                        duration: Theme.mediumDuration
                         easing.type: Easing.OutBack
                         easing.overshoot: 1.2
                     }
@@ -384,15 +228,15 @@ PanelWindow {
                 
                 Behavior on x {
                     NumberAnimation {
-                        duration: activeTheme.mediumDuration
-                        easing.type: activeTheme.emphasizedEasing
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
                     }
                 }
                 
                 Behavior on y {
                     NumberAnimation {
-                        duration: activeTheme.mediumDuration
-                        easing.type: activeTheme.emphasizedEasing
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
                     }
                 }
             }
@@ -402,8 +246,8 @@ PanelWindow {
         
         Behavior on opacity {
             NumberAnimation {
-                duration: activeTheme.mediumDuration
-                easing.type: activeTheme.emphasizedEasing
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
             }
         }
         
@@ -422,8 +266,8 @@ PanelWindow {
             
             Column {
                 anchors.fill: parent
-                anchors.margins: activeTheme.spacingXL
-                spacing: activeTheme.spacingL
+                anchors.margins: Theme.spacingXL
+                spacing: Theme.spacingL
                 
                 // Header section
                 Row {
@@ -434,9 +278,9 @@ PanelWindow {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: "Applications"
-                        font.pixelSize: activeTheme.fontSizeLarge + 4
+                        font.pixelSize: Theme.fontSizeLarge + 4
                         font.weight: Font.Bold
-                        color: activeTheme.surfaceText
+                        color: Theme.surfaceText
                     }
                     
                     Item { width: parent.width - 200; height: 1 }
@@ -445,8 +289,8 @@ PanelWindow {
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: filteredModel.count + " apps"
-                        font.pixelSize: activeTheme.fontSizeMedium
-                        color: activeTheme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceVariantText
                     }
                 }
                 
@@ -455,42 +299,42 @@ PanelWindow {
                     id: searchContainer
                     width: parent.width
                     height: 52
-                    radius: activeTheme.cornerRadiusLarge
-                    color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.6)
+                    radius: Theme.cornerRadiusLarge
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.6)
                     border.width: searchField.activeFocus ? 2 : 1
-                    border.color: searchField.activeFocus ? activeTheme.primary : 
-                                  Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.3)
+                    border.color: searchField.activeFocus ? Theme.primary : 
+                                  Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
                     
                     Behavior on border.color {
                         ColorAnimation {
-                            duration: activeTheme.shortDuration
-                            easing.type: activeTheme.standardEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                     
                     Row {
                         anchors.fill: parent
-                        anchors.leftMargin: activeTheme.spacingL
-                        anchors.rightMargin: activeTheme.spacingL
-                        spacing: activeTheme.spacingM
+                        anchors.leftMargin: Theme.spacingL
+                        anchors.rightMargin: Theme.spacingL
+                        spacing: Theme.spacingM
                         
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "search"
-                            font.family: activeTheme.iconFont
-                            font.pixelSize: activeTheme.iconSize
-                            color: searchField.activeFocus ? activeTheme.primary : activeTheme.surfaceVariantText
-                            font.weight: activeTheme.iconFontWeight
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize
+                            color: searchField.activeFocus ? Theme.primary : Theme.surfaceVariantText
+                            font.weight: Theme.iconFontWeight
                         }
                         
                         TextInput {
                             id: searchField
                             anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width - parent.spacing - activeTheme.iconSize - 32
-                            height: parent.height - activeTheme.spacingS
+                            width: parent.width - parent.spacing - Theme.iconSize - 32
+                            height: parent.height - Theme.spacingS
                             
-                            color: activeTheme.surfaceText
-                            font.pixelSize: activeTheme.fontSizeLarge
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeLarge
                             verticalAlignment: TextInput.AlignVCenter
                             
                             focus: launcher.isVisible
@@ -501,8 +345,8 @@ PanelWindow {
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "Search applications..."
-                                color: activeTheme.surfaceVariantText
-                                font.pixelSize: activeTheme.fontSizeLarge
+                                color: Theme.surfaceVariantText
+                                font.pixelSize: Theme.fontSizeLarge
                                 visible: searchField.text.length === 0 && !searchField.activeFocus
                             }
                             
@@ -511,7 +355,7 @@ PanelWindow {
                                 width: 24
                                 height: 24
                                 radius: 12
-                                color: clearSearchArea.containsMouse ? Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.12) : "transparent"
+                                color: clearSearchArea.containsMouse ? Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12) : "transparent"
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 visible: searchField.text.length > 0
@@ -519,9 +363,9 @@ PanelWindow {
                                 Text {
                                     anchors.centerIn: parent
                                     text: "close"
-                                    font.family: activeTheme.iconFont
+                                    font.family: Theme.iconFont
                                     font.pixelSize: 16
-                                    color: clearSearchArea.containsMouse ? activeTheme.outline : activeTheme.surfaceVariantText
+                                    color: clearSearchArea.containsMouse ? Theme.outline : Theme.surfaceVariantText
                                 }
                                 
                                 MouseArea {
@@ -537,7 +381,12 @@ PanelWindow {
 
                             Keys.onPressed: function (event) {
                                 if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && filteredModel.count) {
-                                    launcher.launchApp(filteredModel.get(0).exec)
+                                    var firstApp = filteredModel.get(0)
+                                    if (firstApp.desktopEntry) {
+                                        AppSearchService.launchApp(firstApp.desktopEntry)
+                                    } else {
+                                        launcher.launchApp(firstApp.exec)
+                                    }
                                     launcher.hide()
                                     event.accepted = true
                                 } else if (event.key === Qt.Key_Escape) {
@@ -553,36 +402,36 @@ PanelWindow {
                 Row {
                     width: parent.width
                     height: 40
-                    spacing: activeTheme.spacingM
+                    spacing: Theme.spacingM
                     visible: searchField.text.length === 0
                     
                     // Category filter
                     Rectangle {
                         width: 200
                         height: 36
-                        radius: activeTheme.cornerRadius
-                        color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.3)
-                        border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+                        radius: Theme.cornerRadius
+                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                         border.width: 1
                         
                         Row {
                             anchors.left: parent.left
-                            anchors.leftMargin: activeTheme.spacingM
+                            anchors.leftMargin: Theme.spacingM
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: activeTheme.spacingS
+                            spacing: Theme.spacingS
                             
                             Text {
                                 text: "category"
-                                font.family: activeTheme.iconFont
+                                font.family: Theme.iconFont
                                 font.pixelSize: 18
-                                color: activeTheme.surfaceVariantText
+                                color: Theme.surfaceVariantText
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             
                             Text {
                                 text: selectedCategory
-                                font.pixelSize: activeTheme.fontSizeMedium
-                                color: activeTheme.surfaceText
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.weight: Font.Medium
                             }
@@ -590,12 +439,12 @@ PanelWindow {
                         
                         Text {
                             anchors.right: parent.right
-                            anchors.rightMargin: activeTheme.spacingM
+                            anchors.rightMargin: Theme.spacingM
                             anchors.verticalCenter: parent.verticalCenter
                             text: showCategories ? "expand_less" : "expand_more"
-                            font.family: activeTheme.iconFont
+                            font.family: Theme.iconFont
                             font.pixelSize: 18
-                            color: activeTheme.surfaceVariantText
+                            color: Theme.surfaceVariantText
                         }
                         
                         MouseArea {
@@ -617,16 +466,16 @@ PanelWindow {
                         Rectangle {
                             width: 36
                             height: 36
-                            radius: activeTheme.cornerRadius
-                            color: viewMode === "list" ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : 
-                                  listViewArea.containsMouse ? Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.08) : "transparent"
+                            radius: Theme.cornerRadius
+                            color: viewMode === "list" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                                  listViewArea.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08) : "transparent"
                             
                             Text {
                                 anchors.centerIn: parent
                                 text: "view_list"
-                                font.family: activeTheme.iconFont
+                                font.family: Theme.iconFont
                                 font.pixelSize: 20
-                                color: viewMode === "list" ? activeTheme.primary : activeTheme.surfaceText
+                                color: viewMode === "list" ? Theme.primary : Theme.surfaceText
                             }
                             
                             MouseArea {
@@ -642,16 +491,16 @@ PanelWindow {
                         Rectangle {
                             width: 36
                             height: 36
-                            radius: activeTheme.cornerRadius
-                            color: viewMode === "grid" ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.12) : 
-                                  gridViewArea.containsMouse ? Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.08) : "transparent"
+                            radius: Theme.cornerRadius
+                            color: viewMode === "grid" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                                  gridViewArea.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08) : "transparent"
                             
                             Text {
                                 anchors.centerIn: parent
                                 text: "grid_view"
-                                font.family: activeTheme.iconFont
+                                font.family: Theme.iconFont
                                 font.pixelSize: 20
-                                color: viewMode === "grid" ? activeTheme.primary : activeTheme.surfaceText
+                                color: viewMode === "grid" ? Theme.primary : Theme.surfaceText
                             }
                             
                             MouseArea {
@@ -682,8 +531,8 @@ PanelWindow {
                         ListView {
                             id: appList
                             width: parent.width
-                            anchors.margins: activeTheme.spacingS
-                            spacing: activeTheme.spacingS
+                            anchors.margins: Theme.spacingS
+                            spacing: Theme.spacingS
                             
                             model: filteredModel
                             delegate: listDelegate
@@ -701,7 +550,7 @@ PanelWindow {
                         GridView {
                             id: appGrid
                             width: parent.width
-                            anchors.margins: activeTheme.spacingS
+                            anchors.margins: Theme.spacingS
                             
                             // Responsive cell sizes based on screen width
                             property int baseCellWidth: Math.max(100, Math.min(140, width / 8))
@@ -713,7 +562,7 @@ PanelWindow {
                             // Center the grid content
                             property int columnsCount: Math.floor(width / cellWidth)
                             property int remainingSpace: width - (columnsCount * cellWidth)
-                            leftMargin: Math.max(activeTheme.spacingS, remainingSpace / 2)
+                            leftMargin: Math.max(Theme.spacingS, remainingSpace / 2)
                             rightMargin: leftMargin
                             
                             model: filteredModel
@@ -726,10 +575,10 @@ PanelWindow {
                 Rectangle {
                     id: categoryDropdown
                     width: 200
-                    height: Math.min(250, categories.length * 40 + activeTheme.spacingM * 2)
-                    radius: activeTheme.cornerRadiusLarge
-                    color: activeTheme.surfaceContainer
-                    border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+                    height: Math.min(250, categories.length * 40 + Theme.spacingM * 2)
+                    radius: Theme.cornerRadiusLarge
+                    color: Theme.surfaceContainer
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                     border.width: 1
                     visible: showCategories
                     z: 1000
@@ -757,7 +606,7 @@ PanelWindow {
                     
                     ScrollView {
                         anchors.fill: parent
-                        anchors.margins: activeTheme.spacingS
+                        anchors.margins: Theme.spacingS
                         clip: true
                         ScrollBar.vertical.policy: ScrollBar.AsNeeded
                         ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
@@ -769,16 +618,16 @@ PanelWindow {
                             delegate: Rectangle {
                                 width: ListView.view.width
                                 height: 36
-                                radius: activeTheme.cornerRadiusSmall
-                                color: catArea.containsMouse ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08) : "transparent"
+                                radius: Theme.cornerRadiusSmall
+                                color: catArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                                 
                                 Text {
                                     anchors.left: parent.left
-                                    anchors.leftMargin: activeTheme.spacingM
+                                    anchors.leftMargin: Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: modelData
-                                    font.pixelSize: activeTheme.fontSizeMedium
-                                    color: selectedCategory === modelData ? activeTheme.primary : activeTheme.surfaceText
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: selectedCategory === modelData ? Theme.primary : Theme.surfaceText
                                     font.weight: selectedCategory === modelData ? Font.Medium : Font.Normal
                                 }
                                 
@@ -807,16 +656,16 @@ PanelWindow {
         Rectangle {
             width: appList.width
             height: 72
-            radius: activeTheme.cornerRadiusLarge
-            color: appMouseArea.hovered ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08)
-                                         : Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
-            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
+            radius: Theme.cornerRadiusLarge
+            color: appMouseArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                                         : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 1
 
             Row {
                 anchors.fill: parent
-                anchors.margins: activeTheme.spacingM
-                spacing: activeTheme.spacingL
+                anchors.margins: Theme.spacingM
+                spacing: Theme.spacingL
 
                 Item {
                     width: 56
@@ -826,22 +675,21 @@ PanelWindow {
                     Loader {
                         id: listIconLoader
                         anchors.fill: parent
-                        property string _iconName: model.icon
-                        property string _appName: model.name
+                        property var modelData: model
                         sourceComponent: iconComponent
                     }
                 }
 
                 Column {
                     anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 56 - activeTheme.spacingL
-                    spacing: activeTheme.spacingXS
+                    width: parent.width - 56 - Theme.spacingL
+                    spacing: Theme.spacingXS
 
                     Text {
                         width: parent.width
                         text: model.name
-                        font.pixelSize: activeTheme.fontSizeLarge
-                        color: activeTheme.surfaceText
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.surfaceText
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                     }
@@ -849,8 +697,8 @@ PanelWindow {
                     Text {
                         width: parent.width
                         text: model.comment || "Application"
-                        font.pixelSize: activeTheme.fontSizeMedium
-                        color: activeTheme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceVariantText
                         elide: Text.ElideRight
                         visible: model.comment && model.comment.length > 0
                     }
@@ -863,7 +711,11 @@ PanelWindow {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    launcher.launchApp(model.exec)
+                    if (model.desktopEntry) {
+                        AppSearchService.launchApp(model.desktopEntry)
+                    } else {
+                        launcher.launchApp(model.exec)
+                    }
                     launcher.hide()
                 }
             }
@@ -876,15 +728,15 @@ PanelWindow {
         Rectangle {
             width: appGrid.cellWidth - 8
             height: appGrid.cellHeight - 8
-            radius: activeTheme.cornerRadiusLarge
-            color: gridAppArea.hovered ? Qt.rgba(activeTheme.primary.r, activeTheme.primary.g, activeTheme.primary.b, 0.08)
-                                       : Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.03)
-            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
+            radius: Theme.cornerRadiusLarge
+            color: gridAppArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                                       : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 1
 
             Column {
                 anchors.centerIn: parent
-                spacing: activeTheme.spacingS
+                spacing: Theme.spacingS
 
                 Item {
                     property int iconSize: Math.min(56, Math.max(32, appGrid.cellWidth * 0.6))
@@ -895,8 +747,7 @@ PanelWindow {
                     Loader {
                         id: gridIconLoader
                         anchors.fill: parent
-                        property string _iconName: model.icon
-                        property string _appName: model.name
+                        property var modelData: model
                         sourceComponent: iconComponent
                     }
                 }
@@ -905,8 +756,8 @@ PanelWindow {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: 88
                     text: model.name
-                    font.pixelSize: activeTheme.fontSizeSmall
-                    color: activeTheme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     font.weight: Font.Medium
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
@@ -921,38 +772,28 @@ PanelWindow {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    launcher.launchApp(model.exec)
+                    if (model.desktopEntry) {
+                        AppSearchService.launchApp(model.desktopEntry)
+                    } else {
+                        launcher.launchApp(model.exec)
+                    }
                     launcher.hide()
                 }
             }
         }
     }
     
-    Process {
-        id: appLauncher
-        
-        function start(exec) {
-            // Clean up exec command (remove field codes)
-            var cleanExec = exec.replace(/%[fFuU]/g, "").trim()
-            console.log("Launching app - Original:", exec, "Cleaned:", cleanExec)
-            
-            // Use setsid to fully detach from shell session
-            command = ["setsid", "sh", "-c", cleanExec]
-            running = true
-        }
-        
-        onExited: (exitCode) => {
-            if (exitCode !== 0) {
-                console.log("Failed to launch application, exit code:", exitCode)
-                console.log("Command was:", command)
-            } else {
-                console.log("App launch command completed successfully")
-            }
-        }
-    }
-    
     function launchApp(exec) {
-        appLauncher.start(exec)
+        // Try to find the desktop entry
+        var app = AppSearchService.getAppByExec(exec)
+        if (app) {
+            AppSearchService.launchApp(app)
+        } else {
+            // Fallback to direct execution
+            var cleanExec = exec.replace(/%[fFuU]/g, "").trim()
+            console.log("Launching app directly:", cleanExec)
+            Quickshell.execDetached(["sh", "-c", cleanExec])
+        }
     }
     
     function show() {
@@ -977,6 +818,9 @@ PanelWindow {
     }
     
     Component.onCompleted: {
-        desktopScanner.running = true
+        if (AppSearchService.ready) {
+            categories = AppSearchService.getAllCategories()
+            updateFilteredModel()
+        }
     }
 }

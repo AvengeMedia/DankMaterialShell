@@ -303,7 +303,6 @@ ShellRoot {
     // Application and clipboard components
     AppLauncher {
         id: appLauncher
-        theme: Theme
     }
     
     SpotlightLauncher {
@@ -312,6 +311,5 @@ ShellRoot {
     
     ClipboardHistory {
         id: clipboardHistoryPopup
-        theme: Theme
     }
 }

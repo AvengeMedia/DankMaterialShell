@@ -9,3 +9,6 @@ singleton BluetoothService 1.0 BluetoothService.qml
 singleton BrightnessService 1.0 BrightnessService.qml
 singleton BatteryService 1.0 BatteryService.qml
 singleton SystemMonitorService 1.0 SystemMonitorService.qml
+singleton AppSearchService 1.0 AppSearchService.qml
+singleton PreferencesService 1.0 PreferencesService.qml
+singleton LauncherService 1.0 LauncherService.qml
