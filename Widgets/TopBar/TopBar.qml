@@ -176,10 +176,10 @@ PanelWindow {
                     topBar.calendarVisible = !topBar.calendarVisible
                 }
                 
-                // Insert audio visualization into the clock widget
+                // Insert audio visualization into the clock widget placeholder
                 AudioVisualization {
-                    parent: clockWidget.children[0].children[0] // Row -> Row (media info)
-                    anchors.verticalCenter: parent.verticalCenter
+                    parent: clockWidget.children[0].children[0].children[0] // Row -> Row (media info) -> Item (placeholder)
+                    anchors.fill: parent
                     hasActiveMedia: topBar.hasActiveMedia
                     activePlayer: topBar.activePlayer
                     visible: topBar.hasActiveMedia
