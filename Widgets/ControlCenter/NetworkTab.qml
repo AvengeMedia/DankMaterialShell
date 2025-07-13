@@ -9,7 +9,12 @@ import "../../Services"
 Item {
     id: networkTab
     
-    property int networkSubTab: 0 // 0: Ethernet, 1: WiFi
+    property int networkSubTab: {
+        // Default to WiFi tab if WiFi is connected, otherwise Ethernet
+        if (networkStatus === "wifi") return 1
+        else if (networkStatus === "ethernet") return 0
+        else return 1 // Default to WiFi when nothing is connected
+    }
     
     // Expose properties that the parent needs to bind to
     property bool wifiAutoRefreshEnabled: false
@@ -19,6 +24,7 @@ Item {
     property bool wifiAvailable: false
     property bool wifiEnabled: false
     property string ethernetIP: ""
+    property string ethernetInterface: ""
     property string currentWifiSSID: ""
     property string wifiIP: ""
     property string wifiSignalStrength: ""
@@ -122,55 +128,63 @@ Item {
         }
         
         // Ethernet Tab Content
-        ScrollView {
+        Flickable {
             width: parent.width
             height: parent.height - 48
             visible: networkTab.networkSubTab === 0
             clip: true
+            contentWidth: width
+            contentHeight: ethernetContent.height
+            boundsBehavior: Flickable.StopAtBounds
+            flickDeceleration: 8000
+            maximumFlickVelocity: 15000
             
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+            }
             
             Column {
+                id: ethernetContent
                 width: parent.width
                 spacing: Theme.spacingL
                 
                 // Ethernet status card
                 Rectangle {
                     width: parent.width
-                    height: 60
+                    height: 70
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
-                    border.color: networkTab.networkStatus === "ethernet" ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) : "transparent"
-                    border.width: networkTab.networkStatus === "ethernet" ? 1 : 0
+                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
+                    border.color: networkTab.networkStatus === "ethernet" ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                    border.width: networkTab.networkStatus === "ethernet" ? 2 : 1
+                    visible: networkTab.networkStatus === "ethernet" || networkTab.networkStatus === "disconnected"
                     
                     Row {
                         anchors.left: parent.left
-                        anchors.leftMargin: Theme.spacingM
+                        anchors.leftMargin: Theme.spacingL
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingM
                         
                         Text {
                             text: "lan"
                             font.family: Theme.iconFont
-                            font.pixelSize: Theme.iconSize
+                            font.pixelSize: Theme.iconSizeLarge - 4
                             color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         
                         Column {
-                            spacing: 2
+                            spacing: 4
                             anchors.verticalCenter: parent.verticalCenter
                             
                             Text {
-                                text: "Ethernet"
+                                text: networkTab.networkStatus === "ethernet" ? (networkTab.ethernetInterface || "Ethernet") : "Ethernet"
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surfaceText
                                 font.weight: Font.Medium
                             }
                             
                             Text {
-                                text: networkTab.networkStatus === "ethernet" ? "Connected" : "Disconnected"
+                                text: networkTab.networkStatus === "ethernet" ? (networkTab.ethernetIP || "Connected") : "Disconnected"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                             }
@@ -218,74 +232,27 @@ Item {
                         }
                     }
                 }
-                
-                // Ethernet details
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingM
-                    visible: networkTab.networkStatus === "ethernet"
-                    
-                    Text {
-                        text: "Connection Details"
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
-                    
-                    Rectangle {
-                        width: parent.width
-                        height: 50
-                        radius: Theme.cornerRadiusSmall
-                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
-                        
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: Theme.spacingM
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.spacingM
-                            
-                            Text {
-                                text: "language"
-                                font.family: Theme.iconFont
-                                font.pixelSize: Theme.iconSize
-                                color: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                            
-                            Column {
-                                spacing: 2
-                                anchors.verticalCenter: parent.verticalCenter
-                                
-                                Text {
-                                    text: "IP Address"
-                                    font.pixelSize: Theme.fontSizeMedium
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Medium
-                                }
-                                
-                                Text {
-                                    text: networkTab.ethernetIP || "192.168.1.100"
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
         
         // WiFi Tab Content
-        ScrollView {
+        Flickable {
             width: parent.width
             height: parent.height - 48
             visible: networkTab.networkSubTab === 1
             clip: true
+            contentWidth: width
+            contentHeight: wifiContent.height
+            boundsBehavior: Flickable.StopAtBounds
+            flickDeceleration: 8000
+            maximumFlickVelocity: 15000
             
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            ScrollBar.vertical: ScrollBar {
+                policy: ScrollBar.AsNeeded
+            }
             
             Column {
+                id: wifiContent
                 width: parent.width
                 spacing: Theme.spacingL
                 

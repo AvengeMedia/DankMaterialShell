@@ -51,6 +51,7 @@ ShellRoot {
     // Network properties from NetworkService
     property string networkStatus: NetworkService.networkStatus
     property string ethernetIP: NetworkService.ethernetIP
+    property string ethernetInterface: NetworkService.ethernetInterface
     property string wifiIP: NetworkService.wifiIP
     property bool bluetoothEnabled: BluetoothService.bluetoothEnabled
     property bool bluetoothAvailable: BluetoothService.bluetoothAvailable

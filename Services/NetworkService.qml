@@ -9,6 +9,7 @@ Singleton {
     
     property string networkStatus: "disconnected" // "ethernet", "wifi", "disconnected"
     property string ethernetIP: ""
+    property string ethernetInterface: ""
     property string wifiIP: ""
     property bool wifiAvailable: false
     property bool wifiEnabled: true
@@ -40,6 +41,7 @@ Singleton {
                     } else {
                         root.networkStatus = "disconnected"
                         root.ethernetIP = ""
+                        root.ethernetInterface = ""
                         root.wifiIP = ""
                         console.log("Setting network status to disconnected")
                     }
@@ -49,6 +51,7 @@ Singleton {
                 } else {
                     root.networkStatus = "disconnected"
                     root.ethernetIP = ""
+                    root.ethernetInterface = ""
                     root.wifiIP = ""
                     console.log("No network output, setting to disconnected")
                 }
@@ -74,15 +77,23 @@ Singleton {
     
     Process {
         id: ethernetIPChecker
-        command: ["bash", "-c", "ip route get 1.1.1.1 | grep -oP 'src \\K\\S+' | head -1"]
+        command: ["bash", "-c", "ip route get 1.1.1.1 | grep -oP '(dev \\K\\S+|src \\K\\S+)' | tr '\\n' ' '"]
         running: false
         
         stdout: SplitParser {
             splitMarker: "\n"
             onRead: (data) => {
                 if (data.trim()) {
-                    root.ethernetIP = data.trim()
-                    console.log("Ethernet IP:", root.ethernetIP)
+                    const parts = data.trim().split(' ')
+                    if (parts.length >= 2) {
+                        root.ethernetInterface = parts[0]
+                        root.ethernetIP = parts[1]
+                        console.log("Ethernet Interface:", root.ethernetInterface, "IP:", root.ethernetIP)
+                    } else if (parts.length === 1) {
+                        // Fallback if only IP is found
+                        root.ethernetIP = parts[0]
+                        console.log("Ethernet IP:", root.ethernetIP)
+                    }
                 }
             }
         }
