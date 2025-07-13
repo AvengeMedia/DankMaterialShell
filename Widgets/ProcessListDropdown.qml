@@ -245,15 +245,21 @@ PanelWindow {
             Row {
                 id: columnHeaders
                 Layout.fillWidth: true
+                anchors.left: parent.left
+                anchors.leftMargin: 8
+                spacing: 8
                 
+                // Icon placeholder + Process name
                 Text {
                     text: "Process"
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     opacity: 0.7
-                    width: 180
+                    width: Theme.iconSize - 4 + 8 + 150  // icon width + spacing + name width
                 }
+                
+                Item { width: parent.parent.width - 280 - 16 }  // Flexible spacer to match process list (280 from row + 16 for margins)
                 
                 Text {
                     text: "CPU"
