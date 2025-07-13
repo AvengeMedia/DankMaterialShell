@@ -21,19 +21,21 @@ PanelWindow {
     anchors {
         top: true
         right: true
-        bottom: true
     }
     
-    implicitWidth: 400
+    margins {
+        top: Theme.barHeight
+        right: 0
+    }
+    
+    implicitWidth: 396
+    implicitHeight: 116  // Just the notification area
     
     Rectangle {
         id: popupContainer
-        width: 380
-        height: 100
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Theme.barHeight + 16
-        anchors.rightMargin: 16
+        anchors.fill: parent
+        anchors.topMargin: 16   // 16px from the top of this window
+        anchors.rightMargin: 16  // 16px from the right edge
         
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusLarge
@@ -50,8 +52,9 @@ PanelWindow {
             anchors.rightMargin: 36  // Don't overlap with close button
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
+            acceptedButtons: Qt.LeftButton
             
-            onClicked: {
+            onClicked: (mouse) => {
                 console.log("Popup clicked!")
                 if (root.activeNotification) {
                     root.handleNotificationClick(root.activeNotification)
@@ -65,6 +68,7 @@ PanelWindow {
                 }
                 // Always hide popup after click
                 Utils.hideNotificationPopup()
+                mouse.accepted = true  // Prevent event propagation
             }
         }
         
@@ -91,7 +95,11 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onClicked: Utils.hideNotificationPopup()
+                acceptedButtons: Qt.LeftButton
+                onClicked: (mouse) => {
+                    Utils.hideNotificationPopup()
+                    mouse.accepted = true  // Prevent event propagation
+                }
             }
             
             Behavior on color {

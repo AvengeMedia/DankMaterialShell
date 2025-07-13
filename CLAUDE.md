@@ -13,7 +13,6 @@ This is a Quickshell-based desktop shell implementation with Material Design 3 d
 - **QML (Qt Modeling Language)** - Primary language for all UI components
 - **Quickshell Framework** - QML-based framework for building desktop shells
 - **Qt/QtQuick** - UI rendering and controls
-- **Qt5Compat** - Graphical effects
 - **Wayland** - Display server protocol
 
 ## Development Commands

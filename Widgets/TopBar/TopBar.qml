@@ -9,6 +9,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
 import "../../Common"
+import "../../Common/Utilities.js" as Utils
 import "../../Services"
 import ".."
 
@@ -177,6 +178,10 @@ PanelWindow {
                 
                 onClicked: {
                     if (topBar.shellRoot) {
+                        // Hide notification popup if visible
+                        if (topBar.shellRoot.showNotificationPopup) {
+                            Utils.hideNotificationPopup()
+                        }
                         topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
                     }
                 }
@@ -195,6 +200,10 @@ PanelWindow {
                 
                 onClicked: {
                     if (topBar.shellRoot) {
+                        // Hide notification popup if visible
+                        if (topBar.shellRoot.showNotificationPopup) {
+                            Utils.hideNotificationPopup()
+                        }
                         topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
                     }
                 }
@@ -243,6 +252,10 @@ PanelWindow {
                         cursorShape: Qt.PointingHandCursor
                         
                         onClicked: {
+                            // Hide notification popup if visible
+                            if (topBar.shellRoot && topBar.shellRoot.showNotificationPopup) {
+                                Utils.hideNotificationPopup()
+                            }
                             topBar.clipboardRequested()
                         }
                     }
@@ -270,6 +283,10 @@ PanelWindow {
                     isActive: topBar.shellRoot ? topBar.shellRoot.notificationHistoryVisible : false
                     onClicked: {
                         if (topBar.shellRoot) {
+                            // Hide notification popup if visible
+                            if (topBar.shellRoot.showNotificationPopup) {
+                                Utils.hideNotificationPopup()
+                            }
                             topBar.shellRoot.notificationHistoryVisible = !topBar.shellRoot.notificationHistoryVisible
                         }
                     }
@@ -291,6 +308,10 @@ PanelWindow {
                     
                     onClicked: {
                         if (topBar.shellRoot) {
+                            // Hide notification popup if visible
+                            if (topBar.shellRoot.showNotificationPopup) {
+                                Utils.hideNotificationPopup()
+                            }
                             topBar.shellRoot.controlCenterVisible = !topBar.shellRoot.controlCenterVisible
                             if (topBar.shellRoot.controlCenterVisible) {
                                 WifiService.scanWifi()
