@@ -19,6 +19,14 @@ Singleton {
     property bool nightModeEnabled: false
     property string profileImage: ""
     
+    // Widget visibility preferences for TopBar
+    property bool showFocusedWindow: true
+    property bool showWeather: true  
+    property bool showMusic: true
+    property bool showClipboard: true
+    property bool showSystemResources: true
+    property bool showSystemTray: true
+    
     
     Component.onCompleted: loadSettings()
     
@@ -59,6 +67,12 @@ Singleton {
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
                 profileImage = settings.profileImage !== undefined ? settings.profileImage : ""
+                showFocusedWindow = settings.showFocusedWindow !== undefined ? settings.showFocusedWindow : true
+                showWeather = settings.showWeather !== undefined ? settings.showWeather : true
+                showMusic = settings.showMusic !== undefined ? settings.showMusic : true
+                showClipboard = settings.showClipboard !== undefined ? settings.showClipboard : true
+                showSystemResources = settings.showSystemResources !== undefined ? settings.showSystemResources : true
+                showSystemTray = settings.showSystemTray !== undefined ? settings.showSystemTray : true
                 console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 
                 applyStoredTheme()
@@ -82,7 +96,13 @@ Singleton {
             use24HourClock,
             useFahrenheit,
             nightModeEnabled,
-            profileImage
+            profileImage,
+            showFocusedWindow,
+            showWeather,
+            showMusic,
+            showClipboard,
+            showSystemResources,
+            showSystemTray
         }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
@@ -198,6 +218,43 @@ Singleton {
     function setProfileImage(imageUrl) {
         console.log("Prefs setProfileImage called - profileImage:", imageUrl)
         profileImage = imageUrl
+        saveSettings()
+    }
+    
+    // Widget visibility setters
+    function setShowFocusedWindow(enabled) {
+        console.log("Prefs setShowFocusedWindow called - showFocusedWindow:", enabled)
+        showFocusedWindow = enabled
+        saveSettings()
+    }
+    
+    function setShowWeather(enabled) {
+        console.log("Prefs setShowWeather called - showWeather:", enabled)
+        showWeather = enabled
+        saveSettings()
+    }
+    
+    function setShowMusic(enabled) {
+        console.log("Prefs setShowMusic called - showMusic:", enabled)
+        showMusic = enabled
+        saveSettings()
+    }
+    
+    function setShowClipboard(enabled) {
+        console.log("Prefs setShowClipboard called - showClipboard:", enabled)
+        showClipboard = enabled
+        saveSettings()
+    }
+    
+    function setShowSystemResources(enabled) {
+        console.log("Prefs setShowSystemResources called - showSystemResources:", enabled)
+        showSystemResources = enabled
+        saveSettings()
+    }
+    
+    function setShowSystemTray(enabled) {
+        console.log("Prefs setShowSystemTray called - showSystemTray:", enabled)
+        showSystemTray = enabled
         saveSettings()
     }
 }

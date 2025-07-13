@@ -159,6 +159,7 @@ PanelWindow {
                 
                 FocusedAppWidget {
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: Prefs.showFocusedWindow
                 }
             }
             
@@ -179,6 +180,7 @@ PanelWindow {
                 anchors.rightMargin: Theme.spacingS
                 activePlayer: topBar.activePlayer
                 hasActiveMedia: topBar.hasActiveMedia
+                visible: Prefs.showMusic && topBar.hasActiveMedia
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -201,6 +203,7 @@ PanelWindow {
                 weatherCode: topBar.weatherCode
                 weatherTemp: topBar.weatherTemp
                 weatherTempF: topBar.weatherTempF
+                visible: Prefs.showWeather
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -222,6 +225,7 @@ PanelWindow {
                 
                 SystemTrayWidget {
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: Prefs.showSystemTray
                     onMenuRequested: (menu, item, x, y) => {
                         topBar.currentTrayMenu = menu
                         topBar.currentTrayItem = item
@@ -239,6 +243,7 @@ PanelWindow {
                     radius: Theme.cornerRadius
                     color: clipboardArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: Prefs.showClipboard
                     
                     Text {
                         anchors.centerIn: parent
@@ -275,10 +280,12 @@ PanelWindow {
                 // System Monitor Widgets
                 CpuMonitorWidget {
                     anchors.verticalCenter: parent.verticalCenter
+                    visible: Prefs.showSystemResources
                 }
 
                 RamMonitorWidget {
-                    anchors.verticalCenter: parent.verticalCenter  
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: Prefs.showSystemResources
                 }
                 
                 NotificationCenterButton {

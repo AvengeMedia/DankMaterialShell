@@ -328,6 +328,59 @@ PanelWindow {
                         }
                     }
                     
+                    // Widget Visibility Settings
+                    SettingsSection {
+                        title: "Top Bar Widgets"
+                        iconName: "widgets"
+                        
+                        content: Column {
+                            width: parent.width
+                            spacing: Theme.spacingM
+                            
+                            SettingsToggle {
+                                text: "Focused Window"
+                                description: "Show the currently focused application in the top bar"
+                                checked: Prefs.showFocusedWindow
+                                onToggled: (checked) => Prefs.setShowFocusedWindow(checked)
+                            }
+                            
+                            SettingsToggle {
+                                text: "Weather Widget"
+                                description: "Display weather information in the top bar"
+                                checked: Prefs.showWeather
+                                onToggled: (checked) => Prefs.setShowWeather(checked)
+                            }
+                            
+                            SettingsToggle {
+                                text: "Media Controls"
+                                description: "Show currently playing media in the top bar"
+                                checked: Prefs.showMusic
+                                onToggled: (checked) => Prefs.setShowMusic(checked)
+                            }
+                            
+                            SettingsToggle {
+                                text: "Clipboard Button"
+                                description: "Show clipboard access button in the top bar"
+                                checked: Prefs.showClipboard
+                                onToggled: (checked) => Prefs.setShowClipboard(checked)
+                            }
+                            
+                            SettingsToggle {
+                                text: "System Resources"
+                                description: "Display CPU and RAM usage indicators"
+                                checked: Prefs.showSystemResources
+                                onToggled: (checked) => Prefs.setShowSystemResources(checked)
+                            }
+                            
+                            SettingsToggle {
+                                text: "System Tray"
+                                description: "Show system tray icons in the top bar"
+                                checked: Prefs.showSystemTray
+                                onToggled: (checked) => Prefs.setShowSystemTray(checked)
+                            }
+                        }
+                    }
+                    
                     // Display Settings
                     SettingsSection {
                         title: "Display & Appearance"
