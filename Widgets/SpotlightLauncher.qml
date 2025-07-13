@@ -12,11 +12,15 @@ PanelWindow {
     id: spotlightLauncher
     
     property bool spotlightOpen: false
-    property var recentApps: []
     property var filteredApps: []
     property int selectedIndex: 0
     property int maxResults: 50
-    property var categories: AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+    property var categories: {
+        var allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+        // Insert "Recents" after "All" 
+        var result = ["All", "Recents"]
+        return result.concat(allCategories.filter(cat => cat !== "All"))
+    }
     property string selectedCategory: "All"
     property string viewMode: "list" // "list" or "grid"
     
@@ -45,7 +49,6 @@ PanelWindow {
         console.log("SpotlightLauncher: show() called")
         spotlightOpen = true
         console.log("SpotlightLauncher: spotlightOpen set to", spotlightOpen)
-        loadRecentApps()
         updateFilteredApps()
         Qt.callLater(function() {
             searchField.forceActiveFocus()
@@ -69,9 +72,6 @@ PanelWindow {
         }
     }
     
-    function loadRecentApps() {
-        recentApps = Prefs.getRecentApps()
-    }
     
     function updateFilteredApps() {
         filteredApps = []
@@ -80,53 +80,34 @@ PanelWindow {
         var apps = []
         
         if (searchField.text.length === 0) {
-            // Show recent apps first, then all apps from category
+            // Show apps from category
             if (selectedCategory === "All") {
-                // For "All" category, show recent apps first, then all available apps
-                var allApps = AppSearchService.applications || []
-                var combined = []
-                
-                // Add recent apps first
-                recentApps.forEach(recentApp => {
-                    var found = allApps.find(app => app.exec === recentApp.exec)
-                    if (found) {
-                        combined.push(found)
-                    }
-                })
-                
-                // Add remaining apps not in recent
-                var remaining = allApps.filter(app => {
-                    return !recentApps.some(recentApp => recentApp.exec === app.exec)
-                })
-                
-                combined = combined.concat(remaining)
-                apps = combined // Show all apps for "All" category
+                // For "All" category, show all available apps
+                apps = AppSearchService.applications || []
+            } else if (selectedCategory === "Recents") {
+                // For "Recents" category, get recent apps from Prefs
+                var recentApps = Prefs.getRecentApps()
+                apps = recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null)
             } else {
                 // For specific categories, limit results
                 var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
-                var combined = []
-                
-                // Add recent apps first if they match category
-                recentApps.forEach(recentApp => {
-                    var found = categoryApps.find(app => app.exec === recentApp.exec)
-                    if (found) {
-                        combined.push(found)
-                    }
-                })
-                
-                // Add remaining apps not in recent
-                var remaining = categoryApps.filter(app => {
-                    return !recentApps.some(recentApp => recentApp.exec === app.exec)
-                })
-                
-                combined = combined.concat(remaining)
-                apps = combined.slice(0, maxResults)
+                apps = categoryApps.slice(0, maxResults)
             }
         } else {
             // Search with category filter
             if (selectedCategory === "All") {
                 // For "All" category, search all apps without limit
                 apps = AppSearchService.searchApplications(searchField.text)
+            } else if (selectedCategory === "Recents") {
+                // For "Recents" category, search within recent apps
+                var recentApps = Prefs.getRecentApps()
+                var recentDesktopEntries = recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null)
+                var allSearchResults = AppSearchService.searchApplications(searchField.text)
+                
+                // Filter search results to only include recent apps
+                apps = allSearchResults.filter(searchApp => {
+                    return recentDesktopEntries.some(recentApp => recentApp.name === searchApp.name)
+                })
             } else {
                 // For specific categories, filter search results by category
                 var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
@@ -215,18 +196,15 @@ PanelWindow {
         target: AppSearchService
         function onReadyChanged() {
             if (AppSearchService.ready) {
-                categories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+                var allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+                // Insert "Recents" after "All" 
+                var result = ["All", "Recents"]
+                categories = result.concat(allCategories.filter(cat => cat !== "All"))
                 if (spotlightOpen) updateFilteredApps()
             }
         }
     }
     
-    Connections {
-        target: Prefs
-        function onRecentlyUsedAppsChanged() {
-            recentApps = Prefs.getRecentApps()
-        }
-    }
     
     // Dimmed overlay background
     Rectangle {
@@ -242,29 +220,23 @@ PanelWindow {
         id: mainContainer
         width: 600
         height: {
-            // Calculate dynamic height based on content
-            let baseHeight = Theme.spacingXL * 2 + Theme.spacingL * 4 // Margins and spacing
+            // Fixed height to prevent shrinking - consistent experience
+            let baseHeight = Theme.spacingXL * 2 + Theme.spacingL * 3 // Margins and spacing
             
             // Add category section height if visible
             if (categories.length > 1 || filteredModel.count > 0) {
                 baseHeight += 36 * 2 + Theme.spacingS + Theme.spacingM // Categories (2 rows)
             }
             
-            // Add recent apps section height if visible
-            if (recentApps.length > 0 && searchField.text.length === 0) {
-                baseHeight += 56 + Theme.spacingS + Theme.fontSizeMedium + Theme.spacingL // Recent apps
-            }
-            
             // Add search field height
             baseHeight += 56
             
-            // Add results height (limit to reasonable size)
-            let maxResultsHeight = 400
-            let actualResultsHeight = Math.min(filteredModel.count * (viewMode === "grid" ? 100 : 60), maxResultsHeight)
-            baseHeight += actualResultsHeight
+            // Add fixed results height for consistent size
+            let fixedResultsHeight = 400 // Always same height regardless of content
+            baseHeight += fixedResultsHeight
             
-            // Ensure minimum and maximum bounds
-            return Math.min(Math.max(baseHeight, 300), parent.height - 40)
+            // Ensure reasonable bounds
+            return Math.min(Math.max(baseHeight, 500), parent.height - 40)
         }
         anchors.centerIn: parent
         color: Theme.surfaceContainer
@@ -306,7 +278,7 @@ PanelWindow {
                         width: parent.width
                         spacing: Theme.spacingS
                         
-                        property var topRowCategories: ["All", "Development", "Graphics", "Internet"]
+                        property var topRowCategories: ["All", "Recents", "Development", "Graphics"]
                         
                         Repeater {
                             model: parent.topRowCategories.filter(cat => categories.includes(cat))
@@ -320,7 +292,7 @@ PanelWindow {
                                 Text { 
                                     anchors.centerIn: parent
                                     text: modelData
-                                    color: selectedCategory === modelData ? Theme.onPrimary : Theme.surfaceText
+                                    color: selectedCategory === modelData ? Theme.surface : Theme.surfaceText
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: selectedCategory === modelData ? Font.Medium : Font.Normal
                                     elide: Text.ElideRight
@@ -344,7 +316,7 @@ PanelWindow {
                         width: parent.width
                         spacing: Theme.spacingS
                         
-                        property var bottomRowCategories: ["Media", "Office", "Settings", "System", "Utilities"]
+                        property var bottomRowCategories: ["Internet", "Media", "Office", "Settings", "System"]
                         
                         Repeater {
                             model: parent.bottomRowCategories.filter(cat => categories.includes(cat))
@@ -358,7 +330,7 @@ PanelWindow {
                                 Text { 
                                     anchors.centerIn: parent
                                     text: modelData
-                                    color: selectedCategory === modelData ? Theme.onPrimary : Theme.surfaceText
+                                    color: selectedCategory === modelData ? Theme.surface : Theme.surfaceText
                                     font.pixelSize: Theme.fontSizeMedium
                                     font.weight: selectedCategory === modelData ? Font.Medium : Font.Normal
                                     elide: Text.ElideRight
@@ -371,73 +343,6 @@ PanelWindow {
                                     onClicked: { 
                                         selectedCategory = modelData
                                         updateFilteredApps() 
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Recent apps section
-            Column {
-                width: parent.width
-                spacing: Theme.spacingS
-                visible: recentApps.length > 0 && searchField.text.length === 0
-                
-                Text {
-                    text: "Recently Used"
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.spacingM
-                    
-                    Repeater {
-                        model: Math.min(recentApps.length, 5)
-                        
-                        Rectangle {
-                            width: 56
-                            height: 56
-                            radius: Theme.cornerRadius
-                            color: recentSpotlightMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
-                            border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
-                            border.width: 1
-                            
-                            IconImage {
-                                anchors.fill: parent
-                                anchors.margins: 8
-                                source: recentApps[index] ? Quickshell.iconPath(recentApps[index].icon, "") : ""
-                                smooth: true
-                                asynchronous: true
-                            }
-                            
-                            MouseArea {
-                                id: recentSpotlightMouseArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (recentApps[index]) {
-                                        var recentApp = recentApps[index]
-                                        // Find the desktop entry for this recent app
-                                        var foundApp = AppSearchService.getAppByExec(recentApp.exec)
-                                        if (foundApp) {
-                                            launchApp({
-                                                name: foundApp.name,
-                                                exec: foundApp.execString,
-                                                icon: foundApp.icon,
-                                                comment: foundApp.comment,
-                                                desktopEntry: foundApp
-                                            })
-                                        } else {
-                                            // Fallback to direct execution
-                                            launchApp(recentApp)
-                                        }
                                     }
                                 }
                             }
@@ -497,7 +402,7 @@ PanelWindow {
                             
                             Text {
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: recentApps.length > 0 ? "Search applications or select from recent..." : "Search applications..."
+                                text: "Search applications..."
                                 color: Theme.surfaceVariantText
                                 font.pixelSize: Theme.fontSizeLarge
                                 visible: searchField.text.length === 0 && !searchField.activeFocus
@@ -807,8 +712,10 @@ PanelWindow {
     Component.onCompleted: {
         console.log("SpotlightLauncher: Component.onCompleted called - component loaded successfully!")
         if (AppSearchService.ready) {
-            categories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+            var allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+            // Insert "Recents" after "All" 
+            var result = ["All", "Recents"]
+            categories = result.concat(allCategories.filter(cat => cat !== "All"))
         }
-        loadRecentApps() // Load recent apps on startup
     }
 }

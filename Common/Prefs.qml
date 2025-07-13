@@ -158,9 +158,9 @@ Singleton {
             return a.name.localeCompare(b.name) // Alphabetical tiebreaker
         })
         
-        // Limit to 5 apps
-        if (sortedApps.length > 5) {
-            sortedApps = sortedApps.slice(0, 5)
+        // Limit to 10 apps
+        if (sortedApps.length > 10) {
+            sortedApps = sortedApps.slice(0, 10)
         }
         
         // Reassign to trigger property change signal
