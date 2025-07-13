@@ -632,7 +632,7 @@ PanelWindow {
                 BluetoothTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === 2
+                    visible: root.bluetoothAvailable && controlCenterPopup.currentTab === 2
                     
                     // Bind properties from root
                     bluetoothEnabled: root.bluetoothEnabled
@@ -643,7 +643,7 @@ PanelWindow {
                 DisplayTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === 3
+                    visible: controlCenterPopup.currentTab === (root.bluetoothAvailable ? 3 : 2)
                     
                 }
             }
