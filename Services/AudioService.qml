@@ -76,6 +76,7 @@ Singleton {
                                 name: "",
                                 displayName: "",
                                 description: "",
+                                nick: "",
                                 active: false
                             }
                         }
@@ -83,9 +84,17 @@ Singleton {
                         else if (line.startsWith('Name: ') && currentSink) {
                             currentSink.name = line.replace('Name: ', '').trim()
                         }
-                        // Get description
-                        else if (line.includes('device.description = ') && currentSink) {
+                        // Get the Description field (main display name)
+                        else if (line.startsWith('Description: ') && currentSink) {
+                            currentSink.description = line.replace('Description: ', '').trim()
+                        }
+                        // Get device.description as fallback
+                        else if (line.includes('device.description = ') && currentSink && !currentSink.description) {
                             currentSink.description = line.replace('device.description = ', '').replace(/"/g, '').trim()
+                        }
+                        // Get node.nick as another fallback option
+                        else if (line.includes('node.nick = ') && currentSink && !currentSink.description) {
+                            currentSink.nick = line.replace('node.nick = ', '').replace(/"/g, '').trim()
                         }
                     }
                     
@@ -97,6 +106,13 @@ Singleton {
                     // Process display names
                     for (let sink of sinks) {
                         let displayName = sink.description
+                        
+                        // If no good description, try nick
+                        if (!displayName || displayName === sink.name) {
+                            displayName = sink.nick
+                        }
+                        
+                        // Still no good name? Fall back to smart defaults
                         if (!displayName || displayName === sink.name) {
                             if (sink.name.includes("analog-stereo")) displayName = "Built-in Speakers"
                             else if (sink.name.includes("bluez")) displayName = "Bluetooth Audio"
@@ -105,6 +121,7 @@ Singleton {
                             else if (sink.name.includes("easyeffects")) displayName = "EasyEffects"
                             else displayName = sink.name
                         }
+                        
                         sink.displayName = displayName
                     }
                     
