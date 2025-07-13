@@ -50,7 +50,20 @@ Singleton {
     }
     
     function saveRecentApps() {
-        recentAppsFileView.text = JSON.stringify(recentApps, null, 2)
+        var jsonData = JSON.stringify(recentApps, null, 2)
+        var process = Qt.createQmlObject('
+            import Quickshell.Io
+            Process {
+                command: ["sh", "-c", "echo \'' + jsonData.replace(/'/g, "'\"'\"'") + '\' > \'' + root.recentAppsFile + '\'"]
+                running: true
+                onExited: {
+                    if (exitCode !== 0) {
+                        console.warn("Failed to save recent apps:", exitCode)
+                    }
+                    destroy()
+                }
+            }
+        ', root)
     }
     
     function addRecentApp(app) {

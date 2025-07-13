@@ -33,7 +33,7 @@ PanelWindow {
     // App management
     property var categories: AppSearchService.getAllCategories()
     property string selectedCategory: "All"
-    property var recentApps: []
+    property var recentApps: Prefs.getRecentApps()
     property var pinnedApps: ["firefox", "code", "terminal", "file-manager"]
     property bool showCategories: false
     property string viewMode: "list" // "list" or "grid"
@@ -81,6 +81,13 @@ PanelWindow {
         }
         function onToggleAppLauncher() {
             launcher.toggle()
+        }
+    }
+    
+    Connections {
+        target: Prefs
+        function onRecentlyUsedAppsChanged() {
+            recentApps = Prefs.getRecentApps()
         }
     }
     
@@ -383,6 +390,7 @@ PanelWindow {
                                 if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && filteredModel.count) {
                                     var firstApp = filteredModel.get(0)
                                     if (firstApp.desktopEntry) {
+                                        Prefs.addRecentApp(firstApp.desktopEntry)
                                         AppSearchService.launchApp(firstApp.desktopEntry)
                                     } else {
                                         launcher.launchApp(firstApp.exec)
@@ -392,6 +400,69 @@ PanelWindow {
                                 } else if (event.key === Qt.Key_Escape) {
                                     launcher.hide()
                                     event.accepted = true
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Recent apps section
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+                    visible: recentApps.length > 0 && searchField.text.length === 0
+                    
+                    Text {
+                        text: "Recently Used"
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                    }
+                    
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        
+                        Repeater {
+                            model: Math.min(recentApps.length, 5)
+                            
+                            Rectangle {
+                                width: 56
+                                height: 56
+                                radius: Theme.cornerRadius
+                                color: recentAppMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                                border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                                border.width: 1
+                                
+                                IconImage {
+                                    anchors.fill: parent
+                                    anchors.margins: 8
+                                    source: recentApps[index] ? Quickshell.iconPath(recentApps[index].icon, "") : ""
+                                    smooth: true
+                                    asynchronous: true
+                                }
+                                
+                                MouseArea {
+                                    id: recentAppMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (recentApps[index]) {
+                                            var recentApp = recentApps[index]
+                                            // Find the desktop entry for this recent app
+                                            var foundApp = AppSearchService.getAppByExec(recentApp.exec)
+                                            if (foundApp) {
+                                                Prefs.addRecentApp(foundApp)
+                                                AppSearchService.launchApp(foundApp)
+                                            } else {
+                                                // Fallback to direct execution
+                                                var cleanExec = recentApp.exec.replace(/%[fFuU]/g, "").trim()
+                                                Quickshell.execDetached(["sh", "-c", cleanExec])
+                                            }
+                                            launcher.hide()
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -521,6 +592,7 @@ PanelWindow {
                         // Calculate more precise remaining height
                         let usedHeight = 40 + Theme.spacingL // Header
                         usedHeight += 52 + Theme.spacingL // Search container
+                        usedHeight += (recentApps.length > 0 && searchField.text.length === 0 ? 56 + Theme.spacingS + Theme.spacingL : 0) // Recent apps when visible
                         usedHeight += (searchField.text.length === 0 ? 40 + Theme.spacingL : 0) // Category/controls when visible
                         return parent.height - usedHeight
                     }
@@ -784,6 +856,7 @@ PanelWindow {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (model.desktopEntry) {
+                        Prefs.addRecentApp(model.desktopEntry)
                         AppSearchService.launchApp(model.desktopEntry)
                     } else {
                         launcher.launchApp(model.exec)
@@ -845,6 +918,7 @@ PanelWindow {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (model.desktopEntry) {
+                        Prefs.addRecentApp(model.desktopEntry)
                         AppSearchService.launchApp(model.desktopEntry)
                     } else {
                         launcher.launchApp(model.exec)
@@ -870,6 +944,7 @@ PanelWindow {
     
     function show() {
         launcher.isVisible = true
+        recentApps = Prefs.getRecentApps() // Refresh recent apps
         Qt.callLater(function() {
             searchField.forceActiveFocus()
         })
@@ -894,5 +969,6 @@ PanelWindow {
             categories = AppSearchService.getAllCategories()
             updateFilteredModel()
         }
+        recentApps = Prefs.getRecentApps() // Load recent apps on startup
     }
 }

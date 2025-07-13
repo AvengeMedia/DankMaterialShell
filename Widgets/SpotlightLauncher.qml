@@ -70,7 +70,7 @@ PanelWindow {
     }
     
     function loadRecentApps() {
-        recentApps = PreferencesService.getRecentApps()
+        recentApps = Prefs.getRecentApps()
     }
     
     function updateFilteredApps() {
@@ -154,7 +154,7 @@ PanelWindow {
     }
     
     function launchApp(app) {
-        PreferencesService.addRecentApp(app)
+        Prefs.addRecentApp(app)
         if (app.desktopEntry) {
             AppSearchService.launchApp(app.desktopEntry)
         } else {
@@ -221,6 +221,13 @@ PanelWindow {
         }
     }
     
+    Connections {
+        target: Prefs
+        function onRecentlyUsedAppsChanged() {
+            recentApps = Prefs.getRecentApps()
+        }
+    }
+    
     // Dimmed overlay background
     Rectangle {
         anchors.fill: parent
@@ -236,11 +243,16 @@ PanelWindow {
         width: 600
         height: {
             // Calculate dynamic height based on content
-            let baseHeight = Theme.spacingXL * 2 + Theme.spacingL * 3 // Margins and spacing
+            let baseHeight = Theme.spacingXL * 2 + Theme.spacingL * 4 // Margins and spacing
             
             // Add category section height if visible
             if (categories.length > 1 || filteredModel.count > 0) {
                 baseHeight += 36 * 2 + Theme.spacingS + Theme.spacingM // Categories (2 rows)
+            }
+            
+            // Add recent apps section height if visible
+            if (recentApps.length > 0 && searchField.text.length === 0) {
+                baseHeight += 56 + Theme.spacingS + Theme.fontSizeMedium + Theme.spacingL // Recent apps
             }
             
             // Add search field height
@@ -359,6 +371,73 @@ PanelWindow {
                                     onClicked: { 
                                         selectedCategory = modelData
                                         updateFilteredApps() 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Recent apps section
+            Column {
+                width: parent.width
+                spacing: Theme.spacingS
+                visible: recentApps.length > 0 && searchField.text.length === 0
+                
+                Text {
+                    text: "Recently Used"
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.spacingM
+                    
+                    Repeater {
+                        model: Math.min(recentApps.length, 5)
+                        
+                        Rectangle {
+                            width: 56
+                            height: 56
+                            radius: Theme.cornerRadius
+                            color: recentSpotlightMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
+                            border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                            border.width: 1
+                            
+                            IconImage {
+                                anchors.fill: parent
+                                anchors.margins: 8
+                                source: recentApps[index] ? Quickshell.iconPath(recentApps[index].icon, "") : ""
+                                smooth: true
+                                asynchronous: true
+                            }
+                            
+                            MouseArea {
+                                id: recentSpotlightMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (recentApps[index]) {
+                                        var recentApp = recentApps[index]
+                                        // Find the desktop entry for this recent app
+                                        var foundApp = AppSearchService.getAppByExec(recentApp.exec)
+                                        if (foundApp) {
+                                            launchApp({
+                                                name: foundApp.name,
+                                                exec: foundApp.execString,
+                                                icon: foundApp.icon,
+                                                comment: foundApp.comment,
+                                                desktopEntry: foundApp
+                                            })
+                                        } else {
+                                            // Fallback to direct execution
+                                            launchApp(recentApp)
+                                        }
                                     }
                                 }
                             }
@@ -531,7 +610,7 @@ PanelWindow {
                     }
                     
                     delegate: Rectangle { 
-                        width: parent.width
+                        width: resultsList.width
                         height: 60
                         radius: Theme.cornerRadius
                         color: ListView.isCurrentItem ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
@@ -730,5 +809,6 @@ PanelWindow {
         if (AppSearchService.ready) {
             categories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
         }
+        loadRecentApps() // Load recent apps on startup
     }
 }

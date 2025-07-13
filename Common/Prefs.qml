@@ -120,23 +120,51 @@ Singleton {
     }
     
     function addRecentApp(app) {
+        if (!app) return
+        
+        var execProp = app.execString || app.exec || ""
+        if (!execProp) return
+        
         var existingIndex = -1
         for (var i = 0; i < recentlyUsedApps.length; i++) {
-            if (recentlyUsedApps[i].exec === app.exec) {
+            if (recentlyUsedApps[i].exec === execProp) {
                 existingIndex = i
                 break
             }
         }
         
         if (existingIndex >= 0) {
-            recentlyUsedApps.splice(existingIndex, 1)
+            // App exists, increment usage count
+            recentlyUsedApps[existingIndex].usageCount = (recentlyUsedApps[existingIndex].usageCount || 1) + 1
+            recentlyUsedApps[existingIndex].lastUsed = Date.now()
+        } else {
+            // New app, create entry
+            var appData = {
+                name: app.name || "",
+                exec: execProp,
+                icon: app.icon || "application-x-executable",
+                comment: app.comment || "",
+                usageCount: 1,
+                lastUsed: Date.now()
+            }
+            recentlyUsedApps.push(appData)
         }
         
-        recentlyUsedApps.unshift(app)
+        // Sort by usage count (descending), then alphabetically by name
+        var sortedApps = recentlyUsedApps.sort(function(a, b) {
+            if (a.usageCount !== b.usageCount) {
+                return b.usageCount - a.usageCount // Higher usage count first
+            }
+            return a.name.localeCompare(b.name) // Alphabetical tiebreaker
+        })
         
-        if (recentlyUsedApps.length > 10) {
-            recentlyUsedApps = recentlyUsedApps.slice(0, 10)
+        // Limit to 5 apps
+        if (sortedApps.length > 5) {
+            sortedApps = sortedApps.slice(0, 5)
         }
+        
+        // Reassign to trigger property change signal
+        recentlyUsedApps = sortedApps
         
         saveSettings()
     }
