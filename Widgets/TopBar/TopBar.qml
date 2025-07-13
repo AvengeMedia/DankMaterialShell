@@ -156,6 +156,10 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     screenName: topBar.screenName
                 }
+                
+                FocusedAppWidget {
+                    anchors.verticalCenter: parent.verticalCenter
+                }
             }
             
             ClockWidget {

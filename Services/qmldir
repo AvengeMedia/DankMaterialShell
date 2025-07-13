@@ -13,3 +13,4 @@ singleton LauncherService 1.0 LauncherService.qml
 singleton NiriWorkspaceService 1.0 NiriWorkspaceService.qml
 singleton CalendarService 1.0 CalendarService.qml
 singleton UserInfoService 1.0 UserInfoService.qml
+singleton FocusedWindowService 1.0 FocusedWindowService.qml
