@@ -13,6 +13,9 @@ Singleton {
     property string cpuModel: ""
     property real cpuFrequency: 0.0
     
+    // Previous CPU stats for accurate calculation
+    property var prevCpuStats: [0, 0, 0, 0, 0, 0, 0, 0]
+    
     // Memory properties  
     property real memoryUsage: 0.0
     property real totalMemory: 0.0
@@ -26,8 +29,8 @@ Singleton {
     property real cpuTemperature: 0.0
     
     // Update intervals
-    property int cpuUpdateInterval: 2000
-    property int memoryUpdateInterval: 3000
+    property int cpuUpdateInterval: 1000
+    property int memoryUpdateInterval: 2000
     property int temperatureUpdateInterval: 5000
     
     Component.onCompleted: {
@@ -63,16 +66,33 @@ Singleton {
         }
     }
     
-    // CPU usage monitoring
+    // CPU usage monitoring with accurate calculation
     Process {
         id: cpuUsageProcess
-        command: ["bash", "-c", "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$3+$4+$5)} END {printf \"%.1f\", usage}'"]
+        command: ["bash", "-c", "head -1 /proc/stat | awk '{print $2,$3,$4,$5,$6,$7,$8,$9}'"]
         running: false
         
         stdout: StdioCollector {
             onStreamFinished: {
                 if (text.trim()) {
-                    root.cpuUsage = parseFloat(text.trim())
+                    const stats = text.trim().split(" ").map(x => parseInt(x))
+                    if (root.prevCpuStats[0] > 0) {
+                        // Calculate differences
+                        let diffs = []
+                        for (let i = 0; i < 8; i++) {
+                            diffs[i] = stats[i] - root.prevCpuStats[i]
+                        }
+                        
+                        // Calculate total and idle time
+                        const totalTime = diffs.reduce((a, b) => a + b, 0)
+                        const idleTime = diffs[3] + diffs[4] // idle + iowait
+                        
+                        // CPU usage percentage
+                        if (totalTime > 0) {
+                            root.cpuUsage = Math.max(0, Math.min(100, ((totalTime - idleTime) / totalTime) * 100))
+                        }
+                    }
+                    root.prevCpuStats = stats
                 }
             }
         }

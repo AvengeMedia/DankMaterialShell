@@ -12,8 +12,8 @@ Rectangle {
     
     signal clicked()
     
-    visible: weatherAvailable
-    width: weatherAvailable ? Math.min(100, weatherRow.implicitWidth + Theme.spacingS * 2) : 0
+    // Visibility is now controlled by TopBar.qml
+    width: visible ? Math.min(100, weatherRow.implicitWidth + Theme.spacingS * 2) : 0
     height: 30
     radius: Theme.cornerRadius
     color: weatherArea.containsMouse ? 

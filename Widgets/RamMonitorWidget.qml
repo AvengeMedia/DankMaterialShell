@@ -2,12 +2,14 @@ import QtQuick
 import QtQuick.Controls
 import "../Common"
 import "../Services"
+import "."
 
 Rectangle {
     id: ramWidget
     
     property bool showPercentage: true
     property bool showIcon: true
+    property var processDropdown: null
     
     width: 55
     height: 30
@@ -24,9 +26,13 @@ Rectangle {
         id: ramArea
         anchors.fill: parent
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
         
         onClicked: {
-            // RAM widget clicked
+            if (processDropdown) {
+                ProcessMonitorService.setSortBy("memory")
+                processDropdown.toggle()
+            }
         }
     }
 
@@ -57,5 +63,4 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
         }
     }
-    
 }

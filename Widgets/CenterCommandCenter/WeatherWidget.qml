@@ -41,7 +41,7 @@ Rectangle {
             Column {
                 anchors.centerIn: parent
                 spacing: theme.spacingS
-                visible: !weather || !weather.available
+                visible: !weather || !weather.available || weather.temp === 0
                 
                 Text {
                     text: "cloud_off"
@@ -63,7 +63,7 @@ Rectangle {
             Row {
                 anchors.fill: parent
                 spacing: theme.spacingL
-                visible: weather
+                visible: weather && weather.available && weather.temp !== 0
                 
                 // Weather icon
                 Text {
@@ -108,7 +108,7 @@ Rectangle {
             columns: 2
             spacing: theme.spacingM
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: weather !== null
+            visible: weather && weather.available && weather.temp !== 0
             
             Row {
                 spacing: theme.spacingXS

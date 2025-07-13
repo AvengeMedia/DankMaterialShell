@@ -50,6 +50,9 @@ PanelWindow {
     // Notification properties
     property int notificationCount: 0
     
+    // Process dropdown reference
+    property var processDropdown: null
+    
     
     // Clipboard properties
     signal clipboardRequested()
@@ -139,6 +142,7 @@ PanelWindow {
             anchors.rightMargin: Theme.spacingM
             anchors.topMargin: Theme.spacingXS
             anchors.bottomMargin: Theme.spacingXS
+            clip: true
             
             Row {
                 id: leftSection
@@ -203,7 +207,7 @@ PanelWindow {
                 weatherCode: topBar.weatherCode
                 weatherTemp: topBar.weatherTemp
                 weatherTempF: topBar.weatherTempF
-                visible: Prefs.showWeather
+                visible: Prefs.showWeather && topBar.weatherAvailable && topBar.weatherTemp > 0 && topBar.weatherTempF > 0
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -281,11 +285,13 @@ PanelWindow {
                 CpuMonitorWidget {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemResources
+                    processDropdown: topBar.processDropdown
                 }
 
                 RamMonitorWidget {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemResources
+                    processDropdown: topBar.processDropdown
                 }
                 
                 NotificationCenterButton {

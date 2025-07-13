@@ -304,6 +304,7 @@ ShellRoot {
             bluetoothEnabled: root.bluetoothEnabled
             shellRoot: root
             notificationCount: notificationHistory.count
+            processDropdown: processListDropdown
             
             // Connect tray menu properties
             showTrayMenu: root.showTrayMenu
@@ -339,6 +340,10 @@ ShellRoot {
     BatteryControlPopup {}
     PowerMenuPopup {}
     PowerConfirmDialog {}
+    
+    ProcessListDropdown {
+        id: processListDropdown
+    }
     
     SettingsPopup {
         id: settingsPopup

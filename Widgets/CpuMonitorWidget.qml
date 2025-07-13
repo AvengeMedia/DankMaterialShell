@@ -2,12 +2,14 @@ import QtQuick
 import QtQuick.Controls
 import "../Common"
 import "../Services"
+import "."
 
 Rectangle {
     id: cpuWidget
     
     property bool showPercentage: true
     property bool showIcon: true
+    property var processDropdown: null
     
     width: 55
     height: 30
@@ -24,9 +26,13 @@ Rectangle {
         id: cpuArea
         anchors.fill: parent
         hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
         
         onClicked: {
-            // CPU widget clicked
+            if (processDropdown) {
+                ProcessMonitorService.setSortBy("cpu")
+                processDropdown.toggle()
+            }
         }
     }
 

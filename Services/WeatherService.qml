@@ -9,6 +9,7 @@ Singleton {
     
     property var weather: ({
         available: false,
+        loading: true,
         temp: 0,
         tempF: 0,
         city: "",
@@ -104,6 +105,7 @@ Singleton {
 
                     root.weather = {
                         available: true,
+                        loading: false,
                         temp: Number(current.temp_C)       || 0,
                         tempF: Number(current.temp_F)      || 0,
                         city:   location.areaName?.[0]?.value || "Unknown",
@@ -122,6 +124,7 @@ Singleton {
                 } catch (e) {
                     console.warn("Failed to parse weather data:", e.message)
                     root.weather.available = false
+                    root.weather.loading = false
                 }
             }
         }
@@ -130,6 +133,7 @@ Singleton {
             if (exitCode !== 0) {
                 console.warn("Weather fetch failed with exit code:", exitCode)
                 root.weather.available = false
+                root.weather.loading = false
             }
         }
     }
