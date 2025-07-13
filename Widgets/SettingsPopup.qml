@@ -98,7 +98,7 @@ PanelWindow {
                 }
                 
                 Item { 
-                    width: parent.width - 200 // Spacer to push close button to the right
+                    width: parent.width - 175 // Spacer to push close button to the right
                     height: 1
                 }
                 

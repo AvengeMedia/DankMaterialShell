@@ -162,68 +162,6 @@ ScrollView {
                     }
                 }
             }
-            
-            // Top Bar Transparency Control
-            Column {
-                width: parent.width
-                spacing: Theme.spacingM
-                anchors.margins: Theme.spacingM
-                
-                Text {
-                    text: "Top Bar Transparency"
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                }
-                
-                CustomSlider {
-                    width: parent.width - (Theme.spacingM * 2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    value: Math.round(Prefs.topBarTransparency * 100)
-                    minimum: 0
-                    maximum: 100
-                    leftIcon: "opacity"
-                    rightIcon: "circle"
-                    unit: "%"
-                    showValue: true
-                    
-                    onSliderValueChanged: (newValue) => {
-                        let transparencyValue = newValue / 100.0
-                        // Update live preview
-                    }
-                    
-                    onSliderDragFinished: (finalValue) => {
-                        let transparencyValue = finalValue / 100.0
-                        Prefs.setTopBarTransparency(transparencyValue)
-                    }
-                }
-                
-                Text {
-                    text: "Adjust the transparency of the top bar background"
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                    wrapMode: Text.WordWrap
-                    width: parent.width - (Theme.spacingM * 2)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
-
-            // Theme Picker
-            Column {
-                width: parent.width
-                spacing: Theme.spacingS
-                
-                Text {
-                    text: "Theme Color"
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
-                }
-                
-                ThemePicker {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
         }
     }
     
