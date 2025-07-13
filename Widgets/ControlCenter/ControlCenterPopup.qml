@@ -99,43 +99,79 @@ PanelWindow {
                         anchors.rightMargin: Theme.spacingL
                         spacing: Theme.spacingL
                         
-                        // Profile Picture
-                        Rectangle {
-                            width: 54
-                            height: 54
-                            radius: 27
-                            color: Theme.primary
-                            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                            border.width: 2
+                        // Profile Picture Container
+                        Item {
+                            width: 64
+                            height: 64
                             
-                            Image {
+                            // Background circle for fallback icon
+                            Rectangle {
                                 anchors.fill: parent
-                                anchors.margins: 2
-                                source: UserInfoService.profilePicture
-                                fillMode: Image.PreserveAspectCrop
-                                visible: UserInfoService.profileAvailable
-                                smooth: true
-                                
-                                layer.enabled: true
-                                layer.effect: MultiEffect {
-                                    maskEnabled: true
-                                    maskSource: Rectangle {
-                                        width: parent.width
-                                        height: parent.height
-                                        radius: width / 2
-                                        visible: false
-                                    }
-                                }
+                                radius: 32
+                                color: Theme.primary
+                                visible: Prefs.profileImage === "" || profileImage.status === Image.Error
                             }
                             
-                            // Fallback icon when no profile picture
+                            // Profile image (working version)
+                            Image {
+                                id: profileImage
+                                anchors.fill: parent
+                                source: {
+                                    if (Prefs.profileImage === "") return ""
+                                    // Add file:// prefix if it's a local path (starts with /)
+                                    if (Prefs.profileImage.startsWith("/")) {
+                                        return "file://" + Prefs.profileImage
+                                    }
+                                    // Return as-is if it already has a protocol or is a web URL
+                                    return Prefs.profileImage
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                visible: Prefs.profileImage !== "" && status !== Image.Error
+                                smooth: true
+                                asynchronous: true
+                                mipmap: true
+                                cache: false
+                            }
+                            
+                            // Subtle circular outline for images
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 32
+                                color: "transparent"
+                                border.color: Qt.rgba(0, 0, 0, 0.15) // Subtle dark outline
+                                border.width: 1
+                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                            }
+                            
+                            // Highlight ring to make it pop
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: -1
+                                radius: 33
+                                color: "transparent"
+                                border.color: Qt.rgba(255, 255, 255, 0.1) // Subtle light ring
+                                border.width: 1
+                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                            }
+                            
+                            // Fallback icon for no profile picture (generic person)
                             Text {
                                 anchors.centerIn: parent
                                 text: "person"
                                 font.family: Theme.iconFont
-                                font.pixelSize: Theme.iconSize + 4
+                                font.pixelSize: Theme.iconSize + 8
                                 color: Theme.onPrimary
-                                visible: !UserInfoService.profileAvailable
+                                visible: Prefs.profileImage === ""
+                            }
+                            
+                            // Error icon when image fails to load
+                            Text {
+                                anchors.centerIn: parent
+                                text: "warning"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.iconSize + 8
+                                color: Theme.onPrimary
+                                visible: Prefs.profileImage !== "" && profileImage.status === Image.Error
                             }
                         }
                         
@@ -143,6 +179,7 @@ PanelWindow {
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.spacingXS
+                            
                             
                             Text {
                                 text: UserInfoService.fullName || UserInfoService.username || "User"

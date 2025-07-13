@@ -139,6 +139,71 @@ PanelWindow {
                     width: parent.width
                     spacing: Theme.spacingL
                     
+                    // Profile Settings
+                    SettingsSection {
+                        title: "Profile"
+                        iconName: "person"
+                        
+                        content: Column {
+                            width: parent.width
+                            spacing: Theme.spacingM
+                            
+                            // Profile Image URL Input
+                            Column {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "Profile Image"
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                    font.weight: Font.Medium
+                                }
+                                
+                                Rectangle {
+                                    width: parent.width
+                                    height: 48
+                                    radius: Theme.cornerRadius
+                                    color: Theme.surfaceVariant
+                                    border.color: profileImageInput.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                                    border.width: profileImageInput.activeFocus ? 2 : 1
+                                    
+                                    TextInput {
+                                        id: profileImageInput
+                                        anchors.fill: parent
+                                        anchors.margins: Theme.spacingM
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        color: Theme.surfaceText
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        text: Prefs.profileImage
+                                        selectByMouse: true
+                                        
+                                        onEditingFinished: {
+                                            Prefs.setProfileImage(text)
+                                        }
+                                        
+                                        // Placeholder text
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: "Enter image path (e.g., /home/user/picture.png)"
+                                            color: Theme.surfaceVariantText
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            visible: profileImageInput.text.length === 0 && !profileImageInput.activeFocus
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "Enter a file path or web URL for your profile picture"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+                            }
+                        }
+                    }
+                    
                     // Clock Settings
                     SettingsSection {
                         title: "Clock & Time"

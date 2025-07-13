@@ -17,6 +17,7 @@ Singleton {
     property bool use24HourClock: true
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
+    property string profileImage: ""
     
     
     Component.onCompleted: loadSettings()
@@ -57,6 +58,7 @@ Singleton {
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
+                profileImage = settings.profileImage !== undefined ? settings.profileImage : ""
                 console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 
                 applyStoredTheme()
@@ -79,7 +81,8 @@ Singleton {
             recentlyUsedApps,
             use24HourClock,
             useFahrenheit,
-            nightModeEnabled
+            nightModeEnabled,
+            profileImage
         }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
@@ -189,6 +192,12 @@ Singleton {
     function setNightModeEnabled(enabled) {
         console.log("Prefs setNightModeEnabled called - nightModeEnabled:", enabled)
         nightModeEnabled = enabled
+        saveSettings()
+    }
+    
+    function setProfileImage(imageUrl) {
+        console.log("Prefs setProfileImage called - profileImage:", imageUrl)
+        profileImage = imageUrl
         saveSettings()
     }
 }
