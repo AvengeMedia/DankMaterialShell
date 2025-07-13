@@ -517,7 +517,13 @@ PanelWindow {
                 // App grid/list container
                 Rectangle {
                     width: parent.width
-                    height: parent.height - searchContainer.height - (searchField.text.length === 0 ? 128 : 60) - parent.spacing * 3
+                    height: {
+                        // Calculate more precise remaining height
+                        let usedHeight = 40 + Theme.spacingL // Header
+                        usedHeight += 52 + Theme.spacingL // Search container
+                        usedHeight += (searchField.text.length === 0 ? 40 + Theme.spacingL : 0) // Category/controls when visible
+                        return parent.height - usedHeight
+                    }
                     color: "transparent"
                     
                     // List view scroll container

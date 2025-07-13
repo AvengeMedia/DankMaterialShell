@@ -29,7 +29,7 @@ PanelWindow {
         bottom: true
     }
     
-    property int currentTab: 0 // 0: Network, 1: Audio, 2: Bluetooth, 3: Display
+    property string currentTab: "network" // "network", "audio", "bluetooth", "display"
     property bool powerOptionsExpanded: false
     
     Rectangle {
@@ -511,7 +511,7 @@ PanelWindow {
                             width: (parent.width - Theme.spacingXS * (tabCount - 1)) / tabCount
                             height: 40
                             radius: Theme.cornerRadius
-                            color: controlCenterPopup.currentTab === index ? 
+                            color: controlCenterPopup.currentTab === modelData.id ? 
                                    Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 
                                    tabArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                             
@@ -523,15 +523,15 @@ PanelWindow {
                                     text: modelData.icon
                                     font.family: Theme.iconFont
                                     font.pixelSize: Theme.iconSize - 4
-                                    color: controlCenterPopup.currentTab === index ? Theme.primary : Theme.surfaceText
+                                    color: controlCenterPopup.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 
                                 Text {
                                     text: modelData.name
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: controlCenterPopup.currentTab === index ? Theme.primary : Theme.surfaceText
-                                    font.weight: controlCenterPopup.currentTab === index ? Font.Medium : Font.Normal
+                                    color: controlCenterPopup.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
+                                    font.weight: controlCenterPopup.currentTab === modelData.id ? Font.Medium : Font.Normal
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
@@ -543,7 +543,7 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.currentTab = index
+                                    controlCenterPopup.currentTab = modelData.id
                                 }
                             }
                             
@@ -591,13 +591,14 @@ PanelWindow {
                 NetworkTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === 0
+                    visible: controlCenterPopup.currentTab === "network"
                     
                     // Bind properties from root
                     networkStatus: root.networkStatus
                     wifiAvailable: root.wifiAvailable
                     wifiEnabled: root.wifiEnabled
                     ethernetIP: root.ethernetIP
+                    ethernetInterface: root.ethernetInterface
                     currentWifiSSID: root.currentWifiSSID
                     wifiIP: root.wifiIP
                     wifiSignalStrength: root.wifiSignalStrength
@@ -617,7 +618,7 @@ PanelWindow {
                 AudioTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === 1
+                    visible: controlCenterPopup.currentTab === "audio"
                     
                     // Bind properties from root
                     volumeLevel: root.volumeLevel
@@ -632,7 +633,11 @@ PanelWindow {
                 BluetoothTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
+<<<<<<< HEAD
                     visible: root.bluetoothAvailable && controlCenterPopup.currentTab === 2
+=======
+                    visible: controlCenterPopup.currentTab === "bluetooth"
+>>>>>>> 86d4c7a429ff69eb5d4da204f98f045ed4634ad3
                     
                     // Bind properties from root
                     bluetoothEnabled: root.bluetoothEnabled
@@ -643,7 +648,11 @@ PanelWindow {
                 DisplayTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
+<<<<<<< HEAD
                     visible: controlCenterPopup.currentTab === (root.bluetoothAvailable ? 3 : 2)
+=======
+                    visible: controlCenterPopup.currentTab === "display"
+>>>>>>> 86d4c7a429ff69eb5d4da204f98f045ed4634ad3
                     
                 }
             }

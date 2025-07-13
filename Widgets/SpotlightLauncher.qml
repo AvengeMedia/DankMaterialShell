@@ -234,7 +234,26 @@ PanelWindow {
     Rectangle {
         id: mainContainer
         width: 600
-        height: 650
+        height: {
+            // Calculate dynamic height based on content
+            let baseHeight = Theme.spacingXL * 2 + Theme.spacingL * 3 // Margins and spacing
+            
+            // Add category section height if visible
+            if (categories.length > 1 || filteredModel.count > 0) {
+                baseHeight += 36 * 2 + Theme.spacingS + Theme.spacingM // Categories (2 rows)
+            }
+            
+            // Add search field height
+            baseHeight += 56
+            
+            // Add results height (limit to reasonable size)
+            let maxResultsHeight = 400
+            let actualResultsHeight = Math.min(filteredModel.count * (viewMode === "grid" ? 100 : 60), maxResultsHeight)
+            baseHeight += actualResultsHeight
+            
+            // Ensure minimum and maximum bounds
+            return Math.min(Math.max(baseHeight, 300), parent.height - 40)
+        }
         anchors.centerIn: parent
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusXLarge
@@ -474,7 +493,7 @@ PanelWindow {
             Rectangle {
                 id: resultsContainer
                 width: parent.width
-                height: Math.min(filteredModel.count * (viewMode === "grid" ? 100 : 60), 480)
+                height: parent.height - y // Use remaining space
                 color: "transparent"
                 
                 // List view
