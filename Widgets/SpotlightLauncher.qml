@@ -499,6 +499,8 @@ PanelWindow {
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.NoButton
+                        propagateComposedEvents: true
+                        z: -1
                         
                         onWheel: (wheel) => {
                             var delta = wheel.angleDelta.y
@@ -569,6 +571,7 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            z: 10
                             onEntered: selectedIndex = index
                             onClicked: launchApp(model)
                         }
@@ -611,6 +614,8 @@ PanelWindow {
                     MouseArea {
                         anchors.fill: parent
                         acceptedButtons: Qt.NoButton
+                        propagateComposedEvents: true
+                        z: -1
                         
                         onWheel: (wheel) => {
                             var delta = wheel.angleDelta.y
@@ -679,6 +684,7 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            z: 10
                             onEntered: selectedIndex = index
                             onClicked: launchApp(model)
                         }

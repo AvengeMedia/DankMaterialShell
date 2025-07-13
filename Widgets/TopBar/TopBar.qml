@@ -68,17 +68,6 @@ PanelWindow {
         property int count: 0
     }
     
-    // Battery widget and other widgets are imported from their original locations
-    // These will be handled by the parent shell
-    property alias batteryWidget: batteryWidgetProxy
-    property alias cpuMonitorWidget: cpuMonitorWidgetProxy
-    property alias ramMonitorWidget: ramMonitorWidgetProxy
-    property alias powerButton: powerButtonProxy
-    
-    QtObject { id: batteryWidgetProxy }
-    QtObject { id: cpuMonitorWidgetProxy }
-    QtObject { id: ramMonitorWidgetProxy }
-    QtObject { id: powerButtonProxy }
     
     anchors {
         top: true

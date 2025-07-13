@@ -37,6 +37,7 @@ PanelWindow {
     property var pinnedApps: ["firefox", "code", "terminal", "file-manager"]
     property bool showCategories: false
     property string viewMode: "list" // "list" or "grid"
+    property int selectedIndex: 0
     
     ListModel { id: filteredModel }
     
@@ -95,6 +96,7 @@ PanelWindow {
     
     function updateFilteredModel() {
         filteredModel.clear()
+        selectedIndex = 0
         
         var apps = []
         
@@ -130,6 +132,57 @@ PanelWindow {
                 desktopEntry: app
             })
         })
+    }
+    
+    function selectNext() {
+        if (filteredModel.count > 0) {
+            if (viewMode === "grid") {
+                // Grid navigation: move by columns
+                var columnsCount = appGrid.columnsCount || 8
+                selectedIndex = Math.min(selectedIndex + columnsCount, filteredModel.count - 1)
+            } else {
+                // List navigation: next item
+                selectedIndex = (selectedIndex + 1) % filteredModel.count
+            }
+        }
+    }
+    
+    function selectPrevious() {
+        if (filteredModel.count > 0) {
+            if (viewMode === "grid") {
+                // Grid navigation: move by columns
+                var columnsCount = appGrid.columnsCount || 8
+                selectedIndex = Math.max(selectedIndex - columnsCount, 0)
+            } else {
+                // List navigation: previous item
+                selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : filteredModel.count - 1
+            }
+        }
+    }
+    
+    function selectNextInRow() {
+        if (filteredModel.count > 0 && viewMode === "grid") {
+            selectedIndex = Math.min(selectedIndex + 1, filteredModel.count - 1)
+        }
+    }
+    
+    function selectPreviousInRow() {
+        if (filteredModel.count > 0 && viewMode === "grid") {
+            selectedIndex = Math.max(selectedIndex - 1, 0)
+        }
+    }
+    
+    function launchSelected() {
+        if (filteredModel.count > 0 && selectedIndex >= 0 && selectedIndex < filteredModel.count) {
+            var selectedApp = filteredModel.get(selectedIndex)
+            if (selectedApp.desktopEntry) {
+                Prefs.addRecentApp(selectedApp.desktopEntry)
+                AppSearchService.launchApp(selectedApp.desktopEntry)
+            } else {
+                launcher.launchApp(selectedApp.exec)
+            }
+            launcher.hide()
+        }
     }
 
     Component {
@@ -276,6 +329,21 @@ PanelWindow {
             Keys.onPressed: function(event) {
                 if (event.key === Qt.Key_Escape) {
                     launcher.hide()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Down) {
+                    selectNext()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Up) {
+                    selectPrevious()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Right && viewMode === "grid") {
+                    selectNextInRow()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Left && viewMode === "grid") {
+                    selectPreviousInRow()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    launchSelected()
                     event.accepted = true
                 }
             }
@@ -559,6 +627,7 @@ PanelWindow {
                             
                             model: filteredModel
                             delegate: listDelegate
+                            currentIndex: selectedIndex
                             
                             // Make mouse wheel scrolling more responsive
                             property real wheelStepSize: 60
@@ -566,6 +635,8 @@ PanelWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
+                                propagateComposedEvents: true
+                                z: -1
                                 
                                 onWheel: (wheel) => {
                                     var delta = wheel.angleDelta.y
@@ -618,6 +689,8 @@ PanelWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
+                                propagateComposedEvents: true
+                                z: -1
                                 
                                 onWheel: (wheel) => {
                                     var delta = wheel.angleDelta.y
@@ -689,6 +762,8 @@ PanelWindow {
                             MouseArea {
                                 anchors.fill: parent
                                 acceptedButtons: Qt.NoButton
+                                propagateComposedEvents: true
+                                z: -1
                                 
                                 onWheel: (wheel) => {
                                     var delta = wheel.angleDelta.y
@@ -746,10 +821,12 @@ PanelWindow {
             width: appList.width
             height: 72
             radius: Theme.cornerRadiusLarge
-            color: appMouseArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-                                         : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            color: ListView.isCurrentItem ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) :
+                   appMouseArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) :
+                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
+            border.color: ListView.isCurrentItem ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) :
+                          Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: ListView.isCurrentItem ? 2 : 1
 
             Row {
                 anchors.fill: parent
@@ -799,6 +876,9 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                z: 10
+                property bool hovered: containsMouse
+                onEntered: selectedIndex = index
                 onClicked: {
                     if (model.desktopEntry) {
                         Prefs.addRecentApp(model.desktopEntry)
@@ -819,10 +899,12 @@ PanelWindow {
             width: appGrid.cellWidth - 8
             height: appGrid.cellHeight - 8
             radius: Theme.cornerRadiusLarge
-            color: gridAppArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-                                       : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            color: selectedIndex === index ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) :
+                   gridAppArea.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) :
+                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.03)
+            border.color: selectedIndex === index ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) :
+                          Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: selectedIndex === index ? 2 : 1
 
             Column {
                 anchors.centerIn: parent
@@ -861,6 +943,9 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                z: 10
+                property bool hovered: containsMouse
+                onEntered: selectedIndex = index
                 onClicked: {
                     if (model.desktopEntry) {
                         Prefs.addRecentApp(model.desktopEntry)

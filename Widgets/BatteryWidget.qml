@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import "../Common"
 import "../Services"
 
@@ -65,7 +64,6 @@ Rectangle {
         
         onClicked: {
             batteryPopupVisible = !batteryPopupVisible
-            root.batteryPopupVisible = batteryPopupVisible
         }
     }
     
