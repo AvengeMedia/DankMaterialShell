@@ -148,10 +148,10 @@ PanelWindow {
                             width: parent.width
                             spacing: Theme.spacingM
                             
-                            // Profile Image URL Input
+                            // Profile Image Preview and Input
                             Column {
                                 width: parent.width
-                                spacing: Theme.spacingS
+                                spacing: Theme.spacingM
                                 
                                 Text {
                                     text: "Profile Image"
@@ -160,45 +160,133 @@ PanelWindow {
                                     font.weight: Font.Medium
                                 }
                                 
-                                Rectangle {
+                                // Profile Image Preview with circular crop
+                                Row {
                                     width: parent.width
-                                    height: 48
-                                    radius: Theme.cornerRadius
-                                    color: Theme.surfaceVariant
-                                    border.color: profileImageInput.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
-                                    border.width: profileImageInput.activeFocus ? 2 : 1
+                                    spacing: Theme.spacingM
                                     
-                                    TextInput {
-                                        id: profileImageInput
-                                        anchors.fill: parent
-                                        anchors.margins: Theme.spacingM
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        color: Theme.surfaceText
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        text: Prefs.profileImage
-                                        selectByMouse: true
-                                        
-                                        onEditingFinished: {
-                                            Prefs.setProfileImage(text)
+                                    // Circular profile image preview
+                                    Item {
+                                        id: avatarBox
+                                        width: 54
+                                        height: 54
+                                        property bool hasImage: profileImageInput.text !== "" && avatarImage.status !== Image.Error
+
+                                        /* 1 px inner padding; change both "1" values to "2" for 2 px */
+                                        ClippingRectangle {
+                                            id: avatarClip
+                                            anchors.fill: parent
+                                            anchors.margins: 1          // ← inner gap between photo & ring
+                                            radius: width / 2           // = perfect circle
+                                            antialiasing: true          // smooth edge
+                                            color: "transparent"
+                                            visible: avatarBox.hasImage // show only when we have a real photo
+
+                                            Image {
+                                                id: avatarImage
+                                                anchors.fill: parent
+                                                fillMode: Image.PreserveAspectCrop
+                                                source: profileImageInput.text.startsWith("/")
+                                                          ? "file://" + profileImageInput.text
+                                                          : profileImageInput.text
+                                                smooth: true
+                                                asynchronous: true
+                                                mipmap: true
+                                                cache: false
+                                                
+                                                onStatusChanged: {
+                                                    console.log("Profile image status:", status, "source:", source)
+                                                    if (status === Image.Ready) {
+                                                        console.log("Image loaded successfully, size:", sourceSize.width + "x" + sourceSize.height)
+                                                    } else if (status === Image.Error) {
+                                                        console.log("Image failed to load")
+                                                    }
+                                                }
+                                            }
                                         }
-                                        
-                                        // Placeholder text
+
+                                        /* Fallback / error icon */
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: width / 2
+                                            color: Theme.primary
+                                            visible: !avatarBox.hasImage
+                                        }
                                         Text {
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            text: "Enter image path (e.g., /home/user/picture.png)"
-                                            color: Theme.surfaceVariantText
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            visible: profileImageInput.text.length === 0 && !profileImageInput.activeFocus
+                                            anchors.centerIn: parent
+                                            text: profileImageInput.text === "" ? "person" : "warning"
+                                            font.family: Theme.iconFont
+                                            font.pixelSize: Theme.iconSize + 8
+                                            color: Theme.onPrimary
+                                            visible: !avatarBox.hasImage
+                                        }
+
+                                        /* Decorative rings (drawn only when a real image is shown) */
+                                        Rectangle {                      // dark outline
+                                            anchors.fill: parent
+                                            radius: width / 2
+                                            border.color: Qt.rgba(0, 0, 0, 0.15)
+                                            border.width: 1
+                                            color: "transparent"
+                                            visible: avatarBox.hasImage
+                                        }
+                                        Rectangle {                      // light highlight
+                                            anchors.fill: parent
+                                            anchors.margins: -1          // hugs just outside the dark outline
+                                            radius: width / 2 + 1
+                                            border.color: Qt.rgba(255, 255, 255, 0.1)
+                                            border.width: 1
+                                            color: "transparent"
+                                            visible: avatarBox.hasImage
                                         }
                                     }
-                                }
-                                
-                                Text {
-                                    text: "Enter a file path or web URL for your profile picture"
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceVariantText
-                                    wrapMode: Text.WordWrap
-                                    width: parent.width
+                                    
+                                    // Input field
+                                    Column {
+                                        width: parent.width - 80 - Theme.spacingM
+                                        spacing: Theme.spacingS
+                                        
+                                        Rectangle {
+                                            width: parent.width
+                                            height: 48
+                                            radius: Theme.cornerRadius
+                                            color: Theme.surfaceVariant
+                                            border.color: profileImageInput.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                                            border.width: profileImageInput.activeFocus ? 2 : 1
+                                            
+                                            TextInput {
+                                                id: profileImageInput
+                                                anchors.fill: parent
+                                                anchors.margins: Theme.spacingM
+                                                verticalAlignment: TextInput.AlignVCenter
+                                                color: Theme.surfaceText
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                text: Prefs.profileImage
+                                                selectByMouse: true
+                                                
+                                                onEditingFinished: {
+                                                    Prefs.setProfileImage(text)
+                                                }
+                                                
+                                                // Placeholder text
+                                                Text {
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    text: "Enter image path or URL"
+                                                    color: Theme.surfaceVariantText
+                                                    font.pixelSize: Theme.fontSizeMedium
+                                                    visible: profileImageInput.text.length === 0 && !profileImageInput.activeFocus
+                                                }
+                                            }
+                                        }
+                                        
+                                        Text {
+                                            text: "Image will be automatically cropped to a circle"
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            wrapMode: Text.WordWrap
+                                            width: parent.width
+                                        }
+                                    }
                                 }
                             }
                         }

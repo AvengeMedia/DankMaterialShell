@@ -104,33 +104,46 @@ PanelWindow {
                             width: 64
                             height: 64
                             
+                            property bool hasImage: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                            
                             // Background circle for fallback icon
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 32
                                 color: Theme.primary
-                                visible: Prefs.profileImage === "" || profileImage.status === Image.Error
+                                visible: !parent.hasImage
                             }
                             
-                            // Profile image (working version)
-                            Image {
-                                id: profileImage
+                            // Circular clipping container for profile image
+                            ClippingRectangle {
                                 anchors.fill: parent
-                                source: {
-                                    if (Prefs.profileImage === "") return ""
-                                    // Add file:// prefix if it's a local path (starts with /)
-                                    if (Prefs.profileImage.startsWith("/")) {
-                                        return "file://" + Prefs.profileImage
+                                anchors.margins: 1
+                                radius: 31
+                                antialiasing: true
+                                visible: parent.hasImage
+                                
+                                Image {
+                                    id: profileImage
+                                    anchors.fill: parent
+                                    source: {
+                                        if (Prefs.profileImage === "") return ""
+                                        // Add file:// prefix if it's a local path (starts with /)
+                                        if (Prefs.profileImage.startsWith("/")) {
+                                            return "file://" + Prefs.profileImage
+                                        }
+                                        // Return as-is if it already has a protocol or is a web URL
+                                        return Prefs.profileImage
                                     }
-                                    // Return as-is if it already has a protocol or is a web URL
-                                    return Prefs.profileImage
+                                    fillMode: Image.PreserveAspectCrop
+                                    smooth: true
+                                    asynchronous: true
+                                    mipmap: true
+                                    cache: false
+                                    
+                                    onStatusChanged: {
+                                        console.log("Control Center profile image status:", status, "source:", source)
+                                    }
                                 }
-                                fillMode: Image.PreserveAspectCrop
-                                visible: Prefs.profileImage !== "" && status !== Image.Error
-                                smooth: true
-                                asynchronous: true
-                                mipmap: true
-                                cache: false
                             }
                             
                             // Subtle circular outline for images
@@ -140,7 +153,7 @@ PanelWindow {
                                 color: "transparent"
                                 border.color: Qt.rgba(0, 0, 0, 0.15) // Subtle dark outline
                                 border.width: 1
-                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                                visible: hasImage
                             }
                             
                             // Highlight ring to make it pop
@@ -151,7 +164,7 @@ PanelWindow {
                                 color: "transparent"
                                 border.color: Qt.rgba(255, 255, 255, 0.1) // Subtle light ring
                                 border.width: 1
-                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                                visible: hasImage
                             }
                             
                             // Fallback icon for no profile picture (generic person)
