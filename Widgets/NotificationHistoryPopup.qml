@@ -69,6 +69,7 @@ PanelWindow {
                     height: 32
                     
                     Text {
+                        id: notificationsTitle
                         text: "Notifications"
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
@@ -76,62 +77,73 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
-                    Item { width: parent.width - 200; height: 1 }
-                }
-                
-                Rectangle {
-                    width: parent.width
-                    height: 36
-                    radius: Theme.cornerRadius
-                    color: clearArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.16) : Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
-                    border.color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.5)
-                    border.width: 1
-                    visible: notificationHistory.count > 0
-                    
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: Theme.spacingS
-                        
-                        Text {
-                            text: "delete_sweep"
-                            font.family: Theme.iconFont
-                            font.pixelSize: Theme.iconSizeSmall + 2
-                            color: Theme.error
-                            font.weight: Theme.iconFontWeight
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        
-                        Text {
-                            text: "Clear All Notifications"
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.error
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+                    Item { 
+                        width: parent.width - notificationsTitle.width - clearButton.width - Theme.spacingM
+                        height: 1 
                     }
                     
-                    MouseArea {
-                        id: clearArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
+                    // Compact Clear All Button
+                    Rectangle {
+                        id: clearButton
+                        width: 120
+                        height: 28
+                        radius: Theme.cornerRadius
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: notificationHistory.count > 0
                         
-                        onClicked: {
-                            notificationHistory.clear()
+                        color: clearArea.containsMouse ? 
+                               Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                               Theme.surfaceContainer
+                        
+                        border.color: clearArea.containsMouse ? 
+                                     Theme.primary : 
+                                     Theme.outline
+                        border.width: 1
+                        
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: Theme.spacingXS
+                            
+                            Text {
+                                text: "delete_sweep"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.iconSizeSmall
+                                color: clearArea.containsMouse ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            
+                            Text {
+                                text: "Clear All"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: clearArea.containsMouse ? Theme.primary : Theme.surfaceText
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
-                    }
-                    
-                    Behavior on color {
-                        ColorAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
+                        
+                        MouseArea {
+                            id: clearArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            
+                            onClicked: {
+                                notificationHistory.clear()
+                            }
                         }
-                    }
-                    
-                    Behavior on border.color {
-                        ColorAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
+                        
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+                        
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
                         }
                     }
                 }
@@ -154,9 +166,46 @@ PanelWindow {
                         radius: Theme.cornerRadius
                         color: notifArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
                         
+                        // Close button for individual notification
+                        Rectangle {
+                            width: 24
+                            height: 24
+                            radius: 12
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 8
+                            color: closeNotifArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "close"
+                                font.family: Theme.iconFont
+                                font.pixelSize: 14
+                                color: closeNotifArea.containsMouse ? Theme.primary : Theme.surfaceText
+                            }
+                            
+                            MouseArea {
+                                id: closeNotifArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    notificationHistory.remove(index)
+                                }
+                            }
+                            
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                        
                         Row {
                             anchors.fill: parent
                             anchors.margins: Theme.spacingM
+                            anchors.rightMargin: 36  // Don't overlap with close button
                             spacing: Theme.spacingM
                             
                             // Notification icon based on EXAMPLE NotificationAppIcon pattern
@@ -212,8 +261,6 @@ PanelWindow {
                                         Image {
                                             id: historyNotifImage
                                             anchors.fill: parent
-                                            readonly property int size: parent.width
-                                            property bool imageValid: true
                                             
                                             source: model.image || ""
                                             fillMode: Image.PreserveAspectCrop
@@ -221,38 +268,33 @@ PanelWindow {
                                             antialiasing: true
                                             asynchronous: true
                                             smooth: true
-                                            visible: imageValid
                                             
-                                            // Proper sizing like EXAMPLE
-                                            width: size
-                                            height: size
-                                            sourceSize.width: size
-                                            sourceSize.height: size
+                                            // Use the parent size for optimization
+                                            sourceSize.width: parent.width
+                                            sourceSize.height: parent.height
                                             
                                             layer.enabled: true
                                             layer.effect: MultiEffect {
                                                 maskEnabled: true
                                                 maskSource: Rectangle {
-                                                    width: historyNotifImage.size
-                                                    height: historyNotifImage.size
-                                                    radius: historyNotifImage.size / 2  // Fully rounded
+                                                    width: 48
+                                                    height: 48
+                                                    radius: 24  // Fully rounded
                                                 }
                                             }
                                             
                                             onStatusChanged: {
                                                 if (status === Image.Error) {
                                                     console.warn("Failed to load notification history image:", source)
-                                                    imageValid = false
                                                 } else if (status === Image.Ready) {
                                                     console.log("Notification history image loaded:", source, "size:", sourceSize.width + "x" + sourceSize.height)
-                                                    imageValid = true
                                                 }
                                             }
                                         }
                                         
                                         // Fallback to app icon when primary image fails
                                         Loader {
-                                            active: !historyNotifImage.imageValid && model.appIcon && model.appIcon !== ""
+                                            active: model.appIcon && model.appIcon !== "" && historyNotifImage.status === Image.Error
                                             anchors.centerIn: parent
                                             sourceComponent: IconImage {
                                                 width: 32
@@ -270,7 +312,7 @@ PanelWindow {
                                         
                                         // Small app icon overlay when showing notification image
                                         Loader {
-                                            active: historyNotifImage.imageValid && model.appIcon && model.appIcon !== ""
+                                            active: model.appIcon && model.appIcon !== "" && historyNotifImage.status === Image.Ready
                                             anchors.bottom: parent.bottom
                                             anchors.right: parent.right
                                             sourceComponent: IconImage {
@@ -329,6 +371,7 @@ PanelWindow {
                         MouseArea {
                             id: notifArea
                             anchors.fill: parent
+                            anchors.rightMargin: 32  // Don't overlap with close button area
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             

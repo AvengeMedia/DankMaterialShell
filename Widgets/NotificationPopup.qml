@@ -76,14 +76,14 @@ PanelWindow {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.margins: 8
-            color: closeButtonArea.containsMouse ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) : "transparent"
+            color: closeButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
             
             Text {
                 anchors.centerIn: parent
                 text: "close"
                 font.family: Theme.iconFont
                 font.pixelSize: 16
-                color: closeButtonArea.containsMouse ? Theme.error : Theme.surfaceText
+                color: closeButtonArea.containsMouse ? Theme.primary : Theme.surfaceText
             }
             
             MouseArea {
@@ -163,7 +163,6 @@ PanelWindow {
                         Image {
                             id: notifImage
                             anchors.fill: parent
-                            readonly property int size: parent.width
                             
                             source: root.activeNotification ? root.activeNotification.image : ""
                             fillMode: Image.PreserveAspectCrop
@@ -172,19 +171,17 @@ PanelWindow {
                             asynchronous: true
                             smooth: true
                             
-                            // Proper sizing like EXAMPLE
-                            width: size
-                            height: size
-                            sourceSize.width: size
-                            sourceSize.height: size
+                            // Use the parent size for optimization
+                            sourceSize.width: parent.width
+                            sourceSize.height: parent.height
                             
                             layer.enabled: true
                             layer.effect: MultiEffect {
                                 maskEnabled: true
                                 maskSource: Rectangle {
-                                    width: notifImage.size
-                                    height: notifImage.size
-                                    radius: notifImage.size / 2  // Fully rounded
+                                    width: 48
+                                    height: 48
+                                    radius: 24  // Fully rounded
                                 }
                             }
                             
