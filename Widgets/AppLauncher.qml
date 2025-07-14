@@ -551,7 +551,7 @@ PanelWindow {
                         height: 36
                         radius: Theme.cornerRadius
                         color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
-                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                         border.width: 1
                         
                         Row {
@@ -777,7 +777,7 @@ PanelWindow {
                     height: Math.min(250, categories.length * 40 + Theme.spacingM * 2)
                     radius: Theme.cornerRadiusLarge
                     color: Theme.contentBackground()
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                     border.width: 1
                     visible: showCategories
                     z: 1000

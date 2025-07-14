@@ -39,7 +39,7 @@ PanelWindow {
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
         // TopBar dropdown animation - optimized for performance
@@ -123,7 +123,7 @@ PanelWindow {
                     height: 90
                     radius: Theme.cornerRadiusLarge
                     color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                     border.width: 1
                     
                     Row {
@@ -363,7 +363,7 @@ PanelWindow {
                     height: controlCenterPopup.powerOptionsExpanded ? 60 : 0
                     radius: Theme.cornerRadius
                     color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                     border.width: controlCenterPopup.powerOptionsExpanded ? 1 : 0
                     opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
                     clip: true

@@ -54,7 +54,7 @@ PanelWindow {
         
         radius: Theme.cornerRadiusLarge
         color: Theme.popupBackground()
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         clip: true
         
@@ -665,7 +665,7 @@ PanelWindow {
             height: menuColumn.implicitHeight + Theme.spacingS * 2
             radius: Theme.cornerRadiusLarge
             color: Theme.popupBackground()
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 1
         
         // Material 3 drop shadow

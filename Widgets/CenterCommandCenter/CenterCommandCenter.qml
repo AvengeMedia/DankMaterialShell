@@ -88,7 +88,7 @@ PanelWindow {
         
         color: theme.surfaceContainer
         radius: theme.cornerRadiusLarge
-        border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.12)
+        border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
         border.width: 1
         
         layer.enabled: true

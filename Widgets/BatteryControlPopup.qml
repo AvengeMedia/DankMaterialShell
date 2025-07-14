@@ -42,7 +42,7 @@ PanelWindow {
         y: Theme.barHeight + Theme.spacingS
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
         opacity: root.batteryPopupVisible ? 1.0 : 0.0

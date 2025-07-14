@@ -186,7 +186,7 @@ PanelWindow {
         
         color: activeTheme.popupBackground()
         radius: activeTheme.cornerRadiusXLarge
-        border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
+        border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
         border.width: 1
         
         opacity: clipboardHistory.isVisible ? 1.0 : 0.0
@@ -301,7 +301,7 @@ PanelWindow {
                 height: 48
                 radius: activeTheme.cornerRadiusLarge
                 color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, activeTheme.getContentBackgroundAlpha() * 0.4)
-                border.color: searchField.focus ? activeTheme.primary : Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
+                border.color: searchField.focus ? activeTheme.primary : Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
                 border.width: searchField.focus ? 2 : 1
                 
                 Row {
@@ -643,7 +643,7 @@ PanelWindow {
             height: 200  // Increased height for better spacing
             radius: activeTheme.cornerRadiusLarge
             color: activeTheme.popupBackground()
-            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
+            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.08)
             border.width: 1
             visible: showClearConfirmation
             z: 1000

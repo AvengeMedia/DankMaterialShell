@@ -531,11 +531,6 @@ QtObject {
         return popupTransparency
     }
     
-    function getPopupBorderAlpha() {
-        // Borders can be more transparent than the main content
-        return popupTransparency * 0.6
-    }
-    
     // Convenience functions for themed backgrounds with transparency
     function popupBackground() {
         return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, popupTransparency)

@@ -50,7 +50,7 @@ PanelWindow {
         anchors.centerIn: parent
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
         // Simple opacity and scale control tied directly to settingsVisible
