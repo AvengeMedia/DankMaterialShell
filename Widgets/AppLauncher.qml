@@ -285,7 +285,7 @@ PanelWindow {
             leftMargin: Theme.spacingL
         }
         
-        color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.98)
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusXLarge
         
         // Material 3 elevation with multiple layers
@@ -437,7 +437,7 @@ PanelWindow {
                     width: parent.width
                     height: 52
                     radius: Theme.cornerRadiusLarge
-                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.6)
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.7)
                     border.width: searchField.activeFocus ? 2 : 1
                     border.color: searchField.activeFocus ? Theme.primary : 
                                   Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
@@ -550,8 +550,8 @@ PanelWindow {
                         width: 200
                         height: 36
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                        color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
                         border.width: 1
                         
                         Row {
@@ -776,8 +776,8 @@ PanelWindow {
                     width: 200
                     height: Math.min(250, categories.length * 40 + Theme.spacingM * 2)
                     radius: Theme.cornerRadiusLarge
-                    color: Theme.surfaceContainer
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                    color: Theme.contentBackground()
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
                     border.width: 1
                     visible: showCategories
                     z: 1000

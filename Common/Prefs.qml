@@ -11,6 +11,7 @@ Singleton {
     property bool themeIsDynamic: false
     property bool isLightMode: false
     property real topBarTransparency: 0.75
+    property real popupTransparency: 0.92
     property var recentlyUsedApps: []
     
     // New global preferences
@@ -75,6 +76,8 @@ Singleton {
                 isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
                 topBarTransparency = settings.topBarTransparency !== undefined ? 
                     (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100.0 : settings.topBarTransparency) : 0.75
+                popupTransparency = settings.popupTransparency !== undefined ? 
+                    (settings.popupTransparency > 1 ? settings.popupTransparency / 100.0 : settings.popupTransparency) : 0.92
                 recentlyUsedApps = settings.recentlyUsedApps || []
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
@@ -107,6 +110,7 @@ Singleton {
             themeIsDynamic,
             isLightMode,
             topBarTransparency,
+            popupTransparency,
             recentlyUsedApps,
             use24HourClock,
             useFahrenheit,
@@ -156,6 +160,12 @@ Singleton {
     function setTopBarTransparency(transparency) {
         console.log("Prefs setTopBarTransparency called - topBarTransparency:", transparency)
         topBarTransparency = transparency
+        saveSettings()
+    }
+    
+    function setPopupTransparency(transparency) {
+        console.log("Prefs setPopupTransparency called - popupTransparency:", transparency)
+        popupTransparency = transparency
         saveSettings()
     }
     

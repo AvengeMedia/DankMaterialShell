@@ -306,9 +306,9 @@ PanelWindow {
             return Math.min(Math.max(baseHeight, 500), parent.height - 40)
         }
         anchors.centerIn: parent
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusXLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -439,9 +439,9 @@ PanelWindow {
                     width: parent.width - 80 - Theme.spacingM // Leave space for view toggle buttons
                     height: 56
                     radius: Theme.cornerRadiusLarge
-                    color: Theme.surfaceVariant
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.7)
                     border.width: searchField.activeFocus ? 2 : 1
-                    border.color: searchField.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                    border.color: searchField.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
                     Behavior on border.color { ColorAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing } }
                     
                     Row { 

@@ -45,9 +45,9 @@ PanelWindow {
         height: 500
         x: parent.width - width - Theme.spacingL
         y: Theme.barHeight + Theme.spacingXS
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         
         // TopBar dropdown animation - slide down from bar (consistent with other TopBar widgets)

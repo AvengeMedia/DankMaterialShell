@@ -37,9 +37,9 @@ PanelWindow {
         height: controlCenterPopup.powerOptionsExpanded ? 570 : 500
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         
         // TopBar dropdown animation - optimized for performance
@@ -122,8 +122,8 @@ PanelWindow {
                     width: parent.width
                     height: 90
                     radius: Theme.cornerRadiusLarge
-                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
                     border.width: 1
                     
                     Row {
@@ -362,8 +362,8 @@ PanelWindow {
                     width: parent.width
                     height: controlCenterPopup.powerOptionsExpanded ? 60 : 0
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
                     border.width: controlCenterPopup.powerOptionsExpanded ? 1 : 0
                     opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
                     clip: true
@@ -635,7 +635,7 @@ PanelWindow {
                 width: parent.width
                 height: controlCenterPopup.powerOptionsExpanded ? 240 : 300
                 radius: Theme.cornerRadius
-                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
+                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.1)
                 
                 Behavior on height {
                     NumberAnimation {

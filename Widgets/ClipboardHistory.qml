@@ -184,9 +184,9 @@ PanelWindow {
         height: Math.min(500, parent.height - 100)
         anchors.centerIn: parent
         
-        color: activeTheme.surfaceContainer
+        color: activeTheme.popupBackground()
         radius: activeTheme.cornerRadiusXLarge
-        border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+        border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
         border.width: 1
         
         opacity: clipboardHistory.isVisible ? 1.0 : 0.0
@@ -300,8 +300,8 @@ PanelWindow {
                 width: parent.width
                 height: 48
                 radius: activeTheme.cornerRadiusLarge
-                color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, 0.3)
-                border.color: searchField.focus ? activeTheme.primary : Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.2)
+                color: Qt.rgba(activeTheme.surfaceVariant.r, activeTheme.surfaceVariant.g, activeTheme.surfaceVariant.b, activeTheme.getContentBackgroundAlpha() * 0.4)
+                border.color: searchField.focus ? activeTheme.primary : Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
                 border.width: searchField.focus ? 2 : 1
                 
                 Row {
@@ -642,8 +642,8 @@ PanelWindow {
             width: 350
             height: 200  // Increased height for better spacing
             radius: activeTheme.cornerRadiusLarge
-            color: activeTheme.surfaceContainer
-            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, 0.3)
+            color: activeTheme.popupBackground()
+            border.color: Qt.rgba(activeTheme.outline.r, activeTheme.outline.g, activeTheme.outline.b, activeTheme.getPopupBorderAlpha())
             border.width: 1
             visible: showClearConfirmation
             z: 1000

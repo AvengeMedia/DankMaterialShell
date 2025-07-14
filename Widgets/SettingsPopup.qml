@@ -48,9 +48,9 @@ PanelWindow {
         width: Math.min(600, parent.width - Theme.spacingXL * 2)
         height: Math.min(700, parent.height - Theme.spacingXL * 2)
         anchors.centerIn: parent
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         
         // Simple opacity and scale control tied directly to settingsVisible
@@ -444,6 +444,43 @@ PanelWindow {
                                 
                                 Text {
                                     text: "Adjust the transparency of the top bar background"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+                            }
+                            
+                            // Popup Transparency
+                            Column {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "Popup Transparency"
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                    font.weight: Font.Medium
+                                }
+                                
+                                CustomSlider {
+                                    width: parent.width
+                                    value: Math.round(Prefs.popupTransparency * 100)
+                                    minimum: 0
+                                    maximum: 100
+                                    leftIcon: "blur_on"
+                                    rightIcon: "circle"
+                                    unit: "%"
+                                    showValue: true
+                                    
+                                    onSliderDragFinished: (finalValue) => {
+                                        let transparencyValue = finalValue / 100.0
+                                        Prefs.setPopupTransparency(transparencyValue)
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "Adjust transparency for dialogs, menus, and popups"
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     wrapMode: Text.WordWrap

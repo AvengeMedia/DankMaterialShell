@@ -29,9 +29,9 @@ PanelWindow {
         y: root.trayMenuY
         width: Math.max(180, Math.min(300, menuList.maxTextWidth + Theme.spacingL * 2))
         height: Math.max(60, menuList.contentHeight + Theme.spacingS * 2)
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         
         // Material 3 drop shadow

@@ -37,7 +37,7 @@ PanelWindow {
         anchors.topMargin: 16   // 16px from the top of this window
         anchors.rightMargin: 16  // 16px from the right edge
         
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
         border.width: 0  // Remove border completely
         

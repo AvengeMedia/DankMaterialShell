@@ -19,8 +19,24 @@ QtObject {
             Colors.colorsUpdated.connect(root.onColorsUpdated)
         }
         
+        // Initialize transparency values from Prefs
+        if (typeof Prefs !== "undefined") {
+            if (Prefs.popupTransparency !== undefined) {
+                root.popupTransparency = Prefs.popupTransparency
+            }
+            // Connect to transparency changes
+            if (Prefs.popupTransparencyChanged) {
+                Prefs.popupTransparencyChanged.connect(function() {
+                    if (typeof Prefs !== "undefined" && Prefs.popupTransparency !== undefined) {
+                        root.popupTransparency = Prefs.popupTransparency
+                    }
+                })
+            }
+        }
+        
         console.log("Theme initialized, waiting for Prefs to load settings and apply theme")
     }
+    
     
     // Handle successful color extraction
     function onColorsUpdated() {
@@ -501,6 +517,37 @@ QtObject {
     property real opacityMedium: 0.60
     property real opacityHigh: 0.87
     property real opacityFull: 1.0
+    
+    // Transparency system - can be overridden by Prefs
+    property real panelTransparency: 0.85
+    property real popupTransparency: 0.92
+    
+    // Smart transparency functions for content-aware backgrounds
+    function getPopupBackgroundAlpha() {
+        return popupTransparency
+    }
+    
+    function getContentBackgroundAlpha() {
+        return popupTransparency
+    }
+    
+    function getPopupBorderAlpha() {
+        // Borders can be more transparent than the main content
+        return popupTransparency * 0.6
+    }
+    
+    // Convenience functions for themed backgrounds with transparency
+    function popupBackground() {
+        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, popupTransparency)
+    }
+    
+    function contentBackground() {
+        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, popupTransparency)
+    }
+    
+    function panelBackground() {
+        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, panelTransparency)
+    }
     
     property string iconFont: "Material Symbols Rounded"
     property string iconFontFilled: "Material Symbols Rounded"

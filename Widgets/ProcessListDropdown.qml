@@ -53,8 +53,8 @@ PanelWindow {
         y: Theme.barHeight + Theme.spacingXS
         
         radius: Theme.cornerRadiusLarge
-        color: Theme.surfaceContainer
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        color: Theme.popupBackground()
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         clip: true
         
@@ -664,8 +664,8 @@ PanelWindow {
             width: 180
             height: menuColumn.implicitHeight + Theme.spacingS * 2
             radius: Theme.cornerRadiusLarge
-            color: Theme.surfaceContainer
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+            color: Theme.popupBackground()
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
             border.width: 1
         
         // Material 3 drop shadow

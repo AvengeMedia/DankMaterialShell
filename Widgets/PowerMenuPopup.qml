@@ -40,9 +40,9 @@ PanelWindow {
         height: 320  // Fixed height to prevent cropping
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
-        color: Theme.surfaceContainer
+        color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, Theme.getPopupBorderAlpha())
         border.width: 1
         
         opacity: root.powerMenuVisible ? 1.0 : 0.0
