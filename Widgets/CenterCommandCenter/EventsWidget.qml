@@ -136,7 +136,8 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: theme.spacingL
         anchors.topMargin: theme.spacingM
-        visible: hasEvents
+        visible: opacity > 0
+        opacity: hasEvents ? 1.0 : 0.0
         clip: true
         spacing: theme.spacingS
         boundsMovement: Flickable.StopAtBounds
@@ -144,6 +145,13 @@ Rectangle {
                     
         ScrollBar.vertical: ScrollBar {
             policy: eventsList.contentHeight > eventsList.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
+        }
+        
+        Behavior on opacity {
+            NumberAnimation {
+                duration: theme.mediumDuration
+                easing.type: theme.emphasizedEasing
+            }
         }
         
         delegate: Rectangle {

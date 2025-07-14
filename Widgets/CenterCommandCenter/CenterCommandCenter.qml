@@ -76,9 +76,10 @@ PanelWindow {
             
             contentHeight += mainRowHeight + theme.spacingM // Add spacing between main row and events
             
-            // Add events widget height - dynamically calculated
+            // Add events widget height - use calculated height instead of actual
             if (CalendarService && CalendarService.khalAvailable) {
-                let eventsHeight = eventsWidget.height || 120 // Use actual widget height or fallback
+                let hasEvents = eventsWidget.selectedDateEvents && eventsWidget.selectedDateEvents.length > 0
+                let eventsHeight = hasEvents ? Math.min(300, 80 + eventsWidget.selectedDateEvents.length * 60) : 120
                 contentHeight += eventsHeight
             }
             
@@ -132,6 +133,15 @@ PanelWindow {
                 mainContainer.height = mainContainer.calculateHeight()
             }
             function onKhalAvailableChanged() {
+                mainContainer.height = mainContainer.calculateHeight()
+            }
+        }
+        
+        // Update height when events widget's selectedDateEvents changes
+        Connections {
+            target: eventsWidget
+            enabled: eventsWidget !== null
+            function onSelectedDateEventsChanged() {
                 mainContainer.height = mainContainer.calculateHeight()
             }
         }
@@ -216,10 +226,6 @@ PanelWindow {
                 theme: centerCommandCenter.theme
                 selectedDate: calendarWidget.selectedDate
                 
-                // Update container height when events widget height changes
-                onHeightChanged: {
-                    mainContainer.height = mainContainer.calculateHeight()
-                }
             }
         }
     }
