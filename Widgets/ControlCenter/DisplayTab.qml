@@ -62,7 +62,7 @@ ScrollView {
                 // Night mode toggle
                 Rectangle {
                     width: (parent.width - Theme.spacingM) / 2
-                    height: 50
+                    height: 80
                     radius: Theme.cornerRadius
                     color: Prefs.nightModeEnabled ? 
                         Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
@@ -72,19 +72,19 @@ ScrollView {
                     
                     Column {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingXS
+                        spacing: Theme.spacingS
                         
                         Text {
                             text: Prefs.nightModeEnabled ? "nightlight" : "dark_mode"
                             font.family: Theme.iconFont
-                            font.pixelSize: Theme.iconSize
+                            font.pixelSize: Theme.iconSizeLarge
                             color: Prefs.nightModeEnabled ? Theme.primary : Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         
                         Text {
                             text: "Night Mode"
-                            font.pixelSize: Theme.fontSizeSmall
+                            font.pixelSize: Theme.fontSizeMedium
                             color: Prefs.nightModeEnabled ? Theme.primary : Theme.surfaceText
                             font.weight: Font.Medium
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -114,7 +114,7 @@ ScrollView {
                 // Light/Dark mode toggle
                 Rectangle {
                     width: (parent.width - Theme.spacingM) / 2
-                    height: 50
+                    height: 80
                     radius: Theme.cornerRadius
                     color: Theme.isLightMode ? 
                         Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
@@ -124,19 +124,19 @@ ScrollView {
                     
                     Column {
                         anchors.centerIn: parent
-                        spacing: Theme.spacingXS
+                        spacing: Theme.spacingS
                         
                         Text {
                             text: Theme.isLightMode ? "light_mode" : "palette"
                             font.family: Theme.iconFont
-                            font.pixelSize: Theme.iconSize
+                            font.pixelSize: Theme.iconSizeLarge
                             color: Theme.isLightMode ? Theme.primary : Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         
                         Text {
                             text: Theme.isLightMode ? "Light Mode" : "Dark Mode"
-                            font.pixelSize: Theme.fontSizeSmall
+                            font.pixelSize: Theme.fontSizeMedium
                             color: Theme.isLightMode ? Theme.primary : Theme.surfaceText
                             font.weight: Font.Medium
                             anchors.horizontalCenter: parent.horizontalCenter

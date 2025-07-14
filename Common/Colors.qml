@@ -21,14 +21,26 @@ Singleton {
     property string matugenJson:      ""
     property var    matugenColors:    ({})
     property bool   extractionRequested: false
+    property int    colorUpdateTrigger: 0  // Force property re-evaluation
 
     Component.onCompleted: {
         console.log("Colors.qml → home =", homeDir)
         // Don't automatically run color extraction - only when requested
         matugenCheck.running = true          // Just check if matugen is available
-        
-        // Start monitoring for wallpaper changes
-        wallpaperMonitorTimer.start()
+                
+        // Connect to Theme light mode changes to update colors
+        if (typeof Theme !== "undefined") {
+            Theme.isLightModeChanged.connect(root.onLightModeChanged)
+        }
+    }
+    
+    function onLightModeChanged() {
+        // Force color properties to update when light mode changes
+        if (matugenColors && Object.keys(matugenColors).length > 0) {
+            console.log("Light mode changed - updating dynamic colors")
+            colorUpdateTrigger++  // This will trigger re-evaluation of all color properties
+            colorsUpdated()
+        }
     }
 
     /* ────────────────  availability checks ──────────────── */
@@ -113,7 +125,12 @@ Singleton {
     }
 
     function getMatugenColor(path, fallback) {
-        let cur = matugenColors?.colors?.dark
+        // Include colorUpdateTrigger in the function to make properties reactive to changes
+        colorUpdateTrigger  // This dependency forces re-evaluation when colorUpdateTrigger changes
+        
+        // Use light or dark colors based on Theme.isLightMode
+        const colorMode = (typeof Theme !== "undefined" && Theme.isLightMode) ? "light" : "dark"
+        let cur = matugenColors?.colors?.[colorMode]
         for (const part of path.split(".")) {
             if (!cur || typeof cur !== "object" || !(part in cur))
                 return fallback

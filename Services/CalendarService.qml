@@ -210,16 +210,10 @@ Singleton {
                 root.lastError = ""
                 
                 console.log("CalendarService: Loaded events for", Object.keys(newEventsByDate).length, "days")
-                
-                // Debug: log parsed events
-                for (let dateKey in newEventsByDate) {
-                    console.log("  " + dateKey + ":", newEventsByDate[dateKey].map(e => e.title).join(", "))
-                }
-                
+            
             } catch (error) {
                 root.lastError = "Failed to parse events JSON: " + error.toString()
                 console.error("CalendarService:", root.lastError)
-                console.error("CalendarService: Raw output was:", eventsProcess.rawOutput)
                 root.eventsByDate = {}
             }
             
