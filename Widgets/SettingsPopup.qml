@@ -271,16 +271,23 @@ PanelWindow {
                                                 // Placeholder text
                                                 Text {
                                                     anchors.verticalCenter: parent.verticalCenter
-                                                    text: "Enter image path or URL"
-                                                    color: Theme.surfaceVariantText
+                                                    text: "Enter image path or URL..."
+                                                    color: Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.6)
                                                     font.pixelSize: Theme.fontSizeMedium
                                                     visible: profileImageInput.text.length === 0 && !profileImageInput.activeFocus
+                                                }
+                                                
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.IBeamCursor
+                                                    acceptedButtons: Qt.NoButton
                                                 }
                                             }
                                         }
                                         
                                         Text {
-                                            text: "Image will be automatically cropped to a circle"
+                                            text: "Local filesystem path or URL to an image file."
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
                                             wrapMode: Text.WordWrap
