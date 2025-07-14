@@ -470,7 +470,6 @@ PanelWindow {
                                         source: parent.entryType === "image" && parent.entryId ? "file://" + parent.tempImagePath : ""
                                         
                                         Component.onCompleted: {
-                                            console.log("Image preview initializing for entry:", parent.entryId, "path:", parent.tempImagePath)
                                             if (parent.entryType === "image" && parent.entryId) {
                                                 // Simple approach: use shell redirection to write to file
                                                 imageDecodeProcess.entryId = parent.entryId
@@ -482,11 +481,8 @@ PanelWindow {
                                         }
                                         
                                         onStatusChanged: {
-                                            console.log("Image preview status changed:", status, "for path:", source)
                                             if (status === Image.Error) {
-                                                console.warn("Failed to load image from:", source)
-                                            } else if (status === Image.Ready) {
-                                                console.log("Successfully loaded image:", source)
+                                                console.warn("Failed to load clipboard image from:", source)
                                             }
                                         }
                                         
@@ -790,16 +786,12 @@ PanelWindow {
         property var imagePreview: null
         
         onExited: (exitCode) => {
-            console.log("Image decode process exited with code:", exitCode, "for entry:", entryId)
             if (exitCode === 0 && imagePreview && tempPath) {
-                console.log("Image decoded successfully to:", tempPath)
                 // Force the Image component to reload
                 Qt.callLater(function() {
                     imagePreview.source = ""
                     imagePreview.source = "file://" + tempPath
                 })
-            } else {
-                console.warn("Failed to decode clipboard image for entry:", entryId)
             }
         }
         

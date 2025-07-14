@@ -64,10 +64,7 @@ Rectangle {
                             }
                         } else if (mouse.button === Qt.RightButton) {
                             if (trayItem.hasMenu) {
-                                console.log("Right-click detected, showing menu for:", trayItem.title || "Unknown")
                                 customTrayMenu.showMenu(mouse.x, mouse.y)
-                            } else {
-                                console.log("No menu available for:", trayItem.title || "Unknown")
                             }
                         }
                     }

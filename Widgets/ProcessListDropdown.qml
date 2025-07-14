@@ -52,8 +52,51 @@ PanelWindow {
         border.width: 1
         clip: true
         
+        // TopBar dropdown animation - slide down from bar
+        transform: [
+            Scale {
+                id: scaleTransform
+                origin.x: parent.width * 0.85  // Scale from top-right
+                origin.y: 0
+                xScale: processDropdown.isVisible ? 1.0 : 0.95
+                yScale: processDropdown.isVisible ? 1.0 : 0.8
+                
+                Behavior on xScale {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+                
+                Behavior on yScale {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            },
+            Translate {
+                id: translateTransform
+                x: processDropdown.isVisible ? 0 : 20
+                y: processDropdown.isVisible ? 0 : -30
+                
+                Behavior on x {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+                
+                Behavior on y {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+        ]
+        
         opacity: processDropdown.isVisible ? 1.0 : 0.0
-        scale: processDropdown.isVisible ? 1.0 : 0.85
         
         // Add shadow effect
         layer.enabled: true
@@ -66,15 +109,7 @@ PanelWindow {
             shadowOpacity: processDropdown.isVisible ? 0.15 : 0
         }
         
-        // Smooth animations
         Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
-        
-        Behavior on scale {
             NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing

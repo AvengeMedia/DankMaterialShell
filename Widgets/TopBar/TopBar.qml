@@ -65,6 +65,7 @@ PanelWindow {
     property real trayMenuY: 0
     
     
+    
     // Proxy objects for external connections
     
     QtObject {
@@ -231,13 +232,14 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemTray
                     onMenuRequested: (menu, item, x, y) => {
-                        topBar.currentTrayMenu = menu
-                        topBar.currentTrayItem = item
-                        topBar.trayMenuX = rightSection.x + rightSection.width - 400 - Theme.spacingL
-                        topBar.trayMenuY = Theme.barHeight + Theme.spacingS
-                        console.log("Showing menu at:", topBar.trayMenuX, topBar.trayMenuY)
+                        if (topBar.shellRoot) {
+                            topBar.shellRoot.currentTrayMenu = menu
+                            topBar.shellRoot.currentTrayItem = item
+                            topBar.shellRoot.trayMenuX = rightSection.x + rightSection.width - 400 - Theme.spacingL
+                            topBar.shellRoot.trayMenuY = Theme.barHeight - Theme.spacingXS
+                            topBar.shellRoot.showTrayMenu = true
+                        }
                         menu.menuVisible = true
-                        topBar.showTrayMenu = true
                     }
                 }
                 

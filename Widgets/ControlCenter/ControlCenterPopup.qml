@@ -34,14 +34,7 @@ PanelWindow {
     
     Rectangle {
         width: Math.min(600, parent.width - Theme.spacingL * 2)
-        height: {
-            let baseHeight = Math.min(500, parent.height - Theme.barHeight - Theme.spacingS * 2)
-            // Expand container when power menu is open
-            if (controlCenterPopup.powerOptionsExpanded) {
-                baseHeight += 70 // Extra space for power options
-            }
-            return baseHeight
-        }
+        height: controlCenterPopup.powerOptionsExpanded ? 570 : 500
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.surfaceContainer
@@ -49,8 +42,61 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         border.width: 1
         
+        // TopBar dropdown animation - optimized for performance
+        transform: [
+            Scale {
+                id: scaleTransform
+                origin.x: parent.width  // Scale from top-right corner
+                origin.y: 0
+                xScale: root.controlCenterVisible ? 1.0 : 0.95
+                yScale: root.controlCenterVisible ? 1.0 : 0.8
+            },
+            Translate {
+                id: translateTransform
+                x: root.controlCenterVisible ? 0 : 15  // Slide slightly left when hidden
+                y: root.controlCenterVisible ? 0 : -30
+            }
+        ]
+        
+        // Single coordinated animation for better performance
+        states: [
+            State {
+                name: "visible"
+                when: root.controlCenterVisible
+                PropertyChanges { target: scaleTransform; xScale: 1.0; yScale: 1.0 }
+                PropertyChanges { target: translateTransform; x: 0; y: 0 }
+            },
+            State {
+                name: "hidden"
+                when: !root.controlCenterVisible
+                PropertyChanges { target: scaleTransform; xScale: 0.95; yScale: 0.8 }
+                PropertyChanges { target: translateTransform; x: 15; y: -30 }
+            }
+        ]
+        
+        // Power menu height animation
+        Behavior on height {
+            NumberAnimation {
+                duration: Theme.shortDuration  // Faster for height changes
+                easing.type: Theme.standardEasing
+            }
+        }
+        
+        transitions: [
+            Transition {
+                from: "*"; to: "*"
+                ParallelAnimation {
+                    NumberAnimation {
+                        targets: [scaleTransform, translateTransform]
+                        properties: "xScale,yScale,x,y"
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+        ]
+        
         opacity: root.controlCenterVisible ? 1.0 : 0.0
-        scale: root.controlCenterVisible ? 1.0 : 0.85
         
         Behavior on opacity {
             NumberAnimation {
@@ -59,19 +105,7 @@ PanelWindow {
             }
         }
         
-        Behavior on scale {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
-        
-        Behavior on height {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
+        // Height animation handled by states below for better performance
         
         Column {
             anchors.fill: parent
@@ -115,11 +149,12 @@ PanelWindow {
                             }
                             
                             // Circular clipping container for profile image
-                            ClippingRectangle {
+                            Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 1
                                 radius: 31
-                                antialiasing: true
+                                color: "transparent"
+                                clip: true
                                 visible: parent.hasImage
                                 
                                 Image {
@@ -135,14 +170,14 @@ PanelWindow {
                                         return Prefs.profileImage
                                     }
                                     fillMode: Image.PreserveAspectCrop
-                                    smooth: true
+                                    smooth: false  // Disable smooth scaling during animations for performance
                                     asynchronous: true
-                                    mipmap: true
-                                    cache: false
+                                    mipmap: false  // Disable mipmap for better performance
+                                    cache: true    // Enable caching to prevent reloads
                                     
-                                    onStatusChanged: {
-                                        console.log("Control Center profile image status:", status, "source:", source)
-                                    }
+                                    // Optimize source size to prevent unnecessary scaling
+                                    sourceSize.width: 64
+                                    sourceSize.height: 64
                                 }
                             }
                             
@@ -322,7 +357,7 @@ PanelWindow {
                     }
                 }
                 
-                // Animated Collapsible Power Options (moved here for better integration)
+                // Animated Collapsible Power Options (optimized)
                 Rectangle {
                     width: parent.width
                     height: controlCenterPopup.powerOptionsExpanded ? 60 : 0
@@ -333,38 +368,25 @@ PanelWindow {
                     opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
                     clip: true
                     
+                    // Single coordinated animation for power options
                     Behavior on height {
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                     
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
-                        }
-                    }
-                    
-                    Behavior on border.width {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                     
                     Row {
                         anchors.centerIn: parent
                         spacing: Theme.spacingL
-                        opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
-                        
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                                easing.type: Theme.emphasizedEasing
-                            }
-                        }
+                        visible: controlCenterPopup.powerOptionsExpanded
                         
                         // Logout
                         Rectangle {
@@ -611,29 +633,14 @@ PanelWindow {
             // Tab content area
             Rectangle {
                 width: parent.width
-                height: {
-                    // More generous height calculation - use most of the available space
-                    let baseHeight = parent.height
-                    
-                    // Subtract only the essential fixed elements
-                    baseHeight -= 90 + Theme.spacingL  // User header + spacing
-                    baseHeight -= 40 + Theme.spacingM  // Tab buttons + spacing
-                    baseHeight -= Theme.spacingM       // Bottom spacing
-                    
-                    // Subtract power options height when expanded
-                    if (controlCenterPopup.powerOptionsExpanded) {
-                        baseHeight -= 60 + Theme.spacingL
-                    }
-                    
-                    return Math.max(300, baseHeight) // Higher minimum height for better content display
-                }
+                height: controlCenterPopup.powerOptionsExpanded ? 240 : 300
                 radius: Theme.cornerRadius
                 color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
                 
                 Behavior on height {
                     NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
                     }
                 }
                 

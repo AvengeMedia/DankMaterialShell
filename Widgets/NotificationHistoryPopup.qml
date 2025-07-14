@@ -50,17 +50,55 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         border.width: 1
         
+        // TopBar dropdown animation - slide down from bar (consistent with other TopBar widgets)
+        transform: [
+            Scale {
+                id: scaleTransform
+                origin.x: parent.width  // Scale from top-right corner
+                origin.y: 0
+                xScale: root.notificationHistoryVisible ? 1.0 : 0.95
+                yScale: root.notificationHistoryVisible ? 1.0 : 0.8
+            },
+            Translate {
+                id: translateTransform
+                x: root.notificationHistoryVisible ? 0 : 15  // Slide slightly left when hidden
+                y: root.notificationHistoryVisible ? 0 : -30
+            }
+        ]
+        
         opacity: root.notificationHistoryVisible ? 1.0 : 0.0
-        scale: root.notificationHistoryVisible ? 1.0 : 0.85
+        
+        // Single coordinated animation for better performance
+        states: [
+            State {
+                name: "visible"
+                when: root.notificationHistoryVisible
+                PropertyChanges { target: scaleTransform; xScale: 1.0; yScale: 1.0 }
+                PropertyChanges { target: translateTransform; x: 0; y: 0 }
+            },
+            State {
+                name: "hidden"
+                when: !root.notificationHistoryVisible
+                PropertyChanges { target: scaleTransform; xScale: 0.95; yScale: 0.8 }
+                PropertyChanges { target: translateTransform; x: 15; y: -30 }
+            }
+        ]
+        
+        transitions: [
+            Transition {
+                from: "*"; to: "*"
+                ParallelAnimation {
+                    NumberAnimation {
+                        targets: [scaleTransform, translateTransform]
+                        properties: "xScale,yScale,x,y"
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+        ]
         
         Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.mediumDuration
-                easing.type: Theme.emphasizedEasing
-            }
-        }
-        
-        Behavior on scale {
             NumberAnimation {
                 duration: Theme.mediumDuration
                 easing.type: Theme.emphasizedEasing

@@ -41,16 +41,50 @@ PanelWindow {
         radius: Theme.cornerRadiusLarge
         border.width: 0  // Remove border completely
         
+        // TopBar dropdown animation - slide down from bar
+        transform: [
+            Translate {
+                id: swipeTransform
+                x: 0
+                y: root.showNotificationPopup ? 0 : -30
+                
+                Behavior on y {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            },
+            Scale {
+                id: scaleTransform
+                origin.x: parent.width
+                origin.y: 0
+                xScale: root.showNotificationPopup ? 1.0 : 0.95
+                yScale: root.showNotificationPopup ? 1.0 : 0.8
+                
+                Behavior on xScale {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+                
+                Behavior on yScale {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+        ]
+        
         opacity: root.showNotificationPopup ? 1.0 : 0.0
         
-        // Transform for swipe animations
-        transform: Translate {
-            id: swipeTransform
-            x: 0
-        }
-        
         Behavior on opacity {
-            NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
         }
         
         // Drag area for swipe gestures

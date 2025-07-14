@@ -27,7 +27,7 @@ PanelWindow {
         id: menuContainer
         x: root.trayMenuX
         y: root.trayMenuY
-        width: 180
+        width: Math.max(180, Math.min(300, menuList.maxTextWidth + Theme.spacingL * 2))
         height: Math.max(60, menuList.contentHeight + Theme.spacingS * 2)
         color: Theme.surfaceContainer
         radius: Theme.cornerRadiusLarge
@@ -78,6 +78,27 @@ PanelWindow {
                 id: menuList
                 anchors.fill: parent
                 spacing: 1
+                
+                // Calculate maximum text width for dynamic menu sizing
+                property real maxTextWidth: {
+                    let maxWidth = 0
+                    if (model && model.values) {
+                        for (let i = 0; i < model.values.length; i++) {
+                            const item = model.values[i]
+                            if (item && item.text) {
+                                const textWidth = textMetrics.advanceWidth * item.text.length * 0.6
+                                maxWidth = Math.max(maxWidth, textWidth)
+                            }
+                        }
+                    }
+                    return Math.min(maxWidth, 280) // Cap at reasonable width
+                }
+                
+                TextMetrics {
+                    id: textMetrics
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: "M"
+                }
                 model: ScriptModel {
                     values: menuOpener.children ? [...menuOpener.children.values].filter(item => {
                         // Filter out empty items and separators
@@ -114,6 +135,8 @@ PanelWindow {
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
                         }
                     }
                     

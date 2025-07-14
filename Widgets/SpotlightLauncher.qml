@@ -320,12 +320,23 @@ PanelWindow {
             shadowColor: Qt.rgba(0, 0, 0, 0.3)
             shadowOpacity: 0.3
         }
-        transform: Scale { origin.x: width/2; origin.y: height/2; xScale: spotlightOpen?1:0.9; yScale: spotlightOpen?1:0.9;
-            Behavior on xScale { NumberAnimation { duration: Theme.mediumDuration; easing.type: Easing.OutBack; easing.overshoot:1.1 } }
-            Behavior on yScale { NumberAnimation { duration: Theme.mediumDuration; easing.type: Easing.OutBack; easing.overshoot:1.1 } }
+        // Center-screen fade with subtle scale
+        opacity: spotlightOpen ? 1.0 : 0.0
+        scale: spotlightOpen ? 1.0 : 0.96
+        
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
         }
-        opacity: spotlightOpen?1:0
-        Behavior on opacity { NumberAnimation { duration: Theme.mediumDuration; easing.type: Theme.emphasizedEasing } }
+        
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
+            }
+        }
 
         Column {
             anchors.fill: parent; anchors.margins: Theme.spacingXL; spacing: Theme.spacingL
