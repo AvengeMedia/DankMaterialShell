@@ -24,6 +24,28 @@ PanelWindow {
     property string selectedCategory: "All"
     property string viewMode: "list" // "list" or "grid"
     
+    // Search debouncing
+    Timer {
+        id: searchDebounceTimer
+        interval: 100
+        repeat: false
+        onTriggered: updateFilteredApps()
+    }
+    
+    // Periodic rescan while open
+    Timer {
+        id: periodicRescanTimer
+        interval: 15000 // 15 seconds
+        repeat: true
+        running: spotlightOpen
+        onTriggered: {
+            console.log("SpotlightLauncher: Periodic rescan triggered")
+            if (DesktopEntries.rescan) {
+                DesktopEntries.rescan()
+            }
+        }
+    }
+    
     anchors {
         top: true
         left: true
@@ -47,9 +69,17 @@ PanelWindow {
     // ...existing code...
     function show() {
         console.log("SpotlightLauncher: show() called")
+        
+        // Trigger manual rescan when opening
+        console.log("SpotlightLauncher: Triggering manual rescan on show")
+        if (DesktopEntries.rescan) {
+            DesktopEntries.rescan()
+        }
+        
         spotlightOpen = true
         console.log("SpotlightLauncher: spotlightOpen set to", spotlightOpen)
-        updateFilteredApps()
+        searchDebounceTimer.stop() // Stop any pending search
+        updateFilteredApps() // Immediate update when showing
         Qt.callLater(function() {
             searchField.forceActiveFocus()
             searchField.selectAll()
@@ -58,6 +88,7 @@ PanelWindow {
     
     function hide() {
         spotlightOpen = false
+        searchDebounceTimer.stop() // Stop any pending search
         searchField.text = ""
         selectedIndex = 0
         selectedCategory = "All"
@@ -74,20 +105,30 @@ PanelWindow {
     
     
     function updateFilteredApps() {
+        if (!AppSearchService.ready) {
+            filteredApps = []
+            selectedIndex = 0
+            filteredModel.clear()
+            return
+        }
+        
         filteredApps = []
         selectedIndex = 0
         
         var apps = []
+        var searchQuery = searchField.text
         
-        if (searchField.text.length === 0) {
+        if (searchQuery.length === 0) {
             // Show apps from category
             if (selectedCategory === "All") {
                 // For "All" category, show all available apps
                 apps = AppSearchService.applications || []
             } else if (selectedCategory === "Recents") {
-                // For "Recents" category, get recent apps from Prefs
+                // For "Recents" category, get recent apps from Prefs and filter out non-existent ones
                 var recentApps = Prefs.getRecentApps()
-                apps = recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null)
+                apps = recentApps
+                    .map(recentApp => AppSearchService.getAppByExec(recentApp.exec))
+                    .filter(app => app !== null && !app.noDisplay)
             } else {
                 // For specific categories, limit results
                 var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
@@ -97,30 +138,39 @@ PanelWindow {
             // Search with category filter
             if (selectedCategory === "All") {
                 // For "All" category, search all apps without limit
-                apps = AppSearchService.searchApplications(searchField.text)
+                apps = AppSearchService.searchApplications(searchQuery)
             } else if (selectedCategory === "Recents") {
                 // For "Recents" category, search within recent apps
                 var recentApps = Prefs.getRecentApps()
-                var recentDesktopEntries = recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null)
-                var allSearchResults = AppSearchService.searchApplications(searchField.text)
+                var recentDesktopEntries = recentApps
+                    .map(recentApp => AppSearchService.getAppByExec(recentApp.exec))
+                    .filter(app => app !== null && !app.noDisplay)
                 
-                // Filter search results to only include recent apps
-                apps = allSearchResults.filter(searchApp => {
-                    return recentDesktopEntries.some(recentApp => recentApp.name === searchApp.name)
-                })
+                if (recentDesktopEntries.length > 0) {
+                    var allSearchResults = AppSearchService.searchApplications(searchQuery)
+                    var recentNames = new Set(recentDesktopEntries.map(app => app.name))
+                    
+                    // Filter search results to only include recent apps
+                    apps = allSearchResults.filter(searchApp => recentNames.has(searchApp.name))
+                } else {
+                    apps = []
+                }
             } else {
                 // For specific categories, filter search results by category
                 var categoryApps = AppSearchService.getAppsInCategory(selectedCategory)
-                var allSearchResults = AppSearchService.searchApplications(searchField.text)
-                
-                // Filter search results to only include apps from the selected category
-                apps = allSearchResults.filter(searchApp => {
-                    return categoryApps.some(categoryApp => categoryApp.name === searchApp.name)
-                }).slice(0, maxResults)
+                if (categoryApps.length > 0) {
+                    var allSearchResults = AppSearchService.searchApplications(searchQuery)
+                    var categoryNames = new Set(categoryApps.map(app => app.name))
+                    
+                    // Filter search results to only include apps from the selected category
+                    apps = allSearchResults.filter(searchApp => categoryNames.has(searchApp.name)).slice(0, maxResults)
+                } else {
+                    apps = []
+                }
             }
         }
         
-        // Convert to our format
+        // Convert to our format - batch operations for better performance
         filteredApps = apps.map(app => ({
             name: app.name,
             exec: app.execString || "",
@@ -130,6 +180,7 @@ PanelWindow {
             desktopEntry: app
         }))
         
+        // Clear and repopulate model efficiently
         filteredModel.clear()
         filteredApps.forEach(app => filteredModel.append(app))
     }
@@ -201,6 +252,23 @@ PanelWindow {
                 var result = ["All", "Recents"]
                 categories = result.concat(allCategories.filter(cat => cat !== "All"))
                 if (spotlightOpen) updateFilteredApps()
+            }
+        }
+    }
+    
+    Connections {
+        target: DesktopEntries
+        function onApplicationsChanged() {
+            console.log("SpotlightLauncher: DesktopEntries.applicationsChanged signal received")
+            // Update categories when applications change
+            if (AppSearchService.ready) {
+                console.log("SpotlightLauncher: Updating categories and apps due to applicationsChanged")
+                var allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
+                var result = ["All", "Recents"]
+                categories = result.concat(allCategories.filter(cat => cat !== "All"))
+                if (spotlightOpen) updateFilteredApps()
+            } else {
+                console.log("SpotlightLauncher: AppSearchService not ready, skipping update")
             }
         }
     }
@@ -390,7 +458,9 @@ PanelWindow {
                             verticalAlignment: Text.AlignVCenter
                             focus: spotlightOpen
                             selectByMouse: true
-                            onTextChanged: updateFilteredApps()
+                            onTextChanged: {
+                                searchDebounceTimer.restart()
+                            }
                             Keys.onPressed: (event) => { 
                                 if(event.key === Qt.Key_Escape) { hide(); event.accepted = true }
                                 else if(event.key === Qt.Key_Return || event.key === Qt.Key_Enter) { launchSelected(); event.accepted = true }
@@ -712,6 +782,14 @@ PanelWindow {
             console.log("SpotlightLauncher: IPC toggle() called")
             spotlightLauncher.toggle()
             return "SPOTLIGHT_TOGGLE_SUCCESS"
+        }
+        function rescan() {
+            console.log("SpotlightLauncher: IPC rescan() called")
+            if (DesktopEntries.rescan) {
+                DesktopEntries.rescan()
+                console.log("SpotlightLauncher: Triggered DesktopEntries rescan")
+            }
+            return "SPOTLIGHT_RESCAN_SUCCESS"
         }
     }
 

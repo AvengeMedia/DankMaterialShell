@@ -39,6 +39,28 @@ PanelWindow {
     property string viewMode: "list" // "list" or "grid"
     property int selectedIndex: 0
     
+    // Search debouncing
+    Timer {
+        id: searchDebounceTimer
+        interval: 100
+        repeat: false
+        onTriggered: updateFilteredModel()
+    }
+    
+    // Periodic rescan while open
+    Timer {
+        id: periodicRescanTimer
+        interval: 15000 // 15 seconds
+        repeat: true
+        running: launcher.isVisible
+        onTriggered: {
+            console.log("AppLauncher: Periodic rescan triggered")
+            if (DesktopEntries.rescan) {
+                DesktopEntries.rescan()
+            }
+        }
+    }
+    
     ListModel { id: filteredModel }
     
     // Background dim with click to close
@@ -75,6 +97,22 @@ PanelWindow {
     }
     
     Connections {
+        target: DesktopEntries
+        function onApplicationsChanged() {
+            console.log("AppLauncher: DesktopEntries.applicationsChanged signal received")
+            // Update categories when applications change
+            if (AppSearchService.ready) {
+                console.log("AppLauncher: Updating categories and model due to applicationsChanged")
+                var allCategories = AppSearchService.getAllCategories()
+                categories = ["All", "Recents"].concat(allCategories.filter(cat => cat !== "All"))
+                updateFilteredModel()
+            } else {
+                console.log("AppLauncher: AppSearchService not ready, skipping update")
+            }
+        }
+    }
+    
+    Connections {
         target: LauncherService
         function onShowAppLauncher() {
             launcher.show()
@@ -95,43 +133,60 @@ PanelWindow {
     }
     
     function updateFilteredModel() {
+        if (!AppSearchService.ready) {
+            filteredModel.clear()
+            selectedIndex = 0
+            return
+        }
+        
         filteredModel.clear()
         selectedIndex = 0
         
         var apps = []
+        var searchQuery = searchField ? searchField.text : ""
         
         // Get apps based on category and search
-        if (searchField.text.length > 0) {
+        if (searchQuery.length > 0) {
             // Search across all apps or category
             var baseApps = selectedCategory === "All" ? 
                 AppSearchService.applications : 
                 selectedCategory === "Recents" ? 
-                    recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null) :
+                    recentApps
+                        .map(recentApp => AppSearchService.getAppByExec(recentApp.exec))
+                        .filter(app => app !== null && !app.noDisplay) :
                     AppSearchService.getAppsInCategory(selectedCategory)
-            apps = AppSearchService.searchApplications(searchField.text).filter(app => 
-                baseApps.includes(app)
-            )
+            
+            if (baseApps && baseApps.length > 0) {
+                var searchResults = AppSearchService.searchApplications(searchQuery)
+                apps = searchResults.filter(app => baseApps.includes(app))
+            }
         } else {
             // Just category filter
             if (selectedCategory === "Recents") {
-                // For recents, use the recent apps from Prefs
-                apps = recentApps.map(recentApp => AppSearchService.getAppByExec(recentApp.exec)).filter(app => app !== null)
+                // For recents, use the recent apps from Prefs and filter out non-existent ones
+                apps = recentApps
+                    .map(recentApp => AppSearchService.getAppByExec(recentApp.exec))
+                    .filter(app => app !== null && !app.noDisplay)
             } else {
-                apps = AppSearchService.getAppsInCategory(selectedCategory)
+                apps = AppSearchService.getAppsInCategory(selectedCategory) || []
             }
         }
         
-        // Add to model
-        apps.forEach(app => {
-            filteredModel.append({
-                name: app.name,
-                exec: app.execString || "",
-                icon: app.icon || "application-x-executable",
-                comment: app.comment || "",
-                categories: app.categories || [],
-                desktopEntry: app
+        // Add to model with null checks
+        if (apps && apps.length > 0) {
+            apps.forEach(app => {
+                if (app) {
+                    filteredModel.append({
+                        name: app.name || "",
+                        exec: app.execString || "",
+                        icon: app.icon || "application-x-executable",
+                        comment: app.comment || "",
+                        categories: app.categories || [],
+                        desktopEntry: app
+                    })
+                }
             })
-        })
+        }
     }
     
     function selectNext() {
@@ -193,7 +248,7 @@ PanelWindow {
             IconImage {
                 id: iconImg
                 anchors.fill: parent
-                source: appData.icon ? Quickshell.iconPath(appData.icon, "") : ""
+                source: (appData && appData.icon) ? Quickshell.iconPath(appData.icon, "") : ""
                 smooth: true
                 asynchronous: true
                 visible: status === Image.Ready
@@ -209,7 +264,7 @@ PanelWindow {
 
                 Text {
                     anchors.centerIn: parent
-                    text: appData.name ? appData.name.charAt(0).toUpperCase() : "A"
+                    text: (appData && appData.name && appData.name.length > 0) ? appData.name.charAt(0).toUpperCase() : "A"
                     font.pixelSize: 28
                     color: Theme.primary
                     font.weight: Font.Bold
@@ -461,7 +516,9 @@ PanelWindow {
                                 }
                             }
                             
-                            onTextChanged: updateFilteredModel()
+                            onTextChanged: {
+                                searchDebounceTimer.restart()
+                            }
 
                             Keys.onPressed: function (event) {
                                 if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && filteredModel.count) {
@@ -973,8 +1030,16 @@ PanelWindow {
     }
     
     function show() {
+        // Trigger manual rescan when opening
+        console.log("AppLauncher: Triggering manual rescan on show")
+        if (DesktopEntries.rescan) {
+            DesktopEntries.rescan()
+        }
+        
         launcher.isVisible = true
         recentApps = Prefs.getRecentApps() // Refresh recent apps
+        searchDebounceTimer.stop() // Stop any pending search
+        updateFilteredModel()
         Qt.callLater(function() {
             searchField.forceActiveFocus()
         })
@@ -982,6 +1047,7 @@ PanelWindow {
     
     function hide() {
         launcher.isVisible = false
+        searchDebounceTimer.stop() // Stop any pending search
         searchField.text = ""
         showCategories = false
     }

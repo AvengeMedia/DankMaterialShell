@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
+import "../Common/fuzzysort.js" as Fuzzy
 pragma Singleton
 pragma ComponentBehavior: Bound
 
@@ -12,61 +13,66 @@ Singleton {
     property var applicationsByName: ({})
     property var applicationsByExec: ({})
     property bool ready: false
-    property int refreshInterval: 10000
     
-    Timer {
-        id: refreshTimer
-        interval: root.refreshInterval
-        repeat: true
-        running: true
-        onTriggered: root.refreshApplications()
-    }
+    // Pre-prepared fuzzy search data
+    property var preppedApps: []
+    
     
     Component.onCompleted: {
         loadApplications()
     }
     
-    function refreshApplications() {
-        loadApplications()
+    Connections {
+        target: DesktopEntries
+        function onApplicationsChanged() {
+            console.log("AppSearchService: DesktopEntries applicationsChanged signal received")
+            console.log("AppSearchService: Current applications count before reload:", applications.length)
+            loadApplications()
+        }
     }
     
+    
     function loadApplications() {
-        var allApps = Array.from(DesktopEntries.applications.values)
-        
-        // Debug: Check what properties are available
-        if (allApps.length > 0) {
-            var firstApp = allApps[0]
-            if (firstApp.exec !== undefined) console.log("  exec:", firstApp.exec)
-            if (firstApp.execString !== undefined) console.log("  execString:", firstApp.execString)
-            if (firstApp.executable !== undefined) console.log("  executable:", firstApp.executable)
-            if (firstApp.command !== undefined) console.log("  command:", firstApp.command)
-        }
-        
-        applications = allApps
-            .filter(app => !app.noDisplay)
-            .sort((a, b) => a.name.localeCompare(b.name))
-        
-        // Build lookup maps
-        var byName = {}
-        var byExec = {}
-        
-        for (var i = 0; i < applications.length; i++) {
-            var app = applications[i]
-            byName[app.name.toLowerCase()] = app
+        // Trigger rescan on next frame to avoid blocking
+        Qt.callLater(function() {
+            var allApps = Array.from(DesktopEntries.applications.values)
             
-            // Clean exec string for lookup
-            var execProp = app.execString || ""
-            var cleanExec = execProp ? execProp.replace(/%[fFuU]/g, "").trim() : ""
-            if (cleanExec) {
-                byExec[cleanExec] = app
+            applications = allApps
+                .filter(app => !app.noDisplay)
+                .sort((a, b) => a.name.localeCompare(b.name))
+            
+            // Build lookup maps
+            var byName = {}
+            var byExec = {}
+            
+            for (var i = 0; i < applications.length; i++) {
+                var app = applications[i]
+                byName[app.name.toLowerCase()] = app
+                
+                // Clean exec string for lookup
+                var execProp = app.execString || ""
+                var cleanExec = execProp ? execProp.replace(/%[fFuU]/g, "").trim() : ""
+                if (cleanExec) {
+                    byExec[cleanExec] = app
+                }
             }
-        }
-        
-        applicationsByName = byName
-        applicationsByExec = byExec
-        ready = true
-        
-        console.log("AppSearchService: Loaded", applications.length, "applications")
+            
+            applicationsByName = byName
+            applicationsByExec = byExec
+            
+            // Prepare fuzzy search data
+            preppedApps = applications.map(app => ({
+                name: Fuzzy.prepare(app.name || ""),
+                comment: Fuzzy.prepare(app.comment || ""),
+                entry: app
+            }))
+            
+            ready = true
+            
+            console.log("AppSearchService: Loaded", applications.length, "applications")
+            console.log("AppSearchService: Prepared", preppedApps.length, "apps for fuzzy search")
+            console.log("AppSearchService: Ready status:", ready)
+        })
     }
     
     function searchApplications(query) {
@@ -74,62 +80,25 @@ Singleton {
             return applications
         }
         
-        var lowerQuery = query.toLowerCase()
-        var results = []
-        
-        for (var i = 0; i < applications.length; i++) {
-            var app = applications[i]
-            var score = 0
-            
-            // Check name
-            var nameLower = app.name.toLowerCase()
-            if (nameLower === lowerQuery) {
-                score = 1000
-            } else if (nameLower.startsWith(lowerQuery)) {
-                score = 500
-            } else if (nameLower.includes(lowerQuery)) {
-                score = 100
-            }
-            
-            // Check comment/description
-            if (app.comment) {
-                var commentLower = app.comment.toLowerCase()
-                if (commentLower.includes(lowerQuery)) {
-                    score += 50
-                }
-            }
-            
-            // Check generic name
-            if (app.genericName) {
-                var genericLower = app.genericName.toLowerCase()
-                if (genericLower.includes(lowerQuery)) {
-                    score += 25
-                }
-            }
-            
-            // Check keywords
-            if (app.keywords && app.keywords.length > 0) {
-                for (var j = 0; j < app.keywords.length; j++) {
-                    if (app.keywords[j].toLowerCase().includes(lowerQuery)) {
-                        score += 10
-                        break
-                    }
-                }
-            }
-            
-            if (score > 0) {
-                results.push({
-                    app: app,
-                    score: score
-                })
-            }
+        if (!ready || preppedApps.length === 0) {
+            return []
         }
         
-        // Sort by score descending
-        results.sort((a, b) => b.score - a.score)
+        // Use fuzzy search with both name and comment fields
+        var results = Fuzzy.go(query, preppedApps, {
+            all: false,
+            keys: ["name", "comment"],
+            scoreFn: r => {
+                // Prioritize name matches over comment matches
+                var nameScore = r[0] ? r[0].score : 0
+                var commentScore = r[1] ? r[1].score : 0
+                return nameScore > 0 ? nameScore * 0.9 + commentScore * 0.1 : commentScore * 0.5
+            },
+            limit: 50
+        })
         
-        // Return just the apps
-        return results.map(r => r.app)
+        // Extract the desktop entries from results
+        return results.map(r => r.obj.entry)
     }
     
     function getAppByName(name) {
