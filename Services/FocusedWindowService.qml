@@ -34,7 +34,7 @@ Singleton {
     Connections {
         target: NiriWorkspaceService
         function onFocusedWindowIdChanged() {
-            root.focusedWindowId = NiriWorkspaceService.focusedWindowId
+            root.focusedWindowId = parseInt(NiriWorkspaceService.focusedWindowId) || -1
             updateFocusedWindowData()
         }
         function onFocusedWindowTitleChanged() {

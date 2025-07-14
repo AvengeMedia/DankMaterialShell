@@ -192,14 +192,18 @@ PanelWindow {
                                                 smooth: true
                                                 asynchronous: true
                                                 mipmap: true
-                                                cache: false
+                                                cache: true
+                                                
+                                                property string lastLoggedSource: ""
                                                 
                                                 onStatusChanged: {
-                                                    console.log("Profile image status:", status, "source:", source)
-                                                    if (status === Image.Ready) {
-                                                        console.log("Image loaded successfully, size:", sourceSize.width + "x" + sourceSize.height)
-                                                    } else if (status === Image.Error) {
-                                                        console.log("Image failed to load")
+                                                    if (source !== lastLoggedSource && (status === Image.Ready || status === Image.Error)) {
+                                                        lastLoggedSource = source
+                                                        if (status === Image.Ready) {
+                                                            console.log("Profile image loaded successfully, size:", sourceSize.width + "x" + sourceSize.height)
+                                                        } else if (status === Image.Error) {
+                                                            console.log("Profile image failed to load:", source)
+                                                        }
                                                     }
                                                 }
                                             }
