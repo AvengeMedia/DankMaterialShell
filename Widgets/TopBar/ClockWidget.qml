@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import "../../Common"
 
 Rectangle {
@@ -51,13 +52,14 @@ Rectangle {
         }
     }
     
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: {
-            root.currentDate = new Date()
-        }
+    SystemClock {
+        id: systemClock
+        precision: SystemClock.Seconds
+        onDateChanged: root.currentDate = systemClock.date
+    }
+    
+    Component.onCompleted: {
+        root.currentDate = systemClock.date
     }
     
     MouseArea {

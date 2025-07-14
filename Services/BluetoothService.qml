@@ -193,10 +193,10 @@ Singleton {
         ', root)
     }
     
-    // Timer to refresh adapter & device state
     Timer {
-        interval: 3000          // 3s refresh for more responsive updates
-        running: true; repeat: true
+        id: bluetoothMonitorTimer
+        interval: 5000
+        running: false; repeat: true
         onTriggered: {
             bluetoothStatusChecker.running = true
             if (root.bluetoothEnabled) {
@@ -205,6 +205,14 @@ Singleton {
                 pairedDeviceChecker.discoveredToMerge = []
                 pairedDeviceChecker.running = true
             }
+        }
+    }
+    
+    function enableMonitoring(enabled) {
+        bluetoothMonitorTimer.running = enabled
+        if (enabled) {
+            // Immediately update when enabled
+            bluetoothStatusChecker.running = true
         }
     }
     

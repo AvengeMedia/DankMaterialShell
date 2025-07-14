@@ -28,11 +28,14 @@ Singleton {
     // Temperature properties
     property real cpuTemperature: 0.0
     
-    // Update intervals
-    property int cpuUpdateInterval: 1000
-    property int memoryUpdateInterval: 2000
-    property int temperatureUpdateInterval: 5000
+    property int cpuUpdateInterval: 3000
+    property int memoryUpdateInterval: 5000
+    property int temperatureUpdateInterval: 10000
     
+    // Performance control
+    property bool enabledForTopBar: true
+    property bool enabledForDetailedView: false
+
     Component.onCompleted: {
         console.log("SystemMonitorService: Starting initialization...")
         getCpuInfo()
@@ -176,12 +179,14 @@ Singleton {
     Timer {
         id: cpuTimer
         interval: root.cpuUpdateInterval
-        running: true
+        running: root.enabledForTopBar || root.enabledForDetailedView
         repeat: true
         
         onTriggered: {
-            cpuUsageProcess.running = true
-            cpuFrequencyProcess.running = true
+            if (root.enabledForTopBar || root.enabledForDetailedView) {
+                cpuUsageProcess.running = true
+                cpuFrequencyProcess.running = true
+            }
         }
     }
     
@@ -189,11 +194,13 @@ Singleton {
     Timer {
         id: memoryTimer
         interval: root.memoryUpdateInterval
-        running: true
+        running: root.enabledForTopBar || root.enabledForDetailedView
         repeat: true
         
         onTriggered: {
-            memoryUsageProcess.running = true
+            if (root.enabledForTopBar || root.enabledForDetailedView) {
+                memoryUsageProcess.running = true
+            }
         }
     }
     
@@ -201,11 +208,13 @@ Singleton {
     Timer {
         id: temperatureTimer
         interval: root.temperatureUpdateInterval
-        running: true
+        running: root.enabledForDetailedView
         repeat: true
         
         onTriggered: {
-            temperatureProcess.running = true
+            if (root.enabledForDetailedView) {
+                temperatureProcess.running = true
+            }
         }
     }
     
@@ -215,10 +224,22 @@ Singleton {
     }
     
     function updateSystemStats() {
-        cpuUsageProcess.running = true
-        memoryUsageProcess.running = true
-        cpuFrequencyProcess.running = true
-        temperatureProcess.running = true
+        if (root.enabledForTopBar || root.enabledForDetailedView) {
+            cpuUsageProcess.running = true
+            memoryUsageProcess.running = true
+            cpuFrequencyProcess.running = true
+            if (root.enabledForDetailedView) {
+                temperatureProcess.running = true
+            }
+        }
+    }
+    
+    function enableTopBarMonitoring(enabled) {
+        root.enabledForTopBar = enabled
+    }
+    
+    function enableDetailedMonitoring(enabled) {
+        root.enabledForDetailedView = enabled
     }
     
     function getCpuUsageColor() {

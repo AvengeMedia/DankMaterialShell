@@ -34,6 +34,15 @@ Singleton {
     
     Component.onCompleted: loadSettings()
     
+    // Monitor system resources preference changes to control service monitoring
+    onShowSystemResourcesChanged: {
+        console.log("Prefs: System resources monitoring", showSystemResources ? "enabled" : "disabled")
+        // Control SystemMonitorService based on whether system monitor widgets are visible
+        if (typeof SystemMonitorService !== 'undefined') {
+            SystemMonitorService.enableTopBarMonitoring(showSystemResources)
+        }
+    }
+    
     FileView {
         id: settingsFile
         path: StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"

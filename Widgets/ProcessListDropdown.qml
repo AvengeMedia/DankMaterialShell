@@ -17,6 +17,12 @@ PanelWindow {
     
     visible: isVisible
     
+    // Monitor process dropdown visibility to enable/disable process monitoring
+    onIsVisibleChanged: {
+        console.log("Process dropdown", isVisible ? "opened" : "closed")
+        ProcessMonitorService.enableMonitoring(isVisible)
+    }
+    
     implicitWidth: 600
     implicitHeight: 600
     

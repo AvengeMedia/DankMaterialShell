@@ -107,7 +107,7 @@ PanelWindow {
             radius: parent.radius
             
             SequentialAnimation on opacity {
-                running: true
+                running: root.calendarVisible
                 loops: Animation.Infinite
                 NumberAnimation {
                     to: 0.08

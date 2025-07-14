@@ -23,6 +23,11 @@ ShellRoot {
     Component.onCompleted: {
         // Make root accessible to Theme singleton for error handling
         Theme.rootObj = root
+        
+        // Initialize service monitoring states based on preferences
+        SystemMonitorService.enableTopBarMonitoring(Prefs.showSystemResources)
+        ProcessMonitorService.enableMonitoring(false) // Start disabled, enable when process dropdown is opened
+        AudioService.enableDeviceScanning(false) // Start disabled, enable when control center is opened
     }
     
     property bool calendarVisible: false
@@ -40,6 +45,17 @@ ShellRoot {
     property MprisPlayer activePlayer: MprisController.activePlayer
     property bool hasActiveMedia: activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist)
     property bool controlCenterVisible: false
+    
+    // Monitor control center visibility to enable/disable audio device scanning
+    onControlCenterVisibleChanged: {
+        console.log("Control center", controlCenterVisible ? "opened" : "closed")
+        AudioService.enableDeviceScanning(controlCenterVisible)
+        BluetoothService.enableMonitoring(controlCenterVisible)
+        if (controlCenterVisible) {
+            // Immediately refresh devices when opening control center
+            AudioService.refreshDevices()
+        }
+    }
     property bool batteryPopupVisible: false
     property bool powerMenuVisible: false
     property bool powerConfirmVisible: false
@@ -165,14 +181,15 @@ ShellRoot {
     // Weather configuration
     
     
-    // WiFi Auto-refresh Timer
     Timer {
         id: wifiAutoRefreshTimer
-        interval: 10000  // 10 seconds
+        interval: 20000
         running: root.wifiAutoRefreshEnabled && root.controlCenterVisible
         repeat: true
         onTriggered: {
-            WifiService.scanWifi()
+            if (root.wifiAutoRefreshEnabled && root.controlCenterVisible) {
+                WifiService.scanWifi()
+            }
         }
     }
     
@@ -374,5 +391,19 @@ ShellRoot {
     
     ClipboardHistory {
         id: clipboardHistoryPopup
+    }
+    
+    IpcHandler {
+        target: "wallpaper"
+        
+        function refresh() {
+            console.log("Wallpaper IPC: refresh() called")
+            // Trigger color extraction if using dynamic theme
+            if (typeof Theme !== "undefined" && Theme.isDynamicTheme) {
+                console.log("Triggering color extraction due to wallpaper IPC")
+                Colors.extractColors()
+            }
+            return "WALLPAPER_REFRESH_SUCCESS"
+        }
     }
 }

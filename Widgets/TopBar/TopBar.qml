@@ -121,7 +121,7 @@ PanelWindow {
                 radius: parent.radius
                 
                 SequentialAnimation on opacity {
-                    running: true
+                    running: false
                     loops: Animation.Infinite
                     NumberAnimation {
                         to: 0.08

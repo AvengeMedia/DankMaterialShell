@@ -101,38 +101,6 @@ Singleton {
     /* ────────────────  wallpaper change monitor ──────────────── */
     property string lastWallpaperTimestamp: ""
     
-    Timer {
-        id: wallpaperMonitorTimer
-        interval: 1000  // Check every second
-        repeat: true
-        
-        onTriggered: {
-            wallpaperNotifyMonitor.reload()
-        }
-    }
-    
-    FileView {
-        id: wallpaperNotifyMonitor
-        path: "file://" + notifyPath
-        
-        onLoaded: {
-            var timestamp = wallpaperNotifyMonitor.text()
-            if (timestamp && timestamp !== lastWallpaperTimestamp) {
-                console.log("Wallpaper change detected - updating dynamic theme")
-                lastWallpaperTimestamp = timestamp
-                
-                // Only update if we're currently using dynamic theme
-                if (typeof Theme !== "undefined" && Theme.isDynamicTheme) {
-                    console.log("Triggering color extraction due to wallpaper change")
-                    extractColors()
-                }
-            }
-        }
-        
-        onLoadFailed: {
-            // File doesn't exist yet, this is normal
-        }
-    }
 
     /* ────────────────  public helper ──────────────── */
     function extractColors() {

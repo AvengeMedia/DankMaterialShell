@@ -36,10 +36,10 @@ Rectangle {
         return activePlayer && activePlayer.length > 0 ? currentPosition / activePlayer.length : 0 
     }
     
-    // Updates progress bar every second
+    // Updates progress bar every 2 seconds when playing
     Timer {
         id: positionTimer
-        interval: 1000
+        interval: 2000
         running: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing && activePlayer.length > 0 && !progressMouseArea.isSeeking
         repeat: true
         onTriggered: {

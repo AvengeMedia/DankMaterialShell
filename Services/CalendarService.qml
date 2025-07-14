@@ -12,10 +12,10 @@ Singleton {
     property bool isLoading: false
     property string lastError: ""
     
-    // Periodic refresh timer (5 minutes)
+    // Periodic refresh timer
     Timer {
         id: refreshTimer
-        interval: 300000 // 5 minutes
+        interval: 60000
         running: root.khalAvailable
         repeat: true
         onTriggered: {

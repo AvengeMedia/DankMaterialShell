@@ -32,10 +32,9 @@ PanelWindow {
         onTriggered: updateFilteredApps()
     }
     
-    // Periodic rescan while open
     Timer {
         id: periodicRescanTimer
-        interval: 15000 // 15 seconds
+        interval: 60000
         repeat: true
         running: spotlightOpen
         onTriggered: {

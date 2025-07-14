@@ -47,14 +47,12 @@ PanelWindow {
         onTriggered: updateFilteredModel()
     }
     
-    // Periodic rescan while open
     Timer {
         id: periodicRescanTimer
-        interval: 15000 // 15 seconds
+        interval: 60000
         repeat: true
         running: launcher.isVisible
         onTriggered: {
-            console.log("AppLauncher: Periodic rescan triggered")
             if (DesktopEntries.rescan) {
                 DesktopEntries.rescan()
             }

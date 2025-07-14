@@ -16,6 +16,10 @@ Singleton {
     property var audioSources: []
     property string currentAudioSource: ""
     
+    // Device scanning control
+    property bool deviceScanningEnabled: false
+    property bool initialScanComplete: false
+    
     // Real Audio Control
     Process {
         id: volumeChecker
@@ -51,7 +55,7 @@ Singleton {
     Process {
         id: audioSinkLister
         command: ["pactl", "list", "sinks"]
-        running: true
+        running: false
         
         stdout: StdioCollector {
             onStreamFinished: {
@@ -136,7 +140,7 @@ Singleton {
     Process {
         id: audioSourceLister
         command: ["pactl", "list", "sources"]
-        running: true
+        running: false
         
         stdout: StdioCollector {
             onStreamFinished: {
@@ -283,7 +287,9 @@ Singleton {
                 console.log("Audio sink changed successfully")
                 // Refresh current sink and list
                 defaultSinkChecker.running = true
-                audioSinkLister.running = true
+                if (root.deviceScanningEnabled) {
+                    audioSinkLister.running = true
+                }
             } else {
                 console.error("Failed to change audio sink")
             }
@@ -308,20 +314,51 @@ Singleton {
                 console.log("Audio source changed successfully")
                 // Refresh current source and list
                 defaultSourceChecker.running = true
-                audioSourceLister.running = true
+                if (root.deviceScanningEnabled) {
+                    audioSourceLister.running = true
+                }
             } else {
                 console.error("Failed to change audio source")
             }
         }
     }
     
-    // Timer to refresh audio devices regularly (catches new Bluetooth devices)
     Timer {
-        interval: 4000          // 4s refresh to catch new BT devices
-        running: true; repeat: true
+        interval: 5000
+        running: root.deviceScanningEnabled && root.initialScanComplete
+        repeat: true
         onTriggered: {
+            if (root.deviceScanningEnabled) {
+                audioSinkLister.running = true
+                audioSourceLister.running = true
+            }
+        }
+    }
+    
+    Component.onCompleted: {
+        console.log("AudioService: Starting initialization...")
+        // Do initial device scan
+        audioSinkLister.running = true
+        audioSourceLister.running = true
+        initialScanComplete = true
+        console.log("AudioService: Initialization complete")
+    }
+    
+    // Control functions for managing device scanning
+    function enableDeviceScanning(enabled) {
+        console.log("AudioService: Device scanning", enabled ? "enabled" : "disabled")
+        root.deviceScanningEnabled = enabled
+        if (enabled && root.initialScanComplete) {
+            // Immediately scan when enabled
             audioSinkLister.running = true
             audioSourceLister.running = true
         }
+    }
+    
+    // Manual refresh function for when user opens audio settings
+    function refreshDevices() {
+        console.log("AudioService: Manual device refresh triggered")
+        audioSinkLister.running = true
+        audioSourceLister.running = true
     }
 }

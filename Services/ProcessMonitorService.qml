@@ -10,7 +10,10 @@ Singleton {
     // Process list properties
     property var processes: []
     property bool isUpdating: false
-    property int processUpdateInterval: 3000
+    property int processUpdateInterval: 1500
+    
+    // Performance control - only run when process monitor is actually visible
+    property bool monitoringEnabled: false
     
     // System information properties
     property int totalMemoryKB: 0
@@ -109,28 +112,41 @@ Singleton {
         }
     }
     
-    // System and process monitoring timer
+    // System and process monitoring timer - now conditional
     Timer {
         id: processTimer
         interval: root.processUpdateInterval
-        running: true
+        running: root.monitoringEnabled  // Only run when monitoring is enabled
         repeat: true
         
         onTriggered: {
-            updateSystemInfo()
-            updateProcessList()
+            if (root.monitoringEnabled) {
+                updateSystemInfo()
+                updateProcessList()
+            }
         }
     }
     
     // Public functions
     function updateSystemInfo() {
-        if (!systemInfoProcess.running) {
+        if (!systemInfoProcess.running && root.monitoringEnabled) {
             systemInfoProcess.running = true
         }
     }
     
+    // Control functions for enabling/disabling monitoring
+    function enableMonitoring(enabled) {
+        console.log("ProcessMonitorService: Monitoring", enabled ? "enabled" : "disabled")
+        root.monitoringEnabled = enabled
+        if (enabled) {
+            // Immediately update when enabled
+            updateSystemInfo()
+            updateProcessList()
+        }
+    }
+    
     function updateProcessList() {
-        if (!root.isUpdating) {
+        if (!root.isUpdating && root.monitoringEnabled) {
             root.isUpdating = true
             
             // Update sort command based on current sort option

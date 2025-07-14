@@ -10,6 +10,9 @@ mkdir -p "$QS_DIR"
 LINK="$QS_DIR/current_wallpaper"
 
 ln -sf -- "$img" "$LINK"
+
+# Kill existing swaybg processes before starting new one
+pkill -f "swaybg.*$LINK" 2>/dev/null || true
 swaybg -m fill -i "$LINK" & disown
 
 json="$(matugen image "$img" --json hex)"
@@ -79,7 +82,5 @@ echo "   (use in ghostty:  theme = $QS_DIR/generated_ghostty_colors.conf )"
 
 niri msg action do-screen-transition --delay-ms 100
 
-# Notify running shell about wallpaper change (for dynamic theme updates)
-NOTIFY_FILE="$QS_DIR/wallpaper_changed"
-echo "$(date '+%s')" > "$NOTIFY_FILE"
-echo "→ Shell notified: $NOTIFY_FILE"
+# Notify running shell about wallpaper change via IPC
+qs -c "DankMaterialShell" ipc call wallpaper refresh 2>/dev/null && echo "→ Shell notified via IPC" || echo "→ Shell not running or IPC failed"
