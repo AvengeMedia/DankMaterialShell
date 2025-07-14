@@ -245,10 +245,13 @@ ShellRoot {
                 "notification": notification  // Keep reference for action handling
             }
             
-            // Add to history (prepend to show newest first)
+            // Add to grouped notifications
+            NotificationGroupingService.addNotification(notifObj)
+            
+            // Also add to legacy flat history for backwards compatibility
             notificationHistory.insert(0, notifObj)
             
-            // Keep only last 50 notifications
+            // Keep only last 50 notifications in flat history
             while (notificationHistory.count > 50) {
                 notificationHistory.remove(notificationHistory.count - 1)
             }
@@ -303,7 +306,7 @@ ShellRoot {
             bluetoothAvailable: root.bluetoothAvailable
             bluetoothEnabled: root.bluetoothEnabled
             shellRoot: root
-            notificationCount: notificationHistory.count
+            notificationCount: NotificationGroupingService.totalCount
             processDropdown: processListDropdown
             
             // Connect tray menu properties
