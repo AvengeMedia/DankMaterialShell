@@ -26,6 +26,30 @@ Singleton {
         `, root)
     }
     
+    // Format timestamp for display
+    function formatTimestamp(timestamp) {
+        if (!timestamp) return ""
+        
+        const now = new Date()
+        const notifTime = new Date(timestamp)
+        const diffMs = now.getTime() - notifTime.getTime()
+        const diffMinutes = Math.floor(diffMs / 60000)
+        const diffHours = Math.floor(diffMs / 3600000)
+        const diffDays = Math.floor(diffMs / 86400000)
+        
+        if (diffMinutes < 1) {
+            return "now"
+        } else if (diffMinutes < 60) {
+            return `${diffMinutes}m ago`
+        } else if (diffHours < 24) {
+            return `${diffHours}h ago`
+        } else if (diffDays < 7) {
+            return `${diffDays}d ago`
+        } else {
+            return notifTime.toLocaleDateString()
+        }
+    }
+    
     // Add a new notification to the appropriate group
     function addNotification(notificationObj) {
         if (!notificationObj || !notificationObj.appName) {

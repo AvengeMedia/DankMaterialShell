@@ -28,6 +28,18 @@ PanelWindow {
         bottom: true
     }
     
+    // Timer to update timestamps periodically
+    Timer {
+        id: timestampUpdateTimer
+        interval: 60000  // Update every minute
+        running: visible
+        repeat: true
+        onTriggered: {
+            // Force model refresh to update timestamps
+            groupedNotificationListView.model = NotificationGroupingService.groupedNotifications
+        }
+    }
+    
     Rectangle {
         width: 400
         height: 500
@@ -156,11 +168,18 @@ PanelWindow {
                 width: parent.width
                 height: parent.height - 120
                 clip: true
+                contentWidth: -1  // Fit to width
+                ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                ScrollBar.vertical.policy: ScrollBar.AsNeeded
                 
                 ListView {
                     id: groupedNotificationListView
                     model: NotificationGroupingService.groupedNotifications
                     spacing: Theme.spacingM
+                    interactive: true
+                    boundsBehavior: Flickable.StopAtBounds
+                    flickDeceleration: 1500
+                    maximumFlickVelocity: 2000
                     
                     delegate: Column {
                         width: groupedNotificationListView.width
@@ -178,122 +197,135 @@ PanelWindow {
                                    Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : 
                                    Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
                             
-                            Row {
-                                anchors.fill: parent
-                                anchors.margins: Theme.spacingM
-                                spacing: Theme.spacingM
+                            // App Icon
+                            Rectangle {
+                                width: 32
+                                height: 32
+                                radius: width / 2
+                                color: Theme.primaryContainer
+                                anchors.left: parent.left
+                                anchors.leftMargin: Theme.spacingM
+                                anchors.verticalCenter: parent.verticalCenter
                                 
-                                // App Icon
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: width / 2
-                                    color: Theme.primaryContainer
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    
-                                    // Material icon fallback
-                                    Loader {
-                                        active: !model.appIcon || model.appIcon === ""
-                                        anchors.fill: parent
-                                        sourceComponent: Text {
-                                            anchors.centerIn: parent
-                                            text: "apps"
-                                            font.family: Theme.iconFont
-                                            font.pixelSize: 16
-                                            color: Theme.primaryText
-                                        }
-                                    }
-                                    
-                                    // App icon
-                                    Loader {
-                                        active: model.appIcon && model.appIcon !== ""
+                                // Material icon fallback
+                                Loader {
+                                    active: !model.appIcon || model.appIcon === ""
+                                    anchors.fill: parent
+                                    sourceComponent: Text {
                                         anchors.centerIn: parent
-                                        sourceComponent: IconImage {
-                                            width: 24
-                                            height: 24
-                                            asynchronous: true
-                                            source: {
-                                                if (!model.appIcon) return ""
-                                                if (model.appIcon.startsWith("file://") || model.appIcon.startsWith("/")) {
-                                                    return model.appIcon
-                                                }
-                                                return Quickshell.iconPath(model.appIcon, "image-missing")
-                                            }
-                                        }
+                                        text: "apps"
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: 16
+                                        color: Theme.primaryText
                                     }
                                 }
                                 
-                                // App Name and Summary
-                                Column {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: parent.width - 100
-                                    spacing: 2
+                                // App icon
+                                Loader {
+                                    active: model.appIcon && model.appIcon !== ""
+                                    anchors.centerIn: parent
+                                    sourceComponent: IconImage {
+                                        width: 24
+                                        height: 24
+                                        asynchronous: true
+                                        source: {
+                                            if (!model.appIcon) return ""
+                                            if (model.appIcon.startsWith("file://") || model.appIcon.startsWith("/")) {
+                                                return model.appIcon
+                                            }
+                                            return Quickshell.iconPath(model.appIcon, "image-missing")
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // App Name and Summary
+                            Column {
+                                anchors.left: parent.left
+                                anchors.leftMargin: Theme.spacingM + 32 + Theme.spacingM  // Icon + spacing
+                                anchors.right: parent.right
+                                anchors.rightMargin: 80  // Space for buttons
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+                                
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
                                     
-                                    Row {
-                                        width: parent.width
-                                        spacing: Theme.spacingS
+                                    Text {
+                                        text: model.appName || "App"
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                    }
+                                    
+                                    // Notification count badge
+                                    Rectangle {
+                                        width: Math.max(countText.width + 8, 20)
+                                        height: 20
+                                        radius: 10
+                                        color: Theme.primary
+                                        visible: model.totalCount > 1
+                                        anchors.verticalCenter: parent.verticalCenter
                                         
                                         Text {
-                                            text: model.appName || "App"
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            color: Theme.surfaceText
+                                            id: countText
+                                            anchors.centerIn: parent
+                                            text: model.totalCount.toString()
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.primaryText
                                             font.weight: Font.Medium
                                         }
-                                        
-                                        // Notification count badge
-                                        Rectangle {
-                                            width: Math.max(countText.width + 8, 20)
-                                            height: 20
-                                            radius: 10
-                                            color: Theme.primary
-                                            visible: model.totalCount > 1
-                                            anchors.verticalCenter: parent.verticalCenter
-                                            
-                                            Text {
-                                                id: countText
-                                                anchors.centerIn: parent
-                                                text: model.totalCount.toString()
-                                                font.pixelSize: Theme.fontSizeSmall
-                                                color: Theme.primaryText
-                                                font.weight: Font.Medium
-                                            }
-                                        }
-                                    }
-                                    
-                                    Text {
-                                        text: model.latestNotification ? 
-                                              (model.latestNotification.summary || model.latestNotification.body || "") : ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                        width: parent.width
-                                        elide: Text.ElideRight
-                                        visible: text.length > 0
                                     }
                                 }
                                 
-                                // Expand/Collapse Icon
-                                Rectangle {
-                                    width: 32
-                                    height: 32
-                                    radius: 16
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    color: groupHeaderArea.containsMouse ? 
-                                           Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
-                                           "transparent"
+                                Text {
+                                    text: model.latestNotification ? 
+                                          (model.latestNotification.summary || model.latestNotification.body || "") : ""
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                    width: parent.width
+                                    elide: Text.ElideRight
+                                    visible: text.length > 0
+                                }
+                            }
+                            
+                            // Expand/Collapse Icon
+                            Rectangle {
+                                id: expandCollapseButton
+                                width: 32
+                                height: 32
+                                radius: 16
+                                anchors.right: parent.right
+                                anchors.rightMargin: 40  // More space from close button
+                                anchors.verticalCenter: parent.verticalCenter
+                                color: expandButtonArea.containsMouse ? 
+                                       Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                                       "transparent"
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: isExpanded ? "expand_less" : "expand_more"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: 20
+                                    color: expandButtonArea.containsMouse ? Theme.primary : Theme.surfaceText
                                     
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: isExpanded ? "expand_less" : "expand_more"
-                                        font.family: Theme.iconFont
-                                        font.pixelSize: 20
-                                        color: groupHeaderArea.containsMouse ? Theme.primary : Theme.surfaceText
-                                        
-                                        Behavior on rotation {
-                                            NumberAnimation {
-                                                duration: Theme.shortDuration
-                                                easing.type: Theme.standardEasing
-                                            }
+                                    Behavior on rotation {
+                                        NumberAnimation {
+                                            duration: Theme.shortDuration
+                                            easing.type: Theme.standardEasing
                                         }
+                                    }
+                                }
+                                
+                                MouseArea {
+                                    id: expandButtonArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    
+                                    onClicked: {
+                                        NotificationGroupingService.toggleGroupExpansion(index)
                                     }
                                 }
                             }
@@ -329,12 +361,28 @@ PanelWindow {
                                 }
                             }
                             
+                            // Timestamp positioned under close button
+                            Text {
+                                id: timestampText
+                                text: model.latestNotification ? 
+                                      NotificationGroupingService.formatTimestamp(model.latestNotification.timestamp) : ""
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                anchors.rightMargin: 6
+                                anchors.bottomMargin: 6
+                                visible: text.length > 0
+                            }
+                            
                             MouseArea {
                                 id: groupHeaderArea
                                 anchors.fill: parent
-                                anchors.rightMargin: 32
+                                anchors.rightMargin: 76  // Exclude both expand and close button areas
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                preventStealing: false
+                                propagateComposedEvents: true
                                 
                                 onClicked: {
                                     NotificationGroupingService.toggleGroupExpansion(index)
@@ -350,13 +398,30 @@ PanelWindow {
                         }
                         
                         // Expanded Notifications List
-                        Loader {
+                        Item {
                             width: parent.width
-                            active: isExpanded
+                            height: isExpanded ? expandedContent.height : 0
+                            clip: true
                             
-                            sourceComponent: Column {
+                            Behavior on height {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
+                            }
+                            
+                            Column {
+                                id: expandedContent
                                 width: parent.width
                                 spacing: Theme.spacingXS
+                                opacity: isExpanded ? 1.0 : 0.0
+                                
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
                                 
                                 Repeater {
                                     model: groupData.notifications
@@ -525,6 +590,13 @@ PanelWindow {
                                                     elide: Text.ElideRight
                                                     visible: text.length > 0
                                                 }
+                                                
+                                                Text {
+                                                    text: NotificationGroupingService.formatTimestamp(model.timestamp)
+                                                    font.pixelSize: Theme.fontSizeSmall
+                                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                                                    visible: text.length > 0
+                                                }
                                             }
                                         }
                                         
@@ -534,6 +606,8 @@ PanelWindow {
                                             anchors.rightMargin: 32
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
+                                            preventStealing: false
+                                            propagateComposedEvents: true
                                             
                                             onClicked: {
                                                 if (model && root.handleNotificationClick) {
