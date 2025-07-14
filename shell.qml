@@ -389,6 +389,10 @@ ShellRoot {
         id: spotlightLauncher
     }
     
+    ProcessListWidget {
+        id: processListWidget
+    }
+    
     ClipboardHistory {
         id: clipboardHistoryPopup
     }

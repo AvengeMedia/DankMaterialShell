@@ -15,6 +15,7 @@ ThemePicker 1.0 ThemePicker.qml
 CpuMonitorWidget 1.0 CpuMonitorWidget.qml
 RamMonitorWidget 1.0 RamMonitorWidget.qml
 ProcessListDropdown 1.0 ProcessListDropdown.qml
+ProcessListWidget 1.0 ProcessListWidget.qml
 SpotlightLauncher 1.0 SpotlightLauncher.qml
 SettingsPopup 1.0 SettingsPopup.qml
 SettingsSection 1.0 SettingsSection.qml

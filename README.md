@@ -70,7 +70,22 @@ Mod+Space hotkey-overlay-title="Run an Application: Spotlight" { spawn "qs" "-c"
 Mod+V hotkey-overlay-title="Open Clipboard History" { spawn "qs" "-c" "DankMaterialShell" "ipc" "call" "clipboard" "toggle"; }
 ```
 
-## Setup Calendar events (Google, Microsoft, other Caldev, etc.)
+# Available IPC Events
+
+IPC Events are events that can be triggered with `qs` cli.
+
+```bash
+qs -c DankMaterialShell ipc call <target> <function>
+```
+
+| Target | Function | Description |
+|--------|----------|-------------|
+| spotlight | toggle | Toggle spotlight (app launcher) |
+| clipboard | toggle | Toggle clipboard history view |
+| processlist | toggle | Toggle process list (task manager) |
+| wallpaper | refresh | Refresh theme (refreshes theme after wallpaper change) |
+
+## (Optional) Setup Calendar events (Google, Microsoft, other Caldev, etc.)
 
 1. Install [khal](https://github.com/pimutils/khal), [vdirsyncer](https://github.com/pimutils/vdirsyncer), and `aiohttp-oauthlib`
 
