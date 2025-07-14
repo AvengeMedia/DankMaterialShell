@@ -12,6 +12,15 @@ Singleton {
     property bool isUpdating: false
     property int processUpdateInterval: 3000
     
+    // System information properties
+    property int totalMemoryKB: 0
+    property int usedMemoryKB: 0
+    property int totalSwapKB: 0
+    property int usedSwapKB: 0
+    property int cpuCount: 1
+    property real totalCpuUsage: 0.0
+    property bool systemInfoAvailable: false
+    
     // Sorting options
     property string sortBy: "cpu" // "cpu", "memory", "name", "pid"
     property bool sortDescending: true
@@ -23,10 +32,32 @@ Singleton {
         console.log("ProcessMonitorService: Initialization complete")
     }
     
+    // System information monitoring
+    Process {
+        id: systemInfoProcess
+        command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu ' /proc/stat"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    parseSystemInfo(text.trim())
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("System info check failed with exit code:", exitCode)
+                root.systemInfoAvailable = false
+            }
+        }
+    }
+    
     // Process monitoring with ps command
     Process {
         id: processListProcess
-        command: ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,comm,cmd --sort=-pcpu | head -" + (root.maxProcesses + 1)]
+        command: ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,rss,comm,cmd --sort=-pcpu | head -" + (root.maxProcesses + 1)]
         running: false
         
         stdout: StdioCollector {
@@ -40,21 +71,23 @@ Singleton {
                         const line = lines[i].trim()
                         if (!line) continue
                         
-                        // Parse ps output: PID PPID %CPU %MEM COMMAND CMD
+                        // Parse ps output: PID PPID %CPU %MEM RSS COMMAND CMD
                         const parts = line.split(/\s+/)
-                        if (parts.length >= 6) {
+                        if (parts.length >= 7) {
                             const pid = parseInt(parts[0])
                             const ppid = parseInt(parts[1])
                             const cpu = parseFloat(parts[2])
-                            const memory = parseFloat(parts[3])
-                            const command = parts[4]
-                            const fullCmd = parts.slice(5).join(' ')
+                            const memoryPercent = parseFloat(parts[3])
+                            const memoryKB = parseInt(parts[4])
+                            const command = parts[5]
+                            const fullCmd = parts.slice(6).join(' ')
                             
                             newProcesses.push({
                                 pid: pid,
                                 ppid: ppid,
                                 cpu: cpu,
-                                memory: memory,
+                                memoryPercent: memoryPercent,
+                                memoryKB: memoryKB,
                                 command: command,
                                 fullCommand: fullCmd,
                                 displayName: command.length > 15 ? command.substring(0, 15) + "..." : command
@@ -76,7 +109,7 @@ Singleton {
         }
     }
     
-    // Process monitoring timer
+    // System and process monitoring timer
     Timer {
         id: processTimer
         interval: root.processUpdateInterval
@@ -84,11 +117,18 @@ Singleton {
         repeat: true
         
         onTriggered: {
+            updateSystemInfo()
             updateProcessList()
         }
     }
     
     // Public functions
+    function updateSystemInfo() {
+        if (!systemInfoProcess.running) {
+            systemInfoProcess.running = true
+        }
+    }
+    
     function updateProcessList() {
         if (!root.isUpdating) {
             root.isUpdating = true
@@ -112,7 +152,7 @@ Singleton {
                     sortOption = "--sort=-pcpu"
             }
             
-            processListProcess.command = ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,comm,cmd " + sortOption + " | head -" + (root.maxProcesses + 1)]
+            processListProcess.command = ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,rss,comm,cmd " + sortOption + " | head -" + (root.maxProcesses + 1)]
             processListProcess.running = true
         }
     }
@@ -167,7 +207,76 @@ Singleton {
         return cpu.toFixed(1) + "%"
     }
     
-    function formatMemoryUsage(memory) {
-        return memory.toFixed(1) + "%"
+    function formatMemoryUsage(memoryKB) {
+        if (memoryKB < 1024) {
+            return memoryKB.toFixed(0) + " KB"
+        } else if (memoryKB < 1024 * 1024) {
+            return (memoryKB / 1024).toFixed(1) + " MB"
+        } else {
+            return (memoryKB / (1024 * 1024)).toFixed(1) + " GB"
+        }
+    }
+    
+    function formatSystemMemory(memoryKB) {
+        if (memoryKB < 1024 * 1024) {
+            return (memoryKB / 1024).toFixed(0) + " MB"
+        } else {
+            return (memoryKB / (1024 * 1024)).toFixed(1) + " GB"
+        }
+    }
+    
+    function parseSystemInfo(text) {
+        const lines = text.split('\n')
+        let section = 'memory'
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim()
+            
+            if (line === '---CPU---') {
+                section = 'cpucount'
+                continue
+            } else if (line === '---CPUSTAT---') {
+                section = 'cpustat'
+                continue
+            }
+            
+            if (section === 'memory') {
+                if (line.startsWith('MemTotal:')) {
+                    root.totalMemoryKB = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('MemAvailable:')) {
+                    const availableKB = parseInt(line.split(/\s+/)[1])
+                    root.usedMemoryKB = root.totalMemoryKB - availableKB
+                } else if (line.startsWith('SwapTotal:')) {
+                    root.totalSwapKB = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('SwapFree:')) {
+                    const freeSwapKB = parseInt(line.split(/\s+/)[1])
+                    root.usedSwapKB = root.totalSwapKB - freeSwapKB
+                }
+            } else if (section === 'cpucount') {
+                const count = parseInt(line)
+                if (!isNaN(count)) {
+                    root.cpuCount = count
+                }
+            } else if (section === 'cpustat') {
+                if (line.startsWith('cpu ')) {
+                    const parts = line.split(/\s+/)
+                    if (parts.length >= 8) {
+                        const user = parseInt(parts[1])
+                        const nice = parseInt(parts[2])
+                        const system = parseInt(parts[3])
+                        const idle = parseInt(parts[4])
+                        const iowait = parseInt(parts[5])
+                        const irq = parseInt(parts[6])
+                        const softirq = parseInt(parts[7])
+                        
+                        const total = user + nice + system + idle + iowait + irq + softirq
+                        const used = total - idle - iowait
+                        root.totalCpuUsage = total > 0 ? (used / total) * 100 : 0
+                    }
+                }
+            }
+        }
+        
+        root.systemInfoAvailable = true
     }
 }

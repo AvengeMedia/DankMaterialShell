@@ -17,8 +17,8 @@ PanelWindow {
     
     visible: isVisible
     
-    implicitWidth: 500
-    implicitHeight: 500
+    implicitWidth: 600
+    implicitHeight: 600
     
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
@@ -41,8 +41,8 @@ PanelWindow {
     
     Rectangle {
         id: dropdownContent
-        width: Math.min(500, parent.width - Theme.spacingL * 2)
-        height: Math.min(500, parent.height - Theme.barHeight - Theme.spacingS * 2)
+        width: Math.min(600, parent.width - Theme.spacingL * 2)
+        height: Math.min(600, parent.height - Theme.barHeight - Theme.spacingS * 2)
         x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         
@@ -94,144 +94,190 @@ PanelWindow {
             anchors.margins: Theme.spacingL
             spacing: Theme.spacingM
             
-            // Header
+            // System overview and controls
             Column {
                 Layout.fillWidth: true
                 spacing: Theme.spacingM
                 
+                // Enhanced system overview with integrated controls
                 Row {
                     width: parent.width
-                    height: 32
+                    spacing: Theme.spacingM
                     
-                    Text {
-                        id: processTitle
-                        text: "System Processes"
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    
-                    Item { 
-                        width: parent.width - processTitle.width - sortControls.width - Theme.spacingM
-                        height: 1 
-                    }
-                    
-                    // Sort controls
-                    Row {
-                        id: sortControls
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-                        
-                        Rectangle {
-                            width: cpuButton.width + ramButton.width + Theme.spacingXS
-                            height: 28
-                            radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                            
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: 0
-                                
-                                Button {
-                                    id: cpuButton
-                                    text: "CPU"
-                                    flat: true
-                                    checkable: true
-                                    checked: ProcessMonitorService.sortBy === "cpu"
-                                    onClicked: ProcessMonitorService.setSortBy("cpu")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    hoverEnabled: true
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: parent.clicked()
-                                    }
-                                    
-                                    contentItem: Text {
-                                        text: parent.text
-                                        font: parent.font
-                                        color: parent.checked ? Theme.primary : Theme.surfaceText
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-                                    
-                                    background: Rectangle {
-                                        color: parent.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                                        radius: Theme.cornerRadius
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: Theme.shortDuration }
-                                        }
-                                    }
-                                }
-                                
-                                Button {
-                                    id: ramButton
-                                    text: "RAM"
-                                    flat: true
-                                    checkable: true
-                                    checked: ProcessMonitorService.sortBy === "memory"
-                                    onClicked: ProcessMonitorService.setSortBy("memory")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    hoverEnabled: true
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: parent.clicked()
-                                    }
-                                    
-                                    contentItem: Text {
-                                        text: parent.text
-                                        font: parent.font
-                                        color: parent.checked ? Theme.primary : Theme.surfaceText
-                                        horizontalAlignment: Text.AlignHCenter
-                                        verticalAlignment: Text.AlignVCenter
-                                    }
-                                    
-                                    background: Rectangle {
-                                        color: parent.checked ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
-                                        radius: Theme.cornerRadius
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: Theme.shortDuration }
-                                        }
-                                    }
-                                }
+                    // CPU Overview Card (clickable for sorting)
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        height: 80
+                        radius: Theme.cornerRadiusLarge
+                        color: {
+                            if (ProcessMonitorService.sortBy === "cpu") {
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16)
+                            } else if (cpuCardMouseArea.containsMouse) {
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                            } else {
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
                             }
                         }
+                        border.color: ProcessMonitorService.sortBy === "cpu" ? 
+                                     Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) :
+                                     Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                        border.width: ProcessMonitorService.sortBy === "cpu" ? 2 : 1
                         
-                        Rectangle {
-                            width: 28
-                            height: 28
-                            radius: Theme.cornerRadius
-                            color: sortOrderArea.containsMouse ? 
-                                   Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08) : 
-                                   "transparent"
+                        MouseArea {
+                            id: cpuCardMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: ProcessMonitorService.setSortBy("cpu")
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: Theme.shortDuration }
+                        }
+                        
+                        Behavior on border.color {
+                            ColorAnimation { duration: Theme.shortDuration }
+                        }
+                        
+                        Column {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
                             
                             Text {
-                                text: ProcessMonitorService.sortDescending ? "↓" : "↑"
-                                font.pixelSize: Theme.fontSizeMedium
+                                text: "CPU"
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: ProcessMonitorService.sortBy === "cpu" ? Theme.primary : Theme.secondary
+                                opacity: ProcessMonitorService.sortBy === "cpu" ? 1.0 : 0.8
+                            }
+                            
+                            Text {
+                                text: ProcessMonitorService.totalCpuUsage.toFixed(1) + "%"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Bold
                                 color: Theme.surfaceText
-                                anchors.centerIn: parent
                             }
                             
-                            MouseArea {
-                                id: sortOrderArea
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: ProcessMonitorService.toggleSortOrder()
+                            Text {
+                                text: ProcessMonitorService.cpuCount + " cores"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                opacity: 0.7
+                            }
+                        }
+                    }
+                    
+                    // Memory Overview Card (clickable for sorting)
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        height: 80
+                        radius: Theme.cornerRadiusLarge
+                        color: {
+                            if (ProcessMonitorService.sortBy === "memory") {
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16)
+                            } else if (memoryCardMouseArea.containsMouse) {
+                                return Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.12)
+                            } else {
+                                return Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
+                            }
+                        }
+                        border.color: ProcessMonitorService.sortBy === "memory" ? 
+                                     Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) :
+                                     Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.2)
+                        border.width: ProcessMonitorService.sortBy === "memory" ? 2 : 1
+                        
+                        MouseArea {
+                            id: memoryCardMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: ProcessMonitorService.setSortBy("memory")
+                        }
+                        
+                        Behavior on color {
+                            ColorAnimation { duration: Theme.shortDuration }
+                        }
+                        
+                        Behavior on border.color {
+                            ColorAnimation { duration: Theme.shortDuration }
+                        }
+                        
+                        Column {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+                            
+                            Text {
+                                text: "Memory"
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: ProcessMonitorService.sortBy === "memory" ? Theme.primary : Theme.secondary
+                                opacity: ProcessMonitorService.sortBy === "memory" ? 1.0 : 0.8
                             }
                             
-                            Behavior on color {
-                                ColorAnimation { duration: Theme.shortDuration }
+                            Text {
+                                text: ProcessMonitorService.formatSystemMemory(ProcessMonitorService.usedMemoryKB)
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Bold
+                                color: Theme.surfaceText
+                            }
+                            
+                            Text {
+                                text: "of " + ProcessMonitorService.formatSystemMemory(ProcessMonitorService.totalMemoryKB)
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                opacity: 0.7
+                            }
+                        }
+                    }
+                    
+                    // Swap Overview Card  
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM * 2) / 3
+                        height: 80
+                        radius: Theme.cornerRadiusLarge
+                        color: ProcessMonitorService.totalSwapKB > 0 ? 
+                               Qt.rgba(Theme.tertiary.r, Theme.tertiary.g, Theme.tertiary.b, 0.08) :
+                               Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.04)
+                        border.color: ProcessMonitorService.totalSwapKB > 0 ? 
+                                     Qt.rgba(Theme.tertiary.r, Theme.tertiary.g, Theme.tertiary.b, 0.2) :
+                                     Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.12)
+                        border.width: 1
+                        
+                        Column {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingM
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+                            
+                            Text {
+                                text: "Swap"
+                                font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
+                                color: ProcessMonitorService.totalSwapKB > 0 ? Theme.tertiary : Theme.surfaceText
+                                opacity: 0.8
+                            }
+                            
+                            Text {
+                                text: ProcessMonitorService.totalSwapKB > 0 ? ProcessMonitorService.formatSystemMemory(ProcessMonitorService.usedSwapKB) : "None"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Bold
+                                color: Theme.surfaceText
+                            }
+                            
+                            Text {
+                                text: ProcessMonitorService.totalSwapKB > 0 ? "of " + ProcessMonitorService.formatSystemMemory(ProcessMonitorService.totalSwapKB) : "No swap configured"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                opacity: 0.7
                             }
                         }
                     }
                 }
+                
                 
                 // Separator
                 Rectangle {
@@ -242,52 +288,106 @@ PanelWindow {
             }
             
             // Headers
-            Row {
+            Item {
                 id: columnHeaders
                 Layout.fillWidth: true
                 Layout.leftMargin: 8
-                spacing: 8
+                height: 24
                 
-                // Icon placeholder + Process name
+                // Process name header
                 Text {
                     text: "Process"
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     opacity: 0.7
-                    width: Theme.iconSize - 4 + 8 + 150  // icon width + spacing + name width
+                    anchors.left: parent.left
+                    anchors.leftMargin: 0  // Left align with content area
+                    anchors.verticalCenter: parent.verticalCenter
                 }
                 
-                Item { width: parent.parent.width - 280 - 16 }  // Flexible spacer to match process list (280 from row + 16 for margins)
-                
-                Text {
-                    text: "CPU"
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    opacity: 0.7
-                    width: 60
-                    horizontalAlignment: Text.AlignRight
+                // CPU header - positioned exactly like CPU badge
+                Rectangle {
+                    width: 80
+                    height: 20
+                    color: "transparent"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 200  // Slight adjustment to move right
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Text {
+                        text: "CPU"
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        opacity: 0.7
+                        anchors.centerIn: parent
+                    }
                 }
                 
-                Text {
-                    text: "RAM"
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    color: Theme.surfaceText
-                    opacity: 0.7
-                    width: 60
-                    horizontalAlignment: Text.AlignRight
+                // RAM header - positioned exactly like memory badge
+                Rectangle {
+                    width: 80
+                    height: 20
+                    color: "transparent"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 112  // Move right by decreasing rightMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Text {
+                        text: "RAM"
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        opacity: 0.7
+                        anchors.centerIn: parent
+                    }
                 }
                 
+                // PID header - positioned exactly like PID text
                 Text {
                     text: "PID"
                     font.pixelSize: Theme.fontSizeSmall
                     font.weight: Font.Medium
                     color: Theme.surfaceText
                     opacity: 0.7
-                    width: 60
+                    width: 50
                     horizontalAlignment: Text.AlignRight
+                    anchors.right: parent.right
+                    anchors.rightMargin: 53  // Move left by increasing rightMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                // Sort direction arrow - far right
+                Rectangle {
+                    width: 28
+                    height: 28
+                    radius: Theme.cornerRadius
+                    color: sortOrderArea.containsMouse ? 
+                           Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08) : 
+                           "transparent"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 8
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    Text {
+                        text: ProcessMonitorService.sortDescending ? "↓" : "↑"
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceText
+                        anchors.centerIn: parent
+                    }
+                    
+                    MouseArea {
+                        id: sortOrderArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: ProcessMonitorService.toggleSortOrder()
+                    }
+                    
+                    Behavior on color {
+                        ColorAnimation { duration: Theme.shortDuration }
+                    }
                 }
             }
             
@@ -305,15 +405,19 @@ PanelWindow {
                     id: processListView
                     anchors.fill: parent
                     model: ProcessMonitorService.processes
-                    spacing: 2
+                    spacing: 4
                     
                     delegate: Rectangle {
-                        width: processListView.width - 16
-                        height: 36
-                        radius: Theme.cornerRadius
+                        width: processListView.width
+                        height: 40
+                        radius: Theme.cornerRadiusLarge
                         color: processMouseArea.containsMouse ? 
                                Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : 
                                "transparent"
+                        border.color: processMouseArea.containsMouse ? 
+                                     Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                                     "transparent"
+                        border.width: 1
                         
                         MouseArea {
                             id: processMouseArea
@@ -342,15 +446,13 @@ PanelWindow {
                             }
                         }
                         
-                        Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 8
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 8
-                            width: parent.width - 16
+                        Item {
+                            anchors.fill: parent
+                            anchors.margins: 8
                             
                             // Process icon
                             Text {
+                                id: processIcon
                                 text: ProcessMonitorService.getProcessIcon(modelData ? modelData.command : "")
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize - 4
@@ -360,6 +462,7 @@ PanelWindow {
                                     return Theme.surfaceText
                                 }
                                 opacity: 0.8
+                                anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             
@@ -367,42 +470,70 @@ PanelWindow {
                             Text {
                                 text: modelData ? modelData.displayName : ""
                                 font.pixelSize: Theme.fontSizeSmall
+                                font.weight: Font.Medium
                                 color: Theme.surfaceText
-                                width: 150
+                                width: 250
                                 elide: Text.ElideRight
+                                anchors.left: processIcon.right
+                                anchors.leftMargin: 8
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             
-                            Item { width: parent.width - 280 }
                             
                             // CPU usage
-                            Text {
-                                text: ProcessMonitorService.formatCpuUsage(modelData ? modelData.cpu : 0)
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                            Rectangle {
+                                id: cpuBadge
+                                width: 80
+                                height: 20
+                                radius: Theme.cornerRadius
                                 color: {
-                                    if (modelData && modelData.cpu > 80) return Theme.error
-                                    if (modelData && modelData.cpu > 50) return Theme.warning
-                                    return Theme.surfaceText
+                                    if (modelData && modelData.cpu > 80) return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
+                                    if (modelData && modelData.cpu > 50) return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+                                    return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
                                 }
-                                width: 60
-                                horizontalAlignment: Text.AlignRight
+                                anchors.right: parent.right
+                                anchors.rightMargin: 194  // 28 (menu) + 12 + 50 (pid) + 12 + 80 (mem) + 12 spacing
                                 anchors.verticalCenter: parent.verticalCenter
+                                
+                                Text {
+                                    text: ProcessMonitorService.formatCpuUsage(modelData ? modelData.cpu : 0)
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Bold
+                                    color: {
+                                        if (modelData && modelData.cpu > 80) return Theme.error
+                                        if (modelData && modelData.cpu > 50) return Theme.warning
+                                        return Theme.surfaceText
+                                    }
+                                    anchors.centerIn: parent
+                                }
                             }
                             
                             // Memory usage
-                            Text {
-                                text: ProcessMonitorService.formatMemoryUsage(modelData ? modelData.memory : 0)
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
+                            Rectangle {
+                                id: memoryBadge
+                                width: 80
+                                height: 20
+                                radius: Theme.cornerRadius
                                 color: {
-                                    if (modelData && modelData.memory > 10) return Theme.error
-                                    if (modelData && modelData.memory > 5) return Theme.warning
-                                    return Theme.surfaceText
+                                    if (modelData && modelData.memoryKB > 1024 * 1024) return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)  // > 1GB
+                                    if (modelData && modelData.memoryKB > 512 * 1024) return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)  // > 512MB
+                                    return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
                                 }
-                                width: 60
-                                horizontalAlignment: Text.AlignRight
+                                anchors.right: parent.right
+                                anchors.rightMargin: 102  // 28 (menu) + 12 + 50 (pid) + 12 spacing
                                 anchors.verticalCenter: parent.verticalCenter
+                                
+                                Text {
+                                    text: ProcessMonitorService.formatMemoryUsage(modelData ? modelData.memoryKB : 0)
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Bold
+                                    color: {
+                                        if (modelData && modelData.memoryKB > 1024 * 1024) return Theme.error  // > 1GB
+                                        if (modelData && modelData.memoryKB > 512 * 1024) return Theme.warning  // > 512MB
+                                        return Theme.surfaceText
+                                    }
+                                    anchors.centerIn: parent
+                                }
                             }
                             
                             // PID
@@ -411,9 +542,53 @@ PanelWindow {
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                                 opacity: 0.7
-                                width: 60
+                                width: 50
                                 horizontalAlignment: Text.AlignRight
+                                anchors.right: parent.right
+                                anchors.rightMargin: 40  // 28 (menu) + 12 spacing
                                 anchors.verticalCenter: parent.verticalCenter
+                            }
+                            
+                            // 3-dot menu button (far right)
+                            Rectangle {
+                                id: menuButton
+                                width: 28
+                                height: 28
+                                radius: Theme.cornerRadius
+                                color: menuButtonArea.containsMouse ? 
+                                       Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08) : 
+                                       "transparent"
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                
+                                    Text {
+                                        text: "more_vert"
+                                        font.family: Theme.iconFont
+                                        font.weight: Theme.iconFontWeight
+                                        font.pixelSize: Theme.iconSize - 2
+                                        color: Theme.surfaceText
+                                        opacity: 0.6
+                                        anchors.centerIn: parent
+                                    }
+                                    
+                                    MouseArea {
+                                        id: menuButtonArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        
+                                        onClicked: {
+                                            if (modelData && modelData.pid > 0) {
+                                                processContextMenuWindow.processData = modelData
+                                                let globalPos = menuButtonArea.mapToGlobal(menuButtonArea.width / 2, menuButtonArea.height)
+                                                processContextMenuWindow.show(globalPos.x, globalPos.y)
+                                            }
+                                        }
+                                    }
+                                    
+                                Behavior on color {
+                                    ColorAnimation { duration: Theme.shortDuration }
+                                }
                             }
                         }
                     }
@@ -674,8 +849,34 @@ PanelWindow {
         }
         
         function show(x, y) {
-            processContextMenu.x = x
-            processContextMenu.y = y
+            // Smart positioning to prevent off-screen cutoff
+            const menuWidth = 180
+            const menuHeight = menuColumn.implicitHeight + Theme.spacingS * 2
+            
+            // Get screen dimensions from the monitor
+            const screenWidth = processContextMenuWindow.screen ? processContextMenuWindow.screen.width : 1920
+            const screenHeight = processContextMenuWindow.screen ? processContextMenuWindow.screen.height : 1080
+            
+            // Calculate optimal position
+            let finalX = x
+            let finalY = y
+            
+            // Check horizontal bounds - if too close to right edge, position to the left
+            if (x + menuWidth > screenWidth - 20) {
+                finalX = x - menuWidth
+            }
+            
+            // Check vertical bounds - if too close to bottom edge, position above
+            if (y + menuHeight > screenHeight - 20) {
+                finalY = y - menuHeight
+            }
+            
+            // Ensure we don't go off the left or top edges
+            finalX = Math.max(20, finalX)
+            finalY = Math.max(20, finalY)
+            
+            processContextMenu.x = finalX
+            processContextMenu.y = finalY
             processContextMenuWindow.menuVisible = true
         }
         
@@ -721,6 +922,7 @@ PanelWindow {
     
     function show() {
         isVisible = true
+        ProcessMonitorService.updateSystemInfo()
         ProcessMonitorService.updateProcessList()
     }
     
