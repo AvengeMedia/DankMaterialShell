@@ -144,7 +144,7 @@ PanelWindow {
                     Text {
                         text: "Confirm"
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.onPrimary
+                        color: Theme.primaryText
                         font.weight: Font.Medium
                         anchors.centerIn: parent
                     }

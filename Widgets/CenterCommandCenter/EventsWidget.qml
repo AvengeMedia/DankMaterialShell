@@ -75,133 +75,119 @@ Rectangle {
         }
     }
     
-    Item {
-        anchors.fill: parent
+    // Header - always visible when widget is shown
+    Row {
+        id: headerRow
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.margins: theme.spacingL
+        spacing: theme.spacingS
         
-        Column {
-            anchors.fill: parent
-            spacing: theme.spacingM
-        
-        // Header - always visible when widget is shown
-        Item {
-            width: parent.width
-            height: headerRow.height
-            
-            Row {
-                id: headerRow
-                width: parent.width
-                spacing: theme.spacingS
-                
-                Text {
-                    text: "event"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.iconSize - 2
-                    color: theme.primary
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                
-                Text {
-                    text: hasEvents ? 
-                        (Qt.formatDate(selectedDate, "MMM d") + " • " + 
-                         (selectedDateEvents.length === 1 ? "1 event" : selectedDateEvents.length + " events")) :
-                        Qt.formatDate(selectedDate, "MMM d")
-                    font.pixelSize: theme.fontSizeMedium
-                    color: theme.surfaceText
-                    font.weight: Font.Medium
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
+        Text {
+            text: "event"
+            font.family: theme.iconFont
+            font.pixelSize: theme.iconSize - 2
+            color: theme.primary
+            anchors.verticalCenter: parent.verticalCenter
         }
         
-            // Content area  
-            Rectangle {
-                anchors.fill: parent
-                anchors.margins: theme.spacingL
-                color: "transparent"
-                
-                // No events placeholder - absolutely centered in this gray container
-                Column {
-                    anchors.centerIn: parent
-                    spacing: theme.spacingXS
-                    visible: !hasEvents
+        Text {
+            text: hasEvents ? 
+                (Qt.formatDate(selectedDate, "MMM d") + " • " + 
+                 (selectedDateEvents.length === 1 ? "1 event" : selectedDateEvents.length + " events")) :
+                Qt.formatDate(selectedDate, "MMM d")
+            font.pixelSize: theme.fontSizeMedium
+            color: theme.surfaceText
+            font.weight: Font.Medium
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+    
+    // No events placeholder - centered in entire widget (not just content area)
+    Column {
+        anchors.centerIn: parent
+        spacing: theme.spacingXS
+        visible: !hasEvents
 
-                    Text {
-                        text: "event_busy"
-                        font.family: theme.iconFont
-                        font.pixelSize: theme.iconSize + 8
-                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.3)
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+        Text {
+            text: "event_busy"
+            font.family: theme.iconFont
+            font.pixelSize: theme.iconSize + 8
+            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.3)
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+        
+        Text {
+            text: "No events"
+            font.pixelSize: theme.fontSizeMedium
+            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+            font.weight: Font.Normal
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+    }
+    
+    // Events list - positioned below header when there are events
+    ListView {
+        id: eventsList
+        anchors.top: headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: theme.spacingL
+        anchors.topMargin: theme.spacingM
+        visible: hasEvents
+        clip: true
+        spacing: theme.spacingS
+        boundsMovement: Flickable.StopAtBounds
+        boundsBehavior: Flickable.StopAtBounds
                     
-                    Text {
-                        text: "No events"
-                        font.pixelSize: theme.fontSizeMedium
-                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
-                        font.weight: Font.Normal
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-                    
+        ScrollBar.vertical: ScrollBar {
+            policy: eventsList.contentHeight > eventsList.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
+        }
+        
+        delegate: Rectangle {
+            width: eventsList.width
+            height: eventContent.implicitHeight + theme.spacingM
+            radius: theme.cornerRadius
+            color: {
+                if (modelData.url && eventMouseArea.containsMouse) {
+                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12)
+                } else if (eventMouseArea.containsMouse) {
+                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.06)
                 }
-                
-                // Events list
-                ListView {
-                    id: eventsList
-                    anchors.fill: parent
-                    anchors.margins: theme.spacingM
-                    anchors.topMargin: theme.spacingM + 2
-                    visible: hasEvents
-                    clip: true
-                    spacing: theme.spacingS
-                    boundsMovement: Flickable.StopAtBounds
-                    boundsBehavior: Flickable.StopAtBounds
-                    
-                    ScrollBar.vertical: ScrollBar {
-                        policy: eventsList.contentHeight > eventsList.height ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
-                    }
-                    
-                    delegate: Rectangle {
-                        width: eventsList.width
-                        height: eventContent.implicitHeight + theme.spacingM
-                        radius: theme.cornerRadius
-                        color: {
-                            if (modelData.url && eventMouseArea.containsMouse) {
-                                return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12)
-                            } else if (eventMouseArea.containsMouse) {
-                                return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.06)
-                            }
-                            return Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.06)
-                        }
-                        border.color: {
-                            if (modelData.url && eventMouseArea.containsMouse) {
-                                return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.3)
-                            } else if (eventMouseArea.containsMouse) {
-                                return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.15)
-                            }
-                            return "transparent"
-                        }
-                        border.width: 1
-                        
-                        // Event indicator strip
-                        Rectangle {
-                            width: 4
-                            height: parent.height - 8
-                            anchors.left: parent.left
-                            anchors.leftMargin: 4
-                            anchors.verticalCenter: parent.verticalCenter
-                            radius: 2
-                            color: theme.primary
-                            opacity: 0.8
-                        }
-                        
-                        Column {
-                            id: eventContent
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.leftMargin: theme.spacingL + 4
-                            anchors.rightMargin: theme.spacingM
-                            spacing: 6
+                return Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.06)
+            }
+            border.color: {
+                if (modelData.url && eventMouseArea.containsMouse) {
+                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.3)
+                } else if (eventMouseArea.containsMouse) {
+                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.15)
+                }
+                return "transparent"
+            }
+            border.width: 1
+            
+            // Event indicator strip
+            Rectangle {
+                width: 4
+                height: parent.height - 8
+                anchors.left: parent.left
+                anchors.leftMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
+                radius: 2
+                color: theme.primary
+                opacity: 0.8
+            }
+            
+            Column {
+                id: eventContent
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: theme.spacingL + 4
+                anchors.rightMargin: theme.spacingM
+                spacing: 6
                             
                             Text {
                                 width: parent.width
@@ -280,37 +266,34 @@ Rectangle {
                                 }
                             }
                         }
-                        
-                        MouseArea {
-                            id: eventMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: modelData.url ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            enabled: modelData.url !== ""
-                            
-                            onClicked: {
-                                if (modelData.url && modelData.url !== "") {
-                                    if (Qt.openUrlExternally(modelData.url) === false) {
-                                        console.warn("Couldn't open", modelData.url)
-                                    }
-                                }
-                            }
-                        }
-                        
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: theme.shortDuration
-                                easing.type: theme.standardEasing
-                            }
-                        }
-                        
-                        Behavior on border.color {
-                            ColorAnimation {
-                                duration: theme.shortDuration
-                                easing.type: theme.standardEasing
-                            }
+            
+            MouseArea {
+                id: eventMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: modelData.url ? Qt.PointingHandCursor : Qt.ArrowCursor
+                enabled: modelData.url !== ""
+                
+                onClicked: {
+                    if (modelData.url && modelData.url !== "") {
+                        if (Qt.openUrlExternally(modelData.url) === false) {
+                            console.warn("Couldn't open", modelData.url)
                         }
                     }
+                }
+            }
+            
+            Behavior on color {
+                ColorAnimation {
+                    duration: theme.shortDuration
+                    easing.type: theme.standardEasing
+                }
+            }
+            
+            Behavior on border.color {
+                ColorAnimation {
+                    duration: theme.shortDuration
+                    easing.type: theme.standardEasing
                 }
             }
         }

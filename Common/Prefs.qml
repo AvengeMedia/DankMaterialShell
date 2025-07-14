@@ -27,6 +27,10 @@ Singleton {
     property bool showSystemResources: true
     property bool showSystemTray: true
     
+    // View mode preferences for launchers
+    property string appLauncherViewMode: "list"
+    property string spotlightLauncherViewMode: "list"
+    
     
     Component.onCompleted: loadSettings()
     
@@ -73,6 +77,8 @@ Singleton {
                 showClipboard = settings.showClipboard !== undefined ? settings.showClipboard : true
                 showSystemResources = settings.showSystemResources !== undefined ? settings.showSystemResources : true
                 showSystemTray = settings.showSystemTray !== undefined ? settings.showSystemTray : true
+                appLauncherViewMode = settings.appLauncherViewMode !== undefined ? settings.appLauncherViewMode : "list"
+                spotlightLauncherViewMode = settings.spotlightLauncherViewMode !== undefined ? settings.spotlightLauncherViewMode : "list"
                 console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 
                 applyStoredTheme()
@@ -102,7 +108,9 @@ Singleton {
             showMusic,
             showClipboard,
             showSystemResources,
-            showSystemTray
+            showSystemTray,
+            appLauncherViewMode,
+            spotlightLauncherViewMode
         }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
@@ -255,6 +263,19 @@ Singleton {
     function setShowSystemTray(enabled) {
         console.log("Prefs setShowSystemTray called - showSystemTray:", enabled)
         showSystemTray = enabled
+        saveSettings()
+    }
+    
+    // View mode setters
+    function setAppLauncherViewMode(mode) {
+        console.log("Prefs setAppLauncherViewMode called - appLauncherViewMode:", mode)
+        appLauncherViewMode = mode
+        saveSettings()
+    }
+    
+    function setSpotlightLauncherViewMode(mode) {
+        console.log("Prefs setSpotlightLauncherViewMode called - spotlightLauncherViewMode:", mode)
+        spotlightLauncherViewMode = mode
         saveSettings()
     }
 }

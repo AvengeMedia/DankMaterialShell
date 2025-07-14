@@ -27,43 +27,43 @@ Rectangle {
         shadowOpacity: 0.1
     }
     
+    // Placeholder when no weather - centered in entire widget
+    Column {
+        anchors.centerIn: parent
+        spacing: theme.spacingS
+        visible: !weather || !weather.available || weather.temp === 0
+        
+        Text {
+            text: "cloud_off"
+            font.family: theme.iconFont
+            font.pixelSize: theme.iconSize + 8
+            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+        
+        Text {
+            text: "No Weather Data"
+            font.pixelSize: theme.fontSizeMedium
+            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
+    }
+    
+    // Weather content when available - original Column structure
     Column {
         anchors.fill: parent
         anchors.margins: theme.spacingL
-        spacing: theme.spacingM
+        spacing: theme.spacingS
+        visible: weather && weather.available && weather.temp !== 0
         
-        // Show different content based on whether we have weather data
+        // Weather header info
         Item {
             width: parent.width
             height: 60
             
-            // Placeholder when no weather
-            Column {
-                anchors.centerIn: parent
-                spacing: theme.spacingS
-                visible: !weather || !weather.available || weather.temp === 0
-                
-                Text {
-                    text: "cloud_off"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.iconSize + 8
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                
-                Text {
-                    text: "No Weather Data"
-                    font.pixelSize: theme.fontSizeMedium
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
-            
-            // Normal weather info when available
             Row {
                 anchors.fill: parent
                 spacing: theme.spacingL
-                visible: weather && weather.available && weather.temp !== 0
                 
                 // Weather icon
                 Text {
@@ -108,7 +108,6 @@ Rectangle {
             columns: 2
             spacing: theme.spacingM
             anchors.horizontalCenter: parent.horizontalCenter
-            visible: weather && weather.available && weather.temp !== 0
             
             Row {
                 spacing: theme.spacingXS

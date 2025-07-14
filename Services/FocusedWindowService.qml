@@ -56,7 +56,7 @@ Singleton {
                         root.focusedAppId = windowData.app_id || ""
                         root.focusedWindowTitle = windowData.title || ""
                         root.focusedAppName = getDisplayName(windowData.app_id || "")
-                        root.focusedWindowId = windowData.id || -1
+                        root.focusedWindowId = parseInt(windowData.id) || -1
                     } catch (e) {
                         console.warn("FocusedWindowService: Failed to parse focused window data:", e)
                         clearFocusedWindow()

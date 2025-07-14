@@ -153,7 +153,7 @@ PanelWindow {
                                 color: "transparent"
                                 border.color: Qt.rgba(0, 0, 0, 0.15) // Subtle dark outline
                                 border.width: 1
-                                visible: hasImage
+                                visible: parent.hasImage
                             }
                             
                             // Highlight ring to make it pop
@@ -164,7 +164,7 @@ PanelWindow {
                                 color: "transparent"
                                 border.color: Qt.rgba(255, 255, 255, 0.1) // Subtle light ring
                                 border.width: 1
-                                visible: hasImage
+                                visible: parent.hasImage
                             }
                             
                             // Fallback icon for no profile picture (generic person)
@@ -173,7 +173,7 @@ PanelWindow {
                                 text: "person"
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize + 8
-                                color: Theme.onPrimary
+                                color: Theme.primaryText
                                 visible: Prefs.profileImage === ""
                             }
                             
@@ -183,7 +183,7 @@ PanelWindow {
                                 text: "warning"
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize + 8
-                                color: Theme.onPrimary
+                                color: Theme.primaryText
                                 visible: Prefs.profileImage !== "" && profileImage.status === Image.Error
                             }
                         }

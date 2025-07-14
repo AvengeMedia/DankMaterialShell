@@ -245,8 +245,7 @@ PanelWindow {
             Row {
                 id: columnHeaders
                 Layout.fillWidth: true
-                anchors.left: parent.left
-                anchors.leftMargin: 8
+                Layout.leftMargin: 8
                 spacing: 8
                 
                 // Icon placeholder + Process name
@@ -466,8 +465,8 @@ PanelWindow {
         }
         
         // Material 3 animations
-        opacity: menuVisible ? 1.0 : 0.0
-        scale: menuVisible ? 1.0 : 0.85
+        opacity: processContextMenuWindow.menuVisible ? 1.0 : 0.0
+        scale: processContextMenuWindow.menuVisible ? 1.0 : 0.85
         
         Behavior on opacity {
             NumberAnimation {

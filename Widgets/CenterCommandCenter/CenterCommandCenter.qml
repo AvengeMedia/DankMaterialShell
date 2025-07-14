@@ -70,9 +70,7 @@ PanelWindow {
             
             // Main row with widgets and calendar
             let widgetHeight = 160  // Media widget always present
-            if (weather?.available) {
-                widgetHeight += (weather ? 140 : 80) + theme.spacingM
-            }
+            widgetHeight += (weather ? 140 : 80) + theme.spacingM  // Weather widget always present
             let calendarHeight = 300
             let mainRowHeight = Math.max(widgetHeight, calendarHeight)
             
@@ -169,9 +167,7 @@ PanelWindow {
                 width: parent.width
                 height: {
                     let widgetHeight = 160  // Media widget always present
-                    if (weather?.available) {
-                        widgetHeight += (weather ? 140 : 80) + theme.spacingM
-                    }
+                    widgetHeight += (weather ? 140 : 80) + theme.spacingM  // Weather widget always present
                     let calendarHeight = 300
                     return Math.max(widgetHeight, calendarHeight)
                 }
@@ -186,7 +182,7 @@ PanelWindow {
                     visible: hasAnyWidgets
                     anchors.top: parent.top
                     
-                    property bool hasAnyWidgets: true || weather?.available  // Always show media widget
+                    property bool hasAnyWidgets: true  // Always show media widget and weather widget
                     
                     MediaPlayerWidget {
                         visible: true  // Always visible - shows placeholder when no media
@@ -196,7 +192,7 @@ PanelWindow {
                     }
                     
                     WeatherWidget {
-                        visible: weather?.available
+                        visible: true  // Always visible - shows placeholder when no weather
                         width: parent.width
                         height: weather ? 140 : 80
                         theme: centerCommandCenter.theme

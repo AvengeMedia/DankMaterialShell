@@ -36,7 +36,7 @@ PanelWindow {
     property var recentApps: Prefs.getRecentApps()
     property var pinnedApps: ["firefox", "code", "terminal", "file-manager"]
     property bool showCategories: false
-    property string viewMode: "list" // "list" or "grid"
+    property string viewMode: Prefs.appLauncherViewMode // "list" or "grid"
     property int selectedIndex: 0
     
     // Search debouncing
@@ -625,7 +625,10 @@ PanelWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: viewMode = "list"
+                                onClicked: {
+                                viewMode = "list"
+                                Prefs.setAppLauncherViewMode("list")
+                            }
                             }
                         }
                         
@@ -650,7 +653,10 @@ PanelWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: viewMode = "grid"
+                                onClicked: {
+                                viewMode = "grid"
+                                Prefs.setAppLauncherViewMode("grid")
+                            }
                             }
                         }
                     }
@@ -721,18 +727,18 @@ PanelWindow {
                         
                         GridView {
                             id: appGrid
-                            width: parent.width
+                            anchors.fill: parent
                             anchors.margins: Theme.spacingS
                             
-                            // Responsive cell sizes based on screen width
-                            property int baseCellWidth: Math.max(100, Math.min(140, width / 8))
+                            // Responsive cell sizes based on screen width - 4 columns
+                            property int columnsCount: 4
+                            property int baseCellWidth: (width - Theme.spacingS * 2) / columnsCount
                             property int baseCellHeight: baseCellWidth + 20
                             
                             cellWidth: baseCellWidth
                             cellHeight: baseCellHeight
                             
                             // Center the grid content
-                            property int columnsCount: Math.floor(width / cellWidth)
                             property int remainingSpace: width - (columnsCount * cellWidth)
                             leftMargin: Math.max(Theme.spacingS, remainingSpace / 2)
                             rightMargin: leftMargin
@@ -983,7 +989,7 @@ PanelWindow {
 
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 88
+                    width: appGrid.cellWidth - 12
                     text: model.name
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText

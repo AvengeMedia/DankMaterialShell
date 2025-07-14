@@ -320,13 +320,6 @@ ShellRoot {
             onClipboardRequested: {
                 clipboardHistoryPopup.toggle()
             }
-            
-            
-            onShowTrayMenuChanged: root.showTrayMenu = showTrayMenu
-            onCurrentTrayMenuChanged: root.currentTrayMenu = currentTrayMenu
-            onCurrentTrayItemChanged: root.currentTrayItem = currentTrayItem
-            onTrayMenuXChanged: root.trayMenuX = trayMenuX
-            onTrayMenuYChanged: root.trayMenuY = trayMenuY
         }
     }
     

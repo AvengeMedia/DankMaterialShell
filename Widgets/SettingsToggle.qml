@@ -80,7 +80,7 @@ Rectangle {
             radius: 10
             anchors.verticalCenter: parent.verticalCenter
             x: root.checked ? parent.width - width - 2 : 2
-            color: root.checked ? Theme.onPrimary : Theme.surfaceText
+            color: root.checked ? Theme.primaryText : Theme.surfaceText
             
             Behavior on x {
                 NumberAnimation {

@@ -22,7 +22,7 @@ PanelWindow {
         return result.concat(allCategories.filter(cat => cat !== "All"))
     }
     property string selectedCategory: "All"
-    property string viewMode: "list" // "list" or "grid"
+    property string viewMode: Prefs.spotlightLauncherViewMode // "list" or "grid"
     
     // Search debouncing
     Timer {
@@ -510,7 +510,10 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: viewMode = "list"
+                            onClicked: {
+                                viewMode = "list"
+                                Prefs.setSpotlightLauncherViewMode("list")
+                            }
                         }
                     }
                     
@@ -537,7 +540,10 @@ PanelWindow {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: viewMode = "grid"
+                            onClicked: {
+                                viewMode = "grid"
+                                Prefs.setSpotlightLauncherViewMode("grid")
+                            }
                         }
                     }
                 }
@@ -598,19 +604,35 @@ PanelWindow {
                             anchors.margins: Theme.spacingM
                             spacing: Theme.spacingL
                             
-                            Rectangle { 
+                            Item { 
                                 width: 40
                                 height: 40
-                                radius: Theme.cornerRadius
-                                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
-                                border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
-                                border.width: 1
                                 anchors.verticalCenter: parent.verticalCenter
                                 
                                 IconImage { 
+                                    id: listIconImg
                                     anchors.fill: parent
-                                    anchors.margins: 4
                                     source: model.icon ? Quickshell.iconPath(model.icon, "") : ""
+                                    smooth: true
+                                    asynchronous: true
+                                    visible: status === Image.Ready
+                                }
+                                
+                                Rectangle {
+                                    anchors.fill: parent
+                                    visible: !listIconImg.visible
+                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.10)
+                                    radius: Theme.cornerRadiusLarge
+                                    border.width: 1
+                                    border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.20)
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
+                                        font.pixelSize: 20
+                                        color: Theme.primary
+                                        font.weight: Font.Bold
+                                    }
                                 }
                             }
                             
@@ -650,56 +672,60 @@ PanelWindow {
                     ScrollBar.vertical: ScrollBar { policy: ScrollBar.AlwaysOn }
                 }
                 
-                // Grid view
-                GridView {
-                    id: resultsGrid
-                    // Center the grid within the parent space
-                    anchors.centerIn: parent
-                    width: Math.min(parent.width, baseCellWidth * 6 + 16) // Optimal width for 6 columns plus spacing
-                    height: parent.height
-                    visible: viewMode === "grid"
-                    model: filteredModel
+                // Grid view scroll container  
+                ScrollView {
+                    anchors.fill: parent
                     clip: true
-                    focus: spotlightOpen
-                    interactive: true
-                    flickDeceleration: 8000
-                    maximumFlickVelocity: 15000
+                    visible: viewMode === "grid"
+                    ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
                     
-                    // Optimized cell sizes for maximum space efficiency - 6 columns
-                    property int baseCellWidth: Math.max(85, Math.min(100, width / 6))
-                    property int baseCellHeight: baseCellWidth + 30
-                    
-                    cellWidth: baseCellWidth
-                    cellHeight: baseCellHeight
-                    
-                    // Use full width with minimal 2px right margin for scrollbar
-                    leftMargin: 0
-                    rightMargin: 2
-                    topMargin: Theme.spacingXS
-                    bottomMargin: Theme.spacingXS
-                    
-                    // Make mouse wheel scrolling more responsive
-                    property real wheelStepSize: 60
-                    
-                    MouseArea {
+                    GridView {
+                        id: resultsGrid
                         anchors.fill: parent
-                        acceptedButtons: Qt.NoButton
-                        propagateComposedEvents: true
-                        z: -1
+                        anchors.margins: Theme.spacingS
                         
-                        onWheel: (wheel) => {
-                            var delta = wheel.angleDelta.y
-                            var steps = delta / 120  // Standard wheel step
-                            resultsGrid.contentY -= steps * resultsGrid.wheelStepSize
+                        model: filteredModel
+                        focus: spotlightOpen
+                        interactive: true
+                        flickDeceleration: 8000
+                        maximumFlickVelocity: 15000
+                        
+                        // Responsive cell sizes based on screen width - wider cells for better fill
+                        property int baseCellWidth: Math.max(120, Math.min(160, width / 6))
+                        property int baseCellHeight: baseCellWidth + 20
+                        
+                        cellWidth: baseCellWidth
+                        cellHeight: baseCellHeight
+                        
+                        // Center the grid content with better fill
+                        property int columnsCount: Math.floor(width / cellWidth)
+                        property int remainingSpace: width - (columnsCount * cellWidth)
+                        leftMargin: Math.max(Theme.spacingXS, remainingSpace / 2)
+                        rightMargin: leftMargin
+                        
+                        // Make mouse wheel scrolling more responsive
+                        property real wheelStepSize: 60
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            acceptedButtons: Qt.NoButton
+                            propagateComposedEvents: true
+                            z: -1
                             
-                            // Ensure we stay within bounds
-                            if (resultsGrid.contentY < 0) {
-                                resultsGrid.contentY = 0
-                            } else if (resultsGrid.contentY > resultsGrid.contentHeight - resultsGrid.height) {
-                                resultsGrid.contentY = Math.max(0, resultsGrid.contentHeight - resultsGrid.height)
+                            onWheel: (wheel) => {
+                                var delta = wheel.angleDelta.y
+                                var steps = delta / 120  // Standard wheel step
+                                resultsGrid.contentY -= steps * resultsGrid.wheelStepSize
+                                
+                                // Ensure we stay within bounds
+                                if (resultsGrid.contentY < 0) {
+                                    resultsGrid.contentY = 0
+                                } else if (resultsGrid.contentY > resultsGrid.contentHeight - resultsGrid.height) {
+                                    resultsGrid.contentY = Math.max(0, resultsGrid.contentHeight - resultsGrid.height)
+                                }
                             }
                         }
-                    }
                     
                     delegate: Rectangle {
                         width: resultsGrid.cellWidth - 8
@@ -720,24 +746,36 @@ PanelWindow {
                                 height: iconSize
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 
+                                IconImage {
+                                    id: iconImg
+                                    anchors.fill: parent
+                                    source: model.icon ? Quickshell.iconPath(model.icon, "") : ""
+                                    smooth: true
+                                    asynchronous: true
+                                    visible: status === Image.Ready
+                                }
+                                
                                 Rectangle {
                                     anchors.fill: parent
-                                    radius: Theme.cornerRadius
-                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
-                                    border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                                    visible: !iconImg.visible
+                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.10)
+                                    radius: Theme.cornerRadiusLarge
                                     border.width: 1
-                                    
-                                    IconImage {
-                                        anchors.fill: parent
-                                        anchors.margins: 4
-                                        source: model.icon ? Quickshell.iconPath(model.icon, "") : ""
+                                    border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.20)
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
+                                        font.pixelSize: Math.min(24, parent.width * 0.5)
+                                        color: Theme.primary
+                                        font.weight: Font.Bold
                                     }
                                 }
                             }
                             
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                width: resultsGrid.cellWidth - 16
+                                width: resultsGrid.cellWidth - 12
                                 text: model.name
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
@@ -759,9 +797,8 @@ PanelWindow {
                             onClicked: launchApp(model)
                         }
                     }
-                    
-                    ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
                 }
+            }
             }
         }
     }

@@ -217,7 +217,7 @@ PanelWindow {
                                             text: profileImageInput.text === "" ? "person" : "warning"
                                             font.family: Theme.iconFont
                                             font.pixelSize: Theme.iconSize + 8
-                                            color: Theme.onPrimary
+                                            color: Theme.primaryText
                                             visible: !avatarBox.hasImage
                                         }
 

@@ -455,8 +455,8 @@ QtObject {
     property color surfaceVariant: isDynamicTheme ? Colors.surfaceVariant : getCurrentTheme().surfaceVariant
     property color surfaceVariantText: isDynamicTheme ? Colors.surfaceVariantText : getCurrentTheme().surfaceVariantText
     property color surfaceTint: isDynamicTheme ? Colors.surfaceTint : getCurrentTheme().surfaceTint
-    property color background: isDynamicTheme ? Colors.background : getCurrentTheme().background
-    property color backgroundText: isDynamicTheme ? Colors.backgroundText : getCurrentTheme().backgroundText
+    property color background: isDynamicTheme ? Colors.bg : getCurrentTheme().background
+    property color backgroundText: isDynamicTheme ? Colors.surfaceText : getCurrentTheme().backgroundText
     property color outline: isDynamicTheme ? Colors.outline : getCurrentTheme().outline
     property color surfaceContainer: isDynamicTheme ? Colors.surfaceContainer : getCurrentTheme().surfaceContainer
     property color surfaceContainerHigh: isDynamicTheme ? Colors.surfaceContainerHigh : getCurrentTheme().surfaceContainerHigh
