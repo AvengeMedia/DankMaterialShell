@@ -36,7 +36,7 @@ ScrollView {
                 rightIcon: "brightness_high"
                 enabled: BrightnessService.brightnessAvailable
                 
-                onSliderValueChanged: (newValue) => {
+                onSliderValueChanged: function(newValue) {
                     BrightnessService.setBrightness(newValue)
                 }
             }

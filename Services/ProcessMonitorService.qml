@@ -318,6 +318,9 @@ Singleton {
         const lines = text.split('\n')
         let section = 'memory'
         const coreUsages = []
+        let memFree = 0
+        let memBuffers = 0
+        let memCached = 0
         
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim()
@@ -333,9 +336,12 @@ Singleton {
             if (section === 'memory') {
                 if (line.startsWith('MemTotal:')) {
                     root.totalMemoryKB = parseInt(line.split(/\s+/)[1])
-                } else if (line.startsWith('MemAvailable:')) {
-                    const availableKB = parseInt(line.split(/\s+/)[1])
-                    root.usedMemoryKB = root.totalMemoryKB - availableKB
+                } else if (line.startsWith('MemFree:')) {
+                    memFree = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('Buffers:')) {
+                    memBuffers = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('Cached:')) {
+                    memCached = parseInt(line.split(/\s+/)[1])
                 } else if (line.startsWith('SwapTotal:')) {
                     root.totalSwapKB = parseInt(line.split(/\s+/)[1])
                 } else if (line.startsWith('SwapFree:')) {
@@ -382,6 +388,9 @@ Singleton {
                 }
             }
         }
+        
+        // Calculate used memory as total minus free minus buffers minus cached
+        root.usedMemoryKB = root.totalMemoryKB - memFree - memBuffers - memCached
         
         // Update per-core usage
         root.perCoreCpuUsage = coreUsages
