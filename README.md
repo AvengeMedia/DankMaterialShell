@@ -60,10 +60,10 @@ git clone https://github.com/bbedward/DankMaterialShell.git ~/.config/quickshell
 4. Enable
 
 ```
-qs -c DankMaterialDark
+qs -c DankMaterialShell
 
 # In niri config
-spawn-at-startup "qs" "-c" "DankMaterialDark"
+spawn-at-startup "qs" "-c" "DankMaterialShell"
 
 # Optionally at bindings for spotlight launcher and clipboard history
 Mod+Space hotkey-overlay-title="Run an Application: Spotlight" { spawn "qs" "-c" "DankMaterialShell" "ipc" "call" "spotlight" "toggle"; }
