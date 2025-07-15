@@ -11,6 +11,7 @@ Item {
     property bool hasActiveMedia: false
     property var activePlayer: null
     property bool cavaAvailable: false
+    property bool configCreated: false
     
     width: 20
     height: Theme.iconSize
@@ -21,10 +22,10 @@ Item {
         running: true
         onExited: (exitCode) => {
             root.cavaAvailable = exitCode === 0
-            if (root.cavaAvailable) {
+            if (root.cavaAvailable && !root.configCreated) {
                 console.log("cava found - creating config and enabling real audio visualization")
                 configWriter.running = true
-            } else {
+            } else if (!root.cavaAvailable) {
                 console.log("cava not found - using fallback animation")
                 fallbackTimer.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
             }
@@ -33,7 +34,7 @@ Item {
     
     Process {
         id: configWriter
-        running: root.cavaAvailable
+        running: false
         command: [
             "sh", "-c", 
             `cat > /tmp/quickshell_cava_config << 'EOF'
@@ -57,6 +58,7 @@ EOF`
         ]
         
         onExited: {
+            root.configCreated = true
             if (root.cavaAvailable) {
                 cavaProcess.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
             }
