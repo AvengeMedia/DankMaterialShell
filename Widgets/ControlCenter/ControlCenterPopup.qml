@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
+import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -104,9 +104,7 @@ PanelWindow {
                 easing.type: Theme.emphasizedEasing
             }
         }
-        
-        // Height animation handled by states below for better performance
-        
+                
         Column {
             anchors.fill: parent
             anchors.margins: Theme.spacingL
@@ -117,7 +115,6 @@ PanelWindow {
                 width: parent.width
                 spacing: Theme.spacingL
                 
-                // User Info Section - Jony Ive inspired
                 Rectangle {
                     width: parent.width
                     height: 90
@@ -133,76 +130,64 @@ PanelWindow {
                         anchors.rightMargin: Theme.spacingL
                         spacing: Theme.spacingL
                         
-                        // Profile Picture Container
-                        Item {
+                        // Profile Picture Container with circular outline
+                        Rectangle {
                             width: 64
                             height: 64
+                            radius: width / 2
+                            color: "transparent"
+                            border.color: Qt.rgba(0, 0, 0, 0.15)
+                            border.width: 1
                             
-                            property bool hasImage: Prefs.profileImage !== "" && profileImage.status !== Image.Error
-                            
-                            // Background circle for fallback icon
-                            Rectangle {
+                            // Hidden image for OpacityMask source
+                            Image {
+                                id: profileImage
                                 anchors.fill: parent
-                                radius: 32
-                                color: Theme.primary
-                                visible: !parent.hasImage
-                            }
-                            
-                            // Circular clipping container for profile image
-                            ClippingRectangle {
-                                anchors.fill: parent
-                                anchors.margins: 1
-                                radius: width / 2
-                                antialiasing: true
-                                color: "transparent"
-                                visible: parent.hasImage
-                                
-                                Image {
-                                    id: profileImage
-                                    anchors.fill: parent
-                                    source: {
-                                        if (Prefs.profileImage === "") return ""
-                                        // Add file:// prefix if it's a local path (starts with /)
-                                        if (Prefs.profileImage.startsWith("/")) {
-                                            return "file://" + Prefs.profileImage
-                                        }
-                                        // Return as-is if it already has a protocol or is a web URL
-                                        return Prefs.profileImage
+                                anchors.margins: 5  // Inset by border width
+                                fillMode: Image.PreserveAspectCrop
+                                smooth: true
+                                asynchronous: true
+                                mipmap: true
+                                cache: true
+                                sourceSize.width: 128
+                                sourceSize.height: 128
+                                visible: false  // Hidden, only used as mask source
+                                source: {
+                                    if (Prefs.profileImage === "") return ""
+                                    // Add file:// prefix if it's a local path (starts with /)
+                                    if (Prefs.profileImage.startsWith("/")) {
+                                        return "file://" + Prefs.profileImage
                                     }
-                                    fillMode: Image.PreserveAspectCrop
-                                    smooth: false  // Disable smooth scaling during animations for performance
-                                    asynchronous: true
-                                    mipmap: false  // Disable mipmap for better performance
-                                    cache: true    // Enable caching to prevent reloads
-                                    
-                                    // Optimize source size to prevent unnecessary scaling
-                                    sourceSize.width: 64
-                                    sourceSize.height: 64
+                                    // Return as-is if it already has a protocol or is a web URL
+                                    return Prefs.profileImage
                                 }
                             }
                             
-                            // Subtle circular outline for images
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: 32
-                                color: "transparent"
-                                border.color: Qt.rgba(0, 0, 0, 0.15) // Subtle dark outline
-                                border.width: 1
-                                visible: parent.hasImage
+                            // OpacityMask inset by 1px to leave border visible
+                            OpacityMask {
+                                anchors.fill: profileImage
+                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
+                                source: profileImage
+                                
+                                maskSource: Rectangle {
+                                    width: profileImage.width
+                                    height: profileImage.height
+                                    radius: width / 2
+                                    color: "white"
+                                    visible: false
+                                }
                             }
                             
-                            // Highlight ring to make it pop
+                            // Fallback background for no image
                             Rectangle {
                                 anchors.fill: parent
-                                anchors.margins: -1
-                                radius: 33
-                                color: "transparent"
-                                border.color: Qt.rgba(255, 255, 255, 0.1) // Subtle light ring
-                                border.width: 1
-                                visible: parent.hasImage
+                                anchors.margins: 2
+                                radius: width / 2
+                                color: Theme.primary
+                                visible: Prefs.profileImage === ""
                             }
                             
-                            // Fallback icon for no profile picture (generic person)
+                            // Fallback icon for no profile picture
                             Text {
                                 anchors.centerIn: parent
                                 text: "person"

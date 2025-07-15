@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import "../Common"
 pragma Singleton
 pragma ComponentBehavior: Bound
 
@@ -21,6 +22,13 @@ Singleton {
         uv: 0,
         pressure: 0
     })
+    
+    property int updateInterval: 600000  // 10 minutes
+    property int retryAttempts: 0
+    property int maxRetryAttempts: 3
+    property int retryDelay: 30000  // 30 seconds
+    property int lastFetchTime: 0
+    property int minFetchInterval: 30000  // 30 seconds minimum between fetches
     
     // Weather icon mapping (based on wttr.in weather codes)
     property var weatherIcons: ({
@@ -78,9 +86,68 @@ Singleton {
         return weatherIcons[code] || "cloud"
     }
     
+    function getWeatherUrl() {
+        if (Prefs.weatherLocationOverrideEnabled && Prefs.weatherLocationOverride) {
+            const url = `wttr.in/${encodeURIComponent(Prefs.weatherLocationOverride)}?format=j1`
+            console.log("Using override location:", Prefs.weatherLocationOverride, "URL:", url)
+            return url
+        }
+        console.log("Using auto-detected location")
+        return "wttr.in/?format=j1"
+    }
+    
+    function fetchWeather() {
+        if (weatherFetcher.running) {
+            console.log("Weather fetch already in progress, skipping")
+            return
+        }
+        
+        // Check if we've fetched recently to prevent spam
+        const now = Date.now()
+        if (now - root.lastFetchTime < root.minFetchInterval) {
+            console.log("Weather fetch throttled, too soon since last fetch")
+            return
+        }
+        
+        console.log("Fetching weather from:", getWeatherUrl())
+        root.lastFetchTime = now
+        root.weather.loading = true
+        weatherFetcher.command = ["bash", "-c", `curl -s --connect-timeout 10 --max-time 30 '${getWeatherUrl()}'`]
+        weatherFetcher.running = true
+    }
+    
+    function forceRefresh() {
+        console.log("Force refreshing weather")
+        root.lastFetchTime = 0  // Reset throttle
+        fetchWeather()
+    }
+    
+    function handleWeatherSuccess() {
+        root.retryAttempts = 0
+        // Don't restart the timer - let it continue its normal interval
+        if (updateTimer.interval !== root.updateInterval) {
+            updateTimer.interval = root.updateInterval
+        }
+    }
+    
+    function handleWeatherFailure() {
+        root.retryAttempts++
+        if (root.retryAttempts < root.maxRetryAttempts) {
+            console.log(`Weather fetch failed, retrying in ${root.retryDelay/1000}s (attempt ${root.retryAttempts}/${root.maxRetryAttempts})`)
+            retryTimer.start()
+        } else {
+            console.warn("Weather fetch failed after maximum retry attempts")
+            root.weather.available = false
+            root.weather.loading = false
+            root.retryAttempts = 0
+            // Set longer interval for next automatic retry
+            updateTimer.interval = root.updateInterval * 2
+        }
+    }
+
     Process {
         id: weatherFetcher
-        command: ["bash", "-c", "curl -s 'wttr.in/?format=j1'"]
+        command: ["bash", "-c", `curl -s --connect-timeout 10 --max-time 30 '${root.getWeatherUrl()}'`]
         running: false
         
         stdout: StdioCollector {
@@ -88,7 +155,7 @@ Singleton {
                 const raw = text.trim()
                 if (!raw || raw[0] !== "{") {
                     console.warn("No valid weather data received")
-                    root.weather.available = false
+                    root.handleWeatherFailure()
                     return
                 }
 
@@ -120,11 +187,12 @@ Singleton {
 
                     console.log("Weather updated:", root.weather.city,
                                 `${root.weather.temp}°C`)
+                    
+                    root.handleWeatherSuccess()
 
                 } catch (e) {
                     console.warn("Failed to parse weather data:", e.message)
-                    root.weather.available = false
-                    root.weather.loading = false
+                    root.handleWeatherFailure()
                 }
             }
         }
@@ -132,19 +200,44 @@ Singleton {
         onExited: (exitCode) => {
             if (exitCode !== 0) {
                 console.warn("Weather fetch failed with exit code:", exitCode)
-                root.weather.available = false
-                root.weather.loading = false
+                root.handleWeatherFailure()
             }
         }
     }
     
     Timer {
-        interval: 600000  // 10 minutes
+        id: updateTimer
+        interval: root.updateInterval
         running: true
         repeat: true
         triggeredOnStart: true
         onTriggered: {
-            weatherFetcher.running = true
+            root.fetchWeather()
         }
+    }
+    
+    Timer {
+        id: retryTimer
+        interval: root.retryDelay
+        running: false
+        repeat: false
+        onTriggered: {
+            root.fetchWeather()
+        }
+    }
+    
+    Component.onCompleted: {
+        // Watch for preference changes to refetch weather
+        Prefs.weatherLocationOverrideChanged.connect(() => {
+            if (Prefs.weatherLocationOverrideEnabled && Prefs.weatherLocationOverride.length > 0) {
+                console.log("Weather location override changed, force refreshing weather")
+                Qt.callLater(root.forceRefresh)
+            }
+        })
+        
+        Prefs.weatherLocationOverrideEnabledChanged.connect(() => {
+            console.log("Weather location override enabled/disabled, force refreshing weather")
+            Qt.callLater(root.forceRefresh)
+        })
     }
 }

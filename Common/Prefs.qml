@@ -19,6 +19,8 @@ Singleton {
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property string profileImage: ""
+    property bool weatherLocationOverrideEnabled: false
+    property string weatherLocationOverride: ""
     
     // Widget visibility preferences for TopBar
     property bool showFocusedWindow: true
@@ -82,6 +84,8 @@ Singleton {
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
                 profileImage = settings.profileImage !== undefined ? settings.profileImage : ""
+                weatherLocationOverrideEnabled = settings.weatherLocationOverrideEnabled !== undefined ? settings.weatherLocationOverrideEnabled : false
+                weatherLocationOverride = settings.weatherLocationOverride !== undefined ? settings.weatherLocationOverride : ""
                 showFocusedWindow = settings.showFocusedWindow !== undefined ? settings.showFocusedWindow : true
                 showWeather = settings.showWeather !== undefined ? settings.showWeather : true
                 showMusic = settings.showMusic !== undefined ? settings.showMusic : true
@@ -115,6 +119,8 @@ Singleton {
             useFahrenheit,
             nightModeEnabled,
             profileImage,
+            weatherLocationOverrideEnabled,
+            weatherLocationOverride,
             showFocusedWindow,
             showWeather,
             showMusic,
@@ -294,6 +300,19 @@ Singleton {
     function setSpotlightLauncherViewMode(mode) {
         console.log("Prefs setSpotlightLauncherViewMode called - spotlightLauncherViewMode:", mode)
         spotlightLauncherViewMode = mode
+        saveSettings()
+    }
+    
+    // Weather location override setters
+    function setWeatherLocationOverrideEnabled(enabled) {
+        console.log("Prefs setWeatherLocationOverrideEnabled called - weatherLocationOverrideEnabled:", enabled)
+        weatherLocationOverrideEnabled = enabled
+        saveSettings()
+    }
+    
+    function setWeatherLocationOverride(location) {
+        console.log("Prefs setWeatherLocationOverride called - weatherLocationOverride:", location)
+        weatherLocationOverride = location
         saveSettings()
     }
 }
