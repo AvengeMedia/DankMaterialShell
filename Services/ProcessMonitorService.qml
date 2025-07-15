@@ -7,15 +7,12 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // Process list properties
     property var processes: []
     property bool isUpdating: false
     property int processUpdateInterval: 3000
     
-    // Performance control - only run when process monitor is actually visible
     property bool monitoringEnabled: false
     
-    // System information properties
     property int totalMemoryKB: 0
     property int usedMemoryKB: 0
     property int totalSwapKB: 0
@@ -24,28 +21,23 @@ Singleton {
     property real totalCpuUsage: 0.0
     property bool systemInfoAvailable: false
     
-    // Performance history for charts
     property var cpuHistory: []
     property var memoryHistory: []
     property var networkHistory: ({rx: [], tx: []})
     property var diskHistory: ({read: [], write: []})
-    property int historySize: 60  // Keep 60 data points
+    property int historySize: 60
     
-    // Per-core CPU usage
     property var perCoreCpuUsage: []
     
-    // Network stats
-    property real networkRxRate: 0  // bytes/sec
-    property real networkTxRate: 0  // bytes/sec
+    property real networkRxRate: 0
+    property real networkTxRate: 0
     property var lastNetworkStats: null
     
-    // Disk I/O stats
-    property real diskReadRate: 0  // bytes/sec
-    property real diskWriteRate: 0  // bytes/sec
+    property real diskReadRate: 0
+    property real diskWriteRate: 0
     property var lastDiskStats: null
     
-    // Sorting options
-    property string sortBy: "cpu" // "cpu", "memory", "name", "pid"
+    property string sortBy: "cpu"
     property bool sortDescending: true
     property int maxProcesses: 20
     
@@ -53,9 +45,6 @@ Singleton {
         console.log("ProcessMonitorService: Starting initialization...")
         updateProcessList()
         console.log("ProcessMonitorService: Initialization complete")
-        
-        // Test monitoring disabled - only monitor when explicitly enabled
-        // testTimer.start()
     }
     
     Timer {
@@ -66,7 +55,6 @@ Singleton {
         onTriggered: {
             console.log("ProcessMonitorService: Starting test monitoring...")
             enableMonitoring(true)
-            // Stop after 8 seconds
             stopTestTimer.start()
         }
     }
@@ -82,7 +70,6 @@ Singleton {
         }
     }
     
-    // System information monitoring
     Process {
         id: systemInfoProcess
         command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu' /proc/stat | head -" + (root.cpuCount + 1)]
@@ -104,7 +91,6 @@ Singleton {
         }
     }
     
-    // Network monitoring process
     Process {
         id: networkStatsProcess
         command: ["bash", "-c", "cat /proc/net/dev | grep -E '(wlan|eth|enp|wlp|ens|eno)' | awk '{print $1,$2,$10}' | sed 's/:/ /'"]
@@ -119,7 +105,6 @@ Singleton {
         }
     }
     
-    // Disk I/O monitoring process
     Process {
         id: diskStatsProcess
         command: ["bash", "-c", "cat /proc/diskstats | grep -E ' (sd[a-z]+|nvme[0-9]+n[0-9]+|vd[a-z]+) ' | grep -v 'p[0-9]' | awk '{print $3,$6,$10}'"]
@@ -134,7 +119,6 @@ Singleton {
         }
     }
     
-    // Process monitoring with ps command
     Process {
         id: processListProcess
         command: ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,rss,comm,cmd --sort=-pcpu | head -" + (root.maxProcesses + 1)]
@@ -146,12 +130,10 @@ Singleton {
                     const lines = text.trim().split('\n')
                     const newProcesses = []
                     
-                    // Skip header line
                     for (let i = 1; i < lines.length; i++) {
                         const line = lines[i].trim()
                         if (!line) continue
                         
-                        // Parse ps output: PID PPID %CPU %MEM RSS COMMAND CMD
                         const parts = line.split(/\s+/)
                         if (parts.length >= 7) {
                             const pid = parseInt(parts[0])
@@ -189,11 +171,10 @@ Singleton {
         }
     }
     
-    // System and process monitoring timer - now conditional
     Timer {
         id: processTimer
         interval: root.processUpdateInterval
-        running: root.monitoringEnabled  // Only run when monitoring is enabled
+        running: root.monitoringEnabled
         repeat: true
         
         onTriggered: {
@@ -206,29 +187,24 @@ Singleton {
         }
     }
     
-    // Public functions
     function updateSystemInfo() {
         if (!systemInfoProcess.running && root.monitoringEnabled) {
             systemInfoProcess.running = true
         }
     }
     
-    // Control functions for enabling/disabling monitoring
     function enableMonitoring(enabled) {
         console.log("ProcessMonitorService: Monitoring", enabled ? "enabled" : "disabled")
         root.monitoringEnabled = enabled
         if (enabled) {
-            // Clear history when starting
             root.cpuHistory = []
             root.memoryHistory = []
             root.networkHistory = ({rx: [], tx: []})
             root.diskHistory = ({read: [], write: []})
-            // Immediately update when enabled
             updateSystemInfo()
             updateProcessList()
             updateNetworkStats()
             updateDiskStats()
-            // console.log("ProcessMonitorService: Initial data collection started")
         }
     }
     
@@ -248,7 +224,6 @@ Singleton {
         if (!root.isUpdating && root.monitoringEnabled) {
             root.isUpdating = true
             
-            // Update sort command based on current sort option
             let sortOption = ""
             switch (root.sortBy) {
                 case "cpu":
@@ -307,7 +282,6 @@ Singleton {
     }
     
     function getProcessIcon(command) {
-        // Return appropriate Material Design icon for common processes
         const cmd = command.toLowerCase()
         if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser")) return "web"
         if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim")) return "code"
@@ -315,7 +289,7 @@ Singleton {
         if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify")) return "music_note"
         if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv")) return "play_circle"
         if (cmd.includes("systemd") || cmd.includes("kernel") || cmd.includes("kthread")) return "settings"
-        return "memory" // Default process icon
+        return "memory"
     }
     
     function formatCpuUsage(cpu) {
@@ -444,7 +418,6 @@ Singleton {
             root.networkRxRate = Math.max(0, (totalRx - root.lastNetworkStats.rx) / timeDiff)
             root.networkTxRate = Math.max(0, (totalTx - root.lastNetworkStats.tx) / timeDiff)
             
-            // Convert to KB/s for history
             addToHistory(root.networkHistory.rx, root.networkRxRate / 1024)
             addToHistory(root.networkHistory.tx, root.networkTxRate / 1024)
         }
@@ -463,7 +436,7 @@ Singleton {
                 const readSectors = parseInt(parts[1])
                 const writeSectors = parseInt(parts[2])
                 if (!isNaN(readSectors) && !isNaN(writeSectors)) {
-                    totalRead += readSectors * 512  // Convert sectors to bytes
+                    totalRead += readSectors * 512
                     totalWrite += writeSectors * 512
                 }
             }
@@ -474,7 +447,6 @@ Singleton {
             root.diskReadRate = Math.max(0, (totalRead - root.lastDiskStats.read) / timeDiff)
             root.diskWriteRate = Math.max(0, (totalWrite - root.lastDiskStats.write) / timeDiff)
             
-            // Convert to MB/s for history
             addToHistory(root.diskHistory.read, root.diskReadRate / (1024 * 1024))
             addToHistory(root.diskHistory.write, root.diskWriteRate / (1024 * 1024))
         }

@@ -7,7 +7,6 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // Battery properties
     property bool batteryAvailable: false
     property int batteryLevel: 0
     property string batteryStatus: "Unknown"
@@ -20,8 +19,6 @@ Singleton {
     property int batteryCapacity: 0
     property var powerProfiles: []
     property string activePowerProfile: ""
-    
-    // Check if battery is available
     Process {
         id: batteryAvailabilityChecker
         command: ["bash", "-c", "ls /sys/class/power_supply/ | grep -E '^BAT' | head -1"]
@@ -58,7 +55,6 @@ Singleton {
                 if (text.trim() && text.trim() !== "fallback") {
                     parseBatteryInfo(text.trim())
                 } else {
-                    // Fallback to simple methods
                     fallbackBatteryChecker.running = true
                 }
             }
@@ -72,7 +68,6 @@ Singleton {
         }
     }
     
-    // Fallback battery checker using /sys files
     Process {
         id: fallbackBatteryChecker
         command: ["bash", "-c", "if [ -f /sys/class/power_supply/BAT0/capacity ]; then BAT=BAT0; elif [ -f /sys/class/power_supply/BAT1/capacity ]; then BAT=BAT1; else echo 'no-battery'; exit 1; fi; echo \"percentage: $(cat /sys/class/power_supply/$BAT/capacity)%\"; echo \"state: $(cat /sys/class/power_supply/$BAT/status 2>/dev/null || echo Unknown)\"; if [ -f /sys/class/power_supply/$BAT/technology ]; then echo \"technology: $(cat /sys/class/power_supply/$BAT/technology)\"; fi; if [ -f /sys/class/power_supply/$BAT/cycle_count ]; then echo \"cycle-count: $(cat /sys/class/power_supply/$BAT/cycle_count)\"; fi"]
@@ -87,7 +82,6 @@ Singleton {
         }
     }
     
-    // Power profiles checker (for systems with power-profiles-daemon)
     Process {
         id: powerProfilesChecker
         command: ["bash", "-c", "if command -v powerprofilesctl > /dev/null; then powerprofilesctl list 2>/dev/null; else echo 'not-available'; fi"]
@@ -170,7 +164,6 @@ Singleton {
         for (let line of lines) {
             line = line.trim()
             if (line.includes('*')) {
-                // Active profile
                 let profileName = line.replace('*', '').trim()
                 if (profileName.includes(':')) {
                     profileName = profileName.split(':')[0].trim()
@@ -248,7 +241,6 @@ Singleton {
     }
     
     
-    // Update timer
     Timer {
         interval: 30000
         running: root.batteryAvailable

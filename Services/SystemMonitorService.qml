@@ -7,16 +7,13 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // CPU properties
     property real cpuUsage: 0.0
     property int cpuCores: 1
     property string cpuModel: ""
     property real cpuFrequency: 0.0
     
-    // Previous CPU stats for accurate calculation
     property var prevCpuStats: [0, 0, 0, 0, 0, 0, 0, 0]
     
-    // Memory properties  
     property real memoryUsage: 0.0
     property real totalMemory: 0.0
     property real usedMemory: 0.0
@@ -25,14 +22,12 @@ Singleton {
     property real bufferMemory: 0.0
     property real cacheMemory: 0.0
     
-    // Temperature properties
     property real cpuTemperature: 0.0
     
     property int cpuUpdateInterval: 3000
     property int memoryUpdateInterval: 5000
     property int temperatureUpdateInterval: 10000
     
-    // Performance control
     property bool enabledForTopBar: true
     property bool enabledForDetailedView: false
 
@@ -43,7 +38,6 @@ Singleton {
         console.log("SystemMonitorService: Initialization complete")
     }
     
-    // Get CPU information (static)
     Process {
         id: cpuInfoProcess
         command: ["bash", "-c", "lscpu | grep -E 'Model name|CPU\\(s\\):' | head -2"]
@@ -69,7 +63,6 @@ Singleton {
         }
     }
     
-    // CPU usage monitoring with accurate calculation
     Process {
         id: cpuUsageProcess
         command: ["bash", "-c", "head -1 /proc/stat | awk '{print $2,$3,$4,$5,$6,$7,$8,$9}'"]
@@ -80,17 +73,14 @@ Singleton {
                 if (text.trim()) {
                     const stats = text.trim().split(" ").map(x => parseInt(x))
                     if (root.prevCpuStats[0] > 0) {
-                        // Calculate differences
                         let diffs = []
                         for (let i = 0; i < 8; i++) {
                             diffs[i] = stats[i] - root.prevCpuStats[i]
                         }
                         
-                        // Calculate total and idle time
                         const totalTime = diffs.reduce((a, b) => a + b, 0)
-                        const idleTime = diffs[3] + diffs[4] // idle + iowait
+                        const idleTime = diffs[3] + diffs[4]
                         
-                        // CPU usage percentage
                         if (totalTime > 0) {
                             root.cpuUsage = Math.max(0, Math.min(100, ((totalTime - idleTime) / totalTime) * 100))
                         }
@@ -107,7 +97,6 @@ Singleton {
         }
     }
     
-    // Memory usage monitoring
     Process {
         id: memoryUsageProcess
         command: ["bash", "-c", "free -m | awk 'NR==2{printf \"%.1f %.1f %.1f %.1f\", $3*100/$2, $2, $3, $7}'"]
@@ -133,7 +122,6 @@ Singleton {
         }
     }
     
-    // CPU frequency monitoring
     Process {
         id: cpuFrequencyProcess
         command: ["bash", "-c", "cat /proc/cpuinfo | grep 'cpu MHz' | head -1 | awk '{print $4}'"]
@@ -154,7 +142,6 @@ Singleton {
         }
     }
     
-    // CPU temperature monitoring
     Process {
         id: temperatureProcess
         command: ["bash", "-c", "if [ -f /sys/class/thermal/thermal_zone0/temp ]; then cat /sys/class/thermal/thermal_zone0/temp | awk '{print $1/1000}'; else sensors 2>/dev/null | grep 'Core 0' | awk '{print $3}' | sed 's/+//g;s/°C//g' | head -1; fi"]
@@ -175,7 +162,6 @@ Singleton {
         }
     }
     
-    // CPU monitoring timer
     Timer {
         id: cpuTimer
         interval: root.cpuUpdateInterval
@@ -190,7 +176,6 @@ Singleton {
         }
     }
     
-    // Memory monitoring timer
     Timer {
         id: memoryTimer
         interval: root.memoryUpdateInterval
@@ -204,7 +189,6 @@ Singleton {
         }
     }
     
-    // Temperature monitoring timer
     Timer {
         id: temperatureTimer
         interval: root.temperatureUpdateInterval
@@ -218,7 +202,6 @@ Singleton {
         }
     }
     
-    // Public functions
     function getCpuInfo() {
         cpuInfoProcess.running = true
     }
@@ -243,15 +226,15 @@ Singleton {
     }
     
     function getCpuUsageColor() {
-        if (cpuUsage > 80) return "#e74c3c" // Red
-        if (cpuUsage > 60) return "#f39c12" // Orange
-        return "#27ae60" // Green
+        if (cpuUsage > 80) return "#e74c3c"
+        if (cpuUsage > 60) return "#f39c12"
+        return "#27ae60"
     }
     
     function getMemoryUsageColor() {
-        if (memoryUsage > 90) return "#e74c3c" // Red
-        if (memoryUsage > 75) return "#f39c12" // Orange
-        return "#3498db" // Blue
+        if (memoryUsage > 90) return "#e74c3c"
+        if (memoryUsage > 75) return "#f39c12"
+        return "#3498db"
     }
     
     function formatMemory(mb) {
@@ -262,8 +245,8 @@ Singleton {
     }
     
     function getTemperatureColor() {
-        if (cpuTemperature > 80) return "#e74c3c" // Red
-        if (cpuTemperature > 65) return "#f39c12" // Orange
-        return "#27ae60" // Green
+        if (cpuTemperature > 80) return "#e74c3c"
+        if (cpuTemperature > 65) return "#f39c12"
+        return "#27ae60"
     }
 }

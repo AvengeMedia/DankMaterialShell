@@ -334,7 +334,7 @@ PanelWindow {
                             topBar.shellRoot.controlCenterVisible = !topBar.shellRoot.controlCenterVisible
                             if (topBar.shellRoot.controlCenterVisible) {
                                 WifiService.scanWifi()
-                                BluetoothService.scanDevices()
+                                // Bluetooth devices are automatically updated via signals
                             }
                         }
                     }
