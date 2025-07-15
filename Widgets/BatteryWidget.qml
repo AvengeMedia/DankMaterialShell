@@ -7,6 +7,8 @@ Rectangle {
     
     property bool batteryPopupVisible: false
     
+    signal toggleBatteryPopup()
+    
     width: 70  // Increased width to accommodate percentage text
     height: 30
     radius: Theme.cornerRadius
@@ -63,7 +65,7 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         
         onClicked: {
-            batteryPopupVisible = !batteryPopupVisible
+            toggleBatteryPopup()
         }
     }
     

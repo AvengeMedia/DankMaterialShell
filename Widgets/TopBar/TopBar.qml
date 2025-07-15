@@ -315,6 +315,10 @@ PanelWindow {
                 // Battery Widget
                 BatteryWidget {
                     anchors.verticalCenter: parent.verticalCenter
+                    batteryPopupVisible: topBar.shellRoot.batteryPopupVisible
+                    onToggleBatteryPopup: {
+                        topBar.shellRoot.batteryPopupVisible = !topBar.shellRoot.batteryPopupVisible
+                    }
                 }
                 
                 ControlCenterButton {

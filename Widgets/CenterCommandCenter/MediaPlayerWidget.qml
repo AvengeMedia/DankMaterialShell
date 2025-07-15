@@ -78,14 +78,14 @@ Rectangle {
     }
     
     Column {
-        anchors.centerIn: parent
-        width: parent.width - theme.spacingM * 2
-        spacing: theme.spacingM
+        anchors.fill: parent
+        anchors.margins: theme.spacingS
+        spacing: theme.spacingS
         
         // Show different content based on whether we have active media
         Item {
             width: parent.width
-            height: 80
+            height: 60
             
             // Placeholder when no media
             Column {
@@ -117,8 +117,8 @@ Rectangle {
                 
                 // Album Art
                 Rectangle {
-                    width: 80
-                    height: 80
+                    width: 60
+                    height: 60
                     radius: theme.cornerRadius
                     color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
                     
@@ -152,7 +152,7 @@ Rectangle {
                 
                 // Track Info
                 Column {
-                    width: parent.width - 80 - theme.spacingM
+                    width: parent.width - 60 - theme.spacingM
                     spacing: theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
                     
@@ -189,7 +189,7 @@ Rectangle {
         Item {
             id: progressBarContainer
             width: parent.width
-            height: 32
+            height: 24
             
             Rectangle {
                 id: progressBarBackground
@@ -305,8 +305,9 @@ Rectangle {
         // Control buttons - always visible
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: theme.spacingL
+            spacing: theme.spacingM
             visible: activePlayer !== null
+            height: 32
             
             // Previous button  
             Rectangle {
@@ -344,9 +345,9 @@ Rectangle {
             
             // Play/Pause button
             Rectangle {
-                width: 36
-                height: 36
-                radius: 18
+                width: 32
+                height: 32
+                radius: 16
                 color: theme.primary
                 
                 Text {
