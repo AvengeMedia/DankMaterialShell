@@ -41,6 +41,7 @@ PanelWindow {
     property string networkStatus: "disconnected"
     property string wifiSignalStrength: "good"
     property int volumeLevel: 50
+    property bool volumeMuted: false
     property bool bluetoothAvailable: false
     property bool bluetoothEnabled: false
     
@@ -298,6 +299,10 @@ PanelWindow {
                 // Battery Widget
                 BatteryWidget {
                     anchors.verticalCenter: parent.verticalCenter
+                    batteryPopupVisible: topBar.shellRoot.batteryPopupVisible
+                    onToggleBatteryPopup: {
+                        topBar.shellRoot.batteryPopupVisible = !topBar.shellRoot.batteryPopupVisible
+                    }
                 }
                 
                 ControlCenterButton {
@@ -305,6 +310,7 @@ PanelWindow {
                     networkStatus: topBar.networkStatus
                     wifiSignalStrength: topBar.wifiSignalStrength
                     volumeLevel: topBar.volumeLevel
+                    volumeMuted: topBar.volumeMuted
                     bluetoothAvailable: topBar.bluetoothAvailable
                     bluetoothEnabled: topBar.bluetoothEnabled
                     isActive: topBar.shellRoot ? topBar.shellRoot.controlCenterVisible : false
@@ -314,7 +320,7 @@ PanelWindow {
                             topBar.shellRoot.controlCenterVisible = !topBar.shellRoot.controlCenterVisible
                             if (topBar.shellRoot.controlCenterVisible) {
                                 WifiService.scanWifi()
-                                BluetoothService.scanDevices()
+                                // Bluetooth devices are automatically updated via signals
                             }
                         }
                     }

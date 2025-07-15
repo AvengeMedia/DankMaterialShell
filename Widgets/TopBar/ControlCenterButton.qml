@@ -8,6 +8,7 @@ Rectangle {
     property string networkStatus: "disconnected"
     property string wifiSignalStrength: "good"
     property int volumeLevel: 50
+    property bool volumeMuted: false
     property bool bluetoothAvailable: false
     property bool bluetoothEnabled: false
     property bool isActive: false
@@ -62,7 +63,7 @@ Rectangle {
         
         // Audio Icon
         Text {
-            text: root.volumeLevel === 0 ? "volume_off" : 
+            text: root.volumeMuted ? "volume_off" : 
                   root.volumeLevel < 33 ? "volume_down" : "volume_up"
             font.family: Theme.iconFont
             font.pixelSize: Theme.iconSize - 8

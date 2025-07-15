@@ -11,7 +11,6 @@ Item {
     property bool hasActiveMedia: false
     property var activePlayer: null
     property bool cavaAvailable: false
-    property bool configCreated: false
     
     width: 20
     height: Theme.iconSize
@@ -22,45 +21,12 @@ Item {
         running: true
         onExited: (exitCode) => {
             root.cavaAvailable = exitCode === 0
-            if (root.cavaAvailable && !root.configCreated) {
-                console.log("cava found - creating config and enabling real audio visualization")
-                configWriter.running = true
-            } else if (!root.cavaAvailable) {
+            if (root.cavaAvailable) {
+                console.log("cava found - enabling real audio visualization")
+                cavaProcess.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
+            } else {
                 console.log("cava not found - using fallback animation")
                 fallbackTimer.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
-            }
-        }
-    }
-    
-    Process {
-        id: configWriter
-        running: false
-        command: [
-            "sh", "-c", 
-            `cat > /tmp/quickshell_cava_config << 'EOF'
-[general]
-mode = normal
-framerate = 30
-autosens = 0
-sensitivity = 50
-bars = 4
-
-[output]
-method = raw
-raw_target = /dev/stdout
-data_format = ascii
-channels = mono
-mono_option = average
-
-[smoothing]
-noise_reduction = 20
-EOF`
-        ]
-        
-        onExited: {
-            root.configCreated = true
-            if (root.cavaAvailable) {
-                cavaProcess.running = Qt.binding(() => root.hasActiveMedia && root.activePlayer?.playbackState === MprisPlaybackState.Playing)
             }
         }
     }
@@ -68,7 +34,7 @@ EOF`
     Process {
         id: cavaProcess
         running: false
-        command: ["cava", "-p", "/tmp/quickshell_cava_config"]
+        command: ["sh", "-c", `printf '[general]\nmode=normal\nframerate=30\nautosens=0\nsensitivity=50\nbars=4\n[output]\nmethod=raw\nraw_target=/dev/stdout\ndata_format=ascii\nchannels=mono\nmono_option=average\n[smoothing]\nnoise_reduction=20' | cava -p /dev/stdin`]
         
         stdout: SplitParser {
             splitMarker: "\n"

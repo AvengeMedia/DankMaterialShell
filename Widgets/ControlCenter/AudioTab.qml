@@ -11,13 +11,14 @@ Item {
     
     property int audioSubTab: 0 // 0: Output, 1: Input
     
-    // These should be bound from parent
-    property real volumeLevel: 50
-    property real micLevel: 50
-    property string currentAudioSink: ""
-    property string currentAudioSource: ""
-    property var audioSinks: []
-    property var audioSources: []
+    readonly property real volumeLevel: AudioService.volumeLevel
+    readonly property real micLevel: AudioService.micLevel
+    readonly property bool volumeMuted: AudioService.sinkMuted
+    readonly property bool micMuted: AudioService.sourceMuted
+    readonly property string currentAudioSink: AudioService.currentAudioSink
+    readonly property string currentAudioSource: AudioService.currentAudioSource
+    readonly property var audioSinks: AudioService.audioSinks
+    readonly property var audioSources: AudioService.audioSources
     
     Column {
         anchors.fill: parent
@@ -102,50 +103,64 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: "volume_down"
+                            text: audioTab.volumeMuted ? "volume_off" : "volume_down"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: Theme.surfaceText
+                            color: audioTab.volumeMuted ? Theme.error : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: AudioService.toggleMute()
+                            }
                         }
                         
-                        Rectangle {
-                            id: volumeSliderTrack
+                        Item {
+                            id: volumeSliderContainer
                             width: parent.width - 80
-                            height: 8
-                            radius: 4
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                            height: 32
                             anchors.verticalCenter: parent.verticalCenter
                             
                             Rectangle {
-                                id: volumeSliderFill
-                                width: parent.width * (audioTab.volumeLevel / 100)
-                                height: parent.height
-                                radius: parent.radius
-                                color: Theme.primary
-                                
-                                Behavior on width {
-                                    NumberAnimation { duration: 100 }
-                                }
-                            }
-                            
-                            // Draggable handle
-                            Rectangle {
-                                id: volumeHandle
-                                width: 18
-                                height: 18
-                                radius: 9
-                                color: Theme.primary
-                                border.color: Qt.lighter(Theme.primary, 1.3)
-                                border.width: 2
-                                
-                                x: Math.max(0, Math.min(parent.width - width, volumeSliderFill.width - width/2))
+                                id: volumeSliderTrack
+                                width: parent.width
+                                height: 8
+                                radius: 4
+                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                scale: volumeMouseArea.containsMouse || volumeMouseArea.pressed ? 1.2 : 1.0
+                                Rectangle {
+                                    id: volumeSliderFill
+                                    width: parent.width * (audioTab.volumeLevel / 100)
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: Theme.primary
+                                    
+                                    Behavior on width {
+                                        NumberAnimation { duration: 100 }
+                                    }
+                                }
                                 
-                                Behavior on scale {
-                                    NumberAnimation { duration: 150 }
+                                // Draggable handle
+                                Rectangle {
+                                    id: volumeHandle
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    color: Theme.primary
+                                    border.color: Qt.lighter(Theme.primary, 1.3)
+                                    border.width: 2
+                                    
+                                    x: Math.max(0, Math.min(parent.width - width, volumeSliderFill.width - width/2))
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    scale: volumeMouseArea.containsMouse || volumeMouseArea.pressed ? 1.2 : 1.0
+                                    
+                                    Behavior on scale {
+                                        NumberAnimation { duration: 150 }
+                                    }
                                 }
                             }
                             
@@ -154,19 +169,55 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                preventStealing: true
                                 
-                                onClicked: (mouse) => {
-                                    let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                property bool isDragging: false
+                                
+                                onPressed: (mouse) => {
+                                    isDragging = true
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
                                     let newVolume = Math.round(ratio * 100)
                                     AudioService.setVolume(newVolume)
                                 }
                                 
+                                onReleased: {
+                                    isDragging = false
+                                }
+                                
                                 onPositionChanged: (mouse) => {
-                                    if (pressed) {
-                                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                    if (pressed && isDragging) {
+                                        let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
                                         let newVolume = Math.round(ratio * 100)
                                         AudioService.setVolume(newVolume)
                                     }
+                                }
+                                
+                                onClicked: (mouse) => {
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
+                                    let newVolume = Math.round(ratio * 100)
+                                    AudioService.setVolume(newVolume)
+                                }
+                            }
+                            
+                            // Global mouse area for drag tracking
+                            MouseArea {
+                                id: volumeGlobalMouseArea
+                                anchors.fill: parent.parent.parent.parent.parent // Fill the entire control center
+                                enabled: volumeMouseArea.isDragging
+                                visible: false
+                                preventStealing: true
+                                
+                                onPositionChanged: (mouse) => {
+                                    if (volumeMouseArea.isDragging) {
+                                        let globalPos = mapToItem(volumeSliderTrack, mouse.x, mouse.y)
+                                        let ratio = Math.max(0, Math.min(1, globalPos.x / volumeSliderTrack.width))
+                                        let newVolume = Math.round(ratio * 100)
+                                        AudioService.setVolume(newVolume)
+                                    }
+                                }
+                                
+                                onReleased: {
+                                    volumeMouseArea.isDragging = false
                                 }
                             }
                         }
@@ -178,13 +229,6 @@ Item {
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                    }
-                    
-                    Text {
-                        text: audioTab.volumeLevel + "%"
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
                 
@@ -224,14 +268,7 @@ Item {
                             }
                             
                             Text {
-                                text: "Current: " + (function() {
-                                    for (let sink of audioTab.audioSinks) {
-                                        if (sink.name === audioTab.currentAudioSink) {
-                                            return sink.displayName
-                                        }
-                                    }
-                                    return audioTab.currentAudioSink
-                                })()
+                                text: "Current: " + (AudioService.currentSinkDisplayName || "None")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -283,10 +320,16 @@ Item {
                                     }
                                     
                                     Text {
-                                        text: modelData.active ? "Selected" : ""
+                                        text: {
+                                            if (modelData.subtitle && modelData.subtitle !== "") {
+                                                return modelData.subtitle + (modelData.active ? " • Selected" : "")
+                                            } else {
+                                                return modelData.active ? "Selected" : ""
+                                            }
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.8)
-                                        visible: modelData.active
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        visible: text !== ""
                                     }
                                 }
                             }
@@ -298,8 +341,6 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    console.log("Clicked audio device:", JSON.stringify(modelData))
-                                    console.log("Device name to set:", modelData.name)
                                     AudioService.setAudioSink(modelData.name)
                                 }
                             }
@@ -337,50 +378,64 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: "mic"
+                            text: audioTab.micMuted ? "mic_off" : "mic"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: Theme.surfaceText
+                            color: audioTab.micMuted ? Theme.error : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: AudioService.toggleMicMute()
+                            }
                         }
                         
-                        Rectangle {
-                            id: micSliderTrack
+                        Item {
+                            id: micSliderContainer
                             width: parent.width - 80
-                            height: 8
-                            radius: 4
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                            height: 32
                             anchors.verticalCenter: parent.verticalCenter
                             
                             Rectangle {
-                                id: micSliderFill
-                                width: parent.width * (audioTab.micLevel / 100)
-                                height: parent.height
-                                radius: parent.radius
-                                color: Theme.primary
-                                
-                                Behavior on width {
-                                    NumberAnimation { duration: 100 }
-                                }
-                            }
-                            
-                            // Draggable handle
-                            Rectangle {
-                                id: micHandle
-                                width: 18
-                                height: 18
-                                radius: 9
-                                color: Theme.primary
-                                border.color: Qt.lighter(Theme.primary, 1.3)
-                                border.width: 2
-                                
-                                x: Math.max(0, Math.min(parent.width - width, micSliderFill.width - width/2))
+                                id: micSliderTrack
+                                width: parent.width
+                                height: 8
+                                radius: 4
+                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                scale: micMouseArea.containsMouse || micMouseArea.pressed ? 1.2 : 1.0
+                                Rectangle {
+                                    id: micSliderFill
+                                    width: parent.width * (audioTab.micLevel / 100)
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: Theme.primary
+                                    
+                                    Behavior on width {
+                                        NumberAnimation { duration: 100 }
+                                    }
+                                }
                                 
-                                Behavior on scale {
-                                    NumberAnimation { duration: 150 }
+                                // Draggable handle
+                                Rectangle {
+                                    id: micHandle
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    color: Theme.primary
+                                    border.color: Qt.lighter(Theme.primary, 1.3)
+                                    border.width: 2
+                                    
+                                    x: Math.max(0, Math.min(parent.width - width, micSliderFill.width - width/2))
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    scale: micMouseArea.containsMouse || micMouseArea.pressed ? 1.2 : 1.0
+                                    
+                                    Behavior on scale {
+                                        NumberAnimation { duration: 150 }
+                                    }
                                 }
                             }
                             
@@ -389,19 +444,55 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                preventStealing: true
                                 
-                                onClicked: (mouse) => {
-                                    let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                property bool isDragging: false
+                                
+                                onPressed: (mouse) => {
+                                    isDragging = true
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
                                     let newMicLevel = Math.round(ratio * 100)
                                     AudioService.setMicLevel(newMicLevel)
                                 }
                                 
+                                onReleased: {
+                                    isDragging = false
+                                }
+                                
                                 onPositionChanged: (mouse) => {
-                                    if (pressed) {
-                                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                    if (pressed && isDragging) {
+                                        let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
                                         let newMicLevel = Math.round(ratio * 100)
                                         AudioService.setMicLevel(newMicLevel)
                                     }
+                                }
+                                
+                                onClicked: (mouse) => {
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
+                                    let newMicLevel = Math.round(ratio * 100)
+                                    AudioService.setMicLevel(newMicLevel)
+                                }
+                            }
+                            
+                            // Global mouse area for drag tracking
+                            MouseArea {
+                                id: micGlobalMouseArea
+                                anchors.fill: parent.parent.parent.parent.parent // Fill the entire control center
+                                enabled: micMouseArea.isDragging
+                                visible: false
+                                preventStealing: true
+                                
+                                onPositionChanged: (mouse) => {
+                                    if (micMouseArea.isDragging) {
+                                        let globalPos = mapToItem(micSliderTrack, mouse.x, mouse.y)
+                                        let ratio = Math.max(0, Math.min(1, globalPos.x / micSliderTrack.width))
+                                        let newMicLevel = Math.round(ratio * 100)
+                                        AudioService.setMicLevel(newMicLevel)
+                                    }
+                                }
+                                
+                                onReleased: {
+                                    micMouseArea.isDragging = false
                                 }
                             }
                         }
@@ -415,12 +506,6 @@ Item {
                         }
                     }
                     
-                    Text {
-                        text: audioTab.micLevel + "%"
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
                 }
                 
                 // Input Devices
@@ -459,14 +544,7 @@ Item {
                             }
                             
                             Text {
-                                text: "Current: " + (function() {
-                                    for (let source of audioTab.audioSources) {
-                                        if (source.name === audioTab.currentAudioSource) {
-                                            return source.displayName
-                                        }
-                                    }
-                                    return audioTab.currentAudioSource
-                                })()
+                                text: "Current: " + (AudioService.currentSourceDisplayName || "None")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -517,10 +595,16 @@ Item {
                                     }
                                     
                                     Text {
-                                        text: modelData.active ? "Selected" : ""
+                                        text: {
+                                            if (modelData.subtitle && modelData.subtitle !== "") {
+                                                return modelData.subtitle + (modelData.active ? " • Selected" : "")
+                                            } else {
+                                                return modelData.active ? "Selected" : ""
+                                            }
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.8)
-                                        visible: modelData.active
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        visible: text !== ""
                                     }
                                 }
                             }
@@ -532,8 +616,6 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    console.log("Clicked audio source:", JSON.stringify(modelData))
-                                    console.log("Source name to set:", modelData.name)
                                     AudioService.setAudioSource(modelData.name)
                                 }
                             }

@@ -7,15 +7,12 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // Process list properties
     property var processes: []
     property bool isUpdating: false
-    property int processUpdateInterval: 1500
+    property int processUpdateInterval: 3000
     
-    // Performance control - only run when process monitor is actually visible
     property bool monitoringEnabled: false
     
-    // System information properties
     property int totalMemoryKB: 0
     property int usedMemoryKB: 0
     property int totalSwapKB: 0
@@ -24,8 +21,23 @@ Singleton {
     property real totalCpuUsage: 0.0
     property bool systemInfoAvailable: false
     
-    // Sorting options
-    property string sortBy: "cpu" // "cpu", "memory", "name", "pid"
+    property var cpuHistory: []
+    property var memoryHistory: []
+    property var networkHistory: ({rx: [], tx: []})
+    property var diskHistory: ({read: [], write: []})
+    property int historySize: 60
+    
+    property var perCoreCpuUsage: []
+    
+    property real networkRxRate: 0
+    property real networkTxRate: 0
+    property var lastNetworkStats: null
+    
+    property real diskReadRate: 0
+    property real diskWriteRate: 0
+    property var lastDiskStats: null
+    
+    property string sortBy: "cpu"
     property bool sortDescending: true
     property int maxProcesses: 20
     
@@ -35,10 +47,32 @@ Singleton {
         console.log("ProcessMonitorService: Initialization complete")
     }
     
-    // System information monitoring
+    Timer {
+        id: testTimer
+        interval: 3000
+        running: false
+        repeat: false
+        onTriggered: {
+            console.log("ProcessMonitorService: Starting test monitoring...")
+            enableMonitoring(true)
+            stopTestTimer.start()
+        }
+    }
+    
+    Timer {
+        id: stopTestTimer
+        interval: 8000
+        running: false
+        repeat: false
+        onTriggered: {
+            console.log("ProcessMonitorService: Stopping test monitoring...")
+            enableMonitoring(false)
+        }
+    }
+    
     Process {
         id: systemInfoProcess
-        command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu ' /proc/stat"]
+        command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu' /proc/stat | head -" + (root.cpuCount + 1)]
         running: false
         
         stdout: StdioCollector {
@@ -57,7 +91,34 @@ Singleton {
         }
     }
     
-    // Process monitoring with ps command
+    Process {
+        id: networkStatsProcess
+        command: ["bash", "-c", "cat /proc/net/dev | grep -E '(wlan|eth|enp|wlp|ens|eno)' | awk '{print $1,$2,$10}' | sed 's/:/ /'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    parseNetworkStats(text.trim())
+                }
+            }
+        }
+    }
+    
+    Process {
+        id: diskStatsProcess
+        command: ["bash", "-c", "cat /proc/diskstats | grep -E ' (sd[a-z]+|nvme[0-9]+n[0-9]+|vd[a-z]+) ' | grep -v 'p[0-9]' | awk '{print $3,$6,$10}'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    parseDiskStats(text.trim())
+                }
+            }
+        }
+    }
+    
     Process {
         id: processListProcess
         command: ["bash", "-c", "ps axo pid,ppid,pcpu,pmem,rss,comm,cmd --sort=-pcpu | head -" + (root.maxProcesses + 1)]
@@ -69,12 +130,10 @@ Singleton {
                     const lines = text.trim().split('\n')
                     const newProcesses = []
                     
-                    // Skip header line
                     for (let i = 1; i < lines.length; i++) {
                         const line = lines[i].trim()
                         if (!line) continue
                         
-                        // Parse ps output: PID PPID %CPU %MEM RSS COMMAND CMD
                         const parts = line.split(/\s+/)
                         if (parts.length >= 7) {
                             const pid = parseInt(parts[0])
@@ -112,36 +171,52 @@ Singleton {
         }
     }
     
-    // System and process monitoring timer - now conditional
     Timer {
         id: processTimer
         interval: root.processUpdateInterval
-        running: root.monitoringEnabled  // Only run when monitoring is enabled
+        running: root.monitoringEnabled
         repeat: true
         
         onTriggered: {
             if (root.monitoringEnabled) {
                 updateSystemInfo()
                 updateProcessList()
+                updateNetworkStats()
+                updateDiskStats()
             }
         }
     }
     
-    // Public functions
     function updateSystemInfo() {
         if (!systemInfoProcess.running && root.monitoringEnabled) {
             systemInfoProcess.running = true
         }
     }
     
-    // Control functions for enabling/disabling monitoring
     function enableMonitoring(enabled) {
         console.log("ProcessMonitorService: Monitoring", enabled ? "enabled" : "disabled")
         root.monitoringEnabled = enabled
         if (enabled) {
-            // Immediately update when enabled
+            root.cpuHistory = []
+            root.memoryHistory = []
+            root.networkHistory = ({rx: [], tx: []})
+            root.diskHistory = ({read: [], write: []})
             updateSystemInfo()
             updateProcessList()
+            updateNetworkStats()
+            updateDiskStats()
+        }
+    }
+    
+    function updateNetworkStats() {
+        if (!networkStatsProcess.running && root.monitoringEnabled) {
+            networkStatsProcess.running = true
+        }
+    }
+    
+    function updateDiskStats() {
+        if (!diskStatsProcess.running && root.monitoringEnabled) {
+            diskStatsProcess.running = true
         }
     }
     
@@ -149,7 +224,6 @@ Singleton {
         if (!root.isUpdating && root.monitoringEnabled) {
             root.isUpdating = true
             
-            // Update sort command based on current sort option
             let sortOption = ""
             switch (root.sortBy) {
                 case "cpu":
@@ -208,7 +282,6 @@ Singleton {
     }
     
     function getProcessIcon(command) {
-        // Return appropriate Material Design icon for common processes
         const cmd = command.toLowerCase()
         if (cmd.includes("firefox") || cmd.includes("chrome") || cmd.includes("browser")) return "web"
         if (cmd.includes("code") || cmd.includes("editor") || cmd.includes("vim")) return "code"
@@ -216,7 +289,7 @@ Singleton {
         if (cmd.includes("music") || cmd.includes("audio") || cmd.includes("spotify")) return "music_note"
         if (cmd.includes("video") || cmd.includes("vlc") || cmd.includes("mpv")) return "play_circle"
         if (cmd.includes("systemd") || cmd.includes("kernel") || cmd.includes("kthread")) return "settings"
-        return "memory" // Default process icon
+        return "memory"
     }
     
     function formatCpuUsage(cpu) {
@@ -244,6 +317,10 @@ Singleton {
     function parseSystemInfo(text) {
         const lines = text.split('\n')
         let section = 'memory'
+        const coreUsages = []
+        let memFree = 0
+        let memBuffers = 0
+        let memCached = 0
         
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim()
@@ -259,9 +336,12 @@ Singleton {
             if (section === 'memory') {
                 if (line.startsWith('MemTotal:')) {
                     root.totalMemoryKB = parseInt(line.split(/\s+/)[1])
-                } else if (line.startsWith('MemAvailable:')) {
-                    const availableKB = parseInt(line.split(/\s+/)[1])
-                    root.usedMemoryKB = root.totalMemoryKB - availableKB
+                } else if (line.startsWith('MemFree:')) {
+                    memFree = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('Buffers:')) {
+                    memBuffers = parseInt(line.split(/\s+/)[1])
+                } else if (line.startsWith('Cached:')) {
+                    memCached = parseInt(line.split(/\s+/)[1])
                 } else if (line.startsWith('SwapTotal:')) {
                     root.totalSwapKB = parseInt(line.split(/\s+/)[1])
                 } else if (line.startsWith('SwapFree:')) {
@@ -289,10 +369,104 @@ Singleton {
                         const used = total - idle - iowait
                         root.totalCpuUsage = total > 0 ? (used / total) * 100 : 0
                     }
+                } else if (line.match(/^cpu\d+/)) {
+                    const parts = line.split(/\s+/)
+                    if (parts.length >= 8) {
+                        const user = parseInt(parts[1])
+                        const nice = parseInt(parts[2])
+                        const system = parseInt(parts[3])
+                        const idle = parseInt(parts[4])
+                        const iowait = parseInt(parts[5])
+                        const irq = parseInt(parts[6])
+                        const softirq = parseInt(parts[7])
+                        
+                        const total = user + nice + system + idle + iowait + irq + softirq
+                        const used = total - idle - iowait
+                        const usage = total > 0 ? (used / total) * 100 : 0
+                        coreUsages.push(usage)
+                    }
                 }
             }
         }
         
+        // Calculate used memory as total minus free minus buffers minus cached
+        root.usedMemoryKB = root.totalMemoryKB - memFree - memBuffers - memCached
+        
+        // Update per-core usage
+        root.perCoreCpuUsage = coreUsages
+        
+        // Update history
+        addToHistory(root.cpuHistory, root.totalCpuUsage)
+        const memoryPercent = root.totalMemoryKB > 0 ? (root.usedMemoryKB / root.totalMemoryKB) * 100 : 0
+        addToHistory(root.memoryHistory, memoryPercent)
+        
+        // console.log("ProcessMonitorService: Updated - CPU:", root.totalCpuUsage.toFixed(1) + "%", "Memory:", memoryPercent.toFixed(1) + "%", "History length:", root.cpuHistory.length)
+        
         root.systemInfoAvailable = true
+    }
+    
+    function parseNetworkStats(text) {
+        const lines = text.split('\n')
+        let totalRx = 0
+        let totalTx = 0
+        
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/)
+            if (parts.length >= 3) {
+                const rx = parseInt(parts[1])
+                const tx = parseInt(parts[2])
+                if (!isNaN(rx) && !isNaN(tx)) {
+                    totalRx += rx
+                    totalTx += tx
+                }
+            }
+        }
+        
+        if (root.lastNetworkStats) {
+            const timeDiff = root.processUpdateInterval / 1000
+            root.networkRxRate = Math.max(0, (totalRx - root.lastNetworkStats.rx) / timeDiff)
+            root.networkTxRate = Math.max(0, (totalTx - root.lastNetworkStats.tx) / timeDiff)
+            
+            addToHistory(root.networkHistory.rx, root.networkRxRate / 1024)
+            addToHistory(root.networkHistory.tx, root.networkTxRate / 1024)
+        }
+        
+        root.lastNetworkStats = { rx: totalRx, tx: totalTx }
+    }
+    
+    function parseDiskStats(text) {
+        const lines = text.split('\n')
+        let totalRead = 0
+        let totalWrite = 0
+        
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/)
+            if (parts.length >= 3) {
+                const readSectors = parseInt(parts[1])
+                const writeSectors = parseInt(parts[2])
+                if (!isNaN(readSectors) && !isNaN(writeSectors)) {
+                    totalRead += readSectors * 512
+                    totalWrite += writeSectors * 512
+                }
+            }
+        }
+        
+        if (root.lastDiskStats) {
+            const timeDiff = root.processUpdateInterval / 1000
+            root.diskReadRate = Math.max(0, (totalRead - root.lastDiskStats.read) / timeDiff)
+            root.diskWriteRate = Math.max(0, (totalWrite - root.lastDiskStats.write) / timeDiff)
+            
+            addToHistory(root.diskHistory.read, root.diskReadRate / (1024 * 1024))
+            addToHistory(root.diskHistory.write, root.diskWriteRate / (1024 * 1024))
+        }
+        
+        root.lastDiskStats = { read: totalRead, write: totalWrite }
+    }
+    
+    function addToHistory(array, value) {
+        array.push(value)
+        if (array.length > root.historySize) {
+            array.shift()
+        }
     }
 }

@@ -7,101 +7,160 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    property int brightnessLevel: 75
+    property list<var> ddcMonitors: []
+    readonly property list<Monitor> monitors: variants.instances
     property bool brightnessAvailable: false
+    property int brightnessLevel: 75
     
-    // Check if brightness control is available
-    Process {
-        id: brightnessAvailabilityChecker
-        command: ["bash", "-c", "if command -v brightnessctl > /dev/null; then echo 'brightnessctl'; elif command -v xbacklight > /dev/null; then echo 'xbacklight'; else echo 'none'; fi"]
-        running: true
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    let method = data.trim()
-                    if (method === "brightnessctl" || method === "xbacklight") {
-                        root.brightnessAvailable = true
-                        brightnessChecker.running = true
-                    } else {
-                        root.brightnessAvailable = false
-                        console.log("Brightness control not available - no brightnessctl or xbacklight found")
-                    }
-                }
-            }
-        }
+    function getMonitorForScreen(screen: ShellScreen): var {
+        return monitors.find(function(m) { return m.modelData === screen; });
     }
     
-    // Brightness Control
-    Process {
-        id: brightnessChecker
-        command: ["bash", "-c", "if command -v brightnessctl > /dev/null; then brightnessctl get; elif command -v xbacklight > /dev/null; then xbacklight -get | cut -d. -f1; else echo 75; fi"]
-        running: false
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    let brightness = parseInt(data.trim()) || 75
-                    // brightnessctl returns absolute value, need to convert to percentage
-                    if (brightness > 100) {
-                        brightnessMaxChecker.running = true
-                    } else {
-                        root.brightnessLevel = brightness
-                    }
-                }
-            }
-        }
-    }
-    
-    Process {
-        id: brightnessMaxChecker
-        command: ["brightnessctl", "max"]
-        running: false
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    let maxBrightness = parseInt(data.trim()) || 100
-                    brightnessCurrentChecker.property("maxBrightness", maxBrightness)
-                    brightnessCurrentChecker.running = true
-                }
-            }
-        }
-    }
-    
-    Process {
-        id: brightnessCurrentChecker
-        property int maxBrightness: 100
-        command: ["brightnessctl", "get"]
-        running: false
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    let currentBrightness = parseInt(data.trim()) || 75
-                    root.brightnessLevel = Math.round((currentBrightness / maxBrightness) * 100)
-                }
+    property var debounceTimer: Timer {
+        id: debounceTimer
+        interval: 50
+        repeat: false
+        property int pendingValue: 0
+        onTriggered: {
+            const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
+            if (focusedMonitor) {
+                focusedMonitor.setBrightness(pendingValue / 100);
             }
         }
     }
     
     function setBrightness(percentage) {
-        if (!root.brightnessAvailable) {
-            console.warn("Brightness control not available")
-            return
+        root.brightnessLevel = percentage;
+        debounceTimer.pendingValue = percentage;
+        debounceTimer.restart();
+    }
+    
+    function increaseBrightness(): void {
+        const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
+        if (focusedMonitor)
+            focusedMonitor.setBrightness(focusedMonitor.brightness + 0.1);
+    }
+    
+    function decreaseBrightness(): void {
+        const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
+        if (focusedMonitor)
+            focusedMonitor.setBrightness(focusedMonitor.brightness - 0.1);
+    }
+    
+    onMonitorsChanged: {
+        ddcMonitors = [];
+        if (ddcAvailable) {
+            ddcProc.running = true;
         }
         
-        let brightnessSetProcess = Qt.createQmlObject('
-            import Quickshell.Io
-            Process {
-                command: ["bash", "-c", "if command -v brightnessctl > /dev/null; then brightnessctl set ' + percentage + '%; elif command -v xbacklight > /dev/null; then xbacklight -set ' + percentage + '; fi"]
-                running: true
-                onExited: brightnessChecker.running = true
+        // Update brightness level from first monitor
+        if (monitors.length > 0) {
+            root.brightnessLevel = Math.round(monitors[0].brightness * 100);
+        }
+    }
+    
+    Component.onCompleted: {
+        ddcAvailabilityChecker.running = true;
+    }
+    
+    Variants {
+        id: variants
+        model: Quickshell.screens
+        Monitor {}
+    }
+    
+    Process {
+        id: ddcAvailabilityChecker
+        command: ["which", "ddcutil"]
+        onExited: function(exitCode) {
+            root.brightnessAvailable = (exitCode === 0);
+            if (root.brightnessAvailable) {
+                ddcProc.running = true;
             }
-        ', root)
+        }
+    }
+    
+    Process {
+        id: ddcProc
+        command: ["ddcutil", "detect", "--brief"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.ddcMonitors = text.trim().split("\n\n").filter(function(d) { return d.startsWith("Display "); }).map(function(d) { return ({
+                        model: d.match(/Monitor:.*:(.*):.*/)?.[1] || "Unknown",
+                        busNum: d.match(/I2C bus:[ ]*\/dev\/i2c-([0-9]+)/)?.[1] || "0"
+                    }); });
+                } else {
+                    root.ddcMonitors = [];
+                }
+            }
+        }
+        onExited: function(exitCode) {
+            if (exitCode !== 0) {
+                root.ddcMonitors = [];
+            }
+        }
+    }
+    
+    component Monitor: QtObject {
+        id: monitor
+        
+        required property ShellScreen modelData
+        readonly property bool isDdc: root.ddcMonitors.some(function(m) { return m.model === modelData.model; })
+        readonly property string busNum: root.ddcMonitors.find(function(m) { return m.model === modelData.model; })?.busNum ?? ""
+        property real brightness: 0.75
+        
+        readonly property Process initProc: Process {
+            stdout: StdioCollector {
+                onStreamFinished: {
+                    if (text.trim()) {
+                        const parts = text.trim().split(" ");
+                        if (parts.length >= 5) {
+                            const current = parseInt(parts[3]) || 75;
+                            const max = parseInt(parts[4]) || 100;
+                            monitor.brightness = current / max;
+                            root.brightnessLevel = Math.round(monitor.brightness * 100);
+                        }
+                    }
+                }
+            }
+            onExited: function(exitCode) {
+                if (exitCode !== 0) {
+                    monitor.brightness = 0.75;
+                    root.brightnessLevel = 75;
+                }
+            }
+        }
+        
+        function setBrightness(value: real): void {
+            value = Math.max(0, Math.min(1, value));
+            const rounded = Math.round(value * 100);
+            if (Math.round(brightness * 100) === rounded)
+                return;
+            
+            brightness = value;
+            root.brightnessLevel = rounded;
+            
+            if (isDdc && busNum) {
+                Quickshell.execDetached(["ddcutil", "-b", busNum, "setvcp", "10", rounded.toString()]);
+            }
+        }
+        
+        onBusNumChanged: {
+            if (isDdc && busNum) {
+                initProc.command = ["ddcutil", "-b", busNum, "getvcp", "10", "--brief"];
+                initProc.running = true;
+            }
+        }
+        
+        Component.onCompleted: {
+            Qt.callLater(function() {
+                if (isDdc && busNum) {
+                    initProc.command = ["ddcutil", "-b", busNum, "getvcp", "10", "--brief"];
+                    initProc.running = true;
+                }
+            });
+        }
     }
 }

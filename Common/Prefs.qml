@@ -68,7 +68,6 @@ Singleton {
     
     function parseSettings(content) {
         try {
-            console.log("Settings file content:", content)
             if (content && content.trim()) {
                 var settings = JSON.parse(content)
                 themeIndex = settings.themeIndex !== undefined ? settings.themeIndex : 0

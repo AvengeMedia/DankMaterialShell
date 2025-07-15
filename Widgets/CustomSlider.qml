@@ -110,34 +110,79 @@ Item {
                     }
                 }
                 
-                MouseArea {
-                    id: sliderMouseArea
+                Item {
+                    id: sliderContainer
                     anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: slider.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    enabled: slider.enabled
                     
-                    onClicked: (mouse) => {
-                        if (slider.enabled) {
-                            let ratio = Math.max(0, Math.min(1, mouse.x / width))
-                            let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
-                            slider.value = newValue
-                            slider.sliderValueChanged(newValue)
+                    MouseArea {
+                        id: sliderMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: slider.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                        enabled: slider.enabled
+                        preventStealing: true
+                        
+                        property bool isDragging: false
+                        
+                        onPressed: (mouse) => {
+                            if (slider.enabled) {
+                                isDragging = true
+                                let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
+                                slider.value = newValue
+                                slider.sliderValueChanged(newValue)
+                            }
+                        }
+                        
+                        onReleased: {
+                            if (slider.enabled) {
+                                isDragging = false
+                                slider.sliderDragFinished(slider.value)
+                            }
+                        }
+                        
+                        onPositionChanged: (mouse) => {
+                            if (pressed && isDragging && slider.enabled) {
+                                let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
+                                slider.value = newValue
+                                slider.sliderValueChanged(newValue)
+                            }
+                        }
+                        
+                        onClicked: (mouse) => {
+                            if (slider.enabled) {
+                                let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
+                                slider.value = newValue
+                                slider.sliderValueChanged(newValue)
+                            }
                         }
                     }
                     
-                    onPositionChanged: (mouse) => {
-                        if (pressed && slider.enabled) {
-                            let ratio = Math.max(0, Math.min(1, mouse.x / width))
-                            let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
-                            slider.value = newValue
-                            slider.sliderValueChanged(newValue)
+                    // Global mouse area for drag tracking
+                    MouseArea {
+                        id: sliderGlobalMouseArea
+                        anchors.fill: slider.parent // Fill the entire settings popup
+                        enabled: sliderMouseArea.isDragging
+                        visible: false
+                        preventStealing: true
+                        
+                        onPositionChanged: (mouse) => {
+                            if (sliderMouseArea.isDragging && slider.enabled) {
+                                let globalPos = mapToItem(sliderTrack, mouse.x, mouse.y)
+                                let ratio = Math.max(0, Math.min(1, globalPos.x / sliderTrack.width))
+                                let newValue = Math.round(slider.minimum + ratio * (slider.maximum - slider.minimum))
+                                slider.value = newValue
+                                slider.sliderValueChanged(newValue)
+                            }
                         }
-                    }
-                    
-                    onReleased: {
-                        if (slider.enabled) {
-                            slider.sliderDragFinished(slider.value)
+                        
+                        onReleased: {
+                            if (sliderMouseArea.isDragging && slider.enabled) {
+                                sliderMouseArea.isDragging = false
+                                slider.sliderDragFinished(slider.value)
+                            }
                         }
                     }
                 }

@@ -14,7 +14,6 @@ Singleton {
     property var applicationsByExec: ({})
     property bool ready: false
     
-    // Pre-prepared fuzzy search data
     property var preppedApps: []
     
     
@@ -33,7 +32,6 @@ Singleton {
     
     
     function loadApplications() {
-        // Trigger rescan on next frame to avoid blocking
         Qt.callLater(function() {
             var allApps = Array.from(DesktopEntries.applications.values)
             
@@ -41,7 +39,6 @@ Singleton {
                 .filter(app => !app.noDisplay)
                 .sort((a, b) => a.name.localeCompare(b.name))
             
-            // Build lookup maps
             var byName = {}
             var byExec = {}
             
@@ -49,7 +46,6 @@ Singleton {
                 var app = applications[i]
                 byName[app.name.toLowerCase()] = app
                 
-                // Clean exec string for lookup
                 var execProp = app.execString || ""
                 var cleanExec = execProp ? execProp.replace(/%[fFuU]/g, "").trim() : ""
                 if (cleanExec) {
@@ -60,7 +56,6 @@ Singleton {
             applicationsByName = byName
             applicationsByExec = byExec
             
-            // Prepare fuzzy search data
             preppedApps = applications.map(app => ({
                 name: Fuzzy.prepare(app.name || ""),
                 comment: Fuzzy.prepare(app.comment || ""),
@@ -84,12 +79,10 @@ Singleton {
             return []
         }
         
-        // Use fuzzy search with both name and comment fields
         var results = Fuzzy.go(query, preppedApps, {
             all: false,
             keys: ["name", "comment"],
             scoreFn: r => {
-                // Prioritize name matches over comment matches
                 var nameScore = r[0] ? r[0].score : 0
                 var commentScore = r[1] ? r[1].score : 0
                 return nameScore > 0 ? nameScore * 0.9 + commentScore * 0.1 : commentScore * 0.5
@@ -97,7 +90,6 @@ Singleton {
             limit: 50
         })
         
-        // Extract the desktop entries from results
         return results.map(r => r.obj.entry)
     }
     
@@ -180,7 +172,6 @@ Singleton {
             return false
         }
         
-        // DesktopEntry objects have an execute() method
         if (typeof app.execute === "function") {
             app.execute()
             return true

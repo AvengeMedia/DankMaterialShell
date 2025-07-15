@@ -78,14 +78,14 @@ Rectangle {
     }
     
     Column {
-        anchors.centerIn: parent
-        width: parent.width - theme.spacingM * 2
-        spacing: theme.spacingM
+        anchors.fill: parent
+        anchors.margins: theme.spacingS
+        spacing: theme.spacingS
         
         // Show different content based on whether we have active media
         Item {
             width: parent.width
-            height: 80
+            height: 60
             
             // Placeholder when no media
             Column {
@@ -117,8 +117,8 @@ Rectangle {
                 
                 // Album Art
                 Rectangle {
-                    width: 80
-                    height: 80
+                    width: 60
+                    height: 60
                     radius: theme.cornerRadius
                     color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
                     
@@ -152,7 +152,7 @@ Rectangle {
                 
                 // Track Info
                 Column {
-                    width: parent.width - 80 - theme.spacingM
+                    width: parent.width - 60 - theme.spacingM
                     spacing: theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
                     
@@ -186,45 +186,52 @@ Rectangle {
         }
         
         // Progress bar
-        Rectangle {
-            id: progressBarBackground
+        Item {
+            id: progressBarContainer
             width: parent.width
-            height: 6
-            radius: 3
-            color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
-            visible: activePlayer !== null
+            height: 24
             
             Rectangle {
-                id: progressFill
-                height: parent.height
-                radius: parent.radius
-                color: theme.primary
-                
-                width: parent.width * ratio()
-                
-                Behavior on width {
-                    NumberAnimation { duration: 100 }
-                }
-            }
-            
-            // Drag handle
-            Rectangle {
-                id: progressHandle
-                width: 12
-                height: 12
-                radius: 6
-                color: theme.primary
-                border.color: Qt.lighter(theme.primary, 1.3)
-                border.width: 1
-                
-                x: Math.max(0, Math.min(parent.width - width, progressFill.width - width/2))
+                id: progressBarBackground
+                width: parent.width
+                height: 6
+                radius: 3
+                color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.3)
+                visible: activePlayer !== null
                 anchors.verticalCenter: parent.verticalCenter
                 
-                visible: activePlayer && activePlayer.length > 0
-                scale: progressMouseArea.containsMouse || progressMouseArea.pressed ? 1.2 : 1.0
+                Rectangle {
+                    id: progressFill
+                    height: parent.height
+                    radius: parent.radius
+                    color: theme.primary
+                    
+                    width: parent.width * ratio()
+                    
+                    Behavior on width {
+                        NumberAnimation { duration: 100 }
+                    }
+                }
                 
-                Behavior on scale {
-                    NumberAnimation { duration: 150 }
+                // Drag handle
+                Rectangle {
+                    id: progressHandle
+                    width: 12
+                    height: 12
+                    radius: 6
+                    color: theme.primary
+                    border.color: Qt.lighter(theme.primary, 1.3)
+                    border.width: 1
+                    
+                    x: Math.max(0, Math.min(parent.width - width, progressFill.width - width/2))
+                    anchors.verticalCenter: parent.verticalCenter
+                    
+                    visible: activePlayer && activePlayer.length > 0
+                    scale: progressMouseArea.containsMouse || progressMouseArea.pressed ? 1.2 : 1.0
+                    
+                    Behavior on scale {
+                        NumberAnimation { duration: 150 }
+                    }
                 }
             }
             
@@ -234,22 +241,14 @@ Rectangle {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 enabled: activePlayer && activePlayer.length > 0 && activePlayer.canSeek
+                preventStealing: true
                 
                 property bool isSeeking: false
-                
-                onClicked: function(mouse) {
-                    if (activePlayer && activePlayer.length > 0) {
-                        let ratio = mouse.x / width
-                        let seekPosition = ratio * activePlayer.length
-                        activePlayer.position = seekPosition
-                        currentPosition = seekPosition
-                    }
-                }
                 
                 onPressed: function(mouse) {
                     isSeeking = true
                     if (activePlayer && activePlayer.length > 0) {
-                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                        let ratio = Math.max(0, Math.min(1, mouse.x / progressBarBackground.width))
                         let seekPosition = ratio * activePlayer.length
                         activePlayer.position = seekPosition
                         currentPosition = seekPosition
@@ -261,12 +260,44 @@ Rectangle {
                 }
                 
                 onPositionChanged: function(mouse) {
-                    if (pressed && activePlayer && activePlayer.length > 0) {
-                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                    if (pressed && isSeeking && activePlayer && activePlayer.length > 0) {
+                        let ratio = Math.max(0, Math.min(1, mouse.x / progressBarBackground.width))
                         let seekPosition = ratio * activePlayer.length
                         activePlayer.position = seekPosition
                         currentPosition = seekPosition
                     }
+                }
+                
+                onClicked: function(mouse) {
+                    if (activePlayer && activePlayer.length > 0) {
+                        let ratio = Math.max(0, Math.min(1, mouse.x / progressBarBackground.width))
+                        let seekPosition = ratio * activePlayer.length
+                        activePlayer.position = seekPosition
+                        currentPosition = seekPosition
+                    }
+                }
+            }
+            
+            // Global mouse area for drag tracking
+            MouseArea {
+                id: progressGlobalMouseArea
+                anchors.fill: parent.parent.parent // Fill the entire media player widget
+                enabled: progressMouseArea.isSeeking
+                visible: false
+                preventStealing: true
+                
+                onPositionChanged: function(mouse) {
+                    if (progressMouseArea.isSeeking && activePlayer && activePlayer.length > 0) {
+                        let globalPos = mapToItem(progressBarBackground, mouse.x, mouse.y)
+                        let ratio = Math.max(0, Math.min(1, globalPos.x / progressBarBackground.width))
+                        let seekPosition = ratio * activePlayer.length
+                        activePlayer.position = seekPosition
+                        currentPosition = seekPosition
+                    }
+                }
+                
+                onReleased: {
+                    progressMouseArea.isSeeking = false
                 }
             }
         }
@@ -274,8 +305,9 @@ Rectangle {
         // Control buttons - always visible
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: theme.spacingL
+            spacing: theme.spacingM
             visible: activePlayer !== null
+            height: 32
             
             // Previous button  
             Rectangle {
@@ -313,9 +345,9 @@ Rectangle {
             
             // Play/Pause button
             Rectangle {
-                width: 36
-                height: 36
-                radius: 18
+                width: 32
+                height: 32
+                radius: 16
                 color: theme.primary
                 
                 Text {
