@@ -325,6 +325,14 @@ PanelWindow {
                         font.pixelSize: activeTheme.fontSizeLarge
                         color: activeTheme.surfaceText
                         verticalAlignment: TextInput.AlignVCenter
+                        selectByMouse: true
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.IBeamCursor
+                            acceptedButtons: Qt.NoButton
+                        }
                         
                         onTextChanged: updateFilteredModel()
                         

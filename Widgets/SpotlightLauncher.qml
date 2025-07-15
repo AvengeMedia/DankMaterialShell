@@ -32,19 +32,6 @@ PanelWindow {
         onTriggered: updateFilteredApps()
     }
     
-    Timer {
-        id: periodicRescanTimer
-        interval: 60000
-        repeat: true
-        running: spotlightOpen
-        onTriggered: {
-            console.log("SpotlightLauncher: Periodic rescan triggered")
-            if (DesktopEntries.rescan) {
-                DesktopEntries.rescan()
-            }
-        }
-    }
-    
     anchors {
         top: true
         left: true
@@ -68,13 +55,7 @@ PanelWindow {
     // ...existing code...
     function show() {
         console.log("SpotlightLauncher: show() called")
-        
-        // Trigger manual rescan when opening
-        console.log("SpotlightLauncher: Triggering manual rescan on show")
-        if (DesktopEntries.rescan) {
-            DesktopEntries.rescan()
-        }
-        
+                
         spotlightOpen = true
         console.log("SpotlightLauncher: spotlightOpen set to", spotlightOpen)
         searchDebounceTimer.stop() // Stop any pending search
@@ -468,6 +449,13 @@ PanelWindow {
                             verticalAlignment: Text.AlignVCenter
                             focus: spotlightOpen
                             selectByMouse: true
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.IBeamCursor
+                                acceptedButtons: Qt.NoButton
+                            }
                             onTextChanged: {
                                 searchDebounceTimer.restart()
                             }
@@ -829,14 +817,6 @@ PanelWindow {
             console.log("SpotlightLauncher: IPC toggle() called")
             spotlightLauncher.toggle()
             return "SPOTLIGHT_TOGGLE_SUCCESS"
-        }
-        function rescan() {
-            console.log("SpotlightLauncher: IPC rescan() called")
-            if (DesktopEntries.rescan) {
-                DesktopEntries.rescan()
-                console.log("SpotlightLauncher: Triggered DesktopEntries rescan")
-            }
-            return "SPOTLIGHT_RESCAN_SUCCESS"
         }
     }
 

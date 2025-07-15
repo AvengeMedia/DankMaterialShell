@@ -47,18 +47,6 @@ PanelWindow {
         onTriggered: updateFilteredModel()
     }
     
-    Timer {
-        id: periodicRescanTimer
-        interval: 60000
-        repeat: true
-        running: launcher.isVisible
-        onTriggered: {
-            if (DesktopEntries.rescan) {
-                DesktopEntries.rescan()
-            }
-        }
-    }
-    
     ListModel { id: filteredModel }
     
     // Background dim with click to close
@@ -477,6 +465,13 @@ PanelWindow {
                             focus: launcher.isVisible
                             selectByMouse: true
                             activeFocusOnTab: true
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.IBeamCursor
+                                acceptedButtons: Qt.NoButton
+                            }
                             
                             // Placeholder text
                             Text {
@@ -1034,12 +1029,6 @@ PanelWindow {
     }
     
     function show() {
-        // Trigger manual rescan when opening
-        console.log("AppLauncher: Triggering manual rescan on show")
-        if (DesktopEntries.rescan) {
-            DesktopEntries.rescan()
-        }
-        
         launcher.isVisible = true
         recentApps = Prefs.getRecentApps() // Refresh recent apps
         searchDebounceTimer.stop() // Stop any pending search
