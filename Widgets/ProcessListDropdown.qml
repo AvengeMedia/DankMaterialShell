@@ -281,10 +281,10 @@ PanelWindow {
                         height: 80
                         radius: Theme.cornerRadiusLarge
                         color: ProcessMonitorService.totalSwapKB > 0 ? 
-                               Qt.rgba(Theme.tertiary.r, Theme.tertiary.g, Theme.tertiary.b, 0.08) :
+                               Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.08) :
                                Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.04)
                         border.color: ProcessMonitorService.totalSwapKB > 0 ? 
-                                     Qt.rgba(Theme.tertiary.r, Theme.tertiary.g, Theme.tertiary.b, 0.2) :
+                                     Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.2) :
                                      Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.12)
                         border.width: 1
                         
@@ -298,7 +298,7 @@ PanelWindow {
                                 text: "Swap"
                                 font.pixelSize: Theme.fontSizeSmall
                                 font.weight: Font.Medium
-                                color: ProcessMonitorService.totalSwapKB > 0 ? Theme.tertiary : Theme.surfaceText
+                                color: ProcessMonitorService.totalSwapKB > 0 ? Theme.warning : Theme.surfaceText
                                 opacity: 0.8
                             }
                             

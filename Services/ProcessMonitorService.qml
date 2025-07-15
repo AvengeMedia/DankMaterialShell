@@ -10,7 +10,7 @@ Singleton {
     // Process list properties
     property var processes: []
     property bool isUpdating: false
-    property int processUpdateInterval: 1500
+    property int processUpdateInterval: 3000
     
     // Performance control - only run when process monitor is actually visible
     property bool monitoringEnabled: false
@@ -24,6 +24,26 @@ Singleton {
     property real totalCpuUsage: 0.0
     property bool systemInfoAvailable: false
     
+    // Performance history for charts
+    property var cpuHistory: []
+    property var memoryHistory: []
+    property var networkHistory: ({rx: [], tx: []})
+    property var diskHistory: ({read: [], write: []})
+    property int historySize: 60  // Keep 60 data points
+    
+    // Per-core CPU usage
+    property var perCoreCpuUsage: []
+    
+    // Network stats
+    property real networkRxRate: 0  // bytes/sec
+    property real networkTxRate: 0  // bytes/sec
+    property var lastNetworkStats: null
+    
+    // Disk I/O stats
+    property real diskReadRate: 0  // bytes/sec
+    property real diskWriteRate: 0  // bytes/sec
+    property var lastDiskStats: null
+    
     // Sorting options
     property string sortBy: "cpu" // "cpu", "memory", "name", "pid"
     property bool sortDescending: true
@@ -33,12 +53,39 @@ Singleton {
         console.log("ProcessMonitorService: Starting initialization...")
         updateProcessList()
         console.log("ProcessMonitorService: Initialization complete")
+        
+        // Test monitoring disabled - only monitor when explicitly enabled
+        // testTimer.start()
+    }
+    
+    Timer {
+        id: testTimer
+        interval: 3000
+        running: false
+        repeat: false
+        onTriggered: {
+            console.log("ProcessMonitorService: Starting test monitoring...")
+            enableMonitoring(true)
+            // Stop after 8 seconds
+            stopTestTimer.start()
+        }
+    }
+    
+    Timer {
+        id: stopTestTimer
+        interval: 8000
+        running: false
+        repeat: false
+        onTriggered: {
+            console.log("ProcessMonitorService: Stopping test monitoring...")
+            enableMonitoring(false)
+        }
     }
     
     // System information monitoring
     Process {
         id: systemInfoProcess
-        command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu ' /proc/stat"]
+        command: ["bash", "-c", "cat /proc/meminfo; echo '---CPU---'; nproc; echo '---CPUSTAT---'; grep '^cpu' /proc/stat | head -" + (root.cpuCount + 1)]
         running: false
         
         stdout: StdioCollector {
@@ -53,6 +100,36 @@ Singleton {
             if (exitCode !== 0) {
                 console.warn("System info check failed with exit code:", exitCode)
                 root.systemInfoAvailable = false
+            }
+        }
+    }
+    
+    // Network monitoring process
+    Process {
+        id: networkStatsProcess
+        command: ["bash", "-c", "cat /proc/net/dev | grep -E '(wlan|eth|enp|wlp|ens|eno)' | awk '{print $1,$2,$10}' | sed 's/:/ /'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    parseNetworkStats(text.trim())
+                }
+            }
+        }
+    }
+    
+    // Disk I/O monitoring process
+    Process {
+        id: diskStatsProcess
+        command: ["bash", "-c", "cat /proc/diskstats | grep -E ' (sd[a-z]+|nvme[0-9]+n[0-9]+|vd[a-z]+) ' | grep -v 'p[0-9]' | awk '{print $3,$6,$10}'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    parseDiskStats(text.trim())
+                }
             }
         }
     }
@@ -123,6 +200,8 @@ Singleton {
             if (root.monitoringEnabled) {
                 updateSystemInfo()
                 updateProcessList()
+                updateNetworkStats()
+                updateDiskStats()
             }
         }
     }
@@ -139,9 +218,29 @@ Singleton {
         console.log("ProcessMonitorService: Monitoring", enabled ? "enabled" : "disabled")
         root.monitoringEnabled = enabled
         if (enabled) {
+            // Clear history when starting
+            root.cpuHistory = []
+            root.memoryHistory = []
+            root.networkHistory = ({rx: [], tx: []})
+            root.diskHistory = ({read: [], write: []})
             // Immediately update when enabled
             updateSystemInfo()
             updateProcessList()
+            updateNetworkStats()
+            updateDiskStats()
+            // console.log("ProcessMonitorService: Initial data collection started")
+        }
+    }
+    
+    function updateNetworkStats() {
+        if (!networkStatsProcess.running && root.monitoringEnabled) {
+            networkStatsProcess.running = true
+        }
+    }
+    
+    function updateDiskStats() {
+        if (!diskStatsProcess.running && root.monitoringEnabled) {
+            diskStatsProcess.running = true
         }
     }
     
@@ -244,6 +343,7 @@ Singleton {
     function parseSystemInfo(text) {
         const lines = text.split('\n')
         let section = 'memory'
+        const coreUsages = []
         
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim()
@@ -289,10 +389,103 @@ Singleton {
                         const used = total - idle - iowait
                         root.totalCpuUsage = total > 0 ? (used / total) * 100 : 0
                     }
+                } else if (line.match(/^cpu\d+/)) {
+                    const parts = line.split(/\s+/)
+                    if (parts.length >= 8) {
+                        const user = parseInt(parts[1])
+                        const nice = parseInt(parts[2])
+                        const system = parseInt(parts[3])
+                        const idle = parseInt(parts[4])
+                        const iowait = parseInt(parts[5])
+                        const irq = parseInt(parts[6])
+                        const softirq = parseInt(parts[7])
+                        
+                        const total = user + nice + system + idle + iowait + irq + softirq
+                        const used = total - idle - iowait
+                        const usage = total > 0 ? (used / total) * 100 : 0
+                        coreUsages.push(usage)
+                    }
                 }
             }
         }
         
+        // Update per-core usage
+        root.perCoreCpuUsage = coreUsages
+        
+        // Update history
+        addToHistory(root.cpuHistory, root.totalCpuUsage)
+        const memoryPercent = root.totalMemoryKB > 0 ? (root.usedMemoryKB / root.totalMemoryKB) * 100 : 0
+        addToHistory(root.memoryHistory, memoryPercent)
+        
+        // console.log("ProcessMonitorService: Updated - CPU:", root.totalCpuUsage.toFixed(1) + "%", "Memory:", memoryPercent.toFixed(1) + "%", "History length:", root.cpuHistory.length)
+        
         root.systemInfoAvailable = true
+    }
+    
+    function parseNetworkStats(text) {
+        const lines = text.split('\n')
+        let totalRx = 0
+        let totalTx = 0
+        
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/)
+            if (parts.length >= 3) {
+                const rx = parseInt(parts[1])
+                const tx = parseInt(parts[2])
+                if (!isNaN(rx) && !isNaN(tx)) {
+                    totalRx += rx
+                    totalTx += tx
+                }
+            }
+        }
+        
+        if (root.lastNetworkStats) {
+            const timeDiff = root.processUpdateInterval / 1000
+            root.networkRxRate = Math.max(0, (totalRx - root.lastNetworkStats.rx) / timeDiff)
+            root.networkTxRate = Math.max(0, (totalTx - root.lastNetworkStats.tx) / timeDiff)
+            
+            // Convert to KB/s for history
+            addToHistory(root.networkHistory.rx, root.networkRxRate / 1024)
+            addToHistory(root.networkHistory.tx, root.networkTxRate / 1024)
+        }
+        
+        root.lastNetworkStats = { rx: totalRx, tx: totalTx }
+    }
+    
+    function parseDiskStats(text) {
+        const lines = text.split('\n')
+        let totalRead = 0
+        let totalWrite = 0
+        
+        for (const line of lines) {
+            const parts = line.trim().split(/\s+/)
+            if (parts.length >= 3) {
+                const readSectors = parseInt(parts[1])
+                const writeSectors = parseInt(parts[2])
+                if (!isNaN(readSectors) && !isNaN(writeSectors)) {
+                    totalRead += readSectors * 512  // Convert sectors to bytes
+                    totalWrite += writeSectors * 512
+                }
+            }
+        }
+        
+        if (root.lastDiskStats) {
+            const timeDiff = root.processUpdateInterval / 1000
+            root.diskReadRate = Math.max(0, (totalRead - root.lastDiskStats.read) / timeDiff)
+            root.diskWriteRate = Math.max(0, (totalWrite - root.lastDiskStats.write) / timeDiff)
+            
+            // Convert to MB/s for history
+            addToHistory(root.diskHistory.read, root.diskReadRate / (1024 * 1024))
+            addToHistory(root.diskHistory.write, root.diskWriteRate / (1024 * 1024))
+        }
+        
+        root.lastDiskStats = { read: totalRead, write: totalWrite }
+    }
+    
+    function addToHistory(array, value) {
+        array.push(value)
+        if (array.length > root.historySize) {
+            array.shift()
+        }
     }
 }
