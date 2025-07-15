@@ -24,9 +24,25 @@ Singleton {
     
     property real cpuTemperature: 0.0
     
+    property string kernelVersion: ""
+    property string distribution: ""
+    property string hostname: ""
+    property string uptime: ""
+    property string scheduler: ""
+    property string architecture: ""
+    property string loadAverage: ""
+    property int processCount: 0
+    property int threadCount: 0
+    property string bootTime: ""
+    property string motherboard: ""
+    property string biosVersion: ""
+    property var diskMounts: []
+    property string diskUsage: ""
+    
     property int cpuUpdateInterval: 3000
     property int memoryUpdateInterval: 5000
     property int temperatureUpdateInterval: 10000
+    property int systemInfoUpdateInterval: 30000
     
     property bool enabledForTopBar: true
     property bool enabledForDetailedView: false
@@ -35,6 +51,7 @@ Singleton {
         console.log("SystemMonitorService: Starting initialization...")
         getCpuInfo()
         updateSystemStats()
+        updateSystemInfo()
         console.log("SystemMonitorService: Initialization complete")
     }
     
@@ -162,6 +179,282 @@ Singleton {
         }
     }
     
+    Process {
+        id: kernelInfoProcess
+        command: ["bash", "-c", "uname -r"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.kernelVersion = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Kernel info check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: distributionProcess
+        command: ["bash", "-c", "grep PRETTY_NAME /etc/os-release 2>/dev/null | cut -d'=' -f2 | tr -d '\"' || echo 'Unknown'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.distribution = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Distribution check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: hostnameProcess
+        command: ["bash", "-c", "hostname"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.hostname = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Hostname check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: uptimeProcess
+        command: ["bash", "-c", "uptime -p | sed 's/up //'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.uptime = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Uptime check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: schedulerProcess
+        command: ["bash", "-c", "cat /sys/block/sda/queue/scheduler 2>/dev/null | grep -o '\\[.*\\]' | tr -d '[]' || echo 'Unknown'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.scheduler = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Scheduler check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: architectureProcess
+        command: ["bash", "-c", "uname -m"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.architecture = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Architecture check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: loadAverageProcess
+        command: ["bash", "-c", "cat /proc/loadavg | cut -d' ' -f1,2,3"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.loadAverage = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Load average check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: processCountProcess
+        command: ["bash", "-c", "ps aux | wc -l"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.processCount = parseInt(text.trim()) - 1
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Process count check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: threadCountProcess
+        command: ["bash", "-c", "cat /proc/stat | grep processes | awk '{print $2}'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.threadCount = parseInt(text.trim())
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Thread count check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: bootTimeProcess
+        command: ["bash", "-c", "who -b | awk '{print $3, $4}' || stat -c %w /proc/1 2>/dev/null | cut -d' ' -f1,2 || echo 'Unknown'"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.bootTime = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Boot time check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: motherboardProcess
+        command: ["bash", "-c", "if [ -r /sys/devices/virtual/dmi/id/board_vendor ] && [ -r /sys/devices/virtual/dmi/id/board_name ]; then echo \"$(cat /sys/devices/virtual/dmi/id/board_vendor 2>/dev/null) $(cat /sys/devices/virtual/dmi/id/board_name 2>/dev/null)\"; else echo 'Unknown'; fi"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.motherboard = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Motherboard check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: biosProcess
+        command: ["bash", "-c", "if [ -r /sys/devices/virtual/dmi/id/bios_version ] && [ -r /sys/devices/virtual/dmi/id/bios_date ]; then echo \"$(cat /sys/devices/virtual/dmi/id/bios_version 2>/dev/null) $(cat /sys/devices/virtual/dmi/id/bios_date 2>/dev/null)\"; else echo 'Unknown'; fi"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    root.biosVersion = text.trim()
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("BIOS check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
+    Process {
+        id: diskMountsProcess
+        command: ["bash", "-c", "df -h --output=source,target,fstype,size,used,avail,pcent | tail -n +2 | grep -v tmpfs | grep -v devtmpfs | head -10"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    let mounts = []
+                    const lines = text.trim().split('\n')
+                    for (const line of lines) {
+                        const parts = line.split(/\s+/)
+                        if (parts.length >= 7) {
+                            mounts.push({
+                                device: parts[0],
+                                mount: parts[1],
+                                fstype: parts[2],
+                                size: parts[3],
+                                used: parts[4],
+                                avail: parts[5],
+                                percent: parts[6]
+                            })
+                        }
+                    }
+                    root.diskMounts = mounts
+                }
+            }
+        }
+        
+        onExited: (exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("Disk mounts check failed with exit code:", exitCode)
+            }
+        }
+    }
+    
     Timer {
         id: cpuTimer
         interval: root.cpuUpdateInterval
@@ -202,6 +495,19 @@ Singleton {
         }
     }
     
+    Timer {
+        id: systemInfoTimer
+        interval: root.systemInfoUpdateInterval
+        running: root.enabledForDetailedView
+        repeat: true
+        
+        onTriggered: {
+            if (root.enabledForDetailedView) {
+                updateSystemInfo()
+            }
+        }
+    }
+    
     function getCpuInfo() {
         cpuInfoProcess.running = true
     }
@@ -215,6 +521,22 @@ Singleton {
                 temperatureProcess.running = true
             }
         }
+    }
+    
+    function updateSystemInfo() {
+        kernelInfoProcess.running = true
+        distributionProcess.running = true
+        hostnameProcess.running = true
+        uptimeProcess.running = true
+        schedulerProcess.running = true
+        architectureProcess.running = true
+        loadAverageProcess.running = true
+        processCountProcess.running = true
+        threadCountProcess.running = true
+        bootTimeProcess.running = true
+        motherboardProcess.running = true
+        biosProcess.running = true
+        diskMountsProcess.running = true
     }
     
     function enableTopBarMonitoring(enabled) {

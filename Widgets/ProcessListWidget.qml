@@ -1115,36 +1115,481 @@ PanelWindow {
     
     Component {
         id: systemTabComponent
-        Rectangle {
-            color: "transparent"
+        
+        ScrollView {
+            anchors.fill: parent
+            clip: true
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             
             Column {
-                anchors.centerIn: parent
-                spacing: Theme.spacingL
+                width: parent.width
+                spacing: Theme.spacingM
                 
-                Text {
-                    text: "settings"
-                    font.family: Theme.iconFont
-                    font.pixelSize: 48
-                    color: Theme.primary
-                    opacity: 0.6
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Row {
+                    width: parent.width
+                    height: 140
+                    spacing: Theme.spacingM
+                    
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM) / 2
+                        height: 140
+                        radius: Theme.cornerRadiusLarge
+                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                        border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16)
+                        border.width: 1
+                        
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            anchors.bottomMargin: Theme.spacingM + 4
+                            spacing: Theme.spacingXS
+                            
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "computer"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize
+                                    color: Theme.primary
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "System"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Bold
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            Text {
+                                text: "Host: " + SystemMonitorService.hostname
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "OS: " + SystemMonitorService.distribution
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Arch: " + SystemMonitorService.architecture
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Kernel: " + SystemMonitorService.kernelVersion
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
+                    
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM) / 2
+                        height: 140
+                        radius: Theme.cornerRadiusLarge
+                        color: Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
+                        border.color: Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.16)
+                        border.width: 1
+                        
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            anchors.bottomMargin: Theme.spacingM + 4
+                            spacing: Theme.spacingXS
+                            
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "developer_board"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize
+                                    color: Theme.secondary
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Hardware"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Bold
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            Text {
+                                text: "CPU: " + SystemMonitorService.cpuModel
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Motherboard: " + SystemMonitorService.motherboard
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "BIOS: " + SystemMonitorService.biosVersion
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Memory: " + SystemMonitorService.formatMemory(SystemMonitorService.totalMemory)
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
                 }
                 
-                Text {
-                    text: "System Information"
-                    font.pixelSize: Theme.fontSizeLarge + 2
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Row {
+                    width: parent.width
+                    height: 120
+                    spacing: Theme.spacingM
+                    
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM) / 2
+                        height: 120
+                        radius: Theme.cornerRadiusLarge
+                        color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.08)
+                        border.color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.16)
+                        border.width: 1
+                        
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            anchors.bottomMargin: Theme.spacingM + 4
+                            spacing: Theme.spacingXS
+                            
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "timer"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize
+                                    color: Theme.warning
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Uptime"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Bold
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            Text {
+                                text: SystemMonitorService.uptime
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Bold
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Boot: " + SystemMonitorService.bootTime
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: "Load: " + SystemMonitorService.loadAverage
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
+                    
+                    Rectangle {
+                        width: (parent.width - Theme.spacingM) / 2
+                        height: 120
+                        radius: Theme.cornerRadiusLarge
+                        color: Qt.rgba(Theme.info.r, Theme.info.g, Theme.info.b, 0.08)
+                        border.color: Qt.rgba(Theme.info.r, Theme.info.g, Theme.info.b, 0.16)
+                        border.width: 1
+                        
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            anchors.bottomMargin: Theme.spacingM + 4
+                            spacing: Theme.spacingXS
+                            
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingS
+                                
+                                Text {
+                                    text: "list_alt"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize
+                                    color: Theme.info
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                
+                                Text {
+                                    text: "Processes"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.weight: Font.Bold
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+                            
+                            Text {
+                                text: SystemMonitorService.processCount + " Running"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                            
+                            Text {
+                                text: SystemMonitorService.threadCount + " Total Created"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
                 }
                 
-                Text {
-                    text: "Kernel information, schedulers,\nand system details will be shown here"
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceVariantText
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Rectangle {
+                    width: parent.width
+                    height: Math.max(200, diskMountRepeater.count * 28 + 60)
+                    radius: Theme.cornerRadiusLarge
+                    color: Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.08)
+                    border.color: Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.16)
+                    border.width: 1
+                    
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingM
+                        spacing: Theme.spacingS
+                        
+                        Row {
+                            width: parent.width
+                            spacing: Theme.spacingS
+                            
+                            Text {
+                                text: "storage"
+                                font.family: Theme.iconFont
+                                font.pixelSize: Theme.iconSize
+                                color: Theme.success
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            
+                            Text {
+                                text: "Storage & Disks"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Bold
+                                color: Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                        
+                        Text {
+                            text: "I/O Scheduler: " + SystemMonitorService.scheduler
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            width: parent.width
+                            elide: Text.ElideRight
+                        }
+                        
+                        ScrollView {
+                            width: parent.width
+                            height: parent.height - 60
+                            clip: true
+                            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+                            
+                            Column {
+                                width: parent.width
+                                spacing: 2
+                                
+                                Row {
+                                    width: parent.width
+                                    height: 24
+                                    spacing: Theme.spacingS
+                                    
+                                    Text {
+                                        text: "Device"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.25
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: "Mount"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.2
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: "Size"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.15
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: "Used"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.15
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: "Available"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.15
+                                        elide: Text.ElideRight
+                                    }
+                                    
+                                    Text {
+                                        text: "Use%"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        font.weight: Font.Bold
+                                        color: Theme.surfaceText
+                                        width: parent.width * 0.1
+                                        elide: Text.ElideRight
+                                    }
+                                }
+                                
+                                Repeater {
+                                    id: diskMountRepeater
+                                    model: SystemMonitorService.diskMounts
+                                    
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 24
+                                        radius: Theme.cornerRadiusSmall
+                                        color: diskMouseArea.containsMouse ? 
+                                               Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.04) : 
+                                               "transparent"
+                                        
+                                        MouseArea {
+                                            id: diskMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                        }
+                                        
+                                        Row {
+                                            anchors.fill: parent
+                                            spacing: Theme.spacingS
+                                            
+                                            Text {
+                                                text: modelData.device
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                width: parent.width * 0.25
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            
+                                            Text {
+                                                text: modelData.mount
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                width: parent.width * 0.2
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            
+                                            Text {
+                                                text: modelData.size
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                width: parent.width * 0.15
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            
+                                            Text {
+                                                text: modelData.used
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                width: parent.width * 0.15
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            
+                                            Text {
+                                                text: modelData.avail
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceText
+                                                width: parent.width * 0.15
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            
+                                            Text {
+                                                text: modelData.percent
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: {
+                                                    const percent = parseInt(modelData.percent)
+                                                    if (percent > 90) return Theme.error
+                                                    if (percent > 75) return Theme.warning
+                                                    return Theme.surfaceText
+                                                }
+                                                width: parent.width * 0.1
+                                                elide: Text.ElideRight
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1484,10 +1929,13 @@ PanelWindow {
         processListWidget.isVisible = true
         ProcessMonitorService.updateSystemInfo()
         ProcessMonitorService.updateProcessList()
+        SystemMonitorService.enableDetailedMonitoring(true)
+        SystemMonitorService.updateSystemInfo()
     }
     
     function hide() {
         processListWidget.isVisible = false
+        SystemMonitorService.enableDetailedMonitoring(false)
     }
     
     function toggle() {
