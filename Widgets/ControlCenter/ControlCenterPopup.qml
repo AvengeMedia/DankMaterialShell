@@ -149,12 +149,12 @@ PanelWindow {
                             }
                             
                             // Circular clipping container for profile image
-                            Rectangle {
+                            ClippingRectangle {
                                 anchors.fill: parent
                                 anchors.margins: 1
-                                radius: 31
+                                radius: width / 2
+                                antialiasing: true
                                 color: "transparent"
-                                clip: true
                                 visible: parent.hasImage
                                 
                                 Image {
