@@ -33,15 +33,16 @@ Rectangle {
                     width: 18
                     height: 18
                     source: {
-                        let icon = trayItem?.icon || "";
-                        if (!icon) return "";
-                        
-                        if (icon.includes("?path=")) {
-                            const [name, path] = icon.split("?path=");
-                            const fileName = name.substring(name.lastIndexOf("/") + 1);
-                            return `file://${path}/${fileName}`;
+                        let icon = trayItem?.icon;
+                        if (typeof icon === 'string' || icon instanceof String) {
+                            if (icon.includes("?path=")) {
+                                const [name, path] = icon.split("?path=");
+                                const fileName = name.substring(name.lastIndexOf("/") + 1);
+                                return `file://${path}/${fileName}`;
+                            }
+                            return icon;
                         }
-                        return icon;
+                        return ""; // Return empty string if icon is not a string
                     }
                     asynchronous: true
                     smooth: true

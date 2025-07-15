@@ -242,7 +242,7 @@ PanelWindow {
             }
         }
         
-        // Small dismiss button - bottom right corner
+        // Small dismiss button - bottom right corner with better positioning
         Rectangle {
             width: 60
             height: 18
@@ -257,7 +257,7 @@ PanelWindow {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.rightMargin: 12
-            anchors.bottomMargin: 10
+            anchors.bottomMargin: 14  // Moved up for better padding
             
             Row {
                 anchors.centerIn: parent
@@ -312,7 +312,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: 12
             anchors.rightMargin: 32
-            anchors.bottomMargin: 6  // Reduced bottom margin to account for dismiss button
+            anchors.bottomMargin: 24  // Even more space to ensure 2px+ margin above dismiss button
             spacing: 12
             
             // Notification icon based on EXAMPLE NotificationAppIcon pattern
@@ -426,17 +426,52 @@ PanelWindow {
             // Text content
             Column {
                 width: parent.width - 68
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
+                anchors.top: parent.top
+                anchors.topMargin: 4  // Move content up slightly
+                spacing: 3
                 
-                Text {
-                    text: root.activeNotification ? (root.activeNotification.summary || "") : ""
-                    font.pixelSize: 14
-                    color: Theme.surfaceText
-                    font.weight: Font.Medium
+                // Title and timestamp row
+                Row {
                     width: parent.width
-                    elide: Text.ElideRight
-                    visible: text.length > 0
+                    spacing: 8
+                    
+                    Text {
+                        text: root.activeNotification ? (root.activeNotification.summary || "") : ""
+                        font.pixelSize: 14
+                        color: Theme.surfaceText
+                        font.weight: Font.Medium
+                        width: parent.width - timestampText.width - parent.spacing
+                        elide: Text.ElideRight
+                        visible: text.length > 0
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    
+                    Text {
+                        id: timestampText
+                        text: root.activeNotification ? formatNotificationTime(root.activeNotification.timestamp) : ""
+                        font.pixelSize: 9
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+                        visible: text.length > 0
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        function formatNotificationTime(timestamp) {
+                            if (!timestamp) return ""
+                            
+                            const now = new Date()
+                            const notifTime = new Date(timestamp)
+                            const diffMs = now.getTime() - notifTime.getTime()
+                            const diffMinutes = Math.floor(diffMs / 60000)
+                            
+                            if (diffMinutes < 1) {
+                                return "now"
+                            } else if (diffMinutes < 60) {
+                                return `${diffMinutes}m`
+                            } else {
+                                const diffHours = Math.floor(diffMs / 3600000)
+                                return `${diffHours}h`
+                            }
+                        }
+                    }
                 }
                 
                 Text {

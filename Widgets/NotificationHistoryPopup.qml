@@ -48,7 +48,7 @@ PanelWindow {
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-        border.width: 1
+        border.width: 0.5
         
         // TopBar dropdown animation - slide down from bar (consistent with other TopBar widgets)
         transform: [
@@ -225,46 +225,128 @@ PanelWindow {
                         
                         property var groupData: model
                         property bool isExpanded: model.expanded || false
+                        property int groupPriority: model.priority || NotificationGroupingService.priorityNormal
+                        property int notificationType: model.notificationType || NotificationGroupingService.typeNormal
                         
-                        // Group Header
+                        // Group Header with enhanced visual hierarchy
                         Rectangle {
                             width: parent.width
-                            height: 56
+                            height: getGroupHeaderHeight()
                             radius: Theme.cornerRadius
-                            color: groupHeaderArea.containsMouse ? 
-                                   Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : 
-                                   Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
+                            color: getGroupHeaderColor()
                             
-                            // App Icon
+                            // Enhanced elevation effect based on priority
+                            layer.enabled: groupPriority === NotificationGroupingService.priorityHigh
+                            layer.effect: MultiEffect {
+                                shadowEnabled: true
+                                shadowHorizontalOffset: 0
+                                shadowVerticalOffset: 2
+                                shadowBlur: 0.4
+                                shadowColor: Qt.rgba(0, 0, 0, 0.1)
+                            }
+                            
+                            // Priority indicator strip
                             Rectangle {
-                                width: 32
-                                height: 32
-                                radius: width / 2
-                                color: Theme.primaryContainer
+                                width: 4
+                                height: parent.height
                                 anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM
+                                radius: 2
+                                color: getPriorityColor()
+                                visible: groupPriority === NotificationGroupingService.priorityHigh
+                            }
+                            
+                            function getGroupHeaderHeight() {
+                                // Dynamic height based on content length and priority
+                                // Calculate height based on message content length
+                                const bodyText = (model.latestNotification && model.latestNotification.body) ? model.latestNotification.body : ""
+                                const bodyLines = Math.min(Math.ceil((bodyText.length / 50)), 4) // Estimate lines needed
+                                const bodyHeight = bodyLines * 16 // 16px per line
+                                const indicatorHeight = model.totalCount > 1 ? 16 : 0
+                                const paddingTop = Theme.spacingM
+                                const paddingBottom = Theme.spacingS
+                                
+                                let calculatedHeight = paddingTop + 20 + bodyHeight + indicatorHeight + paddingBottom
+                                
+                                // Minimum height based on priority
+                                const minHeight = groupPriority === NotificationGroupingService.priorityHigh ? 90 : 80
+                                
+                                return Math.max(calculatedHeight, minHeight)
+                            }
+                            
+                            function getGroupHeaderColor() {
+                                if (groupHeaderArea.containsMouse) {
+                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                                }
+                                
+                                // Different background colors based on priority
+                                if (groupPriority === NotificationGroupingService.priorityHigh) {
+                                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.05)
+                                }
+                                
+                                return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
+                            }
+                            
+                            function getPriorityColor() {
+                                if (notificationType === NotificationGroupingService.typeConversation) {
+                                    return Theme.primary
+                                } else if (notificationType === NotificationGroupingService.typeMedia) {
+                                    return "#FF6B35"  // Orange for media
+                                }
+                                return Theme.primary
+                            }
+                            
+                            // App Icon with enhanced styling
+                            Rectangle {
+                                width: groupPriority === NotificationGroupingService.priorityHigh ? 40 : 32
+                                height: width
+                                radius: width / 2
+                                color: getIconBackgroundColor()
+                                anchors.left: parent.left
+                                anchors.leftMargin: groupPriority === NotificationGroupingService.priorityHigh ? Theme.spacingM + 4 : Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                // Material icon fallback
+                                // Removed glow effect as requested
+                                
+                                function getIconBackgroundColor() {
+                                    if (notificationType === NotificationGroupingService.typeConversation) {
+                                        return Theme.primaryContainer
+                                    } else if (notificationType === NotificationGroupingService.typeMedia) {
+                                        return Qt.rgba(1, 0.42, 0.21, 0.2)  // Orange tint for media
+                                    }
+                                    return Theme.primaryContainer
+                                }
+                                
+                                // Material icon fallback with type-specific icons
                                 Loader {
                                     active: !model.appIcon || model.appIcon === ""
                                     anchors.fill: parent
                                     sourceComponent: Text {
                                         anchors.centerIn: parent
-                                        text: "apps"
+                                        text: getDefaultIcon()
                                         font.family: Theme.iconFont
-                                        font.pixelSize: 16
+                                        font.pixelSize: groupPriority === NotificationGroupingService.priorityHigh ? 20 : 16
                                         color: Theme.primaryText
+                                        
+                                        function getDefaultIcon() {
+                                            if (notificationType === NotificationGroupingService.typeConversation) {
+                                                return "chat"
+                                            } else if (notificationType === NotificationGroupingService.typeMedia) {
+                                                return "music_note"
+                                            } else if (notificationType === NotificationGroupingService.typeSystem) {
+                                                return "settings"
+                                            }
+                                            return "apps"
+                                        }
                                     }
                                 }
                                 
-                                // App icon
+                                // App icon with priority-based sizing
                                 Loader {
                                     active: model.appIcon && model.appIcon !== ""
                                     anchors.centerIn: parent
                                     sourceComponent: IconImage {
-                                        width: 24
-                                        height: 24
+                                        width: groupPriority === NotificationGroupingService.priorityHigh ? 28 : 24
+                                        height: width
                                         asynchronous: true
                                         source: {
                                             if (!model.appIcon) return ""
@@ -277,14 +359,14 @@ PanelWindow {
                                 }
                             }
                             
-                            // App Name and Summary
+                            // App Name and Summary with enhanced layout
                             Column {
                                 anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingM + 32 + Theme.spacingM  // Icon + spacing
+                                anchors.leftMargin: Theme.spacingM + (groupPriority === NotificationGroupingService.priorityHigh ? 48 : 40) + Theme.spacingM
                                 anchors.right: parent.right
-                                anchors.rightMargin: 80  // Space for buttons
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: 2
+                                anchors.rightMargin: 32  // Maximum available width for message content
+                                anchors.verticalCenter: parent.verticalCenter  // Center the entire content vertically
+                                spacing: groupPriority === NotificationGroupingService.priorityHigh ? 4 : 2
                                 
                                 Row {
                                     width: parent.width
@@ -292,19 +374,28 @@ PanelWindow {
                                     
                                     Text {
                                         text: model.appName || "App"
-                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.pixelSize: groupPriority === NotificationGroupingService.priorityHigh ? Theme.fontSizeLarge : Theme.fontSizeMedium
                                         color: Theme.surfaceText
-                                        font.weight: Font.Medium
+                                        font.weight: groupPriority === NotificationGroupingService.priorityHigh ? Font.DemiBold : Font.Medium
                                     }
                                     
-                                    // Notification count badge
+                                    // Enhanced notification count badge
                                     Rectangle {
                                         width: Math.max(countText.width + 8, 20)
                                         height: 20
                                         radius: 10
-                                        color: Theme.primary
+                                        color: getBadgeColor()
                                         visible: model.totalCount > 1
                                         anchors.verticalCenter: parent.verticalCenter
+                                        
+                                        // Removed glow effect as requested
+                                        
+                                        function getBadgeColor() {
+                                            if (groupPriority === NotificationGroupingService.priorityHigh) {
+                                                return Theme.primary
+                                            }
+                                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.8)
+                                        }
                                         
                                         Text {
                                             id: countText
@@ -317,29 +408,67 @@ PanelWindow {
                                     }
                                 }
                                 
+                                // Latest message summary (title)
                                 Text {
-                                    text: model.latestNotification ? 
-                                          (model.latestNotification.summary || model.latestNotification.body || "") : ""
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                    text: getLatestMessageTitle()
+                                    font.pixelSize: groupPriority === NotificationGroupingService.priorityHigh ? Theme.fontSizeMedium : Theme.fontSizeSmall
+                                    color: Theme.surfaceText
                                     width: parent.width
                                     elide: Text.ElideRight
                                     visible: text.length > 0
+                                    font.weight: Font.Medium
+                                    
+                                    function getLatestMessageTitle() {
+                                        if (model.latestNotification) {
+                                            return model.latestNotification.summary || ""
+                                        }
+                                        return ""
+                                    }
                                 }
+                                
+                                // Latest message body (content)
+                                Text {
+                                    text: getLatestMessageBody()
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
+                                    elide: Text.ElideRight
+                                    visible: text.length > 0
+                                    maximumLineCount: groupPriority === NotificationGroupingService.priorityHigh ? 3 : 2
+                                    
+                                    function getLatestMessageBody() {
+                                        if (model.latestNotification) {
+                                            return model.latestNotification.body || ""
+                                        }
+                                        return ""
+                                    }
+                                }
+                                
+                                // Additional messages indicator removed - moved below as floating text
                             }
                             
-                            // Expand/Collapse Icon
+                            // Enhanced Expand/Collapse Icon - moved up more for better spacing
                             Rectangle {
                                 id: expandCollapseButton
-                                width: 32
+                                width: model.totalCount > 1 ? 32 : 0
                                 height: 32
                                 radius: 16
                                 anchors.right: parent.right
-                                anchors.rightMargin: 40  // More space from close button
-                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.rightMargin: 6  // Reduced right margin to add left padding
+                                anchors.bottom: parent.bottom
+                                anchors.bottomMargin: 16  // Moved up even more for better spacing
                                 color: expandButtonArea.containsMouse ? 
                                        Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
                                        "transparent"
+                                visible: model.totalCount > 1
+                                
+                                Behavior on width {
+                                    NumberAnimation {
+                                        duration: Theme.shortDuration
+                                        easing.type: Theme.standardEasing
+                                    }
+                                }
                                 
                                 Text {
                                     anchors.centerIn: parent
@@ -348,11 +477,8 @@ PanelWindow {
                                     font.pixelSize: 20
                                     color: expandButtonArea.containsMouse ? Theme.primary : Theme.surfaceText
                                     
-                                    Behavior on rotation {
-                                        NumberAnimation {
-                                            duration: Theme.shortDuration
-                                            easing.type: Theme.standardEasing
-                                        }
+                                    Behavior on text {
+                                        enabled: false  // Disable animation on text change to prevent flicker
                                     }
                                 }
                                 
@@ -361,6 +487,7 @@ PanelWindow {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
+                                    enabled: model.totalCount > 1
                                     
                                     onClicked: {
                                         NotificationGroupingService.toggleGroupExpansion(index)
@@ -416,14 +543,16 @@ PanelWindow {
                             MouseArea {
                                 id: groupHeaderArea
                                 anchors.fill: parent
-                                anchors.rightMargin: 76  // Exclude both expand and close button areas
+                                anchors.rightMargin: 32  // Adjusted for maximum content width
                                 hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
+                                cursorShape: model.totalCount > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
                                 preventStealing: false
                                 propagateComposedEvents: true
                                 
                                 onClicked: {
-                                    NotificationGroupingService.toggleGroupExpansion(index)
+                                    if (model.totalCount > 1) {
+                                        NotificationGroupingService.toggleGroupExpansion(index)
+                                    }
                                 }
                             }
                             
@@ -435,16 +564,75 @@ PanelWindow {
                             }
                         }
                         
-                        // Expanded Notifications List
+                        // Floating "More messages" indicator - positioned below the main group
+                        Rectangle {
+                            width: Math.min(parent.width * 0.8, 200)
+                            height: 24
+                            radius: 12
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.topMargin: 1 
+                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
+                            border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2)
+                            border.width: 1
+                            visible: model.totalCount > 1 && !isExpanded
+                            
+                            // Smooth fade animation
+                            opacity: (model.totalCount > 1 && !isExpanded) ? 1.0 : 0.0
+                            
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: getFloatingIndicatorText()
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.9)
+                                font.weight: Font.Medium
+                                
+                                function getFloatingIndicatorText() {
+                                    if (model.totalCount > 1) {
+                                        const additionalCount = model.totalCount - 1
+                                        return `${additionalCount} more message${additionalCount > 1 ? "s" : ""} • Tap to expand`
+                                    }
+                                    return ""
+                                }
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    NotificationGroupingService.toggleGroupExpansion(index)
+                                }
+                            }
+                            
+                            // Subtle hover effect
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                        }
+                        
+                        // Expanded Notifications List with enhanced animation
                         Item {
                             width: parent.width
-                            height: isExpanded ? expandedContent.height : 0
+                            height: isExpanded ? expandedContent.height + Theme.spacingS : 0
                             clip: true
                             
+                            // Enhanced staggered animation
                             Behavior on height {
-                                NumberAnimation {
-                                    duration: Theme.mediumDuration
-                                    easing.type: Theme.emphasizedEasing
+                                SequentialAnimation {
+                                    NumberAnimation {
+                                        duration: Theme.mediumDuration
+                                        easing.type: Theme.emphasizedEasing
+                                    }
                                 }
                             }
                             
@@ -453,10 +641,13 @@ PanelWindow {
                                 width: parent.width
                                 spacing: Theme.spacingXS
                                 opacity: isExpanded ? 1.0 : 0.0
+                                topPadding: Theme.spacingS
+                                bottomPadding: Theme.spacingM
                                 
+                                // Enhanced opacity animation
                                 Behavior on opacity {
                                     NumberAnimation {
-                                        duration: Theme.shortDuration
+                                        duration: Theme.mediumDuration
                                         easing.type: Theme.standardEasing
                                     }
                                 }
@@ -465,12 +656,45 @@ PanelWindow {
                                     model: groupData.notifications
                                     
                                     delegate: Rectangle {
+                                        // Skip the first (latest) notification since it's shown in the header
+                                        visible: index > 0
                                         width: parent.width
                                         height: 80
                                         radius: Theme.cornerRadius
                                         color: notifArea.containsMouse ? 
                                                Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : 
                                                Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
+                                        
+                                        // Subtle left border for nested notifications
+                                        Rectangle {
+                                            width: 2
+                                            height: parent.height - 16
+                                            anchors.left: parent.left
+                                            anchors.leftMargin: 8
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
+                                            radius: 1
+                                        }
+                                        
+                                        // Smooth appearance animation
+                                        opacity: isExpanded ? 1.0 : 0.0
+                                        transform: Translate {
+                                            y: isExpanded ? 0 : -10
+                                        }
+                                        
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                                easing.type: Theme.standardEasing
+                                            }
+                                        }
+                                        
+                                        Behavior on transform {
+                                            NumberAnimation {
+                                                duration: Theme.shortDuration
+                                                easing.type: Theme.standardEasing
+                                            }
+                                        }
                                         
                                         // Individual notification close button
                                         Rectangle {
@@ -508,6 +732,7 @@ PanelWindow {
                                         Row {
                                             anchors.fill: parent
                                             anchors.margins: Theme.spacingM
+                                            anchors.leftMargin: Theme.spacingM + 8  // Extra space for border
                                             anchors.rightMargin: 36
                                             spacing: Theme.spacingM
                                             

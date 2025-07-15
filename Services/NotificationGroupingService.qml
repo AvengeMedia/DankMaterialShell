@@ -6,8 +6,8 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // Grouped notifications model
-    property var groupedNotifications: ListModel {}
+    // Grouped notifications model - initialize as ListModel directly
+    property ListModel groupedNotifications: ListModel {}
     
     // Total count of all notifications across all groups
     property int totalCount: 0
@@ -15,16 +15,35 @@ Singleton {
     // Map to track group indices by app name for efficient lookups
     property var appGroupMap: ({})
     
+    // Debounce timer for sorting
+    property bool _sortDirty: false
+    Timer {
+        id: sortTimer
+        interval: 50  // 50ms debounce interval
+        onTriggered: {
+            if (_sortDirty) {
+                sortGroupsByPriority()
+                _sortDirty = false
+            }
+        }
+    }
+    
     // Configuration
     property int maxNotificationsPerGroup: 10
     property int maxGroups: 20
     
-    Component.onCompleted: {
-        groupedNotifications = Qt.createQmlObject(`
-            import QtQuick
-            ListModel {}
-        `, root)
-    }
+    // Priority constants for Android 16-style stacking
+    readonly property int priorityHigh: 2      // Conversations, calls, media
+    readonly property int priorityNormal: 1    // Regular notifications
+    readonly property int priorityLow: 0       // System, background updates
+    
+    // Notification type constants
+    readonly property int typeConversation: 1
+    readonly property int typeMedia: 2
+    readonly property int typeSystem: 3
+    readonly property int typeNormal: 4
+    
+    
     
     // Format timestamp for display
     function formatTimestamp(timestamp) {
@@ -57,6 +76,9 @@ Singleton {
             return
         }
         
+        // Enhance notification with priority and type detection
+        notificationObj = enhanceNotification(notificationObj)
+        
         const appName = notificationObj.appName
         let groupIndex = appGroupMap[appName]
         
@@ -86,15 +108,36 @@ Singleton {
         
         notificationsList.append(notificationObj)
         
-        groupedNotifications.append({
+        // Create properly structured latestNotification object
+        const latestNotificationData = {
+            "id": notificationObj.id || "",
+            "appName": notificationObj.appName || "",
+            "appIcon": notificationObj.appIcon || "",
+            "summary": notificationObj.summary || "",
+            "body": notificationObj.body || "",
+            "timestamp": notificationObj.timestamp || new Date(),
+            "priority": notificationObj.priority || priorityNormal,
+            "notificationType": notificationObj.notificationType || typeNormal,
+            "urgency": notificationObj.urgency || 1,
+            "image": notificationObj.image || ""
+        }
+        
+        const groupData = {
             "appName": appName,
             "appIcon": notificationObj.appIcon || "",
             "notifications": notificationsList,
             "totalCount": 1,
-            "latestNotification": notificationObj,
+            "latestNotification": latestNotificationData,
             "expanded": false,
-            "timestamp": notificationObj.timestamp
-        })
+            "timestamp": notificationObj.timestamp || new Date(),
+            "priority": notificationObj.priority || priorityNormal,
+            "notificationType": notificationObj.notificationType || typeNormal
+        }
+        
+        groupedNotifications.append(groupData)
+        
+        // Sort groups by priority after adding
+        requestSort()
         
         appGroupMap[appName] = groupIndex
         updateGroupMap()
@@ -115,34 +158,83 @@ Singleton {
         // Add to front of group (newest first)
         group.notifications.insert(0, notificationObj)
         
+        // Create a new object with proper property structure for latestNotification
+        const latestNotificationData = {
+            "id": notificationObj.id || "",
+            "appName": notificationObj.appName || "",
+            "appIcon": notificationObj.appIcon || "",
+            "summary": notificationObj.summary || "",
+            "body": notificationObj.body || "",
+            "timestamp": notificationObj.timestamp || new Date(),
+            "priority": notificationObj.priority || priorityNormal,
+            "notificationType": notificationObj.notificationType || typeNormal,
+            "urgency": notificationObj.urgency || 1,
+            "image": notificationObj.image || ""
+        }
+        
         // Update group metadata
         groupedNotifications.setProperty(groupIndex, "totalCount", group.totalCount + 1)
-        groupedNotifications.setProperty(groupIndex, "latestNotification", notificationObj)
-        groupedNotifications.setProperty(groupIndex, "timestamp", notificationObj.timestamp)
+        groupedNotifications.setProperty(groupIndex, "latestNotification", latestNotificationData)
+        groupedNotifications.setProperty(groupIndex, "timestamp", notificationObj.timestamp || new Date())
+        
+        // Update group priority if this notification has higher priority
+        const currentPriority = group.priority || priorityNormal
+        const newPriority = Math.max(currentPriority, notificationObj.priority || priorityNormal)
+        groupedNotifications.setProperty(groupIndex, "priority", newPriority)
+        
+        // Update notification type if needed
+        if (notificationObj.notificationType === typeConversation || 
+            notificationObj.notificationType === typeMedia) {
+            groupedNotifications.setProperty(groupIndex, "notificationType", notificationObj.notificationType)
+        }
         
         // Keep only max notifications per group
         while (group.notifications.count > maxNotificationsPerGroup) {
             group.notifications.remove(group.notifications.count - 1)
         }
         
-        // Move group to front (most recent activity)
-        moveGroupToFront(groupIndex)
+        // Re-sort groups by priority after updating
+        requestSort()
     }
     
-    // Move a group to the front of the list
-    function moveGroupToFront(groupIndex) {
-        if (groupIndex === 0) return // Already at front
-        
-        const group = groupedNotifications.get(groupIndex)
-        if (!group) return
-        
-        // Remove from current position
-        groupedNotifications.remove(groupIndex)
-        
-        // Insert at front
-        groupedNotifications.insert(0, group)
-        
-        // Update group map
+    // Request a debounced sort
+    function requestSort() {
+        _sortDirty = true
+        sortTimer.restart()
+    }
+
+    // Sort groups by priority and recency
+    function sortGroupsByPriority() {
+        if (groupedNotifications.count <= 1) return
+
+        for (let i = 0; i < groupedNotifications.count - 1; i++) {
+            for (let j = 0; j < groupedNotifications.count - i - 1; j++) {
+                const groupA = groupedNotifications.get(j)
+                const groupB = groupedNotifications.get(j + 1)
+
+                const priorityA = groupA.priority || priorityNormal
+                const priorityB = groupB.priority || priorityNormal
+                
+                let shouldSwap = false
+                if (priorityA !== priorityB) {
+                    if (priorityB > priorityA) {
+                        shouldSwap = true
+                    }
+                } else {
+                    const timeA = new Date(groupA.timestamp || 0).getTime()
+                    const timeB = new Date(groupB.timestamp || 0).getTime()
+                    if (timeB > timeA) {
+                        shouldSwap = true
+                    }
+                }
+
+                if (shouldSwap) {
+                    // Swap the elements at j and j + 1
+                    groupedNotifications.move(j, j + 1, 1)
+                }
+            }
+        }
+
         updateGroupMap()
     }
     
@@ -200,7 +292,26 @@ Singleton {
             // Update latest notification if we removed the latest one
             if (notificationIndex === 0 && group.notifications.count > 0) {
                 const newLatest = group.notifications.get(0)
-                groupedNotifications.setProperty(groupIndex, "latestNotification", newLatest)
+                
+                // Create a new object with the correct structure
+                const latestNotificationData = {
+                    "id": newLatest.id || "",
+                    "appName": newLatest.appName || "",
+                    "appIcon": newLatest.appIcon || "",
+                    "summary": newLatest.summary || "",
+                    "body": newLatest.body || "",
+                    "timestamp": newLatest.timestamp || new Date(),
+                    "priority": newLatest.priority || priorityNormal,
+                    "notificationType": newLatest.notificationType || typeNormal,
+                    "urgency": newLatest.urgency || 1,
+                    "image": newLatest.image || ""
+                }
+                
+                groupedNotifications.setProperty(groupIndex, "latestNotification", latestNotificationData)
+                
+                // Update group priority after removal
+                const newPriority = getGroupPriority(groupIndex)
+                groupedNotifications.setProperty(groupIndex, "priority", newPriority)
             }
         }
         
@@ -210,12 +321,12 @@ Singleton {
     // Remove an entire group
     function removeGroup(groupIndex) {
         if (groupIndex >= groupedNotifications.count) return
-        
+
         const group = groupedNotifications.get(groupIndex)
         if (group) {
             delete appGroupMap[group.appName]
             groupedNotifications.remove(groupIndex)
-            updateGroupMap()
+            updateGroupMap() // Re-map all group indices
             updateTotalCount()
         }
     }
@@ -237,6 +348,131 @@ Singleton {
             }
         }
         totalCount = count
+    }
+    
+    // Enhance notification with priority and type detection
+    function enhanceNotification(notificationObj) {
+        const enhanced = Object.assign({}, notificationObj)
+        
+        // Detect notification type and priority
+        enhanced.notificationType = detectNotificationType(enhanced)
+        enhanced.priority = detectPriority(enhanced)
+        
+        return enhanced
+    }
+    
+    // Detect notification type based on content and app
+    function detectNotificationType(notification) {
+        const appName = notification.appName?.toLowerCase() || ""
+        const summary = notification.summary?.toLowerCase() || ""
+        const body = notification.body?.toLowerCase() || ""
+        
+        // Media notifications
+        if (appName.includes("music") || appName.includes("player") || 
+            appName.includes("spotify") || appName.includes("youtube") ||
+            summary.includes("now playing") || summary.includes("playing")) {
+            return typeMedia
+        }
+        
+        // Conversation notifications
+        if (appName.includes("message") || appName.includes("chat") ||
+            appName.includes("telegram") || appName.includes("whatsapp") ||
+            appName.includes("discord") || appName.includes("slack") ||
+            summary.includes("message") || body.includes("message")) {
+            return typeConversation
+        }
+        
+        // System notifications
+        if (appName.includes("system") || appName.includes("update") ||
+            summary.includes("update") || summary.includes("system")) {
+            return typeSystem
+        }
+        
+        return typeNormal
+    }
+    
+    // Detect priority based on type and urgency
+    function detectPriority(notification) {
+        const notificationType = notification.notificationType
+        const urgency = notification.urgency || 1  // Default to normal
+        
+        // High priority for conversations and media
+        if (notificationType === typeConversation || notificationType === typeMedia) {
+            return priorityHigh
+        }
+        
+        // Low priority for system notifications
+        if (notificationType === typeSystem) {
+            return priorityLow
+        }
+        
+        // Use urgency for regular notifications
+        if (urgency >= 2) {
+            return priorityHigh
+        } else if (urgency >= 1) {
+            return priorityNormal
+        }
+        
+        return priorityLow
+    }
+    
+    // Get group priority (highest priority notification in group)
+    function getGroupPriority(groupIndex) {
+        if (groupIndex >= groupedNotifications.count) return priorityLow
+        
+        const group = groupedNotifications.get(groupIndex)
+        if (!group) return priorityLow
+        
+        let maxPriority = priorityLow
+        for (let i = 0; i < group.notifications.count; i++) {
+            const notification = group.notifications.get(i)
+            if (notification && notification.priority > maxPriority) {
+                maxPriority = notification.priority
+            }
+        }
+        
+        return maxPriority
+    }
+    
+    // Generate smart group summary for collapsed state
+    function generateGroupSummary(group) {
+        if (!group || !group.notifications || group.notifications.count === 0) {
+            return ""
+        }
+        
+        const notificationCount = group.notifications.count
+        const latestNotification = group.notifications.get(0)
+        
+        if (notificationCount === 1) {
+            return latestNotification.summary || latestNotification.body || ""
+        }
+        
+        // For conversations, show sender names
+        if (latestNotification.notificationType === typeConversation) {
+            const senders = []
+            for (let i = 0; i < Math.min(3, notificationCount); i++) {
+                const notif = group.notifications.get(i)
+                if (notif && notif.summary && !senders.includes(notif.summary)) {
+                    senders.push(notif.summary)
+                }
+            }
+            
+            if (senders.length > 0) {
+                const remaining = notificationCount - senders.length
+                if (remaining > 0) {
+                    return `${senders.join(", ")} and ${remaining} other${remaining > 1 ? "s" : ""}`
+                }
+                return senders.join(", ")
+            }
+        }
+        
+        // For media, show current track info
+        if (latestNotification.notificationType === typeMedia) {
+            return latestNotification.summary || "Media playing"
+        }
+        
+        // Generic summary for other types
+        return `${notificationCount} notification${notificationCount > 1 ? "s" : ""}`
     }
     
     // Get notification by ID across all groups
