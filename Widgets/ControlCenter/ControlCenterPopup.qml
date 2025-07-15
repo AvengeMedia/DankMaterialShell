@@ -676,14 +676,6 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
                     visible: controlCenterPopup.currentTab === "audio"
-                    
-                    // Bind properties from root
-                    volumeLevel: root.volumeLevel
-                    micLevel: root.micLevel
-                    currentAudioSink: root.currentAudioSink
-                    currentAudioSource: root.currentAudioSource
-                    audioSinks: root.audioSinks
-                    audioSources: root.audioSources
                 }
                 
                 // Bluetooth Tab

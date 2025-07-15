@@ -11,13 +11,14 @@ Item {
     
     property int audioSubTab: 0 // 0: Output, 1: Input
     
-    // These should be bound from parent
-    property real volumeLevel: 50
-    property real micLevel: 50
-    property string currentAudioSink: ""
-    property string currentAudioSource: ""
-    property var audioSinks: []
-    property var audioSources: []
+    readonly property real volumeLevel: AudioService.volumeLevel
+    readonly property real micLevel: AudioService.micLevel
+    readonly property bool volumeMuted: AudioService.sinkMuted
+    readonly property bool micMuted: AudioService.sourceMuted
+    readonly property string currentAudioSink: AudioService.currentAudioSink
+    readonly property string currentAudioSource: AudioService.currentAudioSource
+    readonly property var audioSinks: AudioService.audioSinks
+    readonly property var audioSources: AudioService.audioSources
     
     Column {
         anchors.fill: parent
@@ -102,11 +103,18 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: "volume_down"
+                            text: audioTab.volumeMuted ? "volume_off" : "volume_down"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: Theme.surfaceText
+                            color: audioTab.volumeMuted ? Theme.error : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: AudioService.toggleMute()
+                            }
                         }
                         
                         Rectangle {
@@ -179,13 +187,6 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
-                    
-                    Text {
-                        text: audioTab.volumeLevel + "%"
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
                 }
                 
                 // Output Devices
@@ -224,14 +225,7 @@ Item {
                             }
                             
                             Text {
-                                text: "Current: " + (function() {
-                                    for (let sink of audioTab.audioSinks) {
-                                        if (sink.name === audioTab.currentAudioSink) {
-                                            return sink.displayName
-                                        }
-                                    }
-                                    return audioTab.currentAudioSink
-                                })()
+                                text: "Current: " + (AudioService.currentSinkDisplayName || "None")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -283,10 +277,16 @@ Item {
                                     }
                                     
                                     Text {
-                                        text: modelData.active ? "Selected" : ""
+                                        text: {
+                                            if (modelData.subtitle && modelData.subtitle !== "") {
+                                                return modelData.subtitle + (modelData.active ? " • Selected" : "")
+                                            } else {
+                                                return modelData.active ? "Selected" : ""
+                                            }
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.8)
-                                        visible: modelData.active
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        visible: text !== ""
                                     }
                                 }
                             }
@@ -298,8 +298,6 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    console.log("Clicked audio device:", JSON.stringify(modelData))
-                                    console.log("Device name to set:", modelData.name)
                                     AudioService.setAudioSink(modelData.name)
                                 }
                             }
@@ -337,11 +335,18 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: "mic"
+                            text: audioTab.micMuted ? "mic_off" : "mic"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: Theme.surfaceText
+                            color: audioTab.micMuted ? Theme.error : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: AudioService.toggleMicMute()
+                            }
                         }
                         
                         Rectangle {
@@ -415,12 +420,6 @@ Item {
                         }
                     }
                     
-                    Text {
-                        text: audioTab.micLevel + "%"
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceText
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
                 }
                 
                 // Input Devices
@@ -459,14 +458,7 @@ Item {
                             }
                             
                             Text {
-                                text: "Current: " + (function() {
-                                    for (let source of audioTab.audioSources) {
-                                        if (source.name === audioTab.currentAudioSource) {
-                                            return source.displayName
-                                        }
-                                    }
-                                    return audioTab.currentAudioSource
-                                })()
+                                text: "Current: " + (AudioService.currentSourceDisplayName || "None")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -517,10 +509,16 @@ Item {
                                     }
                                     
                                     Text {
-                                        text: modelData.active ? "Selected" : ""
+                                        text: {
+                                            if (modelData.subtitle && modelData.subtitle !== "") {
+                                                return modelData.subtitle + (modelData.active ? " • Selected" : "")
+                                            } else {
+                                                return modelData.active ? "Selected" : ""
+                                            }
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.8)
-                                        visible: modelData.active
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                        visible: text !== ""
                                     }
                                 }
                             }
@@ -532,8 +530,6 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    console.log("Clicked audio source:", JSON.stringify(modelData))
-                                    console.log("Source name to set:", modelData.name)
                                     AudioService.setAudioSource(modelData.name)
                                 }
                             }

@@ -1,332 +1,264 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
+import Quickshell.Services.Pipewire
 pragma Singleton
 pragma ComponentBehavior: Bound
 
 Singleton {
     id: root
+
+    readonly property PwNode sink: Pipewire.defaultAudioSink
+    readonly property PwNode source: Pipewire.defaultAudioSource
+
+    readonly property bool sinkMuted: sink?.audio?.muted ?? false
+    readonly property bool sourceMuted: source?.audio?.muted ?? false
+    readonly property real volumeLevel: (sink?.audio?.volume ?? 0) * 100
+    readonly property real micLevel: (source?.audio?.volume ?? 0) * 100
+
+    signal audioVolumeChanged(real volume)
+    signal audioMicLevelChanged(real level)
+    signal audioMuteChanged(bool muted)
+    signal audioMicMuteChanged(bool muted)
+    signal audioDeviceChanged()
     
-    property int volumeLevel: 50
+    onVolumeLevelChanged: audioVolumeChanged(volumeLevel)
+    onMicLevelChanged: audioMicLevelChanged(micLevel)
+    onSinkMutedChanged: audioMuteChanged(sinkMuted)
+    onSourceMutedChanged: audioMicMuteChanged(sourceMuted)
+    onSinkChanged: {
+        audioDeviceChanged()
+    }
+    onSourceChanged: {
+        audioDeviceChanged()
+    }
+
     property var audioSinks: []
-    property string currentAudioSink: ""
-    
-    property int micLevel: 50
     property var audioSources: []
-    property string currentAudioSource: ""
-    
-    property bool deviceScanningEnabled: false
-    property bool initialScanComplete: false
-    Process {
-        id: volumeChecker
-        command: ["bash", "-c", "pactl get-sink-volume @DEFAULT_SINK@ | grep -o '[0-9]*%' | head -1 | tr -d '%'"]
-        running: true
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    root.volumeLevel = Math.min(100, parseInt(data.trim()) || 50)
-                }
+
+    Component.onCompleted: {
+        Qt.callLater(updateDevices)
+    }
+
+    function updateDevices() {
+        updateAudioSinks()
+        updateAudioSources()
+    }
+
+    Connections {
+        target: Pipewire
+        function onReadyChanged() {
+            if (Pipewire.ready) {
+                updateAudioSinks()
+                updateAudioSources()
             }
         }
-    }
-    
-    Process {
-        id: micLevelChecker
-        command: ["bash", "-c", "pactl get-source-volume @DEFAULT_SOURCE@ | grep -o '[0-9]*%' | head -1 | tr -d '%'"]
-        running: true
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    root.micLevel = Math.min(100, parseInt(data.trim()) || 50)
-                }
-            }
+        function onDefaultAudioSinkChanged() {
+            updateAudioSinks()
+        }
+        function onDefaultAudioSourceChanged() {
+            updateAudioSources()
         }
     }
-    
-    Process {
-        id: audioSinkLister
-        command: ["pactl", "list", "sinks"]
-        running: false
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    let sinks = []
-                    let lines = text.trim().split('\n')
-                    
-                    let currentSink = null
-                    
-                    for (let line of lines) {
-                        line = line.trim()
-                        
-                        if (line.startsWith('Sink #')) {
-                            if (currentSink && currentSink.name && currentSink.id) {
-                                sinks.push(currentSink)
-                            }
-                            
-                            let sinkId = line.replace('Sink #', '').trim()
-                            currentSink = {
-                                id: sinkId,
-                                name: "",
-                                displayName: "",
-                                description: "",
-                                nick: "",
-                                active: false
-                            }
-                        }
-                        else if (line.startsWith('Name: ') && currentSink) {
-                            currentSink.name = line.replace('Name: ', '').trim()
-                        }
-                        else if (line.startsWith('Description: ') && currentSink) {
-                            currentSink.description = line.replace('Description: ', '').trim()
-                        }
-                        else if (line.includes('device.description = ') && currentSink && !currentSink.description) {
-                            currentSink.description = line.replace('device.description = ', '').replace(/"/g, '').trim()
-                        }
-                        else if (line.includes('node.nick = ') && currentSink && !currentSink.description) {
-                            currentSink.nick = line.replace('node.nick = ', '').replace(/"/g, '').trim()
-                        }
-                    }
-                    
-                    if (currentSink && currentSink.name && currentSink.id) {
-                        sinks.push(currentSink)
-                    }
-                    
-                    for (let sink of sinks) {
-                        let displayName = sink.description
-                        
-                        if (!displayName || displayName === sink.name) {
-                            displayName = sink.nick
-                        }
-                        
-                        if (!displayName || displayName === sink.name) {
-                            if (sink.name.includes("analog-stereo")) displayName = "Built-in Speakers"
-                            else if (sink.name.includes("bluez")) displayName = "Bluetooth Audio"
-                            else if (sink.name.includes("usb")) displayName = "USB Audio"
-                            else if (sink.name.includes("hdmi")) displayName = "HDMI Audio"
-                            else if (sink.name.includes("easyeffects")) displayName = "EasyEffects"
-                            else displayName = sink.name
-                        }
-                        
-                        sink.displayName = displayName
-                    }
-                    
-                    root.audioSinks = sinks
-                    defaultSinkChecker.running = true
-                }
-            }
-        }
-    }
-    
-    Process {
-        id: audioSourceLister
-        command: ["pactl", "list", "sources"]
-        running: false
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    let sources = []
-                    let lines = text.trim().split('\n')
-                    
-                    let currentSource = null
-                    
-                    for (let line of lines) {
-                        line = line.trim()
-                        
-                        if (line.startsWith('Source #')) {
-                            if (currentSource && currentSource.name && currentSource.id) {
-                                sources.push(currentSource)
-                            }
-                            currentSource = {
-                                id: line.replace('Source #', '').replace(':', ''),
-                                name: '',
-                                displayName: '',
-                                active: false
-                            }
-                        }
-                        else if (line.startsWith('Name: ') && currentSource) {
-                            currentSource.name = line.replace('Name: ', '')
-                        }
-                        else if (line.startsWith('Description: ') && currentSource) {
-                            let desc = line.replace('Description: ', '')
-                            currentSource.displayName = desc
-                        }
-                    }
-                    
-                    if (currentSource && currentSource.name && currentSource.id) {
-                        sources.push(currentSource)
-                    }
-                    
-                    sources = sources.filter(source => !source.name.includes('.monitor'))
-                    
-                    root.audioSources = sources
-                    defaultSourceChecker.running = true
-                }
-            }
-        }
-    }
-    
-    Process {
-        id: defaultSinkChecker
-        command: ["pactl", "get-default-sink"]
-        running: false
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    root.currentAudioSink = data.trim()
-                    
-                    let updatedSinks = []
-                    for (let sink of root.audioSinks) {
-                        updatedSinks.push({
-                            id: sink.id,
-                            name: sink.name,
-                            displayName: sink.displayName,
-                            active: sink.name === root.currentAudioSink
-                        })
-                    }
-                    root.audioSinks = updatedSinks
-                }
-            }
-        }
-    }
-    
-    Process {
-        id: defaultSourceChecker
-        command: ["pactl", "get-default-source"]
-        running: false
-        
-        stdout: SplitParser {
-            splitMarker: "\n"
-            onRead: (data) => {
-                if (data.trim()) {
-                    root.currentAudioSource = data.trim()
-                    
-                    let updatedSources = []
-                    for (let source of root.audioSources) {
-                        updatedSources.push({
-                            id: source.id,
-                            name: source.name,
-                            displayName: source.displayName,
-                            active: source.name === root.currentAudioSource
-                        })
-                    }
-                    root.audioSources = updatedSources
-                }
-            }
-        }
-    }
-    
-    function setVolume(percentage) {
-        let volumeSetProcess = Qt.createQmlObject('
-            import Quickshell.Io
-            Process {
-                command: ["pactl", "set-sink-volume", "@DEFAULT_SINK@", "' + percentage + '%"]
-                running: true
-                onExited: volumeChecker.running = true
-            }
-        ', root)
-    }
-    
-    function setMicLevel(percentage) {
-        let micSetProcess = Qt.createQmlObject('
-            import Quickshell.Io
-            Process {
-                command: ["pactl", "set-source-volume", "@DEFAULT_SOURCE@", "' + percentage + '%"]
-                running: true
-                onExited: micLevelChecker.running = true
-            }
-        ', root)
-    }
-    
-    function setAudioSink(sinkName) {
-        console.log("Setting audio sink to:", sinkName)
-        
-        sinkSetProcess.command = ["pactl", "set-default-sink", sinkName]
-        sinkSetProcess.running = true
-    }
-    
-    Process {
-        id: sinkSetProcess
-        running: false
-        
-        onExited: (exitCode) => {
-            console.log("Audio sink change exit code:", exitCode)
-            if (exitCode === 0) {
-                console.log("Audio sink changed successfully")
-                defaultSinkChecker.running = true
-                if (root.deviceScanningEnabled) {
-                    audioSinkLister.running = true
-                }
-            } else {
-                console.error("Failed to change audio sink")
-            }
-        }
-    }
-    
-    function setAudioSource(sourceName) {
-        console.log("Setting audio source to:", sourceName)
-        
-        sourceSetProcess.command = ["pactl", "set-default-source", sourceName]
-        sourceSetProcess.running = true
-    }
-    
-    Process {
-        id: sourceSetProcess
-        running: false
-        
-        onExited: (exitCode) => {
-            console.log("Audio source change exit code:", exitCode)
-            if (exitCode === 0) {
-                console.log("Audio source changed successfully")
-                defaultSourceChecker.running = true
-                if (root.deviceScanningEnabled) {
-                    audioSourceLister.running = true
-                }
-            } else {
-                console.error("Failed to change audio source")
-            }
-        }
-    }
-    
+
+    // Timer to check for node changes since ObjectModel doesn't expose change signals
     Timer {
-        interval: 5000
-        running: root.deviceScanningEnabled && root.initialScanComplete
+        interval: 2000
+        running: Pipewire.ready
         repeat: true
         onTriggered: {
-            if (root.deviceScanningEnabled) {
-                audioSinkLister.running = true
-                audioSourceLister.running = true
+            if (Pipewire.nodes && Pipewire.nodes.values) {
+                let currentCount = Pipewire.nodes.values.length
+                if (currentCount !== lastNodeCount) {
+                    lastNodeCount = currentCount
+                    updateAudioSinks()
+                    updateAudioSources()
+                }
             }
         }
     }
+
+    property int lastNodeCount: 0
+
+    function updateAudioSinks() {
+        if (!Pipewire.ready || !Pipewire.nodes) return
+
+        let sinks = []
+        
+        if (Pipewire.nodes.values) {
+            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+                let node = Pipewire.nodes.values[i]
+                if (!node) continue
+
+                if ((node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
+                    let displayName = getDisplayName(node)
+
+                    sinks.push({
+                        id: node.id.toString(),
+                        name: node.name,
+                        displayName: displayName,
+                        subtitle: getDeviceSubtitle(node.name),
+                        active: node === root.sink,
+                        node: node
+                    })
+                }
+            }
+        }
+
+        audioSinks = sinks
+    }
+
+    function updateAudioSources() {
+        if (!Pipewire.ready || !Pipewire.nodes) return
+
+        let sources = []
+        
+        if (Pipewire.nodes.values) {
+            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+                let node = Pipewire.nodes.values[i]
+                if (!node) continue
+                
+                if ((node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream && !node.name.includes('.monitor')) {
+                    sources.push({
+                        id: node.id.toString(),
+                        name: node.name,
+                        displayName: getDisplayName(node),
+                        subtitle: getDeviceSubtitle(node.name),
+                        active: node === root.source,
+                        node: node
+                    })
+                }
+            }
+        }
+        audioSources = sources
+    }
+
+    function getDisplayName(node) {
+        // Check properties first (this is key for Bluetooth devices!)
+        if (node.properties && node.properties["device.description"]) {
+            return node.properties["device.description"]
+        }
+
+        if (node.description && node.description !== node.name) {
+            return node.description
+        }
+
+        if (node.nickname && node.nickname !== node.name) {
+            return node.nickname
+        }
+
+        // Fallback to name processing
+        if (node.name.includes("analog-stereo")) return "Built-in Speakers"
+        else if (node.name.includes("bluez")) return "Bluetooth Audio"
+        else if (node.name.includes("usb")) return "USB Audio"
+        else if (node.name.includes("hdmi")) return "HDMI Audio"
+
+        return node.name
+    }
+
+    function getDeviceSubtitle(nodeName) {
+        if (!nodeName) return ""
+        
+        // Simple subtitle based on node name patterns
+        if (nodeName.includes('usb-')) {
+            if (nodeName.includes('SteelSeries')) {
+                return "USB Gaming Headset"
+            } else if (nodeName.includes('Generic')) {
+                return "USB Audio Device"
+            }
+            return "USB Audio"
+        } else if (nodeName.includes('pci-')) {
+            if (nodeName.includes('01_00.1') || nodeName.includes('01:00.1')) {
+                return "NVIDIA GPU Audio"
+            }
+            return "PCI Audio"
+        } else if (nodeName.includes('bluez')) {
+            return "Bluetooth Audio"
+        } else if (nodeName.includes('analog')) {
+            return "Built-in Audio"
+        }
+        
+        return ""
+    }
+
+    readonly property string currentAudioSink: sink?.name ?? ""
+    readonly property string currentAudioSource: source?.name ?? ""
     
-    Component.onCompleted: {
-        console.log("AudioService: Starting initialization...")
-        audioSinkLister.running = true
-        audioSourceLister.running = true
-        initialScanComplete = true
-        console.log("AudioService: Initialization complete")
+    readonly property string currentSinkDisplayName: {
+        if (!sink) return ""
+
+        for (let sinkInfo of audioSinks) {
+            if (sinkInfo.node === sink) {
+                return sinkInfo.displayName
+            }
+        }
+
+        return sink.description || sink.name
     }
     
-    function enableDeviceScanning(enabled) {
-        console.log("AudioService: Device scanning", enabled ? "enabled" : "disabled")
-        root.deviceScanningEnabled = enabled
-        if (enabled && root.initialScanComplete) {
-            audioSinkLister.running = true
-            audioSourceLister.running = true
+    readonly property string currentSourceDisplayName: {
+        if (!source) return ""
+
+        for (let sourceInfo of audioSources) {
+            if (sourceInfo.node === source) {
+                return sourceInfo.displayName
+            }
+        }
+
+        return source.description || source.name
+    }
+
+    function setVolume(percentage) {
+        if (sink?.ready && sink?.audio) {
+            sink.audio.muted = false
+            sink.audio.volume = percentage / 100
         }
     }
-    
-    function refreshDevices() {
-        console.log("AudioService: Manual device refresh triggered")
-        audioSinkLister.running = true
-        audioSourceLister.running = true
+
+    function setMicLevel(percentage) {
+        if (source?.ready && source?.audio) {
+            source.audio.muted = false
+            source.audio.volume = percentage / 100
+        }
+    }
+
+    function toggleMute() {
+        if (sink?.ready && sink?.audio) {
+            sink.audio.muted = !sink.audio.muted
+        }
+    }
+
+    function toggleMicMute() {
+        if (source?.ready && source?.audio) {
+            source.audio.muted = !source.audio.muted
+        }
+    }
+
+    function setAudioSink(sinkName) {
+        if (Pipewire.nodes.values) {
+            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+                let node = Pipewire.nodes.values[i]
+                if (node && node.name === sinkName && (node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
+                    Pipewire.preferredDefaultAudioSink = node
+                    break
+                }
+            }
+        }
+    }
+
+    function setAudioSource(sourceName) {
+        if (Pipewire.nodes.values) {
+            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+                let node = Pipewire.nodes.values[i]
+                if (node && node.name === sourceName && (node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream) {
+                    Pipewire.preferredDefaultAudioSource = node
+                    break
+                }
+            }
+        }
+    }
+
+    PwObjectTracker {
+        id: nodeTracker
+        objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
     }
 }

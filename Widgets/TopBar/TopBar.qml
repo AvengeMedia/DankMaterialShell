@@ -41,6 +41,7 @@ PanelWindow {
     property string networkStatus: "disconnected"
     property string wifiSignalStrength: "good"
     property int volumeLevel: 50
+    property bool volumeMuted: false
     property bool bluetoothAvailable: false
     property bool bluetoothEnabled: false
     
@@ -321,6 +322,7 @@ PanelWindow {
                     networkStatus: topBar.networkStatus
                     wifiSignalStrength: topBar.wifiSignalStrength
                     volumeLevel: topBar.volumeLevel
+                    volumeMuted: topBar.volumeMuted
                     bluetoothAvailable: topBar.bluetoothAvailable
                     bluetoothEnabled: topBar.bluetoothEnabled
                     isActive: topBar.shellRoot ? topBar.shellRoot.controlCenterVisible : false

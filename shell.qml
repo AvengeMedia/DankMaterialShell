@@ -82,6 +82,7 @@ ShellRoot {
     
     // Audio properties from AudioService
     property int volumeLevel: AudioService.volumeLevel
+    property bool volumeMuted: AudioService.sinkMuted
     property var audioSinks: AudioService.audioSinks
     property string currentAudioSink: AudioService.currentAudioSink
     
@@ -320,6 +321,7 @@ ShellRoot {
             networkStatus: root.networkStatus
             wifiSignalStrength: root.wifiSignalStrength
             volumeLevel: root.volumeLevel
+            volumeMuted: root.volumeMuted
             bluetoothAvailable: root.bluetoothAvailable
             bluetoothEnabled: root.bluetoothEnabled
             shellRoot: root
