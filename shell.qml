@@ -27,7 +27,7 @@ ShellRoot {
         // Initialize service monitoring states based on preferences
         SystemMonitorService.enableTopBarMonitoring(Prefs.showSystemResources)
         ProcessMonitorService.enableMonitoring(false) // Start disabled, enable when process dropdown is opened
-        AudioService.enableDeviceScanning(false) // Start disabled, enable when control center is opened
+        // Audio service auto-updates devices, no manual scanning needed
     }
     
     property bool calendarVisible: false
@@ -46,14 +46,13 @@ ShellRoot {
     property bool hasActiveMedia: activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist)
     property bool controlCenterVisible: false
     
-    // Monitor control center visibility to enable/disable audio device scanning
+    // Monitor control center visibility to enable/disable bluetooth scanning
     onControlCenterVisibleChanged: {
         console.log("Control center", controlCenterVisible ? "opened" : "closed")
-        AudioService.enableDeviceScanning(controlCenterVisible)
         BluetoothService.enableMonitoring(controlCenterVisible)
         if (controlCenterVisible) {
-            // Immediately refresh devices when opening control center
-            AudioService.refreshDevices()
+            // Refresh devices when opening control center
+            AudioService.updateDevices()
         }
     }
     property bool batteryPopupVisible: false

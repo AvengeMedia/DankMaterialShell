@@ -173,10 +173,19 @@ Singleton {
         deviceObj.type = deviceType
         deviceObj.paired = nativeDevice.paired
         
-        // If device connected state changed, clear connecting/failed states
+        // If device connected state changed, clear connecting/failed states and refresh audio
         if (deviceObj.connected !== nativeDevice.connected) {
             deviceObj.connecting = false
             deviceObj.connectionFailed = false
+            
+            // Refresh audio devices when bluetooth audio device connects/disconnects
+            if (deviceType === "headset" || deviceType === "speaker") {
+                Qt.callLater(() => {
+                    if (typeof AudioService !== 'undefined') {
+                        AudioService.updateDevices()
+                    }
+                })
+            }
         }
         
         deviceObj.connected = nativeDevice.connected

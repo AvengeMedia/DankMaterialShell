@@ -117,43 +117,50 @@ Item {
                             }
                         }
                         
-                        Rectangle {
-                            id: volumeSliderTrack
+                        Item {
+                            id: volumeSliderContainer
                             width: parent.width - 80
-                            height: 8
-                            radius: 4
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                            height: 32
                             anchors.verticalCenter: parent.verticalCenter
                             
                             Rectangle {
-                                id: volumeSliderFill
-                                width: parent.width * (audioTab.volumeLevel / 100)
-                                height: parent.height
-                                radius: parent.radius
-                                color: Theme.primary
-                                
-                                Behavior on width {
-                                    NumberAnimation { duration: 100 }
-                                }
-                            }
-                            
-                            // Draggable handle
-                            Rectangle {
-                                id: volumeHandle
-                                width: 18
-                                height: 18
-                                radius: 9
-                                color: Theme.primary
-                                border.color: Qt.lighter(Theme.primary, 1.3)
-                                border.width: 2
-                                
-                                x: Math.max(0, Math.min(parent.width - width, volumeSliderFill.width - width/2))
+                                id: volumeSliderTrack
+                                width: parent.width
+                                height: 8
+                                radius: 4
+                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                scale: volumeMouseArea.containsMouse || volumeMouseArea.pressed ? 1.2 : 1.0
+                                Rectangle {
+                                    id: volumeSliderFill
+                                    width: parent.width * (audioTab.volumeLevel / 100)
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: Theme.primary
+                                    
+                                    Behavior on width {
+                                        NumberAnimation { duration: 100 }
+                                    }
+                                }
                                 
-                                Behavior on scale {
-                                    NumberAnimation { duration: 150 }
+                                // Draggable handle
+                                Rectangle {
+                                    id: volumeHandle
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    color: Theme.primary
+                                    border.color: Qt.lighter(Theme.primary, 1.3)
+                                    border.width: 2
+                                    
+                                    x: Math.max(0, Math.min(parent.width - width, volumeSliderFill.width - width/2))
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    scale: volumeMouseArea.containsMouse || volumeMouseArea.pressed ? 1.2 : 1.0
+                                    
+                                    Behavior on scale {
+                                        NumberAnimation { duration: 150 }
+                                    }
                                 }
                             }
                             
@@ -162,19 +169,55 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                preventStealing: true
                                 
-                                onClicked: (mouse) => {
-                                    let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                property bool isDragging: false
+                                
+                                onPressed: (mouse) => {
+                                    isDragging = true
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
                                     let newVolume = Math.round(ratio * 100)
                                     AudioService.setVolume(newVolume)
                                 }
                                 
+                                onReleased: {
+                                    isDragging = false
+                                }
+                                
                                 onPositionChanged: (mouse) => {
-                                    if (pressed) {
-                                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                    if (pressed && isDragging) {
+                                        let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
                                         let newVolume = Math.round(ratio * 100)
                                         AudioService.setVolume(newVolume)
                                     }
+                                }
+                                
+                                onClicked: (mouse) => {
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / volumeSliderTrack.width))
+                                    let newVolume = Math.round(ratio * 100)
+                                    AudioService.setVolume(newVolume)
+                                }
+                            }
+                            
+                            // Global mouse area for drag tracking
+                            MouseArea {
+                                id: volumeGlobalMouseArea
+                                anchors.fill: parent.parent.parent.parent.parent // Fill the entire control center
+                                enabled: volumeMouseArea.isDragging
+                                visible: false
+                                preventStealing: true
+                                
+                                onPositionChanged: (mouse) => {
+                                    if (volumeMouseArea.isDragging) {
+                                        let globalPos = mapToItem(volumeSliderTrack, mouse.x, mouse.y)
+                                        let ratio = Math.max(0, Math.min(1, globalPos.x / volumeSliderTrack.width))
+                                        let newVolume = Math.round(ratio * 100)
+                                        AudioService.setVolume(newVolume)
+                                    }
+                                }
+                                
+                                onReleased: {
+                                    volumeMouseArea.isDragging = false
                                 }
                             }
                         }
@@ -349,43 +392,50 @@ Item {
                             }
                         }
                         
-                        Rectangle {
-                            id: micSliderTrack
+                        Item {
+                            id: micSliderContainer
                             width: parent.width - 80
-                            height: 8
-                            radius: 4
-                            color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                            height: 32
                             anchors.verticalCenter: parent.verticalCenter
                             
                             Rectangle {
-                                id: micSliderFill
-                                width: parent.width * (audioTab.micLevel / 100)
-                                height: parent.height
-                                radius: parent.radius
-                                color: Theme.primary
-                                
-                                Behavior on width {
-                                    NumberAnimation { duration: 100 }
-                                }
-                            }
-                            
-                            // Draggable handle
-                            Rectangle {
-                                id: micHandle
-                                width: 18
-                                height: 18
-                                radius: 9
-                                color: Theme.primary
-                                border.color: Qt.lighter(Theme.primary, 1.3)
-                                border.width: 2
-                                
-                                x: Math.max(0, Math.min(parent.width - width, micSliderFill.width - width/2))
+                                id: micSliderTrack
+                                width: parent.width
+                                height: 8
+                                radius: 4
+                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
                                 anchors.verticalCenter: parent.verticalCenter
                                 
-                                scale: micMouseArea.containsMouse || micMouseArea.pressed ? 1.2 : 1.0
+                                Rectangle {
+                                    id: micSliderFill
+                                    width: parent.width * (audioTab.micLevel / 100)
+                                    height: parent.height
+                                    radius: parent.radius
+                                    color: Theme.primary
+                                    
+                                    Behavior on width {
+                                        NumberAnimation { duration: 100 }
+                                    }
+                                }
                                 
-                                Behavior on scale {
-                                    NumberAnimation { duration: 150 }
+                                // Draggable handle
+                                Rectangle {
+                                    id: micHandle
+                                    width: 18
+                                    height: 18
+                                    radius: 9
+                                    color: Theme.primary
+                                    border.color: Qt.lighter(Theme.primary, 1.3)
+                                    border.width: 2
+                                    
+                                    x: Math.max(0, Math.min(parent.width - width, micSliderFill.width - width/2))
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    
+                                    scale: micMouseArea.containsMouse || micMouseArea.pressed ? 1.2 : 1.0
+                                    
+                                    Behavior on scale {
+                                        NumberAnimation { duration: 150 }
+                                    }
                                 }
                             }
                             
@@ -394,19 +444,55 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                preventStealing: true
                                 
-                                onClicked: (mouse) => {
-                                    let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                property bool isDragging: false
+                                
+                                onPressed: (mouse) => {
+                                    isDragging = true
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
                                     let newMicLevel = Math.round(ratio * 100)
                                     AudioService.setMicLevel(newMicLevel)
                                 }
                                 
+                                onReleased: {
+                                    isDragging = false
+                                }
+                                
                                 onPositionChanged: (mouse) => {
-                                    if (pressed) {
-                                        let ratio = Math.max(0, Math.min(1, mouse.x / width))
+                                    if (pressed && isDragging) {
+                                        let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
                                         let newMicLevel = Math.round(ratio * 100)
                                         AudioService.setMicLevel(newMicLevel)
                                     }
+                                }
+                                
+                                onClicked: (mouse) => {
+                                    let ratio = Math.max(0, Math.min(1, mouse.x / micSliderTrack.width))
+                                    let newMicLevel = Math.round(ratio * 100)
+                                    AudioService.setMicLevel(newMicLevel)
+                                }
+                            }
+                            
+                            // Global mouse area for drag tracking
+                            MouseArea {
+                                id: micGlobalMouseArea
+                                anchors.fill: parent.parent.parent.parent.parent // Fill the entire control center
+                                enabled: micMouseArea.isDragging
+                                visible: false
+                                preventStealing: true
+                                
+                                onPositionChanged: (mouse) => {
+                                    if (micMouseArea.isDragging) {
+                                        let globalPos = mapToItem(micSliderTrack, mouse.x, mouse.y)
+                                        let ratio = Math.max(0, Math.min(1, globalPos.x / micSliderTrack.width))
+                                        let newMicLevel = Math.round(ratio * 100)
+                                        AudioService.setMicLevel(newMicLevel)
+                                    }
+                                }
+                                
+                                onReleased: {
+                                    micMouseArea.isDragging = false
                                 }
                             }
                         }
