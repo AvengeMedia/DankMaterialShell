@@ -39,8 +39,6 @@ ShellRoot {
     property string osLogo: OSDetectorService.osLogo
     property string osName: OSDetectorService.osName
     property bool notificationHistoryVisible: false
-    property var activeNotification: null
-    property bool showNotificationPopup: false
     property bool mediaPlayerVisible: false
     property MprisPlayer activePlayer: MprisController.activePlayer
     property bool hasActiveMedia: activePlayer && (activePlayer.trackTitle || activePlayer.trackArtist)
@@ -110,64 +108,6 @@ ShellRoot {
     // Wallpaper error status
     property string wallpaperErrorStatus: ""
     
-    // Notification action handling - ALWAYS invoke action if exists
-    function handleNotificationClick(notifObj) {
-        console.log("Handling notification click for:", notifObj.appName)
-        
-        // ALWAYS try to invoke the action first (this is what real notifications do)
-        if (notifObj.notification && notifObj.actions && notifObj.actions.length > 0) {
-            // Look for "default" action first, then fallback to first action
-            let defaultAction = notifObj.actions.find(action => action.identifier === "default") || notifObj.actions[0]
-            if (defaultAction) {
-                console.log("Invoking notification action:", defaultAction.text, "identifier:", defaultAction.identifier)
-                attemptInvokeAction(notifObj.id, defaultAction.identifier)
-                return
-            }
-        }
-        
-        // If no action exists, check for URLs in notification text
-        let notificationText = (notifObj.summary || "") + " " + (notifObj.body || "")
-        let urlRegex = /(https?:\/\/[^\s]+)/g
-        let urls = notificationText.match(urlRegex)
-        
-        if (urls && urls.length > 0) {
-            console.log("Opening URL from notification:", urls[0])
-            Qt.openUrlExternally(urls[0])
-            return
-        }
-        
-        console.log("No action or URL found, notification will just dismiss")
-    }
-    
-    // Helper function to invoke notification actions (based on EXAMPLE)
-    function attemptInvokeAction(notifId, actionIdentifier) {
-        console.log("Attempting to invoke action:", actionIdentifier, "for notification:", notifId)
-        
-        // Find the notification in the server's tracked notifications
-        let trackedNotifications = notificationServer.trackedNotifications.values
-        let serverNotification = trackedNotifications.find(notif => notif.id === notifId)
-        
-        if (serverNotification) {
-            let action = serverNotification.actions.find(action => action.identifier === actionIdentifier)
-            if (action) {
-                console.log("Invoking action:", action.text)
-                action.invoke()
-            } else {
-                console.warn("Action not found:", actionIdentifier)
-            }
-        } else {
-            console.warn("Notification not found in server:", notifId, "Available IDs:", trackedNotifications.map(n => n.id))
-            // Try to find by any available action
-            if (trackedNotifications.length > 0) {
-                let latestNotif = trackedNotifications[trackedNotifications.length - 1]
-                let action = latestNotif.actions.find(action => action.identifier === actionIdentifier)
-                if (action) {
-                    console.log("Using latest notification for action")
-                    action.invoke()
-                }
-            }
-        }
-    }
     
     // Screen size breakpoints for responsive design
     property real screenWidth: Screen.width
@@ -222,86 +162,6 @@ ShellRoot {
         wallpaperErrorTimer.restart()
     }
     
-    // Notification Server
-    NotificationServer {
-        id: notificationServer
-        actionsSupported: true
-        bodyMarkupSupported: true
-        imageSupported: true
-        keepOnReload: false
-        persistenceSupported: true
-        
-        onNotification: (notification) => {
-            if (!notification || !notification.id) return
-            
-            // Filter empty notifications
-            if (!notification.appName && !notification.summary && !notification.body) {
-                return
-            }
-            
-            console.log("New notification from:", notification.appName || "Unknown", "Summary:", notification.summary || "No summary")
-            
-            // CRITICAL: Mark notification as tracked so it stays in server list for actions
-            notification.tracked = true
-            
-            // Create notification object with correct properties (based on EXAMPLE)
-            var notifObj = {
-                "id": notification.id,
-                "appName": notification.appName || "App",
-                "summary": notification.summary || "",
-                "body": notification.body || "",
-                "timestamp": new Date(),
-                "appIcon": notification.appIcon || notification.icon || "",
-                "icon": notification.icon || "",
-                "image": notification.image || "",
-                "actions": notification.actions ? notification.actions.map(action => ({
-                    "identifier": action.identifier,
-                    "text": action.text
-                })) : [],
-                "urgency": notification.urgency ? notification.urgency.toString() : "normal",
-                "notification": notification  // Keep reference for action handling
-            }
-            
-            // Add to grouped notifications
-            NotificationGroupingService.addNotification(notifObj)
-            
-            // Also add to legacy flat history for backwards compatibility
-            notificationHistory.insert(0, notifObj)
-            
-            // Keep only last 50 notifications in flat history
-            while (notificationHistory.count > 50) {
-                notificationHistory.remove(notificationHistory.count - 1)
-            }
-            
-            // Show popup notification
-            root.activeNotification = notifObj
-            Utils.showNotificationPopup(notifObj)
-        }
-    }
-    
-    // Notification History Model
-    ListModel {
-        id: notificationHistory
-    }
-    
-    // Notification popup timer
-    Timer {
-        id: notificationTimer
-        interval: 5000
-        repeat: false
-        onTriggered: {
-            Utils.hideNotificationPopup()
-        }
-    }
-    
-    Timer {
-        id: clearNotificationTimer
-        interval: 200
-        repeat: false
-        onTriggered: {
-            root.activeNotification = null
-        }
-    }
     
     // Multi-monitor support using Variants
     Variants {
@@ -324,7 +184,7 @@ ShellRoot {
             bluetoothAvailable: root.bluetoothAvailable
             bluetoothEnabled: root.bluetoothEnabled
             shellRoot: root
-            notificationCount: NotificationGroupingService.totalCount
+            notificationCount: NotificationService.notifications.length
             processDropdown: processListDropdown
             
             // Connect tray menu properties
@@ -344,8 +204,13 @@ ShellRoot {
     // Global popup windows
     CenterCommandCenter {}
     TrayMenuPopup {}
-    NotificationPopup {}
-    NotificationHistoryPopup {}
+    NotificationPopupNative {}
+    NotificationHistoryNative {
+        notificationHistoryVisible: root.notificationHistoryVisible
+        onCloseRequested: {
+            root.notificationHistoryVisible = false
+        }
+    }
     ControlCenterPopup {}
     WifiPasswordDialog {}
     InputDialog {
