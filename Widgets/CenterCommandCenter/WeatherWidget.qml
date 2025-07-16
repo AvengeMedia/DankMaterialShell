@@ -34,15 +34,23 @@ Rectangle {
         visible: !weather || !weather.available || weather.temp === 0
         
         Text {
-            text: "cloud_off"
+            text: weather && weather.loading ? "cloud_sync" : "cloud_off"
             font.family: theme.iconFont
             font.pixelSize: theme.iconSize + 8
             color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
             anchors.horizontalCenter: parent.horizontalCenter
+            
+            RotationAnimation on rotation {
+                from: 0
+                to: 360
+                duration: 2000
+                running: weather && weather.loading
+                loops: Animation.Infinite
+            }
         }
         
         Text {
-            text: "No Weather Data"
+            text: weather && weather.loading ? "Loading Weather..." : "No Weather Data"
             font.pixelSize: theme.fontSizeMedium
             color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter

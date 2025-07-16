@@ -9,19 +9,18 @@ Rectangle {
     
     signal toggleBatteryPopup()
     
-    width: 70  // Increased width to accommodate percentage text
+    width: BatteryService.batteryAvailable ? 70 : 40
     height: 30
     radius: Theme.cornerRadius
     color: batteryArea.containsMouse || batteryPopupVisible ? 
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 
            Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
-    visible: BatteryService.batteryAvailable
+    visible: true
     
     Row {
         anchors.centerIn: parent
         spacing: 4
         
-        // Battery icon - Material Design icons already show level visually
         Text {
             text: BatteryService.getBatteryIcon()
             font.family: Theme.iconFont
@@ -34,7 +33,6 @@ Rectangle {
             }
             anchors.verticalCenter: parent.verticalCenter
             
-            // Subtle pulse animation for charging
             SequentialAnimation on opacity {
                 running: BatteryService.isCharging
                 loops: Animation.Infinite
@@ -43,7 +41,6 @@ Rectangle {
             }
         }
         
-        // Battery percentage text
         Text {
             text: BatteryService.batteryLevel + "%"
             font.pixelSize: Theme.fontSizeSmall
@@ -55,6 +52,7 @@ Rectangle {
                 return Theme.surfaceText
             }
             anchors.verticalCenter: parent.verticalCenter
+            visible: BatteryService.batteryAvailable
         }
     }
     
@@ -78,7 +76,7 @@ Rectangle {
         color: Theme.surfaceContainer
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
         border.width: 1
-        visible: batteryArea.containsMouse && !batteryPopupVisible && BatteryService.batteryAvailable
+        visible: batteryArea.containsMouse && !batteryPopupVisible
         
         anchors.bottom: parent.top
         anchors.bottomMargin: Theme.spacingS
@@ -100,7 +98,15 @@ Rectangle {
             Text {
                 id: tooltipText
                 text: {
-                    if (!BatteryService.batteryAvailable) return "No battery"
+                    if (!BatteryService.batteryAvailable) {
+                        let profile = BatteryService.activePowerProfile
+                        switch(profile) {
+                            case "power-saver": return "Power Profile: Power Saver"
+                            case "balanced": return "Power Profile: Balanced"
+                            case "performance": return "Power Profile: Performance"
+                            default: return "Power Profile: " + profile
+                        }
+                    }
                     
                     let status = BatteryService.batteryStatus
                     let level = BatteryService.batteryLevel + "%"

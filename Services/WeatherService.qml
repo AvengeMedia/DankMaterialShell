@@ -29,6 +29,7 @@ Singleton {
     property int retryDelay: 30000  // 30 seconds
     property int lastFetchTime: 0
     property int minFetchInterval: 30000  // 30 seconds minimum between fetches
+    property int persistentRetryCount: 0  // Track persistent retry attempts for backoff
     
     // Weather icon mapping (based on wttr.in weather codes)
     property var weatherIcons: ({
@@ -121,6 +122,11 @@ Singleton {
     
     function handleWeatherSuccess() {
         root.retryAttempts = 0
+        root.persistentRetryCount = 0  // Reset persistent retry count on success
+        // Stop any persistent retry timer if running
+        if (persistentRetryTimer.running) {
+            persistentRetryTimer.stop()
+        }
         // Don't restart the timer - let it continue its normal interval
         if (updateTimer.interval !== root.updateInterval) {
             updateTimer.interval = root.updateInterval
@@ -133,12 +139,17 @@ Singleton {
             console.log(`Weather fetch failed, retrying in ${root.retryDelay/1000}s (attempt ${root.retryAttempts}/${root.maxRetryAttempts})`)
             retryTimer.start()
         } else {
-            console.warn("Weather fetch failed after maximum retry attempts")
+            console.warn("Weather fetch failed after maximum retry attempts, will keep trying...")
             root.weather.available = false
             root.weather.loading = false
+            // Reset retry count but keep trying with exponential backoff
             root.retryAttempts = 0
-            // Set longer interval for next automatic retry
-            updateTimer.interval = root.updateInterval * 2
+            // Use exponential backoff: 1min, 2min, 4min, then cap at 5min
+            const backoffDelay = Math.min(60000 * Math.pow(2, persistentRetryCount), 300000)
+            persistentRetryCount++
+            console.log(`Scheduling persistent retry in ${backoffDelay/1000}s`)
+            persistentRetryTimer.interval = backoffDelay
+            persistentRetryTimer.start()
         }
     }
 
@@ -219,6 +230,17 @@ Singleton {
         running: false
         repeat: false
         onTriggered: {
+            root.fetchWeather()
+        }
+    }
+    
+    Timer {
+        id: persistentRetryTimer
+        interval: 60000  // Will be dynamically set
+        running: false
+        repeat: false
+        onTriggered: {
+            console.log("Persistent retry attempt...")
             root.fetchWeather()
         }
     }

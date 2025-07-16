@@ -9,7 +9,7 @@ import "../Services"
 PanelWindow {
     id: batteryControlPopup
         
-    visible: root.batteryPopupVisible && BatteryService.batteryAvailable
+    visible: root.batteryPopupVisible
         
     implicitWidth: 400
     implicitHeight: 300
@@ -84,7 +84,7 @@ PanelWindow {
                     width: parent.width
                     
                     Text {
-                        text: "Battery Information"
+                        text: BatteryService.batteryAvailable ? "Battery Information" : "Power Management"
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -119,7 +119,6 @@ PanelWindow {
                     }
                 }
                 
-                // Battery status card
                 Rectangle {
                     width: parent.width
                     height: 120
@@ -127,13 +126,13 @@ PanelWindow {
                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
                     border.color: BatteryService.isCharging ? Theme.primary : (BatteryService.isLowBattery ? Theme.error : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12))
                     border.width: BatteryService.isCharging || BatteryService.isLowBattery ? 2 : 1
+                    visible: BatteryService.batteryAvailable
                     
                     Row {
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
                         spacing: Theme.spacingL
                         
-                        // Large battery icon
                         Text {
                             text: BatteryService.getBatteryIcon()
                             font.family: Theme.iconFont
@@ -188,10 +187,53 @@ PanelWindow {
                     }
                 }
                 
+                // No battery info card
+                Rectangle {
+                    width: parent.width
+                    height: 80
+                    radius: Theme.cornerRadius
+                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
+                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+                    border.width: 1
+                    visible: !BatteryService.batteryAvailable
+                    
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: Theme.spacingL
+                        
+                        Text {
+                            text: BatteryService.getBatteryIcon()
+                            font.family: Theme.iconFont
+                            font.pixelSize: 36
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        
+                        Column {
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Text {
+                                text: "No Battery Detected"
+                                font.pixelSize: Theme.fontSizeLarge
+                                color: Theme.surfaceText
+                                font.weight: Font.Medium
+                            }
+                            
+                            Text {
+                                text: "Power profile management is available"
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            }
+                        }
+                    }
+                }
+                
                 // Battery details
                 Column {
                     width: parent.width
                     spacing: Theme.spacingM
+                    visible: BatteryService.batteryAvailable
                     
                     Text {
                         text: "Battery Details"
@@ -224,23 +266,6 @@ PanelWindow {
                             }
                         }
                         
-                        // Cycle count
-                        Column {
-                            spacing: 2
-                            
-                            Text {
-                                text: "Cycle Count"
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                font.weight: Font.Medium
-                            }
-                            
-                            Text {
-                                text: BatteryService.cycleCount > 0 ? BatteryService.cycleCount.toString() : "Unknown"
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                            }
-                        }
                         
                         // Health
                         Column {
@@ -280,11 +305,11 @@ PanelWindow {
                     }
                 }
                 
-                // Power profiles (if available)
+                // Power profiles
                 Column {
                     width: parent.width
                     spacing: Theme.spacingM
-                    visible: BatteryService.powerProfiles.length > 0
+                    visible: true
                     
                     Text {
                         text: "Power Profile"
@@ -378,6 +403,46 @@ PanelWindow {
                     }
                 }
             }
+        }
+    }
+    
+    // Error toast
+    Rectangle {
+        id: errorToast
+        width: Math.min(300, parent.width - Theme.spacingL * 2)
+        height: 50
+        radius: Theme.cornerRadius
+        color: Theme.error
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: Theme.spacingL
+        visible: false
+        z: 1000
+        
+        Text {
+            anchors.centerIn: parent
+            text: "power-profiles-daemon not available"
+            color: "white"
+            font.pixelSize: Theme.fontSizeMedium
+            font.weight: Font.Medium
+        }
+        
+        Timer {
+            id: hideTimer
+            interval: 3000
+            onTriggered: errorToast.visible = false
+        }
+        
+        function show() {
+            visible = true
+            hideTimer.restart()
+        }
+    }
+    
+    Connections {
+        target: BatteryService
+        function onShowErrorMessage(message) {
+            errorToast.show()
         }
     }
 }

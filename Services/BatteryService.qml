@@ -8,206 +8,205 @@ pragma ComponentBehavior: Bound
 Singleton {
     id: root
     
-    // Debug mode for testing (disabled for now)
-    property bool debugMode: false
-    
-    // Battery properties - using shell command method (native UPower API commented out due to issues)
-    property bool batteryAvailable: systemBatteryPercentage > 0
-    property int batteryLevel: systemBatteryPercentage
+    property bool batteryAvailable: UPower.displayDevice?.isLaptopBattery ?? false
+    property int batteryLevel: batteryAvailable ? Math.round(UPower.displayDevice.percentage * 100) : 0
     property string batteryStatus: {
-        return systemBatteryState === "charging" ? "Charging" : 
-               systemBatteryState === "discharging" ? "Discharging" :
-               systemBatteryState === "fully-charged" ? "Full" :
-               systemBatteryState === "empty" ? "Empty" : "Unknown"
+        if (!batteryAvailable) return "No Battery"
+        if (UPower.displayDevice.state === UPowerDeviceState.Charging) return "Charging"
+        if (UPower.displayDevice.state === UPowerDeviceState.Discharging) return "Discharging"
+        if (UPower.displayDevice.state === UPowerDeviceState.FullyCharged) return "Full"
+        if (UPower.displayDevice.state === UPowerDeviceState.Empty) return "Empty"
+        if (UPower.displayDevice.state === UPowerDeviceState.PendingCharge) return "Pending Charge"
+        if (UPower.displayDevice.state === UPowerDeviceState.PendingDischarge) return "Pending Discharge"
+        return "Unknown"
     }
-    property int timeRemaining: 0  // Not implemented for shell fallback
-    property bool isCharging: systemBatteryState === "charging"
-    property bool isLowBattery: systemBatteryPercentage <= 20
+    property int timeRemaining: {
+        if (!batteryAvailable) return 0
+        return UPower.onBattery ? (UPower.displayDevice.timeToEmpty || 0) : (UPower.displayDevice.timeToFull || 0)
+    }
+    property bool isCharging: batteryAvailable && (UPower.displayDevice.state === UPowerDeviceState.Charging || (!UPower.onBattery && batteryLevel < 100))
+    property bool isLowBattery: batteryAvailable && batteryLevel <= 20
     
-    /* Native UPower API (commented out - not working correctly, returns 1% instead of actual values)
-    property bool batteryAvailable: (UPower.displayDevice && UPower.displayDevice.ready && UPower.displayDevice.percentage > 0) || systemBatteryPercentage > 0
-    property int batteryLevel: {
-        if (UPower.displayDevice && UPower.displayDevice.ready && UPower.displayDevice.percentage > 0) {
-            return Math.round(UPower.displayDevice.percentage)
-        }
-        return systemBatteryPercentage
-    }
-    property string batteryStatus: {
-        if (UPower.displayDevice && UPower.displayDevice.ready) {
-            switch(UPower.displayDevice.state) {
-                case UPowerDeviceState.Charging: return "Charging"
-                case UPowerDeviceState.Discharging: return "Discharging"
-                case UPowerDeviceState.FullyCharged: return "Full"
-                case UPowerDeviceState.Empty: return "Empty"
-                case UPowerDeviceState.PendingCharge: return "Pending Charge"
-                case UPowerDeviceState.PendingDischarge: return "Pending Discharge"
-                case UPowerDeviceState.Unknown: 
-                default: return "Unknown"
-            }
-        }
-        return systemBatteryState === "charging" ? "Charging" : 
-               systemBatteryState === "discharging" ? "Discharging" :
-               systemBatteryState === "fully-charged" ? "Full" :
-               systemBatteryState === "empty" ? "Empty" : "Unknown"
-    }
-    property int timeRemaining: (UPower.displayDevice && UPower.displayDevice.ready) ? (UPower.displayDevice.timeToEmpty || UPower.displayDevice.timeToFull || 0) : 0
-    property bool isCharging: {
-        if (UPower.displayDevice && UPower.displayDevice.ready) {
-            return UPower.displayDevice.state === UPowerDeviceState.Charging
-        }
-        return systemBatteryState === "charging"
-    }
-    property bool isLowBattery: {
-        if (UPower.displayDevice && UPower.displayDevice.ready) {
-            return UPower.displayDevice.percentage <= 20
-        }
-        return systemBatteryPercentage <= 20
-    }
-    */
-    property int batteryHealth: 100  // Default fallback
-    property string batteryTechnology: "Li-ion"  // Default fallback
-    property int cycleCount: 0  // Not implemented for shell fallback
-    property int batteryCapacity: 45000  // Default fallback
-    property var powerProfiles: availableProfiles
-    property string activePowerProfile: "balanced"  // Default fallback
+    property int batteryHealth: batteryAvailable && UPower.displayDevice.healthSupported ? Math.round(UPower.displayDevice.healthPercentage * 100) : 100
+    property string batteryTechnology: batteryAvailable ? "Li-ion" : "N/A"
+    property int batteryCapacity: batteryAvailable ? Math.round(UPower.displayDevice.energyCapacity * 1000) : 0
     
-    // System battery info from shell command (primary source)
-    property int systemBatteryPercentage: 100  // Default value, will be updated by shell command
-    property string systemBatteryState: "charging"  // Default value, will be updated by shell command
-    
-    // Shell command fallback for battery info
-    Process {
-        id: batteryProcess
-        running: false
-        command: ["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"]
+    property var powerProfiles: {
+        if (!powerProfilesAvailable || typeof PowerProfiles === "undefined") {
+            return ["power-saver", "balanced", "performance"]
+        }
         
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    let output = text.trim()
-                    let percentageMatch = output.match(/percentage:\s*(\d+)%/)
-                    let stateMatch = output.match(/state:\s*(\w+)/)
-                    
-                    if (percentageMatch) {
-                        root.systemBatteryPercentage = parseInt(percentageMatch[1])
-                        console.log("Battery percentage updated to:", root.systemBatteryPercentage)
-                    }
-                    if (stateMatch) {
-                        root.systemBatteryState = stateMatch[1]
-                        console.log("Battery state updated to:", root.systemBatteryState)
-                    }
+        let profiles = [
+            PowerProfile.PowerSaver,
+            PowerProfile.Balanced,
+            PowerProfile.Performance
+        ].filter(profile => {
+            if (profile === PowerProfile.Performance && !PowerProfiles.hasPerformanceProfile) {
+                return false
+            }
+            return true
+        })
+        
+        return profiles.map(profile => {
+            switch(profile) {
+                case PowerProfile.PowerSaver: return "power-saver"
+                case PowerProfile.Performance: return "performance"
+                case PowerProfile.Balanced:
+                default: return "balanced"
+            }
+        })
+    }
+    property string activePowerProfile: {
+        if (powerProfilesAvailable && typeof PowerProfiles !== "undefined") {
+            try {
+                switch(PowerProfiles.profile) {
+                    case PowerProfile.PowerSaver: return "power-saver"
+                    case PowerProfile.Performance: return "performance"
+                    default: return "balanced"
                 }
+            } catch (error) {
+                return "balanced"
             }
         }
+        return "balanced"
+    }
+    property bool powerProfilesAvailable: false
+    property string powerProfilesError: powerProfilesAvailable ? "" : "Power profiles daemon not available. Install and enable power-profiles-daemon."
+    property bool suggestPowerSaver: batteryAvailable && isLowBattery && UPower.onBattery && activePowerProfile !== "power-saver"
+    
+    Process {
+        id: checkPowerProfilesDaemon
+        command: ["bash", "-c", "systemctl is-active power-profiles-daemon || pgrep -x power-profiles-daemon > /dev/null"]
+        running: false
         
         onExited: (exitCode) => {
-            if (exitCode !== 0) {
-                console.warn("Battery process failed with exit code:", exitCode)
-            }
+            powerProfilesAvailable = (exitCode === 0)
+        }
+    }
+
+
+    Connections {
+        target: UPower
+        function onOnBatteryChanged() {
+            batteryAvailableChanged()
+            isChargingChanged()
         }
     }
     
-    
-    // Timer to periodically check battery status
-    Timer {
-        interval: 5000  // Check every 5 seconds
-        running: true
-        repeat: true
-        onTriggered: {
-            batteryProcess.running = true
+    Connections {
+        target: typeof PowerProfiles !== "undefined" ? PowerProfiles : null
+        function onProfileChanged() {
+            activePowerProfileChanged()
         }
     }
     
+    Connections {
+        target: UPower.displayDevice
+        function onPercentageChanged() {
+            batteryLevelChanged()
+            isLowBatteryChanged()
+        }
+        function onStateChanged() {
+            batteryStatusChanged()
+            isChargingChanged()
+        }
+        function onTimeToEmptyChanged() {
+            timeRemainingChanged()
+        }
+        function onTimeToFullChanged() {
+            timeRemainingChanged()
+        }
+        function onReadyChanged() {
+            batteryAvailableChanged()
+        }
+        function onIsLaptopBatteryChanged() {
+            batteryAvailableChanged()
+        }
+        function onEnergyChanged() {
+            batteryCapacityChanged()
+        }
+        function onEnergyCapacityChanged() {
+            batteryCapacityChanged()
+        }
+        function onHealthPercentageChanged() {
+            batteryHealthChanged()
+        }
+    }
+
     Component.onCompleted: {
-        // Initial battery check
-        batteryProcess.running = true
-        // Get current power profile
-        getCurrentProfile()
-        console.log("BatteryService initialized with shell command approach")
+        checkPowerProfilesDaemon.running = true
     }
     
-    property var availableProfiles: {
-        // Try to use power-profiles-daemon via shell command
-        return ["power-saver", "balanced", "performance"]
-    }
+    signal showErrorMessage(string message)
     
     function setBatteryProfile(profileName) {
         console.log("Setting power profile to:", profileName)
-        powerProfileProcess.command = ["powerprofilesctl", "set", profileName]
-        powerProfileProcess.running = true
-    }
-    
-    // Process to set power profile
-    Process {
-        id: powerProfileProcess
-        running: false
         
-        onExited: (exitCode) => {
-            if (exitCode === 0) {
-                console.log("Power profile set successfully")
-                // Update current profile
-                getCurrentProfile()
-            } else {
-                console.warn("Failed to set power profile, exit code:", exitCode)
-            }
-        }
-    }
-    
-    // Process to get current power profile
-    Process {
-        id: getCurrentProfileProcess
-        running: false
-        command: ["powerprofilesctl", "get"]
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (text.trim()) {
-                    root.activePowerProfile = text.trim()
-                    console.log("Current power profile:", root.activePowerProfile)
-                }
-            }
+        if (!powerProfilesAvailable) {
+            console.warn("Power profiles daemon not available")
+            showErrorMessage("power-profiles-daemon not available")
+            return
         }
         
-        onExited: (exitCode) => {
-            if (exitCode !== 0) {
-                console.warn("Failed to get current power profile, exit code:", exitCode)
+        try {
+            switch(profileName) {
+                case "power-saver":
+                    PowerProfiles.profile = PowerProfile.PowerSaver
+                    break
+                case "balanced":
+                    PowerProfiles.profile = PowerProfile.Balanced
+                    break
+                case "performance":
+                    PowerProfiles.profile = PowerProfile.Performance
+                    break
+                default:
+                    console.warn("Unknown profile:", profileName)
+                    return
             }
+            console.log("Power profile set successfully to:", PowerProfiles.profile)
+        } catch (error) {
+            console.error("Failed to set power profile:", error)
+            showErrorMessage("power-profiles-daemon not available")
         }
-    }
-    
-    function getCurrentProfile() {
-        getCurrentProfileProcess.running = true
     }
     
     function getBatteryIcon() {
-        if (!root.batteryAvailable) return "power"
+        if (!batteryAvailable) {
+            switch(activePowerProfile) {
+                case "power-saver": return "energy_savings_leaf"
+                case "performance": return "rocket_launch"
+                default: return "balance"
+            }
+        }
         
-        let level = root.batteryLevel
-        let charging = root.isCharging
+        const level = batteryLevel
+        const charging = isCharging
         
         if (charging) {
             if (level >= 90) return "battery_charging_full"
-            if (level >= 60) return "battery_charging_90"
-            if (level >= 30) return "battery_charging_60"
+            if (level >= 80) return "battery_charging_90"
+            if (level >= 60) return "battery_charging_80"
+            if (level >= 50) return "battery_charging_60"
+            if (level >= 30) return "battery_charging_50"
             if (level >= 20) return "battery_charging_30"
             return "battery_charging_20"
         } else {
-            if (level >= 90) return "battery_full"
-            if (level >= 60) return "battery_6_bar"
-            if (level >= 50) return "battery_5_bar"
-            if (level >= 40) return "battery_4_bar"
-            if (level >= 30) return "battery_3_bar"
-            if (level >= 20) return "battery_2_bar"
+            if (level >= 95) return "battery_full"
+            if (level >= 85) return "battery_6_bar"
+            if (level >= 70) return "battery_5_bar"
+            if (level >= 55) return "battery_4_bar"
+            if (level >= 40) return "battery_3_bar"
+            if (level >= 25) return "battery_2_bar"
             if (level >= 10) return "battery_1_bar"
             return "battery_alert"
         }
     }
     
     function formatTimeRemaining() {
-        if (root.timeRemaining <= 0) return "Unknown"
+        if (!batteryAvailable || timeRemaining <= 0) return "Unknown"
         
-        let hours = Math.floor(root.timeRemaining / 3600)
-        let minutes = Math.floor((root.timeRemaining % 3600) / 60)
+        const hours = Math.floor(timeRemaining / 3600)
+        const minutes = Math.floor((timeRemaining % 3600) / 60)
         
         if (hours > 0) {
             return hours + "h " + minutes + "m"
