@@ -26,6 +26,7 @@ Item {
     property bool wifiToggling: false
     property string ethernetIP: ""
     property string ethernetInterface: ""
+    property bool ethernetConnected: false
     property string currentWifiSSID: ""
     property string wifiIP: ""
     property string wifiSignalStrength: ""
@@ -124,7 +125,9 @@ Item {
                     onClicked: {
                         networkTab.networkSubTab = 1
                         networkTab.wifiAutoRefreshEnabled = true
-                        WifiService.scanWifi()
+                        if (NetworkService.wifiEnabled) {
+                            WifiService.scanWifi()
+                        }
                     }
                 }
             }
@@ -187,7 +190,7 @@ Item {
                             }
                             
                             Text {
-                                text: networkTab.networkStatus === "ethernet" ? (networkTab.ethernetIP || "Connected") : "Disconnected"
+                                text: networkTab.ethernetConnected ? (networkTab.ethernetIP || "Connected") : "Disconnected"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                             }
@@ -195,7 +198,7 @@ Item {
                         
                         // Force Ethernet preference button
                         Rectangle {
-                            width: 120
+                            width: 150
                             height: 30
                             color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surface
                             border.color: Theme.primary
@@ -204,6 +207,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             z: 10
                             opacity: networkTab.changingNetworkPreference ? 0.6 : 1.0
+                            visible: networkTab.networkStatus !== "ethernet"
                             
                             Behavior on opacity {
                                 NumberAnimation {
@@ -239,7 +243,7 @@ Item {
                                 
                                 Text {
                                     text: networkTab.changingNetworkPreference ? "Switching..." : 
-                                          (networkTab.networkStatus === "ethernet" ? "Using Ethernet" : "Use Ethernet")
+                                          (networkTab.networkStatus === "ethernet" ? "" : "Prefer over WiFi")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: networkTab.networkStatus === "ethernet" ? Theme.background : Theme.primary
                                     anchors.verticalCenter: parent.verticalCenter
@@ -282,15 +286,15 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: networkTab.networkStatus === "ethernet" ? "link_off" : "link"
+                            text: networkTab.ethernetConnected ? "link_off" : "link"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
-                            color: networkTab.networkStatus === "ethernet" ? Theme.error : Theme.primary
+                            color: networkTab.ethernetConnected ? Theme.error : Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         
                         Text {
-                            text: networkTab.networkStatus === "ethernet" ? "Disconnect Ethernet" : "Connect Ethernet"
+                            text: networkTab.ethernetConnected ? "Disconnect Ethernet" : "Connect Ethernet"
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -449,7 +453,7 @@ Item {
                         
                         // Force WiFi preference button
                         Rectangle {
-                            width: 120
+                            width: 150
                             height: 30
                             color: networkTab.networkStatus === "wifi" ? Theme.primary : Theme.surface
                             border.color: Theme.primary
@@ -457,6 +461,7 @@ Item {
                             radius: 6
                             anchors.verticalCenter: parent.verticalCenter
                             opacity: networkTab.changingNetworkPreference ? 0.6 : 1.0
+                            visible: networkTab.networkStatus !== "wifi"
                             
                             Behavior on opacity {
                                 NumberAnimation {
@@ -492,7 +497,7 @@ Item {
                                 
                                 Text {
                                     text: networkTab.changingNetworkPreference ? "Switching..." : 
-                                          (networkTab.networkStatus === "wifi" ? "Using WiFi" : "Use WiFi")
+                                          (networkTab.networkStatus === "wifi" ? "" : "Prefer over Ethernet")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: networkTab.networkStatus === "wifi" ? Theme.background : Theme.primary
                                     anchors.verticalCenter: parent.verticalCenter
@@ -578,7 +583,9 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 enabled: !networkTab.wifiScanning
                                 onClicked: {
-                                    WifiService.scanWifi()
+                                    if (NetworkService.wifiEnabled) {
+                                        WifiService.scanWifi()
+                                    }
                                 }
                             }
                         }

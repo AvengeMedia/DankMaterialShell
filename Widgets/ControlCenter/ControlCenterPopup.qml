@@ -653,6 +653,7 @@ PanelWindow {
                     wifiToggling: root.wifiToggling
                     ethernetIP: root.ethernetIP
                     ethernetInterface: root.ethernetInterface
+                    ethernetConnected: root.ethernetConnected
                     currentWifiSSID: root.currentWifiSSID
                     wifiIP: root.wifiIP
                     wifiSignalStrength: root.wifiSignalStrength

@@ -11,6 +11,7 @@ Singleton {
     property string networkStatus: "disconnected" // "ethernet", "wifi", "disconnected"
     property string ethernetIP: ""
     property string ethernetInterface: ""
+    property bool ethernetConnected: false
     property string wifiIP: ""
     property bool wifiAvailable: false
     property bool wifiEnabled: true
@@ -25,8 +26,8 @@ Singleton {
         root.userPreference = Prefs.networkPreference
         console.log("NetworkService: Loaded network preference from Prefs:", root.userPreference)
         
-        // Trigger immediate WiFi info update if WiFi is connected
-        if (root.networkStatus === "wifi") {
+        // Trigger immediate WiFi info update if WiFi is connected and enabled
+        if (root.networkStatus === "wifi" && root.wifiEnabled) {
             WifiService.updateCurrentWifiInfo()
         }
     }
@@ -46,6 +47,9 @@ Singleton {
                     let hasWifi = text.includes("wifi:connected")
                     let ethernetCableUp = text.includes("state UP")
                     
+                    // Update connection status properties
+                    root.ethernetConnected = hasEthernet || ethernetCableUp
+                    
                     // Always check both IPs when available
                     if (hasWifi) {
                         wifiIPChecker.running = true
@@ -62,7 +66,9 @@ Singleton {
                         if (root.userPreference === "wifi") {
                             root.networkStatus = "wifi"
                             console.log("User prefers WiFi, setting status to wifi")
-                            WifiService.updateCurrentWifiInfo()
+                            if (root.wifiEnabled) {
+                                WifiService.updateCurrentWifiInfo()
+                            }
                         } else if (root.userPreference === "ethernet") {
                             root.networkStatus = "ethernet"
                             console.log("User prefers Ethernet, setting status to ethernet")
@@ -83,7 +89,9 @@ Singleton {
                                                 root.networkStatus = "wifi"
                                                 console.log("WiFi interface has default route, setting status to wifi")
                                                 // Trigger WiFi SSID update
-                                                WifiService.updateCurrentWifiInfo()
+                                                if (root.wifiEnabled) {
+                                                    WifiService.updateCurrentWifiInfo()
+                                                }
                                             } else if (defaultInterface.startsWith("en") || defaultInterface.includes("eth")) {
                                                 root.networkStatus = "ethernet"
                                                 console.log("Ethernet interface has default route, setting status to ethernet")
@@ -100,7 +108,9 @@ Singleton {
                         root.networkStatus = "wifi"
                         console.log("Only WiFi connected, setting status to wifi")
                         // Trigger WiFi SSID update
-                        WifiService.updateCurrentWifiInfo()
+                        if (root.wifiEnabled) {
+                            WifiService.updateCurrentWifiInfo()
+                        }
                     } else if (hasEthernet || ethernetCableUp) {
                         root.networkStatus = "ethernet"
                         console.log("Only Ethernet connected, setting status to ethernet")
@@ -108,6 +118,7 @@ Singleton {
                         root.networkStatus = "disconnected"
                         root.ethernetIP = ""
                         root.ethernetInterface = ""
+                        root.ethernetConnected = false
                         root.wifiIP = ""
                         console.log("Setting network status to disconnected")
                     }
@@ -138,6 +149,7 @@ Singleton {
                     root.networkStatus = "disconnected"
                     root.ethernetIP = ""
                     root.ethernetInterface = ""
+                    root.ethernetConnected = false
                     root.wifiIP = ""
                     console.log("No network output, setting to disconnected")
                 }
@@ -430,6 +442,10 @@ Singleton {
     
     function connectToWifiAndSetPreference(ssid, password) {
         console.log("Connecting to WiFi and setting preference:", ssid)
+        if (!root.wifiEnabled) {
+            console.log("WiFi is disabled, cannot connect to network")
+            return
+        }
         root.userPreference = "wifi"
         Prefs.setNetworkPreference("wifi")
         WifiService.connectToWifiWithPassword(ssid, password)

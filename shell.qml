@@ -65,6 +65,7 @@ ShellRoot {
     property string networkStatus: NetworkService.networkStatus
     property string ethernetIP: NetworkService.ethernetIP
     property string ethernetInterface: NetworkService.ethernetInterface
+    property bool ethernetConnected: NetworkService.ethernetConnected
     property string wifiIP: NetworkService.wifiIP
     property bool bluetoothEnabled: BluetoothService.bluetoothEnabled
     property bool bluetoothAvailable: BluetoothService.bluetoothAvailable
@@ -130,7 +131,7 @@ ShellRoot {
         running: root.wifiAutoRefreshEnabled && root.controlCenterVisible
         repeat: true
         onTriggered: {
-            if (root.wifiAutoRefreshEnabled && root.controlCenterVisible) {
+            if (root.wifiAutoRefreshEnabled && root.controlCenterVisible && NetworkService.wifiEnabled) {
                 WifiService.scanWifi()
             }
         }
