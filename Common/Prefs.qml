@@ -33,6 +33,9 @@ Singleton {
     property string appLauncherViewMode: "list"
     property string spotlightLauncherViewMode: "list"
     
+    // Network preference
+    property string networkPreference: "auto"  // "auto", "wifi", "ethernet"
+    
     
     Component.onCompleted: loadSettings()
     
@@ -92,6 +95,7 @@ Singleton {
                 showSystemTray = settings.showSystemTray !== undefined ? settings.showSystemTray : true
                 appLauncherViewMode = settings.appLauncherViewMode !== undefined ? settings.appLauncherViewMode : "list"
                 spotlightLauncherViewMode = settings.spotlightLauncherViewMode !== undefined ? settings.spotlightLauncherViewMode : "list"
+                networkPreference = settings.networkPreference !== undefined ? settings.networkPreference : "auto"
                 console.log("Loaded settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
                 
                 applyStoredTheme()
@@ -125,7 +129,8 @@ Singleton {
             showSystemResources,
             showSystemTray,
             appLauncherViewMode,
-            spotlightLauncherViewMode
+            spotlightLauncherViewMode,
+            networkPreference
         }, null, 2))
         console.log("Saving settings - themeIndex:", themeIndex, "isDynamic:", themeIsDynamic, "lightMode:", isLightMode, "transparency:", topBarTransparency, "recentApps:", recentlyUsedApps.length)
     }
@@ -304,6 +309,13 @@ Singleton {
     function setWeatherLocationOverride(location) {
         console.log("Prefs setWeatherLocationOverride called - weatherLocationOverride:", location)
         weatherLocationOverride = location
+        saveSettings()
+    }
+    
+    // Network preference setter
+    function setNetworkPreference(preference) {
+        console.log("Prefs setNetworkPreference called - networkPreference:", preference)
+        networkPreference = preference
         saveSettings()
     }
 }

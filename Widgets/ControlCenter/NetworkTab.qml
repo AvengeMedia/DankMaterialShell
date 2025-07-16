@@ -23,16 +23,19 @@ Item {
     property string networkStatus: ""
     property bool wifiAvailable: false
     property bool wifiEnabled: false
+    property bool wifiToggling: false
     property string ethernetIP: ""
     property string ethernetInterface: ""
     property string currentWifiSSID: ""
     property string wifiIP: ""
     property string wifiSignalStrength: ""
     property var wifiNetworks: []
+    property bool wifiScanning: false
     property string wifiConnectionStatus: ""
     property string wifiPasswordSSID: ""
     property string wifiPasswordInput: ""
     property bool wifiPasswordDialogVisible: false
+    property bool changingNetworkPreference: false
     
     Column {
         anchors.fill: parent
@@ -156,7 +159,7 @@ Item {
                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
                     border.color: networkTab.networkStatus === "ethernet" ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: networkTab.networkStatus === "ethernet" ? 2 : 1
-                    visible: networkTab.networkStatus === "ethernet" || networkTab.networkStatus === "disconnected"
+                    visible: true
                     
                     Row {
                         anchors.left: parent.left
@@ -187,6 +190,79 @@ Item {
                                 text: networkTab.networkStatus === "ethernet" ? (networkTab.ethernetIP || "Connected") : "Disconnected"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            }
+                        }
+                        
+                        // Force Ethernet preference button
+                        Rectangle {
+                            width: 120
+                            height: 30
+                            color: networkTab.networkStatus === "ethernet" ? Theme.primary : Theme.surface
+                            border.color: Theme.primary
+                            border.width: 1
+                            radius: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            z: 10
+                            opacity: networkTab.changingNetworkPreference ? 0.6 : 1.0
+                            
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                            
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                
+                                Text {
+                                    id: ethernetPreferenceIcon
+                                    text: networkTab.changingNetworkPreference ? "sync" : ""
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: networkTab.networkStatus === "ethernet" ? Theme.background : Theme.primary
+                                    visible: networkTab.changingNetworkPreference
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    rotation: networkTab.changingNetworkPreference ? ethernetPreferenceIcon.rotation : 0
+                                    
+                                    RotationAnimation {
+                                        target: ethernetPreferenceIcon
+                                        property: "rotation"
+                                        running: networkTab.changingNetworkPreference
+                                        from: 0
+                                        to: 360
+                                        duration: 1000
+                                        loops: Animation.Infinite
+                                    }
+                                }
+                                
+                                Text {
+                                    text: networkTab.changingNetworkPreference ? "Switching..." : 
+                                          (networkTab.networkStatus === "ethernet" ? "Using Ethernet" : "Use Ethernet")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: networkTab.networkStatus === "ethernet" ? Theme.background : Theme.primary
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    font.weight: Font.Medium
+                                }
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                propagateComposedEvents: false
+                                enabled: !networkTab.changingNetworkPreference
+                                onClicked: {
+                                    console.log("*** ETHERNET PREFERENCE BUTTON CLICKED ***")
+                                    if (networkTab.networkStatus !== "ethernet") {
+                                        console.log("Setting preference to ethernet")
+                                        NetworkService.setNetworkPreference("ethernet")
+                                    } else {
+                                        console.log("Setting preference to auto")
+                                        NetworkService.setNetworkPreference("auto")
+                                    }
+                                }
                             }
                         }
                     }
@@ -263,6 +339,14 @@ Item {
                     radius: Theme.cornerRadius
                     color: wifiToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08)
                     visible: networkTab.wifiAvailable
+                    opacity: networkTab.wifiToggling ? 0.6 : 1.0
+                    
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
                     
                     Row {
                         anchors.left: parent.left
@@ -271,15 +355,34 @@ Item {
                         spacing: Theme.spacingM
                         
                         Text {
-                            text: "power_settings_new"
+                            id: wifiToggleIcon
+                            text: networkTab.wifiToggling ? "sync" : "power_settings_new"
                             font.family: Theme.iconFont
                             font.pixelSize: Theme.iconSize
                             color: networkTab.wifiEnabled ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
                             anchors.verticalCenter: parent.verticalCenter
+                            rotation: networkTab.wifiToggling ? wifiToggleIcon.rotation : 0
+                            
+                            RotationAnimation {
+                                target: wifiToggleIcon
+                                property: "rotation"
+                                running: networkTab.wifiToggling
+                                from: 0
+                                to: 360
+                                duration: 1000
+                                loops: Animation.Infinite
+                            }
+                            
+                            Behavior on rotation {
+                                RotationAnimation {
+                                    duration: 200
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
                         }
                         
                         Text {
-                            text: networkTab.wifiEnabled ? "Turn WiFi Off" : "Turn WiFi On"
+                            text: networkTab.wifiToggling ? "Switching WiFi..." : (networkTab.wifiEnabled ? "Turn WiFi Off" : "Turn WiFi On")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -343,6 +446,76 @@ Item {
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                             }
                         }
+                        
+                        // Force WiFi preference button
+                        Rectangle {
+                            width: 120
+                            height: 30
+                            color: networkTab.networkStatus === "wifi" ? Theme.primary : Theme.surface
+                            border.color: Theme.primary
+                            border.width: 1
+                            radius: 6
+                            anchors.verticalCenter: parent.verticalCenter
+                            opacity: networkTab.changingNetworkPreference ? 0.6 : 1.0
+                            
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.shortDuration
+                                    easing.type: Theme.standardEasing
+                                }
+                            }
+                            
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: Theme.spacingXS
+                                
+                                Text {
+                                    id: wifiPreferenceIcon
+                                    text: networkTab.changingNetworkPreference ? "sync" : ""
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: networkTab.networkStatus === "wifi" ? Theme.background : Theme.primary
+                                    visible: networkTab.changingNetworkPreference
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    rotation: networkTab.changingNetworkPreference ? wifiPreferenceIcon.rotation : 0
+                                    
+                                    RotationAnimation {
+                                        target: wifiPreferenceIcon
+                                        property: "rotation"
+                                        running: networkTab.changingNetworkPreference
+                                        from: 0
+                                        to: 360
+                                        duration: 1000
+                                        loops: Animation.Infinite
+                                    }
+                                }
+                                
+                                Text {
+                                    text: networkTab.changingNetworkPreference ? "Switching..." : 
+                                          (networkTab.networkStatus === "wifi" ? "Using WiFi" : "Use WiFi")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: networkTab.networkStatus === "wifi" ? Theme.background : Theme.primary
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    font.weight: Font.Medium
+                                }
+                            }
+                            
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                propagateComposedEvents: false
+                                enabled: !networkTab.changingNetworkPreference
+                                onClicked: {
+                                    console.log("Force WiFi preference clicked")
+                                    if (networkTab.networkStatus !== "wifi") {
+                                        NetworkService.setNetworkPreference("wifi")
+                                    } else {
+                                        NetworkService.setNetworkPreference("auto")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 
@@ -368,14 +541,34 @@ Item {
                             width: 32
                             height: 32
                             radius: 16
-                            color: refreshArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            color: refreshArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
+                                   networkTab.wifiScanning ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06) : "transparent"
                             
                             Text {
+                                id: refreshIcon
                                 anchors.centerIn: parent
-                                text: "refresh"
+                                text: networkTab.wifiScanning ? "sync" : "refresh"
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize - 4
                                 color: Theme.surfaceText
+                                rotation: networkTab.wifiScanning ? refreshIcon.rotation : 0
+                                
+                                RotationAnimation {
+                                    target: refreshIcon
+                                    property: "rotation"
+                                    running: networkTab.wifiScanning
+                                    from: 0
+                                    to: 360
+                                    duration: 1000
+                                    loops: Animation.Infinite
+                                }
+                                
+                                Behavior on rotation {
+                                    RotationAnimation {
+                                        duration: 200
+                                        easing.type: Easing.OutQuad
+                                    }
+                                }
                             }
                             
                             MouseArea {
@@ -383,12 +576,14 @@ Item {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
+                                enabled: !networkTab.wifiScanning
                                 onClicked: {
                                     WifiService.scanWifi()
                                 }
                             }
                         }
                     }
+                    
                     
                     // Connection status indicator
                     Rectangle {
@@ -423,6 +618,7 @@ Item {
                             spacing: Theme.spacingS
                             
                             Text {
+                                id: connectionIcon
                                 text: {
                                     if (networkTab.wifiConnectionStatus === "connecting") return "sync"
                                     if (networkTab.wifiConnectionStatus === "failed") return "error"
@@ -438,22 +634,31 @@ Item {
                                     return Theme.surfaceText
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
+                                rotation: networkTab.wifiConnectionStatus === "connecting" ? connectionIcon.rotation : 0
                                 
                                 RotationAnimation {
-                                    target: parent
+                                    target: connectionIcon
+                                    property: "rotation"
                                     running: networkTab.wifiConnectionStatus === "connecting"
                                     from: 0
                                     to: 360
                                     duration: 1000
                                     loops: Animation.Infinite
                                 }
+                                
+                                Behavior on rotation {
+                                    RotationAnimation {
+                                        duration: 200
+                                        easing.type: Easing.OutQuad
+                                    }
+                                }
                             }
                             
                             Text {
                                 text: {
-                                    if (networkTab.wifiConnectionStatus === "connecting") return "Connecting to " + networkTab.wifiPasswordSSID
-                                    if (networkTab.wifiConnectionStatus === "failed") return "Failed to connect to " + networkTab.wifiPasswordSSID
-                                    if (networkTab.wifiConnectionStatus === "connected") return "Connected to " + networkTab.wifiPasswordSSID
+                                    if (networkTab.wifiConnectionStatus === "connecting") return "Connecting to " + WifiService.connectingSSID
+                                    if (networkTab.wifiConnectionStatus === "failed") return "Failed to connect to " + WifiService.connectingSSID
+                                    if (networkTab.wifiConnectionStatus === "connected") return "Connected to " + WifiService.connectingSSID
                                     return ""
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
@@ -598,10 +803,10 @@ Item {
                                         // Saved network, connect directly
                                         WifiService.connectToWifi(modelData.ssid)
                                     } else if (modelData.secured) {
-                                        // Secured network, need password
-                                        networkTab.wifiPasswordSSID = modelData.ssid
-                                        networkTab.wifiPasswordInput = ""
-                                        networkTab.wifiPasswordDialogVisible = true
+                                        // Secured network, need password - use root dialog
+                                        root.wifiPasswordSSID = modelData.ssid
+                                        root.wifiPasswordInput = ""
+                                        root.wifiPasswordDialogVisible = true
                                     } else {
                                         // Open network, connect directly
                                         WifiService.connectToWifi(modelData.ssid)
@@ -641,6 +846,7 @@ Item {
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
                     }
                 }
+                
             }
         }
     }

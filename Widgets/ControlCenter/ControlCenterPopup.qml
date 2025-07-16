@@ -650,16 +650,19 @@ PanelWindow {
                     networkStatus: root.networkStatus
                     wifiAvailable: root.wifiAvailable
                     wifiEnabled: root.wifiEnabled
+                    wifiToggling: root.wifiToggling
                     ethernetIP: root.ethernetIP
                     ethernetInterface: root.ethernetInterface
                     currentWifiSSID: root.currentWifiSSID
                     wifiIP: root.wifiIP
                     wifiSignalStrength: root.wifiSignalStrength
                     wifiNetworks: root.wifiNetworks
+                    wifiScanning: root.wifiScanning
                     wifiConnectionStatus: root.wifiConnectionStatus
                     wifiPasswordSSID: root.wifiPasswordSSID
                     wifiPasswordInput: root.wifiPasswordInput
                     wifiPasswordDialogVisible: root.wifiPasswordDialogVisible
+                    changingNetworkPreference: root.changingNetworkPreference
                     
                     // Bind the auto-refresh flag
                     onWifiAutoRefreshEnabledChanged: {

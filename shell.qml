@@ -70,12 +70,15 @@ ShellRoot {
     property bool bluetoothAvailable: BluetoothService.bluetoothAvailable
     property bool wifiEnabled: NetworkService.wifiEnabled
     property bool wifiAvailable: NetworkService.wifiAvailable
+    property bool wifiToggling: NetworkService.wifiToggling
+    property bool changingNetworkPreference: NetworkService.changingPreference
     
     // WiFi properties from WifiService
     property string wifiSignalStrength: WifiService.wifiSignalStrength
     property string currentWifiSSID: WifiService.currentWifiSSID
     property var wifiNetworks: WifiService.wifiNetworks
     property var savedWifiNetworks: WifiService.savedWifiNetworks
+    property bool wifiScanning: WifiService.isScanning
     
     // Audio properties from AudioService
     property int volumeLevel: AudioService.volumeLevel
@@ -102,7 +105,7 @@ ShellRoot {
     property bool wifiPasswordDialogVisible: false
     property string wifiPasswordSSID: ""
     property string wifiPasswordInput: ""
-    property string wifiConnectionStatus: ""
+    property string wifiConnectionStatus: WifiService.connectionStatus
     property bool wifiAutoRefreshEnabled: false
     
     // Wallpaper error status
