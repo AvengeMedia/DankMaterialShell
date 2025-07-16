@@ -11,6 +11,13 @@ PanelWindow {
     id: settingsPopup
     
     property bool settingsVisible: false
+    signal closingPopup()
+
+    onSettingsVisibleChanged: {
+        if (!settingsVisible) {
+            closingPopup()
+        }
+    }
     
     visible: settingsVisible
     
@@ -381,8 +388,36 @@ PanelWindow {
                                     
                                     // Weather Location Search Component
                                     Item {
+                                        id: weatherLocationSearchComponent
                                         width: parent.width
                                         height: searchInputField.height + (searchDropdown.visible ? searchDropdown.height : 0)
+
+                                        property bool _internalChange: false
+                                        property bool isLoading: false
+                                        property string helperTextState: "default" // "default", "prompt", "searching", "found", "not_found"
+                                        property string currentSearchText: ""
+
+                                        ListModel {
+                                            id: searchResultsModel
+                                        }
+
+                                        Connections {
+                                            target: settingsPopup
+                                            function onClosingPopup() {
+                                                weatherLocationSearchComponent.resetSearchState()
+                                            }
+                                        }
+
+                                        function resetSearchState() {
+                                            locationSearchTimer.stop()
+                                            dropdownHideTimer.stop()
+                                            if (locationSearcher.running) {
+                                                locationSearcher.running = false;
+                                            }
+                                            isLoading = false
+                                            searchResultsModel.clear()
+                                            helperTextState = "default"
+                                        }
                                         
                                         Timer {
                                             id: locationSearchTimer
@@ -390,38 +425,95 @@ PanelWindow {
                                             running: false
                                             repeat: false
                                             onTriggered: {
-                                                if (weatherLocationInput.text.length > 2 && !locationSearcher.running) {
-                                                    // Clear previous results before starting new search
-                                                    locationSearchResults.searchResults = 0
-                                                    locationSearchResults.searchResultNames = new Array()
-                                                    locationSearchResults.searchResultQueries = new Array()
-                                                    locationSearchResults.isLoading = true
-                                                    locationSearchResults.currentQuery = weatherLocationInput.text
+                                                if (weatherLocationInput.text.length > 2) {
+                                                    // Stop any running search first
+                                                    if (locationSearcher.running) {
+                                                        locationSearcher.running = false
+                                                    }
+                                                    
+                                                    searchResultsModel.clear()
+                                                    weatherLocationSearchComponent.isLoading = true
+                                                    weatherLocationSearchComponent.helperTextState = "searching"
                                                     
                                                     const searchLocation = weatherLocationInput.text
-                                                    console.log("=== Starting location search for:", searchLocation)
-                                                    
-                                                    // Use OpenStreetMap Nominatim API for location search
+                                                    weatherLocationSearchComponent.currentSearchText = searchLocation
                                                     const encodedLocation = encodeURIComponent(searchLocation)
                                                     const curlCommand = `curl -s --connect-timeout 5 --max-time 10 'https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=5&addressdetails=1'`
-                                                    console.log("Running command:", curlCommand)
                                                     
                                                     locationSearcher.command = ["bash", "-c", curlCommand]
                                                     locationSearcher.running = true
-                                                } else if (locationSearcher.running) {
-                                                    console.log("Location search already running, skipping")
                                                 }
                                             }
                                         }
                                         
                                         Timer {
                                             id: dropdownHideTimer
-                                            interval: 1000  // Even longer delay
+                                            interval: 200 // Short delay to allow clicks
                                             running: false
                                             repeat: false
                                             onTriggered: {
-                                                console.log("Hide timer triggered, hiding dropdown")
-                                                searchDropdown.visible = false
+                                                if (!weatherLocationInput.activeFocus && !searchDropdown.hovered) {
+                                                    weatherLocationSearchComponent.resetSearchState()
+                                                }
+                                            }
+                                        }
+
+                                        Process {
+                                            id: locationSearcher
+                                            command: ["bash", "-c", "echo"]
+                                            running: false
+                                            
+                                            stdout: StdioCollector {
+                                                onStreamFinished: {
+                                                    // Only process if this is still the current search
+                                                    if (weatherLocationSearchComponent.currentSearchText !== weatherLocationInput.text) {
+                                                        return
+                                                    }
+                                                    
+                                                    const raw = text.trim()
+                                                    weatherLocationSearchComponent.isLoading = false
+                                                    searchResultsModel.clear()
+
+                                                    if (!raw || raw[0] !== "[") {
+                                                        weatherLocationSearchComponent.helperTextState = "not_found"
+                                                        return
+                                                    }
+                                                    
+                                                    try {
+                                                        const data = JSON.parse(raw)
+                                                        if (data.length === 0) {
+                                                            weatherLocationSearchComponent.helperTextState = "not_found"
+                                                            return
+                                                        }
+                                                        
+                                                        for (let i = 0; i < Math.min(data.length, 5); i++) {
+                                                            const location = data[i]
+                                                            if (location.display_name && location.lat && location.lon) {
+                                                                const parts = location.display_name.split(', ')
+                                                                let cleanName = parts[0]
+                                                                if (parts.length > 1) {
+                                                                    const state = parts[parts.length - 2]
+                                                                    if (state && state !== cleanName) {
+                                                                        cleanName += `, ${state}`
+                                                                    }
+                                                                }
+                                                                const query = `${location.lat},${location.lon}`
+                                                                searchResultsModel.append({ "name": cleanName, "query": query })
+                                                            }
+                                                        }
+                                                        weatherLocationSearchComponent.helperTextState = "found"
+                                                    } catch (e) {
+                                                        weatherLocationSearchComponent.helperTextState = "not_found"
+                                                    }
+                                                }
+                                            }
+                                            
+                                            onExited: (exitCode) => {
+                                                weatherLocationSearchComponent.isLoading = false
+                                                if (exitCode !== 0) {
+                                                    searchResultsModel.clear()
+                                                    weatherLocationSearchComponent.helperTextState = "not_found"
+                                                }
                                             }
                                         }
                                         
@@ -462,22 +554,16 @@ PanelWindow {
                                                     selectByMouse: true
                                                     
                                                     onTextChanged: {
-                                                        console.log("Text changed to:", text, "length:", text.length)
-                                                        if (text.length > 2) {
-                                                            // Don't clear results immediately when starting a new search
-                                                            // Only set loading state and restart timer
-                                                            locationSearchResults.isLoading = true
-                                                            locationSearchTimer.restart()
-                                                            searchDropdown.visible = true
-                                                            console.log("Starting new search, dropdown visible:", searchDropdown.visible)
-                                                        } else {
-                                                            locationSearchTimer.stop()
-                                                            searchDropdown.visible = false
-                                                            locationSearchResults.searchResults = 0
-                                                            locationSearchResults.searchResultNames = new Array()
-                                                            locationSearchResults.searchResultQueries = new Array()
-                                                            locationSearchResults.isLoading = false
-                                                            console.log("Text too short, hiding dropdown")
+                                                        if (weatherLocationSearchComponent._internalChange) return
+                                                        if (activeFocus) {
+                                                            if (text.length > 2) {
+                                                                weatherLocationSearchComponent.isLoading = true
+                                                                weatherLocationSearchComponent.helperTextState = "searching"
+                                                                locationSearchTimer.restart()
+                                                            } else {
+                                                                weatherLocationSearchComponent.resetSearchState()
+                                                                weatherLocationSearchComponent.helperTextState = "prompt"
+                                                            }
                                                         }
                                                     }
                                                     
@@ -488,14 +574,14 @@ PanelWindow {
                                                     }
                                                     
                                                     onActiveFocusChanged: {
-                                                        console.log("Input focus changed:", activeFocus, "dropdown hovered:", searchDropdown.hovered, "aboutToClick:", searchDropdown.aboutToClick, "results count:", locationSearchResults.searchResults)
-                                                        // Start timer on focus loss, but only if dropdown is visible
-                                                        if (!activeFocus && !searchDropdown.hovered && !searchDropdown.aboutToClick && searchDropdown.visible) {
-                                                            console.log("Starting hide timer due to focus loss")
-                                                            dropdownHideTimer.start()
-                                                        } else if (activeFocus) {
-                                                            console.log("Canceling hide timer due to focus gain")
+                                                        if (activeFocus) {
                                                             dropdownHideTimer.stop()
+                                                            if (weatherLocationInput.text.length <= 2) {
+                                                                weatherLocationSearchComponent.helperTextState = "prompt"
+                                                            }
+                                                        }
+                                                        else {
+                                                            dropdownHideTimer.start()
                                                         }
                                                     }
                                                     
@@ -525,19 +611,19 @@ PanelWindow {
                                                     font.family: Theme.iconFont
                                                     font.pixelSize: Theme.iconSize - 4
                                                     color: {
-                                                        if (locationSearchResults.isLoading) return Theme.surfaceVariantText
-                                                        if (locationSearchResults.searchResults > 0) return Theme.success || Theme.primary
-                                                        if (weatherLocationInput.text.length > 2) return Theme.error
+                                                        if (weatherLocationSearchComponent.isLoading) return Theme.surfaceVariantText
+                                                        if (searchResultsModel.count > 0) return Theme.success || Theme.primary
+                                                        if (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2) return Theme.error
                                                         return "transparent"
                                                     }
                                                     text: {
-                                                        if (locationSearchResults.isLoading) return "hourglass_empty"
-                                                        if (locationSearchResults.searchResults > 0) return "check_circle"
-                                                        if (weatherLocationInput.text.length > 2) return "error"
+                                                        if (weatherLocationSearchComponent.isLoading) return "hourglass_empty"
+                                                        if (searchResultsModel.count > 0) return "check_circle"
+                                                        if (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2 && !weatherLocationSearchComponent.isLoading) return "error"
                                                         return ""
                                                     }
                                                     
-                                                    opacity: weatherLocationInput.text.length > 2 ? 1.0 : 0.0
+                                                    opacity: (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2) ? 1.0 : 0.0
                                                     
                                                     Behavior on opacity {
                                                         NumberAnimation {
@@ -553,137 +639,105 @@ PanelWindow {
                                         Rectangle {
                                             id: searchDropdown
                                             width: parent.width
-                                            height: Math.min(searchResultsColumn.height + Theme.spacingS * 2, 200)
+                                            height: Math.min(Math.max(searchResultsModel.count * 38 + Theme.spacingS * 2, 50), 200)
+                                            
                                             y: searchInputField.height
                                             radius: Theme.cornerRadius
                                             color: Theme.popupBackground()
                                             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
                                             border.width: 1
-                                            visible: false
+                                            visible: weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2 && (searchResultsModel.count > 0 || weatherLocationSearchComponent.isLoading)
+                                            
                                             
                                             property bool hovered: false
-                                            property bool aboutToClick: false
-                                            
-                                            onVisibleChanged: {
-                                                console.log("Dropdown visibility changed:", visible)
-                                                if (!visible) {
-                                                    console.log("Dropdown hidden, current results count:", locationSearchResults.searchResults)
-                                                }
-                                            }
                                             
                                             MouseArea {
                                                 anchors.fill: parent
                                                 hoverEnabled: true
                                                 onEntered: {
-                                                    console.log("Dropdown hovered, canceling hide timer")
                                                     parent.hovered = true
                                                     dropdownHideTimer.stop()
                                                 }
                                                 onExited: {
-                                                    console.log("Dropdown hover exited")
                                                     parent.hovered = false
                                                     if (!weatherLocationInput.activeFocus) {
-                                                        console.log("Starting hide timer due to hover exit")
                                                         dropdownHideTimer.start()
                                                     }
                                                 }
                                                 acceptedButtons: Qt.NoButton
                                             }
                                             
-                                            ScrollView {
+                                            Item {
                                                 anchors.fill: parent
                                                 anchors.margins: Theme.spacingS
-                                                clip: true
                                                 
-                                                Column {
-                                                    id: searchResultsColumn
-                                                    width: parent.width
+                                                ListView {
+                                                    id: searchResultsList
+                                                    anchors.fill: parent
+                                                    clip: true
+                                                    model: searchResultsModel
                                                     spacing: 2
                                                     
-                                                    Repeater {
-                                                        model: locationSearchResults.searchResults
-                                                        
-                                                        onModelChanged: {
-                                                            console.log("Repeater model changed, new count:", model)
-                                                            console.log("Names array length:", locationSearchResults.searchResultNames.length)
-                                                            console.log("Queries array length:", locationSearchResults.searchResultQueries.length)
-                                                        }
-                                                        
-                                                        Rectangle {
-                                                            width: parent.width
-                                                            height: 36
-                                                            radius: Theme.cornerRadius
-                                                            color: resultMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : "transparent"
-                                                            
-                                                            Row {
-                                                                anchors.fill: parent
-                                                                anchors.margins: Theme.spacingM
-                                                                spacing: Theme.spacingS
-                                                                
-                                                                Text {
-                                                                    font.family: Theme.iconFont
-                                                                    font.pixelSize: Theme.iconSize - 6
-                                                                    color: Theme.surfaceVariantText
-                                                                    text: "place"
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                }
-                                                                
-                                                                Text {
-                                                                    text: locationSearchResults.searchResultNames[index] || "Unknown"
-                                                                    font.pixelSize: Theme.fontSizeMedium
-                                                                    color: Theme.surfaceText
-                                                                    anchors.verticalCenter: parent.verticalCenter
-                                                                    elide: Text.ElideRight
-                                                                    width: parent.width - 30
-                                                                }
-                                                            }
-                                                            
-                                                            MouseArea {
-                                                                id: resultMouseArea
-                                                                anchors.fill: parent
-                                                                hoverEnabled: true
-                                                                cursorShape: Qt.PointingHandCursor
-                                                                
-                                                                onPressed: {
-                                                                    searchDropdown.aboutToClick = true
-                                                                }
-                                                                
-                                                                onClicked: {
-                                                                    const selectedName = locationSearchResults.searchResultNames[index]
-                                                                    const selectedQuery = locationSearchResults.searchResultQueries[index]
-                                                                    
-                                                                    // Clear search state first
-                                                                    dropdownHideTimer.stop()
-                                                                    searchDropdown.aboutToClick = false
-                                                                    locationSearchResults.searchResults = 0
-                                                                    locationSearchResults.searchResultNames = new Array()
-                                                                    locationSearchResults.searchResultQueries = new Array()
-                                                                    locationSearchResults.isLoading = false
-                                                                    
-                                                                    weatherLocationInput.text = selectedName
-                                                                    searchDropdown.visible = false
-                                                                    Prefs.setWeatherLocationOverride(selectedQuery)
-                                                                    console.log("Selected location:", selectedName, "Query:", selectedQuery)
-                                                                }
-                                                                
-                                                                onCanceled: {
-                                                                    searchDropdown.aboutToClick = false
-                                                                }
-                                                            }
-                                                        }
-                                                    }
                                                     
-                                                    // No results message
-                                                    Text {
-                                                        width: parent.width
+                                                    delegate: Rectangle {
+                                                        width: searchResultsList.width
                                                         height: 36
-                                                        text: locationSearchResults.isLoading ? "Searching..." : "No locations found"
-                                                        font.pixelSize: Theme.fontSizeMedium
-                                                        color: Theme.surfaceVariantText
-                                                        horizontalAlignment: Text.AlignHCenter
-                                                        verticalAlignment: Text.AlignVCenter
-                                                        visible: locationSearchResults.searchResults === 0 && weatherLocationInput.text.length > 2 && !locationSearchResults.isLoading
+                                                        radius: Theme.cornerRadius
+                                                        color: resultMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : "transparent"
+                                                        
+                                                        
+                                                        Row {
+                                                            anchors.fill: parent
+                                                            anchors.margins: Theme.spacingM
+                                                            spacing: Theme.spacingS
+                                                            
+                                                            Text {
+                                                                font.family: Theme.iconFont
+                                                                font.pixelSize: Theme.iconSize - 6
+                                                                color: Theme.surfaceVariantText
+                                                                text: "place"
+                                                                anchors.verticalCenter: parent.verticalCenter
+                                                            }
+                                                            
+                                                            Text {
+                                                                text: model.name || "Unknown"
+                                                                font.pixelSize: Theme.fontSizeMedium
+                                                                color: Theme.surfaceText
+                                                                anchors.verticalCenter: parent.verticalCenter
+                                                                elide: Text.ElideRight
+                                                                width: parent.width - 30
+                                                            }
+                                                        }
+                                                        
+                                                        MouseArea {
+                                                            id: resultMouseArea
+                                                            anchors.fill: parent
+                                                            hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            
+                                                            onClicked: {
+                                                                weatherLocationSearchComponent._internalChange = true
+                                                                const selectedName = model.name
+                                                                const selectedQuery = model.query
+                                                                
+                                                                weatherLocationInput.text = selectedName
+                                                                Prefs.setWeatherLocationOverride(selectedQuery)
+                                                                
+                                                                weatherLocationSearchComponent.resetSearchState()
+                                                                weatherLocationInput.focus = false
+                                                                weatherLocationSearchComponent._internalChange = false
+                                                            }
+                                                        }
                                                     }
+                                                }
+                                                
+                                                // Show message when no results
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: weatherLocationSearchComponent.isLoading ? "Searching..." : "No locations found"
+                                                    font.pixelSize: Theme.fontSizeMedium
+                                                    color: Theme.surfaceVariantText
+                                                    visible: searchResultsList.count === 0 && weatherLocationInput.text.length > 2
                                                 }
                                             }
                                         }
@@ -691,26 +745,28 @@ PanelWindow {
                                     
                                     Text {
                                         text: {
-                                            if (locationSearchResults.searchResults > 0) {
-                                                return `${locationSearchResults.searchResults} location${locationSearchResults.searchResults > 1 ? 's' : ''} found. Click to select.`
-                                            } else if (locationSearchResults.isLoading) {
-                                                return "Searching for locations..."
-                                            } else if (weatherLocationInput.text.length > 2) {
-                                                return "No locations found. Try a different search term."
-                                            } else {
-                                                return "Examples: \"New York\", \"Tokyo\", \"44511\""
+                                            switch (weatherLocationSearchComponent.helperTextState) {
+                                                case "default":
+                                                    return "Examples: \"New York\", \"Tokyo\", \"44511\""
+                                                case "prompt":
+                                                    return "Enter 3+ characters to search."
+                                                case "searching":
+                                                    return "Searching for locations..."
+                                                case "found":
+                                                    return `${searchResultsModel.count} location${searchResultsModel.count > 1 ? 's' : ''} found. Click to select.`
+                                                case "not_found":
+                                                    return "No locations found. Try a different search term."
                                             }
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: {
-                                            if (locationSearchResults.searchResults > 0) {
-                                                return Theme.success || Theme.primary
-                                            } else if (locationSearchResults.isLoading) {
-                                                return Theme.surfaceVariantText
-                                            } else if (weatherLocationInput.text.length > 2) {
-                                                return Theme.error
-                                            } else {
-                                                return Theme.surfaceVariantText
+                                            switch (weatherLocationSearchComponent.helperTextState) {
+                                                case "found":
+                                                    return Theme.success || Theme.primary
+                                                case "not_found":
+                                                    return Theme.error
+                                                default:
+                                                    return Theme.surfaceVariantText
                                             }
                                         }
                                         wrapMode: Text.WordWrap
@@ -937,146 +993,6 @@ PanelWindow {
         onExited: (exitCode) => {
             if (exitCode !== 0) {
                 console.warn("Failed to disable night mode")
-            }
-        }
-    }
-    
-    // Weather location search results
-    QtObject {
-        id: locationSearchResults
-        property var searchResults: []
-        property var searchResultNames: []
-        property var searchResultQueries: []
-        property bool isLoading: false
-        property string currentQuery: ""
-    }
-    
-    // Weather location validation
-    QtObject {
-        id: locationValidationStatus
-        property string validationState: "none"  // "none", "validating", "valid", "invalid"
-        property string lastValidatedLocation: ""
-        property string validatedLocationName: ""
-    }
-    
-    
-    Process {
-        id: locationSearcher
-        command: ["bash", "-c", "echo"]
-        running: false
-        
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const raw = text.trim()
-                locationSearchResults.isLoading = false
-                console.log("=== Location search response received")
-                console.log("Response length:", raw.length)
-                console.log("Response preview:", raw.substring(0, 300))
-                
-                if (!raw) {
-                    console.log("Empty response from location search")
-                    locationSearchResults.searchResults = 0
-                    locationSearchResults.searchResultNames = new Array()
-                    locationSearchResults.searchResultQueries = new Array()
-                    return
-                }
-                
-                if (raw[0] !== "[") {
-                    console.log("Non-JSON array response from location search:", raw)
-                    locationSearchResults.searchResults = 0
-                    locationSearchResults.searchResultNames = new Array()
-                    locationSearchResults.searchResultQueries = new Array()
-                    return
-                }
-                
-                try {
-                    const data = JSON.parse(raw)
-                    console.log("Parsed JSON array length:", data.length)
-                    
-                    if (data.length === 0) {
-                        console.log("No locations found in search results")
-                        locationSearchResults.searchResults = 0
-                        // Force new empty arrays to trigger QML reactivity
-                        locationSearchResults.searchResultNames = new Array()
-                        locationSearchResults.searchResultQueries = new Array()
-                        console.log("Cleared arrays - Names length:", locationSearchResults.searchResultNames.length, "Queries length:", locationSearchResults.searchResultQueries.length)
-                        return
-                    }
-                    
-                    const results = []
-                    
-                    for (let i = 0; i < Math.min(data.length, 5); i++) {
-                        const location = data[i]
-                        console.log(`Location ${i}:`, {
-                            display_name: location.display_name,
-                            lat: location.lat,
-                            lon: location.lon,
-                            type: location.type,
-                            class: location.class
-                        })
-                        
-                        if (location.display_name && location.lat && location.lon) {
-                            // Create a clean location name from display_name
-                            const parts = location.display_name.split(', ')
-                            let cleanName = parts[0] // Start with the first part
-                            
-                            // Add state/region if available and different from first part
-                            if (parts.length > 1) {
-                                const state = parts[parts.length - 2] // Usually the state is second to last
-                                if (state && state !== cleanName) {
-                                    cleanName += `, ${state}`
-                                }
-                            }
-                            
-                            // Use coordinates as the query for wttr.in (most reliable)
-                            const query = `${location.lat},${location.lon}`
-                            
-                            const result = {
-                                "name": cleanName,
-                                "query": query
-                            }
-                            
-                            results.push(result)
-                            console.log(`Added result ${i}: name="${cleanName}" query="${query}"`)
-                        } else {
-                            console.log(`Skipped location ${i}: missing required fields`)
-                        }
-                    }
-                    
-                    console.log("=== Final results array:", results)
-                    
-                    // Create separate arrays for names and queries
-                    const names = []
-                    const queries = []
-                    
-                    for (let i = 0; i < results.length; i++) {
-                        names.push(results[i].name)
-                        queries.push(results[i].query)
-                    }
-                    
-                    // Set all arrays atomically
-                    locationSearchResults.searchResultNames = names
-                    locationSearchResults.searchResultQueries = queries
-                    locationSearchResults.searchResults = results.length // Just use count for now
-                    
-                    console.log("Location search completed:", results.length, "results set")
-                    console.log("Names:", names)
-                    console.log("Queries:", queries)
-                } catch (e) {
-                    console.log("Location search JSON parse error:", e.message)
-                    console.log("Raw response:", raw.substring(0, 500))
-                    locationSearchResults.searchResults = 0
-                    locationSearchResults.searchResultNames = new Array()
-                    locationSearchResults.searchResultQueries = new Array()
-                }
-            }
-        }
-        
-        onExited: (exitCode) => {
-            locationSearchResults.isLoading = false
-            if (exitCode !== 0) {
-                console.log("Location search process failed with exit code:", exitCode)
-                locationSearchResults.searchResults = []
             }
         }
     }

@@ -77,43 +77,42 @@ Rectangle {
         }
     }
     
-    Column {
+    Item {
         anchors.fill: parent
         anchors.margins: theme.spacingS
-        spacing: theme.spacingS
         
-        // Show different content based on whether we have active media
-        Item {
-            width: parent.width
-            height: 60
+        // Placeholder when no media - centered in entire widget
+        Column {
+            anchors.centerIn: parent
+            spacing: theme.spacingS
+            visible: !activePlayer || !activePlayer.trackTitle || activePlayer.trackTitle === ""
             
-            // Placeholder when no media
-            Column {
-                anchors.centerIn: parent
-                spacing: theme.spacingS
-                visible: !activePlayer || !activePlayer.trackTitle || activePlayer.trackTitle === ""
-                
-                Text {
-                    text: "music_note"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.iconSize + 8
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-                
-                Text {
-                    text: "No Media Playing"
-                    font.pixelSize: theme.fontSizeMedium
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
+            Text {
+                text: "music_note"
+                font.family: theme.iconFont
+                font.pixelSize: theme.iconSize + 8
+                color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+                anchors.horizontalCenter: parent.horizontalCenter
             }
             
-            // Normal media info when playing
-            Row {
-                anchors.fill: parent
-                spacing: theme.spacingM
-                visible: activePlayer && activePlayer.trackTitle && activePlayer.trackTitle !== ""
+            Text {
+                text: "No Media Playing"
+                font.pixelSize: theme.fontSizeMedium
+                color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+        
+        // Active content in a column
+        Column {
+            anchors.fill: parent
+            spacing: theme.spacingS
+            visible: activePlayer && activePlayer.trackTitle && activePlayer.trackTitle !== ""
+            
+                // Normal media info when playing
+                Row {
+                    anchors.fill: parent
+                    spacing: theme.spacingM
                 
                 // Album Art
                 Rectangle {
@@ -183,10 +182,9 @@ Rectangle {
                     }
                 }
             }
-        }
-        
-        // Progress bar
-        Item {
+            
+            // Progress bar
+            Item {
             id: progressBarContainer
             width: parent.width
             height: 24
@@ -300,10 +298,10 @@ Rectangle {
                     progressMouseArea.isSeeking = false
                 }
             }
-        }
-        
-        // Control buttons - always visible
-        Row {
+            }
+            
+            // Control buttons - always visible
+            Row {
             anchors.horizontalCenter: parent.horizontalCenter
             spacing: theme.spacingM
             visible: activePlayer !== null
@@ -388,6 +386,7 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: activePlayer?.next()
                 }
+            }
             }
         }
     }
