@@ -9,8 +9,10 @@ Singleton {
     
     property list<var> ddcMonitors: []
     readonly property list<Monitor> monitors: variants.instances
-    property bool brightnessAvailable: false
+    property bool brightnessAvailable: laptopBacklightAvailable || ddcMonitors.length > 0
+    property bool laptopBacklightAvailable: false
     property int brightnessLevel: 75
+    property int laptopBrightnessLevel: 75
     
     function getMonitorForScreen(screen: ShellScreen): var {
         return monitors.find(function(m) { return m.modelData === screen; });
@@ -29,38 +31,68 @@ Singleton {
         }
     }
     
+    property var laptopDebounceTimer: Timer {
+        id: laptopDebounceTimer
+        interval: 50
+        repeat: false
+        property int pendingValue: 0
+        onTriggered: {
+            laptopBrightnessProcess.command = ["brightnessctl", "set", pendingValue + "%"];
+            laptopBrightnessProcess.running = true;
+        }
+    }
+    
     function setBrightness(percentage) {
-        root.brightnessLevel = percentage;
-        debounceTimer.pendingValue = percentage;
-        debounceTimer.restart();
+        if (root.laptopBacklightAvailable) {
+            // Use laptop backlight control
+            root.laptopBrightnessLevel = percentage;
+            laptopDebounceTimer.pendingValue = percentage;
+            laptopDebounceTimer.restart();
+        } else {
+            // Use external monitor control
+            root.brightnessLevel = percentage;
+            debounceTimer.pendingValue = percentage;
+            debounceTimer.restart();
+        }
     }
     
     function increaseBrightness(): void {
-        const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
-        if (focusedMonitor)
-            focusedMonitor.setBrightness(focusedMonitor.brightness + 0.1);
+        if (root.laptopBacklightAvailable) {
+            setBrightness(Math.min(100, root.laptopBrightnessLevel + 10));
+        } else {
+            const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
+            if (focusedMonitor)
+                focusedMonitor.setBrightness(focusedMonitor.brightness + 0.1);
+        }
     }
     
     function decreaseBrightness(): void {
-        const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
-        if (focusedMonitor)
-            focusedMonitor.setBrightness(focusedMonitor.brightness - 0.1);
+        if (root.laptopBacklightAvailable) {
+            setBrightness(Math.max(1, root.laptopBrightnessLevel - 10));
+        } else {
+            const focusedMonitor = monitors.find(function(m) { return m.modelData === Quickshell.screens[0]; });
+            if (focusedMonitor)
+                focusedMonitor.setBrightness(focusedMonitor.brightness - 0.1);
+        }
     }
     
     onMonitorsChanged: {
         ddcMonitors = [];
-        if (ddcAvailable) {
+        if (root.brightnessAvailable) {
             ddcProc.running = true;
         }
         
-        // Update brightness level from first monitor
-        if (monitors.length > 0) {
+        // Update brightness level from laptop or first monitor
+        if (root.laptopBacklightAvailable) {
+            // Laptop brightness is already set by laptopBrightnessInitProcess
+        } else if (monitors.length > 0) {
             root.brightnessLevel = Math.round(monitors[0].brightness * 100);
         }
     }
     
     Component.onCompleted: {
         ddcAvailabilityChecker.running = true;
+        laptopBacklightChecker.running = true;
     }
     
     Variants {
@@ -76,6 +108,76 @@ Singleton {
             root.brightnessAvailable = (exitCode === 0);
             if (root.brightnessAvailable) {
                 ddcProc.running = true;
+            }
+        }
+    }
+    
+    Process {
+        id: laptopBacklightChecker
+        command: ["brightnessctl", "--list"]
+        onExited: function(exitCode) {
+            root.laptopBacklightAvailable = (exitCode === 0);
+            if (root.laptopBacklightAvailable) {
+                laptopBrightnessInitProcess.running = true;
+            }
+        }
+    }
+    
+    Process {
+        id: laptopBrightnessProcess
+        running: false
+        
+        onExited: function(exitCode) {
+            if (exitCode === 0) {
+                // Update was successful
+                root.brightnessLevel = root.laptopBrightnessLevel;
+            } else {
+                console.warn("Failed to set laptop brightness, exit code:", exitCode);
+            }
+        }
+    }
+    
+    Process {
+        id: laptopBrightnessInitProcess
+        command: ["brightnessctl", "get"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    // Get max brightness to calculate percentage
+                    laptopMaxBrightnessProcess.running = true;
+                    root.laptopBrightnessLevel = parseInt(text.trim());
+                }
+            }
+        }
+        
+        onExited: function(exitCode) {
+            if (exitCode !== 0) {
+                console.warn("Failed to get laptop brightness, exit code:", exitCode);
+            }
+        }
+    }
+    
+    Process {
+        id: laptopMaxBrightnessProcess
+        command: ["brightnessctl", "max"]
+        running: false
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    const maxBrightness = parseInt(text.trim());
+                    const currentPercentage = Math.round((root.laptopBrightnessLevel / maxBrightness) * 100);
+                    root.laptopBrightnessLevel = currentPercentage;
+                    root.brightnessLevel = currentPercentage;
+                }
+            }
+        }
+        
+        onExited: function(exitCode) {
+            if (exitCode !== 0) {
+                console.warn("Failed to get max laptop brightness, exit code:", exitCode);
             }
         }
     }
