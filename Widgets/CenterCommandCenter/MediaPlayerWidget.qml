@@ -3,8 +3,8 @@ import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Mpris
-import "../../Common"
-import "../../Services"
+import qs.Common
+import qs.Services
 
 Rectangle {
     id: mediaPlayerWidget

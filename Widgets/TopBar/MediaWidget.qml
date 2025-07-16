@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell.Services.Mpris
-import "../../Common"
+import qs.Common
 
 Rectangle {
     id: root

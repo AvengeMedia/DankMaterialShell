@@ -10,12 +10,13 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
-import "Services"
-import "Widgets"
-import "Widgets/CenterCommandCenter"
-import "Widgets/ControlCenter"
-import "Common"
-import "Common/Utilities.js" as Utils
+import qs.Services
+import qs.Widgets
+import qs.Widgets.CenterCommandCenter
+import qs.Widgets.ControlCenter
+import qs.Widgets.TopBar
+import qs.Common
+import "./Common/Utilities.js" as Utils
 
 ShellRoot {
     id: root

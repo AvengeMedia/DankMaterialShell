@@ -72,7 +72,6 @@ shell.qml           # Main entry point (minimal orchestration)
    - **Full-screen components**: AppLauncher, ClipboardHistory, ControlCenterPopup
    - **Panel components**: TopBar, SystemTrayWidget, NotificationPopup
    - **Reusable controls**: CustomSlider, WorkspaceSwitcher
-   - Each widget directory contains `qmldir` for module registration
 
 ### Key Architectural Patterns
 
@@ -93,21 +92,15 @@ shell.qml           # Main entry point (minimal orchestration)
    }
    ```
 
-2. **Module Registration**: Each directory contains `qmldir` file:
-   ```
-   singleton ServiceName 1.0 ServiceName.qml
-   ComponentName 1.0 ComponentName.qml
-   ```
-
-3. **Smart Feature Detection**: Services detect system capabilities:
+2. **Smart Feature Detection**: Services detect system capabilities:
    ```qml
    property bool featureAvailable: false
    // Auto-hide UI elements when features unavailable
    visible: ServiceName.featureAvailable
    ```
 
-4. **Property Bindings**: Reactive UI updates through property binding
-5. **Material Design Theming**: Consistent use of Theme singleton throughout
+3. **Property Bindings**: Reactive UI updates through property binding
+4. **Material Design Theming**: Consistent use of Theme singleton throughout
 
 ### Important Components
 
@@ -251,19 +244,13 @@ When modifying the shell:
    touch Widgets/NewWidget.qml
    ```
 
-2. **Register in qmldir**:
-   ```
-   # Add to Widgets/qmldir
-   NewWidget 1.0 NewWidget.qml
-   ```
-
-3. **Follow widget patterns**:
+2. **Follow widget patterns**:
    - Use `Theme.propertyName` for styling
    - Import `"../Common"` and `"../Services"` as needed
    - Bind to service properties for reactive updates
    - Consider per-screen vs global behavior
 
-4. **Integration in shell.qml**:
+3. **Integration in shell.qml**:
    ```qml
    NewWidget {
        id: newWidget
@@ -294,13 +281,7 @@ When modifying the shell:
    }
    ```
 
-2. **Register in qmldir**:
-   ```
-   # Add to Services/qmldir
-   singleton NewService 1.0 NewService.qml
-   ```
-
-3. **Use in widgets**:
+2. **Use in widgets**:
    ```qml
    // In widget files
    property alias serviceValue: NewService.currentValue
@@ -314,7 +295,7 @@ When modifying the shell:
 
 ### Debugging Common Issues
 
-1. **Import errors**: Check `qmldir` registration and import paths
+1. **Import errors**: Check import paths
 2. **Singleton conflicts**: Ensure services use `Singleton` type with `id: root`
 3. **Property binding issues**: Use property aliases for reactive updates
 4. **Process failures**: Check system tool availability and command syntax

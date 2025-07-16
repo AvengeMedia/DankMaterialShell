@@ -3,7 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
-import "../Common"
+import qs.Common
 
 PanelWindow {
     id: inputDialog

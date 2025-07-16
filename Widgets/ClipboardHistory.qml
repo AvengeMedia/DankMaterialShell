@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
-import "../Common"
+import qs.Common
 
 PanelWindow {
     id: clipboardHistory

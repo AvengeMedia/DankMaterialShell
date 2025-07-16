@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
-import "../../Common"
-import "../../Services"
+import qs.Common
+import qs.Services
 
 Rectangle {
     id: root

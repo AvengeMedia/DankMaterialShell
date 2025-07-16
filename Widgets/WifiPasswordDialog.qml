@@ -3,8 +3,8 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
-import "../Common"
-import "../Services"
+import qs.Common
+import qs.Services
 
 PanelWindow {
     id: wifiPasswordDialog

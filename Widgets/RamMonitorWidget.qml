@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
-import "../Common"
-import "../Services"
+import qs.Common
+import qs.Services
 import "."
 
 Rectangle {

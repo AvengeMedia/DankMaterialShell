@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
-import "../../Common"
+import qs.Common
 
 Item {
     id: root

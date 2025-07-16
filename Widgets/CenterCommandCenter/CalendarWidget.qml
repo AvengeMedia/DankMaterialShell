@@ -1,8 +1,8 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
-import "../../Common"
-import "../../Services"
+import qs.Common
+import qs.Services
 
 Column {
     id: calendarWidget

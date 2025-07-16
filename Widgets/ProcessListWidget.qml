@@ -6,8 +6,8 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
-import "../Common"
-import "../Services"
+import qs.Common
+import qs.Services
 
 PanelWindow {
     id: processListWidget

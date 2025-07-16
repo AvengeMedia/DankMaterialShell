@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import "../Common"
-import "../Services"
-import "../Widgets"
+import qs.Common
+import qs.Services
+import qs.Widgets
 
 ApplicationWindow {
     id: demoWindow

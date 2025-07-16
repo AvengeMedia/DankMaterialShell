@@ -53,3 +53,4 @@ compile_commands.json
 
 *_qmlcache.qrc
 UNUSED
+.qmlls.ini

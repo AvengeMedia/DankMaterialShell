@@ -5,8 +5,8 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Services.Mpris
-import "../../Common"
-import "../../Services"
+import qs.Common
+import qs.Services
 
 PanelWindow {
     id: centerCommandCenter

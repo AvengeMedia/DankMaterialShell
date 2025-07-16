@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../Common"
+import qs.Common
 pragma Singleton
 pragma ComponentBehavior: Bound
 

@@ -8,10 +8,10 @@ import Quickshell.Io
 import Quickshell.Services.SystemTray
 import Quickshell.Services.Notifications
 import Quickshell.Services.Mpris
-import "../../Common"
+import qs.Common
+import qs.Services
+import qs.Widgets
 import "../../Common/Utilities.js" as Utils
-import "../../Services"
-import ".."
 
 PanelWindow {
     id: topBar

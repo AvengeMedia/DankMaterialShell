@@ -3,9 +3,9 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Io
-import "../../Common"
-import "../../Services"
-import "../"
+import qs.Common
+import qs.Services
+import qs.Widgets
 
 ScrollView {
     id: displayTab
