@@ -61,16 +61,48 @@ Rectangle {
             visible: root.bluetoothAvailable && root.bluetoothEnabled
         }
         
-        // Audio Icon
-        Text {
-            text: root.volumeMuted ? "volume_off" : 
-                  root.volumeLevel < 33 ? "volume_down" : "volume_up"
-            font.family: Theme.iconFont
-            font.pixelSize: Theme.iconSize - 8
-            font.weight: Theme.iconFontWeight
-            color: controlCenterArea.containsMouse || root.isActive ? 
-                   Theme.primary : Theme.surfaceText
+        // Audio Icon with scroll wheel support
+        Rectangle {
+            width: audioIcon.implicitWidth + 4
+            height: audioIcon.implicitHeight + 4
+            color: "transparent"
             anchors.verticalCenter: parent.verticalCenter
+            
+            Text {
+                id: audioIcon
+                text: root.volumeMuted ? "volume_off" : 
+                      root.volumeLevel < 33 ? "volume_down" : "volume_up"
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.iconSize - 8
+                font.weight: Theme.iconFontWeight
+                color: audioWheelArea.containsMouse || controlCenterArea.containsMouse || root.isActive ? 
+                       Theme.primary : Theme.surfaceText
+                anchors.centerIn: parent
+            }
+            
+            MouseArea {
+                id: audioWheelArea
+                anchors.fill: parent
+                hoverEnabled: true
+                acceptedButtons: Qt.NoButton
+                
+                onWheel: function(wheelEvent) {
+                    let delta = wheelEvent.angleDelta.y
+                    let currentVolume = root.volumeLevel
+                    let newVolume
+                    
+                    if (delta > 0) {
+                        // Scroll up - increase volume
+                        newVolume = Math.min(100, currentVolume + 5)
+                    } else {
+                        // Scroll down - decrease volume
+                        newVolume = Math.max(0, currentVolume - 5)
+                    }
+                    
+                    AudioService.setVolume(newVolume)
+                    wheelEvent.accepted = true
+                }
+            }
         }
         
         // Microphone Icon (when active)
