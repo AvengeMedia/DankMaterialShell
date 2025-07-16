@@ -1,4 +1,4 @@
-//NotificationHistoryNative.qml
+//NotificationCenter.qml
 import QtQuick
 import QtQuick.Controls
 import Quickshell
@@ -207,37 +207,51 @@ PanelWindow {
                 ScrollBar.vertical.policy: ScrollBar.AsNeeded
                 
                 ListView {
-                    model: NotificationService.notifications
+                    model: NotificationService.groupedNotifications
                     spacing: Theme.spacingL
                     interactive: true
                     boundsBehavior: Flickable.StopAtBounds
                     flickDeceleration: 1500
                     maximumFlickVelocity: 2000
                     
-                    // Smooth animations to prevent layout jumping
+                    // Enhanced smooth animations to prevent layout jumping
                     add: Transition {
-                        NumberAnimation {
-                            properties: "opacity"
-                            from: 0
-                            to: 1
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
+                        ParallelAnimation {
+                            NumberAnimation {
+                                properties: "opacity"
+                                from: 0
+                                to: 1
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.emphasizedEasing
+                            }
+                            NumberAnimation {
+                                properties: "height"
+                                from: 0
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.emphasizedEasing
+                            }
                         }
                     }
                     
                     remove: Transition {
                         SequentialAnimation {
-                            NumberAnimation {
-                                properties: "opacity"
-                                to: 0
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                            // Pause to let internal content animations complete
+                            PauseAnimation {
+                                duration: 50
                             }
-                            NumberAnimation {
-                                properties: "height"
-                                to: 0
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
+                            ParallelAnimation {
+                                NumberAnimation {
+                                    properties: "opacity"
+                                    to: 0
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
+                                NumberAnimation {
+                                    properties: "height,anchors.topMargin,anchors.bottomMargin"
+                                    to: 0
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
                             }
                         }
                     }
@@ -245,15 +259,25 @@ PanelWindow {
                     displaced: Transition {
                         NumberAnimation {
                             properties: "y"
-                            duration: Theme.shortDuration
-                            easing.type: Theme.standardEasing
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
                         }
                     }
                     
-                    delegate: NotificationItem {
+                    // Add move transition for internal content changes
+                    move: Transition {
+                        NumberAnimation {
+                            properties: "y"
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+                    
+                    delegate: GroupedNotificationCard {
                         required property var modelData
-                        notificationWrapper: modelData
+                        group: modelData
                         width: ListView.view.width - Theme.spacingM
+                        // expanded property is now readonly and managed by NotificationService
                     }
                 }
                 

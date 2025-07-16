@@ -1,8 +1,9 @@
 TopBar 1.0 TopBar/TopBar.qml
 TrayMenuPopup 1.0 TrayMenuPopup.qml
 NotificationItem 1.0 NotificationItem.qml
-NotificationPopupNative 1.0 NotificationPopupNative.qml
-NotificationHistoryNative 1.0 NotificationHistoryNative.qml
+NotificationInit 1.0 NotificationInit.qml
+NotificationCenter 1.0 NotificationCenter.qml
+GroupedNotificationCard 1.0 GroupedNotificationCard.qml
 WifiPasswordDialog 1.0 WifiPasswordDialog.qml
 AppLauncher 1.0 AppLauncher.qml
 ClipboardHistory 1.0 ClipboardHistory.qml

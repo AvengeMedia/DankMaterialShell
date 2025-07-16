@@ -86,12 +86,12 @@ ApplicationWindow {
     }
     
     // Native notification popup
-    NotificationPopupNative {
+    NotificationInit {
         id: notificationPopup
     }
     
     // Native notification history
-    NotificationHistoryNative {
+    NotificationCenter {
         id: notificationHistory
     }
 }

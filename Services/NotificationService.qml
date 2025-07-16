@@ -10,6 +10,12 @@ Singleton {
 
     readonly property list<NotifWrapper> notifications: []
     readonly property list<NotifWrapper> popups: notifications.filter(n => n.popup)
+    
+    // Android 16-style grouped notifications
+    readonly property var groupedNotifications: getGroupedNotifications()
+    readonly property var groupedPopups: getGroupedPopups()
+    
+    property var expandedGroups: ({}) // Track which groups are expanded
 
     NotificationServer {
         id: server
@@ -20,8 +26,10 @@ Singleton {
         bodyImagesSupported: true
         bodyMarkupSupported: true
         imageSupported: true
+        inlineReplySupported: true
 
         onNotification: notif => {
+            console.log("New notification received:", notif.appName, "-", notif.summary);
             notif.tracked = true;
 
             const wrapper = notifComponent.createObject(root, {
@@ -29,7 +37,13 @@ Singleton {
                 notification: notif
             });
 
-            root.notifications.push(wrapper);
+            if (wrapper) {
+                root.notifications.push(wrapper);
+                console.log("Notification added. Total notifications:", root.notifications.length);
+                console.log("Grouped notifications:", root.groupedNotifications.length);
+            } else {
+                console.error("Failed to create notification wrapper");
+            }
         }
     }
 
@@ -166,19 +180,140 @@ Singleton {
 
     function getFallbackIcon(wrapper) {
         if (wrapper.isConversation) {
-            return Quickshell.iconPath("chat", "image-missing");
+            return Quickshell.iconPath("chat-symbolic");
         } else if (wrapper.isMedia) {
-            return Quickshell.iconPath("music_note", "image-missing");
+            return Quickshell.iconPath("audio-x-generic-symbolic");
         } else if (wrapper.isSystem) {
-            return Quickshell.iconPath("settings", "image-missing");
+            return Quickshell.iconPath("preferences-system-symbolic");
         }
-        return Quickshell.iconPath("apps", "image-missing");
+        return Quickshell.iconPath("application-x-executable-symbolic");
     }
 
     function getAppIconPath(wrapper) {
         if (wrapper.hasAppIcon) {
-            return Quickshell.iconPath(wrapper.appIcon, "image-missing");
+            return Quickshell.iconPath(wrapper.appIcon);
         }
         return getFallbackIcon(wrapper);
+    }
+
+    // Android 16-style notification grouping functions
+    function getGroupKey(wrapper) {
+        const appName = wrapper.appName.toLowerCase();
+        
+        // Group by app only - one group per unique application
+        return appName;
+    }
+
+    function getGroupedNotifications() {
+        const groups = {};
+        
+        for (const notif of notifications) {
+            const groupKey = getGroupKey(notif);
+            if (!groups[groupKey]) {
+                groups[groupKey] = {
+                    key: groupKey,
+                    appName: notif.appName,
+                    notifications: [],
+                    latestNotification: null,
+                    count: 0,
+                    hasInlineReply: false,
+                    isConversation: notif.isConversation,
+                    isMedia: notif.isMedia,
+                    isSystem: notif.isSystem
+                };
+            }
+            
+            groups[groupKey].notifications.unshift(notif);
+            groups[groupKey].latestNotification = groups[groupKey].notifications[0];
+            groups[groupKey].count = groups[groupKey].notifications.length;
+            
+            if (notif.notification.hasInlineReply) {
+                groups[groupKey].hasInlineReply = true;
+            }
+        }
+        
+        return Object.values(groups).sort((a, b) => {
+            return b.latestNotification.time.getTime() - a.latestNotification.time.getTime();
+        });
+    }
+
+    function getGroupedPopups() {
+        const groups = {};
+        
+        for (const notif of popups) {
+            const groupKey = getGroupKey(notif);
+            if (!groups[groupKey]) {
+                groups[groupKey] = {
+                    key: groupKey,
+                    appName: notif.appName,
+                    notifications: [],
+                    latestNotification: null,
+                    count: 0,
+                    hasInlineReply: false,
+                    isConversation: notif.isConversation,
+                    isMedia: notif.isMedia,
+                    isSystem: notif.isSystem
+                };
+            }
+            
+            groups[groupKey].notifications.unshift(notif);
+            groups[groupKey].latestNotification = groups[groupKey].notifications[0];
+            groups[groupKey].count = groups[groupKey].notifications.length;
+            
+            if (notif.notification.hasInlineReply) {
+                groups[groupKey].hasInlineReply = true;
+            }
+        }
+        
+        return Object.values(groups).sort((a, b) => {
+            return b.latestNotification.time.getTime() - a.latestNotification.time.getTime();
+        });
+    }
+
+    function toggleGroupExpansion(groupKey) {
+        let newExpandedGroups = {};
+        for (const key in expandedGroups) {
+            newExpandedGroups[key] = expandedGroups[key];
+        }
+        newExpandedGroups[groupKey] = !newExpandedGroups[groupKey];
+        expandedGroups = newExpandedGroups;
+    }
+
+    function dismissGroup(groupKey) {
+        // Use array iteration to avoid spread operator issues
+        for (let i = notifications.length - 1; i >= 0; i--) {
+            const notif = notifications[i];
+            if (getGroupKey(notif) === groupKey) {
+                notif.notification.dismiss();
+            }
+        }
+    }
+
+    function getGroupTitle(group) {
+        if (group.count === 1) {
+            return group.latestNotification.summary;
+        }
+        
+        if (group.isConversation) {
+            return `${group.count} new messages`;
+        }
+        
+        if (group.isMedia) {
+            return "Now playing";
+        }
+        
+        return `${group.count} notifications`;
+    }
+
+    function getGroupBody(group) {
+        if (group.count === 1) {
+            return group.latestNotification.body;
+        }
+        
+        if (group.isConversation) {
+            return group.latestNotification.body || "Tap to view messages";
+        }
+        
+        return `Latest: ${group.latestNotification.summary}`;
     }
 }

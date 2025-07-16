@@ -204,8 +204,8 @@ ShellRoot {
     // Global popup windows
     CenterCommandCenter {}
     TrayMenuPopup {}
-    NotificationPopupNative {}
-    NotificationHistoryNative {
+    NotificationInit {}
+    NotificationCenter {
         notificationHistoryVisible: root.notificationHistoryVisible
         onCloseRequested: {
             root.notificationHistoryVisible = false
