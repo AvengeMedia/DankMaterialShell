@@ -166,73 +166,91 @@ PanelWindow {
                                     spacing: Theme.spacingM
                                     
                                     // Circular profile image preview
-                                    Rectangle {
+                                    Item {
                                         id: avatarContainer
                                         width: 54
                                         height: 54
-                                        radius: width / 2
-                                        color: Theme.primary
-                                        clip: true
-                                        
-                                        property bool hasImage: profileImageInput.text !== "" && avatarImage.status !== Image.Error
-                                        
-                                        Image {
-                                            id: avatarImage
+
+                                        property bool hasImage: avatarImageSource.status === Image.Ready
+
+                                        // This rectangle provides the themed ring via its border.
+                                        Rectangle {
                                             anchors.fill: parent
-                                            anchors.margins: 1
-                                            fillMode: Image.PreserveAspectCrop
-                                            source: profileImageInput.text.startsWith("/")
-                                                      ? "file://" + profileImageInput.text
-                                                      : profileImageInput.text
+                                            radius: width / 2
+                                            color: "transparent"
+                                            border.color: Theme.primary
+                                            border.width: 1 // The ring is 1px thick.
+                                            visible: parent.hasImage
+                                        }
+
+                                        // Hidden Image loader. Its only purpose is to load the texture.
+                                        Image {
+                                            id: avatarImageSource
+                                            source: {
+                                                if (profileImageInput.text === "") return ""
+                                                if (profileImageInput.text.startsWith("/")) {
+                                                    return "file://" + profileImageInput.text
+                                                }
+                                                return profileImageInput.text
+                                            }
                                             smooth: true
                                             asynchronous: true
                                             mipmap: true
                                             cache: true
-                                            sourceSize.width: 128
-                                            sourceSize.height: 128
+                                            visible: false // This item is never shown directly.
+                                        }
+
+                                        MultiEffect {
+                                            anchors.fill: parent
+                                            anchors.margins: 5
+                                            source: avatarImageSource
+                                            maskEnabled: true
+                                            maskSource: settingsCircularMask
                                             visible: avatarContainer.hasImage
-                                            
-                                            property string lastLoggedSource: ""
-                                            
-                                            onStatusChanged: {
-                                                if (source !== lastLoggedSource && (status === Image.Ready || status === Image.Error)) {
-                                                    lastLoggedSource = source
-                                                    if (status === Image.Ready) {
-                                                        console.log("Profile image loaded successfully, size:", sourceSize.width + "x" + sourceSize.height)
-                                                    } else if (status === Image.Error) {
-                                                        console.log("Profile image failed to load:", source)
-                                                    }
-                                                }
+                                            maskThresholdMin: 0.5
+                                            maskSpreadAtMin: 1.0
+                                        }
+
+                                        Item {
+                                            id: settingsCircularMask
+                                            width: 54 - 10
+                                            height: 54 - 10
+                                            layer.enabled: true
+                                            layer.smooth: true
+                                            visible: false
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                radius: width / 2
+                                                color: "black"
+                                                antialiasing: true
                                             }
                                         }
-                                        
-                                        // Fallback icon
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: profileImageInput.text === "" ? "person" : "warning"
-                                            font.family: Theme.iconFont
-                                            font.pixelSize: Theme.iconSize + 8
-                                            color: Theme.primaryText
-                                            visible: !avatarContainer.hasImage
-                                        }
-                                        
-                                        // Decorative rings
+
+                                        // Fallback for when there is no image.
                                         Rectangle {
                                             anchors.fill: parent
                                             radius: width / 2
-                                            border.color: Qt.rgba(0, 0, 0, 0.15)
-                                            border.width: 1
-                                            color: "transparent"
-                                            visible: avatarContainer.hasImage
+                                            color: Theme.primary
+                                            visible: !parent.hasImage
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "person"
+                                                font.family: Theme.iconFont
+                                                font.pixelSize: Theme.iconSize + 8
+                                                color: Theme.primaryText
+                                            }
                                         }
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            anchors.margins: -1
-                                            radius: width / 2 + 1
-                                            border.color: Qt.rgba(255, 255, 255, 0.1)
-                                            border.width: 1
-                                            color: "transparent"
-                                            visible: avatarContainer.hasImage
+
+                                        // Error icon for when the image fails to load.
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "warning"
+                                            font.family: Theme.iconFont
+                                            font.pixelSize: Theme.iconSize + 8
+                                            color: Theme.primaryText
+                                            visible: profileImageInput.text !== "" && avatarImageSource.status === Image.Error
                                         }
                                     }
                                     

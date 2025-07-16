@@ -12,14 +12,13 @@ Specifically created for [Niri](https://github.com/YaLTeR/niri).
 
 ```bash
 # Arch
-paru -S quickshell-git nerd-fonts ttf-material-symbols-variable-git matugen cliphist cava wl-clipboard ddcutil qt6-5compat
+paru -S quickshell-git nerd-fonts ttf-material-symbols-variable-git matugen cliphist cava wl-clipboard ddcutil
 
 # Some dependencies are optional
 # - cava for audio visualizer, without it music will just randomly visualize
 # - cliphist for clipboard history
 # - matugen for dynamic themes based on wallpaper
 # - ddcutil for brightness changing
-# - qt6-5compat - havent been able to figure out circular cropping pictures without it.
 ```
 
 2. Configure SwayBG (Optional)

@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -130,81 +130,92 @@ PanelWindow {
                         anchors.rightMargin: Theme.spacingL
                         spacing: Theme.spacingL
                         
-                        // Profile Picture Container with circular outline
-                        Rectangle {
+                        // Profile Picture Container
+                        Item {
+                            id: avatarContainer
                             width: 64
                             height: 64
-                            radius: width / 2
-                            color: "transparent"
-                            border.color: Qt.rgba(0, 0, 0, 0.15)
-                            border.width: 1
-                            
-                            // Hidden image for OpacityMask source
-                            Image {
-                                id: profileImage
+
+                            property bool hasImage: profileImageLoader.status === Image.Ready
+
+                            // This rectangle provides the themed ring via its border.
+                            Rectangle {
                                 anchors.fill: parent
-                                anchors.margins: 5  // Inset by border width
-                                fillMode: Image.PreserveAspectCrop
+                                radius: width / 2
+                                color: "transparent"
+                                border.color: Theme.primary
+                                border.width: 1 // The ring is 1px thick.
+                                visible: parent.hasImage
+                            }
+
+                            // Hidden Image loader. Its only purpose is to load the texture.
+                            Image {
+                                id: profileImageLoader
+                                source: {
+                                    if (Prefs.profileImage === "") return ""
+                                    if (Prefs.profileImage.startsWith("/")) {
+                                        return "file://" + Prefs.profileImage
+                                    }
+                                    return Prefs.profileImage
+                                }
                                 smooth: true
                                 asynchronous: true
                                 mipmap: true
                                 cache: true
-                                sourceSize.width: 128
-                                sourceSize.height: 128
-                                visible: false  // Hidden, only used as mask source
-                                source: {
-                                    if (Prefs.profileImage === "") return ""
-                                    // Add file:// prefix if it's a local path (starts with /)
-                                    if (Prefs.profileImage.startsWith("/")) {
-                                        return "file://" + Prefs.profileImage
-                                    }
-                                    // Return as-is if it already has a protocol or is a web URL
-                                    return Prefs.profileImage
-                                }
+                                visible: false // This item is never shown directly.
                             }
-                            
-                            // OpacityMask inset by 1px to leave border visible
-                            OpacityMask {
-                                anchors.fill: profileImage
-                                visible: Prefs.profileImage !== "" && profileImage.status !== Image.Error
-                                source: profileImage
-                                
-                                maskSource: Rectangle {
-                                    width: profileImage.width
-                                    height: profileImage.height
+
+                            MultiEffect {
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                source: profileImageLoader
+                                maskEnabled: true
+                                maskSource: circularMask
+                                visible: avatarContainer.hasImage
+                                maskThresholdMin: 0.5
+                                maskSpreadAtMin: 1.0
+                            }
+
+                            Item {
+                                id: circularMask
+                                width: 64 - 10
+                                height: 64 - 10
+                                layer.enabled: true
+                                layer.smooth: true
+                                visible: false
+
+                                Rectangle {
+                                    anchors.fill: parent
                                     radius: width / 2
-                                    color: "white"
-                                    visible: false
+                                    color: "black"
+                                    antialiasing: true
                                 }
                             }
-                            
-                            // Fallback background for no image
+
+                            // Fallback for when there is no image.
                             Rectangle {
                                 anchors.fill: parent
-                                anchors.margins: 2
                                 radius: width / 2
                                 color: Theme.primary
-                                visible: Prefs.profileImage === ""
+                                visible: !parent.hasImage
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "person"
+                                    font.family: Theme.iconFont
+                                    font.pixelSize: Theme.iconSize + 8
+                                    color: Theme.primaryText
+                                }
                             }
-                            
-                            // Fallback icon for no profile picture
-                            Text {
-                                anchors.centerIn: parent
-                                text: "person"
-                                font.family: Theme.iconFont
-                                font.pixelSize: Theme.iconSize + 8
-                                color: Theme.primaryText
-                                visible: Prefs.profileImage === ""
-                            }
-                            
-                            // Error icon when image fails to load
+
+                            // Error icon for when the image fails to load.
                             Text {
                                 anchors.centerIn: parent
                                 text: "warning"
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize + 8
                                 color: Theme.primaryText
-                                visible: Prefs.profileImage !== "" && profileImage.status === Image.Error
+                                visible: Prefs.profileImage !== "" && profileImageLoader.status === Image.Error
                             }
                         }
                         
