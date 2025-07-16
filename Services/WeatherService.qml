@@ -87,13 +87,10 @@ Singleton {
     }
     
     function getWeatherUrl() {
-        if (Prefs.weatherLocationOverrideEnabled && Prefs.weatherLocationOverride) {
-            const url = `wttr.in/${encodeURIComponent(Prefs.weatherLocationOverride)}?format=j1`
-            console.log("Using override location:", Prefs.weatherLocationOverride, "URL:", url)
-            return url
-        }
-        console.log("Using auto-detected location")
-        return "wttr.in/?format=j1"
+        const location = Prefs.weatherLocationOverride || "New York, NY"
+        const url = `wttr.in/${encodeURIComponent(location)}?format=j1`
+        console.log("Using location:", location, "URL:", url)
+        return url
     }
     
     function fetchWeather() {
@@ -229,14 +226,7 @@ Singleton {
     Component.onCompleted: {
         // Watch for preference changes to refetch weather
         Prefs.weatherLocationOverrideChanged.connect(() => {
-            if (Prefs.weatherLocationOverrideEnabled && Prefs.weatherLocationOverride.length > 0) {
-                console.log("Weather location override changed, force refreshing weather")
-                Qt.callLater(root.forceRefresh)
-            }
-        })
-        
-        Prefs.weatherLocationOverrideEnabledChanged.connect(() => {
-            console.log("Weather location override enabled/disabled, force refreshing weather")
+            console.log("Weather location changed, force refreshing weather")
             Qt.callLater(root.forceRefresh)
         })
     }

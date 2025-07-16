@@ -353,425 +353,64 @@ PanelWindow {
                                 onToggled: (checked) => Prefs.setTemperatureUnit(checked)
                             }
                             
-                            // Weather Location Override
+                            // Weather Location Setting
                             Column {
                                 width: parent.width
-                                spacing: Theme.spacingM
+                                spacing: Theme.spacingS
                                 
-                                SettingsToggle {
-                                    text: "Override Location"
-                                    description: "Use a specific location instead of auto-detection"
-                                    checked: Prefs.weatherLocationOverrideEnabled
-                                    onToggled: (checked) => Prefs.setWeatherLocationOverrideEnabled(checked)
+                                Text {
+                                    text: "Location"
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                    font.weight: Font.Medium
                                 }
                                 
-                                // Location input - only visible when override is enabled
-                                Column {
+                                Rectangle {
                                     width: parent.width
-                                    spacing: Theme.spacingS
-                                    visible: Prefs.weatherLocationOverrideEnabled
-                                    opacity: visible ? 1.0 : 0.0
+                                    height: 48
+                                    radius: Theme.cornerRadius
+                                    color: Theme.surfaceVariant
+                                    border.color: weatherLocationInput.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                                    border.width: weatherLocationInput.activeFocus ? 2 : 1
                                     
-                                    Behavior on opacity {
-                                        NumberAnimation {
-                                            duration: Theme.mediumDuration
-                                            easing.type: Theme.emphasizedEasing
-                                        }
-                                    }
-                                    
-                                    Text {
-                                        text: "Location"
-                                        font.pixelSize: Theme.fontSizeMedium
+                                    TextInput {
+                                        id: weatherLocationInput
+                                        anchors.fill: parent
+                                        anchors.margins: Theme.spacingM
+                                        verticalAlignment: TextInput.AlignVCenter
                                         color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                    }
-                                    
-                                    // Weather Location Search Component
-                                    Item {
-                                        id: weatherLocationSearchComponent
-                                        width: parent.width
-                                        height: searchInputField.height + (searchDropdown.visible ? searchDropdown.height : 0)
-
-                                        property bool _internalChange: false
-                                        property bool isLoading: false
-                                        property string helperTextState: "default" // "default", "prompt", "searching", "found", "not_found"
-                                        property string currentSearchText: ""
-
-                                        ListModel {
-                                            id: searchResultsModel
-                                        }
-
-                                        Connections {
-                                            target: settingsPopup
-                                            function onClosingPopup() {
-                                                weatherLocationSearchComponent.resetSearchState()
-                                            }
-                                        }
-
-                                        function resetSearchState() {
-                                            locationSearchTimer.stop()
-                                            dropdownHideTimer.stop()
-                                            if (locationSearcher.running) {
-                                                locationSearcher.running = false;
-                                            }
-                                            isLoading = false
-                                            searchResultsModel.clear()
-                                            helperTextState = "default"
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        text: Prefs.weatherLocationOverride
+                                        selectByMouse: true
+                                        
+                                        onEditingFinished: {
+                                            Prefs.setWeatherLocationOverride(text)
                                         }
                                         
-                                        Timer {
-                                            id: locationSearchTimer
-                                            interval: 500
-                                            running: false
-                                            repeat: false
-                                            onTriggered: {
-                                                if (weatherLocationInput.text.length > 2) {
-                                                    // Stop any running search first
-                                                    if (locationSearcher.running) {
-                                                        locationSearcher.running = false
-                                                    }
-                                                    
-                                                    searchResultsModel.clear()
-                                                    weatherLocationSearchComponent.isLoading = true
-                                                    weatherLocationSearchComponent.helperTextState = "searching"
-                                                    
-                                                    const searchLocation = weatherLocationInput.text
-                                                    weatherLocationSearchComponent.currentSearchText = searchLocation
-                                                    const encodedLocation = encodeURIComponent(searchLocation)
-                                                    const curlCommand = `curl -s --connect-timeout 5 --max-time 10 'https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=5&addressdetails=1'`
-                                                    
-                                                    locationSearcher.command = ["bash", "-c", curlCommand]
-                                                    locationSearcher.running = true
-                                                }
-                                            }
+                                        // Placeholder text
+                                        Text {
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: "Enter location..."
+                                            color: Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.6)
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            visible: weatherLocationInput.text.length === 0 && !weatherLocationInput.activeFocus
                                         }
                                         
-                                        Timer {
-                                            id: dropdownHideTimer
-                                            interval: 200 // Short delay to allow clicks
-                                            running: false
-                                            repeat: false
-                                            onTriggered: {
-                                                if (!weatherLocationInput.activeFocus && !searchDropdown.hovered) {
-                                                    weatherLocationSearchComponent.resetSearchState()
-                                                }
-                                            }
-                                        }
-
-                                        Process {
-                                            id: locationSearcher
-                                            command: ["bash", "-c", "echo"]
-                                            running: false
-                                            
-                                            stdout: StdioCollector {
-                                                onStreamFinished: {
-                                                    // Only process if this is still the current search
-                                                    if (weatherLocationSearchComponent.currentSearchText !== weatherLocationInput.text) {
-                                                        return
-                                                    }
-                                                    
-                                                    const raw = text.trim()
-                                                    weatherLocationSearchComponent.isLoading = false
-                                                    searchResultsModel.clear()
-
-                                                    if (!raw || raw[0] !== "[") {
-                                                        weatherLocationSearchComponent.helperTextState = "not_found"
-                                                        return
-                                                    }
-                                                    
-                                                    try {
-                                                        const data = JSON.parse(raw)
-                                                        if (data.length === 0) {
-                                                            weatherLocationSearchComponent.helperTextState = "not_found"
-                                                            return
-                                                        }
-                                                        
-                                                        for (let i = 0; i < Math.min(data.length, 5); i++) {
-                                                            const location = data[i]
-                                                            if (location.display_name && location.lat && location.lon) {
-                                                                const parts = location.display_name.split(', ')
-                                                                let cleanName = parts[0]
-                                                                if (parts.length > 1) {
-                                                                    const state = parts[parts.length - 2]
-                                                                    if (state && state !== cleanName) {
-                                                                        cleanName += `, ${state}`
-                                                                    }
-                                                                }
-                                                                const query = `${location.lat},${location.lon}`
-                                                                searchResultsModel.append({ "name": cleanName, "query": query })
-                                                            }
-                                                        }
-                                                        weatherLocationSearchComponent.helperTextState = "found"
-                                                    } catch (e) {
-                                                        weatherLocationSearchComponent.helperTextState = "not_found"
-                                                    }
-                                                }
-                                            }
-                                            
-                                            onExited: (exitCode) => {
-                                                weatherLocationSearchComponent.isLoading = false
-                                                if (exitCode !== 0) {
-                                                    searchResultsModel.clear()
-                                                    weatherLocationSearchComponent.helperTextState = "not_found"
-                                                }
-                                            }
-                                        }
-                                        
-                                        // Search input field
-                                        Rectangle {
-                                            id: searchInputField
-                                            width: parent.width
-                                            height: 48
-                                            radius: Theme.cornerRadius
-                                            color: Theme.surfaceVariant
-                                            border.color: weatherLocationInput.activeFocus ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
-                                            border.width: weatherLocationInput.activeFocus ? 2 : 1
-                                            
-                                            Row {
-                                                anchors.fill: parent
-                                                anchors.margins: Theme.spacingM
-                                                spacing: Theme.spacingS
-                                                
-                                                Text {
-                                                    width: 20
-                                                    height: parent.height
-                                                    verticalAlignment: Text.AlignVCenter
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    font.family: Theme.iconFont
-                                                    font.pixelSize: Theme.iconSize - 4
-                                                    color: Theme.surfaceVariantText
-                                                    text: "search"
-                                                }
-                                                
-                                                TextInput {
-                                                    id: weatherLocationInput
-                                                    width: parent.width - 40 - Theme.spacingS * 2
-                                                    height: parent.height
-                                                    verticalAlignment: TextInput.AlignVCenter
-                                                    color: Theme.surfaceText
-                                                    font.pixelSize: Theme.fontSizeMedium
-                                                    text: Prefs.weatherLocationOverride
-                                                    selectByMouse: true
-                                                    
-                                                    onTextChanged: {
-                                                        if (weatherLocationSearchComponent._internalChange) return
-                                                        if (activeFocus) {
-                                                            if (text.length > 2) {
-                                                                weatherLocationSearchComponent.isLoading = true
-                                                                weatherLocationSearchComponent.helperTextState = "searching"
-                                                                locationSearchTimer.restart()
-                                                            } else {
-                                                                weatherLocationSearchComponent.resetSearchState()
-                                                                weatherLocationSearchComponent.helperTextState = "prompt"
-                                                            }
-                                                        }
-                                                    }
-                                                    
-                                                    onEditingFinished: {
-                                                        if (!searchDropdown.visible) {
-                                                            Prefs.setWeatherLocationOverride(text)
-                                                        }
-                                                    }
-                                                    
-                                                    onActiveFocusChanged: {
-                                                        if (activeFocus) {
-                                                            dropdownHideTimer.stop()
-                                                            if (weatherLocationInput.text.length <= 2) {
-                                                                weatherLocationSearchComponent.helperTextState = "prompt"
-                                                            }
-                                                        }
-                                                        else {
-                                                            dropdownHideTimer.start()
-                                                        }
-                                                    }
-                                                    
-                                                    // Placeholder text
-                                                    Text {
-                                                        anchors.verticalCenter: parent.verticalCenter
-                                                        text: "Search for a location..."
-                                                        color: Qt.rgba(Theme.surfaceVariantText.r, Theme.surfaceVariantText.g, Theme.surfaceVariantText.b, 0.6)
-                                                        font.pixelSize: Theme.fontSizeMedium
-                                                        visible: weatherLocationInput.text.length === 0 && !weatherLocationInput.activeFocus
-                                                    }
-                                                    
-                                                    MouseArea {
-                                                        anchors.fill: parent
-                                                        hoverEnabled: true
-                                                        cursorShape: Qt.IBeamCursor
-                                                        acceptedButtons: Qt.NoButton
-                                                    }
-                                                }
-                                                
-                                                // Status icon
-                                                Text {
-                                                    width: 20
-                                                    height: parent.height
-                                                    verticalAlignment: Text.AlignVCenter
-                                                    horizontalAlignment: Text.AlignHCenter
-                                                    font.family: Theme.iconFont
-                                                    font.pixelSize: Theme.iconSize - 4
-                                                    color: {
-                                                        if (weatherLocationSearchComponent.isLoading) return Theme.surfaceVariantText
-                                                        if (searchResultsModel.count > 0) return Theme.success || Theme.primary
-                                                        if (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2) return Theme.error
-                                                        return "transparent"
-                                                    }
-                                                    text: {
-                                                        if (weatherLocationSearchComponent.isLoading) return "hourglass_empty"
-                                                        if (searchResultsModel.count > 0) return "check_circle"
-                                                        if (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2 && !weatherLocationSearchComponent.isLoading) return "error"
-                                                        return ""
-                                                    }
-                                                    
-                                                    opacity: (weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2) ? 1.0 : 0.0
-                                                    
-                                                    Behavior on opacity {
-                                                        NumberAnimation {
-                                                            duration: Theme.shortDuration
-                                                            easing.type: Theme.standardEasing
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        
-                                        // Search results dropdown
-                                        Rectangle {
-                                            id: searchDropdown
-                                            width: parent.width
-                                            height: Math.min(Math.max(searchResultsModel.count * 38 + Theme.spacingS * 2, 50), 200)
-                                            
-                                            y: searchInputField.height
-                                            radius: Theme.cornerRadius
-                                            color: Theme.popupBackground()
-                                            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
-                                            border.width: 1
-                                            visible: weatherLocationInput.activeFocus && weatherLocationInput.text.length > 2 && (searchResultsModel.count > 0 || weatherLocationSearchComponent.isLoading)
-                                            
-                                            
-                                            property bool hovered: false
-                                            
-                                            MouseArea {
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                onEntered: {
-                                                    parent.hovered = true
-                                                    dropdownHideTimer.stop()
-                                                }
-                                                onExited: {
-                                                    parent.hovered = false
-                                                    if (!weatherLocationInput.activeFocus) {
-                                                        dropdownHideTimer.start()
-                                                    }
-                                                }
-                                                acceptedButtons: Qt.NoButton
-                                            }
-                                            
-                                            Item {
-                                                anchors.fill: parent
-                                                anchors.margins: Theme.spacingS
-                                                
-                                                ListView {
-                                                    id: searchResultsList
-                                                    anchors.fill: parent
-                                                    clip: true
-                                                    model: searchResultsModel
-                                                    spacing: 2
-                                                    
-                                                    
-                                                    delegate: Rectangle {
-                                                        width: searchResultsList.width
-                                                        height: 36
-                                                        radius: Theme.cornerRadius
-                                                        color: resultMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : "transparent"
-                                                        
-                                                        
-                                                        Row {
-                                                            anchors.fill: parent
-                                                            anchors.margins: Theme.spacingM
-                                                            spacing: Theme.spacingS
-                                                            
-                                                            Text {
-                                                                font.family: Theme.iconFont
-                                                                font.pixelSize: Theme.iconSize - 6
-                                                                color: Theme.surfaceVariantText
-                                                                text: "place"
-                                                                anchors.verticalCenter: parent.verticalCenter
-                                                            }
-                                                            
-                                                            Text {
-                                                                text: model.name || "Unknown"
-                                                                font.pixelSize: Theme.fontSizeMedium
-                                                                color: Theme.surfaceText
-                                                                anchors.verticalCenter: parent.verticalCenter
-                                                                elide: Text.ElideRight
-                                                                width: parent.width - 30
-                                                            }
-                                                        }
-                                                        
-                                                        MouseArea {
-                                                            id: resultMouseArea
-                                                            anchors.fill: parent
-                                                            hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            
-                                                            onClicked: {
-                                                                weatherLocationSearchComponent._internalChange = true
-                                                                const selectedName = model.name
-                                                                const selectedQuery = model.query
-                                                                
-                                                                weatherLocationInput.text = selectedName
-                                                                Prefs.setWeatherLocationOverride(selectedQuery)
-                                                                
-                                                                weatherLocationSearchComponent.resetSearchState()
-                                                                weatherLocationInput.focus = false
-                                                                weatherLocationSearchComponent._internalChange = false
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Show message when no results
-                                                Text {
-                                                    anchors.centerIn: parent
-                                                    text: weatherLocationSearchComponent.isLoading ? "Searching..." : "No locations found"
-                                                    font.pixelSize: Theme.fontSizeMedium
-                                                    color: Theme.surfaceVariantText
-                                                    visible: searchResultsList.count === 0 && weatherLocationInput.text.length > 2
-                                                }
-                                            }
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.IBeamCursor
+                                            acceptedButtons: Qt.NoButton
                                         }
                                     }
-                                    
-                                    Text {
-                                        text: {
-                                            switch (weatherLocationSearchComponent.helperTextState) {
-                                                case "default":
-                                                    return "Examples: \"New York\", \"Tokyo\", \"44511\""
-                                                case "prompt":
-                                                    return "Enter 3+ characters to search."
-                                                case "searching":
-                                                    return "Searching for locations..."
-                                                case "found":
-                                                    return `${searchResultsModel.count} location${searchResultsModel.count > 1 ? 's' : ''} found. Click to select.`
-                                                case "not_found":
-                                                    return "No locations found. Try a different search term."
-                                            }
-                                        }
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: {
-                                            switch (weatherLocationSearchComponent.helperTextState) {
-                                                case "found":
-                                                    return Theme.success || Theme.primary
-                                                case "not_found":
-                                                    return Theme.error
-                                                default:
-                                                    return Theme.surfaceVariantText
-                                            }
-                                        }
-                                        wrapMode: Text.WordWrap
-                                        width: parent.width
-                                    }
+                                }
+                                
+                                Text {
+                                    text: "Examples: \"New York, NY\", \"London\", \"Tokyo\""
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
                                 }
                             }
                         }

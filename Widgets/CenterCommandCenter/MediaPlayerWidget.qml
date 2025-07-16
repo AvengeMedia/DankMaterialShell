@@ -111,7 +111,8 @@ Rectangle {
             
                 // Normal media info when playing
                 Row {
-                    anchors.fill: parent
+                    width: parent.width
+                    height: 60
                     spacing: theme.spacingM
                 
                 // Album Art
@@ -152,8 +153,8 @@ Rectangle {
                 // Track Info
                 Column {
                     width: parent.width - 60 - theme.spacingM
+                    height: parent.height
                     spacing: theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
                     
                     Text {
                         text: activePlayer?.trackTitle || "Unknown Track"
@@ -301,11 +302,15 @@ Rectangle {
             }
             
             // Control buttons - always visible
-            Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: theme.spacingM
-            visible: activePlayer !== null
-            height: 32
+            Item {
+                width: parent.width
+                height: 32
+                visible: activePlayer !== null
+                
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: theme.spacingM
+                    height: parent.height
             
             // Previous button  
             Rectangle {
@@ -387,6 +392,7 @@ Rectangle {
                     onClicked: activePlayer?.next()
                 }
             }
+                }
             }
         }
     }
