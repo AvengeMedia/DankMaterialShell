@@ -100,6 +100,11 @@ PanelWindow {
             }
         }
         
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {}
+        }
+        
         // Content with focus management
         Item {
             anchors.fill: parent
