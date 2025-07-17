@@ -26,7 +26,7 @@ Singleton {
         bodyImagesSupported: true
         bodyMarkupSupported: true
         imageSupported: true
-        inlineReplySupported: true
+        //inlineReplySupported: true
 
         onNotification: notif => {
             console.log("New notification received:", notif.appName, "-", notif.summary);
