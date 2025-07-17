@@ -19,7 +19,6 @@ PanelWindow {
     
     // Monitor process dropdown visibility to enable/disable process monitoring
     onIsVisibleChanged: {
-        console.log("Process dropdown", isVisible ? "opened" : "closed")
         ProcessMonitorService.enableMonitoring(isVisible)
     }
     
@@ -121,6 +120,7 @@ PanelWindow {
                 easing.type: Theme.emphasizedEasing
             }
         }
+        
         
         // Click inside dropdown - consume the event
         MouseArea {

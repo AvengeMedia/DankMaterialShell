@@ -15,23 +15,6 @@ Singleton {
     readonly property real volumeLevel: (sink?.audio?.volume ?? 0) * 100
     readonly property real micLevel: (source?.audio?.volume ?? 0) * 100
 
-    signal audioVolumeChanged(real volume)
-    signal audioMicLevelChanged(real level)
-    signal audioMuteChanged(bool muted)
-    signal audioMicMuteChanged(bool muted)
-    signal audioDeviceChanged()
-    
-    onVolumeLevelChanged: audioVolumeChanged(volumeLevel)
-    onMicLevelChanged: audioMicLevelChanged(micLevel)
-    onSinkMutedChanged: audioMuteChanged(sinkMuted)
-    onSourceMutedChanged: audioMicMuteChanged(sourceMuted)
-    onSinkChanged: {
-        audioDeviceChanged()
-    }
-    onSourceChanged: {
-        audioDeviceChanged()
-    }
-
     property var audioSinks: []
     property var audioSources: []
 

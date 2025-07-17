@@ -35,7 +35,6 @@ PanelWindow {
     
     // Monitor process widget visibility to enable/disable process monitoring
     onIsVisibleChanged: {
-        console.log("Process list widget", isVisible ? "opened" : "closed")
         ProcessMonitorService.enableMonitoring(isVisible)
     }
     
@@ -99,11 +98,11 @@ PanelWindow {
                 easing.type: Theme.emphasizedEasing
             }
         }
-        
+
         MouseArea {
             anchors.fill: parent
             onClicked: {}
-        }
+        }        
         
         // Content with focus management
         Item {
@@ -1914,17 +1913,14 @@ PanelWindow {
     IpcHandler {
         target: "processlist"
         function open() {
-            console.log("ProcessListWidget: IPC open() called")
             processListWidget.show()
             return "PROCESSLIST_OPEN_SUCCESS"
         }
         function close() {
-            console.log("ProcessListWidget: IPC close() called")
             processListWidget.hide()
             return "PROCESSLIST_CLOSE_SUCCESS"
         }
         function toggle() {
-            console.log("ProcessListWidget: IPC toggle() called")
             processListWidget.toggle()
             return "PROCESSLIST_TOGGLE_SUCCESS"
         }
