@@ -2,7 +2,8 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import Qt.labs.platform           // ← gives us StandardPaths
+import Qt.labs.platform
+import qs.Services
 
 Singleton {
     id: root
@@ -53,7 +54,8 @@ Singleton {
 
             if (!matugenAvailable) {
                 console.warn("Matugen missing → dynamic theme disabled")
-                Theme.rootObj.wallpaperErrorStatus = "matugen_missing"
+                ToastService.wallpaperErrorStatus = "matugen_missing"
+                ToastService.showWarning("matugen not found - dynamic theming disabled")
                 return
             }
             
@@ -74,7 +76,8 @@ Singleton {
             } else {
                 console.error("code", code)
                 console.error("Wallpaper not found:", wallpaperPath)
-                Theme.rootObj.showWallpaperError()
+                ToastService.wallpaperErrorStatus = "error"
+                ToastService.showError("Wallpaper processing failed")
             }
         }
     }
@@ -91,17 +94,20 @@ Singleton {
                 const out = matugenCollector.text
                 if (!out.length) {
                     console.error("matugen produced zero bytes\nstderr:", matugenProcess.stderr)
-                    Theme.rootObj.showWallpaperError()
+                    ToastService.wallpaperErrorStatus = "error"
+                    ToastService.showError("Wallpaper processing failed")
                     return
                 }
                 try {
                     root.matugenJson   = out
                     root.matugenColors = JSON.parse(out)
                     root.colorsUpdated()
-                    Theme.rootObj.wallpaperErrorStatus = ""
+                    ToastService.clearWallpaperError()
+                    ToastService.showInfo("Dynamic theme colors updated")
                 } catch (e) {
                     console.error("JSON parse failed:", e)
-                    Theme.rootObj.showWallpaperError()
+                    ToastService.wallpaperErrorStatus = "error"
+                    ToastService.showError("Wallpaper processing failed")
                 }
             }
         }

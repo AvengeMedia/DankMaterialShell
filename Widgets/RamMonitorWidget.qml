@@ -9,7 +9,6 @@ Rectangle {
     
     property bool showPercentage: true
     property bool showIcon: true
-    property var processDropdown: null
     
     width: 55
     height: 30
@@ -18,10 +17,6 @@ Rectangle {
            Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 
            Qt.rgba(Theme.secondary.r, Theme.secondary.g, Theme.secondary.b, 0.08)
     
-    Component.onCompleted: {
-        // RAM widget initialized
-    }
-    
     MouseArea {
         id: ramArea
         anchors.fill: parent
@@ -29,10 +24,8 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         
         onClicked: {
-            if (processDropdown) {
-                ProcessMonitorService.setSortBy("memory")
-                processDropdown.toggle()
-            }
+            ProcessMonitorService.setSortBy("memory")
+            processListDropdown.toggle()
         }
     }
 

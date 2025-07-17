@@ -8,9 +8,11 @@ import qs.Services
 import Quickshell.Services.UPower
 
 PanelWindow {
-    id: batteryControlPopup
+    id: root
+    
+    property bool batteryPopupVisible: false
         
-    visible: root.batteryPopupVisible
+    visible: batteryPopupVisible
         
     implicitWidth: 400
     implicitHeight: 300
@@ -32,7 +34,7 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            root.batteryPopupVisible = false
+            batteryPopupVisible = false
         }
     }
         
@@ -46,8 +48,8 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
-        opacity: root.batteryPopupVisible ? 1.0 : 0.0
-        scale: root.batteryPopupVisible ? 1.0 : 0.85
+        opacity: batteryPopupVisible ? 1.0 : 0.0
+        scale: batteryPopupVisible ? 1.0 : 0.85
         
         // Prevent click-through to background
         MouseArea {
@@ -114,7 +116,7 @@ PanelWindow {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.batteryPopupVisible = false
+                                batteryPopupVisible = false
                             }
                         }
                     }

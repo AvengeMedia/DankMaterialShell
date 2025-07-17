@@ -16,11 +16,6 @@ Item {
         else return 1 // Default to WiFi when nothing is connected
     }
     
-    // Expose properties that the parent needs to bind to
-    property bool wifiAutoRefreshEnabled: false
-    property string wifiPasswordSSID: ""
-    property string wifiPasswordInput: ""
-    property bool wifiPasswordDialogVisible: false
     
     Column {
         anchors.fill: parent
@@ -67,7 +62,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         networkTab.networkSubTab = 0
-                        networkTab.wifiAutoRefreshEnabled = false
+                        WifiService.autoRefreshEnabled = false
                     }
                 }
             }
@@ -108,7 +103,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         networkTab.networkSubTab = 1
-                        networkTab.wifiAutoRefreshEnabled = true
+                        WifiService.autoRefreshEnabled = true
                         if (NetworkService.wifiEnabled) {
                             WifiService.scanWifi()
                         }
@@ -795,9 +790,9 @@ Item {
                                         WifiService.connectToWifi(modelData.ssid)
                                     } else if (modelData.secured) {
                                         // Secured network, need password - use root dialog
-                                        root.wifiPasswordSSID = modelData.ssid
-                                        root.wifiPasswordInput = ""
-                                        root.wifiPasswordDialogVisible = true
+                                        wifiPasswordDialog.wifiPasswordSSID = modelData.ssid
+                                        wifiPasswordDialog.wifiPasswordInput = ""
+                                        wifiPasswordDialog.wifiPasswordDialogVisible = true
                                     } else {
                                         // Open network, connect directly
                                         WifiService.connectToWifi(modelData.ssid)

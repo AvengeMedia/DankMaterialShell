@@ -9,9 +9,16 @@ import qs.Common
 import qs.Services
 
 PanelWindow {
-    id: controlCenterPopup
+    id: root
+    
+    property bool controlCenterVisible: false
         
-    visible: root.controlCenterVisible
+    visible: controlCenterVisible
+    
+    onVisibleChanged: {
+        // Enable/disable WiFi auto-refresh based on control center visibility
+        WifiService.autoRefreshEnabled = visible && NetworkService.wifiEnabled
+    }
     
     implicitWidth: 600
     implicitHeight: 500
@@ -34,7 +41,7 @@ PanelWindow {
     
     Rectangle {
         width: Math.min(600, Screen.width - Theme.spacingL * 2)
-        height: controlCenterPopup.powerOptionsExpanded ? 570 : 500
+        height: root.powerOptionsExpanded ? 570 : 500
         x: Math.max(Theme.spacingL, Screen.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.popupBackground()
@@ -46,15 +53,15 @@ PanelWindow {
         transform: [
             Scale {
                 id: scaleTransform
-                origin.x: parent.width  // Scale from top-right corner
+                origin.x: 600  // Use fixed width since popup is max 600px wide
                 origin.y: 0
-                xScale: root.controlCenterVisible ? 1.0 : 0.95
-                yScale: root.controlCenterVisible ? 1.0 : 0.8
+                xScale: controlCenterVisible ? 1.0 : 0.95
+                yScale: controlCenterVisible ? 1.0 : 0.8
             },
             Translate {
                 id: translateTransform
-                x: root.controlCenterVisible ? 0 : 15  // Slide slightly left when hidden
-                y: root.controlCenterVisible ? 0 : -30
+                x: controlCenterVisible ? 0 : 15  // Slide slightly left when hidden
+                y: controlCenterVisible ? 0 : -30
             }
         ]
         
@@ -62,13 +69,13 @@ PanelWindow {
         states: [
             State {
                 name: "visible"
-                when: root.controlCenterVisible
+                when: controlCenterVisible
                 PropertyChanges { target: scaleTransform; xScale: 1.0; yScale: 1.0 }
                 PropertyChanges { target: translateTransform; x: 0; y: 0 }
             },
             State {
                 name: "hidden"
-                when: !root.controlCenterVisible
+                when: !controlCenterVisible
                 PropertyChanges { target: scaleTransform; xScale: 0.95; yScale: 0.8 }
                 PropertyChanges { target: translateTransform; x: 15; y: -30 }
             }
@@ -96,7 +103,7 @@ PanelWindow {
             }
         ]
         
-        opacity: root.controlCenterVisible ? 1.0 : 0.0
+        opacity: controlCenterVisible ? 1.0 : 0.0
         
         Behavior on opacity {
             NumberAnimation {
@@ -253,7 +260,7 @@ PanelWindow {
                             width: 40
                             height: 40
                             radius: 20
-                            color: powerButton.containsMouse || controlCenterPopup.powerOptionsExpanded ? 
+                            color: powerButton.containsMouse || root.powerOptionsExpanded ? 
                                    Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12) :
                                    Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
                             
@@ -267,10 +274,10 @@ PanelWindow {
                                 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: controlCenterPopup.powerOptionsExpanded ? "expand_less" : "power_settings_new"
+                                    text: root.powerOptionsExpanded ? "expand_less" : "power_settings_new"
                                     font.family: Theme.iconFont
                                     font.pixelSize: Theme.iconSize - 2
-                                    color: powerButton.containsMouse || controlCenterPopup.powerOptionsExpanded ? Theme.error : Theme.surfaceText
+                                    color: powerButton.containsMouse || root.powerOptionsExpanded ? Theme.error : Theme.surfaceText
                                     
                                     Behavior on text {
                                         // Smooth icon transition
@@ -302,7 +309,7 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.powerOptionsExpanded = !controlCenterPopup.powerOptionsExpanded
+                                    root.powerOptionsExpanded = !root.powerOptionsExpanded
                                 }
                             }
                             
@@ -338,8 +345,8 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    root.controlCenterVisible = false
-                                    root.settingsVisible = true
+                                    controlCenterVisible = false
+                                    settingsPopup.settingsVisible = true
                                 }
                             }
                             
@@ -356,12 +363,12 @@ PanelWindow {
                 // Animated Collapsible Power Options (optimized)
                 Rectangle {
                     width: parent.width
-                    height: controlCenterPopup.powerOptionsExpanded ? 60 : 0
+                    height: root.powerOptionsExpanded ? 60 : 0
                     radius: Theme.cornerRadius
                     color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.4)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-                    border.width: controlCenterPopup.powerOptionsExpanded ? 1 : 0
-                    opacity: controlCenterPopup.powerOptionsExpanded ? 1.0 : 0.0
+                    border.width: root.powerOptionsExpanded ? 1 : 0
+                    opacity: root.powerOptionsExpanded ? 1.0 : 0.0
                     clip: true
                     
                     // Single coordinated animation for power options
@@ -382,7 +389,7 @@ PanelWindow {
                     Row {
                         anchors.centerIn: parent
                         spacing: Theme.spacingL
-                        visible: controlCenterPopup.powerOptionsExpanded
+                        visible: root.powerOptionsExpanded
                         
                         // Logout
                         Rectangle {
@@ -421,11 +428,13 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.powerOptionsExpanded = false
-                                    root.powerConfirmAction = "logout"
-                                    root.powerConfirmTitle = "Logout"
-                                    root.powerConfirmMessage = "Are you sure you want to logout?"
-                                    root.powerConfirmVisible = true
+                                    root.powerOptionsExpanded = false
+                                    if (typeof root !== "undefined" && root.powerConfirmDialog) {
+                                        root.powerConfirmDialog.powerConfirmAction = "logout"
+                                        root.powerConfirmDialog.powerConfirmTitle = "Logout"
+                                        root.powerConfirmDialog.powerConfirmMessage = "Are you sure you want to logout?"
+                                        root.powerConfirmDialog.powerConfirmVisible = true
+                                    }
                                 }
                             }
                             
@@ -474,11 +483,13 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.powerOptionsExpanded = false
-                                    root.powerConfirmAction = "reboot"
-                                    root.powerConfirmTitle = "Restart"
-                                    root.powerConfirmMessage = "Are you sure you want to restart?"
-                                    root.powerConfirmVisible = true
+                                    root.powerOptionsExpanded = false
+                                    if (typeof root !== "undefined" && root.powerConfirmDialog) {
+                                        root.powerConfirmDialog.powerConfirmAction = "reboot"
+                                        root.powerConfirmDialog.powerConfirmTitle = "Restart"
+                                        root.powerConfirmDialog.powerConfirmMessage = "Are you sure you want to restart?"
+                                        root.powerConfirmDialog.powerConfirmVisible = true
+                                    }
                                 }
                             }
                             
@@ -527,11 +538,13 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.powerOptionsExpanded = false
-                                    root.powerConfirmAction = "poweroff"
-                                    root.powerConfirmTitle = "Shutdown"
-                                    root.powerConfirmMessage = "Are you sure you want to shutdown?"
-                                    root.powerConfirmVisible = true
+                                    root.powerOptionsExpanded = false
+                                    if (typeof root !== "undefined" && root.powerConfirmDialog) {
+                                        root.powerConfirmDialog.powerConfirmAction = "poweroff"
+                                        root.powerConfirmDialog.powerConfirmTitle = "Shutdown"
+                                        root.powerConfirmDialog.powerConfirmMessage = "Are you sure you want to shutdown?"
+                                        root.powerConfirmDialog.powerConfirmVisible = true
+                                    }
                                 }
                             }
                             
@@ -579,7 +592,7 @@ PanelWindow {
                             width: (parent.width - Theme.spacingXS * (tabCount - 1)) / tabCount
                             height: 40
                             radius: Theme.cornerRadius
-                            color: controlCenterPopup.currentTab === modelData.id ? 
+                            color: root.currentTab === modelData.id ? 
                                    Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : 
                                    tabArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                             
@@ -591,15 +604,15 @@ PanelWindow {
                                     text: modelData.icon
                                     font.family: Theme.iconFont
                                     font.pixelSize: Theme.iconSize - 4
-                                    color: controlCenterPopup.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
+                                    color: root.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 
                                 Text {
                                     text: modelData.name
                                     font.pixelSize: Theme.fontSizeSmall
-                                    color: controlCenterPopup.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
-                                    font.weight: controlCenterPopup.currentTab === modelData.id ? Font.Medium : Font.Normal
+                                    color: root.currentTab === modelData.id ? Theme.primary : Theme.surfaceText
+                                    font.weight: root.currentTab === modelData.id ? Font.Medium : Font.Normal
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                             }
@@ -611,7 +624,7 @@ PanelWindow {
                                 cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    controlCenterPopup.currentTab = modelData.id
+                                    root.currentTab = modelData.id
                                 }
                             }
                             
@@ -629,7 +642,7 @@ PanelWindow {
             // Tab content area
             Rectangle {
                 width: parent.width
-                height: controlCenterPopup.powerOptionsExpanded ? 240 : 300
+                height: root.powerOptionsExpanded ? 240 : 300
                 radius: Theme.cornerRadius
                 color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, Theme.getContentBackgroundAlpha() * 0.1)
                 
@@ -644,36 +657,29 @@ PanelWindow {
                 NetworkTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === "network"
+                    visible: root.currentTab === "network"
                     
-                    wifiPasswordSSID: root.wifiPasswordSSID
-                    wifiPasswordInput: root.wifiPasswordInput
-                    wifiPasswordDialogVisible: root.wifiPasswordDialogVisible
-                    
-                    onWifiAutoRefreshEnabledChanged: {
-                        root.wifiAutoRefreshEnabled = wifiAutoRefreshEnabled
-                    }
                 }
                 
                 // Audio Tab
                 AudioTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === "audio"
+                    visible: root.currentTab === "audio"
                 }
                 
                 // Bluetooth Tab
                 BluetoothTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: BluetoothService.available && controlCenterPopup.currentTab === "bluetooth"
+                    visible: BluetoothService.available && root.currentTab === "bluetooth"
                 }
                 
                 // Display Tab
                 DisplayTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: controlCenterPopup.currentTab === "display"
+                    visible: root.currentTab === "display"
                     
                 }
             }
@@ -685,7 +691,7 @@ PanelWindow {
         anchors.fill: parent
         z: -1
         onClicked: {
-            root.controlCenterVisible = false
+            controlCenterVisible = false
         }
     }
 }

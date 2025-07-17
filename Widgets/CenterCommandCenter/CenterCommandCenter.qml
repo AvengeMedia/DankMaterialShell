@@ -9,12 +9,12 @@ import qs.Common
 import qs.Services
 
 PanelWindow {
-    id: centerCommandCenter
+    id: root
     
-    property var theme: Theme
     readonly property bool hasActiveMedia: MprisController.activePlayer !== null
+    property bool calendarVisible: false
     
-    visible: root.calendarVisible
+    visible: calendarVisible
     
     implicitWidth: 480
     implicitHeight: 600
@@ -48,15 +48,15 @@ PanelWindow {
         }
         
         function calculateHeight() {
-            let contentHeight = theme.spacingM * 2 // margins
+            let contentHeight = Theme.spacingM * 2 // margins
             
             // Main row with widgets and calendar
             let widgetHeight = 160  // Media widget always present
-            widgetHeight += 140 + theme.spacingM  // Weather widget always present
+            widgetHeight += 140 + Theme.spacingM  // Weather widget always present
             let calendarHeight = 300
             let mainRowHeight = Math.max(widgetHeight, calendarHeight)
             
-            contentHeight += mainRowHeight + theme.spacingM // Add spacing between main row and events
+            contentHeight += mainRowHeight + Theme.spacingM
             
             // Add events widget height - use calculated height instead of actual
             if (CalendarService && CalendarService.khalAvailable) {
@@ -68,9 +68,9 @@ PanelWindow {
             return Math.min(contentHeight, parent.height * 0.9)
         }
         
-        color: theme.surfaceContainer
-        radius: theme.cornerRadiusLarge
-        border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
+        color: Theme.surfaceContainer
+        radius: Theme.cornerRadiusLarge
+        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
         layer.enabled: true
@@ -85,27 +85,27 @@ PanelWindow {
         
         Rectangle {
             anchors.fill: parent
-            color: Qt.rgba(theme.surfaceTint.r, theme.surfaceTint.g, theme.surfaceTint.b, 0.04)
+            color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
             radius: parent.radius
             
             SequentialAnimation on opacity {
-                running: root.calendarVisible
+                running: calendarVisible
                 loops: Animation.Infinite
                 NumberAnimation {
                     to: 0.08
-                    duration: theme.extraLongDuration
-                    easing.type: theme.standardEasing
+                    duration: Theme.extraLongDuration
+                    easing.type: Theme.standardEasing
                 }
                 NumberAnimation {
                     to: 0.02
-                    duration: theme.extraLongDuration
-                    easing.type: theme.standardEasing
+                    duration: Theme.extraLongDuration
+                    easing.type: Theme.standardEasing
                 }
             }
         }
         
-        opacity: root.calendarVisible ? 1.0 : 0.0
-        scale: root.calendarVisible ? 1.0 : 0.92
+        opacity: calendarVisible ? 1.0 : 0.0
+        scale: calendarVisible ? 1.0 : 0.92
         
         // Update height when calendar service events change
         Connections {
@@ -130,47 +130,47 @@ PanelWindow {
         
         Behavior on opacity {
             NumberAnimation {
-                duration: theme.longDuration
-                easing.type: theme.emphasizedEasing
+                duration: Theme.longDuration
+                easing.type: Theme.emphasizedEasing
             }
         }
         
         Behavior on scale {
             NumberAnimation {
-                duration: theme.longDuration
-                easing.type: theme.emphasizedEasing
+                duration: Theme.longDuration
+                easing.type: Theme.emphasizedEasing
             }
         }
         
         Behavior on height {
             NumberAnimation {
-                duration: theme.mediumDuration
-                easing.type: theme.standardEasing
+                duration: Theme.mediumDuration
+                easing.type: Theme.standardEasing
             }
         }
         
         Column {
             anchors.fill: parent
-            anchors.margins: theme.spacingM
-            spacing: theme.spacingM
+            anchors.margins: Theme.spacingM
+            spacing: Theme.spacingM
             
             // Main row with widgets and calendar
             Row {
                 width: parent.width
                 height: {
                     let widgetHeight = 160  // Media widget always present
-                    widgetHeight += 140 + theme.spacingM  // Weather widget always present
+                    widgetHeight += 140 + Theme.spacingM  // Weather widget always present
                     let calendarHeight = 300
                     return Math.max(widgetHeight, calendarHeight)
                 }
-                spacing: theme.spacingM
+                spacing: Theme.spacingM
                 
                 // Left section for widgets
                 Column {
                     id: leftWidgets
                     width: hasAnyWidgets ? parent.width * 0.45 : 0
                     height: childrenRect.height
-                    spacing: theme.spacingM
+                    spacing: Theme.spacingM
                     visible: hasAnyWidgets
                     anchors.top: parent.top
                     
@@ -180,23 +180,20 @@ PanelWindow {
                         visible: true  // Always visible - shows placeholder when no media
                         width: parent.width
                         height: 160
-                        theme: centerCommandCenter.theme
                     }
                     
                     WeatherWidget {
                         visible: true  // Always visible - shows placeholder when no weather
                         width: parent.width
                         height: 140
-                        theme: centerCommandCenter.theme
                     }
                 }
                 
                 // Right section for calendar
                 CalendarWidget {
                     id: calendarWidget
-                    width: leftWidgets.hasAnyWidgets ? parent.width * 0.55 - theme.spacingL : parent.width
+                    width: leftWidgets.hasAnyWidgets ? parent.width * 0.55 - Theme.spacingL : parent.width
                     height: parent.height
-                    theme: centerCommandCenter.theme
                 }
             }
             
@@ -204,7 +201,6 @@ PanelWindow {
             EventsWidget {
                 id: eventsWidget
                 width: parent.width
-                theme: centerCommandCenter.theme
                 selectedDate: calendarWidget.selectedDate
                 
             }
@@ -215,7 +211,7 @@ PanelWindow {
         anchors.fill: parent
         z: -1
         onClicked: {
-            root.calendarVisible = false
+            calendarVisible = false
         }
     }
 }

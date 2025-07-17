@@ -7,9 +7,6 @@ import Quickshell.Io
 Singleton {
     id: root
     
-    // Reference to the main shell root for calling functions
-    property var rootObj: null
-    
     // Initialize theme system
     Component.onCompleted: {
         console.log("Theme Component.onCompleted")
@@ -607,6 +604,21 @@ Singleton {
             case "balanced": return "Balance power and performance"
             case "performance": return "Prioritize performance"
             default: return "Custom power profile"
+        }
+    }
+    
+    // Wallpaper IPC handler
+    IpcHandler {
+        target: "wallpaper"
+        
+        function refresh() {
+            console.log("Wallpaper IPC: refresh() called")
+            // Trigger color extraction if using dynamic theme
+            if (typeof Theme !== "undefined" && Theme.isDynamicTheme) {
+                console.log("Triggering color extraction due to wallpaper IPC")
+                Colors.extractColors()
+            }
+            return "WALLPAPER_REFRESH_SUCCESS"
         }
     }
 }

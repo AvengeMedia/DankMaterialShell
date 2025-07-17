@@ -7,9 +7,14 @@ import Quickshell.Io
 import qs.Common
 
 PanelWindow {
-    id: powerConfirmDialog
+    id: root
     
-    visible: root.powerConfirmVisible
+    property bool powerConfirmVisible: false
+    property string powerConfirmAction: ""
+    property string powerConfirmTitle: ""
+    property string powerConfirmMessage: ""
+    
+    visible: powerConfirmVisible
     
     implicitWidth: 400
     implicitHeight: 300
@@ -43,8 +48,8 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         border.width: 1
         
-        opacity: root.powerConfirmVisible ? 1.0 : 0.0
-        scale: root.powerConfirmVisible ? 1.0 : 0.9
+        opacity: powerConfirmVisible ? 1.0 : 0.0
+        scale: powerConfirmVisible ? 1.0 : 0.9
         
         Behavior on opacity {
             NumberAnimation {
@@ -67,10 +72,10 @@ PanelWindow {
             
             // Title
             Text {
-                text: root.powerConfirmTitle
+                text: powerConfirmTitle
                 font.pixelSize: Theme.fontSizeLarge
                 color: {
-                    switch(root.powerConfirmAction) {
+                    switch(powerConfirmAction) {
                         case "poweroff": return Theme.error
                         case "reboot": return Theme.warning
                         default: return Theme.surfaceText
@@ -83,7 +88,7 @@ PanelWindow {
             
             // Message
             Text {
-                text: root.powerConfirmMessage
+                text: powerConfirmMessage
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 width: parent.width
@@ -119,7 +124,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerConfirmVisible = false
+                            powerConfirmVisible = false
                         }
                     }
                 }
@@ -131,7 +136,7 @@ PanelWindow {
                     radius: Theme.cornerRadius
                     color: {
                         let baseColor
-                        switch(root.powerConfirmAction) {
+                        switch(powerConfirmAction) {
                             case "poweroff": baseColor = Theme.error; break
                             case "reboot": baseColor = Theme.warning; break
                             default: baseColor = Theme.primary; break
@@ -155,8 +160,8 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerConfirmVisible = false
-                            executePowerAction(root.powerConfirmAction)
+                            powerConfirmVisible = false
+                            executePowerAction(powerConfirmAction)
                         }
                     }
                 }

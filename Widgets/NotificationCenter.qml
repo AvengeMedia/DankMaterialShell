@@ -8,10 +8,9 @@ import qs.Common
 import qs.Services
 
 PanelWindow {
-    id: notificationHistoryPopup
+    id: root
     
     property bool notificationHistoryVisible: false
-    signal closeRequested()
     
     visible: notificationHistoryVisible
     
@@ -35,7 +34,7 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            closeRequested()
+            notificationHistoryVisible = false
         }
     }
     
@@ -53,7 +52,7 @@ PanelWindow {
         transform: [
             Scale {
                 id: scaleTransform
-                origin.x: parent.width
+                origin.x: 400  // Use fixed width since popup is 400px wide
                 origin.y: 0
                 xScale: notificationHistoryVisible ? 1.0 : 0.95
                 yScale: notificationHistoryVisible ? 1.0 : 0.8

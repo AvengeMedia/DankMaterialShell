@@ -6,9 +6,15 @@ import Quickshell.Wayland
 import qs.Common
 
 PanelWindow {
-    id: trayMenuPopup
+    id: root
     
-    visible: root.showTrayMenu
+    property bool showTrayMenu: false
+    property real trayMenuX: 0
+    property real trayMenuY: 0
+    property var currentTrayMenu: null
+    property var currentTrayItem: null
+    
+    visible: showTrayMenu
     
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
@@ -25,8 +31,8 @@ PanelWindow {
     
     Rectangle {
         id: menuContainer
-        x: root.trayMenuX
-        y: root.trayMenuY
+        x: trayMenuX
+        y: trayMenuY
         width: Math.max(180, Math.min(300, menuList.maxTextWidth + Theme.spacingL * 2))
         height: Math.max(60, menuList.contentHeight + Theme.spacingS * 2)
         color: Theme.popupBackground()
@@ -47,8 +53,8 @@ PanelWindow {
         }
         
         // Material 3 animations
-        opacity: root.showTrayMenu ? 1.0 : 0.0
-        scale: root.showTrayMenu ? 1.0 : 0.85
+        opacity: showTrayMenu ? 1.0 : 0.0
+        scale: showTrayMenu ? 1.0 : 0.85
         
         Behavior on opacity {
             NumberAnimation {
@@ -70,7 +76,7 @@ PanelWindow {
             
             QsMenuOpener {
                 id: menuOpener
-                menu: root.currentTrayItem ? root.currentTrayItem.menu : null
+                menu: currentTrayItem ? currentTrayItem.menu : null
             }
             
             // Custom menu styling using ListView
@@ -151,7 +157,7 @@ PanelWindow {
                             if (modelData.triggered) {
                                 modelData.triggered()
                             }
-                            root.showTrayMenu = false
+                            showTrayMenu = false
                         }
                     }
                     
@@ -171,7 +177,7 @@ PanelWindow {
         anchors.fill: parent
         z: -1
         onClicked: {
-            root.showTrayMenu = false
+            showTrayMenu = false
         }
     }
 }

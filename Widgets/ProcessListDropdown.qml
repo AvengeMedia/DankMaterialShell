@@ -10,7 +10,7 @@ import qs.Common
 import qs.Services
 
 PanelWindow {
-    id: processDropdown
+    id: processListDropdown
     
     property bool isVisible: false
     property var parentWidget: null
@@ -41,7 +41,7 @@ PanelWindow {
     // Click outside to close
     MouseArea {
         anchors.fill: parent
-        onClicked: processDropdown.hide()
+        onClicked: processListDropdown.hide()
     }
     
     Rectangle {
@@ -63,9 +63,9 @@ PanelWindow {
                 id: scaleTransform
                 origin.x: parent.width * 0.85  // Scale from top-right
                 origin.y: 0
-                xScale: processDropdown.isVisible ? 1.0 : 0.95
-                yScale: processDropdown.isVisible ? 1.0 : 0.8
-                
+                xScale: processListDropdown.isVisible ? 1.0 : 0.95
+                yScale: processListDropdown.isVisible ? 1.0 : 0.8
+
                 Behavior on xScale {
                     NumberAnimation {
                         duration: Theme.mediumDuration
@@ -82,8 +82,8 @@ PanelWindow {
             },
             Translate {
                 id: translateTransform
-                x: processDropdown.isVisible ? 0 : 20
-                y: processDropdown.isVisible ? 0 : -30
+                x: processListDropdown.isVisible ? 0 : 20
+                y: processListDropdown.isVisible ? 0 : -30
                 
                 Behavior on x {
                     NumberAnimation {
@@ -101,7 +101,7 @@ PanelWindow {
             }
         ]
         
-        opacity: processDropdown.isVisible ? 1.0 : 0.0
+        opacity: processListDropdown.isVisible ? 1.0 : 0.0
         
         // Add shadow effect
         layer.enabled: true
@@ -111,7 +111,7 @@ PanelWindow {
             shadowVerticalOffset: 8
             shadowBlur: 1.0
             shadowColor: Qt.rgba(0, 0, 0, 0.15)
-            shadowOpacity: processDropdown.isVisible ? 0.15 : 0
+            shadowOpacity: processListDropdown.isVisible ? 0.15 : 0
         }
         
         Behavior on opacity {

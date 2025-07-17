@@ -7,13 +7,12 @@ import qs.Services
 Rectangle {
     id: weatherWidget
     
-    property var theme: Theme
     
     width: parent.width
     height: parent.height
-    radius: theme.cornerRadiusLarge
-    color: Qt.rgba(theme.surfaceContainer.r, theme.surfaceContainer.g, theme.surfaceContainer.b, 0.4)
-    border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
+    radius: Theme.cornerRadiusLarge
+    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.4)
+    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 1
     
     layer.enabled: true
@@ -29,21 +28,21 @@ Rectangle {
     // Placeholder when no weather - centered in entire widget
     Column {
         anchors.centerIn: parent
-        spacing: theme.spacingS
+        spacing: Theme.spacingS
         visible: !WeatherService.weather.available || WeatherService.weather.temp === 0
         
         Text {
             text: "cloud_off"
-            font.family: theme.iconFont
-            font.pixelSize: theme.iconSize + 8
-            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+            font.family: Theme.iconFont
+            font.pixelSize: Theme.iconSize + 8
+            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             anchors.horizontalCenter: parent.horizontalCenter
         }
         
         Text {
             text: "No Weather Data"
-            font.pixelSize: theme.fontSizeMedium
-            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+            font.pixelSize: Theme.fontSizeMedium
+            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
@@ -51,8 +50,8 @@ Rectangle {
     // Weather content when available - original Column structure
     Column {
         anchors.fill: parent
-        anchors.margins: theme.spacingL
-        spacing: theme.spacingS
+        anchors.margins: Theme.spacingL
+        spacing: Theme.spacingS
         visible: WeatherService.weather.available && WeatherService.weather.temp !== 0
         
         // Weather header info
@@ -62,25 +61,25 @@ Rectangle {
             
             Row {
                 anchors.centerIn: parent
-                spacing: theme.spacingL
+                spacing: Theme.spacingL
                 
                 // Weather icon
                 Text {
                     text: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.iconSize + 8
-                    color: theme.primary
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.iconSize + 8
+                    color: Theme.primary
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 
                 Column {
-                    spacing: theme.spacingXS
+                    spacing: Theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Text {
                         text: (Prefs.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp) + "°" + (Prefs.useFahrenheit ? "F" : "C")
-                        font.pixelSize: theme.fontSizeXLarge
-                        color: theme.surfaceText
+                        font.pixelSize: Theme.fontSizeXLarge
+                        color: Theme.surfaceText
                         font.weight: Font.Light
                         
                         MouseArea {
@@ -94,8 +93,8 @@ Rectangle {
                     
                     Text {
                         text: WeatherService.weather.city || ""
-                        font.pixelSize: theme.fontSizeMedium
-                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         visible: text.length > 0
                     }
                 }
@@ -105,73 +104,73 @@ Rectangle {
         // Weather details grid
         Grid {
             columns: 2
-            spacing: theme.spacingM
+            spacing: Theme.spacingM
             anchors.horizontalCenter: parent.horizontalCenter
             
             Row {
-                spacing: theme.spacingXS
+                spacing: Theme.spacingXS
                 Text {
                     text: "humidity_low"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     text: WeatherService.weather.humidity ? WeatherService.weather.humidity + "%" : "--"
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
             
             Row {
-                spacing: theme.spacingXS
+                spacing: Theme.spacingXS
                 Text {
                     text: "air"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     text: WeatherService.weather.wind || "--"
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
             
             Row {
-                spacing: theme.spacingXS
+                spacing: Theme.spacingXS
                 Text {
                     text: "wb_twilight"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     text: WeatherService.weather.sunrise || "--"
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
             
             Row {
-                spacing: theme.spacingXS
+                spacing: Theme.spacingXS
                 Text {
                     text: "bedtime"
-                    font.family: theme.iconFont
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.family: Theme.iconFont
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
                     text: WeatherService.weather.sunset || "--"
-                    font.pixelSize: theme.fontSizeSmall
-                    color: theme.surfaceText
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
