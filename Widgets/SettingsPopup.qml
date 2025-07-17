@@ -466,6 +466,12 @@ PanelWindow {
                                 checked: Prefs.showSystemTray
                                 onToggled: (checked) => Prefs.setShowSystemTray(checked)
                             }
+                            SettingsToggle {
+                                text: "Workspace Index Numbers"
+                                description: "Show index numbers on workspace switcher buttons"
+                                checked: Prefs.showWorkspaceIndex
+                                onToggled: (checked) => Prefs.setShowWorkspaceIndex(checked)
+                            }
                         }
                     }
                     

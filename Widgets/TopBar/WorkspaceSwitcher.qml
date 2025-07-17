@@ -10,7 +10,7 @@ Rectangle {
     
     width: Math.max(120, workspaceRow.implicitWidth + Theme.spacingL * 2)
     height: 30
-    radius: Theme.cornerRadiusLarge
+    radius: Theme.cornerRadius
     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
     visible: NiriWorkspaceService.niriAvailable
     
@@ -87,11 +87,19 @@ Rectangle {
                 property int sequentialNumber: index + 1
                 
                 width: isActive ? Theme.spacingXL + Theme.spacingM : Theme.spacingL + Theme.spacingXS
-                height: Theme.spacingM
+                height: Theme.spacingL
                 radius: height / 2
                 color: isActive ? Theme.primary : 
                        isHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.5) :
                        Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3)
+                Text {
+                    anchors.centerIn: parent
+                    text: sequentialNumber
+                    color: Theme.surfaceText
+                    font.bold: isActive
+                    font.pixelSize: Theme.fontSizeM
+                    visible: Prefs.showWorkspaceIndex
+                }
                 
                 Behavior on width {
                     NumberAnimation {
