@@ -31,19 +31,6 @@ PanelWindow {
     }
     
     // Properties exposed to shell
-    property bool hasActiveMedia: false
-    property var activePlayer: null
-    property bool weatherAvailable: false
-    property string weatherCode: ""
-    property int weatherTemp: 0
-    property int weatherTempF: 0
-    property string osLogo: ""
-    property string networkStatus: "disconnected"
-    property string wifiSignalStrength: "good"
-    property int volumeLevel: 50
-    property bool volumeMuted: false
-    property bool bluetoothAvailable: false
-    property bool bluetoothEnabled: false
     
     // Shell reference to access root properties directly
     property var shellRoot: null
@@ -155,7 +142,6 @@ PanelWindow {
                 
                 LauncherButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    osLogo: topBar.osLogo
                 }
                 
                 WorkspaceSwitcher {
@@ -184,9 +170,7 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: clockWidget.left
                 anchors.rightMargin: Theme.spacingS
-                activePlayer: topBar.activePlayer
-                hasActiveMedia: topBar.hasActiveMedia
-                visible: Prefs.showMusic && topBar.hasActiveMedia
+                visible: Prefs.showMusic && MprisController.activePlayer
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -201,11 +185,7 @@ PanelWindow {
                 anchors.left: clockWidget.right
                 anchors.leftMargin: Theme.spacingS
                 
-                weatherAvailable: topBar.weatherAvailable
-                weatherCode: topBar.weatherCode
-                weatherTemp: topBar.weatherTemp
-                weatherTempF: topBar.weatherTempF
-                visible: Prefs.showWeather && topBar.weatherAvailable && topBar.weatherTemp > 0 && topBar.weatherTempF > 0
+                visible: Prefs.showWeather && WeatherService.weather.available && WeatherService.weather.temp > 0 && WeatherService.weather.tempF > 0
                 
                 onClicked: {
                     if (topBar.shellRoot) {
@@ -307,12 +287,6 @@ PanelWindow {
                 
                 ControlCenterButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    networkStatus: topBar.networkStatus
-                    wifiSignalStrength: topBar.wifiSignalStrength
-                    volumeLevel: topBar.volumeLevel
-                    volumeMuted: topBar.volumeMuted
-                    bluetoothAvailable: topBar.bluetoothAvailable
-                    bluetoothEnabled: topBar.bluetoothEnabled
                     isActive: topBar.shellRoot ? topBar.shellRoot.controlCenterVisible : false
                     
                     onClicked: {

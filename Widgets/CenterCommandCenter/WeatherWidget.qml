@@ -8,7 +8,6 @@ Rectangle {
     id: weatherWidget
     
     property var theme: Theme
-    property var weather
     
     width: parent.width
     height: parent.height
@@ -31,26 +30,18 @@ Rectangle {
     Column {
         anchors.centerIn: parent
         spacing: theme.spacingS
-        visible: !weather || !weather.available || weather.temp === 0
+        visible: !WeatherService.weather.available || WeatherService.weather.temp === 0
         
         Text {
-            text: weather && weather.loading ? "cloud_sync" : "cloud_off"
+            text: "cloud_off"
             font.family: theme.iconFont
             font.pixelSize: theme.iconSize + 8
             color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
             anchors.horizontalCenter: parent.horizontalCenter
-            
-            RotationAnimation on rotation {
-                from: 0
-                to: 360
-                duration: 2000
-                running: weather && weather.loading
-                loops: Animation.Infinite
-            }
         }
         
         Text {
-            text: weather && weather.loading ? "Loading Weather..." : "No Weather Data"
+            text: "No Weather Data"
             font.pixelSize: theme.fontSizeMedium
             color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -62,7 +53,7 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: theme.spacingL
         spacing: theme.spacingS
-        visible: weather && weather.available && weather.temp !== 0
+        visible: WeatherService.weather.available && WeatherService.weather.temp !== 0
         
         // Weather header info
         Item {
@@ -70,12 +61,12 @@ Rectangle {
             height: 60
             
             Row {
-                anchors.fill: parent
+                anchors.centerIn: parent
                 spacing: theme.spacingL
                 
                 // Weather icon
                 Text {
-                    text: weather ? WeatherService.getWeatherIcon(weather.wCode) : ""
+                    text: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
                     font.family: theme.iconFont
                     font.pixelSize: theme.iconSize + 8
                     color: theme.primary
@@ -87,7 +78,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     
                     Text {
-                        text: weather ? ((Prefs.useFahrenheit ? weather.tempF : weather.temp) + "°" + (Prefs.useFahrenheit ? "F" : "C")) : ""
+                        text: (Prefs.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp) + "°" + (Prefs.useFahrenheit ? "F" : "C")
                         font.pixelSize: theme.fontSizeXLarge
                         color: theme.surfaceText
                         font.weight: Font.Light
@@ -96,13 +87,13 @@ Rectangle {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: if (weather) Prefs.setTemperatureUnit(!Prefs.useFahrenheit)
-                            enabled: weather !== null
+                            onClicked: if (WeatherService.weather.available) Prefs.setTemperatureUnit(!Prefs.useFahrenheit)
+                            enabled: WeatherService.weather.available
                         }
                     }
                     
                     Text {
-                        text: weather ? weather.city : ""
+                        text: WeatherService.weather.city || ""
                         font.pixelSize: theme.fontSizeMedium
                         color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
                         visible: text.length > 0
@@ -127,7 +118,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather ? weather.humidity + "%" : "--"
+                    text: WeatherService.weather.humidity ? WeatherService.weather.humidity + "%" : "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -144,7 +135,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather ? weather.wind : "--"
+                    text: WeatherService.weather.wind || "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -161,7 +152,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather ? weather.sunrise : "--"
+                    text: WeatherService.weather.sunrise || "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -178,7 +169,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 Text {
-                    text: weather ? weather.sunset : "--"
+                    text: WeatherService.weather.sunset || "--"
                     font.pixelSize: theme.fontSizeSmall
                     color: theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter

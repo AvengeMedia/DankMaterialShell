@@ -12,25 +12,7 @@ PanelWindow {
     id: centerCommandCenter
     
     property var theme: Theme
-    property bool hasActiveMedia: root.hasActiveMedia
-    property var weather: root.weather
-    
-    property bool showMediaPlayer: hasActiveMedia || hideMediaTimer.running
-    
-    Timer {
-        id: hideMediaTimer
-        interval: 3000
-        running: false
-        repeat: false
-    }
-    
-    onHasActiveMediaChanged: {
-        if (hasActiveMedia) {
-            hideMediaTimer.stop()
-        } else {
-            hideMediaTimer.start()
-        }
-    }
+    readonly property bool hasActiveMedia: MprisController.activePlayer !== null
     
     visible: root.calendarVisible
     
@@ -70,7 +52,7 @@ PanelWindow {
             
             // Main row with widgets and calendar
             let widgetHeight = 160  // Media widget always present
-            widgetHeight += (weather ? 140 : 80) + theme.spacingM  // Weather widget always present
+            widgetHeight += 140 + theme.spacingM  // Weather widget always present
             let calendarHeight = 300
             let mainRowHeight = Math.max(widgetHeight, calendarHeight)
             
@@ -177,7 +159,7 @@ PanelWindow {
                 width: parent.width
                 height: {
                     let widgetHeight = 160  // Media widget always present
-                    widgetHeight += (weather ? 140 : 80) + theme.spacingM  // Weather widget always present
+                    widgetHeight += 140 + theme.spacingM  // Weather widget always present
                     let calendarHeight = 300
                     return Math.max(widgetHeight, calendarHeight)
                 }
@@ -204,9 +186,8 @@ PanelWindow {
                     WeatherWidget {
                         visible: true  // Always visible - shows placeholder when no weather
                         width: parent.width
-                        height: weather ? 140 : 80
+                        height: 140
                         theme: centerCommandCenter.theme
-                        weather: centerCommandCenter.weather
                     }
                 }
                 

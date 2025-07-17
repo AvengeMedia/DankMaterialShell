@@ -33,9 +33,9 @@ PanelWindow {
     property bool powerOptionsExpanded: false
     
     Rectangle {
-        width: Math.min(600, parent.width - Theme.spacingL * 2)
+        width: Math.min(600, Screen.width - Theme.spacingL * 2)
         height: controlCenterPopup.powerOptionsExpanded ? 570 : 500
-        x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
+        x: Math.max(Theme.spacingL, Screen.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge
@@ -560,7 +560,7 @@ PanelWindow {
                             tabs.push({name: "Audio", icon: "volume_up", id: "audio", available: true})
                             
                             // Show Bluetooth only if available
-                            if (root.bluetoothAvailable) {
+                            if (BluetoothService.available) {
                                 tabs.push({name: "Bluetooth", icon: "bluetooth", id: "bluetooth", available: true})
                             }
                             
@@ -573,7 +573,7 @@ PanelWindow {
                         Rectangle {
                             property int tabCount: {
                                 let count = 3 // Network + Audio + Display (always visible)
-                                if (root.bluetoothAvailable) count++
+                                if (BluetoothService.available) count++
                                 return count
                             }
                             width: (parent.width - Theme.spacingXS * (tabCount - 1)) / tabCount
@@ -646,26 +646,10 @@ PanelWindow {
                     anchors.margins: Theme.spacingM
                     visible: controlCenterPopup.currentTab === "network"
                     
-                    // Bind properties from root
-                    networkStatus: root.networkStatus
-                    wifiAvailable: root.wifiAvailable
-                    wifiEnabled: root.wifiEnabled
-                    wifiToggling: root.wifiToggling
-                    ethernetIP: root.ethernetIP
-                    ethernetInterface: root.ethernetInterface
-                    ethernetConnected: root.ethernetConnected
-                    currentWifiSSID: root.currentWifiSSID
-                    wifiIP: root.wifiIP
-                    wifiSignalStrength: root.wifiSignalStrength
-                    wifiNetworks: root.wifiNetworks
-                    wifiScanning: root.wifiScanning
-                    wifiConnectionStatus: root.wifiConnectionStatus
                     wifiPasswordSSID: root.wifiPasswordSSID
                     wifiPasswordInput: root.wifiPasswordInput
                     wifiPasswordDialogVisible: root.wifiPasswordDialogVisible
-                    changingNetworkPreference: root.changingNetworkPreference
                     
-                    // Bind the auto-refresh flag
                     onWifiAutoRefreshEnabledChanged: {
                         root.wifiAutoRefreshEnabled = wifiAutoRefreshEnabled
                     }
@@ -682,11 +666,7 @@ PanelWindow {
                 BluetoothTab {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
-                    visible: root.bluetoothAvailable && controlCenterPopup.currentTab === "bluetooth"
-                    
-                    // Bind properties from root
-                    bluetoothEnabled: root.bluetoothEnabled
-                    bluetoothDevices: root.bluetoothDevices
+                    visible: BluetoothService.available && controlCenterPopup.currentTab === "bluetooth"
                 }
                 
                 // Display Tab

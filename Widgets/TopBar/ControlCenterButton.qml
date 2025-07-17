@@ -5,12 +5,6 @@ import qs.Services
 Rectangle {
     id: root
     
-    property string networkStatus: "disconnected"
-    property string wifiSignalStrength: "good"
-    property int volumeLevel: 50
-    property bool volumeMuted: false
-    property bool bluetoothAvailable: false
-    property bool bluetoothEnabled: false
     property bool isActive: false
     
     signal clicked()
@@ -30,9 +24,9 @@ Rectangle {
         // Network Status Icon
         Text {
             text: {
-                if (root.networkStatus === "ethernet") return "lan"
-                else if (root.networkStatus === "wifi") {
-                    switch (root.wifiSignalStrength) {
+                if (NetworkService.networkStatus === "ethernet") return "lan"
+                else if (NetworkService.networkStatus === "wifi") {
+                    switch (WifiService.wifiSignalStrength) {
                         case "excellent": return "wifi"
                         case "good": return "wifi_2_bar"
                         case "fair": return "wifi_1_bar"
@@ -45,7 +39,7 @@ Rectangle {
             font.family: Theme.iconFont
             font.pixelSize: Theme.iconSize - 8
             font.weight: Theme.iconFontWeight
-            color: root.networkStatus !== "disconnected" ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            color: NetworkService.networkStatus !== "disconnected" ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             anchors.verticalCenter: parent.verticalCenter
             visible: true
         }
@@ -56,9 +50,9 @@ Rectangle {
             font.family: Theme.iconFont
             font.pixelSize: Theme.iconSize - 8
             font.weight: Theme.iconFontWeight
-            color: root.bluetoothEnabled ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
+            color: BluetoothService.enabled ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             anchors.verticalCenter: parent.verticalCenter
-            visible: root.bluetoothAvailable && root.bluetoothEnabled
+            visible: BluetoothService.available && BluetoothService.enabled
         }
         
         // Audio Icon with scroll wheel support
@@ -70,8 +64,8 @@ Rectangle {
             
             Text {
                 id: audioIcon
-                text: root.volumeMuted ? "volume_off" : 
-                      root.volumeLevel < 33 ? "volume_down" : "volume_up"
+                text: AudioService.sinkMuted ? "volume_off" : 
+                      AudioService.volumeLevel < 33 ? "volume_down" : "volume_up"
                 font.family: Theme.iconFont
                 font.pixelSize: Theme.iconSize - 8
                 font.weight: Theme.iconFontWeight
@@ -88,7 +82,7 @@ Rectangle {
                 
                 onWheel: function(wheelEvent) {
                     let delta = wheelEvent.angleDelta.y
-                    let currentVolume = root.volumeLevel
+                    let currentVolume = AudioService.volumeLevel
                     let newVolume
                     
                     if (delta > 0) {

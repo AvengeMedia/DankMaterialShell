@@ -70,7 +70,7 @@ PanelWindow {
             
             QsMenuOpener {
                 id: menuOpener
-                menu: root.currentTrayItem?.menu
+                menu: root.currentTrayItem ? root.currentTrayItem.menu : null
             }
             
             // Custom menu styling using ListView

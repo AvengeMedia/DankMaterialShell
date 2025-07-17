@@ -12,6 +12,32 @@ Rectangle {
     property MprisPlayer activePlayer: MprisController.activePlayer
     property var theme: Theme
     
+    property string lastValidTitle: ""
+    property string lastValidArtist: ""
+    property string lastValidAlbum: ""
+    property string lastValidArtUrl: ""
+    
+    Timer {
+        id: clearCacheTimer
+        interval: 2000
+        onTriggered: {
+            if (!activePlayer) {
+                lastValidTitle = ""
+                lastValidArtist = ""
+                lastValidAlbum = ""
+                lastValidArtUrl = ""
+            }
+        }
+    }
+    
+    onActivePlayerChanged: {
+        if (!activePlayer) {
+            clearCacheTimer.restart()
+        } else {
+            clearCacheTimer.stop()
+        }
+    }
+    
     width: parent.width
     height: parent.height
     radius: theme.cornerRadiusLarge
@@ -49,15 +75,6 @@ Rectangle {
         }
     }
     
-    // Initialize when player changes
-    onActivePlayerChanged: {
-        if (activePlayer) {
-            currentPosition = activePlayer.position || 0
-        } else {
-            currentPosition = 0
-        }
-    }
-    
     // Backend events
     Connections {
         target: activePlayer
@@ -85,7 +102,7 @@ Rectangle {
         Column {
             anchors.centerIn: parent
             spacing: theme.spacingS
-            visible: !activePlayer || !activePlayer.trackTitle || activePlayer.trackTitle === ""
+            visible: (!activePlayer && !lastValidTitle) || (activePlayer && activePlayer.trackTitle === "" && lastValidTitle === "")
             
             Text {
                 text: "music_note"
@@ -107,7 +124,7 @@ Rectangle {
         Column {
             anchors.fill: parent
             spacing: theme.spacingS
-            visible: activePlayer && activePlayer.trackTitle && activePlayer.trackTitle !== ""
+            visible: activePlayer && activePlayer.trackTitle !== "" || lastValidTitle !== ""
             
                 // Normal media info when playing
                 Row {
@@ -129,7 +146,12 @@ Rectangle {
                         Image {
                             id: albumArt
                             anchors.fill: parent
-                            source: activePlayer?.trackArtUrl || ""
+                            source: activePlayer?.trackArtUrl || lastValidArtUrl || ""
+                            onSourceChanged: {
+                                if (activePlayer?.trackArtUrl) {
+                                    lastValidArtUrl = activePlayer.trackArtUrl;
+                                }
+                            }
                             fillMode: Image.PreserveAspectCrop
                             smooth: true
                         }
@@ -157,7 +179,12 @@ Rectangle {
                     spacing: theme.spacingXS
                     
                     Text {
-                        text: activePlayer?.trackTitle || "Unknown Track"
+                        text: activePlayer?.trackTitle || lastValidTitle || "Unknown Track"
+                        onTextChanged: {
+                            if (activePlayer?.trackTitle) {
+                                lastValidTitle = activePlayer.trackTitle;
+                            }
+                        }
                         font.pixelSize: theme.fontSizeMedium
                         font.weight: Font.Bold
                         color: theme.surfaceText
@@ -166,7 +193,12 @@ Rectangle {
                     }
                     
                     Text {
-                        text: activePlayer?.trackArtist || "Unknown Artist"
+                        text: activePlayer?.trackArtist || lastValidArtist || "Unknown Artist"
+                        onTextChanged: {
+                            if (activePlayer?.trackArtist) {
+                                lastValidArtist = activePlayer.trackArtist;
+                            }
+                        }
                         font.pixelSize: theme.fontSizeSmall
                         color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.8)
                         width: parent.width
@@ -174,7 +206,12 @@ Rectangle {
                     }
                     
                     Text {
-                        text: activePlayer?.trackAlbum || ""
+                        text: activePlayer?.trackAlbum || lastValidAlbum || ""
+                        onTextChanged: {
+                            if (activePlayer?.trackAlbum) {
+                                lastValidAlbum = activePlayer.trackAlbum;
+                            }
+                        }
                         font.pixelSize: theme.fontSizeSmall
                         color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.6)
                         width: parent.width

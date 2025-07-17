@@ -27,9 +27,7 @@ Singleton {
         target: Pipewire
         function onReadyChanged() { _rebuildModels() }
         function onDefaultAudioSinkChanged() { _rebuildModels() }
-        function onDefaultAudioSourceChanged() { _rebuildModels() }        
-        function onNodeAdded() { _rebuildModels() }
-        function onNodeRemoved() { _rebuildModels() }
+        function onDefaultAudioSourceChanged() { _rebuildModels() }
     }
     
     Timer {

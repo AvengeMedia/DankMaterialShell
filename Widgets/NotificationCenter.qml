@@ -42,7 +42,7 @@ PanelWindow {
     Rectangle {
         width: 400
         height: 500
-        x: parent.width - width - Theme.spacingL
+        x: Screen.width - width - Theme.spacingL
         y: Theme.barHeight + Theme.spacingXS
         color: Theme.popupBackground()
         radius: Theme.cornerRadiusLarge

@@ -5,10 +5,6 @@ import qs.Services
 Rectangle {
     id: root
     
-    property bool weatherAvailable: false
-    property string weatherCode: ""
-    property int weatherTemp: 0
-    property int weatherTempF: 0
     
     signal clicked()
     
@@ -40,7 +36,7 @@ Rectangle {
         spacing: Theme.spacingXS
         
         Text {
-            text: WeatherService.getWeatherIcon(weatherCode)
+            text: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
             font.family: Theme.iconFont
             font.pixelSize: Theme.iconSize - 4
             color: Theme.primary
@@ -48,7 +44,7 @@ Rectangle {
         }
         
         Text {
-            text: (Prefs.useFahrenheit ? weatherTempF : weatherTemp) + "°" + (Prefs.useFahrenheit ? "F" : "C")
+            text: (Prefs.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp) + "°" + (Prefs.useFahrenheit ? "F" : "C")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             font.weight: Font.Medium

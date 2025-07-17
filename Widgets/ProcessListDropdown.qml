@@ -46,9 +46,9 @@ PanelWindow {
     
     Rectangle {
         id: dropdownContent
-        width: Math.min(600, parent.width - Theme.spacingL * 2)
-        height: Math.min(600, parent.height - Theme.barHeight - Theme.spacingS * 2)
-        x: Math.max(Theme.spacingL, parent.width - width - Theme.spacingL)
+        width: Math.min(600, Screen.width - Theme.spacingL * 2)
+        height: Math.min(600, Screen.height - Theme.barHeight - Theme.spacingS * 2)
+        x: Math.max(Theme.spacingL, Screen.width - width - Theme.spacingL)
         y: Theme.barHeight + Theme.spacingXS
         
         radius: Theme.cornerRadiusLarge

@@ -7,7 +7,7 @@ import Quickshell.Services.UPower
 Singleton {
     id: root
     
-    readonly property var device: UPower.displayDevice
+    readonly property UPowerDevice device: UPower.displayDevice
     readonly property bool batteryAvailable: device && device.ready && device.isLaptopBattery
     readonly property int batteryLevel: batteryAvailable ? device.percentage * 100.0 : 0
     readonly property bool isCharging: batteryAvailable && device.state === UPowerDeviceState.Charging
