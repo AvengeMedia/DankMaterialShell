@@ -200,7 +200,91 @@ Singleton {
     function getGroupKey(wrapper) {
         const appName = wrapper.appName.toLowerCase();
         
-        // Group by app only - one group per unique application
+        // Enhanced grouping for conversation apps
+        if (wrapper.isConversation) {
+            const summary = wrapper.summary.toLowerCase();
+            const body = wrapper.body.toLowerCase();
+            
+            // Discord: Group by channel or conversation
+            if (appName.includes("discord") || appName.includes("vesktop")) {
+                // Channel notifications: "#general", "#announcements"
+                if (summary.includes("#")) {
+                    const channelMatch = summary.match(/#[\w-]+/);
+                    if (channelMatch) {
+                        return `${appName}:${channelMatch[0]}`;
+                    }
+                }
+                // Direct messages: group by sender
+                if (summary && !summary.includes("new message") && !summary.includes("notification")) {
+                    return `${appName}:dm:${summary}`;
+                }
+                // Server messages or general
+                return `${appName}:messages`;
+            }
+            
+            // Telegram: Group by chat/channel
+            if (appName.includes("telegram")) {
+                if (summary && !summary.includes("new message")) {
+                    return `${appName}:${summary}`;
+                }
+                return `${appName}:messages`;
+            }
+            
+            // Signal: Group by conversation
+            if (appName.includes("signal")) {
+                if (summary && !summary.includes("new message")) {
+                    return `${appName}:${summary}`;
+                }
+                return `${appName}:messages`;
+            }
+            
+            // WhatsApp: Group by contact/group
+            if (appName.includes("whatsapp")) {
+                if (summary && !summary.includes("new message")) {
+                    return `${appName}:${summary}`;
+                }
+                return `${appName}:messages`;
+            }
+            
+            // Slack: Group by channel/DM
+            if (appName.includes("slack")) {
+                if (summary.includes("#")) {
+                    const channelMatch = summary.match(/#[\w-]+/);
+                    if (channelMatch) {
+                        return `${appName}:${channelMatch[0]}`;
+                    }
+                }
+                if (summary && !summary.includes("new message")) {
+                    return `${appName}:dm:${summary}`;
+                }
+                return `${appName}:messages`;
+            }
+            
+            // Default conversation grouping
+            return `${appName}:conversation`;
+        }
+        
+        // Media: Replace previous media notification from same app
+        if (wrapper.isMedia) {
+            return `${appName}:media`;
+        }
+        
+        // System: Group by type
+        if (wrapper.isSystem) {
+            const summary = wrapper.summary.toLowerCase();
+            if (summary.includes("update")) {
+                return "system:updates";
+            }
+            if (summary.includes("battery")) {
+                return "system:battery";
+            }
+            if (summary.includes("network")) {
+                return "system:network";
+            }
+            return "system:general";
+        }
+        
+        // Default: Group by app
         return appName;
     }
 
@@ -295,11 +379,39 @@ Singleton {
         }
         
         if (group.isConversation) {
+            // Extract conversation/channel name from group key
+            const keyParts = group.key.split(":");
+            if (keyParts.length > 1) {
+                const conversationKey = keyParts[keyParts.length - 1];
+                if (conversationKey.startsWith("#")) {
+                    return `${conversationKey}: ${group.count} messages`;
+                }
+                if (keyParts.includes("dm")) {
+                    return `${conversationKey}: ${group.count} messages`;
+                }
+                if (conversationKey !== "messages" && conversationKey !== "conversation") {
+                    return `${conversationKey}: ${group.count} messages`;
+                }
+            }
             return `${group.count} new messages`;
         }
         
         if (group.isMedia) {
             return "Now playing";
+        }
+        
+        if (group.isSystem) {
+            const keyParts = group.key.split(":");
+            if (keyParts.length > 1) {
+                const systemType = keyParts[1];
+                switch (systemType) {
+                    case "updates": return `${group.count} system updates`;
+                    case "battery": return `${group.count} battery notifications`;
+                    case "network": return `${group.count} network notifications`;
+                    default: return `${group.count} system notifications`;
+                }
+            }
+            return `${group.count} system notifications`;
         }
         
         return `${group.count} notifications`;
@@ -311,7 +423,15 @@ Singleton {
         }
         
         if (group.isConversation) {
-            return group.latestNotification.body || "Tap to view messages";
+            const latest = group.latestNotification;
+            if (latest.body && latest.body.length > 0) {
+                return latest.body;
+            }
+            return "Tap to view conversation";
+        }
+        
+        if (group.isMedia) {
+            return group.latestNotification.body || "Media playback";
         }
         
         return `Latest: ${group.latestNotification.summary}`;

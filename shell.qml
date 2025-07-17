@@ -209,7 +209,7 @@ ShellRoot {
     // Global popup windows
     CenterCommandCenter {}
     TrayMenuPopup {}
-    NotificationInit {}
+    NotificationPopup {}
     NotificationCenter {
         notificationHistoryVisible: root.notificationHistoryVisible
         onCloseRequested: {
