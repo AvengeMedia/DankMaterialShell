@@ -49,10 +49,6 @@ ShellRoot {
     onControlCenterVisibleChanged: {
         console.log("Control center", controlCenterVisible ? "opened" : "closed")
         BluetoothService.enableMonitoring(controlCenterVisible)
-        if (controlCenterVisible) {
-            // Refresh devices when opening control center
-            AudioService.updateDevices()
-        }
     }
     property bool batteryPopupVisible: false
     property bool powerMenuVisible: false

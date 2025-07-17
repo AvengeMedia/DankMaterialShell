@@ -15,116 +15,139 @@ Singleton {
     readonly property real volumeLevel: (sink?.audio?.volume ?? 0) * 100
     readonly property real micLevel: (source?.audio?.volume ?? 0) * 100
 
+    property ListModel audioSinksModel: ListModel {}
+    property ListModel audioSourcesModel: ListModel {}
+
     property var audioSinks: []
     property var audioSources: []
 
-    property bool _refreshQueued: false
-
-    Component.onCompleted: {
-        deferRefresh()
-    }
-
-    function deferRefresh() {
-        if (_refreshQueued) return
-        _refreshQueued = true
-        Qt.callLater(function () {
-            _refreshQueued = false
-            updateDevices() 
-        })
-    }
-
-    function updateDevices() {
-        updateAudioSinks()
-        updateAudioSources()
-    }
+    Component.onCompleted: _rebuildModels()
 
     Connections {
         target: Pipewire
-        function onReadyChanged() {
-            if (Pipewire.ready) deferRefresh()
-        }
-        function onDefaultAudioSinkChanged() {
-            deferRefresh()
-        }
-        function onDefaultAudioSourceChanged() {
-            deferRefresh()
-        }
+        function onReadyChanged() { _rebuildModels() }
+        function onDefaultAudioSinkChanged() { _rebuildModels() }
+        function onDefaultAudioSourceChanged() { _rebuildModels() }        
+        function onNodeAdded() { _rebuildModels() }
+        function onNodeRemoved() { _rebuildModels() }
     }
-
-    // Timer to check for node changes since ObjectModel doesn't expose change signals
+    
     Timer {
         interval: 2000
         running: Pipewire.ready
         repeat: true
-        onTriggered: {
-            if (Pipewire.nodes && Pipewire.nodes.values) {
-                let currentCount = Pipewire.nodes.values.length
-                if (currentCount !== lastNodeCount) {
-                    lastNodeCount = currentCount
-                    deferRefresh()
-                }
+        onTriggered: _checkForNodeChanges()
+    }
+    
+    property int _lastNodeCount: 0
+    
+    function _checkForNodeChanges() {
+        if (Pipewire.nodes?.values) {
+            let currentCount = Pipewire.nodes.values.length
+            if (currentCount !== _lastNodeCount) {
+                _lastNodeCount = currentCount
+                _rebuildModels()
             }
         }
     }
 
-    property int lastNodeCount: 0
+    readonly property string currentAudioSink: sink?.name ?? ""
+    readonly property string currentAudioSource: source?.name ?? ""
 
-    function updateAudioSinks() {
-        if (!Pipewire.ready || !Pipewire.nodes) return
+    readonly property string currentSinkDisplayName: {
+        if (!sink) return ""
+        for (let i = 0; i < audioSinksModel.count; i++) {
+            let item = audioSinksModel.get(i)
+            if (item.node === sink) {
+                return item.displayName
+            }
+        }
+        return _displayName(sink)
+    }
 
+    readonly property string currentSourceDisplayName: {
+        if (!source) return ""
+        for (let i = 0; i < audioSourcesModel.count; i++) {
+            let item = audioSourcesModel.get(i)
+            if (item.node === source) {
+                return item.displayName
+            }
+        }
+        return _displayName(source)
+    }
+
+    function setVolume(percentage) {
+        if (sink?.audio) {
+            sink.audio.muted = false
+            sink.audio.volume = percentage / 100
+        }
+    }
+
+    function setMicLevel(percentage) {
+        if (source?.audio) {
+            source.audio.muted = false
+            source.audio.volume = percentage / 100
+        }
+    }
+
+    function toggleMute() {
+        if (sink?.audio) {
+            sink.audio.muted = !sink.audio.muted
+        }
+    }
+
+    function toggleMicMute() {
+        if (source?.audio) {
+            source.audio.muted = !source.audio.muted
+        }
+    }
+
+    function setAudioSink(sinkName) {
+        _setPreferred(sinkName, PwNodeType.AudioSink)
+    }
+
+    function setAudioSource(sourceName) {
+        _setPreferred(sourceName, PwNodeType.AudioSource)
+    }
+
+    function _rebuildModels() {
+        audioSinksModel.clear()
+        audioSourcesModel.clear()
+        
         let sinks = []
-        
-        if (Pipewire.nodes.values) {
-            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-                let node = Pipewire.nodes.values[i]
-                if (!node) continue
-
-                if ((node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
-                    let displayName = getDisplayName(node)
-
-                    sinks.push({
-                        id: node.id.toString(),
-                        name: node.name,
-                        displayName: displayName,
-                        subtitle: getDeviceSubtitle(node.name),
-                        active: node === root.sink,
-                        node: node
-                    })
-                }
-            }
-        }
-
-        audioSinks = sinks
-    }
-
-    function updateAudioSources() {
-        if (!Pipewire.ready || !Pipewire.nodes) return
-
         let sources = []
-        
-        if (Pipewire.nodes.values) {
-            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-                let node = Pipewire.nodes.values[i]
-                if (!node) continue
-                
-                if ((node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream && !node.name.includes('.monitor')) {
-                    sources.push({
-                        id: node.id.toString(),
-                        name: node.name,
-                        displayName: getDisplayName(node),
-                        subtitle: getDeviceSubtitle(node.name),
-                        active: node === root.source,
-                        node: node
-                    })
-                }
+
+        if (!Pipewire.ready || !Pipewire.nodes?.values) return
+
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            let node = Pipewire.nodes.values[i]
+            if (!node || node.isStream) continue
+
+            let entry = {
+                id: node.id.toString(),
+                name: node.name,
+                displayName: _displayName(node),
+                subtitle: _subtitle(node.name),
+                active: node === sink || node === source,
+                node: node
+            }
+
+            if ((node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink) {
+                audioSinksModel.append(entry)
+                sinks.push(entry)
+            }
+            if ((node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.name.includes(".monitor")) {
+                audioSourcesModel.append(entry)
+                sources.push(entry)
             }
         }
+        
+        audioSinks = sinks
         audioSources = sources
     }
 
-    function getDisplayName(node) {
-        // Check properties first (this is key for Bluetooth devices!)
-        if (node.properties && node.properties["device.description"]) {
+    function _displayName(node) {
+        if (node.properties?.["device.description"]) {
             return node.properties["device.description"]
         }
 
@@ -136,7 +159,6 @@ Singleton {
             return node.nickname
         }
 
-        // Fallback to name processing
         if (node.name.includes("analog-stereo")) return "Built-in Speakers"
         else if (node.name.includes("bluez")) return "Bluetooth Audio"
         else if (node.name.includes("usb")) return "USB Audio"
@@ -145,104 +167,49 @@ Singleton {
         return node.name
     }
 
-    function getDeviceSubtitle(nodeName) {
-        if (!nodeName) return ""
-        
-        // Simple subtitle based on node name patterns
-        if (nodeName.includes('usb-')) {
-            if (nodeName.includes('SteelSeries')) {
+    function _subtitle(name) {
+        if (!name) return ""
+
+        if (name.includes('usb-')) {
+            if (name.includes('SteelSeries')) {
                 return "USB Gaming Headset"
-            } else if (nodeName.includes('Generic')) {
+            } else if (name.includes('Generic')) {
                 return "USB Audio Device"
             }
             return "USB Audio"
-        } else if (nodeName.includes('pci-')) {
-            if (nodeName.includes('01_00.1') || nodeName.includes('01:00.1')) {
+        } else if (name.includes('pci-')) {
+            if (name.includes('01_00.1') || name.includes('01:00.1')) {
                 return "NVIDIA GPU Audio"
             }
             return "PCI Audio"
-        } else if (nodeName.includes('bluez')) {
+        } else if (name.includes('bluez')) {
             return "Bluetooth Audio"
-        } else if (nodeName.includes('analog')) {
+        } else if (name.includes('analog')) {
             return "Built-in Audio"
+        } else if (name.includes('hdmi')) {
+            return "HDMI Audio"
         }
-        
+
         return ""
     }
 
-    readonly property string currentAudioSink: sink?.name ?? ""
-    readonly property string currentAudioSource: source?.name ?? ""
-    
-    readonly property string currentSinkDisplayName: {
-        if (!sink) return ""
-
-        for (let sinkInfo of audioSinks) {
-            if (sinkInfo.node === sink) {
-                return sinkInfo.displayName
-            }
-        }
-
-        return sink.description || sink.name
-    }
-    
-    readonly property string currentSourceDisplayName: {
-        if (!source) return ""
-
-        for (let sourceInfo of audioSources) {
-            if (sourceInfo.node === source) {
-                return sourceInfo.displayName
-            }
-        }
-
-        return source.description || source.name
-    }
-
-    function setVolume(percentage) {
-        if (!sink?.ready || !sink?.audio) return
-        sink.audio.muted = false
-        sink.audio.volume = percentage / 100
-    }
-
-    function setMicLevel(percentage) {
-        if (!source?.ready || !source?.audio) return
-        source.audio.muted = false
-        source.audio.volume = percentage / 100
-    }
-
-    function toggleMute() {
-        if (!sink?.ready || !sink?.audio) return
-        sink.audio.muted = !sink.audio.muted
-    }
-
-    function toggleMicMute() {
-        if (!source?.ready || !source?.audio) return
-        source.audio.muted = !source.audio.muted
-    }
-
-    function setAudioSink(sinkName) {
+    function _setPreferred(name, kind) {
         if (!Pipewire.nodes?.values) return
+
         for (let i = 0; i < Pipewire.nodes.values.length; i++) {
             let node = Pipewire.nodes.values[i]
-            if (node && node.name === sinkName && (node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
-                Pipewire.preferredDefaultAudioSink = node
-                break
-            }
-        }
-    }
-
-    function setAudioSource(sourceName) {
-        if (!Pipewire.nodes?.values) return
-        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-            let node = Pipewire.nodes.values[i]
-            if (node && node.name === sourceName && (node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream) {
-                Pipewire.preferredDefaultAudioSource = node
+            if (node && node.name === name && !node.isStream && ((node.type & kind) === kind)) {
+                if (kind === PwNodeType.AudioSink) {
+                    Pipewire.preferredDefaultAudioSink = node
+                } else if (kind === PwNodeType.AudioSource) {
+                    Pipewire.preferredDefaultAudioSource = node
+                }
                 break
             }
         }
     }
 
     PwObjectTracker {
-        id: nodeTracker
         objects: [Pipewire.defaultAudioSink, Pipewire.defaultAudioSource]
     }
 }
