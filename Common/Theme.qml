@@ -4,7 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-QtObject {
+Singleton {
     id: root
     
     // Reference to the main shell root for calling functions
@@ -548,4 +548,65 @@ QtObject {
     property string iconFontFilled: "Material Symbols Rounded"
     property int iconFontWeight: Font.Normal
     property int iconFontFilledWeight: Font.Medium
+    
+    function getBatteryIcon(level, isCharging, batteryAvailable) {
+        if (!batteryAvailable) {
+            return _getBatteryPowerProfileIcon()
+        }
+        
+        if (isCharging) {
+            if (level >= 90) return "battery_charging_full"
+            if (level >= 80) return "battery_charging_90"
+            if (level >= 60) return "battery_charging_80"
+            if (level >= 50) return "battery_charging_60"
+            if (level >= 30) return "battery_charging_50"
+            if (level >= 20) return "battery_charging_30"
+            return "battery_charging_20"
+        } else {
+            if (level >= 95) return "battery_full"
+            if (level >= 85) return "battery_6_bar"
+            if (level >= 70) return "battery_5_bar"
+            if (level >= 55) return "battery_4_bar"
+            if (level >= 40) return "battery_3_bar"
+            if (level >= 25) return "battery_2_bar"
+            if (level >= 10) return "battery_1_bar"
+            return "battery_alert"
+        }
+    }
+    
+    function _getBatteryPowerProfileIcon() {
+        if (typeof PowerProfiles === "undefined") return "balance"
+        switch(PowerProfiles.profile) {
+            case PowerProfile.PowerSaver: return "energy_savings_leaf"
+            case PowerProfile.Performance: return "rocket_launch"
+            default: return "balance"
+        }
+    }
+    
+    function getPowerProfileIcon(profile) {
+        switch (profile) {
+            case "power-saver": return "battery_saver"
+            case "balanced": return "battery_std"
+            case "performance": return "flash_on"
+            default: return "settings"
+        }
+    }
+    
+    function getPowerProfileLabel(profile) {
+        switch (profile) {
+            case "power-saver": return "Power Saver"
+            case "balanced": return "Balanced"
+            case "performance": return "Performance"
+            default: return profile.charAt(0).toUpperCase() + profile.slice(1)
+        }
+    }
+    
+    function getPowerProfileDescription(profile) {
+        switch (profile) {
+            case "power-saver": return "Extend battery life"
+            case "balanced": return "Balance power and performance"
+            case "performance": return "Prioritize performance"
+            default: return "Custom power profile"
+        }
+    }
 }

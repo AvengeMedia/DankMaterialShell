@@ -5,6 +5,7 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import qs.Common
 import qs.Services
+import Quickshell.Services.UPower
 
 PanelWindow {
     id: batteryControlPopup
@@ -121,7 +122,7 @@ PanelWindow {
                 
                 Rectangle {
                     width: parent.width
-                    height: 120
+                    height: 80
                     radius: Theme.cornerRadius
                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
                     border.color: BatteryService.isCharging ? Theme.primary : (BatteryService.isLowBattery ? Theme.error : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12))
@@ -129,14 +130,15 @@ PanelWindow {
                     visible: BatteryService.batteryAvailable
                     
                     Row {
-                        anchors.fill: parent
-                        anchors.margins: Theme.spacingL
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingL
+                        anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingL
                         
                         Text {
-                            text: BatteryService.getBatteryIcon()
+                            text: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
                             font.family: Theme.iconFont
-                            font.pixelSize: 48
+                            font.pixelSize: Theme.iconSizeLarge
                             color: {
                                 if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
                                 if (BatteryService.isCharging) return Theme.primary
@@ -146,29 +148,34 @@ PanelWindow {
                         }
                         
                         Column {
-                            spacing: Theme.spacingS
+                            spacing: 2
                             anchors.verticalCenter: parent.verticalCenter
                             
-                            Text {
-                                text: BatteryService.batteryLevel + "%"
-                                font.pixelSize: Theme.fontSizeXLarge
-                                color: {
-                                    if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
-                                    if (BatteryService.isCharging) return Theme.primary
-                                    return Theme.surfaceText
+                            Row {
+                                spacing: Theme.spacingM
+                                
+                                Text {
+                                    text: BatteryService.batteryLevel + "%"
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    color: {
+                                        if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
+                                        if (BatteryService.isCharging) return Theme.primary
+                                        return Theme.surfaceText
+                                    }
+                                    font.weight: Font.Bold
                                 }
-                                font.weight: Font.Bold
-                            }
-                            
-                            Text {
-                                text: BatteryService.batteryStatus
-                                font.pixelSize: Theme.fontSizeLarge
-                                color: {
-                                    if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
-                                    if (BatteryService.isCharging) return Theme.primary
-                                    return Theme.surfaceText
+                                
+                                Text {
+                                    text: BatteryService.batteryStatus
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: {
+                                        if (BatteryService.isLowBattery && !BatteryService.isCharging) return Theme.error
+                                        if (BatteryService.isCharging) return Theme.primary
+                                        return Theme.surfaceText
+                                    }
+                                    font.weight: Font.Medium
+                                    anchors.verticalCenter: parent.verticalCenter
                                 }
-                                font.weight: Font.Medium
                             }
                             
                             Text {
@@ -179,7 +186,7 @@ PanelWindow {
                                     }
                                     return ""
                                 }
-                                font.pixelSize: Theme.fontSizeMedium
+                                font.pixelSize: Theme.fontSizeSmall
                                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                 visible: text.length > 0
                             }
@@ -202,7 +209,7 @@ PanelWindow {
                         spacing: Theme.spacingL
                         
                         Text {
-                            text: BatteryService.getBatteryIcon()
+                            text: Theme.getBatteryIcon(0, false, false)
                             font.family: Theme.iconFont
                             font.pixelSize: 36
                             color: Theme.surfaceText
@@ -242,34 +249,14 @@ PanelWindow {
                         font.weight: Font.Medium
                     }
                     
-                    Grid {
+                    Row {
                         width: parent.width
-                        columns: 2
-                        columnSpacing: Theme.spacingL
-                        rowSpacing: Theme.spacingM
-                        
-                        // Technology
-                        Column {
-                            spacing: 2
-                            
-                            Text {
-                                text: "Technology"
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                font.weight: Font.Medium
-                            }
-                            
-                            Text {
-                                text: BatteryService.batteryTechnology
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                            }
-                        }
-                        
+                        spacing: Theme.spacingXL
                         
                         // Health
                         Column {
                             spacing: 2
+                            width: (parent.width - Theme.spacingXL) / 2
                             
                             Text {
                                 text: "Health"
@@ -279,15 +266,20 @@ PanelWindow {
                             }
                             
                             Text {
-                                text: BatteryService.batteryHealth + "%"
+                                text: BatteryService.batteryHealth
                                 font.pixelSize: Theme.fontSizeMedium
-                                color: BatteryService.batteryHealth < 80 ? Theme.error : Theme.surfaceText
+                                color: {
+                                    if (BatteryService.batteryHealth === "N/A") return Theme.surfaceText
+                                    var healthNum = parseInt(BatteryService.batteryHealth)
+                                    return healthNum < 80 ? Theme.error : Theme.surfaceText
+                                }
                             }
                         }
                         
                         // Capacity
                         Column {
                             spacing: 2
+                            width: (parent.width - Theme.spacingXL) / 2
                             
                             Text {
                                 text: "Capacity"
@@ -297,7 +289,7 @@ PanelWindow {
                             }
                             
                             Text {
-                                text: BatteryService.batteryCapacity > 0 ? BatteryService.batteryCapacity + " mWh" : "Unknown"
+                                text: BatteryService.batteryCapacity > 0 ? BatteryService.batteryCapacity.toFixed(1) + " Wh" : "Unknown"
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
                             }
@@ -323,15 +315,17 @@ PanelWindow {
                         spacing: Theme.spacingS
                         
                         Repeater {
-                            model: BatteryService.powerProfiles
+                            model: (typeof PowerProfiles !== "undefined") ? 
+                                   [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []) : 
+                                   [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
                             
                             Rectangle {
                                 width: parent.width
                                 height: 50
                                 radius: Theme.cornerRadius
                                 color: profileArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : 
-                                       (modelData === BatteryService.activePowerProfile ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
-                                border.color: modelData === BatteryService.activePowerProfile ? Theme.primary : "transparent"
+                                       (batteryControlPopup.isActiveProfile(modelData) ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08))
+                                border.color: batteryControlPopup.isActiveProfile(modelData) ? Theme.primary : "transparent"
                                 border.width: 2
                                 
                                 Row {
@@ -341,17 +335,10 @@ PanelWindow {
                                     spacing: Theme.spacingM
                                     
                                     Text {
-                                        text: {
-                                            switch (modelData) {
-                                                case "power-saver": return "battery_saver"
-                                                case "balanced": return "battery_std"
-                                                case "performance": return "flash_on"
-                                                default: return "settings"
-                                            }
-                                        }
+                                        text: Theme.getPowerProfileIcon(PowerProfile.toString(modelData))
                                         font.family: Theme.iconFont
                                         font.pixelSize: Theme.iconSize
-                                        color: modelData === BatteryService.activePowerProfile ? Theme.primary : Theme.surfaceText
+                                        color: batteryControlPopup.isActiveProfile(modelData) ? Theme.primary : Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
                                     
@@ -360,28 +347,14 @@ PanelWindow {
                                         anchors.verticalCenter: parent.verticalCenter
                                         
                                         Text {
-                                            text: {
-                                                switch (modelData) {
-                                                    case "power-saver": return "Power Saver"
-                                                    case "balanced": return "Balanced"
-                                                    case "performance": return "Performance"
-                                                    default: return modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                                                }
-                                            }
+                                            text: Theme.getPowerProfileLabel(PowerProfile.toString(modelData))
                                             font.pixelSize: Theme.fontSizeMedium
-                                            color: modelData === BatteryService.activePowerProfile ? Theme.primary : Theme.surfaceText
-                                            font.weight: modelData === BatteryService.activePowerProfile ? Font.Medium : Font.Normal
+                                            color: batteryControlPopup.isActiveProfile(modelData) ? Theme.primary : Theme.surfaceText
+                                            font.weight: batteryControlPopup.isActiveProfile(modelData) ? Font.Medium : Font.Normal
                                         }
                                         
                                         Text {
-                                            text: {
-                                                switch (modelData) {
-                                                    case "power-saver": return "Extend battery life"
-                                                    case "balanced": return "Balance power and performance"
-                                                    case "performance": return "Prioritize performance"
-                                                    default: return "Custom power profile"
-                                                }
-                                            }
+                                            text: Theme.getPowerProfileDescription(PowerProfile.toString(modelData))
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                         }
@@ -395,9 +368,53 @@ PanelWindow {
                                     cursorShape: Qt.PointingHandCursor
                                     
                                     onClicked: {
-                                        BatteryService.setBatteryProfile(modelData)
+                                        batteryControlPopup.setProfile(modelData)
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+                
+                // Degradation reason warning
+                Rectangle {
+                    width: parent.width
+                    height: 60
+                    radius: Theme.cornerRadius
+                    color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
+                    border.color: Theme.error
+                    border.width: 2
+                    visible: (typeof PowerProfiles !== "undefined") && PowerProfiles.degradationReason !== PerformanceDegradationReason.None
+                    
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingL
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingM
+                        
+                        Text {
+                            text: "warning"
+                            font.family: Theme.iconFont
+                            font.pixelSize: Theme.iconSize
+                            color: Theme.error
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        
+                        Column {
+                            spacing: 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Text {
+                                text: "Power Profile Degradation"
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.error
+                                font.weight: Font.Medium
+                            }
+                            
+                            Text {
+                                text: (typeof PowerProfiles !== "undefined") ? PerformanceDegradationReason.toString(PowerProfiles.degradationReason) : ""
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.8)
                             }
                         }
                     }
@@ -439,10 +456,24 @@ PanelWindow {
         }
     }
     
-    Connections {
-        target: BatteryService
-        function onShowErrorMessage(message) {
+    function isActiveProfile(profile) {
+        if (typeof PowerProfiles === "undefined") return false
+        return PowerProfiles.profile === profile
+    }
+    
+    function setProfile(profile) {
+        if (typeof PowerProfiles === "undefined") {
             errorToast.show()
+            return
+        }
+        
+        PowerProfiles.profile = profile
+
+        if (PowerProfiles.profile !== profile) {
+            errorToast.show()
+        } else {
+            console.log("Set power profile to: " + PowerProfile.toString(profile))
         }
     }
+    
 }
