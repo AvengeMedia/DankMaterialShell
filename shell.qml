@@ -24,7 +24,6 @@ ShellRoot {
     TrayMenuPopup {
         id: trayMenuPopup
     }
-    NotificationInit {}
     NotificationCenter {
         id: notificationCenter
     }
