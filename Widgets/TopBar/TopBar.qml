@@ -14,7 +14,7 @@ import qs.Widgets
 import "../../Common/Utilities.js" as Utils
 
 PanelWindow {
-    id: topBar
+    id: root
     
     property var modelData
     screen: modelData
@@ -26,44 +26,16 @@ PanelWindow {
     Connections {
         target: Prefs
         function onTopBarTransparencyChanged() {
-            topBar.backgroundTransparency = Prefs.topBarTransparency
+            root.backgroundTransparency = Prefs.topBarTransparency
         }
     }
     
-    // Properties exposed to shell
-    property bool hasActiveMedia: false
-    property var activePlayer: null
-    property bool weatherAvailable: false
-    property string weatherCode: ""
-    property int weatherTemp: 0
-    property int weatherTempF: 0
-    property string osLogo: ""
-    property string networkStatus: "disconnected"
-    property string wifiSignalStrength: "good"
-    property int volumeLevel: 50
-    property bool volumeMuted: false
-    property bool bluetoothAvailable: false
-    property bool bluetoothEnabled: false
-    
-    // Shell reference to access root properties directly
-    property var shellRoot: null
     
     // Notification properties
-    property int notificationCount: 0
-    
-    // Process dropdown reference
-    property var processDropdown: null
+    readonly property int notificationCount: NotificationService.notifications.length
     
     
-    // Clipboard properties
-    signal clipboardRequested()
     
-    // Tray menu properties
-    property bool showTrayMenu: false
-    property var currentTrayMenu: null
-    property var currentTrayItem: null
-    property real trayMenuX: 0
-    property real trayMenuY: 0
     
     
     
@@ -96,7 +68,7 @@ PanelWindow {
         Rectangle {
             anchors.fill: parent
             radius: Theme.cornerRadiusXLarge
-            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBar.backgroundTransparency)
+            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, root.backgroundTransparency)
             
             layer.enabled: true
             layer.effect: MultiEffect {
@@ -155,12 +127,11 @@ PanelWindow {
                 
                 LauncherButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    osLogo: topBar.osLogo
                 }
                 
                 WorkspaceSwitcher {
                     anchors.verticalCenter: parent.verticalCenter
-                    screenName: topBar.screenName
+                    screenName: root.screenName
                 }
                 
                 FocusedAppWidget {
@@ -174,9 +145,7 @@ PanelWindow {
                 anchors.centerIn: parent
                 
                 onClockClicked: {
-                    if (topBar.shellRoot) {
-                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
-                    }
+                    centerCommandCenter.calendarVisible = !centerCommandCenter.calendarVisible
                 }
             }
             
@@ -184,14 +153,10 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: clockWidget.left
                 anchors.rightMargin: Theme.spacingS
-                activePlayer: topBar.activePlayer
-                hasActiveMedia: topBar.hasActiveMedia
-                visible: Prefs.showMusic && topBar.hasActiveMedia
+                visible: Prefs.showMusic && MprisController.activePlayer
                 
                 onClicked: {
-                    if (topBar.shellRoot) {
-                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
-                    }
+                    centerCommandCenter.calendarVisible = !centerCommandCenter.calendarVisible
                 }
             }
             
@@ -201,16 +166,10 @@ PanelWindow {
                 anchors.left: clockWidget.right
                 anchors.leftMargin: Theme.spacingS
                 
-                weatherAvailable: topBar.weatherAvailable
-                weatherCode: topBar.weatherCode
-                weatherTemp: topBar.weatherTemp
-                weatherTempF: topBar.weatherTempF
-                visible: Prefs.showWeather && topBar.weatherAvailable && topBar.weatherTemp > 0 && topBar.weatherTempF > 0
+                visible: Prefs.showWeather && WeatherService.weather.available && WeatherService.weather.temp > 0 && WeatherService.weather.tempF > 0
                 
                 onClicked: {
-                    if (topBar.shellRoot) {
-                        topBar.shellRoot.calendarVisible = !topBar.shellRoot.calendarVisible
-                    }
+                    centerCommandCenter.calendarVisible = !centerCommandCenter.calendarVisible
                 }
             }
             
@@ -225,13 +184,11 @@ PanelWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemTray
                     onMenuRequested: (menu, item, x, y) => {
-                        if (topBar.shellRoot) {
-                            topBar.shellRoot.currentTrayMenu = menu
-                            topBar.shellRoot.currentTrayItem = item
-                            topBar.shellRoot.trayMenuX = rightSection.x + rightSection.width - 400 - Theme.spacingL
-                            topBar.shellRoot.trayMenuY = Theme.barHeight - Theme.spacingXS
-                            topBar.shellRoot.showTrayMenu = true
-                        }
+                        trayMenuPopup.currentTrayMenu = menu
+                        trayMenuPopup.currentTrayItem = item
+                        trayMenuPopup.trayMenuX = rightSection.x + rightSection.width - 400 - Theme.spacingL
+                        trayMenuPopup.trayMenuY = Theme.barHeight - Theme.spacingXS
+                        trayMenuPopup.showTrayMenu = true
                         menu.menuVisible = true
                     }
                 }
@@ -260,7 +217,7 @@ PanelWindow {
                         cursorShape: Qt.PointingHandCursor
                         
                         onClicked: {
-                            topBar.clipboardRequested()
+                            clipboardHistoryPopup.toggle()
                         }
                     }
                     
@@ -276,54 +233,42 @@ PanelWindow {
                 CpuMonitorWidget {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemResources
-                    processDropdown: topBar.processDropdown
                 }
 
                 RamMonitorWidget {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Prefs.showSystemResources
-                    processDropdown: topBar.processDropdown
                 }
                 
                 NotificationCenterButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    hasUnread: topBar.notificationCount > 0
-                    isActive: topBar.shellRoot ? topBar.shellRoot.notificationHistoryVisible : false
+                    hasUnread: root.notificationCount > 0
+                    isActive: notificationCenter.notificationHistoryVisible
                     onClicked: {
-                        if (topBar.shellRoot) {
-                            topBar.shellRoot.notificationHistoryVisible = !topBar.shellRoot.notificationHistoryVisible
-                        }
+                        notificationCenter.notificationHistoryVisible = !notificationCenter.notificationHistoryVisible
                     }
                 }
                 
                 // Battery Widget
                 BatteryWidget {
                     anchors.verticalCenter: parent.verticalCenter
-                    batteryPopupVisible: topBar.shellRoot.batteryPopupVisible
+                    batteryPopupVisible: batteryControlPopup.batteryPopupVisible
                     onToggleBatteryPopup: {
-                        topBar.shellRoot.batteryPopupVisible = !topBar.shellRoot.batteryPopupVisible
+                        batteryControlPopup.batteryPopupVisible = !batteryControlPopup.batteryPopupVisible
                     }
                 }
                 
                 ControlCenterButton {
                     anchors.verticalCenter: parent.verticalCenter
-                    networkStatus: topBar.networkStatus
-                    wifiSignalStrength: topBar.wifiSignalStrength
-                    volumeLevel: topBar.volumeLevel
-                    volumeMuted: topBar.volumeMuted
-                    bluetoothAvailable: topBar.bluetoothAvailable
-                    bluetoothEnabled: topBar.bluetoothEnabled
-                    isActive: topBar.shellRoot ? topBar.shellRoot.controlCenterVisible : false
+                    isActive: controlCenterPopup.controlCenterVisible
                     
                     onClicked: {
-                        if (topBar.shellRoot) {
-                            topBar.shellRoot.controlCenterVisible = !topBar.shellRoot.controlCenterVisible
-                            if (topBar.shellRoot.controlCenterVisible) {
-                                if (NetworkService.wifiEnabled) {
-                                    WifiService.scanWifi()
-                                }
-                                // Bluetooth devices are automatically updated via signals
+                        controlCenterPopup.controlCenterVisible = !controlCenterPopup.controlCenterVisible
+                        if (controlCenterPopup.controlCenterVisible) {
+                            if (NetworkService.wifiEnabled) {
+                                WifiService.scanWifi()
                             }
+                            // Bluetooth devices are automatically updated via signals
                         }
                     }
                 }

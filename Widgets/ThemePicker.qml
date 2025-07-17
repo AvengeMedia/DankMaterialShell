@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 
 Column {
     id: themePicker
@@ -198,7 +199,7 @@ Column {
             anchors.horizontalCenter: parent.horizontalCenter
             
             color: {
-                if (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") {
+                if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") {
                     return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
                 } else {
                     return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
@@ -206,7 +207,7 @@ Column {
             }
             
             border.color: {
-                if (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") {
+                if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") {
                     return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.5)
                 } else if (Theme.isDynamicTheme) {
                     return Theme.primary
@@ -223,13 +224,13 @@ Column {
                 
                 Text {
                     text: {
-                        if (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") return "error"
+                        if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") return "error"
                         else return "palette"
                     }
                     font.family: Theme.iconFont
                     font.pixelSize: 16
                     color: {
-                        if (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") return Theme.error
+                        if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") return Theme.error
                         else return Theme.surfaceText
                     }
                     font.weight: Theme.iconFontWeight
@@ -238,13 +239,13 @@ Column {
                 
                 Text {
                     text: {
-                        if (root.wallpaperErrorStatus === "error") return "Error"
-                        else if (root.wallpaperErrorStatus === "matugen_missing") return "No matugen"
+                        if (ToastService.wallpaperErrorStatus === "error") return "Error"
+                        else if (ToastService.wallpaperErrorStatus === "matugen_missing") return "No matugen"
                         else return "Auto"
                     }
                     font.pixelSize: Theme.fontSizeMedium
                     color: {
-                        if (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") return Theme.error
+                        if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") return Theme.error
                         else return Theme.surfaceText
                     }
                     font.weight: Font.Medium
@@ -297,21 +298,21 @@ Column {
                 anchors.bottom: parent.top
                 anchors.bottomMargin: Theme.spacingS
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: autoMouseArea.containsMouse && (!Theme.isDynamicTheme || root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing")
+                visible: autoMouseArea.containsMouse && (!Theme.isDynamicTheme || ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing")
                 
                 Text {
                     id: autoTooltipText
                     text: {
-                        if (root.wallpaperErrorStatus === "error") {
+                        if (ToastService.wallpaperErrorStatus === "error") {
                             return "Wallpaper symlink missing at ~/quickshell/current_wallpaper"
-                        } else if (root.wallpaperErrorStatus === "matugen_missing") {
+                        } else if (ToastService.wallpaperErrorStatus === "matugen_missing") {
                             return "Install matugen package for dynamic themes"
                         } else {
                             return "Dynamic wallpaper-based colors"
                         }
                     }
                     font.pixelSize: Theme.fontSizeSmall
-                    color: (root.wallpaperErrorStatus === "error" || root.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceText
+                    color: (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing") ? Theme.error : Theme.surfaceText
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
                     width: Math.min(implicitWidth, 250)

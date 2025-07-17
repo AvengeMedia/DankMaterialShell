@@ -7,9 +7,11 @@ import Quickshell.Io
 import qs.Common
 
 PanelWindow {
-    id: powerMenuPopup
+    id: root
     
-    visible: root.powerMenuVisible
+    property bool powerMenuVisible: false
+    
+    visible: powerMenuVisible
     
     implicitWidth: 400
     implicitHeight: 320
@@ -31,7 +33,7 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            root.powerMenuVisible = false
+            powerMenuVisible = false
         }
     }
     
@@ -45,8 +47,8 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
         
-        opacity: root.powerMenuVisible ? 1.0 : 0.0
-        scale: root.powerMenuVisible ? 1.0 : 0.85
+        opacity: powerMenuVisible ? 1.0 : 0.0
+        scale: powerMenuVisible ? 1.0 : 0.85
         
         Behavior on opacity {
             NumberAnimation {
@@ -109,7 +111,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerMenuVisible = false
+                            powerMenuVisible = false
                         }
                     }
                 }
@@ -156,7 +158,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerMenuVisible = false
+                            powerMenuVisible = false
                             root.powerConfirmAction = "logout"
                             root.powerConfirmTitle = "Log Out"
                             root.powerConfirmMessage = "Are you sure you want to log out?"
@@ -201,7 +203,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerMenuVisible = false
+                            powerMenuVisible = false
                             root.powerConfirmAction = "suspend"
                             root.powerConfirmTitle = "Suspend"
                             root.powerConfirmMessage = "Are you sure you want to suspend the system?"
@@ -246,7 +248,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerMenuVisible = false
+                            powerMenuVisible = false
                             root.powerConfirmAction = "reboot"
                             root.powerConfirmTitle = "Reboot"
                             root.powerConfirmMessage = "Are you sure you want to reboot the system?"
@@ -291,7 +293,7 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.powerMenuVisible = false
+                            powerMenuVisible = false
                             root.powerConfirmAction = "poweroff"
                             root.powerConfirmTitle = "Power Off"
                             root.powerConfirmMessage = "Are you sure you want to power off the system?"

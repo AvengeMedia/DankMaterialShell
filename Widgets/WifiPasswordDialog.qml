@@ -7,9 +7,13 @@ import qs.Common
 import qs.Services
 
 PanelWindow {
-    id: wifiPasswordDialog
+    id: root
     
-    visible: root.wifiPasswordDialogVisible
+    property bool wifiPasswordDialogVisible: false
+    property string wifiPasswordSSID: ""
+    property string wifiPasswordInput: ""
+    
+    visible: wifiPasswordDialogVisible
     anchors {
         top: true
         left: true
@@ -19,7 +23,7 @@ PanelWindow {
     
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
-    WlrLayershell.keyboardFocus: root.wifiPasswordDialogVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: wifiPasswordDialogVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     
     color: "transparent"
     
@@ -32,7 +36,7 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: Qt.rgba(0, 0, 0, 0.5)
-        opacity: root.wifiPasswordDialogVisible ? 1.0 : 0.0
+        opacity: wifiPasswordDialogVisible ? 1.0 : 0.0
         
         Behavior on opacity {
             NumberAnimation {
@@ -44,8 +48,8 @@ PanelWindow {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                root.wifiPasswordDialogVisible = false
-                root.wifiPasswordInput = ""
+                wifiPasswordDialogVisible = false
+                wifiPasswordInput = ""
             }
         }
     }
@@ -59,8 +63,8 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         border.width: 1
         
-        opacity: root.wifiPasswordDialogVisible ? 1.0 : 0.0
-        scale: root.wifiPasswordDialogVisible ? 1.0 : 0.9
+        opacity: wifiPasswordDialogVisible ? 1.0 : 0.0
+        scale: wifiPasswordDialogVisible ? 1.0 : 0.9
         
         Behavior on opacity {
             NumberAnimation {
@@ -97,7 +101,7 @@ PanelWindow {
                     }
                     
                     Text {
-                        text: "Enter password for \"" + root.wifiPasswordSSID + "\""
+                        text: "Enter password for \"" + wifiPasswordSSID + "\""
                         font.pixelSize: Theme.fontSizeMedium
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         width: parent.width
@@ -125,8 +129,8 @@ PanelWindow {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.wifiPasswordDialogVisible = false
-                            root.wifiPasswordInput = ""
+                            wifiPasswordDialogVisible = false
+                            wifiPasswordInput = ""
                         }
                     }
                 }
@@ -162,15 +166,15 @@ PanelWindow {
                     }
                     
                     onTextChanged: {
-                        root.wifiPasswordInput = text
+                        wifiPasswordInput = text
                     }
                     
                     onAccepted: {
-                        WifiService.connectToWifiWithPassword(root.wifiPasswordSSID, root.wifiPasswordInput)
+                        WifiService.connectToWifiWithPassword(wifiPasswordSSID, wifiPasswordInput)
                     }
                     
                     Component.onCompleted: {
-                        if (root.wifiPasswordDialogVisible) {
+                        if (wifiPasswordDialogVisible) {
                             forceActiveFocus()
                         }
                     }
@@ -260,8 +264,8 @@ PanelWindow {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.wifiPasswordDialogVisible = false
-                                root.wifiPasswordInput = ""
+                                wifiPasswordDialogVisible = false
+                                wifiPasswordInput = ""
                             }
                         }
                     }
@@ -271,7 +275,7 @@ PanelWindow {
                         height: 36
                         radius: Theme.cornerRadius
                         color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                        enabled: root.wifiPasswordInput.length > 0
+                        enabled: wifiPasswordInput.length > 0
                         opacity: enabled ? 1.0 : 0.5
                         
                         Text {
@@ -290,7 +294,7 @@ PanelWindow {
                             cursorShape: Qt.PointingHandCursor
                             enabled: parent.enabled
                             onClicked: {
-                                WifiService.connectToWifiWithPassword(root.wifiPasswordSSID, root.wifiPasswordInput)
+                                WifiService.connectToWifiWithPassword(wifiPasswordSSID, wifiPasswordInput)
                             }
                         }
                         

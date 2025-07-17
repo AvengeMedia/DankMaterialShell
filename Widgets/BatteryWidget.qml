@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import Quickshell.Services.UPower
 
 Rectangle {
     id: batteryWidget
@@ -22,7 +23,7 @@ Rectangle {
         spacing: 4
         
         Text {
-            text: BatteryService.getBatteryIcon()
+            text: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
             font.family: Theme.iconFont
             font.pixelSize: Theme.iconSize - 6
             color: {
@@ -99,12 +100,11 @@ Rectangle {
                 id: tooltipText
                 text: {
                     if (!BatteryService.batteryAvailable) {
-                        let profile = BatteryService.activePowerProfile
-                        switch(profile) {
-                            case "power-saver": return "Power Profile: Power Saver"
-                            case "balanced": return "Power Profile: Balanced"
-                            case "performance": return "Power Profile: Performance"
-                            default: return "Power Profile: " + profile
+                        if (typeof PowerProfiles === "undefined") return "Power Management"
+                        switch(PowerProfiles.profile) {
+                            case PowerProfile.PowerSaver: return "Power Profile: Power Saver"
+                            case PowerProfile.Performance: return "Power Profile: Performance"
+                            default: return "Power Profile: Balanced"
                         }
                     }
                     

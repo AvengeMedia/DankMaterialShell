@@ -7,11 +7,10 @@ import qs.Services
 Column {
     id: calendarWidget
     
-    property var theme: Theme
     property date displayDate: new Date()
     property date selectedDate: new Date()
     
-    spacing: theme.spacingM
+    spacing: Theme.spacingM
     
     // Load events when display date changes
     onDisplayDateChanged: {
@@ -61,16 +60,16 @@ Column {
         Rectangle {
             width: 40
             height: 40
-            radius: theme.cornerRadius
-            color: prevMonthArea.containsMouse ? Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12) : "transparent"
+            radius: Theme.cornerRadius
+            color: prevMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
             
             Text {
                 anchors.centerIn: parent
                 text: "chevron_left"
-                font.family: theme.iconFont
-                font.pixelSize: theme.iconSize
-                color: theme.primary
-                font.weight: theme.iconFontWeight
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.iconSize
+                color: Theme.primary
+                font.weight: Theme.iconFontWeight
             }
             
             MouseArea {
@@ -91,8 +90,8 @@ Column {
             width: parent.width - 80
             height: 40
             text: Qt.formatDate(displayDate, "MMMM yyyy")
-            font.pixelSize: theme.fontSizeLarge
-            color: theme.surfaceText
+            font.pixelSize: Theme.fontSizeLarge
+            color: Theme.surfaceText
             font.weight: Font.Medium
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -101,16 +100,16 @@ Column {
         Rectangle {
             width: 40
             height: 40
-            radius: theme.cornerRadius
-            color: nextMonthArea.containsMouse ? Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12) : "transparent"
+            radius: Theme.cornerRadius
+            color: nextMonthArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
             
             Text {
                 anchors.centerIn: parent
                 text: "chevron_right"
-                font.family: theme.iconFont
-                font.pixelSize: theme.iconSize
-                color: theme.primary
-                font.weight: theme.iconFontWeight
+                font.family: Theme.iconFont
+                font.pixelSize: Theme.iconSize
+                color: Theme.primary
+                font.weight: Theme.iconFontWeight
             }
             
             MouseArea {
@@ -144,8 +143,8 @@ Column {
                 Text {
                     anchors.centerIn: parent
                     text: modelData
-                    font.pixelSize: theme.fontSizeSmall
-                    color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.6)
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
                     font.weight: Font.Medium
                 }
             }
@@ -183,20 +182,20 @@ Column {
                 property bool isToday: dayDate.toDateString() === new Date().toDateString()
                 property bool isSelected: dayDate.toDateString() === selectedDate.toDateString()
                 
-                color: isSelected ? theme.primary :
-                       isToday ? Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12) :
-                       dayArea.containsMouse ? Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.08) : "transparent"
+                color: isSelected ? Theme.primary :
+                       isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) :
+                       dayArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 
-                radius: theme.cornerRadiusSmall
+                radius: Theme.cornerRadiusSmall
                 
                 Text {
                     anchors.centerIn: parent
                     text: dayDate.getDate()
-                    font.pixelSize: theme.fontSizeMedium
-                    color: isSelected ? theme.surface :
-                           isToday ? theme.primary :
-                           isCurrentMonth ? theme.surfaceText : 
-                           Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.4)
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: isSelected ? Theme.surface :
+                           isToday ? Theme.primary :
+                           isCurrentMonth ? Theme.surfaceText : 
+                           Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
                     font.weight: isToday || isSelected ? Font.Medium : Font.Normal
                 }
                 
@@ -215,11 +214,11 @@ Column {
                     color: {
                         if (isSelected) {
                             // Use a lighter tint of primary for selected state
-                            return Qt.lighter(theme.primary, 1.3)
+                            return Qt.lighter(Theme.primary, 1.3)
                         } else if (isToday) {
-                            return theme.primary
+                            return Theme.primary
                         } else {
-                            return theme.primary
+                            return Theme.primary
                         }
                     }
                     
@@ -238,22 +237,22 @@ Column {
                     
                     Behavior on scale {
                         NumberAnimation {
-                            duration: theme.shortDuration
-                            easing.type: theme.standardEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                     
                     Behavior on color {
                         ColorAnimation {
-                            duration: theme.shortDuration
-                            easing.type: theme.standardEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                     
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: theme.shortDuration
-                            easing.type: theme.standardEasing
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                 }

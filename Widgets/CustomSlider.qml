@@ -163,7 +163,7 @@ Item {
                     // Global mouse area for drag tracking
                     MouseArea {
                         id: sliderGlobalMouseArea
-                        anchors.fill: slider.parent // Fill the entire settings popup
+                        anchors.fill: sliderContainer
                         enabled: sliderMouseArea.isDragging
                         visible: false
                         preventStealing: true

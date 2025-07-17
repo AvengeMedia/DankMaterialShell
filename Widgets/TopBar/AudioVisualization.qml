@@ -3,13 +3,14 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.Common
+import qs.Services
 
 Item {
     id: root
     
     property list<real> audioLevels: [0, 0, 0, 0]
-    property bool hasActiveMedia: false
-    property var activePlayer: null
+    readonly property MprisPlayer  activePlayer: MprisController.activePlayer 
+    readonly property bool hasActiveMedia: activePlayer !== null 
     property bool cavaAvailable: false
     
     width: 20

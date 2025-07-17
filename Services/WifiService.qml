@@ -263,6 +263,21 @@ Singleton {
         }
     }
     
+    // Auto-refresh timer for when control center is open
+    property bool autoRefreshEnabled: false
+    
+    Timer {
+        id: autoRefreshTimer
+        interval: 20000
+        running: root.autoRefreshEnabled
+        repeat: true
+        onTriggered: {
+            if (root.autoRefreshEnabled) {
+                root.scanWifi()
+            }
+        }
+    }
+    
     function updateCurrentWifiInfo() {
         console.log("Updating current WiFi info...")
         currentWifiInfo.running = true

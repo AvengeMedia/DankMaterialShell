@@ -9,9 +9,6 @@ import qs.Services
 Item {
     id: bluetoothTab
     
-    property bool bluetoothEnabled: false
-    property var bluetoothDevices: []
-    
     ScrollView {
         anchors.fill: parent
         clip: true
@@ -28,8 +25,8 @@ Item {
                 height: 60
                 radius: Theme.cornerRadius
                 color: bluetoothToggle.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : 
-                       (bluetoothTab.bluetoothEnabled ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12))
-                border.color: bluetoothTab.bluetoothEnabled ? Theme.primary : "transparent"
+                       (BluetoothService.enabled ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.16) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12))
+                border.color: BluetoothService.enabled ? Theme.primary : "transparent"
                 border.width: 2
                 
                 Row {
@@ -42,7 +39,7 @@ Item {
                         text: "bluetooth"
                         font.family: Theme.iconFont
                         font.pixelSize: Theme.iconSizeLarge
-                        color: bluetoothTab.bluetoothEnabled ? Theme.primary : Theme.surfaceText
+                        color: BluetoothService.enabled ? Theme.primary : Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
@@ -53,12 +50,12 @@ Item {
                         Text {
                             text: "Bluetooth"
                             font.pixelSize: Theme.fontSizeLarge
-                            color: bluetoothTab.bluetoothEnabled ? Theme.primary : Theme.surfaceText
+                            color: BluetoothService.enabled ? Theme.primary : Theme.surfaceText
                             font.weight: Font.Medium
                         }
                         
                         Text {
-                            text: bluetoothTab.bluetoothEnabled ? "Enabled" : "Disabled"
+                            text: BluetoothService.enabled ? "Enabled" : "Disabled"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         }
@@ -72,7 +69,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     
                     onClicked: {
-                        BluetoothService.toggleBluetooth()
+                        BluetoothService.toggleAdapter()
                     }
                 }
             }
@@ -80,7 +77,7 @@ Item {
             Column {
                 width: parent.width
                 spacing: Theme.spacingM
-                visible: bluetoothTab.bluetoothEnabled
+                visible: BluetoothService.enabled
                 
                 Text {
                     text: "Paired Devices"
@@ -90,7 +87,7 @@ Item {
                 }
                 
                 Repeater {
-                    model: bluetoothTab.bluetoothDevices
+                    model: BluetoothService.pairedDevices
                     
                     Rectangle {
                         width: parent.width
@@ -108,33 +105,11 @@ Item {
                             spacing: Theme.spacingM
                             
                             Text {
-                                text: {
-                                    switch (modelData.type) {
-                                        case "headset": return "headset"
-                                        case "mouse": return "mouse"
-                                        case "keyboard": return "keyboard"
-                                        case "phone": return "smartphone"
-                                        default: return "bluetooth"
-                                    }
-                                }
+                                text: modelData.iconName
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize
-                                color: {
-                                    if (modelData.connecting) return Theme.primary
-                                    if (modelData.connected) return Theme.primary
-                                    return Theme.surfaceText
-                                }
+                                color: modelData.connected ? Theme.primary : Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
-                                opacity: modelData.connecting ? 0.6 : 1.0
-                                
-                                Behavior on opacity {
-                                    SequentialAnimation {
-                                        running: modelData.connecting
-                                        loops: Animation.Infinite
-                                        NumberAnimation { from: 1.0; to: 0.3; duration: 800 }
-                                        NumberAnimation { from: 0.3; to: 1.0; duration: 800 }
-                                    }
-                                }
                             }
                             
                             Column {
@@ -152,20 +127,26 @@ Item {
                                     spacing: Theme.spacingXS
                                     
                                     Text {
-                                        text: modelData.connectionStatus
+                                        text: modelData.connected ? "Connected" : "Disconnected"
                                         font.pixelSize: Theme.fontSizeSmall
-                                        color: {
-                                            if (modelData.connecting) return Theme.primary
-                                            if (modelData.connectionFailed) return Theme.error
-                                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                        }
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                     }
                                     
                                     Text {
-                                        text: modelData.battery >= 0 ? "• " + modelData.battery + "%" : ""
+                                        text: {
+                                            if (modelData.batteryAvailable && modelData.batteryLevel >= 0) {
+                                                return "• " + modelData.batteryLevel + "%"
+                                            }
+                                            var btBattery = BatteryService.bluetoothDevices.find(dev => 
+                                                dev.name === modelData.name || 
+                                                dev.name.toLowerCase().includes(modelData.name.toLowerCase()) ||
+                                                modelData.name.toLowerCase().includes(dev.name.toLowerCase())
+                                            )
+                                            return btBattery ? "• " + btBattery.percentage + "%" : ""
+                                        }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                        visible: modelData.battery >= 0
+                                        visible: text.length > 0
                                     }
                                 }
                             }
@@ -196,16 +177,13 @@ Item {
                             MouseArea {
                                 id: btMenuButtonArea
                                 anchors.fill: parent
-                                hoverEnabled: !modelData.connecting
-                                enabled: !modelData.connecting
-                                cursorShape: modelData.connecting ? Qt.ArrowCursor : Qt.PointingHandCursor
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
                                 
                                 onClicked: {
-                                    if (!modelData.connecting) {
-                                        bluetoothContextMenuWindow.deviceData = modelData
-                                        let localPos = btMenuButtonArea.mapToItem(bluetoothTab, btMenuButtonArea.width / 2, btMenuButtonArea.height)
-                                        bluetoothContextMenuWindow.show(localPos.x, localPos.y)
-                                    }
+                                    bluetoothContextMenuWindow.deviceData = modelData
+                                    let localPos = btMenuButtonArea.mapToItem(bluetoothTab, btMenuButtonArea.width / 2, btMenuButtonArea.height)
+                                    bluetoothContextMenuWindow.show(localPos.x, localPos.y)
                                 }
                             }
                             
@@ -218,14 +196,11 @@ Item {
                             id: btDeviceArea
                             anchors.fill: parent
                             anchors.rightMargin: 40  // Don't overlap with menu button
-                            hoverEnabled: !modelData.connecting
-                            enabled: !modelData.connecting
-                            cursorShape: modelData.connecting ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
                             
                             onClicked: {
-                                if (!modelData.connecting) {
-                                    BluetoothService.toggleBluetoothDevice(modelData.mac)
-                                }
+                                BluetoothService.toggle(modelData.address)
                             }
                         }
                     }
@@ -235,7 +210,7 @@ Item {
             Column {
                 width: parent.width
                 spacing: Theme.spacingM
-                visible: bluetoothTab.bluetoothEnabled
+                visible: BluetoothService.enabled
                 
                 Row {
                     width: parent.width
@@ -264,7 +239,7 @@ Item {
                             spacing: Theme.spacingXS
                             
                             Text {
-                                text: BluetoothService.scanning ? "stop" : "bluetooth_searching"
+                                text: BluetoothService.discovering ? "stop" : "bluetooth_searching"
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize - 4
                                 color: Theme.primary
@@ -273,7 +248,7 @@ Item {
                             
                             Text {
                                 id: scanText
-                                text: BluetoothService.scanning ? "Stop Scanning" : "Start Scanning"
+                                text: BluetoothService.discovering ? "Stop Scanning" : "Start Scanning"
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -288,10 +263,10 @@ Item {
                             cursorShape: Qt.PointingHandCursor
                             
                             onClicked: {
-                                if (BluetoothService.scanning) {
-                                    BluetoothService.stopDiscovery()
+                                if (BluetoothService.discovering) {
+                                    BluetoothService.stopScan()
                                 } else {
-                                    BluetoothService.startDiscovery()
+                                    BluetoothService.startScan()
                                 }
                             }
                         }
@@ -317,18 +292,7 @@ Item {
                             spacing: Theme.spacingM
                             
                             Text {
-                                text: {
-                                    switch (modelData.type) {
-                                        case "headset": return "headset"
-                                        case "mouse": return "mouse"
-                                        case "keyboard": return "keyboard"
-                                        case "phone": return "smartphone"
-                                        case "watch": return "watch"
-                                        case "speaker": return "speaker"
-                                        case "tv": return "tv"
-                                        default: return "bluetooth"
-                                    }
-                                }
+                                text: modelData.iconName
                                 font.family: Theme.iconFont
                                 font.pixelSize: Theme.iconSize
                                 color: modelData.paired ? Theme.secondary : Theme.surfaceText
@@ -350,20 +314,9 @@ Item {
                                     spacing: Theme.spacingXS
                                     
                                     Text {
-                                        text: {
-                                            if (modelData.paired && modelData.connected) return "Connected"
-                                            if (modelData.paired) return "Paired"
-                                            return "Signal: " + modelData.signalStrength
-                                        }
+                                        text: modelData.paired ? "Available" : "Not paired"
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                                    }
-                                    
-                                    Text {
-                                        text: modelData.rssi !== 0 ? "• " + modelData.rssi + " dBm" : ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
-                                        visible: modelData.rssi !== 0
                                     }
                                 }
                             }
@@ -379,11 +332,11 @@ Item {
                             color: actionButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
                             border.color: Theme.primary
                             border.width: 1
-                            visible: modelData.canPair || modelData.paired
+                            visible: true
                             
                             Text {
                                 anchors.centerIn: parent
-                                text: modelData.paired ? (modelData.connected ? "Disconnect" : "Connect") : "Pair"
+                                text: modelData.paired ? "Connect" : "Pair"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.primary
                                 font.weight: Font.Medium
@@ -397,13 +350,9 @@ Item {
                                 
                                 onClicked: {
                                     if (modelData.paired) {
-                                        if (modelData.connected) {
-                                            BluetoothService.toggleBluetoothDevice(modelData.mac)
-                                        } else {
-                                            BluetoothService.connectDevice(modelData.mac)
-                                        }
+                                        BluetoothService.connect(modelData.address)
                                     } else {
-                                        BluetoothService.pairDevice(modelData.mac)
+                                        BluetoothService.pair(modelData.address)
                                     }
                                 }
                             }
@@ -418,9 +367,9 @@ Item {
                             
                             onClicked: {
                                 if (modelData.paired) {
-                                    BluetoothService.toggleBluetoothDevice(modelData.mac)
+                                    BluetoothService.connect(modelData.address)
                                 } else {
-                                    BluetoothService.pairDevice(modelData.mac)
+                                    BluetoothService.pair(modelData.address)
                                 }
                             }
                         }
@@ -430,7 +379,7 @@ Item {
                 Column {
                     width: parent.width
                     spacing: Theme.spacingM
-                    visible: BluetoothService.scanning && BluetoothService.availableDevices.length === 0
+                    visible: BluetoothService.discovering && BluetoothService.availableDevices.length === 0
                     
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -473,7 +422,7 @@ Item {
                     text: "No devices found. Put your device in pairing mode and click Start Scanning."
                     font.pixelSize: Theme.fontSizeMedium
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
-                    visible: BluetoothService.availableDevices.length === 0 && !BluetoothService.scanning
+                    visible: BluetoothService.availableDevices.length === 0 && !BluetoothService.discovering
                     wrapMode: Text.WordWrap
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
@@ -568,7 +517,7 @@ Item {
                     
                     onClicked: {
                         if (bluetoothContextMenuWindow.deviceData) {
-                            BluetoothService.toggleBluetoothDevice(bluetoothContextMenuWindow.deviceData.mac)
+                            BluetoothService.toggle(bluetoothContextMenuWindow.deviceData.address)
                         }
                         bluetoothContextMenuWindow.hide()
                     }
@@ -634,7 +583,7 @@ Item {
                     
                     onClicked: {
                         if (bluetoothContextMenuWindow.deviceData) {
-                            BluetoothService.removeDevice(bluetoothContextMenuWindow.deviceData.mac)
+                            BluetoothService.forget(bluetoothContextMenuWindow.deviceData.address)
                         }
                         bluetoothContextMenuWindow.hide()
                     }

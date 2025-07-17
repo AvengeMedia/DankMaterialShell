@@ -8,7 +8,6 @@ import qs.Services
 Rectangle {
     id: eventsWidget
     
-    property var theme: Theme
     property date selectedDate: new Date()
     property var selectedDateEvents: []
     property bool hasEvents: selectedDateEvents && selectedDateEvents.length > 0
@@ -21,9 +20,9 @@ Rectangle {
     
     width: parent.width
     height: shouldShow ? (hasEvents ? Math.min(300, 80 + selectedDateEvents.length * 60) : 120) : 0
-    radius: theme.cornerRadiusLarge
-    color: Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.12)
-    border.color: Qt.rgba(theme.outline.r, theme.outline.g, theme.outline.b, 0.08)
+    radius: Theme.cornerRadiusLarge
+    color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.12)
+    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 1
     visible: shouldShow
     
@@ -40,8 +39,8 @@ Rectangle {
     
     Behavior on height {
         NumberAnimation {
-            duration: theme.mediumDuration
-            easing.type: theme.emphasizedEasing
+            duration: Theme.mediumDuration
+            easing.type: Theme.emphasizedEasing
         }
     }
     
@@ -81,14 +80,14 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: theme.spacingL
-        spacing: theme.spacingS
+        anchors.margins: Theme.spacingL
+        spacing: Theme.spacingS
         
         Text {
             text: "event"
-            font.family: theme.iconFont
-            font.pixelSize: theme.iconSize - 2
-            color: theme.primary
+            font.family: Theme.iconFont
+            font.pixelSize: Theme.iconSize - 2
+            color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
         }
         
@@ -97,8 +96,8 @@ Rectangle {
                 (Qt.formatDate(selectedDate, "MMM d") + " • " + 
                  (selectedDateEvents.length === 1 ? "1 event" : selectedDateEvents.length + " events")) :
                 Qt.formatDate(selectedDate, "MMM d")
-            font.pixelSize: theme.fontSizeMedium
-            color: theme.surfaceText
+            font.pixelSize: Theme.fontSizeMedium
+            color: Theme.surfaceText
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -107,21 +106,21 @@ Rectangle {
     // No events placeholder - centered in entire widget (not just content area)
     Column {
         anchors.centerIn: parent
-        spacing: theme.spacingXS
+        spacing: Theme.spacingXS
         visible: !hasEvents
 
         Text {
             text: "event_busy"
-            font.family: theme.iconFont
-            font.pixelSize: theme.iconSize + 8
-            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.3)
+            font.family: Theme.iconFont
+            font.pixelSize: Theme.iconSize + 8
+            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3)
             anchors.horizontalCenter: parent.horizontalCenter
         }
         
         Text {
             text: "No events"
-            font.pixelSize: theme.fontSizeMedium
-            color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.5)
+            font.pixelSize: Theme.fontSizeMedium
+            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             font.weight: Font.Normal
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -134,12 +133,12 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        anchors.margins: theme.spacingL
-        anchors.topMargin: theme.spacingM
+        anchors.margins: Theme.spacingL
+        anchors.topMargin: Theme.spacingM
         visible: opacity > 0
         opacity: hasEvents ? 1.0 : 0.0
         clip: true
-        spacing: theme.spacingS
+        spacing: Theme.spacingS
         boundsMovement: Flickable.StopAtBounds
         boundsBehavior: Flickable.StopAtBounds
                     
@@ -149,28 +148,28 @@ Rectangle {
         
         Behavior on opacity {
             NumberAnimation {
-                duration: theme.mediumDuration
-                easing.type: theme.emphasizedEasing
+                duration: Theme.mediumDuration
+                easing.type: Theme.emphasizedEasing
             }
         }
         
         delegate: Rectangle {
             width: eventsList.width
-            height: eventContent.implicitHeight + theme.spacingM
-            radius: theme.cornerRadius
+            height: eventContent.implicitHeight + Theme.spacingM
+            radius: Theme.cornerRadius
             color: {
                 if (modelData.url && eventMouseArea.containsMouse) {
-                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.12)
+                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
                 } else if (eventMouseArea.containsMouse) {
-                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.06)
+                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.06)
                 }
-                return Qt.rgba(theme.surfaceVariant.r, theme.surfaceVariant.g, theme.surfaceVariant.b, 0.06)
+                return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.06)
             }
             border.color: {
                 if (modelData.url && eventMouseArea.containsMouse) {
-                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.3)
+                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
                 } else if (eventMouseArea.containsMouse) {
-                    return Qt.rgba(theme.primary.r, theme.primary.g, theme.primary.b, 0.15)
+                    return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.15)
                 }
                 return "transparent"
             }
@@ -184,7 +183,7 @@ Rectangle {
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 radius: 2
-                color: theme.primary
+                color: Theme.primary
                 opacity: 0.8
             }
             
@@ -193,15 +192,15 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.leftMargin: theme.spacingL + 4
-                anchors.rightMargin: theme.spacingM
+                anchors.leftMargin: Theme.spacingL + 4
+                anchors.rightMargin: Theme.spacingM
                 spacing: 6
                             
                             Text {
                                 width: parent.width
                                 text: modelData.title
-                                font.pixelSize: theme.fontSizeMedium
-                                color: theme.surfaceText
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
                                 font.weight: Font.Medium
                                 elide: Text.ElideRight
                                 wrapMode: Text.Wrap
@@ -220,9 +219,9 @@ Rectangle {
                                     
                                     Text {
                                         text: "schedule"
-                                        font.family: theme.iconFont
-                                        font.pixelSize: theme.fontSizeSmall
-                                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
                                     
@@ -240,8 +239,8 @@ Rectangle {
                                                 return startTime
                                             }
                                         }
-                                        font.pixelSize: theme.fontSizeSmall
-                                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                         font.weight: Font.Normal
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
@@ -256,16 +255,16 @@ Rectangle {
                                     
                                     Text {
                                         text: "location_on"
-                                        font.family: theme.iconFont
-                                        font.pixelSize: theme.fontSizeSmall
-                                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
                                     
                                     Text {
                                         text: modelData.location
-                                        font.pixelSize: theme.fontSizeSmall
-                                        color: Qt.rgba(theme.surfaceText.r, theme.surfaceText.g, theme.surfaceText.b, 0.7)
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                         elide: Text.ElideRight
                                         anchors.verticalCenter: parent.verticalCenter
                                         maximumLineCount: 1
@@ -293,15 +292,15 @@ Rectangle {
             
             Behavior on color {
                 ColorAnimation {
-                    duration: theme.shortDuration
-                    easing.type: theme.standardEasing
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
                 }
             }
             
             Behavior on border.color {
                 ColorAnimation {
-                    duration: theme.shortDuration
-                    easing.type: theme.standardEasing
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
                 }
             }
         }
