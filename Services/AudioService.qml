@@ -18,8 +18,19 @@ Singleton {
     property var audioSinks: []
     property var audioSources: []
 
+    property bool _refreshQueued: false
+
     Component.onCompleted: {
-        Qt.callLater(updateDevices)
+        deferRefresh()
+    }
+
+    function deferRefresh() {
+        if (_refreshQueued) return
+        _refreshQueued = true
+        Qt.callLater(function () {
+            _refreshQueued = false
+            updateDevices() 
+        })
     }
 
     function updateDevices() {
@@ -30,16 +41,13 @@ Singleton {
     Connections {
         target: Pipewire
         function onReadyChanged() {
-            if (Pipewire.ready) {
-                updateAudioSinks()
-                updateAudioSources()
-            }
+            if (Pipewire.ready) deferRefresh()
         }
         function onDefaultAudioSinkChanged() {
-            updateAudioSinks()
+            deferRefresh()
         }
         function onDefaultAudioSourceChanged() {
-            updateAudioSources()
+            deferRefresh()
         }
     }
 
@@ -53,8 +61,7 @@ Singleton {
                 let currentCount = Pipewire.nodes.values.length
                 if (currentCount !== lastNodeCount) {
                     lastNodeCount = currentCount
-                    updateAudioSinks()
-                    updateAudioSources()
+                    deferRefresh()
                 }
             }
         }
@@ -191,51 +198,45 @@ Singleton {
     }
 
     function setVolume(percentage) {
-        if (sink?.ready && sink?.audio) {
-            sink.audio.muted = false
-            sink.audio.volume = percentage / 100
-        }
+        if (!sink?.ready || !sink?.audio) return
+        sink.audio.muted = false
+        sink.audio.volume = percentage / 100
     }
 
     function setMicLevel(percentage) {
-        if (source?.ready && source?.audio) {
-            source.audio.muted = false
-            source.audio.volume = percentage / 100
-        }
+        if (!source?.ready || !source?.audio) return
+        source.audio.muted = false
+        source.audio.volume = percentage / 100
     }
 
     function toggleMute() {
-        if (sink?.ready && sink?.audio) {
-            sink.audio.muted = !sink.audio.muted
-        }
+        if (!sink?.ready || !sink?.audio) return
+        sink.audio.muted = !sink.audio.muted
     }
 
     function toggleMicMute() {
-        if (source?.ready && source?.audio) {
-            source.audio.muted = !source.audio.muted
-        }
+        if (!source?.ready || !source?.audio) return
+        source.audio.muted = !source.audio.muted
     }
 
     function setAudioSink(sinkName) {
-        if (Pipewire.nodes.values) {
-            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-                let node = Pipewire.nodes.values[i]
-                if (node && node.name === sinkName && (node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
-                    Pipewire.preferredDefaultAudioSink = node
-                    break
-                }
+        if (!Pipewire.nodes?.values) return
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            let node = Pipewire.nodes.values[i]
+            if (node && node.name === sinkName && (node.type & PwNodeType.AudioSink) === PwNodeType.AudioSink && !node.isStream) {
+                Pipewire.preferredDefaultAudioSink = node
+                break
             }
         }
     }
 
     function setAudioSource(sourceName) {
-        if (Pipewire.nodes.values) {
-            for (let i = 0; i < Pipewire.nodes.values.length; i++) {
-                let node = Pipewire.nodes.values[i]
-                if (node && node.name === sourceName && (node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream) {
-                    Pipewire.preferredDefaultAudioSource = node
-                    break
-                }
+        if (!Pipewire.nodes?.values) return
+        for (let i = 0; i < Pipewire.nodes.values.length; i++) {
+            let node = Pipewire.nodes.values[i]
+            if (node && node.name === sourceName && (node.type & PwNodeType.AudioSource) === PwNodeType.AudioSource && !node.isStream) {
+                Pipewire.preferredDefaultAudioSource = node
+                break
             }
         }
     }
