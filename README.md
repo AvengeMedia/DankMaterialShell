@@ -54,15 +54,15 @@ sudo dnf install quickshell-git
 ```bash
 # Arch
 # Core dependencies
-pacman -S inter-font ttf-fira-code cava wl-clipboard cliphist
+sudo pacman -S inter-font ttf-fira-code cava wl-clipboard cliphist
 paru -S ttf-material-symbols-variable-git    # AUR package
 
 # Optional: Brightness control
-pacman -S ddcutil          # For external monitors
-pacman -S brightnessctl    # For laptop displays
+sudo pacman -S ddcutil          # For external monitors
+sudo pacman -S brightnessctl    # For laptop displays
 
 # Optional: App theming (only if you use GTK/Qt applications)
-pacman -S adw-gtk3 qt5ct qt6ct gsettings-desktop-schemas
+sudo pacman -S adw-gtk-theme qt5ct qt6ct gsettings-desktop-schemas
 
 # Third-party packages (AUR)
 paru -S matugen
