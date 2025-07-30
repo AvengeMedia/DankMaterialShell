@@ -67,7 +67,7 @@ Item {
         id: fallbackTimer
 
         running: false
-        interval: 100
+        interval: 256
         repeat: true
         onTriggered: {
             root.audioLevels = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25];

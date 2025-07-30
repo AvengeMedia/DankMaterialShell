@@ -66,11 +66,17 @@ Item {
     
     // Auto-enable WiFi auto-refresh when network tab is visible
     Component.onCompleted: {
+        NetworkService.addRef();
         NetworkService.autoRefreshEnabled = true;
         if (NetworkService.wifiEnabled)
             NetworkService.scanWifi();
         // Start smart monitoring
         wifiMonitorTimer.start();
+    }
+    
+    Component.onDestruction: {
+        NetworkService.removeRef();
+        NetworkService.autoRefreshEnabled = false;
     }
 
     // Two-column layout for WiFi and Ethernet (WiFi on left, Ethernet on right)

@@ -9,6 +9,7 @@ import qs.Common
 Singleton {
     id: root
     
+    property int refCount: 0
     property string networkStatus: "disconnected" // "ethernet", "wifi", "disconnected"
     property string ethernetIP: ""
     property string ethernetInterface: ""
@@ -41,6 +42,22 @@ Singleton {
     property bool networkInfoLoading: false
     
     signal networksUpdated()
+    
+    function addRef() {
+        refCount++;
+        console.log("NetworkService: addRef, refCount now:", refCount);
+        // Reference counting affects WiFi scanning operations only
+        // Basic network status monitoring always runs
+    }
+    
+    function removeRef() {
+        refCount = Math.max(0, refCount - 1);
+        console.log("NetworkService: removeRef, refCount now:", refCount);
+        // Stop intensive WiFi operations when no consumers
+        if (refCount === 0) {
+            autoRefreshTimer.running = false;
+        }
+    }
     
     // Load saved preference on startup
     Component.onCompleted: {
@@ -519,7 +536,7 @@ Singleton {
     Timer {
         id: autoRefreshTimer
         interval: 20000
-        running: root.autoRefreshEnabled
+        running: root.autoRefreshEnabled && root.refCount > 0
         repeat: true
         onTriggered: scanWifi()
     }

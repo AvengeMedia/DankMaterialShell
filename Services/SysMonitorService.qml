@@ -4,12 +4,13 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Services
 
 Singleton {
     id: root
 
     property int refCount: 0
-    property int updateInterval: 8000
+    property int updateInterval: 30000
     property int maxProcesses: 100
     property bool isUpdating: false
 
@@ -360,10 +361,25 @@ Singleton {
     Timer {
         id: updateTimer
         interval: root.updateInterval
-        running: root.refCount > 0
+        running: root.refCount > 0 && !IdleService.isIdle
         repeat: true
         triggeredOnStart: true
         onTriggered: root.updateAllStats()
+    }
+    
+    Connections {
+        target: IdleService
+        function onIdleChanged(idle) {
+            if (idle) {
+                console.log("SysMonitorService: System idle, pausing monitoring")
+            } else {
+                console.log("SysMonitorService: System active, resuming monitoring")
+                if (root.refCount > 0) {
+                    // Trigger immediate update when coming back from idle
+                    root.updateAllStats()
+                }
+            }
+        }
     }
 
     readonly property string scriptBody: `set -Eeuo pipefail

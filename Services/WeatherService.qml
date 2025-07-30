@@ -5,6 +5,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -239,11 +240,26 @@ Singleton {
     Timer {
         id: updateTimer
         interval: root.updateInterval
-        running: root.refCount > 0
+        running: root.refCount > 0 && !IdleService.isIdle
         repeat: true
         triggeredOnStart: true
         onTriggered: {
             root.fetchWeather()
+        }
+    }
+    
+    Connections {
+        target: IdleService
+        function onIdleChanged(idle) {
+            if (idle) {
+                console.log("WeatherService: System idle, pausing weather updates")
+            } else {
+                console.log("WeatherService: System active, resuming weather updates")
+                if (root.refCount > 0 && !root.weather.available) {
+                    // Trigger immediate update when coming back from idle if no data
+                    root.fetchWeather()
+                }
+            }
         }
     }
     
