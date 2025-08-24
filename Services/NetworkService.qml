@@ -33,22 +33,26 @@ Singleton {
     property var wifiNetworks: []
     property var savedConnections: []
     property var wifiSignalIcon: {
-        if (currentWifiSSID == "" || !wifiEnabled) {
+        // If WiFi radio is disabled, show the off icon
+        if (!wifiEnabled) {
             return "signal_wifi_off"
         }
-        // Use nmcli signal strength percentage
-        if (wifiSignalStrength >= 70) {
-            return "signal_wifi_4_bar"
-        }
-        if (wifiSignalStrength >= 50) {
-            return "network_wifi_3_bar"
-        }
-        if (wifiSignalStrength >= 25) {
-            return "network_wifi_2_bar"
-        }
-        if (wifiSignalStrength >= 10) {
+        if (wifiConnected || networkStatus === "wifi") {
+            if (wifiSignalStrength >= 70) {
+                return "signal_wifi_4_bar"
+            }
+            if (wifiSignalStrength >= 50) {
+                return "network_wifi_3_bar"
+            }
+            if (wifiSignalStrength >= 25) {
+                return "network_wifi_2_bar"
+            }
+            if (wifiSignalStrength >= 10) {
+                return "network_wifi_1_bar"
+            }
             return "network_wifi_1_bar"
         }
+        // WiFi enabled but not connected
         return "signal_wifi_bad"
     }
 
