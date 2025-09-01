@@ -181,7 +181,9 @@ Item {
                                        slider.isDragging = true
                                        sliderMouseArea.isDragging = true
                                        let ratio = Math.max(
-                                           0, Math.min(1, mouse.x / width))
+                                           0, Math.min(1, (
+                                               mouse.x - sliderHandle.width / 2) / (
+                                                   width - sliderHandle.width)))
                                        let newValue = Math.round(
                                            slider.minimum + ratio
                                            * (slider.maximum - slider.minimum))
@@ -200,8 +202,9 @@ Item {
                                            if (pressed && slider.isDragging
                                                && slider.enabled) {
                                                let ratio = Math.max(
-                                                   0, Math.min(1,
-                                                               mouse.x / width))
+                                                   0, Math.min(1, (
+                                                       mouse.x - sliderHandle.width / 2) / (
+                                                           width - sliderHandle.width)))
                                                let newValue = Math.round(
                                                    slider.minimum + ratio
                                                    * (slider.maximum - slider.minimum))
@@ -213,7 +216,9 @@ Item {
                     onClicked: mouse => {
                                    if (slider.enabled && !slider.isDragging) {
                                        let ratio = Math.max(
-                                           0, Math.min(1, mouse.x / width))
+                                           0, Math.min(1, (
+                                               mouse.x - sliderHandle.width / 2) / (
+                                                   width - sliderHandle.width)))
                                        let newValue = Math.round(
                                            slider.minimum + ratio
                                            * (slider.maximum - slider.minimum))
