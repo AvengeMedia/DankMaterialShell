@@ -51,6 +51,46 @@ Rectangle {
                        baseColor.a * Theme.widgetTransparency)
     }
 
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
+        onWheel: {
+            var windows = root.sortedToplevels;
+            if (windows.length < 2) {
+                return;
+            }
+
+            var currentIndex = -1;
+            for (var i = 0; i < windows.length; i++) {
+                if (windows[i].activated) {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            var nextIndex;
+            if (wheel.angleDelta.y < 0) {
+                if (currentIndex === -1) {
+                    nextIndex = 0;
+                } else {
+                    nextIndex = (currentIndex + 1) % windows.length;
+                }
+            } else {
+                if (currentIndex === -1) {
+                    nextIndex = windows.length - 1;
+                } else {
+                    nextIndex = (currentIndex - 1 + windows.length) % windows.length;
+                }
+            }
+
+            var nextWindow = windows[nextIndex];
+            if (nextWindow) {
+                nextWindow.activate();
+            }
+        }
+    }
+
     Row {
         id: windowRow
 

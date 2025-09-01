@@ -152,6 +152,48 @@ Rectangle {
         target: SettingsData
     }
 
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        acceptedButtons: Qt.NoButton
+        onWheel: {
+            if (CompositorService.isNiri) {
+                var realWorkspaces = [];
+                for (var i = 0; i < root.workspaceList.length; i++) {
+                    if (root.workspaceList[i] !== -1) {
+                        realWorkspaces.push(root.workspaceList[i]);
+                    }
+                }
+
+                if (realWorkspaces.length < 2) return;
+
+                var currentIndex = -1;
+                for (var i = 0; i < realWorkspaces.length; i++) {
+                    if (realWorkspaces[i] === root.currentWorkspace) {
+                        currentIndex = i;
+                        break;
+                    }
+                }
+                if (currentIndex === -1) currentIndex = 0;
+
+                var nextIndex;
+                if (wheel.angleDelta.y < 0) {
+                    nextIndex = (currentIndex + 1) % realWorkspaces.length;
+                } else {
+                    nextIndex = (currentIndex - 1 + realWorkspaces.length) % realWorkspaces.length;
+                }
+                NiriService.switchToWorkspace(realWorkspaces[nextIndex] - 1);
+
+            } else if (CompositorService.isHyprland) {
+                if (wheel.angleDelta.y < 0) {
+                    Hyprland.dispatch("workspace r+1");
+                } else {
+                    Hyprland.dispatch("workspace r-1");
+                }
+            }
+        }
+    }
+
     Row {
         id: workspaceRow
 
