@@ -289,6 +289,12 @@ Item {
                         }
                     }
 
+		    KeyboardController {
+        	        id: keyboardController
+        		target: passwordField
+        		rootObject: root
+    		    }
+
                     StyledText {
                         id: placeholder
 
@@ -373,6 +379,27 @@ Item {
                                  && !pam.active && !LockScreenService.unlocking
                         enabled: visible
                         onClicked: parent.showPassword = !parent.showPassword
+                    }
+		    DankActionButton {
+                        id: virtualKeyboardButton
+
+                        anchors.right: revealButton.left
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "keyboard"
+                        buttonSize: 32
+                        visible: !demoMode && !pam.active && !LockScreenService.unlocking
+                        enabled: visible
+                        onClicked:
+                        {
+			    if(keyboardController.isKeyboardActive)
+			    {
+                                keyboardController.hide()
+		            } else				
+			    {
+			    	keyboardController.show()
+		            }
+                        }
                     }
 
                     Rectangle {
