@@ -117,7 +117,7 @@ DankMaterialShell supports both **niri** and **Hyprland** compositors:
 paru -S niri-git
 
 # Fedora  
-sudo dnf copr enable alebastr/niri && sudo dnf install niri
+sudo dnf copr enable yalter/niri && sudo dnf install niri
 ```
 
 For detailed niri installation instructions, see the [niri Getting Started guide](https://yalter.github.io/niri/Getting-Started.html).
@@ -171,7 +171,7 @@ fc-cache -f
 
 # Arch linux available via AUR
 ```bash
-paru -S dankmaterialshell-git
+paru -S dms-shell-git # Or dms-shell for latest tag
 ```
 
 # Manual install

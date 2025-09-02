@@ -84,7 +84,7 @@ Column {
         StyledText {
             width: parent.width - 80
             height: 40
-            text: Qt.formatDate(displayDate, "MMMM yyyy")
+            text: displayDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceText
             font.weight: Font.Medium
@@ -128,7 +128,15 @@ Column {
         height: 32
 
         Repeater {
-            model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+            model: {
+                var days = []
+                var locale = Qt.locale()
+                for (var i = 0; i < 7; i++) {
+                    var date = new Date(2024, 0, 7 + i)
+                    days.push(locale.dayName(i, Locale.ShortFormat))
+                }
+                return days
+            }
 
             Rectangle {
                 width: parent.width / 7

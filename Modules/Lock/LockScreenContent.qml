@@ -84,7 +84,7 @@ Item {
     SystemClock {
         id: systemClock
 
-        precision: SystemClock.Seconds
+        precision: SystemClock.Minutes
     }
 
     Rectangle {
@@ -102,11 +102,13 @@ Item {
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                text: SettingsData.use24HourClock ? Qt.formatTime(
-                                                        systemClock.date,
-                                                        "HH:mm") : Qt.formatTime(
-                                                        systemClock.date,
-                                                        "h:mm AP")
+                text: {
+                    if (SettingsData.use24HourClock) {
+                        return systemClock.date.toLocaleTimeString(Qt.locale(), Locale.ShortFormat)
+                    } else {
+                        return systemClock.date.toLocaleTimeString(Qt.locale(), "h:mm AP")
+                    }
+                }
                 font.pixelSize: 120
                 font.weight: Font.Light
                 color: "white"
@@ -117,8 +119,12 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: clockText.bottom
                 anchors.topMargin: -20
-                text: Qt.formatDate(systemClock.date,
-                                    SettingsData.lockDateFormat)
+                text: {
+                    if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
+                        return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat)
+                    }
+                    return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat)
+                }
                 font.pixelSize: Theme.fontSizeXLarge
                 color: "white"
                 opacity: 0.9

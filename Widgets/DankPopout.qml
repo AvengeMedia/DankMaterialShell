@@ -137,32 +137,28 @@ PanelWindow {
             active: root.visible
             asynchronous: false
         }
-    }
 
-    FocusScope {
-        anchors.fill: parent
-        visible: shouldBeVisible
-        focus: shouldBeVisible
-
-        Keys.onPressed: event => {
-                            if (event.key === Qt.Key_Escape) {
-                                close()
-                                event.accepted = true
-                            } else {
-                                // Forward all non-escape keys to content
-                                event.accepted = false
-                            }
-                        }
-
-        onVisibleChanged: {
-            if (visible) {
-                Qt.callLater(function () {
-                    if (contentLoader.item) {
-                        contentLoader.item.forceActiveFocus()
-                    } else {
-                        forceActiveFocus()
-                    }
-                })
+        Item {
+            anchors.fill: parent
+            focus: true
+            
+            Keys.onPressed: event => {
+                if (event.key === Qt.Key_Escape) {
+                    close()
+                    event.accepted = true
+                } else {
+                    event.accepted = false
+                }
+            }
+            
+            Component.onCompleted: {
+                forceActiveFocus()
+            }
+            
+            onVisibleChanged: {
+                if (visible) {
+                    forceActiveFocus()
+                }
             }
         }
     }

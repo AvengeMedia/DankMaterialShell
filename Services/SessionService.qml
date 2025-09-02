@@ -33,7 +33,7 @@ Singleton {
     Process {
         id: detectElogindProcess
         running: false
-        command: ["sh", "-c", "ps -eo comm= | grep -Fx elogind-daemon"]
+        command: ["sh", "-c", "ps -eo comm= | grep -E '^(elogind|elogind-daemon)$'"]
 
         onExited: function (exitCode) {
             console.log("SessionService: Elogind detection exited with code", exitCode)

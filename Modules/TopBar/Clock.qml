@@ -37,10 +37,13 @@ Rectangle {
         spacing: Theme.spacingS
 
         StyledText {
-            text: SettingsData.use24HourClock ? Qt.formatTime(
-                                                    root.currentDate,
-                                                    "HH:mm") : Qt.formatTime(
-                                                    root.currentDate, "h:mm AP")
+            text: {
+                if (SettingsData.use24HourClock) {
+                    return root.currentDate.toLocaleTimeString(Qt.locale(), Locale.ShortFormat)
+                } else {
+                    return root.currentDate.toLocaleTimeString(Qt.locale(), "h:mm AP")
+                }
+            }
             font.pixelSize: Theme.fontSizeMedium - 1
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
@@ -55,7 +58,12 @@ Rectangle {
         }
 
         StyledText {
-            text: Qt.formatDate(root.currentDate, SettingsData.clockDateFormat)
+            text: {
+                if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0) {
+                    return root.currentDate.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat)
+                }
+                return root.currentDate.toLocaleDateString(Qt.locale(), "ddd d")
+            }
             font.pixelSize: Theme.fontSizeMedium - 1
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter

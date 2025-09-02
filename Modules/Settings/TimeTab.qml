@@ -126,10 +126,11 @@ Item {
                         width: parent.width
                         height: 50
                         text: "Top Bar Format"
-                        description: "Preview: " + Qt.formatDate(
-                                         new Date(),
-                                         SettingsData.clockDateFormat)
+                        description: "Preview: " + (SettingsData.clockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(Qt.locale(), "ddd d"))
                         currentValue: {
+                            if (!SettingsData.clockDateFormat || SettingsData.clockDateFormat.length === 0) {
+                                return "System Default"
+                            }
                             // Find matching preset or show "Custom"
                             const presets = [{
                                                  "format": "ddd d",
@@ -162,9 +163,10 @@ Item {
                                                        })
                             return match ? match.label : "Custom: " + SettingsData.clockDateFormat
                         }
-                        options: ["Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
+                        options: ["System Default", "Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
                         onValueChanged: value => {
                                             const formatMap = {
+                                                "System Default": "",
                                                 "Day Date": "ddd d",
                                                 "Day Month Date": "ddd MMM d",
                                                 "Month Date": "MMM d",
@@ -188,10 +190,11 @@ Item {
                         width: parent.width
                         height: 50
                         text: "Lock Screen Format"
-                        description: "Preview: " + Qt.formatDate(
-                                         new Date(),
-                                         SettingsData.lockDateFormat)
+                        description: "Preview: " + (SettingsData.lockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(Qt.locale(), Locale.LongFormat))
                         currentValue: {
+                            if (!SettingsData.lockDateFormat || SettingsData.lockDateFormat.length === 0) {
+                                return "System Default"
+                            }
                             // Find matching preset or show "Custom"
                             const presets = [{
                                                  "format": "ddd d",
@@ -224,9 +227,10 @@ Item {
                                                        })
                             return match ? match.label : "Custom: " + SettingsData.lockDateFormat
                         }
-                        options: ["Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
+                        options: ["System Default", "Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
                         onValueChanged: value => {
                                             const formatMap = {
+                                                "System Default": "",
                                                 "Day Date": "ddd d",
                                                 "Day Month Date": "ddd MMM d",
                                                 "Month Date": "MMM d",

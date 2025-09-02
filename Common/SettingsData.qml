@@ -51,8 +51,8 @@ Singleton {
     property bool focusedWindowCompactMode: false
     property bool runningAppsCompactMode: true
     property bool runningAppsCurrentWorkspace: false
-    property string clockDateFormat: "ddd d"
-    property string lockDateFormat: "dddd, MMMM d"
+    property string clockDateFormat: ""
+    property string lockDateFormat: ""
     property int mediaSize: 1
     property var topBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
     property var topBarCenterWidgets: ["music", "clock", "weather"]
@@ -108,6 +108,22 @@ Singleton {
     signal forceTopBarLayoutRefresh
     signal widgetDataChanged
     signal workspaceIconsUpdated
+    
+    function getEffectiveTimeFormat() {
+        if (use24HourClock) {
+            return Locale.ShortFormat
+        } else {
+            return "h:mm AP"
+        }
+    }
+    
+    function getEffectiveClockDateFormat() {
+        return clockDateFormat && clockDateFormat.length > 0 ? clockDateFormat : "ddd d"
+    }
+    
+    function getEffectiveLockDateFormat() {
+        return lockDateFormat && lockDateFormat.length > 0 ? lockDateFormat : Locale.LongFormat
+    }
 
     function initializeListModels() {
         // ! Hack-ish to add all properties to the listmodel once
@@ -227,9 +243,9 @@ Singleton {
                 runningAppsCurrentWorkspace = settings.runningAppsCurrentWorkspace
                         !== undefined ? settings.runningAppsCurrentWorkspace : false
                 clockDateFormat = settings.clockDateFormat
-                        !== undefined ? settings.clockDateFormat : "ddd d"
+                        !== undefined ? settings.clockDateFormat : ""
                 lockDateFormat = settings.lockDateFormat
-                        !== undefined ? settings.lockDateFormat : "dddd, MMMM d"
+                        !== undefined ? settings.lockDateFormat : ""
                 mediaSize = settings.mediaSize !== undefined ? settings.mediaSize : (settings.mediaCompactMode !== undefined ? (settings.mediaCompactMode ? 0 : 1) : 1)
                 if (settings.topBarWidgetOrder) {
                     topBarLeftWidgets = settings.topBarWidgetOrder.filter(w => {
@@ -477,12 +493,12 @@ Singleton {
     }
 
     function setClockDateFormat(format) {
-        clockDateFormat = format
+        clockDateFormat = format || ""
         saveSettings()
     }
 
     function setLockDateFormat(format) {
-        lockDateFormat = format
+        lockDateFormat = format || ""
         saveSettings()
     }
 
