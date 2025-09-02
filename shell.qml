@@ -284,6 +284,16 @@ ShellRoot {
     }
 
     LazyLoader {
+        id: notepadModalLoader
+
+        active: false
+
+        NotepadModal {
+            id: notepadModal
+        }
+    }
+
+    LazyLoader {
         id: powerMenuModalLoader
 
         active: false
@@ -371,6 +381,33 @@ ShellRoot {
         }
 
         target: "processlist"
+    }
+
+    IpcHandler {
+        function open() {
+            notepadModalLoader.active = true
+            if (notepadModalLoader.item)
+                notepadModalLoader.item.show()
+
+            return "NOTEPAD_OPEN_SUCCESS"
+        }
+
+        function close() {
+            if (notepadModalLoader.item)
+                notepadModalLoader.item.hide()
+
+            return "NOTEPAD_CLOSE_SUCCESS"
+        }
+
+        function toggle() {
+            notepadModalLoader.active = true
+            if (notepadModalLoader.item)
+                notepadModalLoader.item.toggle()
+
+            return "NOTEPAD_TOGGLE_SUCCESS"
+        }
+
+        target: "notepad"
     }
 
     Variants {

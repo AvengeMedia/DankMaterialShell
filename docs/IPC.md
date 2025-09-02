@@ -392,6 +392,14 @@ Power menu modal control for system power actions.
 - `close` - Hide power menu modal
 - `toggle` - Toggle power menu modal visibility
 
+### Target: `notepad`
+Notepad/scratchpad modal control for quick note-taking.
+
+**Functions:**
+- `open` - Show notepad modal
+- `close` - Hide notepad modal
+- `toggle` - Toggle notepad modal visibility
+
 ### Target: `file`
 File browser controls for selecting wallpapers and profile images.
 
@@ -422,6 +430,9 @@ qs -c dms ipc call processlist toggle
 # Show power menu
 qs -c dms ipc call powermenu toggle
 
+# Open notepad
+qs -c dms ipc call notepad toggle
+
 # Open file browsers
 qs -c dms ipc call file browse wallpaper
 qs -c dms ipc call file browse profile
@@ -437,6 +448,7 @@ These IPC commands are designed to be used with window manager keybindings. Exam
 binds {
     Mod+Space { spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle"; }
     Mod+V { spawn "qs" "-c" "dms" "ipc" "call" "clipboard" "toggle"; }
+    Mod+P { spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggle"; }
     Mod+X { spawn "qs" "-c" "dms" "ipc" "call" "powermenu" "toggle"; }
     XF86AudioRaiseVolume { spawn "qs" "-c" "dms" "ipc" "call" "audio" "increment" "3"; }
     XF86MonBrightnessUp { spawn "qs" "-c" "dms" "ipc" "call" "brightness" "increment" "5" ""; }

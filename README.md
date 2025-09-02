@@ -91,6 +91,7 @@ https://github.com/user-attachments/assets/5ad934bb-e7aa-4c04-8d40-149181bd2d29
 - **Dock** A dock with pinned apps support, recent apps support, and currently running application support.
 - **Control Center** A full control center with user profile information, network, bluetooth, audio input/output, display controls, and night mode automation.
 - **Lock Screen** Using quickshell's WlSessionLock
+- **Notepad** A simple text notepad/scratchpad with auto-save to session data and file export/import functionality.
 
 **Features:**
 
@@ -299,6 +300,9 @@ binds {
    Mod+Comma hotkey-overlay-title="Settings" {
       spawn "qs" "-c" "dms" "ipc" "call" "settings" "toggle";
    }
+   Mod+P hotkey-overlay-title="Notepad" {
+      spawn "qs" "-c" "dms" "ipc" "call" "notepad" "toggle";
+   }
    Super+Alt+L hotkey-overlay-title="Lock Screen" {
       spawn "qs" "-c" "dms" "ipc" "call" "lock" "lock";
    }
@@ -358,6 +362,7 @@ bind = SUPER, V, exec, qs -c dms ipc call clipboard toggle
 bind = SUPER, M, exec, qs -c dms ipc call processlist toggle
 bind = SUPER, N, exec, qs -c dms ipc call notifications toggle
 bind = SUPER, comma, exec, qs -c dms ipc call settings toggle
+bind = SUPER, P, exec, qs -c dms ipc call notepad toggle
 bind = SUPERALT, L, exec, qs -c dms ipc call lock lock
 bind = SUPER, X, exec, qs -c dms ipc call powermenu toggle
 
@@ -389,6 +394,7 @@ qs -c dms ipc call audio mute
 # Launch applications
 ```bash
 qs -c dms ipc call spotlight toggle
+qs -c dms ipc call notepad toggle
 qs -c dms ipc call processlist toggle
 qs -c dms ipc call powermenu toggle
 ```

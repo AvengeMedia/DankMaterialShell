@@ -25,6 +25,8 @@ DankModal {
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property bool backButtonFocused: false
+    property bool saveMode: false  // Enable save functionality
+    property string defaultFileName: ""  // Default filename for save mode
 
     FolderListModel {
         id: folderModel
@@ -620,6 +622,72 @@ DankModal {
                             }
                         }
                         
+                    }
+                }
+            }
+            
+            // Save functionality - positioned at bottom in save mode
+            Row {
+                id: saveRow
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left  
+                anchors.right: parent.right
+                anchors.margins: Theme.spacingL
+                height: saveMode ? 40 : 0
+                visible: saveMode
+                spacing: Theme.spacingM
+                
+                DankTextField {
+                    id: fileNameInput
+                    width: parent.width - saveButton.width - Theme.spacingM
+                    height: 36
+                    text: defaultFileName
+                    placeholderText: "Enter filename..."
+                    ignoreLeftRightKeys: false  // Allow arrow key navigation
+                    focus: saveMode  // Auto-focus when in save mode
+                    
+                    Component.onCompleted: {
+                        if (saveMode) {
+                            Qt.callLater(() => {
+                                forceActiveFocus();
+                            });
+                        }
+                    }
+                    
+                    onAccepted: {
+                        if (text.trim() !== "") {
+                            var fullPath = currentPath + "/" + text.trim();
+                            fileSelected(fullPath);
+                            fileBrowserModal.close();
+                        }
+                    }
+                }
+                
+                StyledRect {
+                    id: saveButton
+                    width: 80
+                    height: 36
+                    color: fileNameInput.text.trim() !== "" ? Theme.primary : Theme.surfaceVariant
+                    radius: Theme.cornerRadius
+                    
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: "Save"
+                        color: fileNameInput.text.trim() !== "" ? Theme.primaryText : Theme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                    
+                    StateLayer {
+                        stateColor: Theme.primary
+                        cornerRadius: Theme.cornerRadius
+                        enabled: fileNameInput.text.trim() !== ""
+                        onClicked: {
+                            if (fileNameInput.text.trim() !== "") {
+                                var fullPath = currentPath + "/" + fileNameInput.text.trim();
+                                fileSelected(fullPath);
+                                fileBrowserModal.close();
+                            }
+                        }
                     }
                 }
             }

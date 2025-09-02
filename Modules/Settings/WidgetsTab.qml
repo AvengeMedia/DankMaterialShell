@@ -108,6 +108,12 @@ Item {
             "icon": "notifications",
             "enabled": true
         }, {
+            "id": "notepadButton",
+            "text": "Notepad",
+            "description": "Quick access to notepad",
+            "icon": "assignment",
+            "enabled": true
+        }, {
             "id": "battery",
             "text": "Battery",
             "description": "Battery level and power management",
@@ -419,9 +425,9 @@ Item {
             SettingsData.setTopBarCenterWidgets(defaultCenterWidgets)
 
         if (!SettingsData.topBarRightWidgets)
-            SettingsData.setTopBarRightWidgets(
-                        defaultRightWidgets)["left""center""right"].forEach(
-                        sectionId => {
+            SettingsData.setTopBarRightWidgets(defaultRightWidgets)
+
+        ["left", "center", "right"].forEach(sectionId => {
                             var widgets = []
                             if (sectionId === "left")
                             widgets = SettingsData.topBarLeftWidgets.slice()

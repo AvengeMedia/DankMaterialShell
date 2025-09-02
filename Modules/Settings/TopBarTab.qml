@@ -151,6 +151,12 @@ Item {
             "text": "Keyboard Layout Name",
             "description": "Displays the active keyboard layout and allows switching",
             "icon": "keyboard",
+        }, {
+            "id": "notepadButton",
+            "text": "Notepad",
+            "description": "Quick access to notepad",
+            "icon": "assignment",
+            "enabled": true
         }]
     property var defaultLeftWidgets: [{
             "id": "launcherButton",

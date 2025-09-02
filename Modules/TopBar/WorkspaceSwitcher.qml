@@ -156,41 +156,99 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
-        onWheel: {
-            if (CompositorService.isNiri) {
-                var realWorkspaces = [];
-                for (var i = 0; i < root.workspaceList.length; i++) {
-                    if (root.workspaceList[i] !== -1) {
-                        realWorkspaces.push(root.workspaceList[i]);
+        
+        property real scrollAccumulator: 0
+        property real touchpadThreshold: 500
+        
+        onWheel: (wheel) => {
+            const deltaY = wheel.angleDelta.y
+            const isMouseWheel = Math.abs(deltaY) >= 120
+                && (Math.abs(deltaY) % 120) === 0
+            
+            if (isMouseWheel) {
+                // Direct mouse wheel action
+                if (CompositorService.isNiri) {
+                    var realWorkspaces = [];
+                    for (var i = 0; i < root.workspaceList.length; i++) {
+                        if (root.workspaceList[i] !== -1) {
+                            realWorkspaces.push(root.workspaceList[i]);
+                        }
+                    }
+
+                    if (realWorkspaces.length < 2) return;
+
+                    var currentIndex = -1;
+                    for (var i = 0; i < realWorkspaces.length; i++) {
+                        if (realWorkspaces[i] === root.currentWorkspace) {
+                            currentIndex = i;
+                            break;
+                        }
+                    }
+                    if (currentIndex === -1) currentIndex = 0;
+
+                    var nextIndex;
+                    if (deltaY < 0) {
+                        nextIndex = (currentIndex + 1) % realWorkspaces.length;
+                    } else {
+                        nextIndex = (currentIndex - 1 + realWorkspaces.length) % realWorkspaces.length;
+                    }
+                    NiriService.switchToWorkspace(realWorkspaces[nextIndex] - 1);
+
+                } else if (CompositorService.isHyprland) {
+                    if (deltaY < 0) {
+                        Hyprland.dispatch("workspace r+1");
+                    } else {
+                        Hyprland.dispatch("workspace r-1");
                     }
                 }
+            } else {
+                // Touchpad - accumulate small deltas
+                scrollAccumulator += deltaY
+                
+                if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
+                    if (CompositorService.isNiri) {
+                        var realWorkspaces = [];
+                        for (var i = 0; i < root.workspaceList.length; i++) {
+                            if (root.workspaceList[i] !== -1) {
+                                realWorkspaces.push(root.workspaceList[i]);
+                            }
+                        }
 
-                if (realWorkspaces.length < 2) return;
+                        if (realWorkspaces.length < 2) {
+                            scrollAccumulator = 0;
+                            return;
+                        }
 
-                var currentIndex = -1;
-                for (var i = 0; i < realWorkspaces.length; i++) {
-                    if (realWorkspaces[i] === root.currentWorkspace) {
-                        currentIndex = i;
-                        break;
+                        var currentIndex = -1;
+                        for (var i = 0; i < realWorkspaces.length; i++) {
+                            if (realWorkspaces[i] === root.currentWorkspace) {
+                                currentIndex = i;
+                                break;
+                            }
+                        }
+                        if (currentIndex === -1) currentIndex = 0;
+
+                        var nextIndex;
+                        if (scrollAccumulator < 0) {
+                            nextIndex = (currentIndex + 1) % realWorkspaces.length;
+                        } else {
+                            nextIndex = (currentIndex - 1 + realWorkspaces.length) % realWorkspaces.length;
+                        }
+                        NiriService.switchToWorkspace(realWorkspaces[nextIndex] - 1);
+
+                    } else if (CompositorService.isHyprland) {
+                        if (scrollAccumulator < 0) {
+                            Hyprland.dispatch("workspace r+1");
+                        } else {
+                            Hyprland.dispatch("workspace r-1");
+                        }
                     }
-                }
-                if (currentIndex === -1) currentIndex = 0;
-
-                var nextIndex;
-                if (wheel.angleDelta.y < 0) {
-                    nextIndex = (currentIndex + 1) % realWorkspaces.length;
-                } else {
-                    nextIndex = (currentIndex - 1 + realWorkspaces.length) % realWorkspaces.length;
-                }
-                NiriService.switchToWorkspace(realWorkspaces[nextIndex] - 1);
-
-            } else if (CompositorService.isHyprland) {
-                if (wheel.angleDelta.y < 0) {
-                    Hyprland.dispatch("workspace r+1");
-                } else {
-                    Hyprland.dispatch("workspace r-1");
+                    
+                    scrollAccumulator = 0
                 }
             }
+            
+            wheel.accepted = true
         }
     }
 

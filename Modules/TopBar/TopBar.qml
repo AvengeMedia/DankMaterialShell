@@ -341,6 +341,8 @@ PanelWindow {
                             return true
                         case "vpn":
                             return true
+                        case "notepadButton":
+                            return true
                         default:
                             return false
                         }
@@ -394,6 +396,8 @@ PanelWindow {
                             return keyboardLayoutNameComponent
                         case "vpn":
                             return vpnComponent
+                        case "notepadButton":
+                            return notepadButtonComponent
                         default:
                             return null
                         }
@@ -1151,6 +1155,36 @@ PanelWindow {
                         id: keyboardLayoutNameComponent
 
                         KeyboardLayoutName {}
+                    }
+
+                    Component {
+                        id: notepadButtonComponent
+
+                        NotepadButton {
+                            isActive: notepadModalLoader.item ? notepadModalLoader.item.visible : false
+                            widgetHeight: root.widgetHeight
+                            barHeight: root.effectiveBarHeight
+                            section: {
+                                if (parent && parent.parent === leftSection)
+                                    return "left"
+                                if (parent && parent.parent === rightSection)
+                                    return "right"
+                                if (parent && parent.parent === centerSection)
+                                    return "center"
+                                return "right"
+                            }
+                            popupTarget: {
+                                notepadModalLoader.active = true
+                                return notepadModalLoader.item
+                            }
+                            parentScreen: root.screen
+                            onClicked: {
+                                notepadModalLoader.active = true
+                                if (notepadModalLoader.item) {
+                                    notepadModalLoader.item.toggle()
+                                }
+                            }
+                        }
                     }
                 }
             }

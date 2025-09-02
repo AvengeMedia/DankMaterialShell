@@ -147,6 +147,8 @@ Item {
                     id: sliderMouseArea
 
                     property bool isDragging: false
+                    property real scrollAccumulator: 0
+                    property real touchpadThreshold: 20
 
                     anchors.fill: parent
                     anchors.topMargin: -10
@@ -156,23 +158,49 @@ Item {
                     enabled: slider.enabled
                     preventStealing: true
                     acceptedButtons: Qt.LeftButton
-                    onWheel: function (wheelEvent) {
+                    onWheel: (wheelEvent) => {
                         if (!slider.enabled || !slider.wheelEnabled) {
                             wheelEvent.accepted = false
                             return
                         }
-                        let delta = wheelEvent.angleDelta.y
+                        
+                        const deltaY = wheelEvent.angleDelta.y
+                        const isMouseWheel = Math.abs(deltaY) >= 120
+                            && (Math.abs(deltaY) % 120) === 0
+                        
                         let currentValue = slider.value
-                        let step = Math.max(1, (slider.maximum - slider.minimum) / 20)
-                        let newValue
-                        if (delta > 0)
-                            newValue = Math.min(slider.maximum, currentValue + step)
-                        else
-                            newValue = Math.max(slider.minimum, currentValue - step)
-                        newValue = Math.round(newValue)
-                        if (newValue !== slider.value) {
-                            slider.value = newValue
-                            slider.sliderValueChanged(newValue)
+                        
+                        if (isMouseWheel) {
+                            // Direct mouse wheel action - 5% steps
+                            let step = Math.max(1, (slider.maximum - slider.minimum) / 20)
+                            let newValue
+                            if (deltaY > 0)
+                                newValue = Math.min(slider.maximum, currentValue + step)
+                            else
+                                newValue = Math.max(slider.minimum, currentValue - step)
+                            newValue = Math.round(newValue)
+                            if (newValue !== slider.value) {
+                                slider.value = newValue
+                                slider.sliderValueChanged(newValue)
+                            }
+                        } else {
+                            // Touchpad - accumulate then apply 1% steps
+                            scrollAccumulator += deltaY
+                            
+                            if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
+                                let step = Math.max(0.5, (slider.maximum - slider.minimum) / 100)
+                                let newValue
+                                if (scrollAccumulator > 0)
+                                    newValue = Math.min(slider.maximum, currentValue + step)
+                                else
+                                    newValue = Math.max(slider.minimum, currentValue - step)
+                                newValue = Math.round(newValue)
+                                if (newValue !== slider.value) {
+                                    slider.value = newValue
+                                    slider.sliderValueChanged(newValue)
+                                }
+                                scrollAccumulator = 0
+                            }
                         }
                         wheelEvent.accepted = true
                     }
