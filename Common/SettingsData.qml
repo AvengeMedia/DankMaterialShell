@@ -25,7 +25,7 @@ Singleton {
     property bool useAutoLocation: false
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
-    property bool showAdvancedWorkspaceSwitcher: false
+    property bool showAdvancedWorkspaceSwitcher: true
     property bool showFocusedWindow: true
     property bool showWeather: true
     property bool showMusic: true
@@ -200,7 +200,7 @@ Singleton {
                 showWorkspaceSwitcher = settings.showWorkspaceSwitcher
                         !== undefined ? settings.showWorkspaceSwitcher : true
 		showAdvancedWorkspaceSwitcher = settings.showAdvancedWorkspaceSwitcher
-                        !== undefined ? settings.showAdvancedWorkspaceSwitcher : false
+                        !== undefined ? settings.showAdvancedWorkspaceSwitcher : true
                 showFocusedWindow = settings.showFocusedWindow
                         !== undefined ? settings.showFocusedWindow : true
                 showWeather = settings.showWeather !== undefined ? settings.showWeather : true
@@ -730,7 +730,7 @@ Singleton {
         updateListModel(rightWidgetsModel, defaultRight)
         showLauncherButton = true
         showWorkspaceSwitcher = true
-	showAdvancedWorkspaceSwitcher = false
+	showAdvancedWorkspaceSwitcher = true
         showFocusedWindow = true
         showWeather = true
         showMusic = true
