@@ -444,6 +444,17 @@ Singleton {
                         }
                     })
     }
+    
+    function focusWindow(windowId) {
+        return send({
+            "Action": {
+    	        "FocusWindow": {
+      		    "id": windowId
+    	   	}
+  	    }
+        })
+    }
+
 
     function getCurrentOutputWorkspaceNumbers() {
         return currentOutputWorkspaces.map(
