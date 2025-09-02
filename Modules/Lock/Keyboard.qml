@@ -1,13 +1,14 @@
 import QtQuick
+import qs.Common
 
 Rectangle {
     id: root
     property Item target
-    height: 0.4 * parent.height
+    height: 60 * 5
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    color: "#9ea3a8"
+    color: Theme.widgetBackground()
 
     property double rowSpacing:     0.01 * width  // horizontal spacing between keyboard
     property double columnSpacing:  0.02 * height // vertical   spacing between keyboard
@@ -17,7 +18,7 @@ Rectangle {
     property double rows:           4 // Number of row
 
     property string strShift: '\u2191' // UPWARDS ARROW unicode
-    property string strBackspace: '\u2190' // LEFTWARDS ARROW unicode
+    property string strBackspace: "Backspace"
 
     property var modelKeyboard: {
         "row_1" : [
@@ -52,13 +53,13 @@ Rectangle {
                     {text: 'b', symbol: "'", width: 1},
                     {text: 'n', symbol: "%", width: 1},
 		    {text: 'm', symbol: '"', width: 1},
-                    {text: "'", symbol: "*", width: 1},
-                    {text: strBackspace, symbol: strBackspace, width: 1.5}
+                    {text: "'", symbol: "*", width: 1.5}
                 ],
         "row_4" : [
                     {text: '123', symbol: 'ABC', width: 1.5},
                     {text: ' ', symbol: ' ', width: 6},
-                    {text: '.', symbol: '.', width: 1},
+                    {text: '.', symbol: '.', width: 1},,
+                    {text: strBackspace, symbol: strBackspace, width: 1.5}
                 ]
     }
 
@@ -145,8 +146,8 @@ Rectangle {
                     model: modelKeyboard["row_1"]
                     delegate: CustomButtonKeyboard {
                         text: symbols? modelData.symbol: shift? modelData.text.toUpperCase():  modelData.text
-                        buttonWidth: modelData.width * keyboard_container.width / columns - rowSpacing
-                        buttonHeight: keyboard_container.height / rows - columnSpacing
+                        width: modelData.width * keyboard_container.width / columns - rowSpacing
+                        height: keyboard_container.height / rows - columnSpacing
 
                         onClicked: root.clicked(text)
                     }
@@ -159,8 +160,8 @@ Rectangle {
                     model: modelKeyboard["row_2"]
                     delegate: CustomButtonKeyboard {
                         text: symbols? modelData.symbol: shift? modelData.text.toUpperCase():  modelData.text
-                        buttonWidth: modelData.width * keyboard_container.width / columns - rowSpacing
-                        buttonHeight: keyboard_container.height / rows - columnSpacing
+                        width: modelData.width * keyboard_container.width / columns - rowSpacing
+                        height: keyboard_container.height / rows - columnSpacing
 
                         onClicked: root.clicked(text)
                     }
@@ -173,8 +174,8 @@ Rectangle {
                     model: modelKeyboard["row_3"]
                     delegate: CustomButtonKeyboard {
                         text: symbols? modelData.symbol: shift? modelData.text.toUpperCase():  modelData.text
-                        buttonWidth: modelData.width * keyboard_container.width / columns - rowSpacing
-                        buttonHeight: keyboard_container.height / rows - columnSpacing
+                        width: modelData.width * keyboard_container.width / columns - rowSpacing
+                        height: keyboard_container.height / rows - columnSpacing
                         isShift: shift && text === strShift
 
                         onClicked: root.clicked(text)
@@ -188,8 +189,8 @@ Rectangle {
                     model: modelKeyboard["row_4"]
                     delegate: CustomButtonKeyboard {
                         text: symbols? modelData.symbol: shift? modelData.text.toUpperCase():  modelData.text
-                        buttonWidth: modelData.width * keyboard_container.width / columns - rowSpacing
-                        buttonHeight: keyboard_container.height / rows - columnSpacing
+                        width: modelData.width * keyboard_container.width / columns - rowSpacing
+                        height: keyboard_container.height / rows - columnSpacing
 
                         onClicked: root.clicked(text)
                     }
@@ -221,7 +222,6 @@ Connections {
                 var charToInsert = root.symbols ? text : (root.shift ? text.toUpperCase() : text)
                 var current = keyboard_controller.target.text
                 var cursorPos = keyboard_controller.target.cursorPosition
-                // вставка в курсор
                 keyboard_controller.target.text = current.slice(0, cursorPos) + charToInsert + current.slice(cursorPos)
                 keyboard_controller.target.cursorPosition = cursorPos + 1
             }

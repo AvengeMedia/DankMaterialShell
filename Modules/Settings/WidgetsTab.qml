@@ -20,6 +20,12 @@ Item {
             "icon": "view_module",
             "enabled": true
         }, {
+            "id": "advancedWorkspaceSwitcher",
+            "text": "Advanced Workspace Switcher",
+            "description": "Shows workspaced with opened apps and allows switching",
+            "icon": "view_module",
+            "enabled": true
+        }, {
             "id": "focusedWindow",
             "text": "Focused Window",
             "description": "Display currently focused application title",

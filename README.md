@@ -72,6 +72,7 @@ https://github.com/user-attachments/assets/5ad934bb-e7aa-4c04-8d40-149181bd2d29
 - **TopBar**: fully customizable bar where widgets can be added, removed, and re-arranged.
   - **App Launcher** with fuzzy search, categories, and auto-sorting by most used apps.
   - **Workspace Switcher** Dynamically resizing niri workspace switcher.
+  - **Advanced Workspace Switcher** Dynamically resizing niri workspace switcher, also showing opened apps on the workspace.
   - **Focused Window** Displays the currently focused window app name and title.
   - **Running Apps** A view of all running apps, sorted by monitor, workspace, then position on workspace.
   - **Media Player** Short form media player with equalizer, song title, and controls.
@@ -90,7 +91,7 @@ https://github.com/user-attachments/assets/5ad934bb-e7aa-4c04-8d40-149181bd2d29
 - **Notification Center** A center for notifications that has support for grouping.
 - **Dock** A dock with pinned apps support, recent apps support, and currently running application support.
 - **Control Center** A full control center with user profile information, network, bluetooth, audio input/output, display controls, and night mode automation.
-- **Lock Screen** Using quickshell's WlSessionLock
+- **Lock Screen** Using quickshell's WlSessionLock with embedded virtual keyboard for Niri (Niri doesn't support placing virtual keyboard above lockscreen natively: [issue](https://github.com/YaLTeR/niri/issues/2201))
 - **Notepad** A simple text notepad/scratchpad with auto-save to session data and file export/import functionality.
 
 **Features:**

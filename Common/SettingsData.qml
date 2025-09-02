@@ -25,6 +25,7 @@ Singleton {
     property bool useAutoLocation: false
     property bool showLauncherButton: true
     property bool showWorkspaceSwitcher: true
+    property bool showAdvancedWorkspaceSwitcher: false
     property bool showFocusedWindow: true
     property bool showWeather: true
     property bool showMusic: true
@@ -182,6 +183,8 @@ Singleton {
                         !== undefined ? settings.showLauncherButton : true
                 showWorkspaceSwitcher = settings.showWorkspaceSwitcher
                         !== undefined ? settings.showWorkspaceSwitcher : true
+		showAdvancedWorkspaceSwitcher = settings.showAdvancedWorkspaceSwitcher
+                        !== undefined ? settings.showAdvancedWorkspaceSwitcher : false
                 showFocusedWindow = settings.showFocusedWindow
                         !== undefined ? settings.showFocusedWindow : true
                 showWeather = settings.showWeather !== undefined ? settings.showWeather : true
@@ -555,6 +558,11 @@ Singleton {
         saveSettings()
     }
 
+    function setShowAdvancedWorkspaceSwitcher(enabled) {
+        showAdvancedWorkspaceSwitcher = enabled
+        saveSettings()
+    }
+
     function setShowFocusedWindow(enabled) {
         showFocusedWindow = enabled
         saveSettings()
@@ -706,6 +714,7 @@ Singleton {
         updateListModel(rightWidgetsModel, defaultRight)
         showLauncherButton = true
         showWorkspaceSwitcher = true
+	showAdvancedWorkspaceSwitcher = false
         showFocusedWindow = true
         showWeather = true
         showMusic = true

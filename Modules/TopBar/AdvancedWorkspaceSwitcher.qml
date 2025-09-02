@@ -66,17 +66,10 @@ Rectangle {
             var key = isActiveWs ? keyBase + "_" + i : keyBase;
     
             if (!byApp[key]) {
-                var candidates = [];
-                var nm = keyBase.replace(/\s+/g, "-").replace(/[^a-z0-9\.\-_]/g, "");
-                candidates.push("image://icon/" + nm);
-                if (nm.indexOf(".") !== -1) {
-                    var tail = nm.split(".").pop();
-                    if (tail && candidates.indexOf("image://icon/" + tail) === -1)
-                        candidates.push("image://icon/" + tail);
-                }
+                var icon = Quickshell.iconPath(DesktopEntries.heuristicLookup(Paths.moddedAppId(keyBase))?.icon, true)
                 byApp[key] = {
                     type: "icon",
-                    sourceCandidates: candidates,
+                    icon: icon,
                     active: !!w.is_focused,
                     count: 1,
 		    windowId: w.id,
@@ -279,7 +272,7 @@ Rectangle {
 	property var windowId: modelData.windowId
         anchors.fill: parent
         fillMode: Image.PreserveAspectFit
-        source: (modelData.sourceCandidates.length ? modelData.sourceCandidates[0] : "")
+        source: modelData.icon
         opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
 	MouseArea {
 	            id: appMouseArea

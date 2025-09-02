@@ -45,14 +45,6 @@ ShellRoot {
         }
 
     }
-    Variants {
-        model: SettingsData.getFilteredScreens("topBar")
-
-        delegate: BottomBar {
-            modelData: item
-        }
-
-    }
 
     Variants {
         model: SettingsData.getFilteredScreens("dock")
