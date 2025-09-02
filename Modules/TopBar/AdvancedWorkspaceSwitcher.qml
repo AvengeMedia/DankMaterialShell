@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import Quickshell
+import Quickshell.Widgets
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
@@ -13,197 +14,148 @@ Rectangle {
     property real widgetHeight: 30
     property int currentWorkspace: {
         if (CompositorService.isNiri) {
-            return getNiriActiveWorkspace()
+            return getNiriActiveWorkspace();
         } else if (CompositorService.isHyprland) {
-            return Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
+            return Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1;
         }
-        return 1
+        return 1;
     }
     property var workspaceList: {
         if (CompositorService.isNiri) {
-            var baseList = getNiriWorkspaces()
-            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
+            var baseList = getNiriWorkspaces();
+            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList;
         } else if (CompositorService.isHyprland) {
-            var workspaces = Hyprland.workspaces ? Hyprland.workspaces.values : []
+            var workspaces = Hyprland.workspaces ? Hyprland.workspaces.values : [];
             if (workspaces.length === 0) {
-                return [{id: 1, name: "1"}]
+                return [
+                    {
+                        id: 1,
+                        name: "1"
+                    }
+                ];
             }
-            var sorted = workspaces.slice().sort((a, b) => a.id - b.id)
-            return SettingsData.showWorkspacePadding ? padWorkspaces(sorted) : sorted
+            var sorted = workspaces.slice().sort((a, b) => a.id - b.id);
+            return SettingsData.showWorkspacePadding ? padWorkspaces(sorted) : sorted;
         }
-        return [1]
+        return [1];
     }
 
     function getWorkspaceIcons(ws) {
         var chunks = [];
-        if (!ws) return chunks;
-    
+        if (!ws)
+            return chunks;
+
         var wsCandidates = [ws.id, ws.idx].filter(x => typeof x !== "undefined");
-    
+
         var wins = [];
         if (CompositorService.isNiri) {
             wins = NiriService.windows || [];
         } else if (CompositorService.isHyprland) {
             wins = Hyprland.clients ? Hyprland.clients.values : [];
         }
-    
-        var byApp = {}; // ключ = app_id/класс, значение = агрегат
-    
+
+        var byApp = {}; // key = app_id/class, value = 
+
         var isActiveWs = ws.is_active;
-    
+
         for (var i = 0; i < wins.length; i++) {
             var w = wins[i];
-            if (!w) continue;
-    
+            if (!w)
+                continue;
+
             var winWs = w.workspace_id || w.workspaceId || (w.workspace && w.workspace.id) || w.idx || null;
-            if (winWs === null) continue;
-            if (wsCandidates.indexOf(winWs) === -1) continue;
-    
-            // --- нормализуем id приложения
+            if (winWs === null)
+                continue;
+            if (wsCandidates.indexOf(winWs) === -1)
+                continue;
+
+            // --- normalize app id
             var keyBase = (w.app_id || w.appId || w.class || w.windowClass || w.exe || "unknown").toLowerCase();
-    
-            // Для активного воркспейса ключ уникален, для неактивного агрегируем
+
+            // For active workspace every key should be unique. For inactive we just count the duplicates
             var key = isActiveWs ? keyBase + "_" + i : keyBase;
-    
+
             if (!byApp[key]) {
-                var icon = Quickshell.iconPath(DesktopEntries.heuristicLookup(Paths.moddedAppId(keyBase))?.icon, true)
+                var icon = Quickshell.iconPath(DesktopEntries.heuristicLookup(Paths.moddedAppId(keyBase))?.icon, true);
                 byApp[key] = {
                     type: "icon",
                     icon: icon,
                     active: !!w.is_focused,
                     count: 1,
-		    windowId: w.id,
+                    windowId: w.id,
                     fallbackText: w.app_id || w.class || w.title || ""
                 };
             } else {
                 byApp[key].count++;
-                if (w.is_focused) byApp[key].active = true;
+                if (w.is_focused)
+                    byApp[key].active = true;
             }
         }
-    
-        for (var k in byApp) chunks.push(byApp[k]);
-    
+
+        for (var k in byApp)
+            chunks.push(byApp[k]);
+
         return chunks;
     }
 
-
     function padWorkspaces(list) {
-        var padded = list.slice()
+        var padded = list.slice();
         while (padded.length < 3) {
             if (CompositorService.isHyprland) {
-                padded.push({id: -1, name: ""})
+                padded.push({
+                    id: -1,
+                    name: ""
+                });
             } else {
-                padded.push(-1)
+                padded.push(-1);
             }
         }
-        return padded
+        return padded;
     }
 
     function getNiriWorkspaces() {
         if (NiriService.allWorkspaces.length === 0)
-            return [1, 2]
+            return [1, 2];
 
         if (!root.screenName)
-            return NiriService.getCurrentOutputWorkspaceNumbers()
+            return NiriService.getCurrentOutputWorkspaceNumbers();
 
-        var displayWorkspaces = []
+        var displayWorkspaces = [];
         for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-            var ws = NiriService.allWorkspaces[i]
+            var ws = NiriService.allWorkspaces[i];
             if (ws.output === root.screenName)
-                displayWorkspaces.push(ws.idx + 1)
+                displayWorkspaces.push(ws.idx + 1);
         }
-        return displayWorkspaces.length > 0 ? displayWorkspaces : [1, 2]
+        return displayWorkspaces.length > 0 ? displayWorkspaces : [1, 2];
     }
 
     function getNiriActiveWorkspace() {
         if (NiriService.allWorkspaces.length === 0)
-            return 1
+            return 1;
 
         if (!root.screenName)
-            return NiriService.getCurrentWorkspaceNumber()
+            return NiriService.getCurrentWorkspaceNumber();
 
         for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-            var ws = NiriService.allWorkspaces[i]
+            var ws = NiriService.allWorkspaces[i];
             if (ws.output === root.screenName && ws.is_active)
-                return ws.idx + 1
+                return ws.idx + 1;
         }
-        return 1
+        return 1;
     }
 
     readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Math.max(Theme.spacingS, SettingsData.topBarInnerPadding)
-    
-    width: SettingsData.showWorkspacePadding ? Math.max(
-                                                   120,
-                                                   workspaceRow.implicitWidth + horizontalPadding * 2) : workspaceRow.implicitWidth
-                                               + horizontalPadding * 2
+
+    width: SettingsData.showWorkspacePadding ? Math.max(120, workspaceRow.implicitWidth + horizontalPadding * 2) : workspaceRow.implicitWidth + horizontalPadding * 2
     height: widgetHeight
     radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) return "transparent"
-        const baseColor = Theme.surfaceTextHover
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b,
-                       baseColor.a * Theme.widgetTransparency)
+        if (SettingsData.topBarNoBackground)
+            return "transparent";
+        const baseColor = Theme.surfaceTextHover;
+        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
     }
     visible: CompositorService.isNiri || CompositorService.isHyprland
-
-    Connections {
-        function onAllWorkspacesChanged() {
-            if (CompositorService.isNiri) {
-                root.workspaceList = SettingsData.showWorkspacePadding ? root.padWorkspaces(
-                                                                          root.getNiriWorkspaces()) : root.getNiriWorkspaces()
-            }
-        }
-
-        target: NiriService
-        enabled: CompositorService.isNiri
-    }
-
-    Connections {
-        function onValuesChanged() {
-            if (CompositorService.isHyprland) {
-                var workspaces = Hyprland.workspaces ? Hyprland.workspaces.values : []
-                if (workspaces.length === 0) {
-                    workspaces = [{id: 1, name: "1"}]
-                }
-                var sorted = workspaces.slice().sort((a, b) => a.id - b.id)
-                root.workspaceList = SettingsData.showWorkspacePadding ? root.padWorkspaces(sorted) : sorted
-            }
-        }
-
-        target: Hyprland.workspaces
-        enabled: CompositorService.isHyprland
-    }
-
-    Connections {
-        function onFocusedWorkspaceChanged() {
-            // Hyprland workspace changes handled automatically by currentWorkspace binding
-        }
-
-        function onFocusedMonitorChanged() {
-            // Hyprland monitor changes handled automatically by currentWorkspace binding
-        }
-
-        target: Hyprland
-        enabled: CompositorService.isHyprland
-    }
-
-    Connections {
-        function onShowWorkspacePaddingChanged() {
-            if (CompositorService.isHyprland) {
-                var workspaces = Hyprland.workspaces ? Hyprland.workspaces.values : []
-                if (workspaces.length === 0) {
-                    workspaces = [{id: 1, name: "1"}]
-                }
-                var sorted = workspaces.slice().sort((a, b) => a.id - b.id)
-                root.workspaceList = SettingsData.showWorkspacePadding ? root.padWorkspaces(sorted) : sorted
-            } else {
-                var baseList = root.getNiriWorkspaces()
-                root.workspaceList = SettingsData.showWorkspacePadding ? root.padWorkspaces(baseList) : baseList
-            }
-        }
-
-        target: SettingsData
-    }
 
     Row {
         id: workspaceRow
@@ -217,23 +169,25 @@ Rectangle {
                 id: wsBox
                 property bool isActive: {
                     if (CompositorService.isHyprland)
-                        return modelData && modelData.id === root.currentWorkspace
-                    return modelData === root.currentWorkspace
+                        return modelData && modelData.id === root.currentWorkspace;
+                    return modelData === root.currentWorkspace;
                 }
 
                 property var wsData: {
-                    if (CompositorService.isHyprland) return modelData
+                    if (CompositorService.isHyprland)
+                        return modelData;
                     if (CompositorService.isNiri) {
                         for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-                            var ws = NiriService.allWorkspaces[i]
-                            if (ws.idx + 1 === modelData) return ws
+                            var ws = NiriService.allWorkspaces[i];
+                            if (ws.idx + 1 === modelData)
+                                return ws;
                         }
                     }
-                    return null
+                    return null;
                 }
 
                 property var icons: wsData ? root.getWorkspaceIcons(wsData) : []
-		property bool isHovered: mouseArea.containsMouse
+                property bool isHovered: mouseArea.containsMouse
 
                 width: isActive ? widgetHeight * 1.2 + Theme.spacingXS + contentRow.implicitWidth : widgetHeight * 0.8 + contentRow.implicitWidth
                 height: widgetHeight * 0.8
@@ -241,95 +195,93 @@ Rectangle {
                 color: isActive ? Theme.primary : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
                 MouseArea {
-	            id: mouseArea
-		    hoverEnabled: true	
+                    id: mouseArea
+                    hoverEnabled: true
                     anchors.fill: parent
                     enabled: wsData !== null
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        if (!wsData) return
+                        if (!wsData)
+                            return;
                         if (CompositorService.isHyprland) {
-                            Hyprland.dispatch(`workspace ${wsData.id}`)
+                            Hyprland.dispatch(`workspace ${wsData.id}`);
                         } else if (CompositorService.isNiri) {
-                            NiriService.switchToWorkspace(wsData.idx)
+                            NiriService.switchToWorkspace(wsData.idx);
                         }
                     }
                 }
 
-                                Row {
-				id: contentRow
+                Row {
+                    id: contentRow
                     anchors.centerIn: parent
                     spacing: 4
 
                     Repeater {
                         model: root.getWorkspaceIcons(wsData)
                         delegate: Item {
-    width: wsBox.height * 0.9
-    height: wsBox.height * 0.9
+                            width: wsBox.height * 0.9
+                            height: wsBox.height * 0.9
 
-    Image {
-        id: appIcon
-	property var windowId: modelData.windowId
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectFit
-        source: modelData.icon
-        opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-	MouseArea {
-	            id: appMouseArea
-		    hoverEnabled: true	
-                    anchors.fill: parent
-                    enabled: wsBox.isActive
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (CompositorService.isHyprland) {
-                            Hyprland.dispatch(`focuswindow address:${appIcon.windowId}`)
-                        } else if (CompositorService.isNiri) {
-                            NiriService.focusWindow(appIcon.windowId)
+                            IconImage {
+                                id: appIcon
+                                property var windowId: modelData.windowId
+                                anchors.fill: parent
+                                source: modelData.icon
+                                opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
+                                MouseArea {
+                                    id: appMouseArea
+                                    hoverEnabled: true
+                                    anchors.fill: parent
+                                    enabled: wsBox.isActive
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        if (CompositorService.isHyprland) {
+                                            Hyprland.dispatch(`focuswindow address:${appIcon.windowId}`);
+                                        } else if (CompositorService.isNiri) {
+                                            NiriService.focusWindow(appIcon.windowId);
+                                        } else {
+                                            console.log("ERROR: Can't focus window with ", appIcon.windowId);
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Counter Badge
+                            Rectangle {
+                                visible: modelData.count > 1 && !wsBox.isActive
+                                width: 12
+                                height: 12
+                                radius: 6
+                                color: "black"
+                                border.color: "white"
+                                border.width: 1
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                z: 2
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: modelData.count
+                                    font.pixelSize: 9
+                                    color: "white"
+                                }
+                            }
                         }
-			else {
-			console.log("ERROR: Can't focus window with ", appIcon.windowId)
-			}
-                    }
-                }
-    }
-
-    // Counter Badge
-    Rectangle {
-        visible: modelData.count > 1 && !wsBox.isActive
-        width: 12
-        height: 12
-        radius: 6
-        color: "black"
-        border.color: "white"
-        border.width: 1
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        z: 2
-
-        Text {
-            anchors.centerIn: parent
-            text: modelData.count
-            font.pixelSize: 9
-            color: "white"
-        }
-    }
-}
                     }
 
-                    // fallback: если иконок нет — показываем текст (номер/название)
+                    // fallback: if there're no apps - we show workspace number/name
                     Rectangle {
                         visible: root.getWorkspaceIcons(wsData).length === 0
                         anchors.centerIn: parent
                         color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
-			Text {
-                anchors.centerIn: parent
-                text: wsData ? (wsData.name || (wsData.idx ? wsData.idx : (wsData.id ? wsData.id : ""))) : ""
-                font.pixelSize: 12
-                color: modelData && modelData.active ? Theme.surfaceContainer : Theme.surfaceTextMedium
-            }
+                        Text {
+                            anchors.centerIn: parent
+                            text: wsData ? (wsData.name || (wsData.idx ? wsData.idx : (wsData.id ? wsData.id : ""))) : ""
+                            font.pixelSize: 12
+                            color: modelData && modelData.active ? Theme.surfaceContainer : Theme.surfaceTextMedium
+                        }
                     }
                 }
-
             }
         }
     }

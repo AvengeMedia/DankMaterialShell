@@ -15,11 +15,11 @@ DankActionButton {
     hoverColor: Theme.surfacePressed
 
     StyledText {
-    id: contentItem
-                    anchors.centerIn: parent
-                    text: parent.text
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeXLarge
-                    font.weight: Font.Normal
-                }
+        id: contentItem
+        anchors.centerIn: parent
+        text: parent.text
+        color: Theme.surfaceText
+        font.pixelSize: Theme.fontSizeXLarge
+        font.weight: Font.Normal
+    }
 }
