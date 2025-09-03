@@ -466,6 +466,7 @@ Rectangle {
                 }
 
                 Behavior on width {
+		    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                     NumberAnimation {
                         duration: Theme.mediumDuration
                         easing.type: Theme.emphasizedEasing
@@ -473,6 +474,7 @@ Rectangle {
                 }
 
                 Behavior on color {
+		    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                     ColorAnimation {
                         duration: Theme.mediumDuration
                         easing.type: Theme.emphasizedEasing
