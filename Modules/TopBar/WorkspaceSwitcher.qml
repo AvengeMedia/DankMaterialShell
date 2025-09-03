@@ -366,7 +366,7 @@ Rectangle {
                     visible: SettingsData.showWorkspaceApps && icons.length > 0
 
                     Repeater {
-                        model: icons.slice(0, 3)
+                        model: icons.slice(0, SettingsData.maxWorkspaceIcons)
                         delegate: Item {
                             width: 18
                             height: 18

@@ -242,6 +242,48 @@ Item {
                                            checked)
                                    }
                     }
+
+		    Row {
+                        width: parent.width - Theme.spacingL
+                        spacing: Theme.spacingL
+                        visible: SettingsData.showWorkspaceApps
+                        opacity: visible ? 1 : 0
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingL
+
+                        Column {
+                            width: 120
+                            spacing: Theme.spacingS
+
+                            StyledText {
+                                text: "Max apps to show"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                font.weight: Font.Medium
+                            }
+
+                            DankTextField {
+                                width: 100
+                                height: 28
+                                placeholderText: "#ffffff"
+                                text: SettingsData.maxWorkspaceIcons
+                                maximumLength: 7
+                                font.pixelSize: Theme.fontSizeSmall
+                                topPadding: Theme.spacingXS
+                                bottomPadding: Theme.spacingXS
+                                onEditingFinished: {
+                                    SettingsData.setMaxWorkspaceIcons(parseInt(text, 10))
+                                }
+                            }
+                        }
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.mediumDuration
+                                easing.type: Theme.emphasizedEasing
+                            }
+                        }
+                    }
                 }
             }
 

@@ -46,6 +46,7 @@ Singleton {
     property bool showWorkspaceIndex: false
     property bool showWorkspacePadding: false
     property bool showWorkspaceApps: false
+    property int maxWorkspaceIcons: 3
     property var workspaceNameIcons: ({})
     property bool clockCompactMode: false
     property bool focusedWindowCompactMode: false
@@ -232,6 +233,8 @@ Singleton {
                         !== undefined ? settings.showWorkspacePadding : false
                 showWorkspaceApps = settings.showWorkspaceApps
                         !== undefined ? settings.showWorkspaceApps : false
+		maxWorkspaceIcons = settings.maxWorkspaceIcons
+                        !== undefined ? settings.maxWorkspaceIcons : 3
                 workspaceNameIcons = settings.workspaceNameIcons
                         !== undefined ? settings.workspaceNameIcons : ({})
                 clockCompactMode = settings.clockCompactMode
@@ -429,6 +432,11 @@ Singleton {
 
     function setShowWorkspaceApps(enabled) {
         showWorkspaceApps = enabled
+        saveSettings()
+    }
+    
+    function setMaxWorkspaceIcons(maxIcons) {
+        maxWorkspaceIcons = maxIcons
         saveSettings()
     }
 
