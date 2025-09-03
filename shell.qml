@@ -7,6 +7,8 @@ import qs.Common
 import qs.Modals
 import qs.Modals.Common
 import qs.Modals.Clipboard
+import qs.Modals.Settings
+import qs.Modals.Spotlight
 import qs.Modules
 import qs.Modules.AppDrawer
 import qs.Modules.CentcomCenter

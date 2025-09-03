@@ -1,9 +1,5 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
-import Quickshell
 import Quickshell.Io
-import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
 import qs.Modules.Notifications.Center
@@ -13,31 +9,6 @@ import qs.Widgets
 DankModal {
     id: notificationModal
 
-    width: 500
-    height: 700
-    visible: false
-    onBackgroundClicked: hide()
-    onShouldBeVisibleChanged: (shouldBeVisible) => {
-        if (!shouldBeVisible) {
-            notificationModalOpen = false
-            modalKeyboardController.reset()
-            NotificationService.onOverlayClose()
-        }
-    }
-
-    modalFocusScope.Keys.onPressed: function (event) {
-        modalKeyboardController.handleKey(event)
-    }
-
-    NotificationKeyboardController {
-        id: modalKeyboardController
-        listView: null
-        isOpen: notificationModal.notificationModalOpen
-        onClose: function () {
-            notificationModal.hide()
-        }
-    }
-
     property bool notificationModalOpen: false
     property var notificationListRef: null
 
@@ -46,7 +17,6 @@ DankModal {
         NotificationService.onOverlayOpen()
         open()
         modalKeyboardController.reset()
-
         if (modalKeyboardController && notificationListRef) {
             modalKeyboardController.listView = notificationListRef
             modalKeyboardController.rebuildFlatNavigation()
@@ -61,32 +31,54 @@ DankModal {
     }
 
     function toggle() {
-        if (shouldBeVisible)
+        if (shouldBeVisible) {
             hide()
-        else
+        } else {
             show()
+        }
+    }
+
+    width: 500
+    height: 700
+    visible: false
+    onBackgroundClicked: hide()
+    onShouldBeVisibleChanged: (shouldBeVisible) => {
+        if (!shouldBeVisible) {
+            notificationModalOpen = false
+            modalKeyboardController.reset()
+            NotificationService.onOverlayClose()
+        }
+    }
+    modalFocusScope.Keys.onPressed: (event) => modalKeyboardController.handleKey(event)
+
+    NotificationKeyboardController {
+        id: modalKeyboardController
+
+        listView: null
+        isOpen: notificationModal.notificationModalOpen
+        onClose: () => notificationModal.hide()
     }
 
     IpcHandler {
         function open() {
-            notificationModal.show()
-            return "NOTIFICATION_MODAL_OPEN_SUCCESS"
+            notificationModal.show();
+            return "NOTIFICATION_MODAL_OPEN_SUCCESS";
         }
 
         function close() {
-            notificationModal.hide()
-            return "NOTIFICATION_MODAL_CLOSE_SUCCESS"
+            notificationModal.hide();
+            return "NOTIFICATION_MODAL_CLOSE_SUCCESS";
         }
 
         function toggle() {
-            notificationModal.toggle()
-            return "NOTIFICATION_MODAL_TOGGLE_SUCCESS"
+            notificationModal.toggle();
+            return "NOTIFICATION_MODAL_TOGGLE_SUCCESS";
         }
 
         target: "notifications"
     }
 
-    property Component notificationContent: Component {
+    content: Component {
         Item {
             id: notificationKeyHandler
 
@@ -99,11 +91,13 @@ DankModal {
 
                 NotificationHeader {
                     id: notificationHeader
+
                     keyboardController: modalKeyboardController
                 }
 
                 NotificationSettings {
                     id: notificationSettings
+
                     expanded: notificationHeader.showSettings
                 }
 
@@ -113,7 +107,6 @@ DankModal {
                     width: parent.width
                     height: parent.height - y
                     keyboardController: modalKeyboardController
-
                     Component.onCompleted: {
                         notificationModal.notificationListRef = notificationList
                         if (modalKeyboardController) {
@@ -122,18 +115,21 @@ DankModal {
                         }
                     }
                 }
+
             }
 
             NotificationKeyboardHints {
                 id: keyboardHints
+
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.margins: Theme.spacingL
                 showHints: modalKeyboardController.showKeyboardHints
             }
+
         }
+
     }
 
-    content: notificationContent
 }

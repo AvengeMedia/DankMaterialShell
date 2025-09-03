@@ -1,10 +1,6 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
-import qs.Services
 import qs.Widgets
 
 DankModal {
@@ -16,53 +12,61 @@ DankModal {
     signal powerActionRequested(string action, string title, string message)
 
     function selectOption() {
-        close()
-        switch (selectedIndex) {
-        case 0:
-            root.powerActionRequested("logout", "Log Out", "Are you sure you want to log out?")
-            break
-        case 1:
-            root.powerActionRequested("suspend", "Suspend", "Are you sure you want to suspend the system?")
-            break
-        case 2:
-            root.powerActionRequested("reboot", "Reboot", "Are you sure you want to reboot the system?")
-            break
-        case 3:
-            root.powerActionRequested("poweroff", "Power Off", "Are you sure you want to power off the system?")
-            break
+        close();
+        const actions = [{
+            "action": "logout",
+            "title": "Log Out",
+            "message": "Are you sure you want to log out?"
+        }, {
+            "action": "suspend",
+            "title": "Suspend",
+            "message": "Are you sure you want to suspend the system?"
+        }, {
+            "action": "reboot",
+            "title": "Reboot",
+            "message": "Are you sure you want to reboot the system?"
+        }, {
+            "action": "poweroff",
+            "title": "Power Off",
+            "message": "Are you sure you want to power off the system?"
+        }];
+        const selected = actions[selectedIndex];
+        if (selected) {
+            root.powerActionRequested(selected.action, selected.title, selected.message);
         }
+
     }
 
     shouldBeVisible: false
     width: 320
     height: 300
     enableShadow: true
-    onBackgroundClicked: {
-        close()
+    onBackgroundClicked: () => {
+        return close();
     }
-    onOpened: {
-        selectedIndex = 0
-        modalFocusScope.forceActiveFocus()
+    onOpened: () => {
+        selectedIndex = 0;
+        modalFocusScope.forceActiveFocus();
     }
-    modalFocusScope.Keys.onPressed: function(event) {
+    modalFocusScope.Keys.onPressed: (event) => {
         switch (event.key) {
         case Qt.Key_Up:
-            selectedIndex = (selectedIndex - 1 + optionCount) % optionCount
-            event.accepted = true
-            break
+            selectedIndex = (selectedIndex - 1 + optionCount) % optionCount;
+            event.accepted = true;
+            break;
         case Qt.Key_Down:
-            selectedIndex = (selectedIndex + 1) % optionCount
-            event.accepted = true
-            break
+            selectedIndex = (selectedIndex + 1) % optionCount;
+            event.accepted = true;
+            break;
         case Qt.Key_Tab:
-            selectedIndex = (selectedIndex + 1) % optionCount
-            event.accepted = true
-            break
+            selectedIndex = (selectedIndex + 1) % optionCount;
+            event.accepted = true;
+            break;
         case Qt.Key_Return:
         case Qt.Key_Enter:
-            selectOption()
-            event.accepted = true
-            break
+            selectOption();
+            event.accepted = true;
+            break;
         }
     }
 
@@ -96,8 +100,8 @@ DankModal {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         hoverColor: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12)
-                        onClicked: {
-                            close()
+                        onClicked: () => {
+                            return close();
                         }
                     }
 
@@ -112,12 +116,13 @@ DankModal {
                         height: 50
                         radius: Theme.cornerRadius
                         color: {
-                            if (selectedIndex === 0)
+                            if (selectedIndex === 0) {
                                 return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
-                            else if (logoutArea.containsMouse)
+                            } else if (logoutArea.containsMouse) {
                                 return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            else
+                            } else {
                                 return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                            }
                         }
                         border.color: selectedIndex === 0 ? Theme.primary : "transparent"
                         border.width: selectedIndex === 0 ? 1 : 0
@@ -151,9 +156,9 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                selectedIndex = 0
-                                selectOption()
+                            onClicked: () => {
+                                selectedIndex = 0;
+                                selectOption();
                             }
                         }
 
@@ -164,12 +169,13 @@ DankModal {
                         height: 50
                         radius: Theme.cornerRadius
                         color: {
-                            if (selectedIndex === 1)
+                            if (selectedIndex === 1) {
                                 return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
-                            else if (suspendArea.containsMouse)
+                            } else if (suspendArea.containsMouse) {
                                 return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08);
-                            else
+                            } else {
                                 return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                            }
                         }
                         border.color: selectedIndex === 1 ? Theme.primary : "transparent"
                         border.width: selectedIndex === 1 ? 1 : 0
@@ -203,9 +209,9 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                selectedIndex = 1
-                                selectOption()
+                            onClicked: () => {
+                                selectedIndex = 1;
+                                selectOption();
                             }
                         }
 
@@ -216,12 +222,13 @@ DankModal {
                         height: 50
                         radius: Theme.cornerRadius
                         color: {
-                            if (selectedIndex === 2)
+                            if (selectedIndex === 2) {
                                 return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12);
-                            else if (rebootArea.containsMouse)
+                            } else if (rebootArea.containsMouse) {
                                 return Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.08);
-                            else
+                            } else {
                                 return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                            }
                         }
                         border.color: selectedIndex === 2 ? Theme.warning : "transparent"
                         border.width: selectedIndex === 2 ? 1 : 0
@@ -255,9 +262,9 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                selectedIndex = 2
-                                selectOption()
+                            onClicked: () => {
+                                selectedIndex = 2;
+                                selectOption();
                             }
                         }
 
@@ -268,12 +275,13 @@ DankModal {
                         height: 50
                         radius: Theme.cornerRadius
                         color: {
-                            if (selectedIndex === 3)
+                            if (selectedIndex === 3) {
                                 return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.12);
-                            else if (powerOffArea.containsMouse)
+                            } else if (powerOffArea.containsMouse) {
                                 return Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08);
-                            else
+                            } else {
                                 return Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.08);
+                            }
                         }
                         border.color: selectedIndex === 3 ? Theme.error : "transparent"
                         border.width: selectedIndex === 3 ? 1 : 0
@@ -307,9 +315,9 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                selectedIndex = 3
-                                selectOption()
+                            onClicked: () => {
+                                selectedIndex = 3;
+                                selectOption();
                             }
                         }
 

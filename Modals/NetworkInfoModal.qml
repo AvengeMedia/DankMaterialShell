@@ -1,8 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import Quickshell
-import Quickshell.Io
-import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -14,7 +11,6 @@ DankModal {
     property bool networkInfoModalVisible: false
     property string networkSSID: ""
     property var networkData: null
-    property string networkDetails: ""
 
     function showNetworkInfo(ssid, data) {
         networkSSID = ssid
@@ -29,21 +25,17 @@ DankModal {
         close()
         networkSSID = ""
         networkData = null
-        networkDetails = ""
     }
 
     visible: networkInfoModalVisible
     width: 600
     height: 500
     enableShadow: true
-    onBackgroundClicked: {
-        hideDialog()
-    }
+    onBackgroundClicked: hideDialog()
     onVisibleChanged: {
         if (!visible) {
             networkSSID = ""
             networkData = null
-            networkDetails = ""
         }
     }
 
@@ -71,12 +63,13 @@ DankModal {
                         }
 
                         StyledText {
-                            text: "Details for \"" + networkSSID + "\""
+                            text: `Details for "${networkSSID}"`
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceTextMedium
                             width: parent.width
                             elide: Text.ElideRight
                         }
+
                     }
 
                     DankActionButton {
@@ -84,36 +77,30 @@ DankModal {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         hoverColor: Theme.errorHover
-                        onClicked: {
-                            root.hideDialog()
-                        }
+                        onClicked: root.hideDialog()
                     }
+
                 }
 
-                DankFlickable {
-                    id: flickableArea
+                Rectangle {
+                    id: detailsRect
+
                     width: parent.width
                     height: parent.height - 140
+                    radius: Theme.cornerRadius
+                    color: Theme.surfaceHover
+                    border.color: Theme.outlineStrong
+                    border.width: 1
                     clip: true
-                    contentWidth: width
-                    contentHeight: detailsRect.height
 
-                    Rectangle {
-                        id: detailsRect
-                        width: parent.width
-                        height: detailsText.contentHeight + Theme.spacingM * 2
-                        radius: Theme.cornerRadius
-                        color: Theme.surfaceHover
-                        border.color: Theme.outlineStrong
-                        border.width: 1
+                    ScrollView {
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingM
 
                         TextArea {
                             id: detailsText
-                            anchors.fill: parent
-                            anchors.margins: Theme.spacingM
-                            text: NetworkService.networkInfoDetails.replace(
-                                      /\\n/g,
-                                      '\n') || "No information available"
+
+                            text: NetworkService.networkInfoDetails && NetworkService.networkInfoDetails.replace(/\\n/g, '\n') || "No information available"
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             wrapMode: Text.WordWrap
@@ -122,7 +109,9 @@ DankModal {
                             background: null
                             padding: 0
                         }
+
                     }
+
                 }
 
                 Item {
@@ -132,14 +121,10 @@ DankModal {
                     Rectangle {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        width: Math.max(
-                                   70,
-                                   closeText.contentWidth + Theme.spacingM * 2)
+                        width: Math.max(70, closeText.contentWidth + Theme.spacingM * 2)
                         height: 36
                         radius: Theme.cornerRadius
-                        color: closeArea.containsMouse ? Qt.darker(
-                                                             Theme.primary,
-                                                             1.1) : Theme.primary
+                        color: closeArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
 
                         StyledText {
                             id: closeText
@@ -157,9 +142,7 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                root.hideDialog()
-                            }
+                            onClicked: root.hideDialog()
                         }
 
                         Behavior on color {
@@ -167,10 +150,17 @@ DankModal {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
+
                         }
+
                     }
+
                 }
+
             }
+
         }
+
     }
+
 }
