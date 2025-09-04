@@ -60,7 +60,7 @@ PanelWindow {
 
     visible: shouldBeVisible
     color: "transparent"
-    WlrLayershell.layer: WlrLayershell.Top // if set to overlay -> virtual keyboards appear can be stuck under modal
+    WlrLayershell.layer: WlrLayershell.Top // if set to overlay -> virtual keyboards can be stuck under modal
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: shouldHaveFocus ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     onVisibleChanged: {
