@@ -466,6 +466,7 @@ Rectangle {
                 }
 
                 Behavior on width {
+		    // When having more icons, animation becomes clunky
 		    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                     NumberAnimation {
                         duration: Theme.mediumDuration
@@ -474,6 +475,7 @@ Rectangle {
                 }
 
                 Behavior on color {
+		    // When having more icons, animation becomes clunky
 		    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                     ColorAnimation {
                         duration: Theme.mediumDuration
