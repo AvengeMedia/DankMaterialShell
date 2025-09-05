@@ -48,6 +48,7 @@ Singleton {
     property bool showWorkspacePadding: false
     property bool showWorkspaceApps: false
     property int maxWorkspaceIcons: 3
+    property bool workspacesPerMonitor: true
     property var workspaceNameIcons: ({})
     property bool clockCompactMode: false
     property bool focusedWindowCompactMode: false
@@ -199,6 +200,7 @@ Singleton {
                 showWorkspaceApps = settings.showWorkspaceApps !== undefined ? settings.showWorkspaceApps : false
                 maxWorkspaceIcons = settings.maxWorkspaceIcons !== undefined ? settings.maxWorkspaceIcons : 3
                 workspaceNameIcons = settings.workspaceNameIcons !== undefined ? settings.workspaceNameIcons : ({})
+                workspacesPerMonitor = settings.workspacesPerMonitor !== undefined ? settings.workspacesPerMonitor : true
                 clockCompactMode = settings.clockCompactMode !== undefined ? settings.clockCompactMode : false
                 focusedWindowCompactMode = settings.focusedWindowCompactMode !== undefined ? settings.focusedWindowCompactMode : false
                 runningAppsCompactMode = settings.runningAppsCompactMode !== undefined ? settings.runningAppsCompactMode : true
@@ -307,6 +309,8 @@ Singleton {
                                                 "showWorkspaceIndex": showWorkspaceIndex,
                                                 "showWorkspacePadding": showWorkspacePadding,
                                                 "showWorkspaceApps": showWorkspaceApps,
+                                                "maxWorkspaceIcons": maxWorkspaceIcons,
+                                                "workspacesPerMonitor": workspacesPerMonitor,
                                                 "workspaceNameIcons": workspaceNameIcons,
                                                 "clockCompactMode": clockCompactMode,
                                                 "focusedWindowCompactMode": focusedWindowCompactMode,
@@ -367,6 +371,11 @@ Singleton {
 
     function setMaxWorkspaceIcons(maxIcons) {
         maxWorkspaceIcons = maxIcons
+        saveSettings()
+    }
+
+    function setWorkspacesPerMonitor(enabled) {
+        workspacesPerMonitor = enabled
         saveSettings()
     }
 

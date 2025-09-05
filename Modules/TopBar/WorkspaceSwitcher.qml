@@ -16,7 +16,7 @@ Rectangle {
         if (CompositorService.isNiri) {
             return getNiriActiveWorkspace()
         } else if (CompositorService.isHyprland) {
-            return Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
+            return getHyprlandActiveWorkspace()
         }
         return 1
     }
@@ -26,15 +26,8 @@ Rectangle {
             return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
         }
         if (CompositorService.isHyprland) {
-            const workspaces = Hyprland.workspaces?.values || []
-            if (workspaces.length === 0) {
-                return [{
-                            "id": 1,
-                            "name": "1"
-                        }]
-            }
-            const sorted = workspaces.slice().sort((a, b) => a.id - b.id)
-            return SettingsData.showWorkspacePadding ? padWorkspaces(sorted) : sorted
+            const baseList = getHyprlandWorkspaces()
+            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
         }
         return [1]
     }
@@ -61,7 +54,8 @@ Rectangle {
             return []
         }
 
-        const wins = CompositorService.isNiri ? (NiriService.windows || []) : (Hyprland.clients?.values || [])
+        const wins = CompositorService.isNiri ? (NiriService.windows || []) : CompositorService.sortedToplevels
+
 
         const byApp = {}
         const isActiveWs = CompositorService.isNiri ? NiriService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active) : targetWorkspaceId === root.currentWorkspace
@@ -71,13 +65,22 @@ Rectangle {
                              return
                          }
 
-                         const winWs = CompositorService.isNiri ? w.workspace_id : (w.workspace?.id ?? w.workspaceId)
+                         let winWs = null
+                         if (CompositorService.isNiri) {
+                             winWs = w.workspace_id
+                         } else {
+                             // For Hyprland, we need to find the corresponding Hyprland toplevel to get workspace
+                             const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || [])
+                             const hyprToplevel = hyprlandToplevels.find(ht => ht.wayland === w)
+                             winWs = hyprToplevel?.workspace?.id
+                         }
+
 
                          if (winWs === undefined || winWs === null || winWs !== targetWorkspaceId) {
                              return
                          }
 
-                         const keyBase = (w.app_id || w.appId || w.class || w.windowClass || w.exe || "unknown").toLowerCase()
+                         const keyBase = (w.appId || w.class || w.windowClass || "unknown").toLowerCase()
                          const key = isActiveWs ? `${keyBase}_${i}` : keyBase
 
                          if (!byApp[key]) {
@@ -85,14 +88,14 @@ Rectangle {
                              byApp[key] = {
                                  "type": "icon",
                                  "icon": icon,
-                                 "active": !!(w.is_focused || w.activated),
+                                 "active": !!(w.activated || (CompositorService.isNiri && w.is_focused)),
                                  "count": 1,
-                                 "windowId": w.id || w.address,
-                                 "fallbackText": w.app_id || w.appId || w.class || w.title || ""
+                                 "windowId": w.address || w.id,
+                                 "fallbackText": w.appId || w.class || w.title || ""
                              }
                          } else {
                              byApp[key].count++
-                             if (w.is_focused || w.activated) {
+                             if (w.activated || (CompositorService.isNiri && w.is_focused)) {
                                  byApp[key].active = true
                              }
                          }
@@ -118,7 +121,7 @@ Rectangle {
             return [1, 2]
         }
 
-        if (!root.screenName) {
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
             return NiriService.getCurrentOutputWorkspaceNumbers()
         }
 
@@ -131,12 +134,59 @@ Rectangle {
             return 1
         }
 
-        if (!root.screenName) {
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
             return NiriService.getCurrentWorkspaceNumber()
         }
 
         const activeWs = NiriService.allWorkspaces.find(ws => ws.output === root.screenName && ws.is_active)
         return activeWs ? activeWs.idx + 1 : 1
+    }
+
+    function getHyprlandWorkspaces() {
+        const workspaces = Hyprland.workspaces?.values || []
+        
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
+            // Show all workspaces on all monitors if per-monitor filtering is disabled
+            const sorted = workspaces.slice().sort((a, b) => a.id - b.id)
+            return sorted.length > 0 ? sorted : [{
+                        "id": 1,
+                        "name": "1"
+                    }]
+        }
+
+        // Filter workspaces for this specific monitor using lastIpcObject.monitor
+        // This matches the approach from the original kyle-config
+        const monitorWorkspaces = workspaces.filter(ws => {
+            return ws.lastIpcObject && ws.lastIpcObject.monitor === root.screenName
+        })
+        
+        if (monitorWorkspaces.length === 0) {
+            // Fallback if no workspaces exist for this monitor
+            return [{
+                        "id": 1,
+                        "name": "1"
+                    }]
+        }
+
+        // Return all workspaces for this monitor, sorted by ID
+        return monitorWorkspaces.sort((a, b) => a.id - b.id)
+    }
+
+    function getHyprlandActiveWorkspace() {
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
+            return Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id : 1
+        }
+
+        // Find the monitor object for this screen
+        const monitors = Hyprland.monitors?.values || []
+        const currentMonitor = monitors.find(monitor => monitor.name === root.screenName)
+        
+        if (!currentMonitor) {
+            return 1
+        }
+
+        // Use the monitor's active workspace ID (like original config)
+        return currentMonitor.activeWorkspace?.id ?? 1
     }
 
     readonly property real padding: (widgetHeight - workspaceRow.implicitHeight) / 2

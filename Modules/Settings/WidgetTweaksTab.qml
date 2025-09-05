@@ -284,6 +284,16 @@ Item {
                             }
                         }
                     }
+
+                    DankToggle {
+                        width: parent.width
+                        text: "Per-Monitor Workspaces"
+                        description: "Show only workspaces belonging to each specific monitor."
+                        checked: SettingsData.workspacesPerMonitor
+                        onToggled: checked => {
+                            return SettingsData.setWorkspacesPerMonitor(checked);
+                        }
+                    }
                 }
             }
 

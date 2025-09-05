@@ -705,6 +705,7 @@ PanelWindow {
                                 parentWindow: root
                                 parentScreen: root.screen
                                 widgetHeight: root.widgetHeight
+                                visible: SettingsData.getFilteredScreens("systemTray").includes(root.screen)
                             }
                         }
 
