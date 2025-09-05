@@ -119,11 +119,8 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 text: {
-                    if (SettingsData.use24HourClock) {
-                        return systemClock.date.toLocaleTimeString(Qt.locale(), "HH:mm")
-                    } else {
-                        return systemClock.date.toLocaleTimeString(Qt.locale(), "h:mm AP")
-                    }
+                    const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP"
+                    return systemClock.date.toLocaleTimeString(Qt.locale(), format)
                 }
                 font.pixelSize: 120
                 font.weight: Font.Light

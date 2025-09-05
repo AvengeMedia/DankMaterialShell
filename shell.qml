@@ -45,6 +45,7 @@ ShellRoot {
 
         delegate: TopBar {
             modelData: item
+            notepadVariants: notepadSlideoutVariants
         }
     }
 
@@ -265,15 +266,34 @@ ShellRoot {
         }
     }
 
-    LazyLoader {
-        id: notepadSlideoutLoader
+    Variants {
+        id: notepadSlideoutVariants
+        model: SettingsData.getFilteredScreens("notepad")
 
-        active: false
-
-        NotepadSlideout {
-            id: notepadSlideout
-
-            modelData: Quickshell.screens.length > 0 ? Quickshell.screens[0] : null
+        delegate: Loader {
+            id: notepadLoader
+            property var modelData: item
+            active: false
+            
+            sourceComponent: Component {
+                NotepadSlideout {
+                    id: notepadSlideout
+                    modelData: notepadLoader.modelData
+                    
+                    Component.onCompleted: {
+                        notepadLoader.loaded = true
+                    }
+                }
+            }
+            
+            property bool loaded: false
+            
+            function ensureLoaded() {
+                if (!active) {
+                    active = true
+                }
+                return item
+            }
         }
     }
 
@@ -338,7 +358,7 @@ ShellRoot {
     }
 
     IpcHandler {
-        function open() {
+        function open(): string {
             processListModalLoader.active = true
             if (processListModalLoader.item)
                 processListModalLoader.item.show()
@@ -346,14 +366,14 @@ ShellRoot {
             return "PROCESSLIST_OPEN_SUCCESS"
         }
 
-        function close() {
+        function close(): string {
             if (processListModalLoader.item)
                 processListModalLoader.item.hide()
 
             return "PROCESSLIST_CLOSE_SUCCESS"
         }
 
-        function toggle() {
+        function toggle(): string {
             processListModalLoader.active = true
             if (processListModalLoader.item)
                 processListModalLoader.item.toggle()
@@ -365,27 +385,79 @@ ShellRoot {
     }
 
     IpcHandler {
-        function open() {
-            notepadSlideoutLoader.active = true
-            if (notepadSlideoutLoader.item) {
-                notepadSlideoutLoader.item.show()
+        function getFocusedScreenName() {
+            if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
+                return Hyprland.focusedWorkspace.monitor.name
+            }
+            if (CompositorService.isNiri && NiriService.currentOutput) {
+                return NiriService.currentOutput
+            }
+            return ""
+        }
+
+        function getNotepadInstanceForScreen(screenName: string) {
+            if (!screenName || notepadSlideoutVariants.instances.length === 0) {
+                return null
+            }
+            
+            for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
+                var loader = notepadSlideoutVariants.instances[i]
+                if (loader.modelData && loader.modelData.name === screenName) {
+                    return loader.ensureLoaded()
+                }
+            }
+            return null
+        }
+
+        function getActiveNotepadInstance() {
+            if (notepadSlideoutVariants.instances.length === 0) {
+                return null
+            }
+            
+            if (notepadSlideoutVariants.instances.length === 1) {
+                return notepadSlideoutVariants.instances[0].ensureLoaded()
+            }
+            
+            var focusedScreen = getFocusedScreenName()
+            if (focusedScreen) {
+                var focusedInstance = getNotepadInstanceForScreen(focusedScreen)
+                if (focusedInstance) {
+                    return focusedInstance
+                }
+            }
+            
+            for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
+                var loader = notepadSlideoutVariants.instances[i]
+                if (loader.active && loader.item && loader.item.notepadVisible) {
+                    return loader.item
+                }
+            }
+            
+            return notepadSlideoutVariants.instances[0].ensureLoaded()
+        }
+
+        function open(): string {
+            var instance = getActiveNotepadInstance()
+            if (instance) {
+                instance.show()
                 return "NOTEPAD_OPEN_SUCCESS"
             }
             return "NOTEPAD_OPEN_FAILED"
         }
 
-        function close() {
-            if (notepadSlideoutLoader.item) {
-                notepadSlideoutLoader.item.hide()
+        function close(): string {
+            var instance = getActiveNotepadInstance()
+            if (instance) {
+                instance.hide()
                 return "NOTEPAD_CLOSE_SUCCESS"
             }
             return "NOTEPAD_CLOSE_FAILED"
         }
 
-        function toggle() {
-            notepadSlideoutLoader.active = true
-            if (notepadSlideoutLoader.item) {
-                notepadSlideoutLoader.item.toggle()
+        function toggle(): string {
+            var instance = getActiveNotepadInstance()
+            if (instance) {
+                instance.toggle()
                 return "NOTEPAD_TOGGLE_SUCCESS"
             }
             return "NOTEPAD_TOGGLE_FAILED"

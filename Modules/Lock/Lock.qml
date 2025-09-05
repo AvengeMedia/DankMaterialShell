@@ -135,13 +135,13 @@ Item {
     IpcHandler {
         target: "lock"
 
-        function lock(): void {
+        function lock() {
             console.log("Lock screen requested via IPC")
             LockScreenService.resetState()
             loader.activeAsync = true
         }
 
-        function demo(): void {
+        function demo() {
             console.log("Lock screen DEMO mode requested via IPC")
             demoWindow.showDemo()
         }

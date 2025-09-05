@@ -41,17 +41,17 @@ DankModal {
     content: settingsContent
 
     IpcHandler {
-        function open() {
+        function open(): string {
             settingsModal.show();
             return "SETTINGS_OPEN_SUCCESS";
         }
 
-        function close() {
+        function close(): string {
             settingsModal.hide();
             return "SETTINGS_CLOSE_SUCCESS";
         }
 
-        function toggle() {
+        function toggle(): string {
             settingsModal.toggle();
             return "SETTINGS_TOGGLE_SUCCESS";
         }

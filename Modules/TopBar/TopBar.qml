@@ -17,7 +17,22 @@ import qs.Widgets
 PanelWindow {
     id: root
 
+    WlrLayershell.namespace: "quickshell:bar"
+
     property var modelData
+    property var notepadVariants: null
+    
+    function getNotepadInstanceForScreen() {
+        if (!notepadVariants || !notepadVariants.instances) return null
+        
+        for (var i = 0; i < notepadVariants.instances.length; i++) {
+            var loader = notepadVariants.instances[i]
+            if (loader.modelData && loader.modelData.name === root.screen?.name) {
+                return loader.ensureLoaded()
+            }
+        }
+        return null
+    }
     property string screenName: modelData.name
     readonly property int notificationCount: NotificationService.notifications.length
     readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.topBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.topBarInnerPadding))
@@ -112,7 +127,7 @@ PanelWindow {
         right: true
     }
 
-    exclusiveZone: topBarCore.autoHide ? -1 : root.effectiveBarHeight + SettingsData.topBarSpacing - 2 + SettingsData.topBarBottomGap
+    exclusiveZone: (!SettingsData.topBarVisible || topBarCore.autoHide) ? -1 : root.effectiveBarHeight + SettingsData.topBarSpacing - 2 + SettingsData.topBarBottomGap
 
     mask: Region {
         item: topBarMouseArea
@@ -126,6 +141,9 @@ PanelWindow {
         property bool autoHide: SettingsData.topBarAutoHide
         property bool reveal: SettingsData.topBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout)
 
+        property var notepadInstance: null
+        property bool notepadInstanceVisible: notepadInstance?.notepadVisible ?? false
+        
         readonly property bool hasActivePopout: {
             const loaders = [{
                                  "loader": appDrawerLoader,
@@ -149,13 +167,19 @@ PanelWindow {
                                  "loader": controlCenterLoader,
                                  "prop": "shouldBeVisible"
                              }, {
-                                 "loader": notepadSlideoutLoader,
-                                 "prop": "notepadVisible"
-                             }, {
                                  "loader": clipboardHistoryModalPopup,
                                  "prop": "visible"
                              }]
-            return loaders.some(item => item.loader?.item?.[item.prop])
+            return notepadInstanceVisible || loaders.some(item => {
+                if (item.loader) {
+                    return item.loader?.item?.[item.prop]
+                }
+                return false
+            })
+        }
+
+        Component.onCompleted: {
+            notepadInstance = root.getNotepadInstanceForScreen()
         }
 
         Connections {
@@ -946,18 +970,17 @@ PanelWindow {
                             id: notepadButtonComponent
 
                             NotepadButton {
-                                isActive: notepadSlideoutLoader.item ? notepadSlideoutLoader.item.notepadVisible : false
+                                property var notepadInstance: topBarCore.notepadInstance
+                                isActive: notepadInstance ? notepadInstance.notepadVisible : false
                                 widgetHeight: root.widgetHeight
                                 barHeight: root.effectiveBarHeight
                                 section: topBarContent.getWidgetSection(parent) || "right"
-                                popupTarget: {
-                                    notepadSlideoutLoader.active = true
-                                    return notepadSlideoutLoader.item
-                                }
+                                popupTarget: notepadInstance
                                 parentScreen: root.screen
                                 onClicked: {
-                                    notepadSlideoutLoader.active = true
-                                    notepadSlideoutLoader.item?.toggle()
+                                    if (notepadInstance) {
+                                        notepadInstance.toggle()
+                                    }
                                 }
                             }
                         }

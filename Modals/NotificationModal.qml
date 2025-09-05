@@ -60,17 +60,17 @@ DankModal {
     }
 
     IpcHandler {
-        function open() {
+        function open(): string {
             notificationModal.show();
             return "NOTIFICATION_MODAL_OPEN_SUCCESS";
         }
 
-        function close() {
+        function close(): string {
             notificationModal.hide();
             return "NOTIFICATION_MODAL_CLOSE_SUCCESS";
         }
 
-        function toggle() {
+        function toggle(): string {
             notificationModal.toggle();
             return "NOTIFICATION_MODAL_TOGGLE_SUCCESS";
         }

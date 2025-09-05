@@ -25,9 +25,9 @@ Image {
         hashProcess.running = true
     }
     onCachePathChanged: {
-        if (!imageHash || !cachePath) {
+        if (!imageHash || !cachePath)
             return
-        }
+
         Paths.mkdir(Paths.imagecache)
         source = cachePath
     }
@@ -36,15 +36,15 @@ Image {
             source = imagePath
             return
         }
-        if (source != imagePath || status !== Image.Ready || !imageHash || !cachePath) {
+        if (source != imagePath || status !== Image.Ready || !imageHash || !cachePath)
             return
-        }
 
         Paths.mkdir(Paths.imagecache)
         const grabPath = cachePath
-        if (visible && width > 0 && height > 0 && Window.window && Window.window.visible) {
-            grabToImage(res => res.saveToFile(grabPath))
-        }
+        if (visible && width > 0 && height > 0 && Window.window && Window.window.visible)
+            grabToImage(res => {
+                            return res.saveToFile(grabPath)
+                        })
     }
 
     Process {

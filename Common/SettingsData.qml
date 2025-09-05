@@ -1069,22 +1069,22 @@ Singleton {
     }
 
     IpcHandler {
-        function show() {
+        function reveal(): string {
             root.setTopBarVisible(true)
             return "BAR_SHOW_SUCCESS"
         }
 
-        function hide() {
+        function hide(): string {
             root.setTopBarVisible(false)
             return "BAR_HIDE_SUCCESS"
         }
 
-        function toggle() {
+        function toggle(): string {
             root.toggleTopBarVisible()
             return topBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
         }
 
-        function status() {
+        function status(): string {
             return topBarVisible ? "visible" : "hidden"
         }
 

@@ -40,11 +40,8 @@ Rectangle {
 
         StyledText {
             text: {
-                if (SettingsData.use24HourClock) {
-                    return root.currentDate.toLocaleTimeString(Qt.locale(), "HH:mm")
-                } else {
-                    return root.currentDate.toLocaleTimeString(Qt.locale(), "h:mm AP")
-                }
+                const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP"
+                return root.currentDate.toLocaleTimeString(Qt.locale(), format)
             }
             font.pixelSize: Theme.fontSizeMedium - 1
             color: Theme.surfaceText

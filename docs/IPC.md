@@ -317,7 +317,7 @@ Top bar visibility control.
 
 ### Functions
 
-**`show`**
+**`reveal`**
 - Show the top bar
 - Returns: Success confirmation
 

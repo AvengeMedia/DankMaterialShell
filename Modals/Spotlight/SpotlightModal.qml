@@ -83,17 +83,17 @@ DankModal {
     }
 
     IpcHandler {
-        function open() {
+        function open(): string  {
             spotlightModal.show()
             return "SPOTLIGHT_OPEN_SUCCESS"
         }
 
-        function close() {
+        function close(): string  {
             spotlightModal.hide()
             return "SPOTLIGHT_CLOSE_SUCCESS"
         }
 
-        function toggle() {
+        function toggle(): string  {
             spotlightModal.toggle()
             return "SPOTLIGHT_TOGGLE_SUCCESS"
         }
