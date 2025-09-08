@@ -16,6 +16,7 @@ PanelWindow {
     id: root
 
     property bool notepadVisible: false
+    property bool shouldBeVisible: false
     property bool fileDialogOpen: false
     property string currentFileName: ""
     property bool hasUnsavedChanges: false
@@ -36,40 +37,37 @@ PanelWindow {
     }
 
     function show() {
-        notepadVisible = true
-        Qt.callLater(() => textArea.forceActiveFocus())
+        shouldBeVisible = true
+        visible = true
+        Qt.callLater(() => {
+            notepadVisible = true
+            textArea.forceActiveFocus()
+        })
     }
 
     function hide() {
         animatingOut = true
+        shouldBeVisible = false
         notepadVisible = false
         hideTimer.start()
     }
 
     function toggle() {
-        if (notepadVisible) {
+        if (shouldBeVisible) {
             hide()
         } else {
             show()
         }
     }
 
-    visible: notepadVisible || animatingOut
+    visible: shouldBeVisible || animatingOut
     screen: modelData
     
     anchors.top: true
     anchors.bottom: true
     anchors.right: true
     
-    implicitWidth: expandedWidth ? 960 : 480
-    
-    Behavior on implicitWidth {
-        enabled: notepadVisible
-        NumberAnimation {
-            duration: 200
-            easing.type: Easing.InOutCubic
-        }
-    }
+    implicitWidth: 960
     implicitHeight: modelData ? modelData.height : 800
     
     color: "transparent"
@@ -77,6 +75,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: 0
     WlrLayershell.keyboardFocus: (notepadVisible && !animatingOut) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    
 
     // Background click to close
     MouseArea {
@@ -93,19 +92,30 @@ PanelWindow {
     StyledRect {
         id: contentRect
         
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        width: expandedWidth ? 960 : 480
         color: Theme.surfaceContainer
         border.color: Theme.outlineMedium
         border.width: 1
         
         transform: Translate {
-            x: notepadVisible ? 0 : (expandedWidth ? 960 : 480)
+            x: shouldBeVisible ? 0 : width
             
             Behavior on x {
                 NumberAnimation {
                     duration: Theme.longDuration
                     easing.type: Theme.emphasizedEasing
                 }
+            }
+        }
+        
+        
+        Behavior on width {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
             }
         }
 
@@ -417,9 +427,10 @@ PanelWindow {
 
     Timer {
         id: hideTimer
-        interval: Theme.longDuration
+        interval: Theme.longDuration + 50
         repeat: false
         onTriggered: {
+            visible = false
             animatingOut = false
         }
     }
