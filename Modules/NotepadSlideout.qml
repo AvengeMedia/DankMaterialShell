@@ -26,6 +26,7 @@ PanelWindow {
     property bool confirmationDialogOpen: false
     property string pendingAction: ""
     property string lastSavedFileContent: ""
+    property bool expandedWidth: false
     
     function hasFileChanges() {
         if (!root.currentFileUrl.toString()) {
@@ -60,7 +61,15 @@ PanelWindow {
     anchors.bottom: true
     anchors.right: true
     
-    implicitWidth: 480
+    implicitWidth: expandedWidth ? 960 : 480
+    
+    Behavior on implicitWidth {
+        enabled: notepadVisible
+        NumberAnimation {
+            duration: 200
+            easing.type: Easing.InOutCubic
+        }
+    }
     implicitHeight: modelData ? modelData.height : 800
     
     color: "transparent"
@@ -90,7 +99,7 @@ PanelWindow {
         border.width: 1
         
         transform: Translate {
-            x: notepadVisible ? 0 : 480
+            x: notepadVisible ? 0 : (expandedWidth ? 960 : 480)
             
             Behavior on x {
                 NumberAnimation {
@@ -111,7 +120,7 @@ PanelWindow {
                 height: 40
 
                 Column {
-                    width: parent.width - closeButton.width
+                    width: parent.width - buttonRow.width
                     spacing: Theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
                     
@@ -133,12 +142,31 @@ PanelWindow {
                     }
                 }
 
-                DankActionButton {
-                    id: closeButton
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: root.hide()
+                Row {
+                    id: buttonRow
+                    spacing: Theme.spacingXS
+                    
+                    DankActionButton {
+                        id: expandButton
+                        iconName: root.expandedWidth ? "unfold_less" : "unfold_more"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: root.expandedWidth = !root.expandedWidth
+                        
+                        transform: Rotation {
+                            angle: 90
+                            origin.x: expandButton.width / 2
+                            origin.y: expandButton.height / 2
+                        }
+                    }
+                    
+                    DankActionButton {
+                        id: closeButton
+                        iconName: "close"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: root.hide()
+                    }
                 }
             }
 
