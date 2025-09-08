@@ -1301,6 +1301,80 @@ Item {
                                             SettingsData.setMonoFontFamily(value)
                                         }
                     }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        Column {
+                            width: parent.width - fontScaleControls.width - Theme.spacingM
+                            spacing: Theme.spacingXS
+
+                            StyledText {
+                                text: "Font Scale"
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                            }
+
+                            StyledText {
+                                text: "Scale all font sizes (" + (SettingsData.fontScale * 100).toFixed(0) + "%)"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                            }
+                        }
+
+                        Row {
+                            id: fontScaleControls
+
+                            spacing: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            DankActionButton {
+                                buttonSize: 32
+                                iconName: "remove"
+                                iconSize: Theme.iconSizeSmall
+                                enabled: SettingsData.fontScale > 1.0
+                                backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                                iconColor: Theme.surfaceText
+                                onClicked: {
+                                    var newScale = Math.max(1.0, SettingsData.fontScale - 0.05)
+                                    SettingsData.setFontScale(newScale)
+                                }
+                            }
+
+                            StyledRect {
+                                width: 60
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                border.width: 1
+
+                                StyledText {
+                                    anchors.centerIn: parent
+                                    text: (SettingsData.fontScale * 100).toFixed(0) + "%"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                }
+                            }
+
+                            DankActionButton {
+                                buttonSize: 32
+                                iconName: "add"
+                                iconSize: Theme.iconSizeSmall
+                                enabled: SettingsData.fontScale < 2.0
+                                backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
+                                iconColor: Theme.surfaceText
+                                onClicked: {
+                                    var newScale = Math.min(2.0, SettingsData.fontScale + 0.05)
+                                    SettingsData.setFontScale(newScale)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

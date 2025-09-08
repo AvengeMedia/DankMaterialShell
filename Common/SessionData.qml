@@ -104,15 +104,9 @@ Singleton {
                 lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : ""
                 notepadContent = settings.notepadContent !== undefined ? settings.notepadContent : ""
                 
-                // Apply dynamic theming if wallpaper exists and dynamic theming is enabled
-                if (wallpaperPath && wallpaperPath !== "") {
-                    if (typeof Theme !== "undefined") {
-                        if (typeof SettingsData !== "undefined" && SettingsData.wallpaperDynamicTheming) {
-                            Theme.switchTheme("dynamic")
-                            Theme.extractColors()
-                        }
-                        Theme.generateSystemThemesFromCurrentTheme()
-                    }
+                // Generate system themes but don't override user's theme choice
+                if (typeof Theme !== "undefined") {
+                    Theme.generateSystemThemesFromCurrentTheme()
                 }
                 notepadCurrentFileName = settings.notepadCurrentFileName !== undefined ? settings.notepadCurrentFileName : ""
                 notepadCurrentFileUrl = settings.notepadCurrentFileUrl !== undefined ? settings.notepadCurrentFileUrl : ""
@@ -238,10 +232,6 @@ Singleton {
         saveSettings()
 
         if (typeof Theme !== "undefined") {
-            if (typeof SettingsData !== "undefined" && SettingsData.wallpaperDynamicTheming) {
-                Theme.switchTheme("dynamic")
-                Theme.extractColors()
-            }
             Theme.generateSystemThemesFromCurrentTheme()
         }
     }
@@ -251,10 +241,6 @@ Singleton {
         saveSettings()
 
         if (typeof Theme !== "undefined") {
-            if (typeof SettingsData !== "undefined" && SettingsData.wallpaperDynamicTheming) {
-                Theme.switchTheme("dynamic")
-                Theme.extractColors()
-            }
             Theme.generateSystemThemesFromCurrentTheme()
         }
     }
@@ -360,10 +346,6 @@ Singleton {
 
         // Refresh dynamic theming when per-monitor mode changes
         if (typeof Theme !== "undefined") {
-            if (typeof SettingsData !== "undefined" && SettingsData.wallpaperDynamicTheming) {
-                Theme.switchTheme("dynamic")
-                Theme.extractColors()
-            }
             Theme.generateSystemThemesFromCurrentTheme()
         }
     }

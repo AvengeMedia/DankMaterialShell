@@ -81,6 +81,7 @@ Singleton {
     property string fontFamily: "Inter Variable"
     property string monoFontFamily: "Fira Code"
     property int fontWeight: Font.Normal
+    property real fontScale: 1.0
     property bool gtkThemingEnabled: false
     property bool qtThemingEnabled: false
     property bool showDock: false
@@ -243,6 +244,7 @@ Singleton {
                 fontFamily = settings.fontFamily !== undefined ? settings.fontFamily : defaultFontFamily
                 monoFontFamily = settings.monoFontFamily !== undefined ? settings.monoFontFamily : defaultMonoFontFamily
                 fontWeight = settings.fontWeight !== undefined ? settings.fontWeight : Font.Normal
+                fontScale = settings.fontScale !== undefined ? settings.fontScale : 1.0
                 gtkThemingEnabled = settings.gtkThemingEnabled !== undefined ? settings.gtkThemingEnabled : false
                 qtThemingEnabled = settings.qtThemingEnabled !== undefined ? settings.qtThemingEnabled : false
                 showDock = settings.showDock !== undefined ? settings.showDock : false
@@ -338,6 +340,7 @@ Singleton {
                                                 "fontFamily": fontFamily,
                                                 "monoFontFamily": monoFontFamily,
                                                 "fontWeight": fontWeight,
+                                                "fontScale": fontScale,
                                                 "gtkThemingEnabled": gtkThemingEnabled,
                                                 "qtThemingEnabled": qtThemingEnabled,
                                                 "showDock": showDock,
@@ -824,6 +827,11 @@ Singleton {
 
     function setMonoFontFamily(family) {
         monoFontFamily = family
+        saveSettings()
+    }
+
+    function setFontScale(scale) {
+        fontScale = scale
         saveSettings()
     }
 

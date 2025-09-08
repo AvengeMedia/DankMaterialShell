@@ -162,10 +162,10 @@ Singleton {
     property real spacingM: 12
     property real spacingL: 16
     property real spacingXL: 24
-    property real fontSizeSmall: 12
-    property real fontSizeMedium: 14
-    property real fontSizeLarge: 16
-    property real fontSizeXLarge: 20
+    property real fontSizeSmall: (typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0) * 12
+    property real fontSizeMedium: (typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0) * 14
+    property real fontSizeLarge: (typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0) * 16
+    property real fontSizeXLarge: (typeof SettingsData !== "undefined" ? SettingsData.fontScale : 1.0) * 20
     property real barHeight: 48
     property real iconSize: 24
     property real iconSizeSmall: 16
@@ -759,6 +759,10 @@ Singleton {
         matugenCheck.running = true
         if (typeof SessionData !== "undefined")
         SessionData.isLightModeChanged.connect(root.onLightModeChanged)
+        
+        if (typeof SettingsData !== "undefined" && SettingsData.currentThemeName) {
+            switchTheme(SettingsData.currentThemeName, false)
+        }
     }
 
     FileView {
