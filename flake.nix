@@ -43,8 +43,6 @@
                 '';
             };
 
-            quickshell = quickshell.packages.${system}.default;
-
             default = self.packages.${system}.dankMaterialShell;
         });
 
@@ -102,8 +100,10 @@
                     default = true;
                     description = "Add calendar events support via khal";
                 };
-                quickshell = {
-                    package = lib.mkPackageOption pkgs "quickshell" {};
+                quickshell.package = lib.mkOption {
+                    type = lib.types.package;
+                    default = quickshell.packages.${pkgs.system}.default;
+                    description = "Quickshell package to use";
                 };
             };
 
