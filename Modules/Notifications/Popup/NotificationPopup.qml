@@ -11,6 +11,8 @@ import qs.Widgets
 PanelWindow {
     id: win
 
+    WlrLayershell.namespace: "quickshell:notification"
+
     required property var notificationData
     required property string notificationId
     readonly property bool hasValidData: notificationData && notificationData.notification
