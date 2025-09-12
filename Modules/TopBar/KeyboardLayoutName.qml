@@ -1,5 +1,7 @@
 import QtQuick
 import QtQuick.Controls
+import Quickshell
+import Quickshell.Io
 import qs.Common
 import qs.Modules.ProcessList
 import qs.Services
@@ -9,6 +11,8 @@ Rectangle {
     id: root
 
     readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    property string currentLayout: ""
+    property string hyprlandKeyboard: ""
 
     width: contentRow.implicitWidth + horizontalPadding * 2
     height: widgetHeight
@@ -29,7 +33,17 @@ Rectangle {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onClicked: {
-            NiriService.cycleKeyboardLayout();
+            if (CompositorService.isNiri) {
+                NiriService.cycleKeyboardLayout()
+            } else if (CompositorService.isHyprland) {
+                Quickshell.execDetached([
+                    "hyprctl",
+                    "switchxkblayout",
+                    root.hyprlandKeyboard,
+                    "next"
+                ])
+                updateLayout()
+            }
         }
     }
 
@@ -40,7 +54,7 @@ Rectangle {
         spacing: Theme.spacingS
 
         StyledText {
-            text: NiriService.getCurrentKeyboardLayoutName()
+            text: currentLayout
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.verticalCenter: parent.verticalCenter
@@ -56,4 +70,48 @@ Rectangle {
 
     }
 
+    Process {
+        id: hyprlandLayoutProcess
+        running: false
+        command: ["hyprctl", "-j", "devices"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const data = JSON.parse(text)
+                    // Find the main keyboard and get its active keymap
+                    const mainKeyboard = data.keyboards.find(kb => kb.main === true)
+                    root.hyprlandKeyboard = mainKeyboard.name
+                    if (mainKeyboard && mainKeyboard.active_keymap) {
+                        root.currentLayout = mainKeyboard.active_keymap
+                    } else {
+                        root.currentLayout = "Unknown"
+                    }
+                } catch (e) {
+                    root.currentLayout = "Unknown"
+                }
+            }
+        }
+    }
+
+    Timer {
+        id: updateTimer
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            updateLayout()
+        }
+    }
+
+    Component.onCompleted: {
+        updateLayout()
+    }
+
+    function updateLayout() {
+        if (CompositorService.isNiri) {
+            root.currentLayout = NiriService.getCurrentKeyboardLayoutName()
+        } else if (CompositorService.isHyprland) {
+            hyprlandLayoutProcess.running = true
+        }
+    }
 }
