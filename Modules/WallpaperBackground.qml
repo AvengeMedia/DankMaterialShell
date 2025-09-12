@@ -43,12 +43,6 @@ LazyLoader {
                     monitor: modelData.name
                 }
 
-                Component.onCompleted: {
-                    if (isWE) {
-                        weProc.start(source.substring(3))
-                    }
-                }
-
                 Component.onDestruction: {
                     weProc.stop()
                 }
