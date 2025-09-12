@@ -439,8 +439,8 @@ DankModal {
                     width: parent.width
                     height: parent.height - 80
                     clip: true
-                    cellWidth: 150
-                    cellHeight: 130
+                    cellWidth: fileBrowserModal.browserType === "we" ? 255 : 150
+                    cellHeight: fileBrowserModal.browserType === "we" ? 215 : 130
                     cacheBuffer: 260
                     model: folderModel
                     currentIndex: selectedIndex
@@ -466,8 +466,8 @@ DankModal {
                         required property url fileURL
                         required property int index
 
-                        width: 140
-                        height: 120
+                        width: fileBrowserModal.browserType === "we" ? 245 : 140
+                        height: fileBrowserModal.browserType === "we" ? 205 : 120
                         radius: Theme.cornerRadius
                         color: {
                             if (keyboardNavigationActive && delegateRoot.index === selectedIndex)
@@ -498,16 +498,31 @@ DankModal {
                             spacing: Theme.spacingXS
 
                             Item {
-                                width: 80
-                                height: 60
+                                width: fileBrowserModal.browserType === "we" ? 225 : 80
+                                height: fileBrowserModal.browserType === "we" ? 165 : 60
                                 anchors.horizontalCenter: parent.horizontalCenter
 
                                 CachingImage {
                                     anchors.fill: parent
-                                    source: (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) ? ("file://" + delegateRoot.filePath) : ""
+                                    property var weExtensions: [".jpg", ".png", ".webp", ".gif", ".jpeg"]
+                                    property int weExtIndex: 0
+                                    source: {
+                                        if (fileBrowserModal.browserType === "we" && delegateRoot.fileIsDir) {
+                                            return "file://" + delegateRoot.filePath + "/preview" + weExtensions[weExtIndex]
+                                        }
+                                        return (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) ? ("file://" + delegateRoot.filePath) : ""
+                                    }
+                                    onStatusChanged: {
+                                        if (fileBrowserModal.browserType === "we" && delegateRoot.fileIsDir && status === Image.Error) {
+                                            if (weExtIndex < weExtensions.length - 1) {
+                                                weExtIndex++
+                                                source = "file://" + delegateRoot.filePath + "/preview" + weExtensions[weExtIndex]
+                                            }
+                                        }
+                                    }
                                     fillMode: Image.PreserveAspectCrop
-                                    visible: !delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)
-                                    maxCacheSize: 80
+                                    visible: (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) || (fileBrowserModal.browserType === "we" && delegateRoot.fileIsDir)
+                                    maxCacheSize: fileBrowserModal.browserType === "we" ? 225 : 80
                                 }
 
                                 DankIcon {
@@ -523,7 +538,7 @@ DankModal {
                                     name: "folder"
                                     size: Theme.iconSizeLarge
                                     color: Theme.primary
-                                    visible: delegateRoot.fileIsDir
+                                    visible: delegateRoot.fileIsDir && fileBrowserModal.browserType !== "we"
                                 }
                             }
 
@@ -550,7 +565,11 @@ DankModal {
                                 // Update selected file info and index first
                                 selectedIndex = delegateRoot.index
                                 setSelectedFileData(delegateRoot.filePath, delegateRoot.fileName, delegateRoot.fileIsDir)
-                                if (delegateRoot.fileIsDir) {
+                                if (fileBrowserModal.browserType === "we" && delegateRoot.fileIsDir) {
+                                    // Select this folder instead of navigating inside
+                                    fileSelected(delegateRoot.filePath)
+                                    fileBrowserModal.close()
+                                } if (delegateRoot.fileIsDir) {
                                     navigateTo(delegateRoot.filePath)
                                 } else {
                                     fileSelected(delegateRoot.filePath)

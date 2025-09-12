@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
@@ -75,6 +76,12 @@ Item {
         anchors.fill: parent
         source: {
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
+            if (screenName && currentWallpaper && currentWallpaper.startsWith("we:")) {
+                const cacheHome = StandardPaths.writableLocation(StandardPaths.CacheLocation).toString()
+                const baseDir = cacheHome.startsWith("file://") ? cacheHome.substring(7) : cacheHome
+                const screenshotPath = baseDir + "/dankshell/we_screenshots" + "/" + currentWallpaper.substring(3) + ".jpg"
+                return screenshotPath
+            }
             return (currentWallpaper && !currentWallpaper.startsWith("#")) ? currentWallpaper : ""
         }
         fillMode: Image.PreserveAspectCrop

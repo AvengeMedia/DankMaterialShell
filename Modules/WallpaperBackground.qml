@@ -2,8 +2,10 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
+import Quickshell.Io
 import qs.Common
 import qs.Widgets
+import qs.Modules
 
 LazyLoader {
     active: true
@@ -36,20 +38,44 @@ LazyLoader {
                 property bool isColorSource: source.startsWith("#")
                 property Image current: one
 
+                WallpaperEngineProc {
+                    id: weProc
+                    monitor: modelData.name
+                }
+
+                Component.onCompleted: {
+                    if (isWE) {
+                        weProc.start(source.substring(3))
+                    }
+                }
+
+                Component.onDestruction: {
+                    weProc.stop()
+                }
+
                 onSourceChanged: {
-                    if (!source) {
+                    const isWE = source.startsWith("we:")
+                    if (isWE) {
                         current = null
                         one.source = ""
                         two.source = ""
-                    } else if (isColorSource) {
-                        current = null
-                        one.source = ""
-                        two.source = ""
+                        weProc.start(source.substring(3)) // strip "we:"
                     } else {
-                        if (current === one)
-                            two.update()
-                        else
-                            one.update()
+                        weProc.stop()
+                        if (!source) {
+                            current = null
+                            one.source = ""
+                            two.source = ""
+                        } else if (isColorSource) {
+                            current = null
+                            one.source = ""
+                            two.source = ""
+                        } else {
+                            if (current === one)
+                                two.update()
+                            else
+                                one.update()
+                        }
                     }
                 }
 

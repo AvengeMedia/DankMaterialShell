@@ -35,10 +35,36 @@ Singleton {
             var screens = Quickshell.screens
             if (screens.length > 0) {
                 var firstMonitorWallpaper = SessionData.getMonitorWallpaper(screens[0].name)
+                var wallpaperPath = firstMonitorWallpaper || SessionData.wallpaperPath
+
+                if (wallpaperPath && wallpaperPath.startsWith("we:")) {
+                    return stateDir + "/we_screenshots/" + wallpaperPath.substring(3) + ".jpg"
+                }
+
+                return wallpaperPath
+            }
+        }
+
+        var wallpaperPath = SessionData.wallpaperPath
+        var screens = Quickshell.screens
+        if (screens.length > 0 && wallpaperPath && wallpaperPath.startsWith("we:")) {
+            return stateDir + "/we_screenshots/" + wallpaperPath.substring(3) + ".jpg"
+        }
+
+        return wallpaperPath
+    }
+    readonly property string rawWallpaperPath: {
+        if (typeof SessionData === "undefined") return ""
+        
+        if (SessionData.perMonitorWallpaper) {
+            // Use first monitor's wallpaper for dynamic theming
+            var screens = Quickshell.screens
+            if (screens.length > 0) {
+                var firstMonitorWallpaper = SessionData.getMonitorWallpaper(screens[0].name)
                 return firstMonitorWallpaper || SessionData.wallpaperPath
             }
         }
-        
+
         return SessionData.wallpaperPath
     }
 
@@ -383,7 +409,11 @@ Singleton {
     function extractColors() {
         extractionRequested = true
         if (matugenAvailable)
-            fileChecker.running = true
+            if (rawWallpaperPath.startsWith("we:")) {
+                fileCheckerTimer.start()
+            } else {
+                fileChecker.running = true
+            }
         else
             matugenCheck.running = true
     }
@@ -418,7 +448,15 @@ Singleton {
 
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`])
         workerRunning = true
-        systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, "--run"]
+        if (rawWallpaperPath.startsWith("we:")) {
+            console.log("calling matugen worker")
+            systemThemeGenerator.command = [
+                "sh", "-c",
+                `sleep 1 && ${shellDir}/scripts/matugen-worker.sh '${stateDir}' '${shellDir}' --run`
+            ]
+        } else {
+            systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, "--run"]
+        }
         systemThemeGenerator.running = true
     }
 
@@ -552,7 +590,11 @@ Singleton {
                 return
             }
             if (extractionRequested) {
-                fileChecker.running = true
+                if (rawWallpaperPath.startsWith("we:")) {
+                    fileCheckerTimer.start()
+                } else {
+                    fileChecker.running = true
+                }
             }
 
             const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode)
@@ -594,6 +636,15 @@ Singleton {
             } else if (wallpaperPath.startsWith("#")) {
                 colorMatugenProcess.running = true
             }
+        }
+    }
+
+    Timer {
+        id: fileCheckerTimer
+        interval: 1000
+        repeat: false
+        onTriggered: {
+            fileChecker.running = true
         }
     }
 

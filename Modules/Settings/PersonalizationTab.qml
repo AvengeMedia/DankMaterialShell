@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
@@ -141,9 +142,27 @@ Item {
                             CachingImage {
                                 anchors.fill: parent
                                 anchors.margins: 1
+                                property var weExtensions: [".jpg", ".png", ".webp", ".gif", ".jpeg"]
+                                property int weExtIndex: 0
                                 source: {
                                     var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
+                                    if (currentWallpaper && currentWallpaper.startsWith("we:")) {
+                                        var sceneId = currentWallpaper.substring(3)
+                                        return StandardPaths.writableLocation(StandardPaths.HomeLocation)
+                                            + "/.local/share/Steam/steamapps/workshop/content/431960/"
+                                            + sceneId + "/preview" + weExtensions[weExtIndex]
+                                    }
                                     return (currentWallpaper !== "" && !currentWallpaper.startsWith("#")) ? "file://" + currentWallpaper : ""
+                                }
+                                onStatusChanged: {
+                                    var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
+                                    if (currentWallpaper.startsWith("we:") && status === Image.Error && weExtIndex < weExtensions.length - 1) {
+                                        weExtIndex++
+                                        source = StandardPaths.writableLocation(StandardPaths.HomeLocation)
+                                            + "/.local/share/Steam/steamapps/workshop/content/431960/"
+                                            + currentWallpaper.substring(3)
+                                            + "/preview" + weExtensions[weExtIndex]
+                                    }
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 visible: {
@@ -230,6 +249,30 @@ Item {
                                                     parentModal.shouldHaveFocus = false
                                                 }
                                                 wallpaperBrowser.open()
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 32; height: 32; radius: 16
+                                        color: Qt.rgba(255, 255, 255, 0.9)
+
+                                        DankIcon {
+                                            anchors.centerIn: parent
+                                            name: "movie"   // 🎬 icon for WE
+                                            size: 18
+                                            color: "black"
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (parentModal) {
+                                                    parentModal.allowFocusOverride = true
+                                                    parentModal.shouldHaveFocus = false
+                                                }
+                                                weBrowser.open()
                                             }
                                         }
                                     }
@@ -347,11 +390,11 @@ Item {
                                     iconSize: Theme.iconSizeSmall
                                     enabled: {
                                         var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                        return currentWallpaper && !currentWallpaper.startsWith("#")
+                                        return currentWallpaper && !currentWallpaper.startsWith("#") && !currentWallpaper.startsWith("we")
                                     }
                                     opacity: {
                                         var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                        return (currentWallpaper && !currentWallpaper.startsWith("#")) ? 1 : 0.5
+                                        return (currentWallpaper && !currentWallpaper.startsWith("#") && !currentWallpaper.startsWith("we")) ? 1 : 0.5
                                     }
                                     backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
                                     iconColor: Theme.surfaceText
@@ -370,11 +413,11 @@ Item {
                                     iconSize: Theme.iconSizeSmall
                                     enabled: {
                                         var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                        return currentWallpaper && !currentWallpaper.startsWith("#")
+                                        return currentWallpaper && !currentWallpaper.startsWith("#") && !currentWallpaper.startsWith("we")
                                     }
                                     opacity: {
                                         var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                        return (currentWallpaper && !currentWallpaper.startsWith("#")) ? 1 : 0.5
+                                        return (currentWallpaper && !currentWallpaper.startsWith("#") && !currentWallpaper.startsWith("we")) ? 1 : 0.5
                                     }
                                     backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
                                     iconColor: Theme.surfaceText
@@ -1423,6 +1466,38 @@ Item {
             }
         }
     }
+
+    FileBrowserModal {
+        id: weBrowser
+        browserTitle: "Select Wallpaper Engine Scene"
+        browserIcon: "movie"
+        browserType: "we"
+        fileExtensions: []   // only show dirs
+
+        // override homeDir to point to Steam workshop path
+        homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+                + "/.local/share/Steam/steamapps/workshop/content/431960"
+
+        // ensure we start there
+        Component.onCompleted: currentPath = homeDir
+
+        function getLastPath() {
+            return homeDir
+        }
+
+        onFileSelected: folderPath => {
+            var sceneId = folderPath.split("/").pop()
+            var weSource = "we:" + sceneId
+            if (SessionData.perMonitorWallpaper) {
+                SessionData.setMonitorWallpaper(selectedMonitorName, weSource)
+            } else {
+                SessionData.setWallpaper(weSource)
+            }
+            close()
+        }
+    }
+
+
 
     DankColorPicker {
         id: colorPicker
