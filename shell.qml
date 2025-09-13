@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
+import Quickshell.Hyprland
 import qs.Common
 import qs.Modals
 import qs.Modals.Clipboard
@@ -455,20 +456,6 @@ ShellRoot {
             return ""
         }
 
-        function getNotepadInstanceForScreen(screenName: string) {
-            if (!screenName || notepadSlideoutVariants.instances.length === 0) {
-                return
-            }
-            
-            for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
-                var loader = notepadSlideoutVariants.instances[i]
-                if (loader.modelData && loader.modelData.name === screenName) {
-                    loader.ensureLoaded()
-                    return
-                }
-            }
-        }
-
         function getActiveNotepadInstance() {
             if (notepadSlideoutVariants.instances.length === 0) {
                 return null
@@ -479,10 +466,13 @@ ShellRoot {
             }
             
             var focusedScreen = getFocusedScreenName()
-            if (focusedScreen) {
-                var focusedInstance = getNotepadInstanceForScreen(focusedScreen)
-                if (focusedInstance) {
-                    return focusedInstance
+            if (focusedScreen && notepadSlideoutVariants.instances.length > 0) {
+                for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
+                    var loader = notepadSlideoutVariants.instances[i]
+                    if (loader.modelData && loader.modelData.name === focusedScreen) {
+                        loader.ensureLoaded()
+                        return loader.item
+                    }
                 }
             }
             
