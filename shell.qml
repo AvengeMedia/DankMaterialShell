@@ -273,6 +273,16 @@ ShellRoot {
         }
     }
 
+    LazyLoader {
+        id: archUpdaterLoader
+
+        active: false
+
+        ArchUpdaterPopout {
+            id: archUpdaterPopout
+        }
+    }
+
     Variants {
         id: notepadSlideoutVariants
         model: SettingsData.getFilteredScreens("notepad")

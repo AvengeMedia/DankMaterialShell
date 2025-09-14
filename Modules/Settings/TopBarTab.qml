@@ -163,6 +163,12 @@ Item {
             "description": "Quick access to color picker",
             "icon": "palette",
             "enabled": true
+        }, {
+            "id": "archUpdater",
+            "text": "Arch Updater",
+            "description": "Check for updates in Arch-based systems",
+            "icon": "update",
+            "enabled": true
         }]
     property var defaultLeftWidgets: [{
             "id": "launcherButton",

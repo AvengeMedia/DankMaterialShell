@@ -183,6 +183,9 @@ PanelWindow {
                              }, {
                                  "loader": clipboardHistoryModalPopup,
                                  "prop": "visible"
+                             }, {
+                                 "loader": archUpdaterLoader,
+                                 "prop": "shouldBeVisible"
                              }]
             return notepadInstanceVisible || loaders.some(item => {
                 if (item.loader) {
@@ -373,7 +376,8 @@ PanelWindow {
                                                                  "keyboard_layout_name": keyboardLayoutNameComponent,
                                                                  "vpn": vpnComponent,
                                                                  "notepadButton": notepadButtonComponent,
-                                                                 "colorPicker": colorPickerComponent
+                                                                 "colorPicker": colorPickerComponent,
+                                                                 "archUpdater": archUpdaterComponent
                                                              })
 
                         function getWidgetComponent(widgetId) {
@@ -1013,6 +1017,26 @@ PanelWindow {
                                 parentScreen: root.screen
                                 onColorPickerRequested: {
                                     root.colorPickerRequested()
+                                }
+                            }
+                        }
+
+                        Component {
+                            id: archUpdaterComponent
+
+                            ArchUpdater {
+                                isActive: archUpdaterLoader.item ? archUpdaterLoader.item.shouldBeVisible : false
+                                widgetHeight: root.widgetHeight
+                                barHeight: root.effectiveBarHeight
+                                section: topBarContent.getWidgetSection(parent) || "right"
+                                popupTarget: {
+                                    archUpdaterLoader.active = true
+                                    return archUpdaterLoader.item
+                                }
+                                parentScreen: root.screen
+                                onClicked: {
+                                    archUpdaterLoader.active = true
+                                    archUpdaterLoader.item?.toggle()
                                 }
                             }
                         }
