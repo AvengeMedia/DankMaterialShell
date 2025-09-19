@@ -17,6 +17,7 @@ Item {
     property bool debounceSearch: true
     property int debounceInterval: 50
     property bool keyboardNavigationActive: false
+    property bool suppressUpdatesWhileLaunching: false
     readonly property var categories: {
         const allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
         const result = ["All"]
@@ -32,6 +33,10 @@ Item {
     signal viewModeSelected(string mode)
 
     function updateFilteredModel() {
+        if (suppressUpdatesWhileLaunching) {
+            suppressUpdatesWhileLaunching = false
+            return
+        }
         filteredModel.clear()
         selectedIndex = 0
         keyboardNavigationActive = false
@@ -125,6 +130,7 @@ Item {
         if (!appData) {
             return
         }
+        suppressUpdatesWhileLaunching = true
         appData.desktopEntry.execute()
         appLaunched(appData)
         AppUsageHistoryData.addAppUsage(appData.desktopEntry)
