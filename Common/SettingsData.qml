@@ -75,7 +75,7 @@ Singleton {
     property bool qt6ctAvailable: false
     property bool gtkAvailable: false
     property bool useOSLogo: false
-    property bool niriOverviewOnRightClick: true
+    property bool niriOverviewOnRightClick: false
     property string osLogoColorOverride: ""
     property real osLogoBrightness: 0.5
     property real osLogoContrast: 1
@@ -254,7 +254,7 @@ Singleton {
                 networkPreference = settings.networkPreference !== undefined ? settings.networkPreference : "auto"
                 iconTheme = settings.iconTheme !== undefined ? settings.iconTheme : "System Default"
                 useOSLogo = settings.useOSLogo !== undefined ? settings.useOSLogo : false
-                niriOverviewOnRightClick = settings.niriOverviewOnRightClick !== undefined ? settings.niriOverviewOnRightClick : true
+                niriOverviewOnRightClick = settings.niriOverviewOnRightClick !== undefined ? settings.niriOverviewOnRightClick : false
                 osLogoColorOverride = settings.osLogoColorOverride !== undefined ? settings.osLogoColorOverride : ""
                 osLogoBrightness = settings.osLogoBrightness !== undefined ? settings.osLogoBrightness : 0.5
                 osLogoContrast = settings.osLogoContrast !== undefined ? settings.osLogoContrast : 1
