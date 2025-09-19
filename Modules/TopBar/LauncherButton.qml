@@ -28,8 +28,8 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
             onPressed: function(mouse) {
                 if (mouse.button === Qt.RightButton) {
-                    if (CompositorService.isNiri && SettingsData.niriOverviewOnRightClick) {
-                        NiriService.openOverview()
+                    if (CompositorService.isNiri) {
+                        NiriService.toggleOverview()
                     }
                     return
                 }

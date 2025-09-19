@@ -406,6 +406,14 @@ Singleton {
         return true
     }
 
+    function toggleOverview() {
+        return send({
+                        "Action": {
+                            "ToggleOverview": {}
+                        }
+                    })
+    }
+
     function switchToWorkspace(workspaceIndex) {
         return send({
                         "Action": {
