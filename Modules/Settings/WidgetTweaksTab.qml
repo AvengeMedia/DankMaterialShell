@@ -59,6 +59,17 @@ Item {
 
                     DankToggle {
                         width: parent.width
+                        text: "Niri Overview on Right-click"
+                        description: "Right-click the launcher button to open Niri Overview"
+                        checked: SettingsData.niriOverviewOnRightClick
+                        visible: CompositorService.isNiri
+                        onToggled: checked => {
+                                       return SettingsData.setNiriOverviewOnRightClick(checked)
+                                   }
+                    }
+
+                    DankToggle {
+                        width: parent.width
                         text: "Use OS Logo"
                         description: "Display operating system logo instead of apps icon"
                         checked: SettingsData.useOSLogo

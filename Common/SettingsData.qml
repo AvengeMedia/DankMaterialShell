@@ -75,6 +75,7 @@ Singleton {
     property bool qt6ctAvailable: false
     property bool gtkAvailable: false
     property bool useOSLogo: false
+    property bool niriOverviewOnRightClick: true
     property string osLogoColorOverride: ""
     property real osLogoBrightness: 0.5
     property real osLogoContrast: 1
@@ -253,6 +254,7 @@ Singleton {
                 networkPreference = settings.networkPreference !== undefined ? settings.networkPreference : "auto"
                 iconTheme = settings.iconTheme !== undefined ? settings.iconTheme : "System Default"
                 useOSLogo = settings.useOSLogo !== undefined ? settings.useOSLogo : false
+                niriOverviewOnRightClick = settings.niriOverviewOnRightClick !== undefined ? settings.niriOverviewOnRightClick : true
                 osLogoColorOverride = settings.osLogoColorOverride !== undefined ? settings.osLogoColorOverride : ""
                 osLogoBrightness = settings.osLogoBrightness !== undefined ? settings.osLogoBrightness : 0.5
                 osLogoContrast = settings.osLogoContrast !== undefined ? settings.osLogoContrast : 1
@@ -355,6 +357,7 @@ Singleton {
                                                 "topBarCenterWidgets": topBarCenterWidgets,
                                                 "topBarRightWidgets": topBarRightWidgets,
                                                 "appLauncherViewMode": appLauncherViewMode,
+                                                "niriOverviewOnRightClick": niriOverviewOnRightClick,
                                                 "spotlightModalViewMode": spotlightModalViewMode,
                                                 "networkPreference": networkPreference,
                                                 "iconTheme": iconTheme,
@@ -826,6 +829,11 @@ Singleton {
 
     function setUseOSLogo(enabled) {
         useOSLogo = enabled
+        saveSettings()
+    }
+
+    function setNiriOverviewOnRightClick(enabled) {
+        niriOverviewOnRightClick = enabled
         saveSettings()
     }
 
