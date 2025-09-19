@@ -25,16 +25,23 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
-        onPressed: {
-            if (popupTarget && popupTarget.setTriggerPosition) {
-                const globalPos = mapToGlobal(0, 0);
-                const currentScreen = parentScreen || Screen;
-                const screenX = currentScreen.x || 0;
-                const relativeX = globalPos.x - screenX;
-                popupTarget.setTriggerPosition(relativeX, barHeight + Theme.spacingXS, width, section, currentScreen);
-            }
-            root.clicked();
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onPressed: function(mouse) {
+                if (mouse.button === Qt.RightButton) {
+                    if (CompositorService.isNiri && SettingsData.niriOverviewOnRightClick) {
+                        NiriService.openOverview()
+                    }
+                    return
+                }
+            
+                if (popupTarget && popupTarget.setTriggerPosition) {
+                    const globalPos = mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const screenX = currentScreen.x || 0;
+                    const relativeX = globalPos.x - screenX;
+                    popupTarget.setTriggerPosition(relativeX, barHeight + Theme.spacingXS, width, section, currentScreen);
+                }
+                root.clicked();
         }
     }
 
