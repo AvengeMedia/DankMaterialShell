@@ -123,7 +123,7 @@
                     };
                 };
 
-                programs.niri.settings = lib.mkMerge [
+                programs.niri.settings = lib.mkIf config.lib.niri (lib.mkMerge [
                     (lib.mkIf cfg.enableKeybinds {
                         binds = with config.lib.niri.actions; let
                             dms-ipc = spawn "dms" "ipc";
@@ -205,7 +205,7 @@
                             {command = ["dms" "run"];}
                         ];
                     })
-                ];
+                ]);
 
                 home.packages =
                     [
