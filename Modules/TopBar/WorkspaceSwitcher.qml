@@ -147,7 +147,7 @@ Rectangle {
 
     function getHyprlandWorkspaces() {
         const workspaces = Hyprland.workspaces?.values || []
-        
+
         if (!root.screenName || !SettingsData.workspacesPerMonitor) {
             // Show all workspaces on all monitors if per-monitor filtering is disabled
             const sorted = workspaces.slice().sort((a, b) => a.id - b.id)
@@ -162,7 +162,7 @@ Rectangle {
         const monitorWorkspaces = workspaces.filter(ws => {
             return ws.lastIpcObject && ws.lastIpcObject.monitor === root.screenName
         })
-        
+
         if (monitorWorkspaces.length === 0) {
             // Fallback if no workspaces exist for this monitor
             return [{
@@ -183,7 +183,7 @@ Rectangle {
         // Find the monitor object for this screen
         const monitors = Hyprland.monitors?.values || []
         const currentMonitor = monitors.find(monitor => monitor.name === root.screenName)
-        
+
         if (!currentMonitor) {
             return 1
         }
@@ -287,7 +287,6 @@ Rectangle {
                 }
                 property bool isHovered: mouseArea.containsMouse
 
-                // --- ASYNC DATA LOADING (for workspaceData, iconData, icons) ---
                 property var loadedWorkspaceData: null
                 property var loadedIconData: null
                 property bool loadedHasIcon: false
@@ -305,7 +304,6 @@ Rectangle {
                             return
                         }
 
-                        // Calculate workspaceData
                         var wsData = null;
                         if (CompositorService.isNiri) {
                             wsData = NiriService.allWorkspaces.find(ws => ws.idx + 1 === modelData && ws.output === root.screenName) || null;
@@ -314,7 +312,6 @@ Rectangle {
                         }
                         delegateRoot.loadedWorkspaceData = wsData;
 
-                        // Calculate iconData
                         var icData = null;
                         if (wsData?.name) {
                             icData = SettingsData.getWorkspaceNameIcon(wsData.name);
@@ -322,9 +319,8 @@ Rectangle {
                         delegateRoot.loadedIconData = icData;
                         delegateRoot.loadedHasIcon = icData !== null;
 
-                        // Calculate app icons
                         if (SettingsData.showWorkspaceApps) {
-                            delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : modelData);
+                            delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : (modelData === -1 ? null : modelData));
                         } else {
                             delegateRoot.loadedIcons = [];
                         }
@@ -335,7 +331,6 @@ Rectangle {
                     dataUpdateTimer.restart()
                 }
 
-                // --- UI PROPERTIES ---
                 width: {
                     if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
                         const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons);
@@ -349,16 +344,14 @@ Rectangle {
                 radius: height / 2
                 color: isActive ? Theme.primary : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
-                // --- ANIMATION ---
                 Behavior on width {
-		            enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
+                    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                     NumberAnimation {
                         duration: Theme.mediumDuration
                         easing.type: Theme.emphasizedEasing
                     }
                 }
 
-                // --- UI COMPONENTS (Dynamically loaded with Loaders) ---
                 MouseArea {
                     id: mouseArea
 
