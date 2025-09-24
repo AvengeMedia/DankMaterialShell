@@ -13,7 +13,6 @@ Item {
 
     signal removeWidget(int index)
     signal toggleWidgetSize(int index)
-    signal moveWidget(int fromIndex, int toIndex)
 
     // Delete button in top-right
     Rectangle {
@@ -40,186 +39,162 @@ Item {
         }
     }
 
-    // Size control buttons in bottom-right
-    Row {
+    // Circular size control indicator in bottom-right
+    Rectangle {
+        width: 24
+        height: 24
+        radius: 12
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.margins: -8
-        spacing: 4
         visible: editMode && showSizeControls
-        z: 10
+        z: 1000
+        color: Theme.surfaceContainer
+        border.color: Theme.primary
+        border.width: 2
 
-        Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: (widgetData?.width || 50) === 25 ? Theme.primary : Theme.primaryContainer
-            border.color: Theme.primary
-            border.width: 1
-            visible: !isSlider
-
-            StyledText {
-                anchors.centerIn: parent
-                text: "25"
-                font.pixelSize: 10
-                font.weight: Font.Medium
-                color: (widgetData?.width || 50) === 25 ? Theme.primaryText : Theme.primary
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    var widgets = SettingsData.controlCenterWidgets.slice()
-                    if (widgetIndex >= 0 && widgetIndex < widgets.length) {
-                        widgets[widgetIndex].width = 25
-                        SettingsData.setControlCenterWidgets(widgets)
-                    }
-                }
+        property real currentWidth: widgetData?.width || 50
+        property real fillPercentage: {
+            if (isSlider) {
+                // For sliders: 50% = 0.5, 100% = 1.0
+                return currentWidth === 50 ? 0.5 : 1.0
+            } else {
+                // For regular widgets: 25% = 0.25, 50% = 0.5, 75% = 0.75, 100% = 1.0
+                return currentWidth / 100
             }
         }
 
+        // Background circle
         Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: (widgetData?.width || 50) === 50 ? Theme.primary : Theme.primaryContainer
-            border.color: Theme.primary
+            anchors.fill: parent
+            radius: parent.radius
+            color: "transparent"
+            border.color: Theme.outline
             border.width: 1
+            opacity: 0.6
+        }
 
-            StyledText {
-                anchors.centerIn: parent
-                text: "50"
-                font.pixelSize: 10
-                font.weight: Font.Medium
-                color: (widgetData?.width || 50) === 50 ? Theme.primaryText : Theme.primary
+        // Progress fill using a pie chart approach
+        Canvas {
+            id: progressCanvas
+            anchors.fill: parent
+
+            property real targetFillPercentage: parent.fillPercentage
+
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
+
+                var centerX = width / 2
+                var centerY = height / 2
+                var radius = Math.min(width, height) / 2 - 2
+                var fillAngle = targetFillPercentage * 2 * Math.PI
+
+                if (fillAngle > 0) {
+                    ctx.beginPath()
+                    ctx.moveTo(centerX, centerY)
+                    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + fillAngle)
+                    ctx.closePath()
+                    ctx.fillStyle = Theme.primary
+                    ctx.fill()
+                }
             }
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    var widgets = SettingsData.controlCenterWidgets.slice()
-                    if (widgetIndex >= 0 && widgetIndex < widgets.length) {
-                        widgets[widgetIndex].width = 50
-                        SettingsData.setControlCenterWidgets(widgets)
-                    }
-                }
+            onTargetFillPercentageChanged: {
+                requestPaint()
             }
         }
 
-        Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: (widgetData?.width || 50) === 75 ? Theme.primary : Theme.primaryContainer
-            border.color: Theme.primary
-            border.width: 1
-            visible: !isSlider
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            z: 10000
+            propagateComposedEvents: false
+            preventStealing: true
+            visible: editMode
 
-            StyledText {
-                anchors.centerIn: parent
-                text: "75"
-                font.pixelSize: 10
-                font.weight: Font.Medium
-                color: (widgetData?.width || 50) === 75 ? Theme.primaryText : Theme.primary
+            onPressed: function (mouse) {
+                mouse.accepted = true
             }
 
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    var widgets = SettingsData.controlCenterWidgets.slice()
-                    if (widgetIndex >= 0 && widgetIndex < widgets.length) {
-                        widgets[widgetIndex].width = 75
-                        SettingsData.setControlCenterWidgets(widgets)
+            onClicked: function (mouse) {
+                mouse.accepted = true
+
+                var widgets = SettingsData.controlCenterWidgets.slice()
+
+                if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+                    return
+                }
+
+                var currentSize = widgets[widgetIndex].width || 50
+                var newSize
+
+                if (isSlider) {
+                    newSize = currentSize === 50 ? 100 : 50
+                } else {
+                    switch (currentSize) {
+                    case 25:
+                        newSize = 50
+                        break
+                    case 50:
+                        newSize = 75
+                        break
+                    case 75:
+                        newSize = 100
+                        break
+                    case 100:
+                        newSize = 25
+                        break
+                    default:
+                        newSize = 50
+                        break
                     }
                 }
+
+                widgets[widgetIndex].width = newSize
+                SettingsData.setControlCenterWidgets(widgets)
             }
         }
 
-        Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: (widgetData?.width || 50) === 100 ? Theme.primary : Theme.primaryContainer
-            border.color: Theme.primary
-            border.width: 1
-
-            StyledText {
-                anchors.centerIn: parent
-                text: "100"
-                font.pixelSize: 9
-                font.weight: Font.Medium
-                color: (widgetData?.width || 50) === 100 ? Theme.primaryText : Theme.primary
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                cursorShape: Qt.PointingHandCursor
-                onClicked: {
-                    var widgets = SettingsData.controlCenterWidgets.slice()
-                    if (widgetIndex >= 0 && widgetIndex < widgets.length) {
-                        widgets[widgetIndex].width = 100
-                        SettingsData.setControlCenterWidgets(widgets)
-                    }
-                }
+        // Smooth transition for fill changes
+        Behavior on fillPercentage {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Easing.OutCubic
             }
         }
     }
 
-    // Arrow buttons for reordering in top-left
-    Row {
+    // Drag handle indicator in top-left
+    Rectangle {
+        width: 20
+        height: 12
+        radius: 6
+        color: Theme.surfaceContainer
+        border.color: Theme.outline
+        border.width: 1
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 4
-        spacing: 2
         visible: editMode
         z: 20
+        opacity: 0.8
 
-        Rectangle {
-            width: 16
-            height: 16
-            radius: 8
-            color: Theme.surfaceContainer
-            border.color: Theme.outline
-            border.width: 1
+        Column {
+            anchors.centerIn: parent
+            spacing: 1
 
-            DankIcon {
-                anchors.centerIn: parent
-                name: "keyboard_arrow_left"
-                size: 12
+            Rectangle {
+                width: 12
+                height: 2
+                radius: 1
                 color: Theme.surfaceText
             }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: widgetIndex > 0
-                opacity: enabled ? 1.0 : 0.5
-                onClicked: root.moveWidget(widgetIndex, widgetIndex - 1)
-            }
-        }
-
-        Rectangle {
-            width: 16
-            height: 16
-            radius: 8
-            color: Theme.surfaceContainer
-            border.color: Theme.outline
-            border.width: 1
-
-            DankIcon {
-                anchors.centerIn: parent
-                name: "keyboard_arrow_right"
-                size: 12
+            Rectangle {
+                width: 12
+                height: 2
+                radius: 1
                 color: Theme.surfaceText
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: widgetIndex < ((SettingsData.controlCenterWidgets?.length ?? 0) - 1)
-                opacity: enabled ? 1.0 : 0.5
-                onClicked: root.moveWidget(widgetIndex, widgetIndex + 1)
             }
         }
     }
@@ -235,7 +210,9 @@ Item {
         z: -1
 
         Behavior on border.width {
-            NumberAnimation { duration: Theme.shortDuration }
+            NumberAnimation {
+                duration: Theme.shortDuration
+            }
         }
     }
 }
