@@ -483,6 +483,7 @@ PanelWindow {
                                                                  "clipboard": clipboardComponent,
                                                                  "cpuUsage": cpuUsageComponent,
                                                                  "memUsage": memUsageComponent,
+                                                                 "diskUsage": diskUsageComponent,
                                                                  "cpuTemp": cpuTempComponent,
                                                                  "gpuTemp": gpuTempComponent,
                                                                  "notificationButton": notificationButtonComponent,
@@ -988,6 +989,25 @@ PanelWindow {
                             id: memUsageComponent
 
                             RamMonitor {
+                                barHeight: root.effectiveBarHeight
+                                widgetHeight: root.widgetHeight
+                                section: topBarContent.getWidgetSection(parent) || "right"
+                                popupTarget: {
+                                    processListPopoutLoader.active = true
+                                    return processListPopoutLoader.item
+                                }
+                                parentScreen: root.screen
+                                toggleProcessList: () => {
+                                                       processListPopoutLoader.active = true
+                                                       return processListPopoutLoader.item?.toggle()
+                                                   }
+                            }
+                        }
+
+                        Component {
+                            id: diskUsageComponent
+
+                            DiskUsage {
                                 barHeight: root.effectiveBarHeight
                                 widgetHeight: root.widgetHeight
                                 section: topBarContent.getWidgetSection(parent) || "right"

@@ -67,6 +67,13 @@ Item {
             "id": "memUsage",
             "text": "Memory Usage",
             "description": "Memory usage indicator",
+            "icon": "developer_board",
+            "enabled": DgopService.dgopAvailable,
+            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+        }, {
+            "id": "diskUsage",
+            "text": "Disk Usage",
+            "description": "Root filesystem usage indicator",
             "icon": "storage",
             "enabled": DgopService.dgopAvailable,
             "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined

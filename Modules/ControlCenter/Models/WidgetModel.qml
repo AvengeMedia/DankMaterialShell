@@ -100,6 +100,15 @@ QtObject {
             "enabled": true
         },
         {
+            "id": "diskUsage",
+            "text": "Disk Usage",
+            "description": "Filesystem usage monitoring",
+            "icon": "storage",
+            "type": "action",
+            "enabled": DgopService.dgopAvailable,
+            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+        },
+        {
             "id": "battery",
             "text": "Battery",
             "description": "Battery and power management",

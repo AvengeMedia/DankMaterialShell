@@ -102,6 +102,8 @@ Column {
                                     return inputAudioSliderComponent
                                 } else if (id === "battery") {
                                     return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent
+                                } else if (id === "diskUsage") {
+                                    return diskUsagePillComponent
                                 } else {
                                     return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent
                                 }
@@ -472,6 +474,34 @@ Column {
     Component {
         id: batteryPillComponent
         BatteryPill {
+            property var widgetData: parent.widgetData || {}
+            property int widgetIndex: parent.widgetIndex || 0
+            width: parent.width
+            height: 60
+
+            onExpandClicked: {
+                if (!root.editMode) {
+                    root.expandClicked(widgetData, widgetIndex)
+                }
+            }
+
+            EditModeOverlay {
+                anchors.fill: parent
+                editMode: root.editMode
+                widgetData: parent.widgetData
+                widgetIndex: parent.widgetIndex
+                showSizeControls: true
+                isSlider: false
+                onRemoveWidget: (index) => root.removeWidget(index)
+                onToggleWidgetSize: (index) => root.toggleWidgetSize(index)
+                onMoveWidget: (fromIndex, toIndex) => root.moveWidget(fromIndex, toIndex)
+            }
+        }
+    }
+
+    Component {
+        id: diskUsagePillComponent
+        DiskUsagePill {
             property var widgetData: parent.widgetData || {}
             property int widgetIndex: parent.widgetIndex || 0
             width: parent.width
