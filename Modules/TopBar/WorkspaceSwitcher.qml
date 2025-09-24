@@ -271,6 +271,8 @@ Rectangle {
             model: root.workspaceList
 
             Rectangle {
+                id: delegateRoot
+
                 property bool isActive: {
                     if (CompositorService.isHyprland) {
                         return modelData && modelData.id === root.currentWorkspace
@@ -284,34 +286,76 @@ Rectangle {
                     return modelData === -1
                 }
                 property bool isHovered: mouseArea.containsMouse
-                property var workspaceData: {
-                    if (isPlaceholder) {
-                        return null
-                    }
 
-                    if (CompositorService.isNiri) {
-                        return NiriService.allWorkspaces.find(ws => ws.idx + 1 === modelData && ws.output === root.screenName) || null
-                    }
-                    return CompositorService.isHyprland ? modelData : null
-                }
-                property var iconData: workspaceData?.name ? SettingsData.getWorkspaceNameIcon(workspaceData.name) : null
-                property bool hasIcon: iconData !== null
-                property var icons: SettingsData.showWorkspaceApps ? root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : (modelData === -1 ? null : modelData)) : []
+                // --- ASYNC DATA LOADING (for workspaceData, iconData, icons) ---
+                property var loadedWorkspaceData: null
+                property var loadedIconData: null
+                property bool loadedHasIcon: false
+                property var loadedIcons: []
 
-                width: {
-                    if (SettingsData.showWorkspaceApps) {
-                        if (icons.length > 0) {
-                            return isActive ? widgetHeight * 1.0 + Theme.spacingXS + contentRow.implicitWidth : widgetHeight * 0.8 + contentRow.implicitWidth
+                Timer {
+                    id: dataUpdateTimer
+                    interval: 50 // Defer data calculation by 50ms
+                    onTriggered: {
+                        if (isPlaceholder) {
+                            delegateRoot.loadedWorkspaceData = null
+                            delegateRoot.loadedIconData = null
+                            delegateRoot.loadedHasIcon = false
+                            delegateRoot.loadedIcons = []
+                            return
+                        }
+
+                        // Calculate workspaceData
+                        var wsData = null;
+                        if (CompositorService.isNiri) {
+                            wsData = NiriService.allWorkspaces.find(ws => ws.idx + 1 === modelData && ws.output === root.screenName) || null;
+                        } else if (CompositorService.isHyprland) {
+                            wsData = modelData;
+                        }
+                        delegateRoot.loadedWorkspaceData = wsData;
+
+                        // Calculate iconData
+                        var icData = null;
+                        if (wsData?.name) {
+                            icData = SettingsData.getWorkspaceNameIcon(wsData.name);
+                        }
+                        delegateRoot.loadedIconData = icData;
+                        delegateRoot.loadedHasIcon = icData !== null;
+
+                        // Calculate app icons
+                        if (SettingsData.showWorkspaceApps) {
+                            delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : modelData);
                         } else {
-                            return isActive ? widgetHeight * 1.0 + Theme.spacingXS : widgetHeight * 0.8
+                            delegateRoot.loadedIcons = [];
                         }
                     }
-                    return isActive ? widgetHeight * 1.2 + Theme.spacingXS : widgetHeight * 0.8
+                }
+
+                function updateAllData() {
+                    dataUpdateTimer.restart()
+                }
+
+                // --- UI PROPERTIES ---
+                width: {
+                    if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
+                        return isActive ? root.widgetHeight * 2.8 : root.widgetHeight * 2.2;
+                    }
+                    return isActive ? root.widgetHeight * 1.2 : root.widgetHeight * 0.8;
                 }
                 height: SettingsData.showWorkspaceApps ? widgetHeight * 0.8 : widgetHeight * 0.6
                 radius: height / 2
                 color: isActive ? Theme.primary : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
+                // --- ANIMATION ---
+                Behavior on width {
+		            enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+
+                // --- UI COMPONENTS (Dynamically loaded with Loaders) ---
                 MouseArea {
                     id: mouseArea
 
@@ -332,118 +376,153 @@ Rectangle {
                     }
                 }
 
-                Row {
-                    id: contentRow
-                    anchors.centerIn: parent
-                    spacing: 4
-                    visible: SettingsData.showWorkspaceApps && icons.length > 0
+                // Loader for App Icons
+                Loader {
+                    id: appIconsLoader
+                    anchors.fill: parent
+                    active: SettingsData.showWorkspaceApps
+                    sourceComponent: Item {
+                        Row {
+                            id: contentRow
+                            anchors.centerIn: parent
+                            spacing: 4
+                            visible: loadedIcons.length > 0
 
-                    Repeater {
-                        model: icons.slice(0, SettingsData.maxWorkspaceIcons)
-                        delegate: Item {
-                            width: 18
-                            height: 18
+                            Repeater {
+                                model: loadedIcons.slice(0, SettingsData.maxWorkspaceIcons)
+                                delegate: Item {
+                                    width: 18
+                                    height: 18
 
-                            IconImage {
-                                id: appIcon
-                                property var windowId: modelData.windowId
-                                anchors.fill: parent
-                                source: modelData.icon
-                                opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                visible: !modelData.isSteamApp
-                            }
+                                    IconImage {
+                                        id: appIcon
+                                        property var windowId: modelData.windowId
+                                        anchors.fill: parent
+                                        source: modelData.icon
+                                        opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
+                                        visible: !modelData.isSteamApp
+                                    }
 
-                            DankIcon {
-                                anchors.centerIn: parent
-                                size: 18
-                                name: "sports_esports"
-                                color: Theme.surfaceText
-                                opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                visible: modelData.isSteamApp
-                            }
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        size: 18
+                                        name: "sports_esports"
+                                        color: Theme.surfaceText
+                                        opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
+                                        visible: modelData.isSteamApp
+                                    }
 
-                            MouseArea {
-                                id: appMouseArea
-                                hoverEnabled: true
-                                anchors.fill: parent
-                                enabled: isActive
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    if (CompositorService.isHyprland) {
-                                        Hyprland.dispatch(`focuswindow address:${appIcon.windowId}`)
-                                    } else if (CompositorService.isNiri) {
-                                        NiriService.focusWindow(appIcon.windowId)
+                                    MouseArea {
+                                        id: appMouseArea
+                                        hoverEnabled: true
+                                        anchors.fill: parent
+                                        enabled: isActive
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (CompositorService.isHyprland) {
+                                                Hyprland.dispatch(`focuswindow address:${appIcon.windowId}`)
+                                            } else if (CompositorService.isNiri) {
+                                                NiriService.focusWindow(appIcon.windowId)
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        visible: modelData.count > 1 && !isActive
+                                        width: 12
+                                        height: 12
+                                        radius: 6
+                                        color: "black"
+                                        border.color: "white"
+                                        border.width: 1
+                                        anchors.right: parent.right
+                                        anchors.bottom: parent.bottom
+                                        z: 2
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: modelData.count
+                                            font.pixelSize: 8
+                                            color: "white"
+                                        }
                                     }
                                 }
                             }
+                        }
+                    }
+                }
 
-                            Rectangle {
-                                visible: modelData.count > 1 && !isActive
-                                width: 12
-                                height: 12
-                                radius: 6
-                                color: "black"
-                                border.color: "white"
-                                border.width: 1
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                z: 2
+                // Loader for Custom Name Icon
+                Loader {
+                    id: customIconLoader
+                    anchors.fill: parent
+                    active: !isPlaceholder && loadedHasIcon && loadedIconData.type === "icon" && !SettingsData.showWorkspaceApps
+                    sourceComponent: Item {
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: loadedIconData ? loadedIconData.value : "" // NULL CHECK
+                            size: Theme.fontSizeSmall
+                            color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
+                            weight: isActive && !isPlaceholder ? 500 : 400
+                        }
+                    }
+                }
 
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData.count
-                                    font.pixelSize: 8
-                                    color: "white"
+                // Loader for Custom Name Text
+                Loader {
+                    id: customTextLoader
+                    anchors.fill: parent
+                    active: !isPlaceholder && loadedHasIcon && loadedIconData.type === "text" && !SettingsData.showWorkspaceApps
+                    sourceComponent: Item {
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: loadedIconData ? loadedIconData.value : "" // NULL CHECK
+                            color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
+                        }
+                    }
+                }
+
+                // Loader for Workspace Index
+                Loader {
+                    id: indexLoader
+                    anchors.fill: parent
+                    active: !isPlaceholder && SettingsData.showWorkspaceIndex && !loadedHasIcon && !SettingsData.showWorkspaceApps
+                    sourceComponent: Item {
+                        StyledText {
+                            anchors.centerIn: parent
+                            text: {
+                                const isPlaceholder = CompositorService.isHyprland ? (modelData?.id === -1) : (modelData === -1)
+                                if (isPlaceholder) {
+                                    return index + 1
                                 }
+                                return CompositorService.isHyprland ? (modelData?.id || "") : (modelData - 1);
                             }
+                            color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
                         }
                     }
                 }
 
-                DankIcon {
-                    visible: hasIcon && iconData.type === "icon" && (!SettingsData.showWorkspaceApps || icons.length === 0)
-                    anchors.centerIn: parent
-                    name: (hasIcon && iconData.type === "icon") ? iconData.value : ""
-                    size: Theme.fontSizeSmall
-                    color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
-                    weight: isActive && !isPlaceholder ? 500 : 400
+                // --- LOGIC / TRIGGERS ---
+                Component.onCompleted: updateAllData()
+
+                Connections {
+                    target: CompositorService
+                    function onSortedToplevelsChanged() { delegateRoot.updateAllData() }
                 }
-
-                StyledText {
-                    visible: hasIcon && iconData.type === "text" && (!SettingsData.showWorkspaceApps || icons.length === 0)
-                    anchors.centerIn: parent
-                    text: (hasIcon && iconData.type === "text") ? iconData.value : ""
-                    color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
+                Connections {
+                    target: NiriService
+                    enabled: CompositorService.isNiri
+                    function onAllWorkspacesChanged() { delegateRoot.updateAllData() }
                 }
-
-                StyledText {
-                    visible: (SettingsData.showWorkspaceIndex && !hasIcon && (!SettingsData.showWorkspaceApps || icons.length === 0))
-                    anchors.centerIn: parent
-                    text: {
-                        const isPlaceholder = CompositorService.isHyprland ? (modelData?.id === -1) : (modelData === -1)
-
-                        if (isPlaceholder) {
-                            return index + 1
-                        }
-
-                        return CompositorService.isHyprland ? (modelData?.id || "") : (modelData - 1)
-                    }
-                    color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
+                Connections {
+                    target: SettingsData
+                    function onShowWorkspaceAppsChanged() { delegateRoot.updateAllData() }
+                    function onWorkspaceNameIconsChanged() { delegateRoot.updateAllData() }
                 }
-
-                Behavior on width {
-		    // When having more icons, animation becomes clunky
-		    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
-                    }
-                }
-
             }
         }
     }
