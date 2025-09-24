@@ -338,7 +338,10 @@ Rectangle {
                 // --- UI PROPERTIES ---
                 width: {
                     if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
-                        return isActive ? root.widgetHeight * 2.8 : root.widgetHeight * 2.2;
+                        const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons);
+                        const iconsWidth = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0);
+                        const baseWidth = isActive ? root.widgetHeight * 1.0 + Theme.spacingXS : root.widgetHeight * 0.8;
+                        return baseWidth + iconsWidth;
                     }
                     return isActive ? root.widgetHeight * 1.2 : root.widgetHeight * 0.8;
                 }
