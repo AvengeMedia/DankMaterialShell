@@ -6,7 +6,7 @@ import qs.Services
 import qs.Widgets
 
 Item {
-    id: topBarTab
+    id: dankBarTab
 
     property var baseWidgetDefinitions: [{
             "id": "launcherButton",
@@ -635,10 +635,10 @@ Item {
                 }
             }
 
-            // TopBar Auto-hide Section
+            // DankBar Auto-hide Section
             StyledRect {
                 width: parent.width
-                height: topBarAutoHideSection.implicitHeight + Theme.spacingL * 2
+                height: dankBarAutoHideSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
@@ -646,7 +646,7 @@ Item {
                 border.width: 0
 
                 Column {
-                    id: topBarAutoHideSection
+                    id: dankBarAutoHideSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
@@ -809,7 +809,7 @@ Item {
             // Spacing
             StyledRect {
                 width: parent.width
-                height: topBarSpacingSection.implicitHeight + Theme.spacingL * 2
+                height: dankBarSpacingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
@@ -817,7 +817,7 @@ Item {
                 border.width: 0
 
                 Column {
-                    id: topBarSpacingSection
+                    id: dankBarSpacingSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
@@ -848,7 +848,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Top/Left/Right Gaps (0 = edge-to-edge)"
+                            text: SettingsData.dankBarAtBottom ? "Bottom/Left/Right Gaps (0 = edge-to-edge)" : "Top/Left/Right Gaps (0 = edge-to-edge)"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -1103,29 +1103,29 @@ Item {
                         title: "Left Section"
                         titleIcon: "format_align_left"
                         sectionId: "left"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("left")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("left")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "left", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1147,12 +1147,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1175,29 +1175,29 @@ Item {
                         title: "Center Section"
                         titleIcon: "format_align_center"
                         sectionId: "center"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("center")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("center")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "center", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1219,12 +1219,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1247,29 +1247,29 @@ Item {
                         title: "Right Section"
                         titleIcon: "format_align_right"
                         sectionId: "right"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("right")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("right")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "right", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1291,12 +1291,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1310,7 +1310,7 @@ Item {
 
         anchors.centerIn: parent
         onWidgetSelected: (widgetId, targetSection) => {
-                              topBarTab.addWidgetToSection(widgetId,
+                              dankBarTab.addWidgetToSection(widgetId,
                                                            targetSection)
                           }
     }
