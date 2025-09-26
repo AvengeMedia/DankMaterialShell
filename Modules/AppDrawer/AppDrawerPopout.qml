@@ -33,7 +33,7 @@ DankPopout {
     popupWidth: 520
     popupHeight: 600
     triggerX: Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.topBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.topBarInnerPadding)) + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance
+    triggerY: Math.max(26 + SettingsData.statusBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.statusBarInnerPadding)) + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2 + Theme.popupDistance
     triggerWidth: 40
     positioning: "center"
     screen: triggerScreen

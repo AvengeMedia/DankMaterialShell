@@ -27,6 +27,8 @@ PanelWindow {
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
     readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore.backgroundTransparency)
+    readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
+    function px(v) { return Math.round(v * _dpr) / _dpr }
 
     signal colorPickerRequested()
 
@@ -47,7 +49,7 @@ PanelWindow {
     readonly property real widgetHeight: Math.max(20, 26 + SettingsData.statusBarInnerPadding * 0.6)
 
     screen: modelData
-    implicitHeight: effectiveBarHeight + SettingsData.statusBarSpacing + (SettingsData.statusBarGothCornersEnabled ? _wingR : 0)
+    implicitHeight: px(effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing) + (SettingsData.statusBarGothCornersEnabled ? _wingR : 0))
     color: "transparent"
     Component.onCompleted: {
         const fonts = Qt.fontFamilies()
@@ -141,12 +143,13 @@ PanelWindow {
     Item {
         id: inputMask
         anchors {
-            top: parent.top
+            top: SettingsData.statusBarAtBottom ? undefined : parent.top
+            bottom: SettingsData.statusBarAtBottom ? parent.bottom : undefined
             left: parent.left
             right: parent.right
         }
         height: {
-            const base = root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing)
+            const base = px(root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing))
             if (topBarCore.autoHide && !topBarCore.reveal) return 8
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.statusBarOpenOnOverview) return base
             return SettingsData.statusBarVisible ? base : 0
@@ -256,7 +259,7 @@ PanelWindow {
         MouseArea {
             id: topBarMouseArea
             y: SettingsData.statusBarAtBottom ? parent.height - height : 0
-            height: root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing)
+            height: px(root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing))
             anchors {
                 left: parent.left
                 right: parent.right
@@ -271,7 +274,7 @@ PanelWindow {
 
                 transform: Translate {
                     id: topBarSlide
-                    y: Math.round(topBarCore.reveal ? 0 : (SettingsData.statusBarAtBottom ? root.implicitHeight : -root.implicitHeight))
+                    y: px(topBarCore.reveal ? 0 : (SettingsData.statusBarAtBottom ? root.implicitHeight : -root.implicitHeight))
 
                     Behavior on y {
                         NumberAnimation {
@@ -284,10 +287,10 @@ PanelWindow {
                 Item {
                     id: barUnitInset
                     anchors.fill: parent
-                    anchors.leftMargin: SettingsData.statusBarSpacing
-                    anchors.rightMargin: SettingsData.statusBarSpacing
-                    anchors.topMargin: SettingsData.statusBarAtBottom ? SettingsData.statusBarSpacing : 0
-                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing
+                    anchors.leftMargin: px(SettingsData.statusBarSpacing)
+                    anchors.rightMargin: px(SettingsData.statusBarSpacing)
+                    anchors.topMargin: SettingsData.statusBarAtBottom ? px(SettingsData.statusBarSpacing) : 0
+                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? 0 : px(SettingsData.statusBarSpacing)
 
                     Item {
                         id: barBackground
@@ -299,7 +302,8 @@ PanelWindow {
                             id: barShape
                             anchors.fill: parent
                             antialiasing: true
-                            renderTarget: Canvas.FramebufferObject
+                            renderTarget: Canvas.Image
+                            canvasSize: Qt.size(px(width), px(height))
 
                             property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
                             property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
@@ -309,19 +313,26 @@ PanelWindow {
 
                             onWingChanged: requestPaint()
                             onRtChanged: requestPaint()
+                            onWidthChanged: requestPaint()
+                            onHeightChanged: requestPaint()
 
                             Connections {
                                 target: root
                                 function on_BgColorChanged() { barShape.requestPaint() }
+                                function on_DprChanged() { barShape.requestPaint() }
                             }
 
                             onPaint: {
                                 const ctx = getContext("2d")
-                                const W = width
-                                const R = wing
-                                const RT = rt
-                                const H = Math.round(height - (R > 0 ? R : 0))
+                                const scale = root._dpr
+                                const W = px(width)
+                                const H_raw = px(height)
+                                const R = px(wing)
+                                const RT = px(rt)
+                                const H = H_raw - (R > 0 ? R : 0)
                                 const isBottom = SettingsData.statusBarAtBottom
+
+                                ctx.scale(scale, scale)
 
                                 function drawTopPath() {
                                     ctx.beginPath()
@@ -349,11 +360,11 @@ PanelWindow {
                                 }
 
                                 ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
+                                ctx.clearRect(0, 0, W, H_raw)
 
                                 if (isBottom) {
                                     ctx.save()
-                                    ctx.translate(0, height)
+                                    ctx.translate(0, H_raw)
                                     ctx.scale(1, -1)
                                     drawTopPath()
                                     ctx.restore()
@@ -372,7 +383,8 @@ PanelWindow {
                             id: barTint
                             anchors.fill: parent
                             antialiasing: true
-                            renderTarget: Canvas.FramebufferObject
+                            renderTarget: Canvas.Image
+                            canvasSize: Qt.size(px(width), px(height))
 
                             property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
                             property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
@@ -384,19 +396,26 @@ PanelWindow {
                             onWingChanged: requestPaint()
                             onRtChanged: requestPaint()
                             onAlphaTintChanged: requestPaint()
+                            onWidthChanged: requestPaint()
+                            onHeightChanged: requestPaint()
 
                             Connections {
                                 target: root
                                 function on_BgColorChanged() { barTint.requestPaint() }
+                                function on_DprChanged() { barTint.requestPaint() }
                             }
 
                             onPaint: {
                                 const ctx = getContext("2d")
-                                const W = width
-                                const R = wing
-                                const RT = rt
-                                const H = Math.round(height - (R > 0 ? R : 0))
+                                const scale = root._dpr
+                                const W = px(width)
+                                const H_raw = px(height)
+                                const R = px(wing)
+                                const RT = px(rt)
+                                const H = H_raw - (R > 0 ? R : 0)
                                 const isBottom = SettingsData.statusBarAtBottom
+
+                                ctx.scale(scale, scale)
 
                                 function drawTopPath() {
                                     ctx.beginPath()
@@ -424,11 +443,11 @@ PanelWindow {
                                 }
 
                                 ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
+                                ctx.clearRect(0, 0, W, H_raw)
 
                                 if (isBottom) {
                                     ctx.save()
-                                    ctx.translate(0, height)
+                                    ctx.translate(0, H_raw)
                                     ctx.scale(1, -1)
                                     drawTopPath()
                                     ctx.restore()
