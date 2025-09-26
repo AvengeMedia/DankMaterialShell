@@ -584,6 +584,57 @@ Item {
             width: parent.width
             spacing: Theme.spacingXL
 
+            // Position Section
+            StyledRect {
+                width: parent.width
+                height: positionSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: positionSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "vertical_align_center"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: "Position"
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        DankButtonGroup {
+                            id: positionButtonGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            model: ["Top", "Bottom"]
+                            currentIndex: SettingsData.dankBarAtBottom ? 1 : 0
+                            onSelectionChanged: (index, selected) => {
+                                if (selected) {
+                                    SettingsData.setDankBarAtBottom(index === 1)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // TopBar Auto-hide Section
             StyledRect {
                 width: parent.width
@@ -750,24 +801,6 @@ Item {
                                                toggled)
                                        }
                         }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                    }
-
-                    DankDropdown {
-                        width: parent.width
-                        text: "Status Bar Position"
-                        description: "Position status bar at top or bottom of display"
-                        currentValue: SettingsData.dankBarAtBottom ? "Bottom" : "Top"
-                        options: ["Top", "Bottom"]
-                        onValueChanged: value => {
-                                            SettingsData.setDankBarAtBottom(value === "Bottom")
-                                        }
                     }
                 }
             }
