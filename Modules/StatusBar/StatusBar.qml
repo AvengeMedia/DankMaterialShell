@@ -136,7 +136,7 @@ PanelWindow {
         right: true
     }
 
-    exclusiveZone: (!SettingsData.statusBarVisible || topBarCore.autoHide) ? -1 : root.effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2
+    exclusiveZone: (!SettingsData.statusBarVisible || topBarCore.autoHide) ? -1 : (SettingsData.statusBarAtBottom ? (root.effectiveBarHeight + SettingsData.statusBarBottomGap) : (root.effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2))
 
     Item {
         id: inputMask
@@ -146,13 +146,10 @@ PanelWindow {
             right: parent.right
         }
         height: {
-            if (topBarCore.autoHide && !topBarCore.reveal) {
-                return 8
-            }
-            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.statusBarOpenOnOverview) {
-                return root.effectiveBarHeight + SettingsData.statusBarSpacing
-            }
-            return SettingsData.statusBarVisible ? (root.effectiveBarHeight + SettingsData.statusBarSpacing) : 0
+            const base = root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing)
+            if (topBarCore.autoHide && !topBarCore.reveal) return 8
+            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.statusBarOpenOnOverview) return base
+            return SettingsData.statusBarVisible ? base : 0
         }
     }
 
@@ -259,7 +256,7 @@ PanelWindow {
         MouseArea {
             id: topBarMouseArea
             y: SettingsData.statusBarAtBottom ? parent.height - height : 0
-            height: root.effectiveBarHeight + SettingsData.statusBarSpacing
+            height: root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing)
             anchors {
                 left: parent.left
                 right: parent.right
@@ -289,8 +286,8 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.leftMargin: SettingsData.statusBarSpacing
                     anchors.rightMargin: SettingsData.statusBarSpacing
-                    anchors.topMargin: SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing
-                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? SettingsData.statusBarSpacing : 0
+                    anchors.topMargin: SettingsData.statusBarAtBottom ? SettingsData.statusBarSpacing : 0
+                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing
 
                     Item {
                         id: barBackground
@@ -304,11 +301,13 @@ PanelWindow {
                             antialiasing: true
                             renderTarget: Canvas.FramebufferObject
 
-                            property real h  : height - (SettingsData.statusBarGothCornersEnabled ? root._wingR : 0)
-                            property real rb : SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
-                            property real rt : SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real h: height
+                            property real contentH: height - wing
+                            property real y0: SettingsData.statusBarAtBottom ? wing : 0
 
-                            onRbChanged: requestPaint()
+                            onWingChanged: requestPaint()
                             onRtChanged: requestPaint()
 
                             Connections {
@@ -318,122 +317,19 @@ PanelWindow {
 
                             onPaint: {
                                 const ctx = getContext("2d")
-                                const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
+                                const W = width
+                                const R = wing
+                                const RT = rt
+                                const H = Math.round(height - (R > 0 ? R : 0))
                                 const isBottom = SettingsData.statusBarAtBottom
 
-                                ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
-
-                                function outline() {
+                                function drawTopPath() {
                                     ctx.beginPath()
-
-                                    if (isBottom) {
-                                        if (R > 0) {
-                                            ctx.moveTo(0, -R)
-                                            ctx.lineTo(0, 0)
-                                            ctx.lineTo(R, 0)
-                                            ctx.arc(R, -R, R, Math.PI / 2, 0, true)
-                                            ctx.lineTo(W - R, -R)
-                                            ctx.arc(W - R, -R, R, 0, -Math.PI / 2, true)
-                                            ctx.lineTo(W, 0)
-                                            ctx.lineTo(W, H - RT)
-                                            ctx.arcTo(W, H, W - RT, H, RT)
-                                            ctx.lineTo(RT, H)
-                                            ctx.arcTo(0, H, 0, H - RT, RT)
-                                        } else {
-                                            ctx.moveTo(0, 0)
-                                            ctx.lineTo(W, 0)
-                                            ctx.lineTo(W, H - RT)
-                                            ctx.arcTo(W, H, W - RT, H, RT)
-                                            ctx.lineTo(RT, H)
-                                            ctx.arcTo(0, H, 0, H - RT, RT)
-                                        }
-                                    } else {
-                                        ctx.moveTo(RT, 0)
-                                        ctx.lineTo(W - RT, 0)
-                                        ctx.arcTo(W, 0, W, RT, RT)
-                                        ctx.lineTo(W, H)
-
-                                        if (R > 0) {
-                                            ctx.lineTo(W, H + R)
-                                            ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
-                                            ctx.lineTo(R, H)
-                                            ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
-                                            ctx.lineTo(0, H + R)
-                                        } else {
-                                            ctx.lineTo(W, H - RT)
-                                            ctx.arcTo(W, H, W - RT, H, RT)
-                                            ctx.lineTo(RT, H)
-                                            ctx.arcTo(0, H, 0, H - RT, RT)
-                                        }
-
-                                        ctx.lineTo(0, RT)
-                                        ctx.arcTo(0, 0, RT, 0, RT)
-                                    }
-
-                                    ctx.closePath()
-                                }
-
-                                ctx.fillStyle = root._bgColor
-                                outline()
-                                ctx.fill()
-                            }
-
-                        }
-
-                        Canvas {
-                            id: barTint
-                            anchors.fill: parent
-                            antialiasing: true
-                            renderTarget: Canvas.FramebufferObject
-
-                            Connections {
-                                target: barShape
-                                function onRbChanged() { barTint.requestPaint() }
-                                function onRtChanged() { barTint.requestPaint() }
-                            }
-
-                            Connections {
-                                target: root
-                                function on_BgColorChanged() { barTint.requestPaint() }
-                            }
-
-                            onPaint: {
-                                const ctx = getContext("2d")
-                                const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
-                                const isBottom = SettingsData.statusBarAtBottom
-
-                                ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
-
-                                ctx.beginPath()
-
-                                if (isBottom) {
-                                    if (R > 0) {
-                                        ctx.moveTo(0, -R)
-                                        ctx.lineTo(0, 0)
-                                        ctx.lineTo(R, 0)
-                                        ctx.arc(R, -R, R, Math.PI / 2, 0, true)
-                                        ctx.lineTo(W - R, -R)
-                                        ctx.arc(W - R, -R, R, 0, -Math.PI / 2, true)
-                                        ctx.lineTo(W, 0)
-                                        ctx.lineTo(W, H - RT)
-                                        ctx.arcTo(W, H, W - RT, H, RT)
-                                        ctx.lineTo(RT, H)
-                                        ctx.arcTo(0, H, 0, H - RT, RT)
-                                    } else {
-                                        ctx.moveTo(0, 0)
-                                        ctx.lineTo(W, 0)
-                                        ctx.lineTo(W, H - RT)
-                                        ctx.arcTo(W, H, W - RT, H, RT)
-                                        ctx.lineTo(RT, H)
-                                        ctx.arcTo(0, H, 0, H - RT, RT)
-                                    }
-                                } else {
                                     ctx.moveTo(RT, 0)
                                     ctx.lineTo(W - RT, 0)
                                     ctx.arcTo(W, 0, W, RT, RT)
                                     ctx.lineTo(W, H)
+
                                     if (R > 0) {
                                         ctx.lineTo(W, H + R)
                                         ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
@@ -446,13 +342,103 @@ PanelWindow {
                                         ctx.lineTo(RT, H)
                                         ctx.arcTo(0, H, 0, H - RT, RT)
                                     }
+
                                     ctx.lineTo(0, RT)
                                     ctx.arcTo(0, 0, RT, 0, RT)
+                                    ctx.closePath()
                                 }
-                                ctx.closePath()
+
+                                ctx.reset()
+                                ctx.clearRect(0, 0, width, height)
+
+                                if (isBottom) {
+                                    ctx.save()
+                                    ctx.translate(0, height)
+                                    ctx.scale(1, -1)
+                                    drawTopPath()
+                                    ctx.restore()
+                                } else {
+                                    drawTopPath()
+                                }
 
                                 ctx.fillStyle = root._bgColor
                                 ctx.fill()
+
+                            }
+
+                        }
+
+                        Canvas {
+                            id: barTint
+                            anchors.fill: parent
+                            antialiasing: true
+                            renderTarget: Canvas.FramebufferObject
+
+                            property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real h: height
+                            property real contentH: height - wing
+                            property real y0: SettingsData.statusBarAtBottom ? wing : 0
+                            property real alphaTint: root._bgColor.a < 0.99 ? Theme.stateLayerOpacity : 0
+
+                            onWingChanged: requestPaint()
+                            onRtChanged: requestPaint()
+                            onAlphaTintChanged: requestPaint()
+
+                            Connections {
+                                target: root
+                                function on_BgColorChanged() { barTint.requestPaint() }
+                            }
+
+                            onPaint: {
+                                const ctx = getContext("2d")
+                                const W = width
+                                const R = wing
+                                const RT = rt
+                                const H = Math.round(height - (R > 0 ? R : 0))
+                                const isBottom = SettingsData.statusBarAtBottom
+
+                                function drawTopPath() {
+                                    ctx.beginPath()
+                                    ctx.moveTo(RT, 0)
+                                    ctx.lineTo(W - RT, 0)
+                                    ctx.arcTo(W, 0, W, RT, RT)
+                                    ctx.lineTo(W, H)
+
+                                    if (R > 0) {
+                                        ctx.lineTo(W, H + R)
+                                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
+                                        ctx.lineTo(R, H)
+                                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
+                                        ctx.lineTo(0, H + R)
+                                    } else {
+                                        ctx.lineTo(W, H - RT)
+                                        ctx.arcTo(W, H, W - RT, H, RT)
+                                        ctx.lineTo(RT, H)
+                                        ctx.arcTo(0, H, 0, H - RT, RT)
+                                    }
+
+                                    ctx.lineTo(0, RT)
+                                    ctx.arcTo(0, 0, RT, 0, RT)
+                                    ctx.closePath()
+                                }
+
+                                ctx.reset()
+                                ctx.clearRect(0, 0, width, height)
+
+                                if (isBottom) {
+                                    ctx.save()
+                                    ctx.translate(0, height)
+                                    ctx.scale(1, -1)
+                                    drawTopPath()
+                                    ctx.restore()
+                                } else {
+                                    drawTopPath()
+                                }
+
+                                ctx.fillStyle = Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, alphaTint)
+                                ctx.fill()
+
                             }
                         }
                     }
