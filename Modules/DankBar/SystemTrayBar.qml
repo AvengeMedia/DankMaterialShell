@@ -229,7 +229,7 @@ Rectangle {
                 Rectangle {
                     id: menuContainer
 
-                    width: Math.min(300, Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2))
+                    width: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
                     height: Math.max(40, menuColumn.implicitHeight + Theme.spacingS * 2)
 
                     x: {
@@ -443,6 +443,8 @@ Rectangle {
                                         color: (menuEntry?.enabled !== false) ? Theme.surfaceText : Theme.surfaceTextMedium
                                         elide: Text.ElideRight
                                         anchors.verticalCenter: parent.verticalCenter
+                                        width: Math.max(150, parent.width - 64)
+                                        wrapMode: Text.NoWrap
                                     }
 
                                     Item {
