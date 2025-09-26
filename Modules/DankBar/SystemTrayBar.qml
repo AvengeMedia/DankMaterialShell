@@ -48,6 +48,9 @@ Rectangle {
                 property string iconSource: {
                     let icon = trayItem && trayItem.icon;
                     if (typeof icon === 'string' || icon instanceof String) {
+                        if (icon === "") {
+                            return "";
+                        }
                         if (icon.includes("?path=")) {
                             const split = icon.split("?path=");
                             if (split.length !== 2) {
@@ -58,6 +61,9 @@ Rectangle {
                             const path = split[1];
                             const fileName = name.substring(name.lastIndexOf("/") + 1);
                             return `file://${path}/${fileName}`;
+                        }
+                        if (icon.startsWith("/") && !icon.startsWith("file://")) {
+                            return `file://${icon}`;
                         }
                         return icon;
                     }
