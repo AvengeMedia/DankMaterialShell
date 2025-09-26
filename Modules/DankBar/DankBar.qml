@@ -11,7 +11,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
 import qs.Modules
-import qs.Modules.StatusBar
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
@@ -26,7 +26,7 @@ PanelWindow {
     property bool gothCornersEnabled: SettingsData.statusBarGothCornersEnabled
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
-    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore.backgroundTransparency)
+    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.statusBarTransparency)
     readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
     function px(v) { return Math.round(v * _dpr) / _dpr }
 
@@ -391,7 +391,7 @@ PanelWindow {
                             property real h: height
                             property real contentH: height - wing
                             property real y0: SettingsData.statusBarAtBottom ? wing : 0
-                            property real alphaTint: root._bgColor.a < 0.99 ? Theme.stateLayerOpacity : 0
+                            property real alphaTint: (root._bgColor?.a ?? 1) < 0.99 ? (Theme.stateLayerOpacity ?? 0) : 0
 
                             onWingChanged: requestPaint()
                             onRtChanged: requestPaint()

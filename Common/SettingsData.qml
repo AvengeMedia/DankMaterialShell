@@ -124,7 +124,7 @@ Singleton {
     property bool statusBarVisible: true
     property real statusBarSpacing: 4
     property real statusBarBottomGap: 0
-    property real statusBarInnerPadding: 8
+    property real statusBarInnerPadding: 4
     property bool statusBarSquareCorners: false
     property bool statusBarNoBackground: false
     property bool statusBarGothCornersEnabled: false

@@ -10,7 +10,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Details
-import qs.Modules.StatusBar
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 import qs.Modules.ControlCenter.Components
