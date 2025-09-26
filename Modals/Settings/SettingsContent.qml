@@ -67,7 +67,7 @@ Item {
             visible: active
             asynchronous: true
 
-            sourceComponent: StatusBarTab {
+            sourceComponent: DankBarTab {
             }
 
         }

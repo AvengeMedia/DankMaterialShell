@@ -16,15 +16,15 @@ Rectangle {
     property bool showAudioIcon: SettingsData.controlCenterShowAudioIcon
     property real widgetHeight: 30
     property real barHeight: 48
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal clicked()
 
     width: controlIndicators.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 

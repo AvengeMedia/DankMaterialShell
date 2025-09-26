@@ -14,18 +14,18 @@ Rectangle {
     property var parentScreen: null
     property real widgetHeight: 30
     property bool isAtBottom: false
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property int calculatedWidth: SystemTray.items.values.length > 0 ? SystemTray.items.values.length * 24 + horizontalPadding * 2 : 0
 
     width: calculatedWidth
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
         if (SystemTray.items.values.length === 0) {
             return "transparent";
         }
 
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -212,15 +212,15 @@ Rectangle {
                     const relativeX = globalPos.x - screenX
                     const relativeY = globalPos.y - screenY
 
-                    const widgetHeight = Math.max(20, 26 + SettingsData.statusBarInnerPadding * 0.6)
-                    const effectiveBarHeight = Math.max(widgetHeight + SettingsData.statusBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.statusBarInnerPadding))
+                    const widgetHeight = Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
+                    const effectiveBarHeight = Math.max(widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
 
                     let targetY
                     if (menuRoot.isAtBottom) {
-                        const popupY = effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2 + Theme.popupDistance
+                        const popupY = effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2 + Theme.popupDistance
                         targetY = screen.height - popupY
                     } else {
-                        targetY = effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2 + Theme.popupDistance
+                        targetY = effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2 + Theme.popupDistance
                     }
 
                     anchorPos = Qt.point(relativeX + menuRoot.anchorItem.width / 2, targetY)

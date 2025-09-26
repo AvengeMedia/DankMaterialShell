@@ -104,15 +104,13 @@ PanelWindow {
             return triggerX
         }
         readonly property real calculatedY: {
-            if (SettingsData.statusBarAtBottom) {
-                // For bottom bar: position popup above the bar with 10px additional spacing
-                return screenHeight - triggerY - popupHeight - 10
+            if (SettingsData.dankBarAtBottom) {
+                return Math.max(Theme.spacingM, Math.min(screenHeight - popupHeight - Theme.spacingM, screenHeight - triggerY - popupHeight - 10))
             } else {
-                // For top bar: use original positioning
-                return triggerY
+                return Math.max(0, Math.min(screenHeight - popupHeight - Theme.spacingM, triggerY))
             }
         }
-
+        
         width: popupWidth
         height: popupHeight
         x: calculatedX

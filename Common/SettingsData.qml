@@ -16,8 +16,8 @@ Singleton {
     property string currentThemeName: "blue"
     property string customThemeFile: ""
     property string matugenScheme: "scheme-tonal-spot"
-    property real statusBarTransparency: 1.0
-    property real statusBarWidgetTransparency: 1.0
+    property real dankBarTransparency: 1.0
+    property real dankBarWidgetTransparency: 1.0
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property bool use24HourClock: true
@@ -70,12 +70,13 @@ Singleton {
     property string clockDateFormat: ""
     property string lockDateFormat: ""
     property int mediaSize: 1
-    property var statusBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
-    property var statusBarCenterWidgets: ["music", "clock", "weather"]
-    property var statusBarRightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
-    property alias statusBarLeftWidgetsModel: leftWidgetsModel
-    property alias statusBarCenterWidgetsModel: centerWidgetsModel
-    property alias statusBarRightWidgetsModel: rightWidgetsModel
+    property var dankBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
+    property var dankBarCenterWidgets: ["music", "clock", "weather"]
+    property var dankBarRightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
+    property var dankBarWidgetOrder: []
+    property alias dankBarLeftWidgetsModel: leftWidgetsModel
+    property alias dankBarCenterWidgetsModel: centerWidgetsModel
+    property alias dankBarRightWidgetsModel: rightWidgetsModel
     property string appLauncherViewMode: "list"
     property string spotlightModalViewMode: "list"
     property string networkPreference: "auto"
@@ -119,16 +120,16 @@ Singleton {
     property bool dockGroupByApp: false
     property real cornerRadius: 12
     property bool notificationOverlayEnabled: false
-    property bool statusBarAutoHide: false
-    property bool statusBarOpenOnOverview: false
-    property bool statusBarVisible: true
-    property real statusBarSpacing: 4
-    property real statusBarBottomGap: 0
-    property real statusBarInnerPadding: 8
-    property bool statusBarSquareCorners: false
-    property bool statusBarNoBackground: false
-    property bool statusBarGothCornersEnabled: false
-    property bool statusBarAtBottom: false
+    property bool dankBarAutoHide: false
+    property bool dankBarOpenOnOverview: false
+    property bool dankBarVisible: true
+    property real dankBarSpacing: 4
+    property real dankBarBottomGap: 0
+    property real dankBarInnerPadding: 4
+    property bool dankBarSquareCorners: false
+    property bool dankBarNoBackground: false
+    property bool dankBarGothCornersEnabled: false
+    property bool dankBarAtBottom: false
     property bool lockScreenShowPowerActions: true
     property bool hideBrightnessSlider: false
     property string widgetBackgroundColor: "sch"
@@ -143,7 +144,7 @@ Singleton {
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
 
-    signal forceStatusBarLayoutRefresh
+    signal forceDankBarLayoutRefresh
     signal widgetDataChanged
     signal workspaceIconsUpdated
 
@@ -180,9 +181,9 @@ Singleton {
         centerWidgetsModel.append(dummyItem)
         rightWidgetsModel.append(dummyItem)
 
-        updateListModel(leftWidgetsModel, statusBarLeftWidgets)
-        updateListModel(centerWidgetsModel, statusBarCenterWidgets)
-        updateListModel(rightWidgetsModel, statusBarRightWidgets)
+        updateListModel(leftWidgetsModel, dankBarLeftWidgets)
+        updateListModel(centerWidgetsModel, dankBarCenterWidgets)
+        updateListModel(rightWidgetsModel, dankBarRightWidgets)
     }
 
     function loadSettings() {
@@ -210,8 +211,8 @@ Singleton {
                 }
                 customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : ""
                 matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot"
-                statusBarTransparency = settings.statusBarTransparency !== undefined ? (settings.statusBarTransparency > 1 ? settings.statusBarTransparency / 100 : settings.statusBarTransparency) : (settings.topBarTransparency !== undefined ? (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100 : settings.topBarTransparency) : 1.0)
-                statusBarWidgetTransparency = settings.statusBarWidgetTransparency !== undefined ? (settings.statusBarWidgetTransparency > 1 ? settings.statusBarWidgetTransparency / 100 : settings.statusBarWidgetTransparency) : (settings.topBarWidgetTransparency !== undefined ? (settings.topBarWidgetTransparency > 1 ? settings.topBarWidgetTransparency / 100 : settings.topBarWidgetTransparency) : 1.0)
+                dankBarTransparency = settings.dankBarTransparency !== undefined ? (settings.dankBarTransparency > 1 ? settings.dankBarTransparency / 100 : settings.dankBarTransparency) : (settings.topBarTransparency !== undefined ? (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100 : settings.topBarTransparency) : 1.0)
+                dankBarWidgetTransparency = settings.dankBarWidgetTransparency !== undefined ? (settings.dankBarWidgetTransparency > 1 ? settings.dankBarWidgetTransparency / 100 : settings.dankBarWidgetTransparency) : (settings.topBarWidgetTransparency !== undefined ? (settings.topBarWidgetTransparency > 1 ? settings.topBarWidgetTransparency / 100 : settings.topBarWidgetTransparency) : 1.0)
                 popupTransparency = settings.popupTransparency !== undefined ? (settings.popupTransparency > 1 ? settings.popupTransparency / 100 : settings.popupTransparency) : 1.0
                 dockTransparency = settings.dockTransparency !== undefined ? (settings.dockTransparency > 1 ? settings.dockTransparency / 100 : settings.dockTransparency) : 1
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
@@ -265,24 +266,24 @@ Singleton {
                 clockDateFormat = settings.clockDateFormat !== undefined ? settings.clockDateFormat : ""
                 lockDateFormat = settings.lockDateFormat !== undefined ? settings.lockDateFormat : ""
                 mediaSize = settings.mediaSize !== undefined ? settings.mediaSize : (settings.mediaCompactMode !== undefined ? (settings.mediaCompactMode ? 0 : 1) : 1)
-                if (settings.statusBarWidgetOrder || settings.topBarWidgetOrder) {
-                    var widgetOrder = settings.statusBarWidgetOrder || settings.topBarWidgetOrder
-                    statusBarLeftWidgets = widgetOrder.filter(w => {
+                if (settings.dankBarWidgetOrder || settings.topBarWidgetOrder) {
+                    var widgetOrder = settings.dankBarWidgetOrder || settings.topBarWidgetOrder
+                    dankBarLeftWidgets = widgetOrder.filter(w => {
                                                                               return ["launcherButton", "workspaceSwitcher", "focusedWindow"].includes(w)
                                                                           })
-                    statusBarCenterWidgets = widgetOrder.filter(w => {
+                    dankBarCenterWidgets = widgetOrder.filter(w => {
                                                                                 return ["clock", "music", "weather"].includes(w)
                                                                             })
-                    statusBarRightWidgets = widgetOrder.filter(w => {
+                    dankBarRightWidgets = widgetOrder.filter(w => {
                                                                                return ["systemTray", "clipboard", "systemResources", "notificationButton", "battery", "controlCenterButton"].includes(w)
                                                                            })
                 } else {
-                    var leftWidgets = settings.statusBarLeftWidgets !== undefined ? settings.statusBarLeftWidgets : (settings.topBarLeftWidgets !== undefined ? settings.topBarLeftWidgets : ["launcherButton", "workspaceSwitcher", "focusedWindow"])
-                    var centerWidgets = settings.statusBarCenterWidgets !== undefined ? settings.statusBarCenterWidgets : (settings.topBarCenterWidgets !== undefined ? settings.topBarCenterWidgets : ["music", "clock", "weather"])
-                    var rightWidgets = settings.statusBarRightWidgets !== undefined ? settings.statusBarRightWidgets : (settings.topBarRightWidgets !== undefined ? settings.topBarRightWidgets : ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"])
-                    statusBarLeftWidgets = leftWidgets
-                    statusBarCenterWidgets = centerWidgets
-                    statusBarRightWidgets = rightWidgets
+                    var leftWidgets = settings.dankBarLeftWidgets !== undefined ? settings.dankBarLeftWidgets : (settings.topBarLeftWidgets !== undefined ? settings.topBarLeftWidgets : ["launcherButton", "workspaceSwitcher", "focusedWindow"])
+                    var centerWidgets = settings.dankBarCenterWidgets !== undefined ? settings.dankBarCenterWidgets : (settings.topBarCenterWidgets !== undefined ? settings.topBarCenterWidgets : ["music", "clock", "weather"])
+                    var rightWidgets = settings.dankBarRightWidgets !== undefined ? settings.dankBarRightWidgets : (settings.topBarRightWidgets !== undefined ? settings.topBarRightWidgets : ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"])
+                    dankBarLeftWidgets = leftWidgets
+                    dankBarCenterWidgets = centerWidgets
+                    dankBarRightWidgets = rightWidgets
                     updateListModel(leftWidgetsModel, leftWidgets)
                     updateListModel(centerWidgetsModel, centerWidgets)
                     updateListModel(rightWidgetsModel, rightWidgets)
@@ -312,19 +313,19 @@ Singleton {
                 dockGroupByApp = settings.dockGroupByApp !== undefined ? settings.dockGroupByApp : false
                 cornerRadius = settings.cornerRadius !== undefined ? settings.cornerRadius : 12
                 notificationOverlayEnabled = settings.notificationOverlayEnabled !== undefined ? settings.notificationOverlayEnabled : false
-                statusBarAutoHide = settings.statusBarAutoHide !== undefined ? settings.statusBarAutoHide : (settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false)
-                statusBarOpenOnOverview = settings.statusBarOpenOnOverview !== undefined ? settings.statusBarOpenOnOverview : (settings.topBarOpenOnOverview !== undefined ? settings.topBarOpenOnOverview : false)
-                statusBarVisible = settings.statusBarVisible !== undefined ? settings.statusBarVisible : (settings.topBarVisible !== undefined ? settings.topBarVisible : true)
+                dankBarAutoHide = settings.dankBarAutoHide !== undefined ? settings.dankBarAutoHide : (settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false)
+                dankBarOpenOnOverview = settings.dankBarOpenOnOverview !== undefined ? settings.dankBarOpenOnOverview : (settings.topBarOpenOnOverview !== undefined ? settings.topBarOpenOnOverview : false)
+                dankBarVisible = settings.dankBarVisible !== undefined ? settings.dankBarVisible : (settings.topBarVisible !== undefined ? settings.topBarVisible : true)
                 notificationTimeoutLow = settings.notificationTimeoutLow !== undefined ? settings.notificationTimeoutLow : 5000
                 notificationTimeoutNormal = settings.notificationTimeoutNormal !== undefined ? settings.notificationTimeoutNormal : 5000
                 notificationTimeoutCritical = settings.notificationTimeoutCritical !== undefined ? settings.notificationTimeoutCritical : 0
-                statusBarSpacing = settings.statusBarSpacing !== undefined ? settings.statusBarSpacing : (settings.topBarSpacing !== undefined ? settings.topBarSpacing : 4)
-                statusBarBottomGap = settings.statusBarBottomGap !== undefined ? settings.statusBarBottomGap : (settings.topBarBottomGap !== undefined ? settings.topBarBottomGap : 0)
-                statusBarInnerPadding = settings.statusBarInnerPadding !== undefined ? settings.statusBarInnerPadding : (settings.topBarInnerPadding !== undefined ? settings.topBarInnerPadding : 8)
-                statusBarSquareCorners = settings.statusBarSquareCorners !== undefined ? settings.statusBarSquareCorners : (settings.topBarSquareCorners !== undefined ? settings.topBarSquareCorners : false)
-                statusBarNoBackground = settings.statusBarNoBackground !== undefined ? settings.statusBarNoBackground : (settings.topBarNoBackground !== undefined ? settings.topBarNoBackground : false)
-                statusBarGothCornersEnabled = settings.statusBarGothCornersEnabled !== undefined ? settings.statusBarGothCornersEnabled : (settings.topBarGothCornersEnabled !== undefined ? settings.topBarGothCornersEnabled : false)
-                statusBarAtBottom = settings.statusBarAtBottom !== undefined ? settings.statusBarAtBottom : (settings.topBarAtBottom !== undefined ? settings.topBarAtBottom : false)
+                dankBarSpacing = settings.dankBarSpacing !== undefined ? settings.dankBarSpacing : (settings.topBarSpacing !== undefined ? settings.topBarSpacing : 4)
+                dankBarBottomGap = settings.dankBarBottomGap !== undefined ? settings.dankBarBottomGap : (settings.topBarBottomGap !== undefined ? settings.topBarBottomGap : 0)
+                dankBarInnerPadding = settings.dankBarInnerPadding !== undefined ? settings.dankBarInnerPadding : (settings.topBarInnerPadding !== undefined ? settings.topBarInnerPadding : 8)
+                dankBarSquareCorners = settings.dankBarSquareCorners !== undefined ? settings.dankBarSquareCorners : (settings.topBarSquareCorners !== undefined ? settings.topBarSquareCorners : false)
+                dankBarNoBackground = settings.dankBarNoBackground !== undefined ? settings.dankBarNoBackground : (settings.topBarNoBackground !== undefined ? settings.topBarNoBackground : false)
+                dankBarGothCornersEnabled = settings.dankBarGothCornersEnabled !== undefined ? settings.dankBarGothCornersEnabled : (settings.topBarGothCornersEnabled !== undefined ? settings.topBarGothCornersEnabled : false)
+                dankBarAtBottom = settings.dankBarAtBottom !== undefined ? settings.dankBarAtBottom : (settings.topBarAtBottom !== undefined ? settings.topBarAtBottom : false)
                 lockScreenShowPowerActions = settings.lockScreenShowPowerActions !== undefined ? settings.lockScreenShowPowerActions : true
                 hideBrightnessSlider = settings.hideBrightnessSlider !== undefined ? settings.hideBrightnessSlider : false
                 widgetBackgroundColor = settings.widgetBackgroundColor !== undefined ? settings.widgetBackgroundColor : "sch"
@@ -352,8 +353,8 @@ Singleton {
                                                 "currentThemeName": currentThemeName,
                                                 "customThemeFile": customThemeFile,
                                                 "matugenScheme": matugenScheme,
-                                                "statusBarTransparency": statusBarTransparency,
-                                                "statusBarWidgetTransparency": statusBarWidgetTransparency,
+                                                "dankBarTransparency": dankBarTransparency,
+                                                "dankBarWidgetTransparency": dankBarWidgetTransparency,
                                                 "popupTransparency": popupTransparency,
                                                 "dockTransparency": dockTransparency,
                                                 "use24HourClock": use24HourClock,
@@ -398,9 +399,9 @@ Singleton {
                                                 "clockDateFormat": clockDateFormat,
                                                 "lockDateFormat": lockDateFormat,
                                                 "mediaSize": mediaSize,
-                                                "statusBarLeftWidgets": statusBarLeftWidgets,
-                                                "statusBarCenterWidgets": statusBarCenterWidgets,
-                                                "statusBarRightWidgets": statusBarRightWidgets,
+                                                "dankBarLeftWidgets": dankBarLeftWidgets,
+                                                "dankBarCenterWidgets": dankBarCenterWidgets,
+                                                "dankBarRightWidgets": dankBarRightWidgets,
                                                 "appLauncherViewMode": appLauncherViewMode,
                                                 "spotlightModalViewMode": spotlightModalViewMode,
                                                 "networkPreference": networkPreference,
@@ -426,16 +427,16 @@ Singleton {
                                                 "dockGroupByApp": dockGroupByApp,
                                                 "cornerRadius": cornerRadius,
                                                 "notificationOverlayEnabled": notificationOverlayEnabled,
-                                                "statusBarAutoHide": statusBarAutoHide,
-                                                "statusBarOpenOnOverview": statusBarOpenOnOverview,
-                                                "statusBarVisible": statusBarVisible,
-                                                "statusBarSpacing": statusBarSpacing,
-                                                "statusBarBottomGap": statusBarBottomGap,
-                                                "statusBarInnerPadding": statusBarInnerPadding,
-                                                "statusBarSquareCorners": statusBarSquareCorners,
-                                                "statusBarNoBackground": statusBarNoBackground,
-                                                "statusBarGothCornersEnabled": statusBarGothCornersEnabled,
-                                                "statusBarAtBottom": statusBarAtBottom,
+                                                "dankBarAutoHide": dankBarAutoHide,
+                                                "dankBarOpenOnOverview": dankBarOpenOnOverview,
+                                                "dankBarVisible": dankBarVisible,
+                                                "dankBarSpacing": dankBarSpacing,
+                                                "dankBarBottomGap": dankBarBottomGap,
+                                                "dankBarInnerPadding": dankBarInnerPadding,
+                                                "dankBarSquareCorners": dankBarSquareCorners,
+                                                "dankBarNoBackground": dankBarNoBackground,
+                                                "dankBarGothCornersEnabled": dankBarGothCornersEnabled,
+                                                "dankBarAtBottom": dankBarAtBottom,
                                                 "lockScreenShowPowerActions": lockScreenShowPowerActions,
                                                 "hideBrightnessSlider": hideBrightnessSlider,
                                                 "widgetBackgroundColor": widgetBackgroundColor,
@@ -590,13 +591,13 @@ Singleton {
         }
     }
 
-    function setStatusBarTransparency(transparency) {
-        statusBarTransparency = transparency
+    function setDankBarTransparency(transparency) {
+        dankBarTransparency = transparency
         saveSettings()
     }
 
-    function setStatusBarWidgetTransparency(transparency) {
-        statusBarWidgetTransparency = transparency
+    function setDankBarWidgetTransparency(transparency) {
+        dankBarWidgetTransparency = transparency
         saveSettings()
     }
 
@@ -731,25 +732,25 @@ Singleton {
         saveSettings()
     }
 
-    function setStatusBarWidgetOrder(order) {
-        statusBarWidgetOrder = order
+    function setDankBarWidgetOrder(order) {
+        dankBarWidgetOrder = order
         saveSettings()
     }
 
-    function setStatusBarLeftWidgets(order) {
-        statusBarLeftWidgets = order
+    function setDankBarLeftWidgets(order) {
+        dankBarLeftWidgets = order
         updateListModel(leftWidgetsModel, order)
         saveSettings()
     }
 
-    function setStatusBarCenterWidgets(order) {
-        statusBarCenterWidgets = order
+    function setDankBarCenterWidgets(order) {
+        dankBarCenterWidgets = order
         updateListModel(centerWidgetsModel, order)
         saveSettings()
     }
 
-    function setStatusBarRightWidgets(order) {
-        statusBarRightWidgets = order
+    function setDankBarRightWidgets(order) {
+        dankBarRightWidgets = order
         updateListModel(rightWidgetsModel, order)
         saveSettings()
     }
@@ -782,13 +783,13 @@ Singleton {
         widgetDataChanged()
     }
 
-    function resetStatusBarWidgetsToDefault() {
+    function resetDankBarWidgetsToDefault() {
         var defaultLeft = ["launcherButton", "workspaceSwitcher", "focusedWindow"]
         var defaultCenter = ["music", "clock", "weather"]
         var defaultRight = ["systemTray", "clipboard", "notificationButton", "battery", "controlCenterButton"]
-        statusBarLeftWidgets = defaultLeft
-        statusBarCenterWidgets = defaultCenter
-        statusBarRightWidgets = defaultRight
+        dankBarLeftWidgets = defaultLeft
+        dankBarCenterWidgets = defaultCenter
+        dankBarRightWidgets = defaultRight
         updateListModel(leftWidgetsModel, defaultLeft)
         updateListModel(centerWidgetsModel, defaultCenter)
         updateListModel(rightWidgetsModel, defaultRight)
@@ -955,8 +956,8 @@ Singleton {
 
     function setShowDock(enabled) {
         showDock = enabled
-        if (enabled && statusBarAtBottom) {
-            setStatusBarAtBottom(false)
+        if (enabled && dankBarAtBottom) {
+            setDankBarAtBottom(false)
         }
         saveSettings()
     }
@@ -981,23 +982,23 @@ Singleton {
         saveSettings()
     }
 
-    function setStatusBarAutoHide(enabled) {
-        statusBarAutoHide = enabled
+    function setDankBarAutoHide(enabled) {
+        dankBarAutoHide = enabled
         saveSettings()
     }
 
-    function setStatusBarOpenOnOverview(enabled) {
-        statusBarOpenOnOverview = enabled
+    function setDankBarOpenOnOverview(enabled) {
+        dankBarOpenOnOverview = enabled
         saveSettings()
     }
 
-    function setStatusBarVisible(visible) {
-        statusBarVisible = visible
+    function setDankBarVisible(visible) {
+        dankBarVisible = visible
         saveSettings()
     }
 
-    function toggleStatusBarVisible() {
-        statusBarVisible = !statusBarVisible
+    function toggleDankBarVisible() {
+        dankBarVisible = !dankBarVisible
         saveSettings()
     }
 
@@ -1016,38 +1017,38 @@ Singleton {
         saveSettings()
     }
 
-    function setStatusBarSpacing(spacing) {
-        statusBarSpacing = spacing
+    function setDankBarSpacing(spacing) {
+        dankBarSpacing = spacing
         saveSettings()
     }
 
-    function setStatusBarBottomGap(gap) {
-        statusBarBottomGap = gap
+    function setDankBarBottomGap(gap) {
+        dankBarBottomGap = gap
         saveSettings()
     }
 
-    function setStatusBarInnerPadding(padding) {
-        statusBarInnerPadding = padding
+    function setDankBarInnerPadding(padding) {
+        dankBarInnerPadding = padding
         saveSettings()
     }
 
-    function setStatusBarSquareCorners(enabled) {
-        statusBarSquareCorners = enabled
+    function setDankBarSquareCorners(enabled) {
+        dankBarSquareCorners = enabled
         saveSettings()
     }
 
-    function setStatusBarNoBackground(enabled) {
-        statusBarNoBackground = enabled
+    function setDankBarNoBackground(enabled) {
+        dankBarNoBackground = enabled
         saveSettings()
     }
 
-    function setStatusBarGothCornersEnabled(enabled) {
-        statusBarGothCornersEnabled = enabled
+    function setDankBarGothCornersEnabled(enabled) {
+        dankBarGothCornersEnabled = enabled
         saveSettings()
     }
 
-    function setStatusBarAtBottom(enabled) {
-        statusBarAtBottom = enabled
+    function setDankBarAtBottom(enabled) {
+        dankBarAtBottom = enabled
         if (enabled && showDock) {
             setShowDock(false)
         }
@@ -1055,7 +1056,7 @@ Singleton {
     }
 
     function getPopupYPosition(barHeight) {
-        return barHeight + statusBarSpacing + statusBarBottomGap - 2 + Theme.popupDistance
+        return barHeight + dankBarSpacing + dankBarBottomGap - 2 + Theme.popupDistance
     }
 
     function setLockScreenShowPowerActions(enabled) {
@@ -1240,22 +1241,22 @@ Singleton {
 
     IpcHandler {
         function reveal(): string {
-            root.setStatusBarVisible(true)
+            root.setDankBarVisible(true)
             return "BAR_SHOW_SUCCESS"
         }
 
         function hide(): string {
-            root.setStatusBarVisible(false)
+            root.setDankBarVisible(false)
             return "BAR_HIDE_SUCCESS"
         }
 
         function toggle(): string {
-            root.toggleStatusBarVisible()
-            return statusBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
+            root.toggleDankBarVisible()
+            return root.dankBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
         }
 
         function status(): string {
-            return statusBarVisible ? "visible" : "hidden"
+            return root.dankBarVisible ? "visible" : "hidden"
         }
 
         target: "bar"

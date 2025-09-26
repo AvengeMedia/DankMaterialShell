@@ -15,17 +15,17 @@ Rectangle {
     property var parentScreen: null
     property real barHeight: 48
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
-    width: cpuTempContent.implicitWidth + horizontalPadding * 2
+    width: cpuContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
-        const baseColor = cpuTempArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
+        const baseColor = cpuArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
     }
     Component.onCompleted: {
@@ -36,7 +36,7 @@ Rectangle {
     }
 
     MouseArea {
-        id: cpuTempArea
+        id: cpuArea
 
         anchors.fill: parent
         hoverEnabled: true
@@ -58,7 +58,7 @@ Rectangle {
     }
 
     Row {
-        id: cpuTempContent
+        id: cpuContent
 
         anchors.centerIn: parent
         spacing: 3
@@ -67,11 +67,11 @@ Rectangle {
             name: "memory"
             size: Theme.iconSize - 8
             color: {
-                if (DgopService.cpuTemperature > 85) {
+                if (DgopService.cpuUsage > 80) {
                     return Theme.tempDanger;
                 }
 
-                if (DgopService.cpuTemperature > 69) {
+                if (DgopService.cpuUsage > 60) {
                     return Theme.tempWarning;
                 }
 
@@ -82,11 +82,11 @@ Rectangle {
 
         StyledText {
             text: {
-                if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
-                    return "--°";
+                if (DgopService.cpuUsage === undefined || DgopService.cpuUsage === null || DgopService.cpuUsage === 0) {
+                    return "--%";
                 }
 
-                return Math.round(DgopService.cpuTemperature) + "°";
+                return DgopService.cpuUsage.toFixed(0) + "%";
             }
             font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
@@ -96,13 +96,13 @@ Rectangle {
             elide: Text.ElideNone
 
             StyledTextMetrics {
-                id: tempBaseline
+                id: cpuBaseline
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
-                text: "100°"
+                text: "100%"
             }
 
-            width: Math.max(tempBaseline.width, paintedWidth)
+            width: Math.max(cpuBaseline.width, paintedWidth)
 
             Behavior on width {
                 NumberAnimation {
@@ -113,6 +113,5 @@ Rectangle {
         }
 
     }
-
 
 }

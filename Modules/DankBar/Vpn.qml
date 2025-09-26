@@ -13,15 +13,15 @@ Rectangle {
     property string section: "right"
     property var popupTarget: null
     property var parentScreen: null
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal toggleVpnPopup()
 
     width: Theme.iconSize + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
