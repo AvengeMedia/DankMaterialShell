@@ -17,7 +17,7 @@ Rectangle {
     property real barHeight: 48
     property real widgetHeight: 30
     property int selectedGpuIndex: (widgetData && widgetData.selectedGpuIndex !== undefined) ? widgetData.selectedGpuIndex : 0
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
     property real displayTemp: {
         if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
             return 0;
@@ -37,11 +37,11 @@ Rectangle {
             const sectionId = sections[s];
             let widgets = [];
             if (sectionId === "left") {
-                widgets = SettingsData.statusBarLeftWidgets.slice();
+                widgets = SettingsData.dankBarLeftWidgets.slice();
             } else if (sectionId === "center") {
-                widgets = SettingsData.statusBarCenterWidgets.slice();
+                widgets = SettingsData.dankBarCenterWidgets.slice();
             } else if (sectionId === "right") {
-                widgets = SettingsData.statusBarRightWidgets.slice();
+                widgets = SettingsData.dankBarRightWidgets.slice();
             }
             for (let i = 0; i < widgets.length; i++) {
                 const widget = widgets[i];
@@ -53,11 +53,11 @@ Rectangle {
                         "pciId": pciId
                     };
                     if (sectionId === "left") {
-                        SettingsData.setStatusBarLeftWidgets(widgets);
+                        SettingsData.setDankBarLeftWidgets(widgets);
                     } else if (sectionId === "center") {
-                        SettingsData.setStatusBarCenterWidgets(widgets);
+                        SettingsData.setDankBarCenterWidgets(widgets);
                     } else if (sectionId === "right") {
-                        SettingsData.setStatusBarRightWidgets(widgets);
+                        SettingsData.setDankBarRightWidgets(widgets);
                     }
                     return ;
                 }
@@ -67,9 +67,9 @@ Rectangle {
 
     width: gpuTempContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 

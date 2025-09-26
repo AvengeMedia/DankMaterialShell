@@ -10,18 +10,18 @@ Rectangle {
     property var parentWindow: null
     property var parentScreen: null
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property int calculatedWidth: SystemTray.items.values.length > 0 ? SystemTray.items.values.length * 24 + horizontalPadding * 2 : 0
 
     width: calculatedWidth
     height: widgetHeight
-    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
         if (SystemTray.items.values.length === 0) {
             return "transparent";
         }
 
-        if (SettingsData.statusBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -104,7 +104,7 @@ Rectangle {
                             const relativeX = globalPos.x - screenX;
                             menuAnchor.menu = trayItem.menu;
                             menuAnchor.anchor.window = parentWindow;
-                            menuAnchor.anchor.rect = Qt.rect(relativeX, parentWindow.effectiveBarHeight + SettingsData.statusBarSpacing, parent.width, 1);
+                            menuAnchor.anchor.rect = Qt.rect(relativeX, parentWindow.effectiveBarHeight + SettingsData.dankBarSpacing, parent.width, 1);
                             menuAnchor.open();
                         }
                     }

@@ -23,10 +23,10 @@ PanelWindow {
     property var modelData
     property var notepadVariants: null
 
-    property bool gothCornersEnabled: SettingsData.statusBarGothCornersEnabled
+    property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
-    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.statusBarTransparency)
+    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
     readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
     function px(v) { return Math.round(v * _dpr) / _dpr }
 
@@ -45,11 +45,11 @@ PanelWindow {
     }
     property string screenName: modelData.name
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.statusBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.statusBarInnerPadding))
-    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.statusBarInnerPadding * 0.6)
+    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
 
     screen: modelData
-    implicitHeight: px(effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing) + (SettingsData.statusBarGothCornersEnabled ? _wingR : 0))
+    implicitHeight: px(effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing) + (SettingsData.dankBarGothCornersEnabled ? _wingR : 0))
     color: "transparent"
     Component.onCompleted: {
         const fonts = Qt.fontFamilies()
@@ -81,7 +81,7 @@ PanelWindow {
     }
 
     function updateGpuTempConfig() {
-        const allWidgets = [...(SettingsData.statusBarLeftWidgets || []), ...(SettingsData.statusBarCenterWidgets || []), ...(SettingsData.statusBarRightWidgets || [])]
+        const allWidgets = [...(SettingsData.dankBarLeftWidgets || []), ...(SettingsData.dankBarCenterWidgets || []), ...(SettingsData.dankBarRightWidgets || [])]
 
         const hasGpuTempWidget = allWidgets.some(widget => {
                                                      const widgetId = typeof widget === "string" ? widget : widget.id
@@ -132,27 +132,27 @@ PanelWindow {
     }
 
     anchors {
-        top: !SettingsData.statusBarAtBottom
-        bottom: SettingsData.statusBarAtBottom
+        top: !SettingsData.dankBarAtBottom
+        bottom: SettingsData.dankBarAtBottom
         left: true
         right: true
     }
 
-    exclusiveZone: (!SettingsData.statusBarVisible || topBarCore.autoHide) ? -1 : (SettingsData.statusBarAtBottom ? (root.effectiveBarHeight + SettingsData.statusBarBottomGap) : (root.effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2))
+    exclusiveZone: (!SettingsData.dankBarVisible || topBarCore.autoHide) ? -1 : (SettingsData.dankBarAtBottom ? (root.effectiveBarHeight + SettingsData.dankBarBottomGap) : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2))
 
     Item {
         id: inputMask
         anchors {
-            top: SettingsData.statusBarAtBottom ? undefined : parent.top
-            bottom: SettingsData.statusBarAtBottom ? parent.bottom : undefined
+            top: SettingsData.dankBarAtBottom ? undefined : parent.top
+            bottom: SettingsData.dankBarAtBottom ? parent.bottom : undefined
             left: parent.left
             right: parent.right
         }
         height: {
-            const base = px(root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing))
+            const base = px(root.effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing))
             if (topBarCore.autoHide && !topBarCore.reveal) return 8
-            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.statusBarOpenOnOverview) return base
-            return SettingsData.statusBarVisible ? base : 0
+            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview) return base
+            return SettingsData.dankBarVisible ? base : 0
         }
     }
 
@@ -165,8 +165,8 @@ PanelWindow {
         id: topBarCore
         anchors.fill: parent
 
-        property real backgroundTransparency: SettingsData.statusBarTransparency
-        property bool autoHide: SettingsData.statusBarAutoHide
+        property real backgroundTransparency: SettingsData.dankBarTransparency
+        property bool autoHide: SettingsData.dankBarAutoHide
         property bool revealSticky: false
 
         Timer {
@@ -178,9 +178,9 @@ PanelWindow {
 
         property bool reveal: {
             if (CompositorService.isNiri && NiriService.inOverview) {
-                return SettingsData.statusBarOpenOnOverview
+                return SettingsData.dankBarOpenOnOverview
             }
-            return SettingsData.statusBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
+            return SettingsData.dankBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
         }
 
         property var notepadInstance: null
@@ -229,7 +229,7 @@ PanelWindow {
 
         Connections {
             function onStatusBarTransparencyChanged() {
-                topBarCore.backgroundTransparency = SettingsData.statusBarTransparency
+                topBarCore.backgroundTransparency = SettingsData.dankBarTransparency
             }
 
             target: SettingsData
@@ -258,8 +258,8 @@ PanelWindow {
 
         MouseArea {
             id: topBarMouseArea
-            y: SettingsData.statusBarAtBottom ? parent.height - height : 0
-            height: px(root.effectiveBarHeight + (SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing))
+            y: SettingsData.dankBarAtBottom ? parent.height - height : 0
+            height: px(root.effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing))
             anchors {
                 left: parent.left
                 right: parent.right
@@ -274,7 +274,7 @@ PanelWindow {
 
                 transform: Translate {
                     id: topBarSlide
-                    y: px(topBarCore.reveal ? 0 : (SettingsData.statusBarAtBottom ? root.implicitHeight : -root.implicitHeight))
+                    y: px(topBarCore.reveal ? 0 : (SettingsData.dankBarAtBottom ? root.implicitHeight : -root.implicitHeight))
 
                     Behavior on y {
                         NumberAnimation {
@@ -287,16 +287,16 @@ PanelWindow {
                 Item {
                     id: barUnitInset
                     anchors.fill: parent
-                    anchors.leftMargin: px(SettingsData.statusBarSpacing)
-                    anchors.rightMargin: px(SettingsData.statusBarSpacing)
-                    anchors.topMargin: SettingsData.statusBarAtBottom ? px(SettingsData.statusBarSpacing) : 0
-                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? 0 : px(SettingsData.statusBarSpacing)
+                    anchors.leftMargin: px(SettingsData.dankBarSpacing)
+                    anchors.rightMargin: px(SettingsData.dankBarSpacing)
+                    anchors.topMargin: SettingsData.dankBarAtBottom ? px(SettingsData.dankBarSpacing) : 0
+                    anchors.bottomMargin: SettingsData.dankBarAtBottom ? 0 : px(SettingsData.dankBarSpacing)
 
                     Item {
                         id: barBackground
                         anchors.fill: parent
-                        anchors.bottomMargin: -(SettingsData.statusBarGothCornersEnabled && !SettingsData.statusBarAtBottom ? root._wingR : 0)
-                        anchors.topMargin: -(SettingsData.statusBarGothCornersEnabled && SettingsData.statusBarAtBottom ? root._wingR : 0)
+                        anchors.bottomMargin: -(SettingsData.dankBarGothCornersEnabled && !SettingsData.dankBarAtBottom ? root._wingR : 0)
+                        anchors.topMargin: -(SettingsData.dankBarGothCornersEnabled && SettingsData.dankBarAtBottom ? root._wingR : 0)
 
                     Canvas {
                             id: barShape
@@ -305,11 +305,11 @@ PanelWindow {
                             renderTarget: Canvas.Image
                             canvasSize: Qt.size(px(width), px(height))
 
-                            property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
-                            property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real wing: SettingsData.dankBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
                             property real h: height
                             property real contentH: height - wing
-                            property real y0: SettingsData.statusBarAtBottom ? wing : 0
+                            property real y0: SettingsData.dankBarAtBottom ? wing : 0
 
                             onWingChanged: requestPaint()
                             onRtChanged: requestPaint()
@@ -330,7 +330,7 @@ PanelWindow {
                                 const R = px(wing)
                                 const RT = px(rt)
                                 const H = H_raw - (R > 0 ? R : 0)
-                                const isBottom = SettingsData.statusBarAtBottom
+                                const isBottom = SettingsData.dankBarAtBottom
 
                                 ctx.scale(scale, scale)
 
@@ -386,11 +386,11 @@ PanelWindow {
                             renderTarget: Canvas.Image
                             canvasSize: Qt.size(px(width), px(height))
 
-                            property real wing: SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
-                            property real rt: SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real wing: SettingsData.dankBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
                             property real h: height
                             property real contentH: height - wing
-                            property real y0: SettingsData.statusBarAtBottom ? wing : 0
+                            property real y0: SettingsData.dankBarAtBottom ? wing : 0
                             property real alphaTint: (root._bgColor?.a ?? 1) < 0.99 ? (Theme.stateLayerOpacity ?? 0) : 0
 
                             onWingChanged: requestPaint()
@@ -413,7 +413,7 @@ PanelWindow {
                                 const R = px(wing)
                                 const RT = px(rt)
                                 const H = H_raw - (R > 0 ? R : 0)
-                                const isBottom = SettingsData.statusBarAtBottom
+                                const isBottom = SettingsData.dankBarAtBottom
 
                                 ctx.scale(scale, scale)
 
@@ -465,10 +465,10 @@ PanelWindow {
                     Item {
                         id: topBarContent
                         anchors.fill: parent
-                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.statusBarInnerPadding * 0.8)
-                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.statusBarInnerPadding * 0.8)
-                        anchors.topMargin: SettingsData.statusBarInnerPadding / 2
-                        anchors.bottomMargin: SettingsData.statusBarInnerPadding / 2
+                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                        anchors.topMargin: SettingsData.dankBarInnerPadding / 2
+                        anchors.bottomMargin: SettingsData.dankBarInnerPadding / 2
                         clip: true
 
                     readonly property int availableWidth: width
@@ -563,12 +563,12 @@ PanelWindow {
                             id: leftSection
 
                             height: parent.height
-                            spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.statusBarLeftWidgetsModel
+                                model: SettingsData.dankBarLeftWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -590,7 +590,7 @@ PanelWindow {
                             property var centerWidgets: []
                             property int totalWidgets: 0
                             property real totalWidth: 0
-                            property real spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
+                            property real spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
 
                             function updateLayout() {
                                 if (width <= 0 || height <= 0 || !visible) {
@@ -785,7 +785,7 @@ PanelWindow {
                             Repeater {
                                 id: centerRepeater
 
-                                model: SettingsData.statusBarCenterWidgetsModel
+                                model: SettingsData.dankBarCenterWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -819,7 +819,7 @@ PanelWindow {
                                     Qt.callLater(centerSection.updateLayout)
                                 }
 
-                                target: SettingsData.statusBarCenterWidgetsModel
+                                target: SettingsData.dankBarCenterWidgetsModel
                             }
                         }
 
@@ -827,12 +827,12 @@ PanelWindow {
                             id: rightSection
 
                             height: parent.height
-                            spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.statusBarRightWidgetsModel
+                                model: SettingsData.dankBarRightWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -852,12 +852,12 @@ PanelWindow {
                             id: clipboardComponent
 
                             Rectangle {
-                                readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
+                                readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
                                 width: clipboardIcon.width + horizontalPadding * 2
                                 height: root.widgetHeight
-                                radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
+                                radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
                                 color: {
-                                    if (SettingsData.statusBarNoBackground) {
+                                    if (SettingsData.dankBarNoBackground) {
                                         return "transparent"
                                     }
                                     const baseColor = clipboardArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor

@@ -774,7 +774,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.statusBarTransparency * 100)
+                                       SettingsData.dankBarTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -782,7 +782,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setStatusBarTransparency(
+                                                      SettingsData.setDankBarTransparency(
                                                           newValue / 100)
                                                   }
                         }
@@ -843,7 +843,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.statusBarWidgetTransparency * 100)
+                                       SettingsData.dankBarWidgetTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -851,7 +851,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setStatusBarWidgetTransparency(
+                                                      SettingsData.setDankBarWidgetTransparency(
                                                           newValue / 100)
                                                   }
                         }

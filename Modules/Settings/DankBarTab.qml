@@ -236,51 +236,51 @@ Item {
 
         var widgets = []
         if (targetSection === "left") {
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         } else if (targetSection === "center") {
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         } else if (targetSection === "right") {
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
         }
     }
 
     function removeWidgetFromSection(sectionId, widgetIndex) {
         var widgets = []
         if (sectionId === "left") {
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         } else if (sectionId === "center") {
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         } else if (sectionId === "right") {
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
         }
     }
 
     function handleItemEnabledChanged(sectionId, itemId, enabled) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
         for (var i = 0; i < widgets.length; i++) {
             var widget = widgets[i]
             var widgetId = typeof widget === "string" ? widget : widget.id
@@ -316,30 +316,30 @@ Item {
             }
         }
         if (sectionId === "left")
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleItemOrderChanged(sectionId, newOrder) {
         if (sectionId === "left")
-            SettingsData.setStatusBarLeftWidgets(newOrder)
+            SettingsData.setDankBarLeftWidgets(newOrder)
         else if (sectionId === "center")
-            SettingsData.setStatusBarCenterWidgets(newOrder)
+            SettingsData.setDankBarCenterWidgets(newOrder)
         else if (sectionId === "right")
-            SettingsData.setStatusBarRightWidgets(newOrder)
+            SettingsData.setDankBarRightWidgets(newOrder)
     }
 
     function handleSpacerSizeChanged(sectionId, widgetIndex, newSize) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
         
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -372,21 +372,21 @@ Item {
         }
         
         if (sectionId === "left")
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleGpuSelectionChanged(sectionId, widgetIndex, selectedGpuIndex) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
 
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -415,21 +415,21 @@ Item {
         }
 
         if (sectionId === "left")
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleDiskMountSelectionChanged(sectionId, widgetIndex, mountPath) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.statusBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.statusBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.statusBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
 
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -461,11 +461,11 @@ Item {
         }
 
         if (sectionId === "left")
-            SettingsData.setStatusBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setStatusBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setStatusBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value) {
@@ -483,11 +483,11 @@ Item {
         var widgets = []
         var widgetData = []
         if (sectionId === "left")
-            widgetData = SettingsData.statusBarLeftWidgets || []
+            widgetData = SettingsData.dankBarLeftWidgets || []
         else if (sectionId === "center")
-            widgetData = SettingsData.statusBarCenterWidgets || []
+            widgetData = SettingsData.dankBarCenterWidgets || []
         else if (sectionId === "right")
-            widgetData = SettingsData.statusBarRightWidgets || []
+            widgetData = SettingsData.dankBarRightWidgets || []
         widgetData.forEach(widget => {
                                var widgetId = typeof widget === "string" ? widget : widget.id
                                var widgetEnabled = typeof widget
@@ -531,23 +531,23 @@ Item {
 
     Component.onCompleted: {
         // Only set defaults if widgets have never been configured (null/undefined, not empty array)
-        if (!SettingsData.statusBarLeftWidgets)
-            SettingsData.setStatusBarLeftWidgets(defaultLeftWidgets)
+        if (!SettingsData.dankBarLeftWidgets)
+            SettingsData.setDankBarLeftWidgets(defaultLeftWidgets)
 
-        if (!SettingsData.statusBarCenterWidgets)
-            SettingsData.setStatusBarCenterWidgets(defaultCenterWidgets)
+        if (!SettingsData.dankBarCenterWidgets)
+            SettingsData.setDankBarCenterWidgets(defaultCenterWidgets)
 
-        if (!SettingsData.statusBarRightWidgets)
-            SettingsData.setStatusBarRightWidgets(defaultRightWidgets)
+        if (!SettingsData.dankBarRightWidgets)
+            SettingsData.setDankBarRightWidgets(defaultRightWidgets)
         const sections = ["left", "center", "right"]
         sections.forEach(sectionId => {
                              var widgets = []
                              if (sectionId === "left")
-                             widgets = SettingsData.statusBarLeftWidgets.slice()
+                             widgets = SettingsData.dankBarLeftWidgets.slice()
                              else if (sectionId === "center")
-                             widgets = SettingsData.statusBarCenterWidgets.slice()
+                             widgets = SettingsData.dankBarCenterWidgets.slice()
                              else if (sectionId === "right")
-                             widgets = SettingsData.statusBarRightWidgets.slice()
+                             widgets = SettingsData.dankBarRightWidgets.slice()
                              var updated = false
                              for (var i = 0; i < widgets.length; i++) {
                                  var widget = widgets[i]
@@ -562,11 +562,11 @@ Item {
                              }
                              if (updated) {
                                  if (sectionId === "left")
-                                 SettingsData.setStatusBarLeftWidgets(widgets)
+                                 SettingsData.setDankBarLeftWidgets(widgets)
                                  else if (sectionId === "center")
-                                 SettingsData.setStatusBarCenterWidgets(widgets)
+                                 SettingsData.setDankBarCenterWidgets(widgets)
                                  else if (sectionId === "right")
-                                 SettingsData.setStatusBarRightWidgets(widgets)
+                                 SettingsData.setDankBarRightWidgets(widgets)
                              }
                          })
     }
@@ -638,9 +638,9 @@ Item {
                             id: autoHideToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.statusBarAutoHide
+                            checked: SettingsData.dankBarAutoHide
                             onToggled: toggled => {
-                                           return SettingsData.setStatusBarAutoHide(
+                                           return SettingsData.setDankBarAutoHide(
                                                toggled)
                                        }
                         }
@@ -690,9 +690,9 @@ Item {
                             id: visibilityToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.statusBarVisible
+                            checked: SettingsData.dankBarVisible
                             onToggled: toggled => {
-                                           return SettingsData.setStatusBarVisible(
+                                           return SettingsData.setDankBarVisible(
                                                toggled)
                                        }
                         }
@@ -744,9 +744,9 @@ Item {
                             id: overviewToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.statusBarOpenOnOverview
+                            checked: SettingsData.dankBarOpenOnOverview
                             onToggled: toggled => {
-                                           return SettingsData.setStatusBarOpenOnOverview(
+                                           return SettingsData.setDankBarOpenOnOverview(
                                                toggled)
                                        }
                         }
@@ -763,10 +763,10 @@ Item {
                         width: parent.width
                         text: "Status Bar Position"
                         description: "Position status bar at top or bottom of display"
-                        currentValue: SettingsData.statusBarAtBottom ? "Bottom" : "Top"
+                        currentValue: SettingsData.dankBarAtBottom ? "Bottom" : "Top"
                         options: ["Top", "Bottom"]
                         onValueChanged: value => {
-                                            SettingsData.setStatusBarAtBottom(value === "Bottom")
+                                            SettingsData.setDankBarAtBottom(value === "Bottom")
                                         }
                     }
                 }
@@ -824,7 +824,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.statusBarSpacing
+                            value: SettingsData.dankBarSpacing
                             minimum: 0
                             maximum: 32
                             unit: ""
@@ -832,7 +832,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setStatusBarSpacing(
+                                                      SettingsData.setDankBarSpacing(
                                                           newValue)
                                                   }
                         }
@@ -852,7 +852,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.statusBarBottomGap
+                            value: SettingsData.dankBarBottomGap
                             minimum: -100
                             maximum: 100
                             unit: ""
@@ -860,7 +860,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setStatusBarBottomGap(
+                                                      SettingsData.setDankBarBottomGap(
                                                           newValue)
                                                   }
                         }
@@ -880,7 +880,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.statusBarInnerPadding
+                            value: SettingsData.dankBarInnerPadding
                             minimum: 0
                             maximum: 24
                             unit: ""
@@ -888,7 +888,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setStatusBarInnerPadding(
+                                                      SettingsData.setDankBarInnerPadding(
                                                           newValue)
                                                   }
                         }
@@ -899,9 +899,9 @@ Item {
                         width: parent.width
                         text: "Square Corners"
                         description: "Removes rounded corners from bar container."
-                        checked: SettingsData.statusBarSquareCorners
+                        checked: SettingsData.dankBarSquareCorners
                         onToggled: checked => {
-                                       SettingsData.setStatusBarSquareCorners(
+                                       SettingsData.setDankBarSquareCorners(
                                            checked)
                                    }
                     }
@@ -910,9 +910,9 @@ Item {
                         width: parent.width
                         text: "No Background"
                         description: "Remove widget backgrounds for a minimal look with tighter spacing."
-                        checked: SettingsData.statusBarNoBackground
+                        checked: SettingsData.dankBarNoBackground
                         onToggled: checked => {
-                                       SettingsData.setStatusBarNoBackground(
+                                       SettingsData.setDankBarNoBackground(
                                            checked)
                                    }
                     }
@@ -921,9 +921,9 @@ Item {
                         width: parent.width
                         text: "Goth Corners"
                         description: "Add curved swooping tips at the bottom of the bar."
-                        checked: SettingsData.statusBarGothCornersEnabled
+                        checked: SettingsData.dankBarGothCornersEnabled
                         onToggled: checked => {
-                                       SettingsData.setStatusBarGothCornersEnabled(
+                                       SettingsData.setDankBarGothCornersEnabled(
                                            checked)
                                    }
                     }
@@ -1014,11 +1014,11 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    SettingsData.setStatusBarLeftWidgets(
+                                    SettingsData.setDankBarLeftWidgets(
                                                 defaultLeftWidgets)
-                                    SettingsData.setStatusBarCenterWidgets(
+                                    SettingsData.setDankBarCenterWidgets(
                                                 defaultCenterWidgets)
-                                    SettingsData.setStatusBarRightWidgets(
+                                    SettingsData.setDankBarRightWidgets(
                                                 defaultRightWidgets)
                                 }
                             }

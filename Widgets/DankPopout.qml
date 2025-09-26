@@ -104,7 +104,7 @@ PanelWindow {
             return triggerX
         }
         readonly property real calculatedY: {
-            if (SettingsData.statusBarAtBottom) {
+            if (SettingsData.dankBarAtBottom) {
                 return Math.max(Theme.spacingM, Math.min(screenHeight - popupHeight - Theme.spacingM, screenHeight - triggerY - popupHeight - 10))
             } else {
                 return Math.max(0, Math.min(screenHeight - popupHeight - Theme.spacingM, triggerY))
