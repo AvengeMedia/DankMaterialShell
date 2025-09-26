@@ -18,7 +18,7 @@ Rectangle {
         "text": "Weather",
         "icon": "cloud"
     }, {
-        "text": "Top Bar",
+        "text": "Status Bar",
         "icon": "toolbar"
     }, {
         "text": "Widgets",

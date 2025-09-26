@@ -15,17 +15,17 @@ Rectangle {
     property var parentScreen: null
     property real barHeight: 48
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
-    width: cpuContent.implicitWidth + horizontalPadding * 2
+    width: cpuTempContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.statusBarNoBackground) {
             return "transparent";
         }
 
-        const baseColor = cpuArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
+        const baseColor = cpuTempArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
     }
     Component.onCompleted: {
@@ -36,7 +36,7 @@ Rectangle {
     }
 
     MouseArea {
-        id: cpuArea
+        id: cpuTempArea
 
         anchors.fill: parent
         hoverEnabled: true
@@ -47,7 +47,7 @@ Rectangle {
                 const currentScreen = parentScreen || Screen;
                 const screenX = currentScreen.x || 0;
                 const relativeX = globalPos.x - screenX;
-                popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, width, section, currentScreen);
+                popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), width, section, currentScreen);
             }
             DgopService.setSortBy("cpu");
             if (root.toggleProcessList) {
@@ -58,7 +58,7 @@ Rectangle {
     }
 
     Row {
-        id: cpuContent
+        id: cpuTempContent
 
         anchors.centerIn: parent
         spacing: 3
@@ -67,11 +67,11 @@ Rectangle {
             name: "memory"
             size: Theme.iconSize - 8
             color: {
-                if (DgopService.cpuUsage > 80) {
+                if (DgopService.cpuTemperature > 85) {
                     return Theme.tempDanger;
                 }
 
-                if (DgopService.cpuUsage > 60) {
+                if (DgopService.cpuTemperature > 69) {
                     return Theme.tempWarning;
                 }
 
@@ -82,11 +82,11 @@ Rectangle {
 
         StyledText {
             text: {
-                if (DgopService.cpuUsage === undefined || DgopService.cpuUsage === null || DgopService.cpuUsage === 0) {
-                    return "--%";
+                if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
+                    return "--°";
                 }
 
-                return DgopService.cpuUsage.toFixed(0) + "%";
+                return Math.round(DgopService.cpuTemperature) + "°";
             }
             font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
@@ -96,13 +96,13 @@ Rectangle {
             elide: Text.ElideNone
 
             StyledTextMetrics {
-                id: cpuBaseline
+                id: tempBaseline
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
-                text: "100%"
+                text: "100°"
             }
 
-            width: Math.max(cpuBaseline.width, paintedWidth)
+            width: Math.max(tempBaseline.width, paintedWidth)
 
             Behavior on width {
                 NumberAnimation {
@@ -113,5 +113,6 @@ Rectangle {
         }
 
     }
+
 
 }

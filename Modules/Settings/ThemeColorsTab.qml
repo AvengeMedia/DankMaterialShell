@@ -774,7 +774,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.topBarTransparency * 100)
+                                       SettingsData.statusBarTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -782,7 +782,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarTransparency(
+                                                      SettingsData.setStatusBarTransparency(
                                                           newValue / 100)
                                                   }
                         }
@@ -843,7 +843,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.topBarWidgetTransparency * 100)
+                                       SettingsData.statusBarWidgetTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -851,7 +851,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarWidgetTransparency(
+                                                      SettingsData.setStatusBarWidgetTransparency(
                                                           newValue / 100)
                                                   }
                         }

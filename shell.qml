@@ -24,7 +24,7 @@ import qs.Modules.Notifications.Popup
 import qs.Modules.OSD
 import qs.Modules.ProcessList
 import qs.Modules.Settings
-import qs.Modules.TopBar
+import qs.Modules.StatusBar
 import qs.Services
 
 ShellRoot {
@@ -47,9 +47,9 @@ ShellRoot {
     }
 
     Variants {
-        model: SettingsData.getFilteredScreens("topBar")
+        model: SettingsData.getFilteredScreens("statusBar")
 
-        delegate: TopBar {
+        delegate: StatusBar {
             modelData: item
             notepadVariants: notepadSlideoutVariants
             onColorPickerRequested: colorPickerModal.show()

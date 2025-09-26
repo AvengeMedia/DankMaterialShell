@@ -16,8 +16,8 @@ Singleton {
     property string currentThemeName: "blue"
     property string customThemeFile: ""
     property string matugenScheme: "scheme-tonal-spot"
-    property real topBarTransparency: 1.0
-    property real topBarWidgetTransparency: 1.0
+    property real statusBarTransparency: 1.0
+    property real statusBarWidgetTransparency: 1.0
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property bool use24HourClock: true
@@ -70,12 +70,12 @@ Singleton {
     property string clockDateFormat: ""
     property string lockDateFormat: ""
     property int mediaSize: 1
-    property var topBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
-    property var topBarCenterWidgets: ["music", "clock", "weather"]
-    property var topBarRightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
-    property alias topBarLeftWidgetsModel: leftWidgetsModel
-    property alias topBarCenterWidgetsModel: centerWidgetsModel
-    property alias topBarRightWidgetsModel: rightWidgetsModel
+    property var statusBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
+    property var statusBarCenterWidgets: ["music", "clock", "weather"]
+    property var statusBarRightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
+    property alias statusBarLeftWidgetsModel: leftWidgetsModel
+    property alias statusBarCenterWidgetsModel: centerWidgetsModel
+    property alias statusBarRightWidgetsModel: rightWidgetsModel
     property string appLauncherViewMode: "list"
     property string spotlightModalViewMode: "list"
     property string networkPreference: "auto"
@@ -119,15 +119,16 @@ Singleton {
     property bool dockGroupByApp: false
     property real cornerRadius: 12
     property bool notificationOverlayEnabled: false
-    property bool topBarAutoHide: false
-    property bool topBarOpenOnOverview: false
-    property bool topBarVisible: true
-    property real topBarSpacing: 4
-    property real topBarBottomGap: 0
-    property real topBarInnerPadding: 8
-    property bool topBarSquareCorners: false
-    property bool topBarNoBackground: false
-    property bool topBarGothCornersEnabled: false
+    property bool statusBarAutoHide: false
+    property bool statusBarOpenOnOverview: false
+    property bool statusBarVisible: true
+    property real statusBarSpacing: 4
+    property real statusBarBottomGap: 0
+    property real statusBarInnerPadding: 8
+    property bool statusBarSquareCorners: false
+    property bool statusBarNoBackground: false
+    property bool statusBarGothCornersEnabled: false
+    property bool statusBarAtBottom: false
     property bool lockScreenShowPowerActions: true
     property bool hideBrightnessSlider: false
     property string widgetBackgroundColor: "sch"
@@ -142,7 +143,7 @@ Singleton {
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
 
-    signal forceTopBarLayoutRefresh
+    signal forceStatusBarLayoutRefresh
     signal widgetDataChanged
     signal workspaceIconsUpdated
 
@@ -179,9 +180,9 @@ Singleton {
         centerWidgetsModel.append(dummyItem)
         rightWidgetsModel.append(dummyItem)
 
-        updateListModel(leftWidgetsModel, topBarLeftWidgets)
-        updateListModel(centerWidgetsModel, topBarCenterWidgets)
-        updateListModel(rightWidgetsModel, topBarRightWidgets)
+        updateListModel(leftWidgetsModel, statusBarLeftWidgets)
+        updateListModel(centerWidgetsModel, statusBarCenterWidgets)
+        updateListModel(rightWidgetsModel, statusBarRightWidgets)
     }
 
     function loadSettings() {
@@ -209,8 +210,8 @@ Singleton {
                 }
                 customThemeFile = settings.customThemeFile !== undefined ? settings.customThemeFile : ""
                 matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot"
-                topBarTransparency = settings.topBarTransparency !== undefined ? (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100 : settings.topBarTransparency) : 1.0
-                topBarWidgetTransparency = settings.topBarWidgetTransparency !== undefined ? (settings.topBarWidgetTransparency > 1 ? settings.topBarWidgetTransparency / 100 : settings.topBarWidgetTransparency) : 1.0
+                statusBarTransparency = settings.statusBarTransparency !== undefined ? (settings.statusBarTransparency > 1 ? settings.statusBarTransparency / 100 : settings.statusBarTransparency) : (settings.topBarTransparency !== undefined ? (settings.topBarTransparency > 1 ? settings.topBarTransparency / 100 : settings.topBarTransparency) : 1.0)
+                statusBarWidgetTransparency = settings.statusBarWidgetTransparency !== undefined ? (settings.statusBarWidgetTransparency > 1 ? settings.statusBarWidgetTransparency / 100 : settings.statusBarWidgetTransparency) : (settings.topBarWidgetTransparency !== undefined ? (settings.topBarWidgetTransparency > 1 ? settings.topBarWidgetTransparency / 100 : settings.topBarWidgetTransparency) : 1.0)
                 popupTransparency = settings.popupTransparency !== undefined ? (settings.popupTransparency > 1 ? settings.popupTransparency / 100 : settings.popupTransparency) : 1.0
                 dockTransparency = settings.dockTransparency !== undefined ? (settings.dockTransparency > 1 ? settings.dockTransparency / 100 : settings.dockTransparency) : 1
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
@@ -264,23 +265,24 @@ Singleton {
                 clockDateFormat = settings.clockDateFormat !== undefined ? settings.clockDateFormat : ""
                 lockDateFormat = settings.lockDateFormat !== undefined ? settings.lockDateFormat : ""
                 mediaSize = settings.mediaSize !== undefined ? settings.mediaSize : (settings.mediaCompactMode !== undefined ? (settings.mediaCompactMode ? 0 : 1) : 1)
-                if (settings.topBarWidgetOrder) {
-                    topBarLeftWidgets = settings.topBarWidgetOrder.filter(w => {
+                if (settings.statusBarWidgetOrder || settings.topBarWidgetOrder) {
+                    var widgetOrder = settings.statusBarWidgetOrder || settings.topBarWidgetOrder
+                    statusBarLeftWidgets = widgetOrder.filter(w => {
                                                                               return ["launcherButton", "workspaceSwitcher", "focusedWindow"].includes(w)
                                                                           })
-                    topBarCenterWidgets = settings.topBarWidgetOrder.filter(w => {
+                    statusBarCenterWidgets = widgetOrder.filter(w => {
                                                                                 return ["clock", "music", "weather"].includes(w)
                                                                             })
-                    topBarRightWidgets = settings.topBarWidgetOrder.filter(w => {
+                    statusBarRightWidgets = widgetOrder.filter(w => {
                                                                                return ["systemTray", "clipboard", "systemResources", "notificationButton", "battery", "controlCenterButton"].includes(w)
                                                                            })
                 } else {
-                    var leftWidgets = settings.topBarLeftWidgets !== undefined ? settings.topBarLeftWidgets : ["launcherButton", "workspaceSwitcher", "focusedWindow"]
-                    var centerWidgets = settings.topBarCenterWidgets !== undefined ? settings.topBarCenterWidgets : ["music", "clock", "weather"]
-                    var rightWidgets = settings.topBarRightWidgets !== undefined ? settings.topBarRightWidgets : ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
-                    topBarLeftWidgets = leftWidgets
-                    topBarCenterWidgets = centerWidgets
-                    topBarRightWidgets = rightWidgets
+                    var leftWidgets = settings.statusBarLeftWidgets !== undefined ? settings.statusBarLeftWidgets : (settings.topBarLeftWidgets !== undefined ? settings.topBarLeftWidgets : ["launcherButton", "workspaceSwitcher", "focusedWindow"])
+                    var centerWidgets = settings.statusBarCenterWidgets !== undefined ? settings.statusBarCenterWidgets : (settings.topBarCenterWidgets !== undefined ? settings.topBarCenterWidgets : ["music", "clock", "weather"])
+                    var rightWidgets = settings.statusBarRightWidgets !== undefined ? settings.statusBarRightWidgets : (settings.topBarRightWidgets !== undefined ? settings.topBarRightWidgets : ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"])
+                    statusBarLeftWidgets = leftWidgets
+                    statusBarCenterWidgets = centerWidgets
+                    statusBarRightWidgets = rightWidgets
                     updateListModel(leftWidgetsModel, leftWidgets)
                     updateListModel(centerWidgetsModel, centerWidgets)
                     updateListModel(rightWidgetsModel, rightWidgets)
@@ -310,18 +312,19 @@ Singleton {
                 dockGroupByApp = settings.dockGroupByApp !== undefined ? settings.dockGroupByApp : false
                 cornerRadius = settings.cornerRadius !== undefined ? settings.cornerRadius : 12
                 notificationOverlayEnabled = settings.notificationOverlayEnabled !== undefined ? settings.notificationOverlayEnabled : false
-                topBarAutoHide = settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false
-                topBarOpenOnOverview = settings.topBarOpenOnOverview !== undefined ? settings.topBarOpenOnOverview : false
-                topBarVisible = settings.topBarVisible !== undefined ? settings.topBarVisible : true
+                statusBarAutoHide = settings.statusBarAutoHide !== undefined ? settings.statusBarAutoHide : (settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false)
+                statusBarOpenOnOverview = settings.statusBarOpenOnOverview !== undefined ? settings.statusBarOpenOnOverview : (settings.topBarOpenOnOverview !== undefined ? settings.topBarOpenOnOverview : false)
+                statusBarVisible = settings.statusBarVisible !== undefined ? settings.statusBarVisible : (settings.topBarVisible !== undefined ? settings.topBarVisible : true)
                 notificationTimeoutLow = settings.notificationTimeoutLow !== undefined ? settings.notificationTimeoutLow : 5000
                 notificationTimeoutNormal = settings.notificationTimeoutNormal !== undefined ? settings.notificationTimeoutNormal : 5000
                 notificationTimeoutCritical = settings.notificationTimeoutCritical !== undefined ? settings.notificationTimeoutCritical : 0
-                topBarSpacing = settings.topBarSpacing !== undefined ? settings.topBarSpacing : 4
-                topBarBottomGap = settings.topBarBottomGap !== undefined ? settings.topBarBottomGap : 0
-                topBarInnerPadding = settings.topBarInnerPadding !== undefined ? settings.topBarInnerPadding : 8
-                topBarSquareCorners = settings.topBarSquareCorners !== undefined ? settings.topBarSquareCorners : false
-                topBarNoBackground = settings.topBarNoBackground !== undefined ? settings.topBarNoBackground : false
-                topBarGothCornersEnabled = settings.topBarGothCornersEnabled !== undefined ? settings.topBarGothCornersEnabled : false
+                statusBarSpacing = settings.statusBarSpacing !== undefined ? settings.statusBarSpacing : (settings.topBarSpacing !== undefined ? settings.topBarSpacing : 4)
+                statusBarBottomGap = settings.statusBarBottomGap !== undefined ? settings.statusBarBottomGap : (settings.topBarBottomGap !== undefined ? settings.topBarBottomGap : 0)
+                statusBarInnerPadding = settings.statusBarInnerPadding !== undefined ? settings.statusBarInnerPadding : (settings.topBarInnerPadding !== undefined ? settings.topBarInnerPadding : 8)
+                statusBarSquareCorners = settings.statusBarSquareCorners !== undefined ? settings.statusBarSquareCorners : (settings.topBarSquareCorners !== undefined ? settings.topBarSquareCorners : false)
+                statusBarNoBackground = settings.statusBarNoBackground !== undefined ? settings.statusBarNoBackground : (settings.topBarNoBackground !== undefined ? settings.topBarNoBackground : false)
+                statusBarGothCornersEnabled = settings.statusBarGothCornersEnabled !== undefined ? settings.statusBarGothCornersEnabled : (settings.topBarGothCornersEnabled !== undefined ? settings.topBarGothCornersEnabled : false)
+                statusBarAtBottom = settings.statusBarAtBottom !== undefined ? settings.statusBarAtBottom : (settings.topBarAtBottom !== undefined ? settings.topBarAtBottom : false)
                 lockScreenShowPowerActions = settings.lockScreenShowPowerActions !== undefined ? settings.lockScreenShowPowerActions : true
                 hideBrightnessSlider = settings.hideBrightnessSlider !== undefined ? settings.hideBrightnessSlider : false
                 widgetBackgroundColor = settings.widgetBackgroundColor !== undefined ? settings.widgetBackgroundColor : "sch"
@@ -349,8 +352,8 @@ Singleton {
                                                 "currentThemeName": currentThemeName,
                                                 "customThemeFile": customThemeFile,
                                                 "matugenScheme": matugenScheme,
-                                                "topBarTransparency": topBarTransparency,
-                                                "topBarWidgetTransparency": topBarWidgetTransparency,
+                                                "statusBarTransparency": statusBarTransparency,
+                                                "statusBarWidgetTransparency": statusBarWidgetTransparency,
                                                 "popupTransparency": popupTransparency,
                                                 "dockTransparency": dockTransparency,
                                                 "use24HourClock": use24HourClock,
@@ -395,9 +398,9 @@ Singleton {
                                                 "clockDateFormat": clockDateFormat,
                                                 "lockDateFormat": lockDateFormat,
                                                 "mediaSize": mediaSize,
-                                                "topBarLeftWidgets": topBarLeftWidgets,
-                                                "topBarCenterWidgets": topBarCenterWidgets,
-                                                "topBarRightWidgets": topBarRightWidgets,
+                                                "statusBarLeftWidgets": statusBarLeftWidgets,
+                                                "statusBarCenterWidgets": statusBarCenterWidgets,
+                                                "statusBarRightWidgets": statusBarRightWidgets,
                                                 "appLauncherViewMode": appLauncherViewMode,
                                                 "spotlightModalViewMode": spotlightModalViewMode,
                                                 "networkPreference": networkPreference,
@@ -423,15 +426,16 @@ Singleton {
                                                 "dockGroupByApp": dockGroupByApp,
                                                 "cornerRadius": cornerRadius,
                                                 "notificationOverlayEnabled": notificationOverlayEnabled,
-                                                "topBarAutoHide": topBarAutoHide,
-                                                "topBarOpenOnOverview": topBarOpenOnOverview,
-                                                "topBarVisible": topBarVisible,
-                                                "topBarSpacing": topBarSpacing,
-                                                "topBarBottomGap": topBarBottomGap,
-                                                "topBarInnerPadding": topBarInnerPadding,
-                                                "topBarSquareCorners": topBarSquareCorners,
-                                                "topBarNoBackground": topBarNoBackground,
-                                                "topBarGothCornersEnabled": topBarGothCornersEnabled,
+                                                "statusBarAutoHide": statusBarAutoHide,
+                                                "statusBarOpenOnOverview": statusBarOpenOnOverview,
+                                                "statusBarVisible": statusBarVisible,
+                                                "statusBarSpacing": statusBarSpacing,
+                                                "statusBarBottomGap": statusBarBottomGap,
+                                                "statusBarInnerPadding": statusBarInnerPadding,
+                                                "statusBarSquareCorners": statusBarSquareCorners,
+                                                "statusBarNoBackground": statusBarNoBackground,
+                                                "statusBarGothCornersEnabled": statusBarGothCornersEnabled,
+                                                "statusBarAtBottom": statusBarAtBottom,
                                                 "lockScreenShowPowerActions": lockScreenShowPowerActions,
                                                 "hideBrightnessSlider": hideBrightnessSlider,
                                                 "widgetBackgroundColor": widgetBackgroundColor,
@@ -586,13 +590,13 @@ Singleton {
         }
     }
 
-    function setTopBarTransparency(transparency) {
-        topBarTransparency = transparency
+    function setStatusBarTransparency(transparency) {
+        statusBarTransparency = transparency
         saveSettings()
     }
 
-    function setTopBarWidgetTransparency(transparency) {
-        topBarWidgetTransparency = transparency
+    function setStatusBarWidgetTransparency(transparency) {
+        statusBarWidgetTransparency = transparency
         saveSettings()
     }
 
@@ -727,25 +731,25 @@ Singleton {
         saveSettings()
     }
 
-    function setTopBarWidgetOrder(order) {
-        topBarWidgetOrder = order
+    function setStatusBarWidgetOrder(order) {
+        statusBarWidgetOrder = order
         saveSettings()
     }
 
-    function setTopBarLeftWidgets(order) {
-        topBarLeftWidgets = order
+    function setStatusBarLeftWidgets(order) {
+        statusBarLeftWidgets = order
         updateListModel(leftWidgetsModel, order)
         saveSettings()
     }
 
-    function setTopBarCenterWidgets(order) {
-        topBarCenterWidgets = order
+    function setStatusBarCenterWidgets(order) {
+        statusBarCenterWidgets = order
         updateListModel(centerWidgetsModel, order)
         saveSettings()
     }
 
-    function setTopBarRightWidgets(order) {
-        topBarRightWidgets = order
+    function setStatusBarRightWidgets(order) {
+        statusBarRightWidgets = order
         updateListModel(rightWidgetsModel, order)
         saveSettings()
     }
@@ -778,13 +782,13 @@ Singleton {
         widgetDataChanged()
     }
 
-    function resetTopBarWidgetsToDefault() {
+    function resetStatusBarWidgetsToDefault() {
         var defaultLeft = ["launcherButton", "workspaceSwitcher", "focusedWindow"]
         var defaultCenter = ["music", "clock", "weather"]
         var defaultRight = ["systemTray", "clipboard", "notificationButton", "battery", "controlCenterButton"]
-        topBarLeftWidgets = defaultLeft
-        topBarCenterWidgets = defaultCenter
-        topBarRightWidgets = defaultRight
+        statusBarLeftWidgets = defaultLeft
+        statusBarCenterWidgets = defaultCenter
+        statusBarRightWidgets = defaultRight
         updateListModel(leftWidgetsModel, defaultLeft)
         updateListModel(centerWidgetsModel, defaultCenter)
         updateListModel(rightWidgetsModel, defaultRight)
@@ -951,6 +955,9 @@ Singleton {
 
     function setShowDock(enabled) {
         showDock = enabled
+        if (enabled && statusBarAtBottom) {
+            setStatusBarAtBottom(false)
+        }
         saveSettings()
     }
 
@@ -974,23 +981,23 @@ Singleton {
         saveSettings()
     }
 
-    function setTopBarAutoHide(enabled) {
-        topBarAutoHide = enabled
+    function setStatusBarAutoHide(enabled) {
+        statusBarAutoHide = enabled
         saveSettings()
     }
 
-    function setTopBarOpenOnOverview(enabled) {
-        topBarOpenOnOverview = enabled
+    function setStatusBarOpenOnOverview(enabled) {
+        statusBarOpenOnOverview = enabled
         saveSettings()
     }
 
-    function setTopBarVisible(visible) {
-        topBarVisible = visible
+    function setStatusBarVisible(visible) {
+        statusBarVisible = visible
         saveSettings()
     }
 
-    function toggleTopBarVisible() {
-        topBarVisible = !topBarVisible
+    function toggleStatusBarVisible() {
+        statusBarVisible = !statusBarVisible
         saveSettings()
     }
 
@@ -1009,34 +1016,46 @@ Singleton {
         saveSettings()
     }
 
-    function setTopBarSpacing(spacing) {
-        topBarSpacing = spacing
+    function setStatusBarSpacing(spacing) {
+        statusBarSpacing = spacing
         saveSettings()
     }
 
-    function setTopBarBottomGap(gap) {
-        topBarBottomGap = gap
+    function setStatusBarBottomGap(gap) {
+        statusBarBottomGap = gap
         saveSettings()
     }
 
-    function setTopBarInnerPadding(padding) {
-        topBarInnerPadding = padding
+    function setStatusBarInnerPadding(padding) {
+        statusBarInnerPadding = padding
         saveSettings()
     }
 
-    function setTopBarSquareCorners(enabled) {
-        topBarSquareCorners = enabled
+    function setStatusBarSquareCorners(enabled) {
+        statusBarSquareCorners = enabled
         saveSettings()
     }
 
-    function setTopBarNoBackground(enabled) {
-        topBarNoBackground = enabled
+    function setStatusBarNoBackground(enabled) {
+        statusBarNoBackground = enabled
         saveSettings()
     }
 
-    function setTopBarGothCornersEnabled(enabled) {
-        topBarGothCornersEnabled = enabled
+    function setStatusBarGothCornersEnabled(enabled) {
+        statusBarGothCornersEnabled = enabled
         saveSettings()
+    }
+
+    function setStatusBarAtBottom(enabled) {
+        statusBarAtBottom = enabled
+        if (enabled && showDock) {
+            setShowDock(false)
+        }
+        saveSettings()
+    }
+
+    function getPopupYPosition(barHeight) {
+        return barHeight + statusBarSpacing + statusBarBottomGap - 2 + Theme.popupDistance
     }
 
     function setLockScreenShowPowerActions(enabled) {
@@ -1221,22 +1240,22 @@ Singleton {
 
     IpcHandler {
         function reveal(): string {
-            root.setTopBarVisible(true)
+            root.setStatusBarVisible(true)
             return "BAR_SHOW_SUCCESS"
         }
 
         function hide(): string {
-            root.setTopBarVisible(false)
+            root.setStatusBarVisible(false)
             return "BAR_HIDE_SUCCESS"
         }
 
         function toggle(): string {
-            root.toggleTopBarVisible()
-            return topBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
+            root.toggleStatusBarVisible()
+            return statusBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
         }
 
         function status(): string {
-            return topBarVisible ? "visible" : "hidden"
+            return statusBarVisible ? "visible" : "hidden"
         }
 
         target: "bar"

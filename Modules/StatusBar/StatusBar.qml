@@ -11,7 +11,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
 import qs.Modules
-import qs.Modules.TopBar
+import qs.Modules.StatusBar
 import qs.Services
 import qs.Widgets
 
@@ -23,7 +23,7 @@ PanelWindow {
     property var modelData
     property var notepadVariants: null
 
-    property bool gothCornersEnabled: SettingsData.topBarGothCornersEnabled
+    property bool gothCornersEnabled: SettingsData.statusBarGothCornersEnabled
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
     readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore.backgroundTransparency)
@@ -43,11 +43,11 @@ PanelWindow {
     }
     property string screenName: modelData.name
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.topBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.topBarInnerPadding))
-    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.topBarInnerPadding * 0.6)
+    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.statusBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.statusBarInnerPadding))
+    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.statusBarInnerPadding * 0.6)
 
     screen: modelData
-    implicitHeight: effectiveBarHeight + SettingsData.topBarSpacing + (SettingsData.topBarGothCornersEnabled ? _wingR : 0)
+    implicitHeight: effectiveBarHeight + SettingsData.statusBarSpacing + (SettingsData.statusBarGothCornersEnabled ? _wingR : 0)
     color: "transparent"
     Component.onCompleted: {
         const fonts = Qt.fontFamilies()
@@ -55,7 +55,7 @@ PanelWindow {
             ToastService.showError("Please install Material Symbols Rounded and Restart your Shell. See README.md for instructions")
         }
 
-        SettingsData.forceTopBarLayoutRefresh.connect(() => {
+        SettingsData.forceStatusBarLayoutRefresh.connect(() => {
                                                           Qt.callLater(() => {
                                                                            leftSection.visible = false
                                                                            centerSection.visible = false
@@ -79,7 +79,7 @@ PanelWindow {
     }
 
     function updateGpuTempConfig() {
-        const allWidgets = [...(SettingsData.topBarLeftWidgets || []), ...(SettingsData.topBarCenterWidgets || []), ...(SettingsData.topBarRightWidgets || [])]
+        const allWidgets = [...(SettingsData.statusBarLeftWidgets || []), ...(SettingsData.statusBarCenterWidgets || []), ...(SettingsData.statusBarRightWidgets || [])]
 
         const hasGpuTempWidget = allWidgets.some(widget => {
                                                      const widgetId = typeof widget === "string" ? widget : widget.id
@@ -93,15 +93,15 @@ PanelWindow {
     }
 
     Connections {
-        function onTopBarLeftWidgetsChanged() {
+        function onStatusBarLeftWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
-        function onTopBarCenterWidgetsChanged() {
+        function onStatusBarCenterWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
-        function onTopBarRightWidgetsChanged() {
+        function onStatusBarRightWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
@@ -130,12 +130,13 @@ PanelWindow {
     }
 
     anchors {
-        top: true
+        top: !SettingsData.statusBarAtBottom
+        bottom: SettingsData.statusBarAtBottom
         left: true
         right: true
     }
 
-    exclusiveZone: (!SettingsData.topBarVisible || topBarCore.autoHide) ? -1 : root.effectiveBarHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2
+    exclusiveZone: (!SettingsData.statusBarVisible || topBarCore.autoHide) ? -1 : root.effectiveBarHeight + SettingsData.statusBarSpacing + SettingsData.statusBarBottomGap - 2
 
     Item {
         id: inputMask
@@ -148,10 +149,10 @@ PanelWindow {
             if (topBarCore.autoHide && !topBarCore.reveal) {
                 return 8
             }
-            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.topBarOpenOnOverview) {
-                return root.effectiveBarHeight + SettingsData.topBarSpacing
+            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.statusBarOpenOnOverview) {
+                return root.effectiveBarHeight + SettingsData.statusBarSpacing
             }
-            return SettingsData.topBarVisible ? (root.effectiveBarHeight + SettingsData.topBarSpacing) : 0
+            return SettingsData.statusBarVisible ? (root.effectiveBarHeight + SettingsData.statusBarSpacing) : 0
         }
     }
 
@@ -164,8 +165,8 @@ PanelWindow {
         id: topBarCore
         anchors.fill: parent
 
-        property real backgroundTransparency: SettingsData.topBarTransparency
-        property bool autoHide: SettingsData.topBarAutoHide
+        property real backgroundTransparency: SettingsData.statusBarTransparency
+        property bool autoHide: SettingsData.statusBarAutoHide
         property bool revealSticky: false
 
         Timer {
@@ -177,9 +178,9 @@ PanelWindow {
 
         property bool reveal: {
             if (CompositorService.isNiri && NiriService.inOverview) {
-                return SettingsData.topBarOpenOnOverview
+                return SettingsData.statusBarOpenOnOverview
             }
-            return SettingsData.topBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
+            return SettingsData.statusBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
         }
 
         property var notepadInstance: null
@@ -227,8 +228,8 @@ PanelWindow {
         }
 
         Connections {
-            function onTopBarTransparencyChanged() {
-                topBarCore.backgroundTransparency = SettingsData.topBarTransparency
+            function onStatusBarTransparencyChanged() {
+                topBarCore.backgroundTransparency = SettingsData.statusBarTransparency
             }
 
             target: SettingsData
@@ -257,10 +258,9 @@ PanelWindow {
 
         MouseArea {
             id: topBarMouseArea
-            y: 0
-            height: root.effectiveBarHeight + SettingsData.topBarSpacing
+            y: SettingsData.statusBarAtBottom ? parent.height - height : 0
+            height: root.effectiveBarHeight + SettingsData.statusBarSpacing
             anchors {
-                top: parent.top
                 left: parent.left
                 right: parent.right
             }
@@ -274,7 +274,7 @@ PanelWindow {
 
                 transform: Translate {
                     id: topBarSlide
-                    y: Math.round(topBarCore.reveal ? 0 : -root.implicitHeight)
+                    y: Math.round(topBarCore.reveal ? 0 : (SettingsData.statusBarAtBottom ? root.implicitHeight : -root.implicitHeight))
 
                     Behavior on y {
                         NumberAnimation {
@@ -287,14 +287,16 @@ PanelWindow {
                 Item {
                     id: barUnitInset
                     anchors.fill: parent
-                    anchors.leftMargin: SettingsData.topBarSpacing
-                    anchors.rightMargin: SettingsData.topBarSpacing
-                    anchors.topMargin: SettingsData.topBarSpacing
+                    anchors.leftMargin: SettingsData.statusBarSpacing
+                    anchors.rightMargin: SettingsData.statusBarSpacing
+                    anchors.topMargin: SettingsData.statusBarAtBottom ? 0 : SettingsData.statusBarSpacing
+                    anchors.bottomMargin: SettingsData.statusBarAtBottom ? SettingsData.statusBarSpacing : 0
 
                     Item {
                         id: barBackground
                         anchors.fill: parent
-                        anchors.bottomMargin: -(SettingsData.topBarGothCornersEnabled ? root._wingR : 0)
+                        anchors.bottomMargin: -(SettingsData.statusBarGothCornersEnabled && !SettingsData.statusBarAtBottom ? root._wingR : 0)
+                        anchors.topMargin: -(SettingsData.statusBarGothCornersEnabled && SettingsData.statusBarAtBottom ? root._wingR : 0)
 
                     Canvas {
                             id: barShape
@@ -302,9 +304,9 @@ PanelWindow {
                             antialiasing: true
                             renderTarget: Canvas.FramebufferObject
 
-                            property real h  : height - (SettingsData.topBarGothCornersEnabled ? root._wingR : 0)
-                            property real rb : SettingsData.topBarGothCornersEnabled ? root._wingR : 0
-                            property real rt : SettingsData.topBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real h  : height - (SettingsData.statusBarGothCornersEnabled ? root._wingR : 0)
+                            property real rb : SettingsData.statusBarGothCornersEnabled ? root._wingR : 0
+                            property real rt : SettingsData.statusBarSquareCorners ? 0 : Theme.cornerRadius
 
                             onRbChanged: requestPaint()
                             onRtChanged: requestPaint()
@@ -317,6 +319,7 @@ PanelWindow {
                             onPaint: {
                                 const ctx = getContext("2d")
                                 const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
+                                const isBottom = SettingsData.statusBarAtBottom
 
                                 ctx.reset()
                                 ctx.clearRect(0, 0, width, height)
@@ -324,26 +327,49 @@ PanelWindow {
                                 function outline() {
                                     ctx.beginPath()
 
-                                    ctx.moveTo(RT, 0)
-                                    ctx.lineTo(W - RT, 0)
-                                    ctx.arcTo(W, 0, W, RT, RT)
-                                    ctx.lineTo(W, H)
-
-                                    if (R > 0) {
-                                        ctx.lineTo(W, H + R)
-                                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
-                                        ctx.lineTo(R, H)
-                                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
-                                        ctx.lineTo(0, H + R)
+                                    if (isBottom) {
+                                        if (R > 0) {
+                                            ctx.moveTo(0, -R)
+                                            ctx.lineTo(0, 0)
+                                            ctx.lineTo(R, 0)
+                                            ctx.arc(R, -R, R, Math.PI / 2, 0, true)
+                                            ctx.lineTo(W - R, -R)
+                                            ctx.arc(W - R, -R, R, 0, -Math.PI / 2, true)
+                                            ctx.lineTo(W, 0)
+                                            ctx.lineTo(W, H - RT)
+                                            ctx.arcTo(W, H, W - RT, H, RT)
+                                            ctx.lineTo(RT, H)
+                                            ctx.arcTo(0, H, 0, H - RT, RT)
+                                        } else {
+                                            ctx.moveTo(0, 0)
+                                            ctx.lineTo(W, 0)
+                                            ctx.lineTo(W, H - RT)
+                                            ctx.arcTo(W, H, W - RT, H, RT)
+                                            ctx.lineTo(RT, H)
+                                            ctx.arcTo(0, H, 0, H - RT, RT)
+                                        }
                                     } else {
-                                        ctx.lineTo(W, H - RT)
-                                        ctx.arcTo(W, H, W - RT, H, RT)
-                                        ctx.lineTo(RT, H)
-                                        ctx.arcTo(0, H, 0, H - RT, RT)
-                                    }
+                                        ctx.moveTo(RT, 0)
+                                        ctx.lineTo(W - RT, 0)
+                                        ctx.arcTo(W, 0, W, RT, RT)
+                                        ctx.lineTo(W, H)
 
-                                    ctx.lineTo(0, RT)
-                                    ctx.arcTo(0, 0, RT, 0, RT)
+                                        if (R > 0) {
+                                            ctx.lineTo(W, H + R)
+                                            ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
+                                            ctx.lineTo(R, H)
+                                            ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
+                                            ctx.lineTo(0, H + R)
+                                        } else {
+                                            ctx.lineTo(W, H - RT)
+                                            ctx.arcTo(W, H, W - RT, H, RT)
+                                            ctx.lineTo(RT, H)
+                                            ctx.arcTo(0, H, 0, H - RT, RT)
+                                        }
+
+                                        ctx.lineTo(0, RT)
+                                        ctx.arcTo(0, 0, RT, 0, RT)
+                                    }
 
                                     ctx.closePath()
                                 }
@@ -375,29 +401,54 @@ PanelWindow {
                             onPaint: {
                                 const ctx = getContext("2d")
                                 const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
+                                const isBottom = SettingsData.statusBarAtBottom
 
                                 ctx.reset()
                                 ctx.clearRect(0, 0, width, height)
 
                                 ctx.beginPath()
-                                ctx.moveTo(RT, 0)
-                                ctx.lineTo(W - RT, 0)
-                                ctx.arcTo(W, 0, W, RT, RT)
-                                ctx.lineTo(W, H)
-                                if (R > 0) {
-                                    ctx.lineTo(W, H + R)
-                                    ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
-                                    ctx.lineTo(R, H)
-                                    ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
-                                    ctx.lineTo(0, H + R)
+
+                                if (isBottom) {
+                                    if (R > 0) {
+                                        ctx.moveTo(0, -R)
+                                        ctx.lineTo(0, 0)
+                                        ctx.lineTo(R, 0)
+                                        ctx.arc(R, -R, R, Math.PI / 2, 0, true)
+                                        ctx.lineTo(W - R, -R)
+                                        ctx.arc(W - R, -R, R, 0, -Math.PI / 2, true)
+                                        ctx.lineTo(W, 0)
+                                        ctx.lineTo(W, H - RT)
+                                        ctx.arcTo(W, H, W - RT, H, RT)
+                                        ctx.lineTo(RT, H)
+                                        ctx.arcTo(0, H, 0, H - RT, RT)
+                                    } else {
+                                        ctx.moveTo(0, 0)
+                                        ctx.lineTo(W, 0)
+                                        ctx.lineTo(W, H - RT)
+                                        ctx.arcTo(W, H, W - RT, H, RT)
+                                        ctx.lineTo(RT, H)
+                                        ctx.arcTo(0, H, 0, H - RT, RT)
+                                    }
                                 } else {
-                                    ctx.lineTo(W, H - RT)
-                                    ctx.arcTo(W, H, W - RT, H, RT)
-                                    ctx.lineTo(RT, H)
-                                    ctx.arcTo(0, H, 0, H - RT, RT)
+                                    ctx.moveTo(RT, 0)
+                                    ctx.lineTo(W - RT, 0)
+                                    ctx.arcTo(W, 0, W, RT, RT)
+                                    ctx.lineTo(W, H)
+                                    if (R > 0) {
+                                        ctx.lineTo(W, H + R)
+                                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
+                                        ctx.lineTo(R, H)
+                                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
+                                        ctx.lineTo(0, H + R)
+                                    } else {
+                                        ctx.lineTo(W, H - RT)
+                                        ctx.arcTo(W, H, W - RT, H, RT)
+                                        ctx.lineTo(RT, H)
+                                        ctx.arcTo(0, H, 0, H - RT, RT)
+                                    }
+                                    ctx.lineTo(0, RT)
+                                    ctx.arcTo(0, 0, RT, 0, RT)
                                 }
-                                ctx.lineTo(0, RT)
-                                ctx.arcTo(0, 0, RT, 0, RT)
                                 ctx.closePath()
 
                                 ctx.fillStyle = root._bgColor
@@ -409,10 +460,10 @@ PanelWindow {
                     Item {
                         id: topBarContent
                         anchors.fill: parent
-                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.topBarInnerPadding * 0.8)
-                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.topBarInnerPadding * 0.8)
-                        anchors.topMargin: SettingsData.topBarInnerPadding / 2
-                        anchors.bottomMargin: SettingsData.topBarInnerPadding / 2
+                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.statusBarInnerPadding * 0.8)
+                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.statusBarInnerPadding * 0.8)
+                        anchors.topMargin: SettingsData.statusBarInnerPadding / 2
+                        anchors.bottomMargin: SettingsData.statusBarInnerPadding / 2
                         clip: true
 
                     readonly property int availableWidth: width
@@ -507,12 +558,12 @@ PanelWindow {
                             id: leftSection
 
                             height: parent.height
-                            spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.topBarLeftWidgetsModel
+                                model: SettingsData.statusBarLeftWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -534,7 +585,7 @@ PanelWindow {
                             property var centerWidgets: []
                             property int totalWidgets: 0
                             property real totalWidth: 0
-                            property real spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            property real spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
 
                             function updateLayout() {
                                 if (width <= 0 || height <= 0 || !visible) {
@@ -729,7 +780,7 @@ PanelWindow {
                             Repeater {
                                 id: centerRepeater
 
-                                model: SettingsData.topBarCenterWidgetsModel
+                                model: SettingsData.statusBarCenterWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -763,7 +814,7 @@ PanelWindow {
                                     Qt.callLater(centerSection.updateLayout)
                                 }
 
-                                target: SettingsData.topBarCenterWidgetsModel
+                                target: SettingsData.statusBarCenterWidgetsModel
                             }
                         }
 
@@ -771,12 +822,12 @@ PanelWindow {
                             id: rightSection
 
                             height: parent.height
-                            spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.statusBarNoBackground ? 2 : Theme.spacingXS
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.topBarRightWidgetsModel
+                                model: SettingsData.statusBarRightWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -796,12 +847,12 @@ PanelWindow {
                             id: clipboardComponent
 
                             Rectangle {
-                                readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
+                                readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
                                 width: clipboardIcon.width + horizontalPadding * 2
                                 height: root.widgetHeight
-                                radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+                                radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
                                 color: {
-                                    if (SettingsData.topBarNoBackground) {
+                                    if (SettingsData.statusBarNoBackground) {
                                         return "transparent"
                                     }
                                     const baseColor = clipboardArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor

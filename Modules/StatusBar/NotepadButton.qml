@@ -12,15 +12,15 @@ Rectangle {
     property var parentScreen: null
     property real widgetHeight: 30
     property real barHeight: 48
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.statusBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal clicked()
 
     width: notepadIcon.width + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.statusBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.statusBarNoBackground) {
             return "transparent";
         }
 
@@ -44,8 +44,8 @@ Rectangle {
         color: Theme.primary
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.rightMargin: SettingsData.topBarNoBackground ? 0 : 4
-        anchors.topMargin: SettingsData.topBarNoBackground ? 0 : 4
+        anchors.rightMargin: SettingsData.statusBarNoBackground ? 0 : 4
+        anchors.topMargin: SettingsData.statusBarNoBackground ? 0 : 4
         visible: NotepadStorageService.tabs && NotepadStorageService.tabs.length > 0
         opacity: 0.8
     }
