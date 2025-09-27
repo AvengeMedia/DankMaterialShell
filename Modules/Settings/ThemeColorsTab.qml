@@ -764,7 +764,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Top Bar Transparency"
+                            text: "Status Bar Transparency"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -798,7 +798,7 @@ Item {
 
                             StyledText {
                                 id: transparencyLabel
-                                text: "Top Bar Widget Transparency"
+                                text: "Status Bar Widget Transparency"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium

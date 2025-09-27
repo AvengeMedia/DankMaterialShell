@@ -876,7 +876,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Bottom Gap (Exclusive Zone)"
+                            text: "Height to Edge Gap (Exclusive Zone)"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
