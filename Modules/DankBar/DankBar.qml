@@ -49,7 +49,7 @@ PanelWindow {
     readonly property real widgetHeight: Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
 
     screen: modelData
-    implicitHeight: px(effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing) + (SettingsData.dankBarGothCornersEnabled ? _wingR : 0))
+    implicitHeight: px(effectiveBarHeight + SettingsData.dankBarSpacing + (SettingsData.dankBarGothCornersEnabled ? _wingR : 0))
     color: "transparent"
     Component.onCompleted: {
         const fonts = Qt.fontFamilies()
@@ -140,7 +140,7 @@ PanelWindow {
         right: true
     }
 
-    exclusiveZone: (!SettingsData.dankBarVisible || topBarCore.autoHide) ? -1 : (SettingsData.dankBarAtBottom ? (root.effectiveBarHeight + SettingsData.dankBarBottomGap) : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2))
+    exclusiveZone: (!SettingsData.dankBarVisible || topBarCore.autoHide) ? -1 : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap)
 
     Item {
         id: inputMask
@@ -151,7 +151,7 @@ PanelWindow {
             right: parent.right
         }
         height: {
-            const base = px(root.effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing))
+            const base = px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
             if (topBarCore.autoHide && !topBarCore.reveal) return 8
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview) return base
             return SettingsData.dankBarVisible ? base : 0
@@ -261,7 +261,7 @@ PanelWindow {
         MouseArea {
             id: topBarMouseArea
             y: SettingsData.dankBarAtBottom ? parent.height - height : 0
-            height: px(root.effectiveBarHeight + (SettingsData.dankBarAtBottom ? 0 : SettingsData.dankBarSpacing))
+            height: px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
             anchors {
                 left: parent.left
                 right: parent.right
@@ -291,8 +291,8 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.leftMargin: px(SettingsData.dankBarSpacing)
                     anchors.rightMargin: px(SettingsData.dankBarSpacing)
-                    anchors.topMargin: SettingsData.dankBarAtBottom ? px(SettingsData.dankBarSpacing) : 0
-                    anchors.bottomMargin: SettingsData.dankBarAtBottom ? 0 : px(SettingsData.dankBarSpacing)
+                    anchors.topMargin: SettingsData.dankBarAtBottom ? 0 : px(SettingsData.dankBarSpacing)
+                    anchors.bottomMargin: SettingsData.dankBarAtBottom ? px(SettingsData.dankBarSpacing) : 0
 
                     Item {
                         id: barBackground

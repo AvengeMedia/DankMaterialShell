@@ -848,7 +848,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: SettingsData.dankBarAtBottom ? "Bottom/Left/Right Gaps (0 = edge-to-edge)" : "Top/Left/Right Gaps (0 = edge-to-edge)"
+                            text: "Edge Spacing (0 = edge-to-edge)"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
