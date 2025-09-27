@@ -34,14 +34,14 @@ Rectangle {
     property var parentScreen: null
     property real barHeight: 48
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal clicked()
 
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -212,7 +212,7 @@ Rectangle {
                             const currentScreen = root.parentScreen || Screen;
                             const screenX = currentScreen.x || 0;
                             const relativeX = globalPos.x - screenX;
-                            root.popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, root.width, root.section, currentScreen);
+                            root.popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), root.width, root.section, currentScreen);
                         }
                         root.clicked();
                     }

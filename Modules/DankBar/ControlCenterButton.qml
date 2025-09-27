@@ -16,15 +16,15 @@ Rectangle {
     property bool showAudioIcon: SettingsData.controlCenterShowAudioIcon
     property real widgetHeight: 30
     property real barHeight: 48
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal clicked()
 
     width: controlIndicators.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -160,7 +160,7 @@ Rectangle {
                 const currentScreen = parentScreen || Screen;
                 const screenX = currentScreen.x || 0;
                 const relativeX = globalPos.x - screenX;
-                popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, width, section, currentScreen);
+                popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), width, section, currentScreen);
             }
             root.clicked();
         }

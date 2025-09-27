@@ -69,7 +69,7 @@ PanelWindow {
         width: shouldBeVisible ? (ToastService.hasDetails ? 380 : 350) : frozenWidth
         height: toastContent.height + Theme.spacingL * 2
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Theme.barHeight - 4 + SettingsData.topBarSpacing + 2
+        y: Theme.barHeight - 4 + SettingsData.dankBarSpacing + 2
         color: {
             switch (ToastService.currentLevel) {
             case ToastService.levelError:

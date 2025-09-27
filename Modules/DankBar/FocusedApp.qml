@@ -12,7 +12,7 @@ Rectangle {
     property bool compactMode: SettingsData.focusedWindowCompactMode
     property int availableWidth: 400
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property int baseWidth: contentRow.implicitWidth + horizontalPadding * 2
     readonly property int maxNormalWidth: 456
     readonly property int maxCompactWidth: 288
@@ -56,13 +56,13 @@ Rectangle {
 
     width: !hasWindowsOnCurrentWorkspace ? 0 : (compactMode ? Math.min(baseWidth, maxCompactWidth) : Math.min(baseWidth, maxNormalWidth))
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
         if (!activeWindow || !activeWindow.title) {
             return "transparent";
         }
 
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 

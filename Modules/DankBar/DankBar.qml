@@ -11,7 +11,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
 import qs.Modules
-import qs.Modules.TopBar
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
@@ -23,10 +23,12 @@ PanelWindow {
     property var modelData
     property var notepadVariants: null
 
-    property bool gothCornersEnabled: SettingsData.topBarGothCornersEnabled
+    property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
-    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore.backgroundTransparency)
+    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
+    readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
+    function px(v) { return Math.round(v * _dpr) / _dpr }
 
     signal colorPickerRequested()
 
@@ -43,11 +45,11 @@ PanelWindow {
     }
     property string screenName: modelData.name
     readonly property int notificationCount: NotificationService.notifications.length
-    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.topBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.topBarInnerPadding))
-    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.topBarInnerPadding * 0.6)
+    readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
 
     screen: modelData
-    implicitHeight: effectiveBarHeight + SettingsData.topBarSpacing + (SettingsData.topBarGothCornersEnabled ? _wingR : 0)
+    implicitHeight: px(effectiveBarHeight + SettingsData.dankBarSpacing + (SettingsData.dankBarGothCornersEnabled ? _wingR : 0))
     color: "transparent"
     Component.onCompleted: {
         const fonts = Qt.fontFamilies()
@@ -55,18 +57,20 @@ PanelWindow {
             ToastService.showError("Please install Material Symbols Rounded and Restart your Shell. See README.md for instructions")
         }
 
-        SettingsData.forceTopBarLayoutRefresh.connect(() => {
-                                                          Qt.callLater(() => {
-                                                                           leftSection.visible = false
-                                                                           centerSection.visible = false
-                                                                           rightSection.visible = false
-                                                                           Qt.callLater(() => {
-                                                                                            leftSection.visible = true
-                                                                                            centerSection.visible = true
-                                                                                            rightSection.visible = true
-                                                                                        })
-                                                                       })
-                                                      })
+        if (SettingsData.forceStatusBarLayoutRefresh) {
+            SettingsData.forceStatusBarLayoutRefresh.connect(() => {
+                Qt.callLater(() => {
+                    leftSection.visible = false
+                    centerSection.visible = false
+                    rightSection.visible = false
+                    Qt.callLater(() => {
+                        leftSection.visible = true
+                        centerSection.visible = true
+                        rightSection.visible = true
+                    })
+                })
+            })
+        }
 
         updateGpuTempConfig()
         Qt.callLater(() => Qt.callLater(forceWidgetRefresh))
@@ -79,7 +83,7 @@ PanelWindow {
     }
 
     function updateGpuTempConfig() {
-        const allWidgets = [...(SettingsData.topBarLeftWidgets || []), ...(SettingsData.topBarCenterWidgets || []), ...(SettingsData.topBarRightWidgets || [])]
+        const allWidgets = [...(SettingsData.dankBarLeftWidgets || []), ...(SettingsData.dankBarCenterWidgets || []), ...(SettingsData.dankBarRightWidgets || [])]
 
         const hasGpuTempWidget = allWidgets.some(widget => {
                                                      const widgetId = typeof widget === "string" ? widget : widget.id
@@ -93,15 +97,15 @@ PanelWindow {
     }
 
     Connections {
-        function onTopBarLeftWidgetsChanged() {
+        function onDankBarLeftWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
-        function onTopBarCenterWidgetsChanged() {
+        function onDankBarCenterWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
-        function onTopBarRightWidgetsChanged() {
+        function onDankBarRightWidgetsChanged() {
             root.updateGpuTempConfig()
         }
 
@@ -130,28 +134,27 @@ PanelWindow {
     }
 
     anchors {
-        top: true
+        top: !SettingsData.dankBarAtBottom
+        bottom: SettingsData.dankBarAtBottom
         left: true
         right: true
     }
 
-    exclusiveZone: (!SettingsData.topBarVisible || topBarCore.autoHide) ? -1 : root.effectiveBarHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2
+    exclusiveZone: (!SettingsData.dankBarVisible || topBarCore.autoHide) ? -1 : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap)
 
     Item {
         id: inputMask
         anchors {
-            top: parent.top
+            top: SettingsData.dankBarAtBottom ? undefined : parent.top
+            bottom: SettingsData.dankBarAtBottom ? parent.bottom : undefined
             left: parent.left
             right: parent.right
         }
         height: {
-            if (topBarCore.autoHide && !topBarCore.reveal) {
-                return 8
-            }
-            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.topBarOpenOnOverview) {
-                return root.effectiveBarHeight + SettingsData.topBarSpacing
-            }
-            return SettingsData.topBarVisible ? (root.effectiveBarHeight + SettingsData.topBarSpacing) : 0
+            const base = px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
+            if (topBarCore.autoHide && !topBarCore.reveal) return 1
+            if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview) return base
+            return SettingsData.dankBarVisible ? base : 0
         }
     }
 
@@ -164,8 +167,8 @@ PanelWindow {
         id: topBarCore
         anchors.fill: parent
 
-        property real backgroundTransparency: SettingsData.topBarTransparency
-        property bool autoHide: SettingsData.topBarAutoHide
+        property real backgroundTransparency: SettingsData.dankBarTransparency
+        property bool autoHide: SettingsData.dankBarAutoHide
         property bool revealSticky: false
 
         Timer {
@@ -177,9 +180,9 @@ PanelWindow {
 
         property bool reveal: {
             if (CompositorService.isNiri && NiriService.inOverview) {
-                return SettingsData.topBarOpenOnOverview
+                return SettingsData.dankBarOpenOnOverview
             }
-            return SettingsData.topBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
+            return SettingsData.dankBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
         }
 
         property var notepadInstance: null
@@ -227,8 +230,8 @@ PanelWindow {
         }
 
         Connections {
-            function onTopBarTransparencyChanged() {
-                topBarCore.backgroundTransparency = SettingsData.topBarTransparency
+            function onDankBarTransparencyChanged() {
+                topBarCore.backgroundTransparency = SettingsData.dankBarTransparency
             }
 
             target: SettingsData
@@ -257,10 +260,9 @@ PanelWindow {
 
         MouseArea {
             id: topBarMouseArea
-            y: 0
-            height: root.effectiveBarHeight + SettingsData.topBarSpacing
+            y: SettingsData.dankBarAtBottom ? parent.height - height : 0
+            height: px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
             anchors {
-                top: parent.top
                 left: parent.left
                 right: parent.right
             }
@@ -274,7 +276,7 @@ PanelWindow {
 
                 transform: Translate {
                     id: topBarSlide
-                    y: Math.round(topBarCore.reveal ? 0 : -root.implicitHeight)
+                    y: px(topBarCore.reveal ? 0 : (SettingsData.dankBarAtBottom ? root.implicitHeight : -root.implicitHeight))
 
                     Behavior on y {
                         NumberAnimation {
@@ -287,43 +289,55 @@ PanelWindow {
                 Item {
                     id: barUnitInset
                     anchors.fill: parent
-                    anchors.leftMargin: SettingsData.topBarSpacing
-                    anchors.rightMargin: SettingsData.topBarSpacing
-                    anchors.topMargin: SettingsData.topBarSpacing
+                    anchors.leftMargin: px(SettingsData.dankBarSpacing)
+                    anchors.rightMargin: px(SettingsData.dankBarSpacing)
+                    anchors.topMargin: SettingsData.dankBarAtBottom ? 0 : px(SettingsData.dankBarSpacing)
+                    anchors.bottomMargin: SettingsData.dankBarAtBottom ? px(SettingsData.dankBarSpacing) : 0
 
                     Item {
                         id: barBackground
                         anchors.fill: parent
-                        anchors.bottomMargin: -(SettingsData.topBarGothCornersEnabled ? root._wingR : 0)
+                        anchors.bottomMargin: -(SettingsData.dankBarGothCornersEnabled && !SettingsData.dankBarAtBottom ? root._wingR : 0)
+                        anchors.topMargin: -(SettingsData.dankBarGothCornersEnabled && SettingsData.dankBarAtBottom ? root._wingR : 0)
 
                     Canvas {
                             id: barShape
                             anchors.fill: parent
                             antialiasing: true
-                            renderTarget: Canvas.FramebufferObject
+                            renderTarget: Canvas.Image
+                            canvasSize: Qt.size(px(width), px(height))
 
-                            property real h  : height - (SettingsData.topBarGothCornersEnabled ? root._wingR : 0)
-                            property real rb : SettingsData.topBarGothCornersEnabled ? root._wingR : 0
-                            property real rt : SettingsData.topBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real wing: SettingsData.dankBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real h: height
+                            property real contentH: height - wing
+                            property real y0: SettingsData.dankBarAtBottom ? wing : 0
 
-                            onRbChanged: requestPaint()
+                            onWingChanged: requestPaint()
                             onRtChanged: requestPaint()
+                            onWidthChanged: requestPaint()
+                            onHeightChanged: requestPaint()
 
                             Connections {
                                 target: root
                                 function on_BgColorChanged() { barShape.requestPaint() }
+                                function on_DprChanged() { barShape.requestPaint() }
                             }
 
                             onPaint: {
                                 const ctx = getContext("2d")
-                                const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
+                                const scale = root._dpr
+                                const W = px(width)
+                                const H_raw = px(height)
+                                const R = px(wing)
+                                const RT = px(rt)
+                                const H = H_raw - (R > 0 ? R : 0)
+                                const isBottom = SettingsData.dankBarAtBottom
 
-                                ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
+                                ctx.scale(scale, scale)
 
-                                function outline() {
+                                function drawTopPath() {
                                     ctx.beginPath()
-
                                     ctx.moveTo(RT, 0)
                                     ctx.lineTo(W - RT, 0)
                                     ctx.arcTo(W, 0, W, RT, RT)
@@ -344,13 +358,25 @@ PanelWindow {
 
                                     ctx.lineTo(0, RT)
                                     ctx.arcTo(0, 0, RT, 0, RT)
-
                                     ctx.closePath()
                                 }
 
+                                ctx.reset()
+                                ctx.clearRect(0, 0, W, H_raw)
+
+                                if (isBottom) {
+                                    ctx.save()
+                                    ctx.translate(0, H_raw)
+                                    ctx.scale(1, -1)
+                                    drawTopPath()
+                                    ctx.restore()
+                                } else {
+                                    drawTopPath()
+                                }
+
                                 ctx.fillStyle = root._bgColor
-                                outline()
                                 ctx.fill()
+
                             }
 
                         }
@@ -359,49 +385,81 @@ PanelWindow {
                             id: barTint
                             anchors.fill: parent
                             antialiasing: true
-                            renderTarget: Canvas.FramebufferObject
+                            renderTarget: Canvas.Image
+                            canvasSize: Qt.size(px(width), px(height))
 
-                            Connections {
-                                target: barShape
-                                function onRbChanged() { barTint.requestPaint() }
-                                function onRtChanged() { barTint.requestPaint() }
-                            }
+                            property real wing: SettingsData.dankBarGothCornersEnabled ? root._wingR : 0
+                            property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
+                            property real h: height
+                            property real contentH: height - wing
+                            property real y0: SettingsData.dankBarAtBottom ? wing : 0
+                            property real alphaTint: (root._bgColor?.a ?? 1) < 0.99 ? (Theme.stateLayerOpacity ?? 0) : 0
+
+                            onWingChanged: requestPaint()
+                            onRtChanged: requestPaint()
+                            onAlphaTintChanged: requestPaint()
+                            onWidthChanged: requestPaint()
+                            onHeightChanged: requestPaint()
 
                             Connections {
                                 target: root
                                 function on_BgColorChanged() { barTint.requestPaint() }
+                                function on_DprChanged() { barTint.requestPaint() }
                             }
 
                             onPaint: {
                                 const ctx = getContext("2d")
-                                const W = width, H = barShape.h, R = barShape.rb, RT = barShape.rt
+                                const scale = root._dpr
+                                const W = px(width)
+                                const H_raw = px(height)
+                                const R = px(wing)
+                                const RT = px(rt)
+                                const H = H_raw - (R > 0 ? R : 0)
+                                const isBottom = SettingsData.dankBarAtBottom
+
+                                ctx.scale(scale, scale)
+
+                                function drawTopPath() {
+                                    ctx.beginPath()
+                                    ctx.moveTo(RT, 0)
+                                    ctx.lineTo(W - RT, 0)
+                                    ctx.arcTo(W, 0, W, RT, RT)
+                                    ctx.lineTo(W, H)
+
+                                    if (R > 0) {
+                                        ctx.lineTo(W, H + R)
+                                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
+                                        ctx.lineTo(R, H)
+                                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
+                                        ctx.lineTo(0, H + R)
+                                    } else {
+                                        ctx.lineTo(W, H - RT)
+                                        ctx.arcTo(W, H, W - RT, H, RT)
+                                        ctx.lineTo(RT, H)
+                                        ctx.arcTo(0, H, 0, H - RT, RT)
+                                    }
+
+                                    ctx.lineTo(0, RT)
+                                    ctx.arcTo(0, 0, RT, 0, RT)
+                                    ctx.closePath()
+                                }
 
                                 ctx.reset()
-                                ctx.clearRect(0, 0, width, height)
+                                ctx.clearRect(0, 0, W, H_raw)
 
-                                ctx.beginPath()
-                                ctx.moveTo(RT, 0)
-                                ctx.lineTo(W - RT, 0)
-                                ctx.arcTo(W, 0, W, RT, RT)
-                                ctx.lineTo(W, H)
-                                if (R > 0) {
-                                    ctx.lineTo(W, H + R)
-                                    ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
-                                    ctx.lineTo(R, H)
-                                    ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
-                                    ctx.lineTo(0, H + R)
+                                if (isBottom) {
+                                    ctx.save()
+                                    ctx.translate(0, H_raw)
+                                    ctx.scale(1, -1)
+                                    drawTopPath()
+                                    ctx.restore()
                                 } else {
-                                    ctx.lineTo(W, H - RT)
-                                    ctx.arcTo(W, H, W - RT, H, RT)
-                                    ctx.lineTo(RT, H)
-                                    ctx.arcTo(0, H, 0, H - RT, RT)
+                                    drawTopPath()
                                 }
-                                ctx.lineTo(0, RT)
-                                ctx.arcTo(0, 0, RT, 0, RT)
-                                ctx.closePath()
 
-                                ctx.fillStyle = root._bgColor
+                                ctx.fillStyle = Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, alphaTint)
                                 ctx.fill()
+
                             }
                         }
                     }
@@ -409,10 +467,10 @@ PanelWindow {
                     Item {
                         id: topBarContent
                         anchors.fill: parent
-                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.topBarInnerPadding * 0.8)
-                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.topBarInnerPadding * 0.8)
-                        anchors.topMargin: SettingsData.topBarInnerPadding / 2
-                        anchors.bottomMargin: SettingsData.topBarInnerPadding / 2
+                        anchors.leftMargin: Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                        anchors.rightMargin: Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                        anchors.topMargin: SettingsData.dankBarInnerPadding / 2
+                        anchors.bottomMargin: SettingsData.dankBarInnerPadding / 2
                         clip: true
 
                     readonly property int availableWidth: width
@@ -507,12 +565,12 @@ PanelWindow {
                             id: leftSection
 
                             height: parent.height
-                            spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
                             anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.topBarLeftWidgetsModel
+                                model: SettingsData.dankBarLeftWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -534,7 +592,7 @@ PanelWindow {
                             property var centerWidgets: []
                             property int totalWidgets: 0
                             property real totalWidth: 0
-                            property real spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            property real spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
 
                             function updateLayout() {
                                 if (width <= 0 || height <= 0 || !visible) {
@@ -729,7 +787,7 @@ PanelWindow {
                             Repeater {
                                 id: centerRepeater
 
-                                model: SettingsData.topBarCenterWidgetsModel
+                                model: SettingsData.dankBarCenterWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -763,7 +821,7 @@ PanelWindow {
                                     Qt.callLater(centerSection.updateLayout)
                                 }
 
-                                target: SettingsData.topBarCenterWidgetsModel
+                                target: SettingsData.dankBarCenterWidgetsModel
                             }
                         }
 
@@ -771,12 +829,12 @@ PanelWindow {
                             id: rightSection
 
                             height: parent.height
-                            spacing: SettingsData.topBarNoBackground ? 2 : Theme.spacingXS
+                            spacing: SettingsData.dankBarNoBackground ? 2 : Theme.spacingXS
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
 
                             Repeater {
-                                model: SettingsData.topBarRightWidgetsModel
+                                model: SettingsData.dankBarRightWidgetsModel
 
                                 Loader {
                                     property string widgetId: model.widgetId
@@ -796,12 +854,12 @@ PanelWindow {
                             id: clipboardComponent
 
                             Rectangle {
-                                readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
+                                readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (root.widgetHeight / 30))
                                 width: clipboardIcon.width + horizontalPadding * 2
                                 height: root.widgetHeight
-                                radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+                                radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
                                 color: {
-                                    if (SettingsData.topBarNoBackground) {
+                                    if (SettingsData.dankBarNoBackground) {
                                         return "transparent"
                                     }
                                     const baseColor = clipboardArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor
@@ -951,6 +1009,7 @@ PanelWindow {
                                 parentWindow: root
                                 parentScreen: root.screen
                                 widgetHeight: root.widgetHeight
+                                isAtBottom: SettingsData.dankBarAtBottom
                                 visible: SettingsData.getFilteredScreens("systemTray").includes(root.screen)
                             }
                         }

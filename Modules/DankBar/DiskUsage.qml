@@ -10,7 +10,7 @@ Rectangle {
     property var widgetData: null
     property real widgetHeight: 30
     property string mountPath: (widgetData && widgetData.mountPath !== undefined) ? widgetData.mountPath : "/"
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     property var selectedMount: {
         if (!DgopService.diskMounts || DgopService.diskMounts.length === 0) {
@@ -48,9 +48,9 @@ Rectangle {
 
     width: diskContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent"
         }
 

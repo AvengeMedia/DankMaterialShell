@@ -10,7 +10,7 @@ import qs.Common
 import qs.Modules.ControlCenter
 import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Details
-import qs.Modules.TopBar
+import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 import qs.Modules.ControlCenter.Components
@@ -66,7 +66,7 @@ DankPopout {
     popupWidth: 550
     popupHeight: Math.min((triggerScreen?.height ?? 1080) - 100, contentLoader.item && contentLoader.item.implicitHeight > 0 ? contentLoader.item.implicitHeight + 20 : 400)
     triggerX: (triggerScreen?.width ?? 1920) - 600 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.topBarSpacing + Theme.popupDistance
+    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing + Theme.popupDistance
     triggerWidth: 80
     positioning: "center"
     screen: triggerScreen

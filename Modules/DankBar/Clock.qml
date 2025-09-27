@@ -12,15 +12,15 @@ Rectangle {
     property var parentScreen: null
     property real barHeight: 48
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
 
     signal clockClicked
 
     width: clockRow.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -84,7 +84,7 @@ Rectangle {
                 const currentScreen = parentScreen || Screen
                 const screenX = currentScreen.x || 0
                 const relativeX = globalPos.x - screenX
-                popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, width, section, currentScreen)
+                popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), width, section, currentScreen)
             }
             root.clockClicked()
         }

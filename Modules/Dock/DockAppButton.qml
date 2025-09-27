@@ -25,6 +25,27 @@ Item {
     property string windowTitle: ""
     property bool isHovered: mouseArea.containsMouse && !dragging
     property bool showTooltip: mouseArea.containsMouse && !dragging
+    property var cachedDesktopEntry: null
+
+    function updateDesktopEntry() {
+        if (!appData || appData.appId === "__SEPARATOR__") {
+            cachedDesktopEntry = null
+            return
+        }
+        const moddedId = Paths.moddedAppId(appData.appId)
+        cachedDesktopEntry = DesktopEntries.heuristicLookup(moddedId)
+    }
+
+    Component.onCompleted: updateDesktopEntry()
+
+    onAppDataChanged: updateDesktopEntry()
+
+    Connections {
+        target: DesktopEntries
+        function onApplicationsChanged() {
+            updateDesktopEntry()
+        }
+    }
     property bool isWindowFocused: {
         if (!appData) {
             return false
@@ -55,8 +76,7 @@ Item {
         }
 
         if ((appData.type === "window" && showWindowTitle) || (appData.type === "grouped" && appData.windowTitle)) {
-            const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
-            const appName = desktopEntry && desktopEntry.name ? desktopEntry.name : appData.appId
+            const appName = cachedDesktopEntry && cachedDesktopEntry.name ? cachedDesktopEntry.name : appData.appId
             const title = appData.type === "window" ? windowTitle : appData.windowTitle
             return appName + (title ? " • " + title : "")
         }
@@ -65,8 +85,7 @@ Item {
             return ""
         }
 
-        const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
-        return desktopEntry && desktopEntry.name ? desktopEntry.name : appData.appId
+        return cachedDesktopEntry && cachedDesktopEntry.name ? cachedDesktopEntry.name : appData.appId
     }
 
     width: 40
@@ -255,7 +274,7 @@ Item {
                        if (mouse.button === Qt.LeftButton) {
                            if (appData.type === "pinned") {
                                if (appData && appData.appId) {
-                                   const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
+                                   const desktopEntry = cachedDesktopEntry
                                    if (desktopEntry) {
                                        AppUsageHistoryData.addAppUsage({
                                                                            "id": appData.appId,
@@ -275,7 +294,7 @@ Item {
                            } else if (appData.type === "grouped") {
                                if (appData.windowCount === 0) {
                                    if (appData && appData.appId) {
-                                       const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
+                                       const desktopEntry = cachedDesktopEntry
                                        if (desktopEntry) {
                                            AppUsageHistoryData.addAppUsage({
                                                                                "id": appData.appId,
@@ -305,7 +324,7 @@ Item {
                            }
                        } else if (mouse.button === Qt.MiddleButton) {
                            if (appData && appData.appId) {
-                               const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
+                               const desktopEntry = cachedDesktopEntry
                                if (desktopEntry) {
                                    AppUsageHistoryData.addAppUsage({
                                                                        "id": appData.appId,
@@ -341,8 +360,7 @@ Item {
             if (moddedId.toLowerCase().includes("steam_app")) {
                 return ""
             }
-            const desktopEntry = DesktopEntries.heuristicLookup(moddedId)
-            return desktopEntry && desktopEntry.icon ? Quickshell.iconPath(desktopEntry.icon, true) : ""
+            return cachedDesktopEntry && cachedDesktopEntry.icon ? Quickshell.iconPath(cachedDesktopEntry.icon, true) : ""
         }
         mipmap: true
         smooth: true
@@ -381,7 +399,7 @@ Item {
                     return "?"
                 }
 
-                const desktopEntry = DesktopEntries.heuristicLookup(appData.appId)
+                const desktopEntry = cachedDesktopEntry
                 if (desktopEntry && desktopEntry.name) {
                     return desktopEntry.name.charAt(0).toUpperCase()
                 }

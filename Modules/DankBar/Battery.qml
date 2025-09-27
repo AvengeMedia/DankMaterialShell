@@ -13,15 +13,15 @@ Rectangle {
     property var parentScreen: null
     property real widgetHeight: 30
     property real barHeight: 48
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
     signal toggleBatteryPopup()
 
     width: batteryContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -34,7 +34,7 @@ Rectangle {
         id: batteryContent
 
         anchors.centerIn: parent
-        spacing: SettingsData.topBarNoBackground ? 1 : 2
+        spacing: SettingsData.dankBarNoBackground ? 1 : 2
 
         DankIcon {
             name: BatteryService.getBatteryIcon()
@@ -80,7 +80,7 @@ Rectangle {
                 const currentScreen = parentScreen || Screen;
                 const screenX = currentScreen.x || 0;
                 const relativeX = globalPos.x - screenX;
-                popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, width, section, currentScreen);
+                popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), width, section, currentScreen);
             }
             toggleBatteryPopup();
         }

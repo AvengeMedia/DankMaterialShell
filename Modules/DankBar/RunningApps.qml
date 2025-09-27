@@ -15,7 +15,7 @@ Rectangle {
     property var hoveredItem: null
     property var topBar: null
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     // The visual root for this window
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
     readonly property var sortedToplevels: {
@@ -39,7 +39,7 @@ Rectangle {
 
     width: calculatedWidth
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     visible: windowCount > 0
     clip: false
     color: {
@@ -47,7 +47,7 @@ Rectangle {
             return "transparent";
         }
 
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
@@ -299,7 +299,7 @@ Rectangle {
                                 const screenX = root.parentScreen ? root.parentScreen.x : 0;
                                 const screenY = root.parentScreen ? root.parentScreen.y : 0;
                                 const relativeX = globalPos.x - screenX;
-                                const yPos = Theme.barHeight + SettingsData.topBarSpacing - 7;
+                                const yPos = Theme.barHeight + SettingsData.dankBarSpacing - 7;
                                 windowContextMenuLoader.item.showAt(relativeX, yPos);
                             }
                         }
@@ -311,7 +311,7 @@ Rectangle {
                         tooltipLoader.active = true;
                         if (tooltipLoader.item) {
                             const tooltipY = Theme.barHeight
-                                    + SettingsData.topBarSpacing + Theme.spacingXS;
+                                    + SettingsData.dankBarSpacing + Theme.spacingXS;
                             tooltipLoader.item.showTooltip(
                                         delegateItem.tooltipText, globalPos.x,
                                         tooltipY, root.parentScreen);

@@ -15,28 +15,28 @@ Rectangle {
     property var parentScreen: null
     property real barHeight: 48
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
 
-    width: cpuTempContent.implicitWidth + horizontalPadding * 2
+    width: ramContent.implicitWidth + horizontalPadding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 
-        const baseColor = cpuTempArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
+        const baseColor = ramArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
     }
     Component.onCompleted: {
-        DgopService.addRef(["cpu"]);
+        DgopService.addRef(["memory"]);
     }
     Component.onDestruction: {
-        DgopService.removeRef(["cpu"]);
+        DgopService.removeRef(["memory"]);
     }
 
     MouseArea {
-        id: cpuTempArea
+        id: ramArea
 
         anchors.fill: parent
         hoverEnabled: true
@@ -47,9 +47,9 @@ Rectangle {
                 const currentScreen = parentScreen || Screen;
                 const screenX = currentScreen.x || 0;
                 const relativeX = globalPos.x - screenX;
-                popupTarget.setTriggerPosition(relativeX, barHeight + SettingsData.topBarSpacing + SettingsData.topBarBottomGap - 2 + Theme.popupDistance, width, section, currentScreen);
+                popupTarget.setTriggerPosition(relativeX, SettingsData.getPopupYPosition(barHeight), width, section, currentScreen);
             }
-            DgopService.setSortBy("cpu");
+            DgopService.setSortBy("memory");
             if (root.toggleProcessList) {
                 root.toggleProcessList();
             }
@@ -58,20 +58,20 @@ Rectangle {
     }
 
     Row {
-        id: cpuTempContent
+        id: ramContent
 
         anchors.centerIn: parent
         spacing: 3
 
         DankIcon {
-            name: "memory"
+            name: "developer_board"
             size: Theme.iconSize - 8
             color: {
-                if (DgopService.cpuTemperature > 85) {
+                if (DgopService.memoryUsage > 90) {
                     return Theme.tempDanger;
                 }
 
-                if (DgopService.cpuTemperature > 69) {
+                if (DgopService.memoryUsage > 75) {
                     return Theme.tempWarning;
                 }
 
@@ -82,11 +82,11 @@ Rectangle {
 
         StyledText {
             text: {
-                if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
-                    return "--°";
+                if (DgopService.memoryUsage === undefined || DgopService.memoryUsage === null || DgopService.memoryUsage === 0) {
+                    return "--%";
                 }
 
-                return Math.round(DgopService.cpuTemperature) + "°";
+                return DgopService.memoryUsage.toFixed(0) + "%";
             }
             font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
@@ -96,13 +96,13 @@ Rectangle {
             elide: Text.ElideNone
 
             StyledTextMetrics {
-                id: tempBaseline
+                id: ramBaseline
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
-                text: "100°"
+                text: "100%"
             }
 
-            width: Math.max(tempBaseline.width, paintedWidth)
+            width: Math.max(ramBaseline.width, paintedWidth)
 
             Behavior on width {
                 NumberAnimation {
@@ -113,6 +113,5 @@ Rectangle {
         }
 
     }
-
 
 }

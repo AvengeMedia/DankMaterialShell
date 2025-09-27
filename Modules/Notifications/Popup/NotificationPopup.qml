@@ -76,7 +76,13 @@ PanelWindow {
     color: "transparent"
     implicitWidth: 400
     implicitHeight: 122
-    onScreenYChanged: margins.top = Theme.barHeight - 4 + SettingsData.topBarSpacing + 4 + screenY
+    onScreenYChanged: {
+        if (SettingsData.dankBarAtBottom) {
+            margins.bottom = Theme.barHeight - 4 + SettingsData.dankBarSpacing + 4 + screenY
+        } else {
+            margins.top = Theme.barHeight - 4 + SettingsData.dankBarSpacing + 4 + screenY
+        }
+    }
     onHasValidDataChanged: {
         if (!hasValidData && !exiting && !_isDestroying) {
             forceExit()
@@ -109,12 +115,14 @@ PanelWindow {
     }
 
     anchors {
-        top: true
+        top: !SettingsData.dankBarAtBottom
+        bottom: SettingsData.dankBarAtBottom
         right: true
     }
 
     margins {
-        top: Theme.barHeight - 4 + SettingsData.topBarSpacing + 4
+        top: SettingsData.dankBarAtBottom ? 0 : (Theme.barHeight - 4 + SettingsData.dankBarSpacing + 4)
+        bottom: SettingsData.dankBarAtBottom ? (Theme.barHeight - 4 + SettingsData.dankBarSpacing + 4) : 0
         right: 12
     }
 

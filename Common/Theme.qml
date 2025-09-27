@@ -258,7 +258,7 @@ Singleton {
     property real iconSizeLarge: 32
 
     property real panelTransparency: 0.85
-    property real widgetTransparency: typeof SettingsData !== "undefined" && SettingsData.topBarWidgetTransparency !== undefined ? SettingsData.topBarWidgetTransparency : 1.0
+    property real widgetTransparency: typeof SettingsData !== "undefined" && SettingsData.dankBarWidgetTransparency !== undefined ? SettingsData.dankBarWidgetTransparency : 1.0
     property real popupTransparency: typeof SettingsData !== "undefined" && SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0
 
     function screenTransition() {

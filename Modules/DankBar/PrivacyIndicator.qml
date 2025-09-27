@@ -11,19 +11,19 @@ Rectangle {
     property var popupTarget: null
     property var parentScreen: null
     property real widgetHeight: 30
-    readonly property real horizontalPadding: SettingsData.topBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property bool hasActivePrivacy: PrivacyService.anyPrivacyActive
     readonly property int activeCount: PrivacyService.microphoneActive + PrivacyService.cameraActive + PrivacyService.screensharingActive
     readonly property real contentWidth: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
 
     width: hasActivePrivacy ? (contentWidth + horizontalPadding * 2) : 0
     height: hasActivePrivacy ? widgetHeight : 0
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     visible: hasActivePrivacy
     opacity: hasActivePrivacy ? 1 : 0
     enabled: hasActivePrivacy
     color: {
-        if (SettingsData.topBarNoBackground) {
+        if (SettingsData.dankBarNoBackground) {
             return "transparent";
         }
 

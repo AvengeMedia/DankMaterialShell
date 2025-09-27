@@ -223,9 +223,9 @@ Rectangle {
 
     width: workspaceRow.implicitWidth + padding * 2
     height: widgetHeight
-    radius: SettingsData.topBarNoBackground ? 0 : Theme.cornerRadius
+    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
     color: {
-        if (SettingsData.topBarNoBackground)
+        if (SettingsData.dankBarNoBackground)
             return "transparent"
         const baseColor = Theme.widgetBaseBackgroundColor
         return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency)

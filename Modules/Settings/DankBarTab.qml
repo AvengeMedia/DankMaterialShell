@@ -6,7 +6,7 @@ import qs.Services
 import qs.Widgets
 
 Item {
-    id: topBarTab
+    id: dankBarTab
 
     property var baseWidgetDefinitions: [{
             "id": "launcherButton",
@@ -236,51 +236,51 @@ Item {
 
         var widgets = []
         if (targetSection === "left") {
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         } else if (targetSection === "center") {
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         } else if (targetSection === "right") {
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
             widgets.push(widgetObj)
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
         }
     }
 
     function removeWidgetFromSection(sectionId, widgetIndex) {
         var widgets = []
         if (sectionId === "left") {
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         } else if (sectionId === "center") {
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         } else if (sectionId === "right") {
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets.splice(widgetIndex, 1)
             }
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
         }
     }
 
     function handleItemEnabledChanged(sectionId, itemId, enabled) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
         for (var i = 0; i < widgets.length; i++) {
             var widget = widgets[i]
             var widgetId = typeof widget === "string" ? widget : widget.id
@@ -316,30 +316,30 @@ Item {
             }
         }
         if (sectionId === "left")
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleItemOrderChanged(sectionId, newOrder) {
         if (sectionId === "left")
-            SettingsData.setTopBarLeftWidgets(newOrder)
+            SettingsData.setDankBarLeftWidgets(newOrder)
         else if (sectionId === "center")
-            SettingsData.setTopBarCenterWidgets(newOrder)
+            SettingsData.setDankBarCenterWidgets(newOrder)
         else if (sectionId === "right")
-            SettingsData.setTopBarRightWidgets(newOrder)
+            SettingsData.setDankBarRightWidgets(newOrder)
     }
 
     function handleSpacerSizeChanged(sectionId, widgetIndex, newSize) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
         
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -372,21 +372,21 @@ Item {
         }
         
         if (sectionId === "left")
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleGpuSelectionChanged(sectionId, widgetIndex, selectedGpuIndex) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
 
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -415,21 +415,21 @@ Item {
         }
 
         if (sectionId === "left")
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleDiskMountSelectionChanged(sectionId, widgetIndex, mountPath) {
         var widgets = []
         if (sectionId === "left")
-            widgets = SettingsData.topBarLeftWidgets.slice()
+            widgets = SettingsData.dankBarLeftWidgets.slice()
         else if (sectionId === "center")
-            widgets = SettingsData.topBarCenterWidgets.slice()
+            widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
-            widgets = SettingsData.topBarRightWidgets.slice()
+            widgets = SettingsData.dankBarRightWidgets.slice()
 
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
@@ -461,11 +461,11 @@ Item {
         }
 
         if (sectionId === "left")
-            SettingsData.setTopBarLeftWidgets(widgets)
+            SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
-            SettingsData.setTopBarCenterWidgets(widgets)
+            SettingsData.setDankBarCenterWidgets(widgets)
         else if (sectionId === "right")
-            SettingsData.setTopBarRightWidgets(widgets)
+            SettingsData.setDankBarRightWidgets(widgets)
     }
 
     function handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value) {
@@ -483,11 +483,11 @@ Item {
         var widgets = []
         var widgetData = []
         if (sectionId === "left")
-            widgetData = SettingsData.topBarLeftWidgets || []
+            widgetData = SettingsData.dankBarLeftWidgets || []
         else if (sectionId === "center")
-            widgetData = SettingsData.topBarCenterWidgets || []
+            widgetData = SettingsData.dankBarCenterWidgets || []
         else if (sectionId === "right")
-            widgetData = SettingsData.topBarRightWidgets || []
+            widgetData = SettingsData.dankBarRightWidgets || []
         widgetData.forEach(widget => {
                                var widgetId = typeof widget === "string" ? widget : widget.id
                                var widgetEnabled = typeof widget
@@ -531,23 +531,23 @@ Item {
 
     Component.onCompleted: {
         // Only set defaults if widgets have never been configured (null/undefined, not empty array)
-        if (!SettingsData.topBarLeftWidgets)
-            SettingsData.setTopBarLeftWidgets(defaultLeftWidgets)
+        if (!SettingsData.dankBarLeftWidgets)
+            SettingsData.setDankBarLeftWidgets(defaultLeftWidgets)
 
-        if (!SettingsData.topBarCenterWidgets)
-            SettingsData.setTopBarCenterWidgets(defaultCenterWidgets)
+        if (!SettingsData.dankBarCenterWidgets)
+            SettingsData.setDankBarCenterWidgets(defaultCenterWidgets)
 
-        if (!SettingsData.topBarRightWidgets)
-            SettingsData.setTopBarRightWidgets(defaultRightWidgets)
+        if (!SettingsData.dankBarRightWidgets)
+            SettingsData.setDankBarRightWidgets(defaultRightWidgets)
         const sections = ["left", "center", "right"]
         sections.forEach(sectionId => {
                              var widgets = []
                              if (sectionId === "left")
-                             widgets = SettingsData.topBarLeftWidgets.slice()
+                             widgets = SettingsData.dankBarLeftWidgets.slice()
                              else if (sectionId === "center")
-                             widgets = SettingsData.topBarCenterWidgets.slice()
+                             widgets = SettingsData.dankBarCenterWidgets.slice()
                              else if (sectionId === "right")
-                             widgets = SettingsData.topBarRightWidgets.slice()
+                             widgets = SettingsData.dankBarRightWidgets.slice()
                              var updated = false
                              for (var i = 0; i < widgets.length; i++) {
                                  var widget = widgets[i]
@@ -562,11 +562,11 @@ Item {
                              }
                              if (updated) {
                                  if (sectionId === "left")
-                                 SettingsData.setTopBarLeftWidgets(widgets)
+                                 SettingsData.setDankBarLeftWidgets(widgets)
                                  else if (sectionId === "center")
-                                 SettingsData.setTopBarCenterWidgets(widgets)
+                                 SettingsData.setDankBarCenterWidgets(widgets)
                                  else if (sectionId === "right")
-                                 SettingsData.setTopBarRightWidgets(widgets)
+                                 SettingsData.setDankBarRightWidgets(widgets)
                              }
                          })
     }
@@ -584,10 +584,10 @@ Item {
             width: parent.width
             spacing: Theme.spacingXL
 
-            // TopBar Auto-hide Section
+            // Position Section
             StyledRect {
                 width: parent.width
-                height: topBarAutoHideSection.implicitHeight + Theme.spacingL * 2
+                height: positionSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
@@ -595,7 +595,58 @@ Item {
                 border.width: 0
 
                 Column {
-                    id: topBarAutoHideSection
+                    id: positionSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "vertical_align_center"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: "Position"
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        DankButtonGroup {
+                            id: positionButtonGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            model: ["Top", "Bottom"]
+                            currentIndex: SettingsData.dankBarAtBottom ? 1 : 0
+                            onSelectionChanged: (index, selected) => {
+                                if (selected) {
+                                    SettingsData.setDankBarAtBottom(index === 1)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // DankBar Auto-hide Section
+            StyledRect {
+                width: parent.width
+                height: dankBarAutoHideSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: dankBarAutoHideSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
@@ -638,9 +689,9 @@ Item {
                             id: autoHideToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.topBarAutoHide
+                            checked: SettingsData.dankBarAutoHide
                             onToggled: toggled => {
-                                           return SettingsData.setTopBarAutoHide(
+                                           return SettingsData.setDankBarAutoHide(
                                                toggled)
                                        }
                         }
@@ -690,9 +741,9 @@ Item {
                             id: visibilityToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.topBarVisible
+                            checked: SettingsData.dankBarVisible
                             onToggled: toggled => {
-                                           return SettingsData.setTopBarVisible(
+                                           return SettingsData.setDankBarVisible(
                                                toggled)
                                        }
                         }
@@ -744,9 +795,9 @@ Item {
                             id: overviewToggle
 
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.topBarOpenOnOverview
+                            checked: SettingsData.dankBarOpenOnOverview
                             onToggled: toggled => {
-                                           return SettingsData.setTopBarOpenOnOverview(
+                                           return SettingsData.setDankBarOpenOnOverview(
                                                toggled)
                                        }
                         }
@@ -758,7 +809,7 @@ Item {
             // Spacing
             StyledRect {
                 width: parent.width
-                height: topBarSpacingSection.implicitHeight + Theme.spacingL * 2
+                height: dankBarSpacingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.surfaceContainerHigh
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
@@ -766,7 +817,7 @@ Item {
                 border.width: 0
 
                 Column {
-                    id: topBarSpacingSection
+                    id: dankBarSpacingSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
@@ -797,7 +848,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Top/Left/Right Gaps (0 = edge-to-edge)"
+                            text: "Edge Spacing (0 = edge-to-edge)"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -806,7 +857,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.topBarSpacing
+                            value: SettingsData.dankBarSpacing
                             minimum: 0
                             maximum: 32
                             unit: ""
@@ -814,7 +865,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarSpacing(
+                                                      SettingsData.setDankBarSpacing(
                                                           newValue)
                                                   }
                         }
@@ -825,7 +876,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Bottom Gap (Exclusive Zone)"
+                            text: "Height to Edge Gap (Exclusive Zone)"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -834,7 +885,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.topBarBottomGap
+                            value: SettingsData.dankBarBottomGap
                             minimum: -100
                             maximum: 100
                             unit: ""
@@ -842,7 +893,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarBottomGap(
+                                                      SettingsData.setDankBarBottomGap(
                                                           newValue)
                                                   }
                         }
@@ -862,7 +913,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: SettingsData.topBarInnerPadding
+                            value: SettingsData.dankBarInnerPadding
                             minimum: 0
                             maximum: 24
                             unit: ""
@@ -870,7 +921,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarInnerPadding(
+                                                      SettingsData.setDankBarInnerPadding(
                                                           newValue)
                                                   }
                         }
@@ -881,9 +932,9 @@ Item {
                         width: parent.width
                         text: "Square Corners"
                         description: "Removes rounded corners from bar container."
-                        checked: SettingsData.topBarSquareCorners
+                        checked: SettingsData.dankBarSquareCorners
                         onToggled: checked => {
-                                       SettingsData.setTopBarSquareCorners(
+                                       SettingsData.setDankBarSquareCorners(
                                            checked)
                                    }
                     }
@@ -892,9 +943,9 @@ Item {
                         width: parent.width
                         text: "No Background"
                         description: "Remove widget backgrounds for a minimal look with tighter spacing."
-                        checked: SettingsData.topBarNoBackground
+                        checked: SettingsData.dankBarNoBackground
                         onToggled: checked => {
-                                       SettingsData.setTopBarNoBackground(
+                                       SettingsData.setDankBarNoBackground(
                                            checked)
                                    }
                     }
@@ -903,9 +954,9 @@ Item {
                         width: parent.width
                         text: "Goth Corners"
                         description: "Add curved swooping tips at the bottom of the bar."
-                        checked: SettingsData.topBarGothCornersEnabled
+                        checked: SettingsData.dankBarGothCornersEnabled
                         onToggled: checked => {
-                                       SettingsData.setTopBarGothCornersEnabled(
+                                       SettingsData.setDankBarGothCornersEnabled(
                                            checked)
                                    }
                     }
@@ -996,11 +1047,11 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    SettingsData.setTopBarLeftWidgets(
+                                    SettingsData.setDankBarLeftWidgets(
                                                 defaultLeftWidgets)
-                                    SettingsData.setTopBarCenterWidgets(
+                                    SettingsData.setDankBarCenterWidgets(
                                                 defaultCenterWidgets)
-                                    SettingsData.setTopBarRightWidgets(
+                                    SettingsData.setDankBarRightWidgets(
                                                 defaultRightWidgets)
                                 }
                             }
@@ -1052,29 +1103,29 @@ Item {
                         title: "Left Section"
                         titleIcon: "format_align_left"
                         sectionId: "left"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("left")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("left")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "left", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1096,12 +1147,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1124,29 +1175,29 @@ Item {
                         title: "Center Section"
                         titleIcon: "format_align_center"
                         sectionId: "center"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("center")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("center")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "center", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1168,12 +1219,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1196,29 +1247,29 @@ Item {
                         title: "Right Section"
                         titleIcon: "format_align_right"
                         sectionId: "right"
-                        allWidgets: topBarTab.baseWidgetDefinitions
-                        items: topBarTab.getItemsForSection("right")
+                        allWidgets: dankBarTab.baseWidgetDefinitions
+                        items: dankBarTab.getItemsForSection("right")
                         onItemEnabledChanged: (sectionId, itemId, enabled) => {
-                                                  topBarTab.handleItemEnabledChanged(
+                                                  dankBarTab.handleItemEnabledChanged(
                                                       sectionId,
                                                       itemId, enabled)
                                               }
                         onItemOrderChanged: newOrder => {
-                                                topBarTab.handleItemOrderChanged(
+                                                dankBarTab.handleItemOrderChanged(
                                                     "right", newOrder)
                                             }
                         onAddWidget: sectionId => {
                                          widgetSelectionPopup.allWidgets
-                                         = topBarTab.baseWidgetDefinitions
+                                         = dankBarTab.baseWidgetDefinitions
                                          widgetSelectionPopup.targetSection = sectionId
                                          widgetSelectionPopup.safeOpen()
                                      }
                         onRemoveWidget: (sectionId, widgetIndex) => {
-                                            topBarTab.removeWidgetFromSection(
+                                            dankBarTab.removeWidgetFromSection(
                                                 sectionId, widgetIndex)
                                         }
                         onSpacerSizeChanged: (sectionId, widgetIndex, newSize) => {
-                                                 topBarTab.handleSpacerSizeChanged(
+                                                 dankBarTab.handleSpacerSizeChanged(
                                                      sectionId, widgetIndex, newSize)
                                              }
                         onCompactModeChanged: (widgetId, value) => {
@@ -1240,12 +1291,12 @@ Item {
                                                            handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value)
                                                        }
                         onGpuSelectionChanged: (sectionId, widgetIndex, selectedIndex) => {
-                                                   topBarTab.handleGpuSelectionChanged(
+                                                   dankBarTab.handleGpuSelectionChanged(
                                                        sectionId, widgetIndex,
                                                        selectedIndex)
                                                }
                         onDiskMountSelectionChanged: (sectionId, widgetIndex, mountPath) => {
-                                                         topBarTab.handleDiskMountSelectionChanged(
+                                                         dankBarTab.handleDiskMountSelectionChanged(
                                                              sectionId, widgetIndex, mountPath)
                                                      }
                     }
@@ -1259,7 +1310,7 @@ Item {
 
         anchors.centerIn: parent
         onWidgetSelected: (widgetId, targetSection) => {
-                              topBarTab.addWidgetToSection(widgetId,
+                              dankBarTab.addWidgetToSection(widgetId,
                                                            targetSection)
                           }
     }

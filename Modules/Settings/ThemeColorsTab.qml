@@ -764,7 +764,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Top Bar Transparency"
+                            text: "Dank Bar Transparency"
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -774,7 +774,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.topBarTransparency * 100)
+                                       SettingsData.dankBarTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -782,7 +782,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarTransparency(
+                                                      SettingsData.setDankBarTransparency(
                                                           newValue / 100)
                                                   }
                         }
@@ -798,7 +798,7 @@ Item {
 
                             StyledText {
                                 id: transparencyLabel
-                                text: "Top Bar Widget Transparency"
+                                text: "Dank Bar Widget Transparency"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium
@@ -843,7 +843,7 @@ Item {
                             width: parent.width
                             height: 24
                             value: Math.round(
-                                       SettingsData.topBarWidgetTransparency * 100)
+                                       SettingsData.dankBarWidgetTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -851,7 +851,7 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.surfaceContainerHigh
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setTopBarWidgetTransparency(
+                                                      SettingsData.setDankBarWidgetTransparency(
                                                           newValue / 100)
                                                   }
                         }
