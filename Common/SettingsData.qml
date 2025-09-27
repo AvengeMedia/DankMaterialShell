@@ -117,6 +117,7 @@ Singleton {
     property bool showDock: false
     property bool dockAutoHide: false
     property bool dockGroupByApp: false
+    property bool dockOpenOnOverview: false
     property real cornerRadius: 12
     property bool notificationOverlayEnabled: false
     property bool topBarAutoHide: false
@@ -312,6 +313,7 @@ Singleton {
                 notificationOverlayEnabled = settings.notificationOverlayEnabled !== undefined ? settings.notificationOverlayEnabled : false
                 topBarAutoHide = settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false
                 topBarOpenOnOverview = settings.topBarOpenOnOverview !== undefined ? settings.topBarOpenOnOverview : false
+                dockOpenOnOverview = settings.dockOpenOnOverview !== undefined ? settings.dockOpenOnOverview : false
                 topBarVisible = settings.topBarVisible !== undefined ? settings.topBarVisible : true
                 notificationTimeoutLow = settings.notificationTimeoutLow !== undefined ? settings.notificationTimeoutLow : 5000
                 notificationTimeoutNormal = settings.notificationTimeoutNormal !== undefined ? settings.notificationTimeoutNormal : 5000
@@ -421,6 +423,7 @@ Singleton {
                                                 "showDock": showDock,
                                                 "dockAutoHide": dockAutoHide,
                                                 "dockGroupByApp": dockGroupByApp,
+                                                "dockOpenOnOverview": dockOpenOnOverview,
                                                 "cornerRadius": cornerRadius,
                                                 "notificationOverlayEnabled": notificationOverlayEnabled,
                                                 "topBarAutoHide": topBarAutoHide,
@@ -961,6 +964,11 @@ Singleton {
 
     function setDockGroupByApp(enabled) {
         dockGroupByApp = enabled
+        saveSettings()
+    }
+
+    function setdockOpenOnOverview(enabled) {
+        dockOpenOnOverview = enabled
         saveSettings()
     }
 

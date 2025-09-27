@@ -154,6 +154,78 @@ Item {
                 }
             }
 
+            // Show Dock in Overview
+            StyledRect {
+                width: parent.width
+                height: overviewSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+                visible: SettingsData.showDock
+                opacity: visible ? 1 : 0
+
+                Column {
+                    id: overviewSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "visibility_off"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: parent.width - Theme.iconSize - Theme.spacingM
+                                   - overviewToggle.width - Theme.spacingM
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                text: "Show on Overview"
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                            }
+
+                            StyledText {
+                                text: "Always show the dock when niri's overview is open"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
+                        }
+
+                        DankToggle {
+                            id: overviewToggle
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            checked: SettingsData.dockOpenOnOverview
+                            onToggled: checked => {
+                                           SettingsData.setdockOpenOnOverview(checked)
+                                       }
+                        }
+                    }
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+
             // Group by App
             StyledRect {
                 width: parent.width

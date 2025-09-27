@@ -31,7 +31,12 @@ PanelWindow {
         const fullscreenApps = ["vlc", "mpv", "kodi", "steam", "lutris", "wine", "dosbox"]
         return fullscreenApps.some(app => activeWindow.appId && activeWindow.appId.toLowerCase().includes(app))
     }
-    property bool reveal: (!autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen) && !windowIsFullscreen
+    property bool reveal: {
+        if (CompositorService.isNiri && NiriService.inOverview) {
+            return SettingsData.dockOpenOnOverview
+        }
+        return (!autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen) && !windowIsFullscreen
+    }
 
     Connections {
         target: SettingsData
