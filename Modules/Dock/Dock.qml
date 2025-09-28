@@ -119,29 +119,12 @@ PanelWindow {
 
     exclusiveZone: {
         if (!SettingsData.showDock || autoHide) return -1
-        if (needsBarSpacing) return -1  // Let DankBar handle exclusiveZone when both are on same side
+        if (needsBarSpacing) return -1
         return px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
     }
 
-    Item {
-        id: inputMask
-        anchors {
-            top: SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top
-            bottom: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined
-            left: parent.left
-            right: parent.right
-        }
-        height: {
-            const base = px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
-            if (autoHide && !reveal) return 1
-            if (autoHide && reveal) return px(58 + SettingsData.dockSpacing) + 3  // Content height + buffer when revealed
-            if (needsBarSpacing) return base + px(positionSpacing)
-            return base
-        }
-    }
-
     mask: Region {
-        item: inputMask
+        item: dockMouseArea
     }
 
     Item {
@@ -167,74 +150,89 @@ PanelWindow {
             property real currentScreen: modelData ? modelData : dock.screen
             property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
             property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
-            property real baseHeight: px(58 + SettingsData.dockSpacing)
 
-            y: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height : 0
-            height: autoHide ? (reveal ? px(58 + SettingsData.dockSpacing) + 3 : 1) : baseHeight
+            height: dock.reveal ? px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 20
+            width: dock.reveal ? Math.min(dockBackground.implicitWidth + 32, maxDockWidth) : Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
             anchors {
-                left: parent.left
-                right: parent.right
+                top: SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top
+                bottom: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined
+                horizontalCenter: parent.horizontalCenter
             }
             hoverEnabled: true
             acceptedButtons: Qt.NoButton
-            enabled: true
 
-            Behavior on y {
+            Behavior on height {
                 NumberAnimation {
                     duration: 200
                     easing.type: Easing.OutCubic
                 }
             }
 
+
             Item {
-            id: dockContainer
-            anchors.fill: parent
+                id: dockContainer
+                anchors.fill: parent
 
-            transform: Translate {
-                id: dockSlide
-                y: dock.reveal ? 0 : px(SettingsData.dockPosition === SettingsData.Position.Bottom ? 58 : -58)
+                transform: Translate {
+                    id: dockSlide
+                    y: {
+                        if (dock.reveal) return 0
+                        if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
+                            return 60
+                        } else {
+                            return -60
+                        }
+                    }
 
-                Behavior on y {
-                    NumberAnimation {
-                        duration: 200
-                        easing.type: Easing.OutCubic
+                    Behavior on y {
+                        NumberAnimation {
+                            duration: 200
+                            easing.type: Easing.OutCubic
+                        }
                     }
                 }
-            }
-
-            Rectangle {
-                id: dockBackground
-                objectName: "dockBackground"
-                anchors.centerIn: parent
-
-                implicitWidth: px(dockApps.implicitWidth + (SettingsData.dockSpacing * 2))
-                implicitHeight: px(dockApps.implicitHeight + (SettingsData.dockSpacing * 2))
-
-                color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, backgroundTransparency)
-                radius: Theme.cornerRadius
-                border.width: 1
-                border.color: Theme.outlineMedium
-                layer.enabled: true
 
                 Rectangle {
-                    anchors.fill: parent
-                    color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
-                    radius: parent.radius
+                    id: dockBackground
+                    objectName: "dockBackground"
+                    anchors {
+                        top: SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top
+                        bottom: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                    anchors.topMargin: SettingsData.dockPosition === SettingsData.Position.Bottom ? 0 : barSpacing + 4
+                    anchors.bottomMargin: SettingsData.dockPosition === SettingsData.Position.Bottom ? barSpacing + 1 : 0
+
+                    implicitWidth: dockApps.implicitWidth + SettingsData.dockSpacing * 2
+                    implicitHeight: dockApps.implicitHeight + SettingsData.dockSpacing * 2
+                    width: implicitWidth
+                    height: implicitHeight
+
+                    color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, backgroundTransparency)
+                    radius: Theme.cornerRadius
+                    border.width: 1
+                    border.color: Theme.outlineMedium
+                    layer.enabled: true
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
+                        radius: parent.radius
+                    }
+
+                    DockApps {
+                        id: dockApps
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.topMargin: SettingsData.dockSpacing
+                        anchors.bottomMargin: SettingsData.dockSpacing
+
+                        contextMenu: dock.contextMenu
+                        groupByApp: dock.groupByApp
+                    }
                 }
-
-                DockApps {
-                    id: dockApps
-
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.topMargin: SettingsData.dockSpacing
-                    anchors.bottomMargin: SettingsData.dockSpacing
-
-                    contextMenu: dock.contextMenu
-                    groupByApp: dock.groupByApp
-                }
-            }
 
             Rectangle {
                 id: appTooltip
@@ -275,7 +273,7 @@ PanelWindow {
                 border.width: 1
                 border.color: Theme.outlineMedium
 
-                y: !isDockAtTop ? -height - Theme.spacingS : parent.height + Theme.spacingS
+                y: SettingsData.dockPosition === SettingsData.Position.Bottom ? -height - Theme.spacingS : parent.height + Theme.spacingS
                 x: hoveredButton ? hoveredButton.mapToItem(dockContainer, hoveredButton.width / 2, 0).x - width / 2 : 0
 
                 StyledText {
