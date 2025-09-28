@@ -37,6 +37,8 @@ PanelWindow {
 
     readonly property real dockMargin: SettingsData.dockSpacing
     readonly property real positionSpacing: barSpacing + SettingsData.dockBottomGap
+    readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
+    function px(v) { return Math.round(v * _dpr) / _dpr }
 
     function forceDockRefresh() {
         const container = dockContainer
@@ -103,19 +105,31 @@ PanelWindow {
     exclusiveZone: {
         if (!SettingsData.showDock || autoHide) return -1
         if (needsBarSpacing) return -1  // Let DankBar handle exclusiveZone when both are on same side
-        return 58 + SettingsData.dockSpacing + SettingsData.dockBottomGap
-    }
-
-    mask: Region {
-        item: dockMouseArea
+        return px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
     }
 
     Item {
+        id: inputMask
+        anchors {
+            top: SettingsData.dockAtBottom ? undefined : parent.top
+            bottom: SettingsData.dockAtBottom ? parent.bottom : undefined
+            left: parent.left
+            right: parent.right
+        }
+        height: {
+            const base = px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
+            if (needsBarSpacing) return base + px(positionSpacing)
+            return base
+        }
+    }
+
+    mask: Region {
+        item: inputMask
+    }
+
+    Item {
+        id: dockCore
         anchors.fill: parent
-        anchors.leftMargin: 0
-        anchors.rightMargin: 0
-        anchors.topMargin: SettingsData.dockAtBottom ? 0 : (needsBarSpacing ? positionSpacing : SettingsData.dockBottomGap)
-        anchors.bottomMargin: SettingsData.dockAtBottom ? (needsBarSpacing ? positionSpacing : SettingsData.dockBottomGap) : 0
 
         MouseArea {
             id: dockMouseArea
@@ -123,12 +137,15 @@ PanelWindow {
             property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
             property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
 
-            implicitHeight: dock.reveal ? 58 : 20
-            implicitWidth: dockBackground.implicitWidth
-            anchors.centerIn: parent
+            y: SettingsData.dockAtBottom ? parent.height - height : 0
+            height: px(58 + SettingsData.dockSpacing)
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
             hoverEnabled: true
 
-            Behavior on height {
+            Behavior on y {
                 NumberAnimation {
                     duration: 200
                     easing.type: Easing.OutCubic
@@ -141,7 +158,7 @@ PanelWindow {
 
             transform: Translate {
                 id: dockSlide
-                y: dock.reveal ? 0 : (!isDockAtTop ? 50 : -50)
+                y: dock.reveal ? 0 : px(SettingsData.dockAtBottom ? 58 : -58)
 
                 Behavior on y {
                     NumberAnimation {
@@ -156,8 +173,8 @@ PanelWindow {
                 objectName: "dockBackground"
                 anchors.centerIn: parent
 
-                implicitWidth: dockApps.implicitWidth + (SettingsData.dockSpacing * 2)
-                implicitHeight: dockApps.implicitHeight + (SettingsData.dockSpacing * 2)
+                implicitWidth: px(dockApps.implicitWidth + (SettingsData.dockSpacing * 2))
+                implicitHeight: px(dockApps.implicitHeight + (SettingsData.dockSpacing * 2))
 
                 color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, backgroundTransparency)
                 radius: Theme.cornerRadius
@@ -216,8 +233,8 @@ PanelWindow {
                 property string tooltipText: hoveredButton ? hoveredButton.tooltipText : ""
 
                 visible: hoveredButton !== null && tooltipText !== ""
-                width: tooltipLabel.implicitWidth + 24
-                height: tooltipLabel.implicitHeight + 12
+                width: px(tooltipLabel.implicitWidth + 24)
+                height: px(tooltipLabel.implicitHeight + 12)
 
                 color: Theme.surfaceContainer
                 radius: Theme.cornerRadius

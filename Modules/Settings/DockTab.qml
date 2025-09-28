@@ -19,6 +19,63 @@ Item {
             width: parent.width
             spacing: Theme.spacingXL
 
+            // Dock Position
+            StyledRect {
+                width: parent.width
+                height: dockPositionSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: dockPositionSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "swap_vert"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            id: positionText
+                            text: "Dock Position"
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item {
+                            width: parent.width - Theme.iconSize - Theme.spacingM - positionText.width - positionButtonGroup.width - Theme.spacingM * 2
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        DankButtonGroup {
+                            id: positionButtonGroup
+                            anchors.verticalCenter: parent.verticalCenter
+                            model: ["Top", "Bottom"]
+                            currentIndex: SettingsData.dockAtBottom ? 1 : 0
+                            onSelectionChanged: (index, selected) => {
+                                if (selected) {
+                                    SettingsData.setDockAtBottom(index === 1)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Enable Dock
             StyledRect {
                 width: parent.width
@@ -78,72 +135,6 @@ Item {
                                            SettingsData.setShowDock(checked)
                                        }
                         }
-                    }
-                }
-            }
-
-            // Dock Position
-            StyledRect {
-                width: parent.width
-                height: dockPositionSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
-                visible: SettingsData.showDock
-                opacity: visible ? 1 : 0
-
-                Column {
-                    id: dockPositionSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "swap_vert"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            id: positionText
-                            text: "Dock Position"
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - positionText.width - positionButtonGroup.width - Theme.spacingM * 2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankButtonGroup {
-                            id: positionButtonGroup
-                            anchors.verticalCenter: parent.verticalCenter
-                            model: ["Top", "Bottom"]
-                            currentIndex: SettingsData.dockAtBottom ? 1 : 0
-                            onSelectionChanged: (index, selected) => {
-                                if (selected) {
-                                    SettingsData.setDockAtBottom(index === 1)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
                     }
                 }
             }
