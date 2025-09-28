@@ -35,7 +35,7 @@ Item {
 
     Row {
         id: row
-        spacing: 2
+        spacing: 8
         anchors.centerIn: parent
         height: 40
 

@@ -119,6 +119,9 @@ Singleton {
     property bool dockAutoHide: false
     property bool dockGroupByApp: false
     property bool dockOpenOnOverview: false
+    property bool dockAtBottom: true
+    property real dockSpacing: 4
+    property real dockBottomGap: 0
     property real cornerRadius: 12
     property bool notificationOverlayEnabled: false
     property bool dankBarAutoHide: false
@@ -146,6 +149,7 @@ Singleton {
     readonly property string _configDir: Paths.strip(_configUrl)
 
     signal forceDankBarLayoutRefresh
+    signal forceDockLayoutRefresh
     signal widgetDataChanged
     signal workspaceIconsUpdated
 
@@ -312,6 +316,9 @@ Singleton {
                 showDock = settings.showDock !== undefined ? settings.showDock : false
                 dockAutoHide = settings.dockAutoHide !== undefined ? settings.dockAutoHide : false
                 dockGroupByApp = settings.dockGroupByApp !== undefined ? settings.dockGroupByApp : false
+                dockAtBottom = settings.dockAtBottom !== undefined ? settings.dockAtBottom : true
+                dockSpacing = settings.dockSpacing !== undefined ? settings.dockSpacing : 4
+                dockBottomGap = settings.dockBottomGap !== undefined ? settings.dockBottomGap : 0
                 cornerRadius = settings.cornerRadius !== undefined ? settings.cornerRadius : 12
                 notificationOverlayEnabled = settings.notificationOverlayEnabled !== undefined ? settings.notificationOverlayEnabled : false
                 dankBarAutoHide = settings.dankBarAutoHide !== undefined ? settings.dankBarAutoHide : (settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false)
@@ -428,6 +435,9 @@ Singleton {
                                                 "dockAutoHide": dockAutoHide,
                                                 "dockGroupByApp": dockGroupByApp,
                                                 "dockOpenOnOverview": dockOpenOnOverview,
+                                                "dockAtBottom": dockAtBottom,
+                                                "dockSpacing": dockSpacing,
+                                                "dockBottomGap": dockBottomGap,
                                                 "cornerRadius": cornerRadius,
                                                 "notificationOverlayEnabled": notificationOverlayEnabled,
                                                 "dankBarAutoHide": dankBarAutoHide,
@@ -959,7 +969,7 @@ Singleton {
 
     function setShowDock(enabled) {
         showDock = enabled
-        if (enabled && dankBarAtBottom) {
+        if (enabled && dankBarAtBottom && dockAtBottom) {
             setDankBarAtBottom(false)
         }
         saveSettings()
@@ -1057,9 +1067,36 @@ Singleton {
 
     function setDankBarAtBottom(enabled) {
         dankBarAtBottom = enabled
-        if (enabled && showDock) {
-            setShowDock(false)
+        if (enabled && showDock && dockAtBottom) {
+            setDockAtBottom(false)
         }
+        if (!enabled && showDock && !dockAtBottom) {
+            setDockAtBottom(true)
+        }
+        saveSettings()
+    }
+
+    function setDockAtBottom(enabled) {
+        dockAtBottom = enabled
+        if (enabled && dankBarAtBottom && showDock) {
+            setDankBarAtBottom(false)
+        }
+        if (!enabled && !dankBarAtBottom && showDock) {
+            setDankBarAtBottom(true)
+        }
+        saveSettings()
+        Qt.callLater(() => forceDockLayoutRefresh())
+    }
+    function setDockSpacing(spacing) {
+        dockSpacing = spacing
+        saveSettings()
+    }
+    function setDockBottomGap(gap) {
+        dockBottomGap = gap
+        saveSettings()
+    }
+    function setDockOpenOnOverview(enabled) {
+        dockOpenOnOverview = enabled
         saveSettings()
     }
 

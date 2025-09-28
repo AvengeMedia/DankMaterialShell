@@ -7,20 +7,69 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
+pragma ComponentBehavior: Bound
+
 PanelWindow {
     id: dock
 
     WlrLayershell.namespace: "quickshell:dock"
 
-    WlrLayershell.layer: WlrLayershell.Top
-    WlrLayershell.exclusiveZone: -1
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+    anchors {
+        top: !SettingsData.dockAtBottom
+        bottom: SettingsData.dockAtBottom
+        left: true
+        right: true
+    }
 
     property var modelData
     property var contextMenu
     property bool autoHide: SettingsData.dockAutoHide
     property real backgroundTransparency: SettingsData.dockTransparency
     property bool groupByApp: SettingsData.dockGroupByApp
+
+    readonly property bool isDockAtTop: !SettingsData.dockAtBottom
+    readonly property bool isDankBarAtTop: !SettingsData.dankBarAtBottom
+    readonly property bool isDankBarVisible: SettingsData.dankBarVisible
+    readonly property bool needsBarSpacing: isDankBarVisible && (isDockAtTop === isDankBarAtTop)
+    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
+    readonly property real effectiveBarHeight: Math.max(widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+    readonly property real barSpacing: needsBarSpacing ? (SettingsData.dankBarSpacing + effectiveBarHeight + SettingsData.dankBarBottomGap) : 0
+
+    readonly property real dockMargin: SettingsData.dockSpacing
+    readonly property real positionSpacing: barSpacing + SettingsData.dockBottomGap
+
+    function forceDockRefresh() {
+        const container = dockContainer
+        if (container) {
+            container.visible = false
+            Qt.callLater(() => {
+                container.visible = true
+            })
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onDockAtBottomChanged() {
+            Qt.callLater(() => {
+                forceDockRefresh()
+                // Force WlrLayershell refresh
+                if (dock.WlrLayershell) {
+                    dock.WlrLayershell.layer = dock.WlrLayershell.layer
+                }
+            })
+        }
+    }
+
+    Component.onCompleted: {
+        if (SettingsData.forceDockLayoutRefresh) {
+            SettingsData.forceDockLayoutRefresh.connect(() => {
+                Qt.callLater(() => {
+                    forceDockRefresh()
+                })
+            })
+        }
+    }
 
     property bool contextMenuOpen: (contextMenu && contextMenu.visible && contextMenu.screen === modelData)
     property bool windowIsFullscreen: {
@@ -38,6 +87,7 @@ PanelWindow {
         return (!autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen) && !windowIsFullscreen
     }
 
+
     Connections {
         target: SettingsData
         function onDockTransparencyChanged() {
@@ -49,52 +99,49 @@ PanelWindow {
     visible: SettingsData.showDock
     color: "transparent"
 
-    anchors {
-        bottom: true
-        left: true
-        right: true
-    }
 
-    margins {
-        left: 0
-        right: 0
+    exclusiveZone: {
+        if (!SettingsData.showDock || autoHide) return -1
+        if (needsBarSpacing) return -1  // Let DankBar handle exclusiveZone when both are on same side
+        return 58 + SettingsData.dockSpacing + SettingsData.dockBottomGap
     }
-
-    implicitHeight: 100
-    exclusiveZone: autoHide ? -1 : 65 - 16
 
     mask: Region {
         item: dockMouseArea
     }
 
-    MouseArea {
-        id: dockMouseArea
-        property real currentScreen: modelData ? modelData : dock.screen
-        property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
-        property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
+    Item {
+        anchors.fill: parent
+        anchors.leftMargin: 0
+        anchors.rightMargin: 0
+        anchors.topMargin: SettingsData.dockAtBottom ? 0 : (needsBarSpacing ? positionSpacing : SettingsData.dockBottomGap)
+        anchors.bottomMargin: SettingsData.dockAtBottom ? (needsBarSpacing ? positionSpacing : SettingsData.dockBottomGap) : 0
 
-        height: dock.reveal ? 65 : 20
-        width: dock.reveal ? Math.min(dockBackground.width + 32, maxDockWidth) : Math.min(Math.max(dockBackground.width + 64, 200), screenWidth * 0.5)
-        anchors {
-            bottom: parent.bottom
-            horizontalCenter: parent.horizontalCenter
-        }
-        hoverEnabled: true
+        MouseArea {
+            id: dockMouseArea
+            property real currentScreen: modelData ? modelData : dock.screen
+            property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
+            property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
 
-        Behavior on height {
-            NumberAnimation {
-                duration: 200
-                easing.type: Easing.OutCubic
+            implicitHeight: dock.reveal ? 58 : 20
+            implicitWidth: dockBackground.implicitWidth
+            anchors.centerIn: parent
+            hoverEnabled: true
+
+            Behavior on height {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
             }
-        }
 
-        Item {
+            Item {
             id: dockContainer
             anchors.fill: parent
 
             transform: Translate {
                 id: dockSlide
-                y: dock.reveal ? 0 : 60
+                y: dock.reveal ? 0 : (!isDockAtTop ? 50 : -50)
 
                 Behavior on y {
                     NumberAnimation {
@@ -107,17 +154,10 @@ PanelWindow {
             Rectangle {
                 id: dockBackground
                 objectName: "dockBackground"
-                anchors {
-                    top: parent.top
-                    bottom: parent.bottom
-                    horizontalCenter: parent.horizontalCenter
-                }
+                anchors.centerIn: parent
 
-                width: dockApps.implicitWidth + 12
-                height: parent.height - 8
-
-                anchors.topMargin: 4
-                anchors.bottomMargin: 1
+                implicitWidth: dockApps.implicitWidth + (SettingsData.dockSpacing * 2)
+                implicitHeight: dockApps.implicitHeight + (SettingsData.dockSpacing * 2)
 
                 color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, backgroundTransparency)
                 radius: Theme.cornerRadius
@@ -137,8 +177,8 @@ PanelWindow {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.topMargin: 4
-                    anchors.bottomMargin: 4
+                    anchors.topMargin: SettingsData.dockSpacing
+                    anchors.bottomMargin: SettingsData.dockSpacing
 
                     contextMenu: dock.contextMenu
                     groupByApp: dock.groupByApp
@@ -184,7 +224,7 @@ PanelWindow {
                 border.width: 1
                 border.color: Theme.outlineMedium
 
-                y: -height - 8
+                y: !isDockAtTop ? -height - Theme.spacingS : parent.height + Theme.spacingS
                 x: hoveredButton ? hoveredButton.mapToItem(dockContainer, hoveredButton.width / 2, 0).x - width / 2 : 0
 
                 StyledText {
@@ -195,6 +235,7 @@ PanelWindow {
                     color: Theme.surfaceText
                 }
             }
+        }
         }
     }
 }
