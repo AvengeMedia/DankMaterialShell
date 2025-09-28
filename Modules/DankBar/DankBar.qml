@@ -26,7 +26,7 @@ PanelWindow {
     property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
     property real wingtipsRadius: Theme.cornerRadius
     readonly property real _wingR: Math.max(0, wingtipsRadius)
-    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
+    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, dankBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
     readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
     function px(v) { return Math.round(v * _dpr) / _dpr }
 
@@ -140,7 +140,7 @@ PanelWindow {
         right: true
     }
 
-    exclusiveZone: (!SettingsData.dankBarVisible || topBarCore.autoHide) ? -1 : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap)
+    exclusiveZone: (!SettingsData.dankBarVisible || dankBarCore.autoHide) ? -1 : (root.effectiveBarHeight + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap)
 
     Item {
         id: inputMask
@@ -152,7 +152,8 @@ PanelWindow {
         }
         height: {
             const base = px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
-            if (topBarCore.autoHide && !topBarCore.reveal) return 1
+            if (dankBarCore.autoHide && !dankBarCore.reveal) return 1
+            if (dankBarCore.autoHide && dankBarCore.reveal) return px(root.effectiveBarHeight) + 3  // Content height + buffer when revealed
             if (CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview) return base
             return SettingsData.dankBarVisible ? base : 0
         }
@@ -164,7 +165,7 @@ PanelWindow {
 
 
     Item {
-        id: topBarCore
+        id: dankBarCore
         anchors.fill: parent
 
         property real backgroundTransparency: SettingsData.dankBarTransparency
@@ -175,7 +176,7 @@ PanelWindow {
             id: revealHold
             interval: 250
             repeat: false
-            onTriggered: topBarCore.revealSticky = false
+            onTriggered: dankBarCore.revealSticky = false
         }
 
         property bool reveal: {
@@ -231,7 +232,7 @@ PanelWindow {
 
         Connections {
             function onDankBarTransparencyChanged() {
-                topBarCore.backgroundTransparency = SettingsData.dankBarTransparency
+                dankBarCore.backgroundTransparency = SettingsData.dankBarTransparency
             }
 
             target: SettingsData
@@ -241,10 +242,10 @@ PanelWindow {
             target: topBarMouseArea
             function onContainsMouseChanged() {
                 if (topBarMouseArea.containsMouse) {
-                    topBarCore.revealSticky = true
+                    dankBarCore.revealSticky = true
                     revealHold.stop()
                 } else {
-                    if (topBarCore.autoHide && !topBarCore.hasActivePopout) {
+                    if (dankBarCore.autoHide && !dankBarCore.hasActivePopout) {
                         revealHold.restart()
                     }
                 }
@@ -261,7 +262,7 @@ PanelWindow {
         MouseArea {
             id: topBarMouseArea
             y: SettingsData.dankBarAtBottom ? parent.height - height : 0
-            height: px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
+            height: dankBarCore.autoHide ? (dankBarCore.reveal ? px(root.effectiveBarHeight) + 3 : 1) : px(root.effectiveBarHeight + SettingsData.dankBarSpacing)
             anchors {
                 left: parent.left
                 right: parent.right
@@ -276,7 +277,7 @@ PanelWindow {
 
                 transform: Translate {
                     id: topBarSlide
-                    y: px(topBarCore.reveal ? 0 : (SettingsData.dankBarAtBottom ? root.implicitHeight : -root.implicitHeight))
+                    y: px(dankBarCore.reveal ? 0 : (SettingsData.dankBarAtBottom ? root.implicitHeight : -root.implicitHeight))
 
                     Behavior on y {
                         NumberAnimation {
@@ -1260,7 +1261,7 @@ PanelWindow {
                             id: notepadButtonComponent
 
                             NotepadButton {
-                                property var notepadInstance: topBarCore.notepadInstance
+                                property var notepadInstance: dankBarCore.notepadInstance
                                 isActive: notepadInstance?.isVisible ?? false
                                 widgetHeight: root.widgetHeight
                                 barHeight: root.effectiveBarHeight

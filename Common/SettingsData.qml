@@ -12,6 +12,13 @@ import qs.Services
 Singleton {
     id: root
 
+    enum Position {
+        Top,
+        Bottom,
+        Left,
+        Right
+    }
+
     // Theme settings
     property string currentThemeName: "blue"
     property string customThemeFile: ""
@@ -119,7 +126,7 @@ Singleton {
     property bool dockAutoHide: false
     property bool dockGroupByApp: false
     property bool dockOpenOnOverview: false
-    property bool dockAtBottom: true
+    property int dockPosition: SettingsData.Position.Bottom
     property real dockSpacing: 4
     property real dockBottomGap: 0
     property real cornerRadius: 12
@@ -316,7 +323,7 @@ Singleton {
                 showDock = settings.showDock !== undefined ? settings.showDock : false
                 dockAutoHide = settings.dockAutoHide !== undefined ? settings.dockAutoHide : false
                 dockGroupByApp = settings.dockGroupByApp !== undefined ? settings.dockGroupByApp : false
-                dockAtBottom = settings.dockAtBottom !== undefined ? settings.dockAtBottom : true
+                dockPosition = settings.dockPosition !== undefined ? settings.dockPosition : SettingsData.Position.Bottom
                 dockSpacing = settings.dockSpacing !== undefined ? settings.dockSpacing : 4
                 dockBottomGap = settings.dockBottomGap !== undefined ? settings.dockBottomGap : 0
                 cornerRadius = settings.cornerRadius !== undefined ? settings.cornerRadius : 12
@@ -435,7 +442,7 @@ Singleton {
                                                 "dockAutoHide": dockAutoHide,
                                                 "dockGroupByApp": dockGroupByApp,
                                                 "dockOpenOnOverview": dockOpenOnOverview,
-                                                "dockAtBottom": dockAtBottom,
+                                                "dockPosition": dockPosition,
                                                 "dockSpacing": dockSpacing,
                                                 "dockBottomGap": dockBottomGap,
                                                 "cornerRadius": cornerRadius,
@@ -969,7 +976,7 @@ Singleton {
 
     function setShowDock(enabled) {
         showDock = enabled
-        if (enabled && dankBarAtBottom && dockAtBottom) {
+        if (enabled && dankBarAtBottom && dockPosition === SettingsData.Position.Bottom) {
             setDankBarAtBottom(false)
         }
         saveSettings()
@@ -1067,21 +1074,21 @@ Singleton {
 
     function setDankBarAtBottom(enabled) {
         dankBarAtBottom = enabled
-        if (enabled && showDock && dockAtBottom) {
-            setDockAtBottom(false)
+        if (enabled && showDock && dockPosition === SettingsData.Position.Bottom) {
+            setDockPosition(SettingsData.Position.Top)
         }
-        if (!enabled && showDock && !dockAtBottom) {
-            setDockAtBottom(true)
+        if (!enabled && showDock && dockPosition === SettingsData.Position.Top) {
+            setDockPosition(SettingsData.Position.Bottom)
         }
         saveSettings()
     }
 
-    function setDockAtBottom(enabled) {
-        dockAtBottom = enabled
-        if (enabled && dankBarAtBottom && showDock) {
+    function setDockPosition(position) {
+        dockPosition = position
+        if (position === SettingsData.Position.Bottom && dankBarAtBottom && showDock) {
             setDankBarAtBottom(false)
         }
-        if (!enabled && !dankBarAtBottom && showDock) {
+        if (position === SettingsData.Position.Top && !dankBarAtBottom && showDock) {
             setDankBarAtBottom(true)
         }
         saveSettings()

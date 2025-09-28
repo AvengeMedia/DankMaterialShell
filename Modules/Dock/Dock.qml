@@ -15,8 +15,8 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell:dock"
 
     anchors {
-        top: !SettingsData.dockAtBottom
-        bottom: SettingsData.dockAtBottom
+        top: SettingsData.dockPosition === SettingsData.Position.Top
+        bottom: SettingsData.dockPosition === SettingsData.Position.Bottom
         left: true
         right: true
     }
@@ -27,7 +27,7 @@ PanelWindow {
     property real backgroundTransparency: SettingsData.dockTransparency
     property bool groupByApp: SettingsData.dockGroupByApp
 
-    readonly property bool isDockAtTop: !SettingsData.dockAtBottom
+    readonly property bool isDockAtTop: SettingsData.dockPosition === SettingsData.Position.Top
     readonly property bool isDankBarAtTop: !SettingsData.dankBarAtBottom
     readonly property bool isDankBarVisible: SettingsData.dankBarVisible
     readonly property bool needsBarSpacing: isDankBarVisible && (isDockAtTop === isDankBarAtTop)
@@ -52,7 +52,7 @@ PanelWindow {
 
     Connections {
         target: SettingsData
-        function onDockAtBottomChanged() {
+        function onDockPositionChanged() {
             Qt.callLater(() => {
                 forceDockRefresh()
                 // Force WlrLayershell refresh
@@ -82,13 +82,28 @@ PanelWindow {
         const fullscreenApps = ["vlc", "mpv", "kodi", "steam", "lutris", "wine", "dosbox"]
         return fullscreenApps.some(app => activeWindow.appId && activeWindow.appId.toLowerCase().includes(app))
     }
+    property bool revealSticky: false
+
+    Timer {
+        id: revealHold
+        interval: 250
+        repeat: false
+        onTriggered: dock.revealSticky = false
+    }
+
     property bool reveal: {
         if (CompositorService.isNiri && NiriService.inOverview) {
             return SettingsData.dockOpenOnOverview
         }
-        return (!autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen) && !windowIsFullscreen
+        return (!autoHide || dockMouseArea.containsMouse || dockApps.requestDockShow || contextMenuOpen || revealSticky) && !windowIsFullscreen
     }
 
+    onContextMenuOpenChanged: {
+        if (!contextMenuOpen && autoHide && !dockMouseArea.containsMouse) {
+            revealSticky = true
+            revealHold.restart()
+        }
+    }
 
     Connections {
         target: SettingsData
@@ -111,13 +126,15 @@ PanelWindow {
     Item {
         id: inputMask
         anchors {
-            top: SettingsData.dockAtBottom ? undefined : parent.top
-            bottom: SettingsData.dockAtBottom ? parent.bottom : undefined
+            top: SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top
+            bottom: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined
             left: parent.left
             right: parent.right
         }
         height: {
             const base = px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
+            if (autoHide && !reveal) return 1
+            if (autoHide && reveal) return px(58 + SettingsData.dockSpacing) + 3  // Content height + buffer when revealed
             if (needsBarSpacing) return base + px(positionSpacing)
             return base
         }
@@ -131,19 +148,36 @@ PanelWindow {
         id: dockCore
         anchors.fill: parent
 
+        Connections {
+            target: dockMouseArea
+            function onContainsMouseChanged() {
+                if (dockMouseArea.containsMouse) {
+                    dock.revealSticky = true
+                    revealHold.stop()
+                } else {
+                    if (dock.autoHide && !dock.contextMenuOpen) {
+                        revealHold.restart()
+                    }
+                }
+            }
+        }
+
         MouseArea {
             id: dockMouseArea
             property real currentScreen: modelData ? modelData : dock.screen
             property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
             property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
+            property real baseHeight: px(58 + SettingsData.dockSpacing)
 
-            y: SettingsData.dockAtBottom ? parent.height - height : 0
-            height: px(58 + SettingsData.dockSpacing)
+            y: SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.height - height : 0
+            height: autoHide ? (reveal ? px(58 + SettingsData.dockSpacing) + 3 : 1) : baseHeight
             anchors {
                 left: parent.left
                 right: parent.right
             }
             hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+            enabled: true
 
             Behavior on y {
                 NumberAnimation {
@@ -158,7 +192,7 @@ PanelWindow {
 
             transform: Translate {
                 id: dockSlide
-                y: dock.reveal ? 0 : px(SettingsData.dockAtBottom ? 58 : -58)
+                y: dock.reveal ? 0 : px(SettingsData.dockPosition === SettingsData.Position.Bottom ? 58 : -58)
 
                 Behavior on y {
                     NumberAnimation {

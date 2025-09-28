@@ -96,8 +96,15 @@ PanelWindow {
             actualDockHeight = dockBackground.height
         }
 
+        const isDockAtBottom = SettingsData.dockPosition === SettingsData.Position.Bottom
         const dockBottomMargin = 16
-        const buttonScreenY = root.screen.height - actualDockHeight - dockBottomMargin - 20
+        let buttonScreenY
+
+        if (isDockAtBottom) {
+            buttonScreenY = root.screen.height - actualDockHeight - dockBottomMargin - 20
+        } else {
+            buttonScreenY = actualDockHeight + dockBottomMargin + 20
+        }
 
         const dockContentWidth = dockWindow.width
         const screenWidth = root.screen.width
@@ -119,7 +126,14 @@ PanelWindow {
             const want = root.anchorPos.x - width / 2
             return Math.max(left, Math.min(right, want))
         }
-        y: Math.max(10, root.anchorPos.y - height + 30)
+        y: {
+            const isDockAtBottom = SettingsData.dockPosition === SettingsData.Position.Bottom
+            if (isDockAtBottom) {
+                return Math.max(10, root.anchorPos.y - height + 30)
+            } else {
+                return Math.min(root.height - height - 10, root.anchorPos.y - 30)
+            }
+        }
         color: Theme.popupBackground()
         radius: Theme.cornerRadius
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
