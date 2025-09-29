@@ -46,25 +46,52 @@ ShellRoot {
         anchors.fill: parent
     }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("dankBar")
+    Loader {
+        id: dankBarLoader
+        active: true
+        asynchronous: false
 
-        delegate: DankBar {
-            modelData: item
+        property var currentPosition: SettingsData.dankBarAtBottom
+
+        sourceComponent: DankBar {
             notepadVariants: notepadSlideoutVariants
             onColorPickerRequested: colorPickerModal.show()
         }
+
+        onCurrentPositionChanged: {
+            console.log("DEBUG: DankBar position changed to:", currentPosition, "- recreating bar")
+            const comp = sourceComponent
+            sourceComponent = null
+            Qt.callLater(() => {
+                sourceComponent = comp
+            })
+        }
     }
 
-    Variants {
-        model: SettingsData.getFilteredScreens("dock")
+    Loader {
+        id: dockLoader
+        active: true
+        asynchronous: false
 
-        delegate: Dock {
-            modelData: item
+        property var currentPosition: SettingsData.dockPosition
+
+        sourceComponent: Dock {
             contextMenu: dockContextMenuLoader.item ? dockContextMenuLoader.item : null
-            Component.onCompleted: {
+        }
+
+        onLoaded: {
+            if (item) {
                 dockContextMenuLoader.active = true
             }
+        }
+
+        onCurrentPositionChanged: {
+            console.log("DEBUG: Dock position changed to:", currentPosition, "- recreating dock")
+            const comp = sourceComponent
+            sourceComponent = null
+            Qt.callLater(() => {
+                sourceComponent = comp
+            })
         }
     }
 

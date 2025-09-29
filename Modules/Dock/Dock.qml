@@ -9,20 +9,25 @@ import qs.Widgets
 
 pragma ComponentBehavior: Bound
 
-PanelWindow {
-    id: dock
+Variants {
+    id: dockVariants
+    model: SettingsData.getFilteredScreens("dock")
 
-    WlrLayershell.namespace: "quickshell:dock"
-
-    anchors {
-        top: SettingsData.dockPosition === SettingsData.Position.Top
-        bottom: SettingsData.dockPosition === SettingsData.Position.Bottom
-        left: true
-        right: true
-    }
-
-    property var modelData
     property var contextMenu
+
+    delegate: PanelWindow {
+        id: dock
+
+        WlrLayershell.namespace: "quickshell:dock"
+
+        anchors {
+            top: SettingsData.dockPosition === SettingsData.Position.Top
+            bottom: SettingsData.dockPosition === SettingsData.Position.Bottom
+            left: true
+            right: true
+        }
+
+        property var modelData: item
     property bool autoHide: SettingsData.dockAutoHide
     property real backgroundTransparency: SettingsData.dockTransparency
     property bool groupByApp: SettingsData.dockGroupByApp
@@ -40,40 +45,8 @@ PanelWindow {
     readonly property real _dpr: (dock.screen && dock.screen.devicePixelRatio) ? dock.screen.devicePixelRatio : 1
     function px(v) { return Math.round(v * _dpr) / _dpr }
 
-    function forceDockRefresh() {
-        const container = dockContainer
-        if (container) {
-            container.visible = false
-            Qt.callLater(() => {
-                container.visible = true
-            })
-        }
-    }
 
-    Connections {
-        target: SettingsData
-        function onDockPositionChanged() {
-            Qt.callLater(() => {
-                forceDockRefresh()
-                // Force WlrLayershell refresh
-                if (dock.WlrLayershell) {
-                    dock.WlrLayershell.layer = dock.WlrLayershell.layer
-                }
-            })
-        }
-    }
-
-    Component.onCompleted: {
-        if (SettingsData.forceDockLayoutRefresh) {
-            SettingsData.forceDockLayoutRefresh.connect(() => {
-                Qt.callLater(() => {
-                    forceDockRefresh()
-                })
-            })
-        }
-    }
-
-    property bool contextMenuOpen: (contextMenu && contextMenu.visible && contextMenu.screen === modelData)
+    property bool contextMenuOpen: (dockVariants.contextMenu && dockVariants.contextMenu.visible && dockVariants.contextMenu.screen === modelData)
     property bool windowIsFullscreen: {
         if (!ToplevelManager.activeToplevel) {
             return false
@@ -229,7 +202,7 @@ PanelWindow {
                         anchors.topMargin: SettingsData.dockSpacing
                         anchors.bottomMargin: SettingsData.dockSpacing
 
-                        contextMenu: dock.contextMenu
+                        contextMenu: dockVariants.contextMenu
                         groupByApp: dock.groupByApp
                     }
                 }
@@ -284,6 +257,7 @@ PanelWindow {
                     color: Theme.surfaceText
                 }
             }
+        }
         }
         }
     }

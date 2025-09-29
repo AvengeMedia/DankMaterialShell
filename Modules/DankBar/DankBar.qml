@@ -15,21 +15,11 @@ import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 
-PanelWindow {
-    id: root
+Variants {
+    id: dankBarVariants
+    model: SettingsData.getFilteredScreens("dankBar")
 
-    WlrLayershell.namespace: "quickshell:bar"
-
-    property var modelData
     property var notepadVariants: null
-
-    property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
-    property real wingtipsRadius: Theme.cornerRadius
-    readonly property real _wingR: Math.max(0, wingtipsRadius)
-    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
-    readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
-    function px(v) { return Math.round(v * _dpr) / _dpr }
-
     signal colorPickerRequested()
 
     function getNotepadInstanceForScreen() {
@@ -43,6 +33,20 @@ PanelWindow {
         }
         return null
     }
+
+    delegate: PanelWindow {
+        id: root
+
+        WlrLayershell.namespace: "quickshell:bar"
+
+        property var modelData: item
+
+        property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
+    property real wingtipsRadius: Theme.cornerRadius
+    readonly property real _wingR: Math.max(0, wingtipsRadius)
+    readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
+    readonly property real _dpr: (root.screen && root.screen.devicePixelRatio) ? root.screen.devicePixelRatio : 1
+    function px(v) { return Math.round(v * _dpr) / _dpr }
     property string screenName: modelData.name
     readonly property int notificationCount: NotificationService.notifications.length
     readonly property real effectiveBarHeight: Math.max(root.widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
@@ -57,30 +61,9 @@ PanelWindow {
             ToastService.showError("Please install Material Symbols Rounded and Restart your Shell. See README.md for instructions")
         }
 
-        if (SettingsData.forceStatusBarLayoutRefresh) {
-            SettingsData.forceStatusBarLayoutRefresh.connect(() => {
-                Qt.callLater(() => {
-                    leftSection.visible = false
-                    centerSection.visible = false
-                    rightSection.visible = false
-                    Qt.callLater(() => {
-                        leftSection.visible = true
-                        centerSection.visible = true
-                        rightSection.visible = true
-                    })
-                })
-            })
-        }
-
         updateGpuTempConfig()
-        Qt.callLater(() => Qt.callLater(forceWidgetRefresh))
     }
 
-    function forceWidgetRefresh() {
-        const sections = [leftSection, centerSection, rightSection]
-        sections.forEach(section => section && (section.visible = false))
-        Qt.callLater(() => sections.forEach(section => section && (section.visible = true)))
-    }
 
     function updateGpuTempConfig() {
         const allWidgets = [...(SettingsData.dankBarLeftWidgets || []), ...(SettingsData.dankBarCenterWidgets || []), ...(SettingsData.dankBarRightWidgets || [])]
@@ -226,7 +209,7 @@ PanelWindow {
         }
 
         Component.onCompleted: {
-            notepadInstance = root.getNotepadInstanceForScreen()
+            notepadInstance = dankBarVariants.getNotepadInstanceForScreen()
         }
 
         Connections {
@@ -1284,7 +1267,7 @@ PanelWindow {
                                 section: topBarContent.getWidgetSection(parent) || "right"
                                 parentScreen: root.screen
                                 onColorPickerRequested: {
-                                    root.colorPickerRequested()
+                                    dankBarVariants.colorPickerRequested()
                                 }
                             }
                         }
@@ -1313,6 +1296,5 @@ PanelWindow {
                 }
             }
         }
-
-
+    }
 }
