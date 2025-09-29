@@ -13,9 +13,10 @@ Item {
     property bool requestDockShow: false
     property int pinnedAppCount: 0
     property bool groupByApp: false
+    property bool isVertical: false
 
-    implicitWidth: row.width
-    implicitHeight: row.height
+    implicitWidth: isVertical ? layoutContainer.width : layoutContainer.width
+    implicitHeight: isVertical ? layoutContainer.height : layoutContainer.height
 
     function movePinnedApp(fromIndex, toIndex) {
         if (fromIndex === toIndex) {
@@ -33,65 +34,157 @@ Item {
         SessionData.setPinnedApps(currentPinned)
     }
 
-    Row {
-        id: row
-        spacing: 8
+    Item {
+        id: layoutContainer
         anchors.centerIn: parent
-        height: 40
+        width: isVertical ? 40 : horizontalLayout.width
+        height: isVertical ? verticalLayout.height : 40
 
-        Repeater {
-            id: repeater
-            model: ListModel {
-                id: dockModel
+        Row {
+            id: horizontalLayout
+            spacing: 8
+            anchors.centerIn: parent
+            height: 40
+            visible: !isVertical
 
-                Component.onCompleted: updateModel()
+            Repeater {
+                id: horizontalRepeater
+                model: dockModel
 
-                function updateModel() {
-                    clear()
+                delegate: Item {
+                    id: delegateItemH
+                    property alias dockButton: buttonH
 
-                    const items = []
-                    const pinnedApps = [...(SessionData.pinnedApps || [])]
-                    const sortedToplevels = CompositorService.sortedToplevels
+                    width: model.type === "separator" ? 16 : 40
+                    height: 40
 
-                    if (root.groupByApp) {
-                        // Group windows by appId
-                        const appGroups = new Map()
+                    Rectangle {
+                        visible: model.type === "separator"
+                        width: 2
+                        height: 20
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                        radius: 1
+                        anchors.centerIn: parent
+                    }
 
-                        // Add pinned apps first (even if they have no windows)
-                        pinnedApps.forEach(appId => {
-                            appGroups.set(appId, {
-                                appId: appId,
-                                isPinned: true,
-                                windows: []
-                            })
+                    DockAppButton {
+                        id: buttonH
+                        visible: model.type !== "separator"
+                        anchors.centerIn: parent
+
+                        width: 40
+                        height: 40
+
+                        appData: model
+                        contextMenu: root.contextMenu
+                        dockApps: root
+                        index: model.index
+
+                        showWindowTitle: model.type === "window" || model.type === "grouped"
+                        windowTitle: model.windowTitle || ""
+                    }
+                }
+            }
+        }
+
+        Column {
+            id: verticalLayout
+            spacing: 8
+            anchors.centerIn: parent
+            width: 40
+            visible: isVertical
+
+            Repeater {
+                id: verticalRepeater
+                model: dockModel
+
+                delegate: Item {
+                    id: delegateItemV
+                    property alias dockButton: buttonV
+
+                    width: 40
+                    height: model.type === "separator" ? 16 : 40
+
+                    Rectangle {
+                        visible: model.type === "separator"
+                        width: 20
+                        height: 2
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+                        radius: 1
+                        anchors.centerIn: parent
+                    }
+
+                    DockAppButton {
+                        id: buttonV
+                        visible: model.type !== "separator"
+                        anchors.centerIn: parent
+
+                        width: 40
+                        height: 40
+
+                        appData: model
+                        contextMenu: root.contextMenu
+                        dockApps: root
+                        index: model.index
+
+                        showWindowTitle: model.type === "window" || model.type === "grouped"
+                        windowTitle: model.windowTitle || ""
+                    }
+                }
+            }
+        }
+
+    ListModel {
+        id: dockModel
+
+        Component.onCompleted: updateModel()
+
+        function updateModel() {
+            clear()
+
+            const items = []
+            const pinnedApps = [...(SessionData.pinnedApps || [])]
+            const sortedToplevels = CompositorService.sortedToplevels
+
+            if (root.groupByApp) {
+                // Group windows by appId
+                const appGroups = new Map()
+
+                // Add pinned apps first (even if they have no windows)
+                pinnedApps.forEach(appId => {
+                    appGroups.set(appId, {
+                        appId: appId,
+                        isPinned: true,
+                        windows: []
+                    })
+                })
+
+                // Group all running windows by appId
+                sortedToplevels.forEach((toplevel, index) => {
+                    const appId = toplevel.appId || "unknown"
+                    if (!appGroups.has(appId)) {
+                        appGroups.set(appId, {
+                            appId: appId,
+                            isPinned: false,
+                            windows: []
                         })
+                    }
+                    const title = toplevel.title || "(Unnamed)"
+                    const truncatedTitle = title.length > 50 ? title.substring(0, 47) + "..." : title
+                    const uniqueId = toplevel.title + "|" + (toplevel.appId || "") + "|" + index
 
-                        // Group all running windows by appId
-                        sortedToplevels.forEach((toplevel, index) => {
-                            const appId = toplevel.appId || "unknown"
-                            if (!appGroups.has(appId)) {
-                                appGroups.set(appId, {
-                                    appId: appId,
-                                    isPinned: false,
-                                    windows: []
-                                })
-                            }
-                            const title = toplevel.title || "(Unnamed)"
-                            const truncatedTitle = title.length > 50 ? title.substring(0, 47) + "..." : title
-                            const uniqueId = toplevel.title + "|" + (toplevel.appId || "") + "|" + index
+                    appGroups.get(appId).windows.push({
+                        windowId: index,
+                        windowTitle: truncatedTitle,
+                        uniqueId: uniqueId
+                    })
+                })
 
-                            appGroups.get(appId).windows.push({
-                                windowId: index,
-                                windowTitle: truncatedTitle,
-                                uniqueId: uniqueId
-                            })
-                        })
+                // Sort groups: pinned first, then unpinned
+                const pinnedGroups = []
+                const unpinnedGroups = []
 
-                        // Sort groups: pinned first, then unpinned
-                        const pinnedGroups = []
-                        const unpinnedGroups = []
-
-                        Array.from(appGroups.entries()).forEach(([appId, group]) => {
+                Array.from(appGroups.entries()).forEach(([appId, group]) => {
                             // For grouped apps, just show the first window info but track all windows
                             const firstWindow = group.windows.length > 0 ? group.windows[0] : null
 
@@ -179,43 +272,7 @@ Item {
                         })
                     }
 
-                    items.forEach(item => append(item))
-                }
-            }
-
-            delegate: Item {
-                id: delegateItem
-                property alias dockButton: button
-
-                width: model.type === "separator" ? 16 : 40
-                height: 40
-
-                Rectangle {
-                    visible: model.type === "separator"
-                    width: 2
-                    height: 20
-                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
-                    radius: 1
-                    anchors.centerIn: parent
-                }
-
-                DockAppButton {
-                    id: button
-                    visible: model.type !== "separator"
-                    anchors.centerIn: parent
-
-                    width: 40
-                    height: 40
-
-                    appData: model
-                    contextMenu: root.contextMenu
-                    dockApps: root
-                    index: model.index
-
-                    // Override tooltip for windows to show window title
-                    showWindowTitle: model.type === "window" || model.type === "grouped"
-                    windowTitle: model.windowTitle || ""
-                }
+                items.forEach(item => append(item))
             }
         }
     }

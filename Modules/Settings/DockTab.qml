@@ -42,7 +42,7 @@ Item {
                         spacing: Theme.spacingM
 
                         DankIcon {
-                            name: "swap_vert"
+                            name: "open_with"
                             size: Theme.iconSize
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
@@ -65,11 +65,24 @@ Item {
                         DankButtonGroup {
                             id: positionButtonGroup
                             anchors.verticalCenter: parent.verticalCenter
-                            model: ["Top", "Bottom"]
-                            currentIndex: SettingsData.dockPosition === SettingsData.Position.Bottom ? 1 : 0
+                            model: ["Top", "Bottom", "Left", "Right"]
+                            currentIndex: {
+                                switch (SettingsData.dockPosition) {
+                                case SettingsData.Position.Top: return 0
+                                case SettingsData.Position.Bottom: return 1
+                                case SettingsData.Position.Left: return 2
+                                case SettingsData.Position.Right: return 3
+                                default: return 1
+                                }
+                            }
                             onSelectionChanged: (index, selected) => {
                                 if (selected) {
-                                    SettingsData.setDockPosition(index === 1 ? SettingsData.Position.Bottom : SettingsData.Position.Top)
+                                    switch (index) {
+                                    case 0: SettingsData.setDockPosition(SettingsData.Position.Top); break
+                                    case 1: SettingsData.setDockPosition(SettingsData.Position.Bottom); break
+                                    case 2: SettingsData.setDockPosition(SettingsData.Position.Left); break
+                                    case 3: SettingsData.setDockPosition(SettingsData.Position.Right); break
+                                    }
                                 }
                             }
                         }
@@ -170,7 +183,7 @@ Item {
                             }
 
                             StyledText {
-                                text: "Display a dock with pinned and running applications that can be positioned at the top or bottom of the screen"
+                                text: "Display a dock with pinned and running applications that can be positioned at any edge of the screen"
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
