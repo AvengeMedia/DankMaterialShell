@@ -375,6 +375,284 @@ Item {
                     }
                 }
             }
+
+            // World Clock Section
+            StyledRect {
+                width: parent.width
+                height: worldClockSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: worldClockSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "public"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: "World Clock"
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    StyledText {
+                        text: "Add multiple timezones to display in the DankBar"
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                    }
+
+                    // Add Timezone Section
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankTextField {
+                            id: timezoneInput
+
+                            width: (parent.width - Theme.spacingM * 2) * 0.6
+                            placeholderText: "e.g., America/New_York, Europe/London, Asia/Tokyo"
+                            text: ""
+                        }
+
+                        DankTextField {
+                            id: labelInput
+
+                            width: (parent.width - Theme.spacingM * 2) * 0.3
+                            placeholderText: "Label (optional)"
+                            text: ""
+                        }
+
+                        Rectangle {
+                            width: 40
+                            height: 40
+                            radius: Theme.cornerRadius
+                            color: addButtonArea.containsMouse ? Theme.primaryContainer : Theme.surfaceContainer
+                            border.color: Theme.outline
+                            border.width: 1
+
+                            DankIcon {
+                                name: "add"
+                                size: Theme.iconSize
+                                color: Theme.primary
+                                anchors.centerIn: parent
+                            }
+
+                            MouseArea {
+                                id: addButtonArea
+
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (timezoneInput.text.trim()) {
+                                        SettingsData.addWorldClockTimezone(
+                                            timezoneInput.text.trim(),
+                                            labelInput.text.trim() || null
+                                        )
+                                        timezoneInput.text = ""
+                                        labelInput.text = ""
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Current Timezones List
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        Repeater {
+                            model: SettingsData.worldClockTimezones || []
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingM
+
+                                Rectangle {
+                                    width: parent.width - removeButton.width - Theme.spacingM
+                                    height: 40
+                                    radius: Theme.cornerRadius
+                                    color: Theme.surfaceContainer
+                                    border.color: Theme.outline
+                                    border.width: 1
+
+                                    Row {
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: Theme.spacingM
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: Theme.spacingM
+
+                                        StyledText {
+                                            text: modelData.timezone
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            color: Theme.surfaceText
+                                        }
+
+                                        StyledText {
+                                            text: "•"
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.outline
+                                            visible: modelData.label && modelData.label !== modelData.timezone
+                                        }
+
+                                        StyledText {
+                                            text: modelData.label || ""
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            color: Theme.surfaceVariantText
+                                            visible: modelData.label && modelData.label !== modelData.timezone
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    id: removeButton
+
+                                    width: 40
+                                    height: 40
+                                    radius: Theme.cornerRadius
+                                    color: removeButtonArea.containsMouse ? Theme.errorContainer : Theme.surfaceContainer
+                                    border.color: Theme.outline
+                                    border.width: 1
+
+                                    DankIcon {
+                                        name: "delete"
+                                        size: Theme.iconSize
+                                        color: removeButtonArea.containsMouse ? Theme.error : Theme.surfaceText
+                                        anchors.centerIn: parent
+                                    }
+
+                                    MouseArea {
+                                        id: removeButtonArea
+
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            SettingsData.removeWorldClockTimezone(modelData.timezone)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        StyledText {
+                            text: "No timezones added yet. Add a timezone above to get started."
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            visible: !SettingsData.worldClockTimezones || SettingsData.worldClockTimezones.length === 0
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: timezoneHelp.implicitHeight + Theme.spacingM * 2
+                        radius: Theme.cornerRadius
+                        color: Theme.surfaceContainerHigh
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                              Theme.outline.b, 0.1)
+                        border.width: 0
+
+                        Column {
+                            id: timezoneHelp
+
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingM
+                            spacing: Theme.spacingXS
+
+                            StyledText {
+                                text: "Common Timezone Examples"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.primary
+                                font.weight: Font.Medium
+                            }
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingL
+
+                                Column {
+                                    width: (parent.width - Theme.spacingL) / 2
+                                    spacing: 2
+
+                                    StyledText {
+                                        text: "• America/New_York (EST/EDT)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• America/Los_Angeles (PST/PDT)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• Europe/London (GMT/BST)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• Europe/Paris (CET/CEST)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+
+                                Column {
+                                    width: (parent.width - Theme.spacingL) / 2
+                                    spacing: 2
+
+                                    StyledText {
+                                        text: "• Asia/Tokyo (JST)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• Asia/Shanghai (CST)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• Australia/Sydney (AEST/AEDT)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+
+                                    StyledText {
+                                        text: "• UTC (Coordinated Universal Time)"
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

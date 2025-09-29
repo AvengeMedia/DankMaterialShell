@@ -162,6 +162,49 @@ Singleton {
 
     property bool _loading: false
 
+    property var worldClockTimezones: []
+
+    function addWorldClockTimezone(timezone, label) {
+        if (!worldClockTimezones) {
+            worldClockTimezones = []
+        }
+
+        const exists = worldClockTimezones.some(tz => tz.timezone === timezone)
+        if (!exists) {
+            let newTimezones = [...worldClockTimezones]
+            newTimezones.push({
+                timezone: timezone,
+                label: label || timezone.split('/').pop().replace(/_/g, ' ')
+            })
+            worldClockTimezones = newTimezones
+            saveSettings()
+        }
+    }
+
+    function removeWorldClockTimezone(timezone) {
+        if (!worldClockTimezones) {
+            return
+        }
+
+        const newTimezones = worldClockTimezones.filter(tz => tz.timezone !== timezone)
+        worldClockTimezones = newTimezones
+        saveSettings()
+    }
+
+    function updateWorldClockTimezoneLabel(timezone, newLabel) {
+        if (!worldClockTimezones) {
+            return
+        }
+
+        let newTimezones = [...worldClockTimezones]
+        const index = newTimezones.findIndex(tz => tz.timezone === timezone)
+        if (index >= 0) {
+            newTimezones[index].label = newLabel
+            worldClockTimezones = newTimezones
+            saveSettings()
+        }
+    }
+
     function getEffectiveTimeFormat() {
         if (use24HourClock) {
             return Locale.ShortFormat
@@ -277,6 +320,7 @@ Singleton {
                 runningAppsCurrentWorkspace = settings.runningAppsCurrentWorkspace !== undefined ? settings.runningAppsCurrentWorkspace : false
                 clockDateFormat = settings.clockDateFormat !== undefined ? settings.clockDateFormat : ""
                 lockDateFormat = settings.lockDateFormat !== undefined ? settings.lockDateFormat : ""
+                worldClockTimezones = settings.worldClockTimezones !== undefined ? settings.worldClockTimezones : []
                 mediaSize = settings.mediaSize !== undefined ? settings.mediaSize : (settings.mediaCompactMode !== undefined ? (settings.mediaCompactMode ? 0 : 1) : 1)
                 if (settings.dankBarWidgetOrder || settings.topBarWidgetOrder) {
                     var widgetOrder = settings.dankBarWidgetOrder || settings.topBarWidgetOrder
@@ -414,6 +458,7 @@ Singleton {
                                                 "runningAppsCurrentWorkspace": runningAppsCurrentWorkspace,
                                                 "clockDateFormat": clockDateFormat,
                                                 "lockDateFormat": lockDateFormat,
+                                                "worldClockTimezones": worldClockTimezones,
                                                 "mediaSize": mediaSize,
                                                 "dankBarLeftWidgets": dankBarLeftWidgets,
                                                 "dankBarCenterWidgets": dankBarCenterWidgets,

@@ -39,6 +39,12 @@ Item {
             "icon": "schedule",
             "enabled": true
         }, {
+            "id": "worldClock",
+            "text": "World Clock",
+            "description": "Multiple timezones display",
+            "icon": "public",
+            "enabled": true
+        }, {
             "id": "weather",
             "text": "Weather Widget",
             "description": "Current weather conditions and temperature",

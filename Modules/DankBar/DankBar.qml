@@ -518,6 +518,7 @@ Variants {
                                                                  "focusedWindow": focusedWindowComponent,
                                                                  "runningApps": runningAppsComponent,
                                                                  "clock": clockComponent,
+                                                                 "worldClock": worldClockComponent,
                                                                  "music": mediaComponent,
                                                                  "weather": weatherComponent,
                                                                  "systemTray": systemTrayComponent,
@@ -933,6 +934,29 @@ Variants {
                                 }
                                 parentScreen: root.screen
                                 onClockClicked: {
+                                    dankDashPopoutLoader.active = true
+                                    if (dankDashPopoutLoader.item) {
+                                        dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
+                                        dankDashPopoutLoader.item.currentTabIndex = 0
+                                    }
+                                }
+                            }
+                        }
+
+                        Component {
+                            id: worldClockComponent
+
+                            WorldClock {
+                                compactMode: topBarContent.overlapping
+                                barHeight: root.effectiveBarHeight
+                                widgetHeight: root.widgetHeight
+                                section: topBarContent.getWidgetSection(parent) || "center"
+                                popupTarget: {
+                                    dankDashPopoutLoader.active = true
+                                    return dankDashPopoutLoader.item
+                                }
+                                parentScreen: root.screen
+                                onWorldClockClicked: {
                                     dankDashPopoutLoader.active = true
                                     if (dankDashPopoutLoader.item) {
                                         dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
