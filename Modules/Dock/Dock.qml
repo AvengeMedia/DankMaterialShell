@@ -124,7 +124,7 @@ Variants {
             property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
             property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
 
-            height: dock.reveal ? px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 20
+            height: dock.reveal ? px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 1
             width: dock.reveal ? Math.min(dockBackground.implicitWidth + 32, maxDockWidth) : Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
             anchors {
                 top: SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top
