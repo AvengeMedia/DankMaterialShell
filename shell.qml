@@ -54,7 +54,6 @@ ShellRoot {
         property var currentPosition: SettingsData.dankBarAtBottom
 
         sourceComponent: DankBar {
-            notepadVariants: notepadSlideoutVariants
             onColorPickerRequested: colorPickerModal.show()
         }
 

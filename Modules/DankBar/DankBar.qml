@@ -19,19 +19,21 @@ Variants {
     id: dankBarVariants
     model: SettingsData.getFilteredScreens("dankBar")
 
-    property var notepadVariants: null
     signal colorPickerRequested()
 
     function getNotepadInstanceForScreen() {
-        if (!notepadVariants || !notepadVariants.instances) return null
+        if (typeof notepadSlideoutVariants === "undefined" || !notepadSlideoutVariants || !notepadSlideoutVariants.instances) {
+            return null
+        }
 
-        for (var i = 0; i < notepadVariants.instances.length; i++) {
-            var slideout = notepadVariants.instances[i]
+        for (var i = 0; i < notepadSlideoutVariants.instances.length; i++) {
+            var slideout = notepadSlideoutVariants.instances[i]
             if (slideout.modelData && slideout.modelData.name === root.screen?.name) {
                 return slideout
             }
         }
-        return null
+
+        return notepadSlideoutVariants.instances.length > 0 ? notepadSlideoutVariants.instances[0] : null
     }
 
     delegate: PanelWindow {
