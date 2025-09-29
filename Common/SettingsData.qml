@@ -164,6 +164,8 @@ Singleton {
 
     property bool _loading: false
 
+    property var pluginSettings: ({})
+
     function getEffectiveTimeFormat() {
         if (use24HourClock) {
             return Locale.ShortFormat
@@ -350,6 +352,7 @@ Singleton {
                 widgetBackgroundColor = settings.widgetBackgroundColor !== undefined ? settings.widgetBackgroundColor : "sch"
                 surfaceBase = settings.surfaceBase !== undefined ? settings.surfaceBase : "s"
                 screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({})
+                pluginSettings = settings.pluginSettings !== undefined ? settings.pluginSettings : ({})
                 applyStoredTheme()
                 detectAvailableIconThemes()
                 detectQtTools()
@@ -468,7 +471,8 @@ Singleton {
                                                 "notificationTimeoutNormal": notificationTimeoutNormal,
                                                 "notificationTimeoutCritical": notificationTimeoutCritical,
                                                 "notificationPopupPosition": notificationPopupPosition,
-                                                "screenPreferences": screenPreferences
+                                                "screenPreferences": screenPreferences,
+                                                "pluginSettings": pluginSettings
                                             }, null, 2))
     }
 
@@ -1227,6 +1231,33 @@ Singleton {
             return Quickshell.screens
         }
         return Quickshell.screens.filter(screen => prefs.includes(screen.name))
+    }
+
+    // Plugin settings functions
+    function getPluginSetting(pluginId, key, defaultValue) {
+        if (!pluginSettings[pluginId]) {
+            return defaultValue
+        }
+        return pluginSettings[pluginId][key] !== undefined ? pluginSettings[pluginId][key] : defaultValue
+    }
+
+    function setPluginSetting(pluginId, key, value) {
+        if (!pluginSettings[pluginId]) {
+            pluginSettings[pluginId] = {}
+        }
+        pluginSettings[pluginId][key] = value
+        saveSettings()
+    }
+
+    function removePluginSettings(pluginId) {
+        if (pluginSettings[pluginId]) {
+            delete pluginSettings[pluginId]
+            saveSettings()
+        }
+    }
+
+    function getPluginSettingsForPlugin(pluginId) {
+        return pluginSettings[pluginId] || {}
     }
 
     function _shq(s) {

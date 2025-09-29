@@ -95,6 +95,24 @@ Item {
                 Qt.callLater(() => Qt.callLater(forceWidgetRefresh))
             }
 
+            Connections {
+                target: PluginService
+                function onPluginLoaded(pluginId) {
+                    console.log("DankBar: Plugin loaded:", pluginId)
+                    // Force componentMap to update by triggering property change
+                    if (topBarContent) {
+                        topBarContent.updateComponentMap()
+                    }
+                }
+                function onPluginUnloaded(pluginId) {
+                    console.log("DankBar: Plugin unloaded:", pluginId)
+                    // Force componentMap to update by triggering property change
+                    if (topBarContent) {
+                        topBarContent.updateComponentMap()
+                    }
+                }
+            }
+
             function forceWidgetRefresh() {
             }
 
@@ -366,7 +384,13 @@ Item {
                         anchors.bottomMargin: !barWindow.isVertical ? SettingsData.dankBarInnerPadding / 2 : Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
                         clip: true
 
-                    readonly property int availableWidth: width
+                        property int componentMapRevision: 0
+
+                        function updateComponentMap() {
+                            componentMapRevision++
+                        }
+
+                        readonly property int availableWidth: width
                         readonly property int launcherButtonWidth: 40
                         readonly property int workspaceSwitcherWidth: 120
                         readonly property int focusedAppMaxWidth: 456
@@ -421,35 +445,44 @@ Item {
                             return widgetVisibility[widgetId] ?? true
                         }
 
-                        readonly property var componentMap: ({
-                                                                 "launcherButton": launcherButtonComponent,
-                                                                 "workspaceSwitcher": workspaceSwitcherComponent,
-                                                                 "focusedWindow": focusedWindowComponent,
-                                                                 "runningApps": runningAppsComponent,
-                                                                 "clock": clockComponent,
-                                                                 "music": mediaComponent,
-                                                                 "weather": weatherComponent,
-                                                                 "systemTray": systemTrayComponent,
-                                                                 "privacyIndicator": privacyIndicatorComponent,
-                                                                 "clipboard": clipboardComponent,
-                                                                 "cpuUsage": cpuUsageComponent,
-                                                                 "memUsage": memUsageComponent,
-                                                                 "diskUsage": diskUsageComponent,
-                                                                 "cpuTemp": cpuTempComponent,
-                                                                 "gpuTemp": gpuTempComponent,
-                                                                 "notificationButton": notificationButtonComponent,
-                                                                 "battery": batteryComponent,
-                                                                 "controlCenterButton": controlCenterButtonComponent,
-                                                                 "idleInhibitor": idleInhibitorComponent,
-                                                                 "spacer": spacerComponent,
-                                                                 "separator": separatorComponent,
-                                                                 "network_speed_monitor": networkComponent,
-                                                                 "keyboard_layout_name": keyboardLayoutNameComponent,
-                                                                 "vpn": vpnComponent,
-                                                                 "notepadButton": notepadButtonComponent,
-                                                                 "colorPicker": colorPickerComponent,
-                                                                 "systemUpdate": systemUpdateComponent
-                                                             })
+                        readonly property var componentMap: {
+                            // This property depends on componentMapRevision to ensure it updates when plugins change
+                            componentMapRevision;
+
+                            let baseMap = {
+                                "launcherButton": launcherButtonComponent,
+                                "workspaceSwitcher": workspaceSwitcherComponent,
+                                "focusedWindow": focusedWindowComponent,
+                                "runningApps": runningAppsComponent,
+                                "clock": clockComponent,
+                                "music": mediaComponent,
+                                "weather": weatherComponent,
+                                "systemTray": systemTrayComponent,
+                                "privacyIndicator": privacyIndicatorComponent,
+                                "clipboard": clipboardComponent,
+                                "cpuUsage": cpuUsageComponent,
+                                "memUsage": memUsageComponent,
+                                "diskUsage": diskUsageComponent,
+                                "cpuTemp": cpuTempComponent,
+                                "gpuTemp": gpuTempComponent,
+                                "notificationButton": notificationButtonComponent,
+                                "battery": batteryComponent,
+                                "controlCenterButton": controlCenterButtonComponent,
+                                "idleInhibitor": idleInhibitorComponent,
+                                "spacer": spacerComponent,
+                                "separator": separatorComponent,
+                                "network_speed_monitor": networkComponent,
+                                "keyboard_layout_name": keyboardLayoutNameComponent,
+                                "vpn": vpnComponent,
+                                "notepadButton": notepadButtonComponent,
+                                "colorPicker": colorPickerComponent,
+                                "systemUpdate": systemUpdateComponent
+                            }
+
+                            // Merge with plugin widgets
+                            let pluginMap = PluginService.getWidgetComponents()
+                            return Object.assign(baseMap, pluginMap)
+                        }
 
                         function getWidgetComponent(widgetId) {
                             return componentMap[widgetId] || null
@@ -1016,6 +1049,7 @@ Item {
                                 }
                             }
                         }
+
                     }
                 }
             }

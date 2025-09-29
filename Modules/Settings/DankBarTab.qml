@@ -8,7 +8,8 @@ import qs.Widgets
 Item {
     id: dankBarTab
 
-    property var baseWidgetDefinitions: [{
+    property var baseWidgetDefinitions: {
+        var coreWidgets = [{
             "id": "launcherButton",
             "text": "App Launcher",
             "description": "Quick access to application launcher",
@@ -177,6 +178,22 @@ Item {
             "icon": "update",
             "enabled": SystemUpdateService.distributionSupported
         }]
+
+        // Add plugin widgets dynamically
+        var loadedPlugins = PluginService.getLoadedPlugins()
+        for (var i = 0; i < loadedPlugins.length; i++) {
+            var plugin = loadedPlugins[i]
+            coreWidgets.push({
+                "id": plugin.id,
+                "text": plugin.name,
+                "description": plugin.description || "Plugin widget",
+                "icon": plugin.icon || "extension",
+                "enabled": true
+            })
+        }
+
+        return coreWidgets
+    }
     property var defaultLeftWidgets: [{
             "id": "launcherButton",
             "enabled": true

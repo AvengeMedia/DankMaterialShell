@@ -63,6 +63,9 @@ quickshell -p shell.qml
 # Or use the shorthand
 qs -p .
 
+# Run with verbose output for debugging
+qs -v -p shell.qml
+
 # Code formatting and linting
 qmlfmt -t 4 -i 4 -b 250 -w /path/to/file.qml    # Format a QML file (requires qmlfmt, do not use qmlformat)
 qmllint **/*.qml         # Lint all QML files for syntax errors
@@ -89,6 +92,7 @@ shell.qml           # Main entry point (minimal orchestration)
 │   ├── DisplayService.qml
 │   ├── NotificationService.qml
 │   ├── WeatherService.qml
+│   ├── PluginService.qml
 │   └── [14 more services]
 ├── Modules/        # UI components (93 files)
 │   ├── TopBar/     # Panel components (13 files)
@@ -104,15 +108,21 @@ shell.qml           # Main entry point (minimal orchestration)
 │   ├── SettingsModal.qml
 │   ├── ClipboardHistoryModal.qml
 │   ├── ProcessListModal.qml
+│   ├── PluginSettingsModal.qml
 │   └── [7 more modals]
-└── Widgets/        # Reusable UI controls (19 files)
-    ├── DankIcon.qml
-    ├── DankSlider.qml
-    ├── DankToggle.qml
-    ├── DankTabBar.qml
-    ├── DankGridView.qml
-    ├── DankListView.qml
-    └── [13 more widgets]
+├── Widgets/        # Reusable UI controls (19 files)
+│   ├── DankIcon.qml
+│   ├── DankSlider.qml
+│   ├── DankToggle.qml
+│   ├── DankTabBar.qml
+│   ├── DankGridView.qml
+│   ├── DankListView.qml
+│   └── [13 more widgets]
+└── plugins/        # External plugins directory ($CONFIGPATH/DankMaterialShell/plugins/)
+    └── PluginName/ # Example Plugin structure
+        ├── plugin.json            # Plugin manifest
+        ├── PluginNameWidget.qml   # Widget component
+        └── PluginNameSettings.qml # Settings UI
 ```
 
 ### Component Organization
@@ -162,6 +172,12 @@ shell.qml           # Main entry point (minimal orchestration)
    - **CachingImage**: Optimized image loading with caching
    - **DankLocationSearch**: Location picker with search
    - **SystemLogo**: Animated system branding component
+
+7. **Plugins/** - External plugin system (`$CONFIGPATH/DankMaterialShell/plugins/`)
+   - **PluginService**: Discovers, loads, and manages plugin lifecycle
+   - **Dynamic Loading**: Plugins loaded at runtime from external directory
+   - **DankBar Integration**: Plugin widgets rendered alongside built-in widgets
+   - **Settings System**: Per-plugin settings with persistence
 
 ### Key Architectural Patterns
 
@@ -408,10 +424,10 @@ When modifying the shell:
 
    Singleton {
        id: root
-       
+
        property bool featureAvailable: false
        property type currentValue: defaultValue
-       
+
        function performAction(param) {
            // Implementation
        }
@@ -422,13 +438,141 @@ When modifying the shell:
    ```qml
    // In module files
    property alias serviceValue: NewService.currentValue
-   
+
    SomeControl {
        visible: NewService.featureAvailable
        enabled: NewService.featureAvailable
        onTriggered: NewService.performAction(value)
    }
    ```
+
+### Creating Plugins
+
+Plugins are external, dynamically-loaded components that extend DankBar functionality. Plugins are stored in `~/.config/DankMaterialShell/plugins/` and have their settings isolated from core DMS settings.
+
+1. **Create plugin directory**:
+   ```bash
+   mkdir -p ~/.config/DankMaterialShell/plugins/YourPlugin
+   ```
+
+2. **Create manifest** (`plugin.json`):
+   ```json
+   {
+       "id": "yourPlugin",
+       "name": "Your Plugin",
+       "description": "Widget description",
+       "version": "1.0.0",
+       "author": "Your Name",
+       "icon": "extension",
+       "component": "./YourWidget.qml",
+       "settings": "./YourSettings.qml",
+       "permissions": ["settings_read", "settings_write"]
+   }
+   ```
+
+3. **Create widget component** (`YourWidget.qml`):
+   ```qml
+   import QtQuick
+   import qs.Services
+
+   Rectangle {
+       id: root
+
+       property bool compactMode: false
+       property string section: "center"
+       property real widgetHeight: 30
+       property var pluginService: null
+
+       width: content.implicitWidth + 16
+       height: widgetHeight
+       radius: 8
+       color: "#20FFFFFF"
+
+       Component.onCompleted: {
+           if (pluginService) {
+               var data = pluginService.loadPluginData("yourPlugin", "key", defaultValue)
+           }
+       }
+   }
+   ```
+
+4. **Create settings component** (`YourSettings.qml`):
+   ```qml
+   import QtQuick
+   import QtQuick.Controls
+
+   FocusScope {
+       id: root
+
+       property var pluginService: null
+
+       implicitHeight: settingsColumn.implicitHeight
+       height: implicitHeight
+
+       Column {
+           id: settingsColumn
+           anchors.fill: parent
+           anchors.margins: 16
+           spacing: 12
+
+           Text {
+               text: "Your Plugin Settings"
+               font.pixelSize: 18
+               font.weight: Font.Bold
+           }
+
+           // Your settings UI here
+       }
+
+       function saveSettings(key, value) {
+           if (pluginService) {
+               pluginService.savePluginData("yourPlugin", key, value)
+           }
+       }
+
+       function loadSettings(key, defaultValue) {
+           if (pluginService) {
+               return pluginService.loadPluginData("yourPlugin", key, defaultValue)
+           }
+           return defaultValue
+       }
+   }
+   ```
+
+5. **Enable plugin**:
+   - Open Settings → Plugins
+   - Click "Scan for Plugins"
+   - Toggle plugin to enable
+   - Add plugin ID to DankBar widget list
+
+**Plugin Directory Structure:**
+```
+~/.config/DankMaterialShell/
+├── settings.json                    # Core DMS settings + plugin settings
+│   └── pluginSettings: {
+│       └── yourPlugin: {
+│           ├── enabled: true,
+│           └── customData: {...}
+│       }
+│   }
+└── plugins/                         # Plugin files directory
+    └── YourPlugin/                  # Plugin directory (matches manifest ID)
+        ├── plugin.json              # Plugin manifest
+        ├── YourWidget.qml           # Widget component
+        └── YourSettings.qml         # Settings UI (optional)
+```
+
+**Key Plugin APIs:**
+- `pluginService.loadPluginData(pluginId, key, default)` - Load persistent data
+- `pluginService.savePluginData(pluginId, key, value)` - Save persistent data
+- `PluginService.enablePlugin(pluginId)` - Load plugin
+- `PluginService.disablePlugin(pluginId)` - Unload plugin
+
+**Important Notes:**
+- Plugin settings are automatically injected by the PluginService via `item.pluginService = PluginService`
+- Settings are stored in the main settings.json but namespaced under `pluginSettings.{pluginId}`
+- Plugin directories must match the plugin ID in the manifest
+- Use the injected `pluginService` property in both widget and settings components
 
 ### Debugging Common Issues
 
@@ -454,6 +598,7 @@ When modifying the shell:
 - **Function Discovery**: Use grep/search tools to find existing utility functions before implementing new ones
 - **Modern QML Patterns**: Leverage new widgets like DankTextField, DankDropdown, CachingImage
 - **Structured Organization**: Follow the established Services/Modules/Widgets/Modals separation
+- **Plugin System**: For user extensions, create plugins instead of modifying core modules - see docs/PLUGINS.md
 
 ### Common Widget Patterns
 

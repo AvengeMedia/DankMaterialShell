@@ -39,6 +39,9 @@ Rectangle {
         "text": "Power",
         "icon": "power_settings_new"
     }, {
+        "text": "Plugins",
+        "icon": "extension"
+    }, {
         "text": "About",
         "icon": "info"
     }]
