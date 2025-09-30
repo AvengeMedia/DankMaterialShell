@@ -266,7 +266,8 @@ Item {
     }
 
     function getWidgetComponent(widgetId) {
-        const componentMap = {
+        // Build dynamic component map including plugins
+        let baseMap = {
             "launcherButton": "launcherButtonComponent",
             "workspaceSwitcher": "workspaceSwitcherComponent",
             "focusedWindow": "focusedWindowComponent",
@@ -296,8 +297,15 @@ Item {
             "systemUpdate": "systemUpdateComponent"
         }
 
-        const componentKey = componentMap[widgetId]
-        return componentKey ? root.components[componentKey] : null
+        // For built-in components, get from components property
+        const componentKey = baseMap[widgetId]
+        if (componentKey && root.components[componentKey]) {
+            return root.components[componentKey]
+        }
+
+        // For plugin components, get from PluginService
+        let pluginMap = PluginService.getWidgetComponents()
+        return pluginMap[widgetId] || null
     }
 
     height: parent.height
@@ -337,6 +345,7 @@ Item {
         id: centerRepeater
         model: root.widgetsModel
 
+
         Loader {
             property string widgetId: model.widgetId
             property var widgetData: model
@@ -364,6 +373,17 @@ Item {
                 if (root.axis && "isVertical" in item) {
                     item.isVertical = root.axis.isVertical
                 }
+
+                // Inject PluginService for plugin widgets
+                if (item.pluginService !== undefined) {
+                    console.log("CenterSection: Injecting PluginService into plugin widget:", model.widgetId)
+                    item.pluginService = PluginService
+                    if (item.loadTimezones) {
+                        console.log("CenterSection: Calling loadTimezones for widget:", model.widgetId)
+                        item.loadTimezones()
+                    }
+                }
+
                 layoutTimer.restart()
             }
 
@@ -377,6 +397,29 @@ Item {
         target: widgetsModel
         function onCountChanged() {
             layoutTimer.restart()
+        }
+    }
+
+    // Listen for plugin changes and refresh components
+    Connections {
+        target: PluginService
+        function onPluginLoaded(pluginId) {
+            // Force refresh of component lookups
+            for (var i = 0; i < centerRepeater.count; i++) {
+                var item = centerRepeater.itemAt(i)
+                if (item && item.widgetId === pluginId) {
+                    item.sourceComponent = root.getWidgetComponent(pluginId)
+                }
+            }
+        }
+        function onPluginUnloaded(pluginId) {
+            // Force refresh of component lookups
+            for (var i = 0; i < centerRepeater.count; i++) {
+                var item = centerRepeater.itemAt(i)
+                if (item && item.widgetId === pluginId) {
+                    item.sourceComponent = root.getWidgetComponent(pluginId)
+                }
+            }
         }
     }
 }

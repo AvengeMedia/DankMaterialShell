@@ -38,7 +38,7 @@ ShellRoot {
         // Initialize WallpaperCyclingService
         WallpaperCyclingService.cyclingActive
         // Initialize PluginService by accessing its properties
-        console.log("Shell: PluginService directory:", PluginService.pluginDirectory)
+        PluginService.pluginDirectory
     }
 
     WallpaperBackground {}

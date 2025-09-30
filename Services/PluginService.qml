@@ -32,7 +32,6 @@ Singleton {
     }
 
     function initializePlugins() {
-        console.log("PluginService: Initializing plugins from:", pluginDirectory)
         scanPlugins()
     }
 
@@ -41,8 +40,6 @@ Singleton {
 
         stdout: StdioCollector {
             onStreamFinished: {
-                console.log("PluginService: Directory scan completed")
-                console.log("PluginService: ls output:", text)
                 var output = text.trim()
                 if (output) {
                     var directories = output.split('\n')
@@ -68,9 +65,7 @@ Singleton {
     }
 
     function scanPlugins() {
-        console.log("PluginService: Scanning plugins directory:", pluginDirectory)
         lsProcess.command = ["find", pluginDirectory, "-maxdepth", "1", "-type", "d", "-not", "-path", pluginDirectory, "-exec", "basename", "{}", ";"]
-        console.log("PluginService: Running command:", lsProcess.command)
         lsProcess.running = true
     }
 
