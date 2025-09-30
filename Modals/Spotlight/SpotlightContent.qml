@@ -33,6 +33,18 @@ Item {
                         } else if (event.key === Qt.Key_Left && appLauncher.viewMode === "grid") {
                             appLauncher.selectPreviousInRow()
                             event.accepted = true
+                        } else if (event.key == Qt.Key_J && event.modifiers & Qt.ControlModifier) {
+                            appLauncher.selectNext()
+                            event.accepted = true
+                        } else if (event.key == Qt.Key_K && event.modifiers & Qt.ControlModifier) {
+                            appLauncher.selectPrevious()
+                            event.accepted = true
+                        } else if (event.key == Qt.Key_L && event.modifiers & Qt.ControlModifier && appLauncher.viewMode === "grid") {
+                            appLauncher.selectNextInRow()
+                            event.accepted = true
+                        } else if (event.key == Qt.Key_H && event.modifiers & Qt.ControlModifier && appLauncher.viewMode === "grid") {
+                            appLauncher.selectPreviousInRow()
+                            event.accepted = true
                         } else if (event.key === Qt.Key_Tab) {
                             if (appLauncher.viewMode === "grid") {
                                 appLauncher.selectNextInRow()
@@ -41,6 +53,20 @@ Item {
                             }
                             event.accepted = true
                         } else if (event.key === Qt.Key_Backtab) {
+                            if (appLauncher.viewMode === "grid") {
+                                appLauncher.selectPreviousInRow()
+                            } else {
+                                appLauncher.selectPrevious()
+                            }
+                            event.accepted = true
+                        } else if (event.key === Qt.Key_N && event.modifiers & Qt.ControlModifier) {
+                            if (appLauncher.viewMode === "grid") {
+                                appLauncher.selectNextInRow()
+                            } else {
+                                appLauncher.selectNext()
+                            }
+                            event.accepted = true
+                        } else if (event.key === Qt.Key_P && event.modifiers & Qt.ControlModifier) {
                             if (appLauncher.viewMode === "grid") {
                                 appLauncher.selectPreviousInRow()
                             } else {
