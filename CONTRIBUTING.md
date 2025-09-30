@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions are welcome and encourages.
+Contributions are welcome and encouraged.
 
 ## Formatting
 
