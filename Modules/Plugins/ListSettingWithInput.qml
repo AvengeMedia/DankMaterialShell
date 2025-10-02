@@ -15,14 +15,25 @@ Column {
     width: parent.width
     spacing: Theme.spacingM
 
+    property bool isLoading: false
+
     Component.onCompleted: {
+        loadValue()
+    }
+
+    function loadValue() {
         const settings = findSettings()
         if (settings) {
+            isLoading = true
             items = settings.loadValue(settingKey, defaultValue)
+            isLoading = false
         }
     }
 
     onItemsChanged: {
+        if (isLoading) {
+            return
+        }
         const settings = findSettings()
         if (settings) {
             settings.saveValue(settingKey, items)
@@ -169,23 +180,37 @@ Column {
                 color: Theme.surfaceContainerHigh
                 border.width: 0
 
+                required property int index
+                required property var modelData
+
                 Row {
+                    id: itemRow
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingM
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: Theme.spacingM
 
+                    property var itemData: parent.modelData
+
                     Repeater {
                         model: root.fields
 
                         StyledText {
+                            required property int index
+                            required property var modelData
+
                             text: {
-                                const value = root.items[index][modelData.id]
+                                const field = modelData
+                                const item = itemRow.itemData
+                                if (!field || !field.id || !item) {
+                                    return ""
+                                }
+                                const value = item[field.id]
                                 return value || ""
                             }
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeMedium
-                            width: modelData.width || 200
+                            width: modelData ? (modelData.width || 200) : 200
                             elide: Text.ElideRight
                         }
                     }
@@ -203,7 +228,7 @@ Column {
                     StyledText {
                         anchors.centerIn: parent
                         text: "Remove"
-                        color: Theme.errorText
+                        color: Theme.onError
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                     }
