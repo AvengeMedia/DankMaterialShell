@@ -29,6 +29,11 @@
             nixpkgs.lib.genAttrs
             ["aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux"]
             (system: fn system nixpkgs.legacyPackages.${system});
+        buildDmsPkgs = pkgs: {
+            dmsCli = dms-cli.packages.${pkgs.system}.default;
+            dgop = dgop.packages.${pkgs.system}.dgop;
+            dankMaterialShell = self.packages.${pkgs.system}.dankMaterialShell;
+        };
     in {
         formatter = forEachSystem (_: pkgs: pkgs.alejandra);
 
@@ -49,16 +54,19 @@
         });
 
         homeModules.dankMaterialShell.default = {pkgs, ...}: let
-            dmsPkgs = {
-                dmsCli = dms-cli.packages.${pkgs.system}.default;
-                dgop = dgop.packages.${pkgs.system}.dgop;
-                dankMaterialShell = self.packages.${pkgs.system}.dankMaterialShell;
-            };
+            dmsPkgs = buildDmsPkgs pkgs;
         in {
             imports = [./nix/default.nix];
             _module.args.dmsPkgs = dmsPkgs;
         };
 
         homeModules.dankMaterialShell.niri = import ./nix/niri.nix;
+
+        nixosModules.greeter = {pkgs, ...}: let
+            dmsPkgs = buildDmsPkgs pkgs;
+        in {
+            imports = [./nix/greeter.nix];
+            _module.args.dmsPkgs = dmsPkgs;
+        };
     };
 }
