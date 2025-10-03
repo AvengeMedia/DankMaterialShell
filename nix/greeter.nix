@@ -53,7 +53,6 @@
         export XDG_SESSION_TYPE=wayland
         export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
         export EGL_PLATFORM=gbm
-        ln -sf ${lib.concatStringsSep " " cfg.configFiles} /var/lib/dmsgreeter
         ${sessionCommands.${cfg.compositor}}
     '';
 in {
@@ -103,6 +102,9 @@ in {
                 mode = "0755";
             };
         };
+        systemd.services.greetd.preStart = ''
+            ln -f ${lib.concatStringsSep " " cfg.configFiles} /var/lib/dmsgreeter/
+        '';
         programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
             "${cfg.configHome}/.config/DankMaterialShell/settings.json"
             "${cfg.configHome}/.local/state/DankMaterialShell/session.json"
