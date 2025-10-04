@@ -8,43 +8,21 @@
     inherit (lib) types;
     cfg = config.programs.dankMaterialShell.greeter;
 
-    sessionConfigs = {
-        niri = pkgs.writeText "niri.kdl" ''
-            hotkey-overlay {
-                skip-at-startup
-            }
+    user = config.services.greetd.settings.default_session.user;
 
-            environment {
-                DMS_RUN_GREETER "1"
-                DMS_GREET_CFG_DIR "/var/lib/dmsgreeter"
-            }
-
-            spawn-at-startup "sh" "-c" "${pkgs.quickshell}/bin/qs -p ${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms; niri msg action quit --skip-confirmation"
-
-            debug {
-              keep-max-bpc-unchanged
-            }
-
-            gestures {
-               hot-corners {
-                 off
-               }
-            }
-        '';
-        hyprland = pkgs.writeText "hyprland.conf" ''
-            env = DMS_RUN_GREETER,1
-            env = DMS_GREET_CFG_DIR,/var/lib/dmsgreeter
-
-            exec = sh -c "${pkgs.quickshell}/bin/qs -p ${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms; hyprctl dispatch exit"
-        '';
-    };
+    buildCompositorConfig = conf: pkgs.writeText "dmsgreeter-compositor-config" ''
+        ${(lib.replaceString "_DMS_PATH_" "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms" (lib.fileContents conf))}
+        ${cfg.compositor.extraConfig}
+    '';
 
     sessionCommands = {
         niri = ''
-            ${config.programs.niri.package}/bin/niri -c ${sessionConfigs.niri}
+            export PATH=$PATH:${lib.makeBinPath [ config.programs.niri.package ]}
+            niri -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl}
         '';
         hyprland = ''
-            ${config.programs.hyprland.package}/bin/hyprland -c ${sessionConfigs.hyprland}
+            export PATH=$PATH:${lib.makeBinPath [ config.programs.hyprland.package ]}
+            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl}
         '';
     };
 
@@ -53,14 +31,20 @@
         export XDG_SESSION_TYPE=wayland
         export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
         export EGL_PLATFORM=gbm
-        ${sessionCommands.${cfg.compositor}}
+        export DMS_GREET_CFG_DIR="/var/lib/dmsgreeter/"
+        export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package ]}
+        ${sessionCommands.${cfg.compositor.name}}
     '';
 in {
     options.programs.dankMaterialShell.greeter = {
         enable = lib.mkEnableOption "DankMaterialShell greeter";
-        compositor = lib.mkOption {
+        compositor.name = lib.mkOption {
             type = types.enum ["niri" "hyprland"];
             description = "Compositor to run greeter in";
+        };
+        compositor.extraConfig = lib.mkOption {
+            type = types.lines;
+            description = "Exra compositor config to include";
         };
         configFiles = lib.mkOption {
             type = types.listOf types.path;
@@ -79,8 +63,19 @@ in {
                 If DMS config files are in non-standard locations then use the configFiles option instead
             '';
         };
+        quickshell = {
+            package = lib.mkPackageOption pkgs "quickshell" {};
+        };
     };
     config = lib.mkIf cfg.enable {
+        assertions = [
+            {
+                assertion = (config.users.users.${user} or { }) != { };
+                message = ''
+                    dmsgreeter: user set for greetd default_session ${user} does not exist. Please create it before referencing it.
+                '';
+            }
+        ];
         services.greetd = {
             enable = lib.mkDefault true;
             settings.default_session.command = lib.mkDefault (lib.getExe greeterScript);
@@ -90,20 +85,23 @@ in {
             inter
             material-symbols
         ];
-        environment.systemPackages = with pkgs; [
-            fira-code
-            inter
-            material-symbols
-        ];
         systemd.tmpfiles.settings."10-dmsgreeter" = {
             "/var/lib/dmsgreeter".d = {
-                user = "greeter";
-                group = "greeter";
+                user = user;
+                group = if config.users.users.${user}.group != ""
+                    then config.users.users.${user}.group else "greeter";
                 mode = "0755";
             };
         };
         systemd.services.greetd.preStart = ''
-            ln -f ${lib.concatStringsSep " " cfg.configFiles} /var/lib/dmsgreeter/
+            cd /var/lib/dmsgreeter/
+            cp ${lib.concatStringsSep " " cfg.configFiles} .
+            if [ -f session.json ]; then
+                cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg
+                mv session.json session.orig.json
+                ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
+            fi
+            cd -
         '';
         programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
             "${cfg.configHome}/.config/DankMaterialShell/settings.json"
