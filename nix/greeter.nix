@@ -50,7 +50,7 @@ in {
         configFiles = lib.mkOption {
             type = types.listOf types.path;
             default = [];
-            description = "Config files to symlink into data directory";
+            description = "Config files to copy into data directory";
             example = [
                 "/home/user/.config/DankMaterialShell/settings.json"
             ];
@@ -60,7 +60,7 @@ in {
             default = null;
             example = "/home/user";
             description = ''
-                User home directory to symlink configurations for greeter
+                User home directory to copy configurations for greeter
                 If DMS config files are in non-standard locations then use the configFiles option instead
             '';
         };
