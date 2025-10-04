@@ -44,6 +44,7 @@ in {
         };
         compositor.extraConfig = lib.mkOption {
             type = types.lines;
+            default = "";
             description = "Exra compositor config to include";
         };
         configFiles = lib.mkOption {
