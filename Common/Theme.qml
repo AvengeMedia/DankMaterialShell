@@ -881,7 +881,7 @@ Singleton {
 
         function toggle(): string {
             root.toggleLightMode()
-            return root.isLightMode ? "light" : "dark"
+            return root.isLightMode ? "dark" : "light"
         }
 
         function light(): string {
