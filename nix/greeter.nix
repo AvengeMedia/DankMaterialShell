@@ -100,6 +100,7 @@ in {
                 cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg
                 mv session.json session.orig.json
                 ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
+                chown ${user} *
             fi
             cd -
         '';
