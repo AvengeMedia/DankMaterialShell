@@ -472,13 +472,13 @@ Singleton {
             splitMarker: "\n"
             onRead: line => {
                 if (line.startsWith("yes:")) {
-                    const rest = line.substring(2)
+                    const rest = line.substring(4)
                     const parts = root.splitNmcliFields(rest)
                     if (parts.length >= 2) {
-                        const signal = parseInt(parts[1])
+                        const signal = parseInt(parts[0])
                         console.log("Current WiFi signal strength:", signal)
                         root.wifiSignalStrength = isNaN(signal) ? 0 : signal
-                        root.currentWifiSSID = parts.slice(1).join(":")
+                        root.currentWifiSSID = parts[1]
                         console.log("Current WiFi SSID:", root.currentWifiSSID)
                     }
                     return
