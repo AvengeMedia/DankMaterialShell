@@ -65,7 +65,7 @@ Rectangle {
         spacing: 1
 
         DankIcon {
-            name: "memory"
+            name: "device_thermostat"
             size: Theme.iconSize - 8
             color: {
                 if (DgopService.cpuTemperature > 85) {
@@ -103,7 +103,7 @@ Rectangle {
         spacing: 3
 
         DankIcon {
-            name: "memory"
+            name: "device_thermostat"
             size: Theme.iconSize - 8
             color: {
                 if (DgopService.cpuTemperature > 85) {
