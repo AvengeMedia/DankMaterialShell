@@ -103,15 +103,20 @@ in {
             };
         };
         systemd.services.greetd.preStart = ''
-            cd /var/lib/dmsgreeter/
-            cp ${lib.concatStringsSep " " cfg.configFiles} .
+            cd /var/lib/dmsgreeter
+            ${lib.concatStringsSep "\n" (lib.map (f: ''
+                if [ -f "${f}" ]; then
+                    cp "${f}" .
+                fi
+            '') cfg.configFiles)}
+
             if [ -f session.json ]; then
-                cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg
-                mv session.json session.orig.json
-                ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
-                chown ${user} *
+                if cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg; then
+                    mv session.json session.orig.json
+                    ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
+                fi
             fi
-            cd -
+            chown ${user}: *
         '';
         programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
             "${cfg.configHome}/.config/DankMaterialShell/settings.json"
