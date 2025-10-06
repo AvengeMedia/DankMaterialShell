@@ -60,7 +60,7 @@ Enable the greeter with this in your NixOS config:
 programs.dankMaterialShell.greeter = {
   enable = true;
   compositor.name = "niri"; # or set to hyprland
-  configHome = "/home/user"; # optionally symlinks that users DMS settings to the greeters data directory
+  configHome = "/home/user"; # optionally copyies that users DMS settings (and wallpaper if set) to the greeters data directory as root before greeter starts
 };
 ```
 
