@@ -18,11 +18,11 @@
     sessionCommands = {
         niri = ''
             export PATH=$PATH:${lib.makeBinPath [ config.programs.niri.package ]}
-            niri -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl}
+            niri -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl} \
         '';
         hyprland = ''
             export PATH=$PATH:${lib.makeBinPath [ config.programs.hyprland.package ]}
-            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl}
+            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl} \
         '';
     };
 
@@ -33,7 +33,7 @@
         export EGL_PLATFORM=gbm
         export DMS_GREET_CFG_DIR="/var/lib/dmsgreeter/"
         export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package ]}
-        ${sessionCommands.${cfg.compositor.name}}
+        ${sessionCommands.${cfg.compositor.name}} ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
     '';
 in {
     options.programs.dankMaterialShell.greeter = {
@@ -66,6 +66,14 @@ in {
         };
         quickshell = {
             package = lib.mkPackageOption pkgs "quickshell" {};
+        };
+        logs.save = lib.mkEnableOption "saving logs from DMS greeter to file";
+        logs.path = lib.mkOption {
+            type = types.path;
+            default = "/tmp/dms-greeter.log";
+            description = ''
+                File path to save DMS greeter logs to
+            '';
         };
     };
     config = lib.mkIf cfg.enable {
