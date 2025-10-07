@@ -68,11 +68,7 @@ build_once() {
   [[ -z "$surface_base" ]] && surface_base="sc"
 
   CONFIG_DIR="${CONFIG_DIR:-$HOME/.config}"
-  
-  # Create user directories
   USER_MATUGEN_DIR="$CONFIG_DIR/matugen/dms"
-  [[ -d "$USER_MATUGEN_DIR/configs" ]] || mkdir -p "$USER_MATUGEN_DIR/configs"
-  [[ -d "$USER_MATUGEN_DIR/templates" ]] || mkdir -p "$USER_MATUGEN_DIR/templates"
   
   TMP_CFG="$(mktemp)"
   trap 'rm -f "$TMP_CFG"' RETURN
