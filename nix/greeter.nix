@@ -116,7 +116,7 @@ in {
                     ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
                 fi
             fi
-            chown ${user}: *
+            chown ${user}: * || :
         '';
         programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
             "${cfg.configHome}/.config/DankMaterialShell/settings.json"
