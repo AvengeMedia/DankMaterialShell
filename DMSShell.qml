@@ -195,7 +195,7 @@ Item {
           powerMenuModalLoader: controlCenterLoader.powerModalLoaderRef
 
           onLockRequested: {
-              lock.activate()
+              lockLoader.item.activate()
           }
 
           Component.onCompleted: {
