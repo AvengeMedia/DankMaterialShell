@@ -22,7 +22,7 @@
         '';
         hyprland = ''
             export PATH=$PATH:${lib.makeBinPath [ config.programs.hyprland.package ]}
-            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl} \
+            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-hypr.conf} \
         '';
     };
 
