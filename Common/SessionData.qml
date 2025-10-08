@@ -662,8 +662,8 @@ Singleton {
             }
         }
         onLoadFailed: error => {
-            if (!isGreeterMode && !hasTriedDefaultSettings) {
-                hasTriedDefaultSettings = true
+            if (!isGreeterMode && !hasTriedDefaultSession) {
+                hasTriedDefaultSession = true
                 defaultSessionCheckProcess.running = true
             }
         }
@@ -692,7 +692,7 @@ Singleton {
         id: defaultSessionCheckProcess
 
         command: ["sh", "-c", "CONFIG_DIR=\"" + _stateDir
-            + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-session.json\" ] && [ ! -f \"$CONFIG_DIR/session.json\" ]; then cp \"$CONFIG_DIR/default-session.json\" \"$CONFIG_DIR/session.json\" && echo 'copied'; else echo 'not_found'; fi"]
+            + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-session.json\" ] && [ ! -f \"$CONFIG_DIR/session.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-session.json\" \"$CONFIG_DIR/session.json\" && echo 'copied'; else echo 'not_found'; fi"]
         running: false
         onExited: exitCode => {
             if (exitCode === 0) {
