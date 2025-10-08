@@ -171,7 +171,7 @@ DankPopout {
                                     return "Failed to check for updates:\n" + SystemUpdateService.errorMessage;
                                 }
                                 if (!SystemUpdateService.helperAvailable) {
-                                    return "No package manager found. Please install 'paru' or 'yay' to check for updates.";
+                                    return "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.";
                                 }
                                 if (SystemUpdateService.isChecking) {
                                     return "Checking for updates...";

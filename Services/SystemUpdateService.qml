@@ -19,7 +19,48 @@ Singleton {
     property bool distributionSupported: false
     property string shellVersion: ""
 
-    readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros"]
+    readonly property var archBasedSettings: {
+        "listUpdatesParams": ["-Qu"],
+        "upgradeSettings": {
+            "params": ["-Syu"],
+            "requiresSudo": false
+        },
+        "parserSettings": {
+            "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
+            "entryProducer": function (match) {
+                return {
+                    "name": match[1],
+                    "currentVersion": match[2],
+                    "newVersion": match[3],
+                    "description": `${match[1]} ${match[2]} → ${match[3]}`
+                }
+            }
+        }
+    }
+
+    readonly property var packageManagerParams: {
+        "yay": archBasedSettings,
+        "paru": archBasedSettings,
+        "dnf": {
+            "listUpdatesParams": ["list", "--upgrades", "--quiet", "--color=never"],
+            "upgradeSettings": {
+                "params": ["upgrade"],
+                "requiresSudo": true
+            },
+            "parserSettings": {
+                "lineRegex": /^([^\s]+)\s+([^\s]+)\s+.*$/,
+                "entryProducer": function (match) {
+                    return {
+                        "name": match[1],
+                        "currentVersion": "",
+                        "newVersion": match[2],
+                        "description": `${match[1]} → ${match[2]}`
+                    }
+                }
+            }
+        }
+    }
+    readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros", "fedora"]
     readonly property int updateCount: availableUpdates.length
     readonly property bool helperAvailable: pkgManager !== "" && distributionSupported
 
@@ -63,7 +104,7 @@ Singleton {
 
     Process {
         id: helperDetection
-        command: ["sh", "-c", "which paru || which yay"]
+        command: ["sh", "-c", "which paru || which yay || which dnf"]
 
         onExited: (exitCode) => {
             if (exitCode === 0) {
@@ -110,7 +151,7 @@ Singleton {
 
         isChecking = true
         hasError = false
-        updateChecker.command = [pkgManager, "-Qu"]
+        updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesParams)
         updateChecker.running = true
     }
 
@@ -118,15 +159,13 @@ Singleton {
         const lines = output.trim().split('\n').filter(line => line.trim())
         const updates = []
 
+        const regex = packageManagerParams[pkgManager].parserSettings.lineRegex
+        const entryProducer = packageManagerParams[pkgManager].parserSettings.entryProducer
+
         for (const line of lines) {
-            const match = line.match(/^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/)
+            const match = line.match(regex)
             if (match) {
-                updates.push({
-                    name: match[1],
-                    currentVersion: match[2],
-                    newVersion: match[3],
-                    description: `${match[1]} ${match[2]} → ${match[3]}`
-                })
+                updates.push(entryProducer(match))
             }
         }
 
@@ -137,7 +176,9 @@ Singleton {
         if (!distributionSupported || !pkgManager || updateCount === 0) return
 
         const terminal = Quickshell.env("TERMINAL") || "xterm"
-        const updateCommand = `${pkgManager} -Syu && echo "Updates complete! Press Enter to close..." && read`
+        const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ")
+        const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : ""
+        const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`
 
         updater.command = [terminal, "-e", "sh", "-c", updateCommand]
         updater.running = true
