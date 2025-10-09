@@ -781,7 +781,7 @@ DankModal {
                     width: parent.width - saveButton.width - Theme.spacingM
                     height: 40
                     text: defaultFileName
-                    placeholderText: qsTr("Enter filename...")
+                    placeholderText: I18n.tr("Enter filename...")
                     ignoreLeftRightKeys: false
                     focus: saveMode
                     topPadding: Theme.spacingS
@@ -814,7 +814,7 @@ DankModal {
 
                     StyledText {
                         anchors.centerIn: parent
-                        text: qsTr("Save")
+                        text: I18n.tr("Save")
                         color: fileNameInput.text.trim() !== "" ? Theme.primaryText : Theme.surfaceVariantText
                         font.pixelSize: Theme.fontSizeMedium
                     }
@@ -918,7 +918,7 @@ DankModal {
                         spacing: Theme.spacingM
                         
                         StyledText {
-                            text: qsTr("File Already Exists")
+                            text: I18n.tr("File Already Exists")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -926,7 +926,7 @@ DankModal {
                         }
                         
                         StyledText {
-                            text: qsTr("A file with this name already exists. Do you want to overwrite it?")
+                            text: I18n.tr("A file with this name already exists. Do you want to overwrite it?")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceTextMedium
                             width: parent.width
@@ -948,7 +948,7 @@ DankModal {
                                 
                                 StyledText {
                                     anchors.centerIn: parent
-                                    text: qsTr("Cancel")
+                                    text: I18n.tr("Cancel")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceText
                                     font.weight: Font.Medium
@@ -974,7 +974,7 @@ DankModal {
                                 
                                 StyledText {
                                     anchors.centerIn: parent
-                                    text: qsTr("Overwrite")
+                                    text: I18n.tr("Overwrite")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.background
                                     font.weight: Font.Medium

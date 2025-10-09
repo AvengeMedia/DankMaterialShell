@@ -127,7 +127,7 @@ DankFlickable {
                                 }
 
                                 StyledText {
-                                    text: qsTr("System")
+                                    text: I18n.tr("System")
                                     font.pixelSize: Theme.fontSizeSmall
                                     font.family: SettingsData.monoFontFamily
                                     font.weight: Font.Bold
@@ -411,7 +411,7 @@ DankFlickable {
                     }
 
                     StyledText {
-                        text: qsTr("Storage & Disks")
+                        text: I18n.tr("Storage & Disks")
                         font.pixelSize: Theme.fontSizeLarge
                         font.family: SettingsData.monoFontFamily
                         font.weight: Font.Bold
@@ -431,7 +431,7 @@ DankFlickable {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Device")
+                            text: I18n.tr("Device")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold
@@ -442,7 +442,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: qsTr("Mount")
+                            text: I18n.tr("Mount")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold
@@ -453,7 +453,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: qsTr("Size")
+                            text: I18n.tr("Size")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold
@@ -464,7 +464,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: qsTr("Used")
+                            text: I18n.tr("Used")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold
@@ -475,7 +475,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: qsTr("Available")
+                            text: I18n.tr("Available")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold
@@ -486,7 +486,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: qsTr("Use%")
+                            text: I18n.tr("Use%")
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             font.weight: Font.Bold

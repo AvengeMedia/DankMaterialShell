@@ -105,7 +105,7 @@ Rectangle {
         spacing: Theme.spacingM
 
         StyledText {
-            text: qsTr("Notification Settings")
+            text: I18n.tr("Notification Settings")
             font.pixelSize: Theme.fontSizeMedium
             font.weight: Font.Bold
             color: Theme.surfaceText
@@ -128,7 +128,7 @@ Rectangle {
                 }
 
                 StyledText {
-                    text: qsTr("Do Not Disturb")
+                    text: I18n.tr("Do Not Disturb")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
@@ -150,14 +150,14 @@ Rectangle {
         }
 
         StyledText {
-            text: qsTr("Notification Timeouts")
+            text: I18n.tr("Notification Timeouts")
             font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
             color: Theme.surfaceVariantText
         }
 
         DankDropdown {
-            text: qsTr("Low Priority")
+            text: I18n.tr("Low Priority")
             description: "Timeout for low priority notifications"
             currentValue: getTimeoutText(SettingsData.notificationTimeoutLow)
             options: timeoutOptions.map(opt => opt.text)
@@ -172,7 +172,7 @@ Rectangle {
         }
 
         DankDropdown {
-            text: qsTr("Normal Priority")
+            text: I18n.tr("Normal Priority")
             description: "Timeout for normal priority notifications"
             currentValue: getTimeoutText(SettingsData.notificationTimeoutNormal)
             options: timeoutOptions.map(opt => opt.text)
@@ -187,7 +187,7 @@ Rectangle {
         }
 
         DankDropdown {
-            text: qsTr("Critical Priority")
+            text: I18n.tr("Critical Priority")
             description: "Timeout for critical priority notifications"
             currentValue: getTimeoutText(SettingsData.notificationTimeoutCritical)
             options: timeoutOptions.map(opt => opt.text)
@@ -228,13 +228,13 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
 
                     StyledText {
-                        text: qsTr("Notification Overlay")
+                        text: I18n.tr("Notification Overlay")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceText
                     }
 
                     StyledText {
-                        text: qsTr("Display all priorities over fullscreen apps")
+                        text: I18n.tr("Display all priorities over fullscreen apps")
                         font.pixelSize: Theme.fontSizeSmall - 1
                         color: Theme.surfaceVariantText
                     }

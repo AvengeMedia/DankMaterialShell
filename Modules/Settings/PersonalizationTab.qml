@@ -104,7 +104,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Wallpaper")
+                            text: I18n.tr("Wallpaper")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -438,14 +438,14 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 StyledText {
-                                    text: qsTr("Per-Mode Wallpapers")
+                                    text: I18n.tr("Per-Mode Wallpapers")
                                     font.pixelSize: Theme.fontSizeLarge
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
                                 }
 
                                 StyledText {
-                                    text: qsTr("Set different wallpapers for light and dark mode")
+                                    text: I18n.tr("Set different wallpapers for light and dark mode")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     width: parent.width
@@ -495,14 +495,14 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 StyledText {
-                                    text: qsTr("Per-Monitor Wallpapers")
+                                    text: I18n.tr("Per-Monitor Wallpapers")
                                     font.pixelSize: Theme.fontSizeLarge
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
                                 }
 
                                 StyledText {
-                                    text: qsTr("Set different wallpapers for each connected monitor")
+                                    text: I18n.tr("Set different wallpapers for each connected monitor")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     width: parent.width
@@ -527,7 +527,7 @@ Item {
                             leftPadding: Theme.iconSize + Theme.spacingM
 
                             StyledText {
-                                text: qsTr("Monitor Selection:")
+                                text: I18n.tr("Monitor Selection:")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium
@@ -536,8 +536,8 @@ Item {
                             DankDropdown {
                                 id: monitorDropdown
 
-                                text: qsTr("Monitor")
-                                description: "Select monitor to configure wallpaper"
+                                text: I18n.tr("Monitor")
+                                description: I18n.tr("Select monitor to configure wallpaper")
                                 currentValue: selectedMonitorName || "No monitors"
                                 options: {
                                     var screenNames = []
@@ -584,14 +584,14 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 StyledText {
-                                    text: qsTr("Automatic Cycling")
+                                    text: I18n.tr("Automatic Cycling")
                                     font.pixelSize: Theme.fontSizeLarge
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
                                 }
 
                                 StyledText {
-                                    text: qsTr("Automatically cycle through wallpapers in the same folder")
+                                    text: I18n.tr("Automatically cycle through wallpapers in the same folder")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     width: parent.width
@@ -633,7 +633,7 @@ Item {
                                 width: parent.width - parent.leftPadding
 
                                 StyledText {
-                                    text: qsTr("Mode:")
+                                    text: I18n.tr("Mode:")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
@@ -700,8 +700,8 @@ Item {
                                         return SessionData.wallpaperCyclingMode === "interval"
                                     }
                                 }
-                                text: qsTr("Interval")
-                                description: "How often to change wallpaper"
+                                text: I18n.tr("Interval")
+                                description: I18n.tr("How often to change wallpaper")
                                 options: intervalOptions
                                 currentValue: {
                                     var currentSeconds
@@ -755,7 +755,7 @@ Item {
                                 width: parent.width - parent.leftPadding
 
                                 StyledText {
-                                    text: qsTr("Daily at:")
+                                    text: I18n.tr("Daily at:")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
@@ -830,7 +830,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: qsTr("24-hour format")
+                                    text: I18n.tr("24-hour format")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     anchors.verticalCenter: parent.verticalCenter
@@ -847,8 +847,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Transition Effect")
-                        description: "Visual effect used when wallpaper changes"
+                        text: I18n.tr("Transition Effect")
+                        description: I18n.tr("Visual effect used when wallpaper changes")
                         currentValue: {
                             if (SessionData.wallpaperTransition === "random") return "Random"
                             return SessionData.wallpaperTransition.charAt(0).toUpperCase() + SessionData.wallpaperTransition.slice(1)
@@ -866,14 +866,14 @@ Item {
                         visible: SessionData.wallpaperTransition === "random"
 
                         StyledText {
-                            text: qsTr("Include Transitions")
+                            text: I18n.tr("Include Transitions")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
                         }
 
                         StyledText {
-                            text: qsTr("Select which transitions to include in randomization")
+                            text: I18n.tr("Select which transitions to include in randomization")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
@@ -938,14 +938,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Dynamic Theming")
+                                text: I18n.tr("Dynamic Theming")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Automatically extract colors from wallpaper")
+                                text: I18n.tr("Automatically extract colors from wallpaper")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -970,7 +970,7 @@ Item {
 
                     DankDropdown {
                         id: personalizationMatugenPaletteDropdown
-                        text: qsTr("Matugen Palette")
+                        text: I18n.tr("Matugen Palette")
                         description: "Select the palette algorithm used for wallpaper-based colors"
                         options: Theme.availableMatugenSchemes.map(function (option) { return option.label })
                         currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
@@ -999,7 +999,7 @@ Item {
                     }
 
                     StyledText {
-                        text: qsTr("matugen not detected - dynamic theming unavailable")
+                        text: I18n.tr("matugen not detected - dynamic theming unavailable")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.error
                         visible: ToastService.wallpaperErrorStatus === "matugen_missing"
@@ -1037,7 +1037,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Display Settings")
+                            text: I18n.tr("Display Settings")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1047,8 +1047,8 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Light Mode")
-                        description: "Use light theme instead of dark theme"
+                        text: I18n.tr("Light Mode")
+                        description: I18n.tr("Use light theme instead of dark theme")
                         checked: SessionData.isLightMode
                         onToggleCompleted: checked => {
                                        Theme.screenTransition()
@@ -1068,7 +1068,7 @@ Item {
                         id: nightModeToggle
 
                         width: parent.width
-                        text: qsTr("Night Mode")
+                        text: I18n.tr("Night Mode")
                         description: "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates."
                         checked: DisplayService.nightModeEnabled
                         onToggled: checked => {
@@ -1085,8 +1085,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Temperature")
-                        description: "Color temperature for night mode"
+                        text: I18n.tr("Temperature")
+                        description: I18n.tr("Color temperature for night mode")
                         currentValue: SessionData.nightModeTemperature + "K"
                         options: {
                             var temps = []
@@ -1104,7 +1104,7 @@ Item {
                     DankToggle {
                         id: automaticToggle
                         width: parent.width
-                        text: qsTr("Automatic Control")
+                        text: I18n.tr("Automatic Control")
                         description: "Only adjust gamma based on time or location rules."
                         checked: SessionData.nightModeAutoEnabled
                         onToggled: checked => {
@@ -1187,7 +1187,7 @@ Item {
                                 leftPadding: 45
 
                                 StyledText {
-                                    text: qsTr("Hour")
+                                    text: I18n.tr("Hour")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     width: 50
@@ -1196,7 +1196,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: qsTr("Minute")
+                                    text: I18n.tr("Minute")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                     width: 50
@@ -1212,7 +1212,7 @@ Item {
 
                                 StyledText {
                                     id: startLabel
-                                    text: qsTr("Start")
+                                    text: I18n.tr("Start")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceText
                                     width: 50
@@ -1260,7 +1260,7 @@ Item {
                                 height: 32
 
                                 StyledText {
-                                    text: qsTr("End")
+                                    text: I18n.tr("End")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.surfaceText
                                     width: startLabel.width
@@ -1311,7 +1311,7 @@ Item {
 
                             DankToggle {
                                 width: parent.width
-                                text: qsTr("Auto-location")
+                                text: I18n.tr("Auto-location")
                                 description: DisplayService.geoclueAvailable ? "Use automatic location detection (geoclue2)" : "Geoclue service not running - cannot auto-detect location"
                                 checked: SessionData.nightModeLocationProvider === "geoclue2"
                                 enabled: DisplayService.geoclueAvailable
@@ -1327,7 +1327,7 @@ Item {
                             }
 
                             StyledText {
-                                text: qsTr("Manual Coordinates")
+                                text: I18n.tr("Manual Coordinates")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
                                 visible: SessionData.nightModeLocationProvider !== "geoclue2"
@@ -1341,7 +1341,7 @@ Item {
                                     spacing: Theme.spacingXS
 
                                     StyledText {
-                                        text: qsTr("Latitude")
+                                        text: I18n.tr("Latitude")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                     }
@@ -1364,7 +1364,7 @@ Item {
                                     spacing: Theme.spacingXS
 
                                     StyledText {
-                                        text: qsTr("Longitude")
+                                        text: I18n.tr("Longitude")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                     }
@@ -1385,7 +1385,7 @@ Item {
                             }
 
                             StyledText {
-                                text: "Uses sunrise/sunset times to automatically adjust night mode based on your location."
+                                text: I18n.tr("Uses sunrise/sunset times to automatically adjust night mode based on your location.")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 width: parent.width
@@ -1424,7 +1424,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Notification Popups")
+                            text: I18n.tr("Notification Popups")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1433,8 +1433,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Popup Position")
-                        description: "Choose where notification popups appear on screen"
+                        text: I18n.tr("Popup Position")
+                        description: I18n.tr("Choose where notification popups appear on screen")
                         currentValue: {
                             if (SettingsData.notificationPopupPosition === -1) {
                                 return "Top Center"
@@ -1484,8 +1484,8 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Always Show OSD Percentage")
-                        description: "Display volume and brightness percentage values by default in OSD popups"
+                        text: I18n.tr("Always Show OSD Percentage")
+                        description: I18n.tr("Display volume and brightness percentage values by default in OSD popups")
                         checked: SettingsData.osdAlwaysShowValue
                         onToggled: checked => {
                                        SettingsData.setOsdAlwaysShowValue(checked)
@@ -1522,7 +1522,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Font Settings")
+                            text: I18n.tr("Font Settings")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1531,8 +1531,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Font Family")
-                        description: "Select system font family"
+                        text: I18n.tr("Font Family")
+                        description: I18n.tr("Select system font family")
                         currentValue: {
                             if (SettingsData.fontFamily === SettingsData.defaultFontFamily)
                                 return "Default"
@@ -1552,8 +1552,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Font Weight")
-                        description: "Select font weight"
+                        text: I18n.tr("Font Weight")
+                        description: I18n.tr("Select font weight")
                         currentValue: {
                             switch (SettingsData.fontWeight) {
                             case Font.Thin:
@@ -1618,8 +1618,8 @@ Item {
                     }
 
                     DankDropdown {
-                        text: qsTr("Monospace Font")
-                        description: "Select monospace font for process list and technical displays"
+                        text: I18n.tr("Monospace Font")
+                        description: I18n.tr("Select monospace font for process list and technical displays")
                         currentValue: {
                             if (SettingsData.monoFontFamily === SettingsData.defaultMonoFontFamily)
                                 return "Default"
@@ -1653,14 +1653,14 @@ Item {
                             spacing: Theme.spacingXS
 
                             StyledText {
-                                text: qsTr("Font Scale")
+                                text: I18n.tr("Font Scale")
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Scale all font sizes")
+                                text: I18n.tr("Scale all font sizes")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 width: parent.width
@@ -1752,7 +1752,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Animations")
+                            text: I18n.tr("Animations")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1765,14 +1765,14 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Animation Speed")
+                            text: I18n.tr("Animation Speed")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
                         }
 
                         StyledText {
-                            text: qsTr("Control the speed of animations throughout the interface")
+                            text: I18n.tr("Control the speed of animations throughout the interface")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                             wrapMode: Text.WordWrap
@@ -1823,7 +1823,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Lock Screen")
+                            text: I18n.tr("Lock Screen")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1833,7 +1833,7 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Show Power Actions")
+                        text: I18n.tr("Show Power Actions")
                         description: "Show power, restart, and logout buttons on the lock screen"
                         checked: SettingsData.lockScreenShowPowerActions
                         onToggled: checked => {

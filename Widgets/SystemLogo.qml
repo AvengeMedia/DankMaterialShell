@@ -22,8 +22,12 @@ IconImage {
 
         stdout: StdioCollector {
             onStreamFinished: () => {
-                                  source = Quickshell.iconPath(text.trim(), true)
-                              }
+                if (text.trim() === "cachyos") {
+                    source = "file:///usr/share/icons/cachyos.svg"
+                    return
+                }
+                source = Quickshell.iconPath(text.trim(), true)
+            }
         }
     }
 

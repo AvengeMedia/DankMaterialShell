@@ -85,7 +85,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Copy PID")
+                    text: I18n.tr("Copy PID")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     font.weight: Font.Normal
@@ -118,7 +118,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Copy Process Name")
+                    text: I18n.tr("Copy Process Name")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     font.weight: Font.Normal
@@ -168,7 +168,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Kill Process")
+                    text: I18n.tr("Kill Process")
                     font.pixelSize: Theme.fontSizeSmall
                     color: parent.enabled ? (killArea.containsMouse ? Theme.error : Theme.surfaceText) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
                     font.weight: Font.Normal
@@ -204,7 +204,7 @@ Popup {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Force Kill Process")
+                    text: I18n.tr("Force Kill Process")
                     font.pixelSize: Theme.fontSizeSmall
                     color: parent.enabled ? (forceKillArea.containsMouse ? Theme.error : Theme.surfaceText) : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
                     font.weight: Font.Normal

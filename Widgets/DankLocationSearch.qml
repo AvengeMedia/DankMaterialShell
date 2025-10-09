@@ -19,7 +19,7 @@ Item {
     }
 
     property string currentLocation: ""
-    property string placeholderText: qsTr("Search for a location...")
+    property string placeholderText: I18n.tr("Search for a location...")
     property bool _internalChange: false
     property bool isLoading: false
     property string currentSearchText: ""

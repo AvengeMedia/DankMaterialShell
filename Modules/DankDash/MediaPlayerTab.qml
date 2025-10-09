@@ -305,7 +305,7 @@ Item {
         }
 
         StyledText {
-            text: qsTr("No Active Players")
+            text: I18n.tr("No Active Players")
             font.pixelSize: Theme.fontSizeLarge
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter
@@ -406,7 +406,7 @@ Item {
                 anchors.margins: Theme.spacingM
                 
                 StyledText {
-                    text: qsTr("Audio Output Devices (") + audioDevicesDropdown.availableDevices.length + ")"
+                    text: I18n.tr("Audio Output Devices (") + audioDevicesDropdown.availableDevices.length + ")"
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -564,7 +564,7 @@ Item {
                 anchors.margins: Theme.spacingM
 
                 StyledText {
-                    text: qsTr("Media Players (") + (allPlayers?.length || 0) + ")"
+                    text: I18n.tr("Media Players (") + (allPlayers?.length || 0) + ")"
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText

@@ -265,7 +265,7 @@ Column {
             StyledText {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignVCenter
-                text: qsTr("Find in note...")
+                text: I18n.tr("Find in note...")
                 font: searchField.font
                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
                 visible: searchField.text.length === 0 && !searchField.activeFocus
@@ -275,7 +275,7 @@ Column {
             // Match count display
             StyledText {
                 Layout.alignment: Qt.AlignVCenter
-                text: matchCount > 0 ? qsTr("%1/%2").arg(currentMatchIndex + 1).arg(matchCount) : searchQuery.length > 0 ? qsTr("No matches") : ""
+                text: matchCount > 0 ? I18n.tr("%1/%2").arg(currentMatchIndex + 1).arg(matchCount) : searchQuery.length > 0 ? I18n.tr("No matches") : ""
                 font.pixelSize: Theme.fontSizeSmall
                 color: matchCount > 0 ? Theme.primary : Theme.surfaceTextMedium
                 visible: searchQuery.length > 0
@@ -383,7 +383,7 @@ Column {
 
             TextArea.flickable: TextArea {
                 id: textArea
-                placeholderText: qsTr("Start typing your notes here...")
+                placeholderText: I18n.tr("Start typing your notes here...")
                 placeholderTextColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
                 font.family: SettingsData.notepadUseMonospace ? SettingsData.monoFontFamily : (SettingsData.notepadFontFamily || SettingsData.fontFamily)
                 font.pixelSize: SettingsData.notepadFontSize * SettingsData.fontScale
@@ -508,7 +508,7 @@ Column {
                     }
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Save")
+                        text: I18n.tr("Save")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextMedium
                     }
@@ -524,7 +524,7 @@ Column {
                     }
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Open")
+                        text: I18n.tr("Open")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextMedium
                     }
@@ -540,7 +540,7 @@ Column {
                     }
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("New")
+                        text: I18n.tr("New")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceTextMedium
                     }
@@ -562,13 +562,13 @@ Column {
             spacing: Theme.spacingL
 
             StyledText {
-                text: textArea.text.length > 0 ? qsTr("%1 characters").arg(textArea.text.length) : qsTr("Empty")
+                text: textArea.text.length > 0 ? I18n.tr("%1 characters").arg(textArea.text.length) : I18n.tr("Empty")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
             }
 
             StyledText {
-                text: qsTr("Lines: %1").arg(textArea.lineCount)
+                text: I18n.tr("Lines: %1").arg(textArea.lineCount)
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 visible: textArea.text.length > 0
@@ -578,17 +578,17 @@ Column {
             StyledText {
                 text: {
                     if (autoSaveTimer.running) {
-                        return qsTr("Auto-saving...")
+                        return I18n.tr("Auto-saving...")
                     }
 
                     if (hasUnsavedChanges()) {
                         if (currentTab && currentTab.isTemporary) {
-                            return qsTr("Unsaved note...")
+                            return I18n.tr("Unsaved note...")
                         } else {
-                            return qsTr("Unsaved changes")
+                            return I18n.tr("Unsaved changes")
                         }
                     } else {
-                        return qsTr("Saved")
+                        return I18n.tr("Saved")
                     }
                 }
                 font.pixelSize: Theme.fontSizeSmall

@@ -119,7 +119,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: -Theme.spacingXS
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Notepad Font Settings")
+                    text: I18n.tr("Notepad Font Settings")
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                     color: Theme.surfaceText
@@ -136,7 +136,7 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: -Theme.spacingM
                 width: parent.width + Theme.spacingM
-                text: qsTr("Use Monospace Font")
+                text: I18n.tr("Use Monospace Font")
                 description: "Toggle fonts"
                 checked: SettingsData.notepadUseMonospace
                 onToggled: checked => {
@@ -148,7 +148,7 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: -Theme.spacingM
                 width: parent.width + Theme.spacingM
-                text: qsTr("Show Line Numbers")
+                text: I18n.tr("Show Line Numbers")
                 description: "Display line numbers in editor"
                 checked: SettingsData.notepadShowLineNumbers
                 onToggled: checked => {
@@ -191,14 +191,14 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: qsTr("Find in Text")
+                            text: I18n.tr("Find in Text")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                         }
 
                         StyledText {
-                            text: qsTr("Open search bar to find text")
+                            text: I18n.tr("Open search bar to find text")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
@@ -217,7 +217,7 @@ Item {
                     anchors.left: parent.left 
                     anchors.leftMargin: -Theme.spacingM
                     width: parent.width + Theme.spacingM
-                    text: qsTr("Font Family")
+                    text: I18n.tr("Font Family")
                     options: cachedFontFamilies
                     currentValue: {
                         if (!SettingsData.notepadFontFamily || SettingsData.notepadFontFamily === "")
@@ -251,7 +251,7 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: qsTr("Font Size")
+                            text: I18n.tr("Font Size")
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -330,7 +330,7 @@ Item {
                         anchors.left: parent.left
                         anchors.leftMargin: -Theme.spacingM
                         width: parent.width + Theme.spacingM
-                        text: qsTr("Custom Transparency")
+                        text: I18n.tr("Custom Transparency")
                         description: "Override global transparency for Notepad"
                         checked: SettingsData.notepadTransparencyOverride >= 0
                         onToggled: checked => {

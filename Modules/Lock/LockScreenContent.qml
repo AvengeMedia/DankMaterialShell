@@ -609,7 +609,7 @@ Item {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.margins: Theme.spacingXL
-            text: qsTr("DEMO MODE - Click anywhere to exit")
+            text: I18n.tr("DEMO MODE - Click anywhere to exit")
             font.pixelSize: Theme.fontSizeSmall
             color: "white"
             opacity: 0.7
@@ -1244,7 +1244,7 @@ Item {
 
                         StyledText {
                             anchors.centerIn: parent
-                            text: qsTr("Cancel")
+                            text: I18n.tr("Cancel")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeMedium
                         }

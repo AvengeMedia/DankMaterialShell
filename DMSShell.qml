@@ -409,7 +409,7 @@ Item {
       delegate: DankSlideout {
           id: notepadSlideout
           modelData: item
-          title: qsTr("Notepad")
+          title: I18n.tr("Notepad")
           slideoutWidth: 480
           expandable: true
           expandedWidthValue: 960

@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1757252286,
-        "narHash": "sha256-QwWQzlxAGvIi6VAc8DQ6ONCKKwtPyaHQW1cQyGbP7Og=",
+        "lastModified": 1759769087,
+        "narHash": "sha256-b4dEAjvIfIkw2/C47aZGDnwhTBEjqptDo8J5PizeTCo=",
         "owner": "AvengeMedia",
         "repo": "dgop",
-        "rev": "a65a02ddf8bade9c109d055e644e4bd851183bd5",
+        "rev": "ad6ad285e8b882c41eb8994ef7c91e151afb9a97",
         "type": "github"
       },
       "original": {
@@ -27,11 +27,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1757296630,
-        "narHash": "sha256-3H236F5oIKkqpfnwrvZQs4Y5imKb6JCMFGDkHs8VDjQ=",
+        "lastModified": 1759946376,
+        "narHash": "sha256-/kQpJPH1y+U6V7N3bbGzvNRGfk9VuxdZev9Os4bS5ZQ=",
         "owner": "AvengeMedia",
         "repo": "danklinux",
-        "rev": "dac591711ab30d6b071a5cec674a3d2e04665ee1",
+        "rev": "98db89ffba290265bc4a886d13b8a27a53fdaca1",
         "type": "github"
       },
       "original": {
@@ -42,11 +42,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1757034884,
-        "narHash": "sha256-PgLSZDBEWUHpfTRfFyklmiiLBE1i1aGCtz4eRA3POao=",
+        "lastModified": 1759826507,
+        "narHash": "sha256-vwXL9H5zDHEQA0oFpww2one0/hkwnPAjc47LRph6d0I=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "ca77296380960cd497a765102eeb1356eb80fed0",
+        "rev": "bce5fe2bb998488d8e7e7856315f90496723793c",
         "type": "github"
       },
       "original": {
@@ -63,11 +63,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1756981260,
-        "narHash": "sha256-GhuD9QVimjynHI0OOyZsqJsnlXr2orowh9H+HYz4YMs=",
+        "lastModified": 1759610621,
+        "narHash": "sha256-P3UPFd95mS/3aNgy40nCXAmyfR2bEEBd+tX6xfkYFb0=",
         "ref": "refs/heads/master",
-        "rev": "6eb12551baf924f8fdecdd04113863a754259c34",
-        "revCount": 672,
+        "rev": "c5c438f1cd1a76660a8658ef929a3d19e968e2ce",
+        "revCount": 689,
         "type": "git",
         "url": "https://git.outfoxxed.me/quickshell/quickshell"
       },

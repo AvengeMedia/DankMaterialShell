@@ -480,7 +480,7 @@ Column {
                                 StyledText {
                                     id: tooltipText
                                     anchors.centerIn: parent
-                                    text: qsTr("Compact Mode")
+                                    text: I18n.tr("Compact Mode")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceText
                                 }
@@ -667,7 +667,7 @@ Column {
         anchors.horizontalCenter: parent.horizontalCenter
 
         StyledText {
-            text: qsTr("Add Widget")
+            text: I18n.tr("Add Widget")
             font.pixelSize: Theme.fontSizeSmall
             font.weight: Font.Medium
             color: Theme.primary
@@ -752,7 +752,7 @@ Column {
                         }
 
                         StyledText {
-                            text: qsTr("Network Icon")
+                            text: I18n.tr("Network Icon")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal
@@ -805,7 +805,7 @@ Column {
                         }
 
                         StyledText {
-                            text: qsTr("Bluetooth Icon")
+                            text: I18n.tr("Bluetooth Icon")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal
@@ -858,7 +858,7 @@ Column {
                         }
 
                         StyledText {
-                            text: qsTr("Audio Icon")
+                            text: I18n.tr("Audio Icon")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Normal

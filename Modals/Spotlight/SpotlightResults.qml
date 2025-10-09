@@ -19,7 +19,7 @@ Rectangle {
     height: parent.height - y
     radius: Theme.cornerRadius
     color: "transparent"
-    clip: false
+    clip: true
 
     DankListView {
         id: resultsList

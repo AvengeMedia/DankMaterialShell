@@ -77,6 +77,27 @@
     "comment": ""
   },
   {
+    "term": "Access clipboard history",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Access to notifications and do not disturb",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Access to system controls and settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Actions",
     "translation": "",
     "context": "",
@@ -126,6 +147,13 @@
     "comment": ""
   },
   {
+    "term": "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Always Show OSD Percentage",
     "translation": "",
     "context": "",
@@ -141,6 +169,13 @@
   },
   {
     "term": "Animations",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "App Launcher",
     "translation": "",
     "context": "",
     "reference": "",
@@ -371,6 +406,20 @@
     "comment": ""
   },
   {
+    "term": "Battery",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Battery level and power management",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Battery not detected - only AC power settings available",
     "translation": "",
     "context": "",
@@ -427,6 +476,34 @@
     "comment": ""
   },
   {
+    "term": "CPU Temperature",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "CPU Usage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "CPU temperature display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "CPU usage indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Cancel",
     "translation": "",
     "context": "",
@@ -442,6 +519,13 @@
   },
   {
     "term": "Center Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Check for system updates",
     "translation": "",
     "context": "",
     "reference": "",
@@ -469,6 +553,13 @@
     "comment": ""
   },
   {
+    "term": "Choose where notification popups appear on screen",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Clear",
     "translation": "",
     "context": "",
@@ -483,6 +574,34 @@
     "comment": ""
   },
   {
+    "term": "Clear All History?",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Clipboard History",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Clipboard Manager",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Clock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Close",
     "translation": "",
     "context": "",
@@ -491,6 +610,20 @@
   },
   {
     "term": "Color Override",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Color Picker",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Color temperature for night mode",
     "translation": "",
     "context": "",
     "reference": "",
@@ -560,7 +693,28 @@
     "comment": ""
   },
   {
+    "term": "Control Center",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Control currently playing media",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Control the speed of animations throughout the interface",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Copied to clipboard",
     "translation": "",
     "context": "",
     "reference": "",
@@ -595,6 +749,13 @@
     "comment": ""
   },
   {
+    "term": "Corner Radius (0 = square corners)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Create Dir",
     "translation": "",
     "context": "",
@@ -610,6 +771,20 @@
   },
   {
     "term": "Current Items",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Current time and date display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Current weather conditions and temperature",
     "translation": "",
     "context": "",
     "reference": "",
@@ -644,6 +819,13 @@
     "comment": ""
   },
   {
+    "term": "Customizable empty space",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "DEMO MODE - Click anywhere to exit",
     "translation": "",
     "context": "",
@@ -666,6 +848,13 @@
   },
   {
     "term": "Daily at:",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dank Bar",
     "translation": "",
     "context": "",
     "reference": "",
@@ -701,6 +890,13 @@
   },
   {
     "term": "Date Format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Default",
     "translation": "",
     "context": "",
     "reference": "",
@@ -749,6 +945,13 @@
     "comment": ""
   },
   {
+    "term": "Disk Usage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Display Settings",
     "translation": "",
     "context": "",
@@ -770,7 +973,42 @@
     "comment": ""
   },
   {
+    "term": "Display currently focused application title",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Display volume and brightness percentage values by default in OSD popups",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Displays the active keyboard layout and allows switching",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Do Not Disturb",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Dock",
     "translation": "",
     "context": "",
     "reference": "",
@@ -791,7 +1029,21 @@
     "comment": ""
   },
   {
+    "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Dynamic Theming",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Edge Spacing (0 = edge-to-edge)",
     "translation": "",
     "context": "",
     "reference": "",
@@ -868,6 +1120,13 @@
     "comment": ""
   },
   {
+    "term": "F1/I: Toggle • F10: Help",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Feels Like",
     "translation": "",
     "context": "",
@@ -897,6 +1156,13 @@
   },
   {
     "term": "Find in note...",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Focused Window",
     "translation": "",
     "context": "",
     "reference": "",
@@ -981,6 +1247,20 @@
   },
   {
     "term": "GPU",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "GPU Temperature",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "GPU temperature display",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1085,6 +1365,13 @@
     "comment": ""
   },
   {
+    "term": "How often to change wallpaper",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Humidity",
     "translation": "",
     "context": "",
@@ -1106,6 +1393,13 @@
     "comment": ""
   },
   {
+    "term": "Idle Inhibitor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Idle Settings",
     "translation": "",
     "context": "",
@@ -1114,6 +1408,13 @@
   },
   {
     "term": "Idle monitoring not supported - requires newer Quickshell version",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Image",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1162,6 +1463,13 @@
     "comment": ""
   },
   {
+    "term": "Keyboard Layout Name",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Kill Process",
     "translation": "",
     "context": "",
@@ -1198,6 +1506,13 @@
   },
   {
     "term": "Launch on dGPU",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Launcher",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1267,6 +1582,13 @@
     "comment": ""
   },
   {
+    "term": "Long Text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Longitude",
     "translation": "",
     "context": "",
@@ -1289,6 +1611,13 @@
   },
   {
     "term": "Manual Coordinates",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Manual Show/Hide",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1323,6 +1652,13 @@
     "comment": ""
   },
   {
+    "term": "Media Controls",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Media Player Settings",
     "translation": "",
     "context": "",
@@ -1338,6 +1674,20 @@
   },
   {
     "term": "Memory",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Memory Usage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Memory usage indicator",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1442,6 +1792,20 @@
     "comment": ""
   },
   {
+    "term": "Network Speed Monitor",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Network download and upload speed display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "New",
     "translation": "",
     "context": "",
@@ -1533,6 +1897,13 @@
     "comment": ""
   },
   {
+    "term": "No plugins found.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Normal Priority",
     "translation": "",
     "context": "",
@@ -1555,6 +1926,13 @@
   },
   {
     "term": "Nothing to see here",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Notification Center",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1687,7 +2065,35 @@
     "comment": ""
   },
   {
+    "term": "Percentage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Personalization",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pin to Dock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Place plugin directories here. Each plugin should have a plugin.json manifest file.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Place plugins in",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1702,6 +2108,20 @@
   },
   {
     "term": "Plugin Management",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugin is disabled - enable in Plugins settings to use",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Plugins",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1723,6 +2143,13 @@
   },
   {
     "term": "Position",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Power",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1757,6 +2184,27 @@
     "comment": ""
   },
   {
+    "term": "Prevent screen timeout",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Primary",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Privacy Indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Process",
     "translation": "",
     "context": "",
@@ -1765,6 +2213,27 @@
   },
   {
     "term": "QML (Qt Modeling Language)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Quick access to application launcher",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Quick access to color picker",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Quick access to notepad",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1814,6 +2283,13 @@
   },
   {
     "term": "Reset",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Running Apps",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1932,7 +2408,42 @@
     "comment": ""
   },
   {
+    "term": "Select font weight",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select monitor to configure wallpaper",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select monospace font for process list and technical displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select system font family",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Select which transitions to include in randomization",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Separator",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2002,6 +2513,13 @@
     "comment": ""
   },
   {
+    "term": "Show on all connected displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show on screens:",
     "translation": "",
     "context": "",
@@ -2023,6 +2541,27 @@
     "comment": ""
   },
   {
+    "term": "Shows all running applications with focus indication",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shows current workspace and allows switching",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Shows when microphone, camera, or screen sharing is active",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Size",
     "translation": "",
     "context": "",
@@ -2031,6 +2570,13 @@
   },
   {
     "term": "Size Offset",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Spacer",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2073,6 +2619,13 @@
   },
   {
     "term": "Storage & Disks",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Surface",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2142,7 +2695,35 @@
     "comment": ""
   },
   {
+    "term": "System Tray",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "System Update",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "System Updates",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "System notification area icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2163,7 +2744,28 @@
     "comment": ""
   },
   {
+    "term": "Text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Theme & Colors",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2178,6 +2780,34 @@
   },
   {
     "term": "Third-Party Plugin Warning",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "This will permanently delete all clipboard history.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Time & Date",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2226,6 +2856,13 @@
     "comment": ""
   },
   {
+    "term": "Unpin from Dock",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Unsaved Changes",
     "translation": "",
     "context": "",
@@ -2261,6 +2898,13 @@
     "comment": ""
   },
   {
+    "term": "Use 24-hour time format instead of 12-hour AM/PM",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use Fahrenheit",
     "translation": "",
     "context": "",
@@ -2282,6 +2926,13 @@
     "comment": ""
   },
   {
+    "term": "Use light theme instead of dark theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use%",
     "translation": "",
     "context": "",
@@ -2296,7 +2947,21 @@
     "comment": ""
   },
   {
+    "term": "Uses sunrise/sunset times to automatically adjust night mode based on your location.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Utilities",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "VPN",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2310,7 +2975,28 @@
     "comment": ""
   },
   {
+    "term": "VPN status and quick connect",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Visibility",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Visual divider between widgets",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Visual effect used when wallpaper changes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2338,6 +3024,13 @@
     "comment": ""
   },
   {
+    "term": "Weather Widget",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "WiFi is off",
     "translation": "",
     "context": "",
@@ -2353,6 +3046,13 @@
   },
   {
     "term": "Widget Styling",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Widgets",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2388,6 +3088,13 @@
   },
   {
     "term": "Workspace Settings",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Workspace Switcher",
     "translation": "",
     "context": "",
     "reference": "",

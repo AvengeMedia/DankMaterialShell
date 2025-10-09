@@ -130,7 +130,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Theme Color")
+                            text: I18n.tr("Theme Color")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -651,7 +651,7 @@ Item {
 
                             DankDropdown {
                                 id: matugenPaletteDropdown
-                                text: qsTr("Matugen Palette")
+                                text: I18n.tr("Matugen Palette")
                                 description: "Select the palette algorithm used for wallpaper-based colors"
                                 options: Theme.availableMatugenSchemes.map(function (option) { return option.label })
                                 currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
@@ -756,7 +756,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Widget Styling")
+                            text: I18n.tr("Widget Styling")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -769,7 +769,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Dank Bar Transparency")
+                            text: I18n.tr("Dank Bar Transparency")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -803,7 +803,7 @@ Item {
 
                             StyledText {
                                 id: transparencyLabel
-                                text: qsTr("Dank Bar Widget Transparency")
+                                text: I18n.tr("Dank Bar Widget Transparency")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium
@@ -867,7 +867,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Popup Transparency")
+                            text: I18n.tr("Popup Transparency")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -904,7 +904,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Corner Radius (0 = square corners)"
+                            text: I18n.tr("Corner Radius (0 = square corners)")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -955,7 +955,7 @@ Item {
                     StyledText {
                         id: warningText
                         font.pixelSize: Theme.fontSizeSmall
-                        text: "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0)."
+                        text: I18n.tr("The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).")
                         wrapMode: Text.WordWrap
                         width: parent.width - Theme.iconSizeSmall - Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
@@ -993,7 +993,7 @@ Item {
 
                         DankDropdown {
                             anchors.verticalCenter: parent.verticalCenter
-                            text: qsTr("Icon Theme")
+                            text: I18n.tr("Icon Theme")
                             description: "DankShell & System Icons\n(requires restart)"
                             currentValue: SettingsData.iconTheme
                             enableFuzzySearch: true
@@ -1046,7 +1046,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("System App Theming")
+                            text: I18n.tr("System App Theming")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1078,7 +1078,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: qsTr("Apply GTK Colors")
+                                    text: I18n.tr("Apply GTK Colors")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.primary
                                     font.weight: Font.Medium
@@ -1114,7 +1114,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: qsTr("Apply Qt Colors")
+                                    text: I18n.tr("Apply Qt Colors")
                                     font.pixelSize: Theme.fontSizeMedium
                                     color: Theme.primary
                                     font.weight: Font.Medium

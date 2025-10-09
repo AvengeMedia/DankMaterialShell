@@ -14,6 +14,7 @@ PanelWindow {
     property var modelData
     property bool shouldBeVisible: false
     property real frozenWidth: 0
+    readonly property string copiedText: I18n.tr("Copied!")
 
     Connections {
         target: ToastService
@@ -280,7 +281,7 @@ PanelWindow {
                         StyledText {
                             id: tooltipLabel
                             anchors.centerIn: parent
-                            text: qsTr("Copied!")
+                            text: root.copiedText
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                         }

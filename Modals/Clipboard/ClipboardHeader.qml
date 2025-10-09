@@ -28,7 +28,7 @@ Item {
         }
 
         StyledText {
-            text: `Clipboard History (${totalCount})`
+            text: I18n.tr("Clipboard History") + ` (${totalCount})`
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceText
             font.weight: Font.Medium

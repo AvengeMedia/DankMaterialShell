@@ -248,7 +248,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("About")
+                            text: I18n.tr("About")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -307,7 +307,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Technical Details")
+                            text: I18n.tr("Technical Details")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -322,7 +322,7 @@ Item {
                         rowSpacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Framework:")
+                            text: I18n.tr("Framework:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -345,20 +345,20 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Language:")
+                            text: I18n.tr("Language:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                         }
 
                         StyledText {
-                            text: qsTr("QML (Qt Modeling Language)")
+                            text: I18n.tr("QML (Qt Modeling Language)")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                         }
 
                         StyledText {
-                            text: qsTr("Compositor:")
+                            text: I18n.tr("Compositor:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -410,7 +410,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Github:")
+                            text: I18n.tr("Github:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -437,7 +437,7 @@ Item {
                             }
                             
                             StyledText {
-                                text: qsTr("- Support Us With a Star ⭐")
+                                text: I18n.tr("- Support Us With a Star ⭐")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceVariantText
                                 anchors.verticalCenter: parent.verticalCenter
@@ -445,7 +445,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("System Monitoring:")
+                            text: I18n.tr("System Monitoring:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -472,7 +472,7 @@ Item {
                             }
                             
                             StyledText {
-                                text: qsTr("- Stateless System Monitoring")
+                                text: I18n.tr("- Stateless System Monitoring")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceVariantText
                                 anchors.verticalCenter: parent.verticalCenter
@@ -480,7 +480,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Dank Suite:")
+                            text: I18n.tr("Dank Suite:")
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Medium
                             color: Theme.surfaceText

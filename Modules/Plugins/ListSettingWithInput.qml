@@ -123,7 +123,7 @@ Column {
             id: addButton
             width: 50
             height: 36
-            text: qsTr("Add")
+            text: I18n.tr("Add")
 
             onClicked: {
                 let newItem = {}
@@ -159,7 +159,7 @@ Column {
     }
 
     StyledText {
-        text: qsTr("Current Items")
+        text: I18n.tr("Current Items")
         font.pixelSize: Theme.fontSizeMedium
         font.weight: Font.Medium
         color: Theme.surfaceText
@@ -227,7 +227,7 @@ Column {
 
                     StyledText {
                         anchors.centerIn: parent
-                        text: qsTr("Remove")
+                        text: I18n.tr("Remove")
                         color: Theme.onError
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
@@ -247,7 +247,7 @@ Column {
         }
 
         StyledText {
-            text: qsTr("No items added yet")
+            text: I18n.tr("No items added yet")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
             visible: root.items.length === 0

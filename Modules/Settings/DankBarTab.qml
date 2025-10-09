@@ -22,170 +22,170 @@ Item {
     property var baseWidgetDefinitions: {
         var coreWidgets = [{
             "id": "launcherButton",
-            "text": "App Launcher",
-            "description": "Quick access to application launcher",
+            "text": I18n.tr("App Launcher"),
+            "description": I18n.tr("Quick access to application launcher"),
             "icon": "apps",
             "enabled": true
         }, {
             "id": "workspaceSwitcher",
-            "text": "Workspace Switcher",
-            "description": "Shows current workspace and allows switching",
+            "text": I18n.tr("Workspace Switcher"),
+            "description": I18n.tr("Shows current workspace and allows switching"),
             "icon": "view_module",
             "enabled": true
         }, {
             "id": "focusedWindow",
-            "text": "Focused Window",
-            "description": "Display currently focused application title",
+            "text": I18n.tr("Focused Window"),
+            "description": I18n.tr("Display currently focused application title"),
             "icon": "window",
             "enabled": true
         }, {
             "id": "runningApps",
-            "text": "Running Apps",
-            "description": "Shows all running applications with focus indication",
+            "text": I18n.tr("Running Apps"),
+            "description": I18n.tr("Shows all running applications with focus indication"),
             "icon": "apps",
             "enabled": true
         }, {
             "id": "clock",
-            "text": "Clock",
-            "description": "Current time and date display",
+            "text": I18n.tr("Clock"),
+            "description": I18n.tr("Current time and date display"),
             "icon": "schedule",
             "enabled": true
         }, {
             "id": "weather",
-            "text": "Weather Widget",
-            "description": "Current weather conditions and temperature",
+            "text": I18n.tr("Weather Widget"),
+            "description": I18n.tr("Current weather conditions and temperature"),
             "icon": "wb_sunny",
             "enabled": true
         }, {
             "id": "music",
-            "text": "Media Controls",
-            "description": "Control currently playing media",
+            "text": I18n.tr("Media Controls"),
+            "description": I18n.tr("Control currently playing media"),
             "icon": "music_note",
             "enabled": true
         }, {
             "id": "clipboard",
-            "text": "Clipboard Manager",
-            "description": "Access clipboard history",
+            "text": I18n.tr("Clipboard Manager"),
+            "description": I18n.tr("Access clipboard history"),
             "icon": "content_paste",
             "enabled": true
         }, {
             "id": "cpuUsage",
-            "text": "CPU Usage",
-            "description": "CPU usage indicator",
+            "text": I18n.tr("CPU Usage"),
+            "description": I18n.tr("CPU usage indicator"),
             "icon": "memory",
             "enabled": DgopService.dgopAvailable,
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined
         }, {
             "id": "memUsage",
-            "text": "Memory Usage",
-            "description": "Memory usage indicator",
+            "text": I18n.tr("Memory Usage"),
+            "description": I18n.tr("Memory usage indicator"),
             "icon": "developer_board",
             "enabled": DgopService.dgopAvailable,
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined
         }, {
             "id": "diskUsage",
-            "text": "Disk Usage",
-            "description": "Percentage",
+            "text": I18n.tr("Disk Usage"),
+            "description": I18n.tr("Percentage"),
             "icon": "storage",
             "enabled": DgopService.dgopAvailable,
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined
         }, {
             "id": "cpuTemp",
-            "text": "CPU Temperature",
-            "description": "CPU temperature display",
+            "text": I18n.tr("CPU Temperature"),
+            "description": I18n.tr("CPU temperature display"),
             "icon": "device_thermostat",
             "enabled": DgopService.dgopAvailable,
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined
         }, {
             "id": "gpuTemp",
-            "text": "GPU Temperature",
-            "description": "GPU temperature display",
+            "text": I18n.tr("GPU Temperature"),
+            "description": I18n.tr("GPU temperature display"),
             "icon": "auto_awesome_mosaic",
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.",
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : I18n.tr("This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics."),
             "enabled": DgopService.dgopAvailable
         }, {
             "id": "systemTray",
-            "text": "System Tray",
-            "description": "System notification area icons",
+            "text": I18n.tr("System Tray"),
+            "description": I18n.tr("System notification area icons"),
             "icon": "notifications",
             "enabled": true
         }, {
             "id": "privacyIndicator",
-            "text": "Privacy Indicator",
-            "description": "Shows when microphone, camera, or screen sharing is active",
+            "text": I18n.tr("Privacy Indicator"),
+            "description": I18n.tr("Shows when microphone, camera, or screen sharing is active"),
             "icon": "privacy_tip",
             "enabled": true
         }, {
             "id": "controlCenterButton",
-            "text": "Control Center",
-            "description": "Access to system controls and settings",
+            "text": I18n.tr("Control Center"),
+            "description": I18n.tr("Access to system controls and settings"),
             "icon": "settings",
             "enabled": true
         }, {
             "id": "notificationButton",
-            "text": "Notification Center",
-            "description": "Access to notifications and do not disturb",
+            "text": I18n.tr("Notification Center"),
+            "description": I18n.tr("Access to notifications and do not disturb"),
             "icon": "notifications",
             "enabled": true
         }, {
             "id": "battery",
-            "text": "Battery",
-            "description": "Battery level and power management",
+            "text": I18n.tr("Battery"),
+            "description": I18n.tr("Battery level and power management"),
             "icon": "battery_std",
             "enabled": true
         }, {
             "id": "vpn",
-            "text": "VPN",
-            "description": "VPN status and quick connect",
+            "text": I18n.tr("VPN"),
+            "description": I18n.tr("VPN status and quick connect"),
             "icon": "vpn_lock",
             "enabled": true
         }, {
             "id": "idleInhibitor",
-            "text": "Idle Inhibitor",
-            "description": "Prevent screen timeout",
+            "text": I18n.tr("Idle Inhibitor"),
+            "description": I18n.tr("Prevent screen timeout"),
             "icon": "motion_sensor_active",
             "enabled": true
         }, {
             "id": "spacer",
-            "text": "Spacer",
-            "description": "Customizable empty space",
+            "text": I18n.tr("Spacer"),
+            "description": I18n.tr("Customizable empty space"),
             "icon": "more_horiz",
             "enabled": true
         }, {
             "id": "separator",
-            "text": "Separator",
-            "description": "Visual divider between widgets",
+            "text": I18n.tr("Separator"),
+            "description": I18n.tr("Visual divider between widgets"),
             "icon": "remove",
             "enabled": true
         },
         {
             "id": "network_speed_monitor",
-            "text": "Network Speed Monitor",
-            "description": "Network download and upload speed display",
+            "text": I18n.tr("Network Speed Monitor"),
+            "description": I18n.tr("Network download and upload speed display"),
             "icon": "network_check",
-            "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined,
+            "warning": !DgopService.dgopAvailable ? I18n.tr("Requires 'dgop' tool") : undefined,
             "enabled": DgopService.dgopAvailable
         }, {
             "id": "keyboard_layout_name",
-            "text": "Keyboard Layout Name",
-            "description": "Displays the active keyboard layout and allows switching",
+            "text": I18n.tr("Keyboard Layout Name"),
+            "description": I18n.tr("Displays the active keyboard layout and allows switching"),
             "icon": "keyboard",
         }, {
             "id": "notepadButton",
-            "text": "Notepad",
-            "description": "Quick access to notepad",
+            "text": I18n.tr("Notepad"),
+            "description": I18n.tr("Quick access to notepad"),
             "icon": "assignment",
             "enabled": true
         }, {
             "id": "colorPicker",
-            "text": "Color Picker",
-            "description": "Quick access to color picker",
+            "text": I18n.tr("Color Picker"),
+            "description": I18n.tr("Quick access to color picker"),
             "icon": "palette",
             "enabled": true
         }, {
             "id": "systemUpdate",
-            "text": "System Update",
-            "description": "Check for system updates",
+            "text": I18n.tr("System Update"),
+            "description": I18n.tr("Check for system updates"),
             "icon": "update",
             "enabled": SystemUpdateService.distributionSupported
         }]
@@ -199,7 +199,7 @@ Item {
                 "description": variant.description,
                 "icon": variant.icon,
                 "enabled": variant.loaded,
-                "warning": !variant.loaded ? "Plugin is disabled - enable in Plugins settings to use" : undefined
+                "warning": !variant.loaded ? I18n.tr("Plugin is disabled - enable in Plugins settings to use") : undefined
             })
         }
 
@@ -695,7 +695,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Position")
+                            text: I18n.tr("Position")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -765,14 +765,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Auto-hide")
+                                text: I18n.tr("Auto-hide")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Automatically hide the top bar to expand screen real estate")
+                                text: I18n.tr("Automatically hide the top bar to expand screen real estate")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -817,14 +817,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: "Manual Show/Hide"
+                                text: I18n.tr("Manual Show/Hide")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Toggle top bar visibility manually (can be controlled via IPC)")
+                                text: I18n.tr("Toggle top bar visibility manually (can be controlled via IPC)")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -871,14 +871,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Show on Overview")
+                                text: I18n.tr("Show on Overview")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: "Always show the top bar when niri's overview is open"
+                                text: I18n.tr("Always show the top bar when niri's overview is open")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -930,7 +930,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Spacing")
+                            text: I18n.tr("Spacing")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -943,7 +943,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: "Edge Spacing (0 = edge-to-edge)"
+                            text: I18n.tr("Edge Spacing (0 = edge-to-edge)")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -971,7 +971,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Exclusive Zone Offset")
+                            text: I18n.tr("Exclusive Zone Offset")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -999,7 +999,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Size")
+                            text: I18n.tr("Size")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -1025,7 +1025,7 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Square Corners")
+                        text: I18n.tr("Square Corners")
                         description: "Removes rounded corners from bar container."
                         checked: SettingsData.dankBarSquareCorners
                         onToggled: checked => {
@@ -1036,7 +1036,7 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("No Background")
+                        text: I18n.tr("No Background")
                         description: "Remove widget backgrounds for a minimal look with tighter spacing."
                         checked: SettingsData.dankBarNoBackground
                         onToggled: checked => {
@@ -1047,7 +1047,7 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Goth Corners")
+                        text: I18n.tr("Goth Corners")
                         description: "Add curved swooping tips at the bottom of the bar."
                         checked: SettingsData.dankBarGothCornersEnabled
                         onToggled: checked => {
@@ -1058,7 +1058,7 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Border")
+                        text: I18n.tr("Border")
                         description: "Add a 1px border to the bar. Smart edge detection only shows border on exposed sides."
                         checked: SettingsData.dankBarBorderEnabled
                         onToggled: checked => {
@@ -1088,14 +1088,14 @@ Item {
                             spacing: Theme.spacingXS
 
                             StyledText {
-                                text: qsTr("DankBar Font Scale")
+                                text: I18n.tr("DankBar Font Scale")
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Scale DankBar font sizes independently")
+                                text: I18n.tr("Scale DankBar font sizes independently")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 width: parent.width
@@ -1190,7 +1190,7 @@ Item {
 
                         StyledText {
                             id: widgetTitle
-                            text: qsTr("Widget Management")
+                            text: I18n.tr("Widget Management")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1228,7 +1228,7 @@ Item {
                                 }
 
                                 StyledText {
-                                    text: qsTr("Reset")
+                                    text: I18n.tr("Reset")
                                     font.pixelSize: Theme.fontSizeSmall
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
@@ -1270,7 +1270,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely."
+                        text: I18n.tr("Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
@@ -1372,7 +1372,7 @@ Item {
                         id: centerSection
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
-                        title: qsTr("Center Section")
+                        title: I18n.tr("Center Section")
                         titleIcon: "format_align_center"
                         sectionId: "center"
                         allWidgets: dankBarTab.baseWidgetDefinitions

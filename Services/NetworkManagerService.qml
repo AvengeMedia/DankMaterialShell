@@ -76,14 +76,15 @@ Singleton {
     signal networksUpdated
     signal connectionChanged
 
-    property var dmsService: null
     property bool subscriptionConnected: false
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
     Component.onCompleted: {
         root.userPreference = SettingsData.networkPreference
-        Qt.callLater(initializeDMSConnection)
+        if (socketPath && socketPath.length > 0) {
+            checkDMSCapabilities()
+        }
     }
 
     DankSocket {
@@ -133,65 +134,43 @@ Singleton {
         console.log("NetworkManagerService: Sent network.subscribe request")
     }
 
-    function initializeDMSConnection() {
-        try {
-            console.log("NetworkManagerService: Initializing DMS connection...")
-            dmsService = Qt.createQmlObject('import QtQuick; import qs.Services; QtObject { property var service: DMSService }', root)
-            if (dmsService && dmsService.service) {
-                console.log("NetworkManagerService: DMS service reference created")
-                checkCapabilities()
-                dmsService.service.connectionStateChanged.connect(onDMSConnectionStateChanged)
-                dmsService.service.capabilitiesChanged.connect(onDMSCapabilitiesChanged)
-                console.log("NetworkManagerService: Callbacks registered, isConnected:", dmsService.service.isConnected, "capabilities:", JSON.stringify(dmsService.service.capabilities))
-            } else {
-                console.warn("NetworkManagerService: Failed to get DMS service reference")
-            }
-        } catch (e) {
-            console.warn("NetworkManagerService: Failed to initialize DMS connection:", e)
-        }
-    }
+    Connections {
+        target: DMSService
 
-    function checkCapabilities() {
-        if (dmsService && dmsService.service && dmsService.service.isConnected) {
-            onDMSConnected()
-        }
-    }
-
-    function onDMSConnectionStateChanged() {
-        if (dmsService && dmsService.service && dmsService.service.isConnected) {
-            onDMSConnected()
-        }
-    }
-
-    function onDMSCapabilitiesChanged() {
-        console.log("NetworkManagerService: onDMSCapabilitiesChanged called, capabilities:", dmsService ? JSON.stringify(dmsService.service.capabilities) : "no service")
-        if (dmsService && dmsService.service && dmsService.service.capabilities.includes("network")) {
-            console.log("NetworkManagerService: Network capability detected!")
-            networkAvailable = true
-            if (dmsService.service.isConnected && !stateInitialized) {
-                console.log("NetworkManagerService: DMS is connected, fetching state and starting subscription socket...")
-                stateInitialized = true
-                getState()
-                subscriptionSocket.connected = true
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected) {
+                checkDMSCapabilities()
             }
         }
     }
 
-    function onDMSConnected() {
-        console.log("NetworkManagerService: onDMSConnected called")
-        if (dmsService && dmsService.service && dmsService.service.capabilities && dmsService.service.capabilities.length > 0) {
-            console.log("NetworkManagerService: Capabilities:", JSON.stringify(dmsService.service.capabilities))
-            networkAvailable = dmsService.service.capabilities.includes("network")
-            console.log("NetworkManagerService: Network available:", networkAvailable)
+    Connections {
+        target: DMSService
+        enabled: DMSService.isConnected
 
-            if (networkAvailable && !stateInitialized) {
-                console.log("NetworkManagerService: Requesting network state and starting subscription socket...")
-                stateInitialized = true
-                getState()
-                subscriptionSocket.connected = true
-            }
-        } else {
-            console.log("NetworkManagerService: No capabilities yet or service not ready")
+        function onCapabilitiesChanged() {
+            checkDMSCapabilities()
+        }
+    }
+
+    function checkDMSCapabilities() {
+        if (!DMSService.isConnected) {
+            return
+        }
+
+        if (DMSService.capabilities.length === 0) {
+            return
+        }
+
+        console.log("NetworkManagerService: Capabilities:", JSON.stringify(DMSService.capabilities))
+        networkAvailable = DMSService.capabilities.includes("network")
+        console.log("NetworkManagerService: Network available:", networkAvailable)
+
+        if (networkAvailable && !stateInitialized) {
+            console.log("NetworkManagerService: Requesting network state and starting subscription socket...")
+            stateInitialized = true
+            getState()
+            subscriptionSocket.connected = true
         }
     }
 
@@ -212,9 +191,9 @@ Singleton {
     property bool initialStateFetched: false
 
     function getState() {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
-        dmsService.service.sendRequest("network.getState", null, response => {
+        DMSService.sendRequest("network.getState", null, response => {
             if (response.result) {
                 updateState(response.result)
                 if (!initialStateFetched && response.result.wifiEnabled && (!response.result.wifiNetworks || response.result.wifiNetworks.length === 0)) {
@@ -277,11 +256,11 @@ Singleton {
     }
 
     function scanWifi() {
-        if (!networkAvailable || isScanning || !wifiEnabled || !dmsService || !dmsService.service) return
+        if (!networkAvailable || isScanning || !wifiEnabled) return
 
         console.log("NetworkManagerService: Starting WiFi scan...")
         isScanning = true
-        dmsService.service.sendRequest("network.wifi.scan", null, response => {
+        DMSService.sendRequest("network.wifi.scan", null, response => {
             isScanning = false
             if (response.error) {
                 console.warn("NetworkManagerService: WiFi scan failed:", response.error)
@@ -297,7 +276,7 @@ Singleton {
     }
 
     function connectToWifi(ssid, password = "", username = "") {
-        if (!networkAvailable || isConnecting || !dmsService || !dmsService.service) return
+        if (!networkAvailable || isConnecting) return
 
         isConnecting = true
         connectingSSID = ssid
@@ -308,7 +287,7 @@ Singleton {
         if (password) params.password = password
         if (username) params.username = username
 
-        dmsService.service.sendRequest("network.wifi.connect", params, response => {
+        DMSService.sendRequest("network.wifi.connect", params, response => {
             if (response.error) {
                 connectionError = response.error
                 lastConnectionError = response.error
@@ -338,9 +317,9 @@ Singleton {
     }
 
     function disconnectWifi() {
-        if (!networkAvailable || !wifiInterface || !dmsService || !dmsService.service) return
+        if (!networkAvailable || !wifiInterface) return
 
-        dmsService.service.sendRequest("network.wifi.disconnect", null, response => {
+        DMSService.sendRequest("network.wifi.disconnect", null, response => {
             if (response.error) {
                 ToastService.showError("Failed to disconnect WiFi")
             } else {
@@ -352,10 +331,10 @@ Singleton {
     }
 
     function forgetWifiNetwork(ssid) {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
         forgetSSID = ssid
-        dmsService.service.sendRequest("network.wifi.forget", { ssid: ssid }, response => {
+        DMSService.sendRequest("network.wifi.forget", { ssid: ssid }, response => {
             if (response.error) {
                 console.warn("Failed to forget network:", response.error)
             } else {
@@ -382,10 +361,10 @@ Singleton {
     }
 
     function toggleWifiRadio() {
-        if (!networkAvailable || wifiToggling || !dmsService || !dmsService.service) return
+        if (!networkAvailable || wifiToggling) return
 
         wifiToggling = true
-        dmsService.service.sendRequest("network.wifi.toggle", null, response => {
+        DMSService.sendRequest("network.wifi.toggle", null, response => {
             wifiToggling = false
 
             if (response.error) {
@@ -398,9 +377,9 @@ Singleton {
     }
 
     function enableWifiDevice() {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
-        dmsService.service.sendRequest("network.wifi.enable", null, response => {
+        DMSService.sendRequest("network.wifi.enable", null, response => {
             if (response.error) {
                 ToastService.showError("Failed to enable WiFi")
             } else {
@@ -410,14 +389,14 @@ Singleton {
     }
 
     function setNetworkPreference(preference) {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
         userPreference = preference
         changingPreference = true
         targetPreference = preference
         SettingsData.setNetworkPreference(preference)
 
-        dmsService.service.sendRequest("network.preference.set", { preference: preference }, response => {
+        DMSService.sendRequest("network.preference.set", { preference: preference }, response => {
             changingPreference = false
             targetPreference = ""
 
@@ -441,13 +420,13 @@ Singleton {
     }
 
     function toggleNetworkConnection(type) {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
         if (type === "ethernet") {
             if (networkStatus === "ethernet") {
-                dmsService.service.sendRequest("network.ethernet.disconnect", null, null)
+                DMSService.sendRequest("network.ethernet.disconnect", null, null)
             } else {
-                dmsService.service.sendRequest("network.ethernet.connect", null, null)
+                DMSService.sendRequest("network.ethernet.connect", null, null)
             }
         }
     }
@@ -466,13 +445,13 @@ Singleton {
     }
 
     function fetchNetworkInfo(ssid) {
-        if (!networkAvailable || !dmsService || !dmsService.service) return
+        if (!networkAvailable) return
 
         networkInfoSSID = ssid
         networkInfoLoading = true
         networkInfoDetails = "Loading network information..."
 
-        dmsService.service.sendRequest("network.info", { ssid: ssid }, response => {
+        DMSService.sendRequest("network.info", { ssid: ssid }, response => {
             networkInfoLoading = false
 
             if (response.error) {

@@ -11,6 +11,7 @@ import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Lock
 
 Item {
     id: root
@@ -322,12 +323,17 @@ Item {
                         TextInput {
                             id: inputField
 
+                            property bool syncingFromState: false
+
                             anchors.fill: parent
                             anchors.leftMargin: lockIcon.width + Theme.spacingM * 2
                             anchors.rightMargin: {
                                 let margin = Theme.spacingM
                                 if (GreeterState.showPasswordInput && revealButton.visible) {
                                     margin += revealButton.width
+                                }
+                                if (virtualKeyboardButton.visible) {
+                                    margin += virtualKeyboardButton.width
                                 }
                                 if (enterButton.visible) {
                                     margin += enterButton.width + 2
@@ -338,6 +344,7 @@ Item {
                             focus: true
                             echoMode: GreeterState.showPasswordInput ? (parent.showPassword ? TextInput.Normal : TextInput.Password) : TextInput.Normal
                             onTextChanged: {
+                                if (syncingFromState) return
                                 if (GreeterState.showPasswordInput) {
                                     GreeterState.passwordBuffer = text
                                 } else {
@@ -355,13 +362,17 @@ Item {
                                         GreeterState.showPasswordInput = true
                                         PortalService.getGreeterUserProfileImage(GreeterState.username)
                                         GreeterState.passwordBuffer = ""
-                                        inputField.text = ""
+                                        syncingFromState = true
+                                        text = ""
+                                        syncingFromState = false
                                     }
                                 }
                             }
 
                             Component.onCompleted: {
+                                syncingFromState = true
                                 text = GreeterState.showPasswordInput ? GreeterState.passwordBuffer : GreeterState.usernameInput
+                                syncingFromState = false
                                 if (isPrimaryScreen)
                                     forceActiveFocus()
                             }
@@ -371,12 +382,18 @@ Item {
                             }
                         }
 
+                        KeyboardController {
+                            id: keyboard_controller
+                            target: inputField
+                            rootObject: root
+                        }
+
                         StyledText {
                             id: placeholder
 
                             anchors.left: lockIcon.right
                             anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (enterButton.visible ? enterButton.left : parent.right))
+                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)))
                             anchors.rightMargin: 2
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
@@ -413,7 +430,7 @@ Item {
                         StyledText {
                             anchors.left: lockIcon.right
                             anchors.leftMargin: Theme.spacingM
-                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (enterButton.visible ? enterButton.left : parent.right))
+                            anchors.right: (GreeterState.showPasswordInput && revealButton.visible ? revealButton.left : (virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)))
                             anchors.rightMargin: 2
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
@@ -441,14 +458,32 @@ Item {
                         DankActionButton {
                             id: revealButton
 
-                            anchors.right: enterButton.visible ? enterButton.left : parent.right
-                            anchors.rightMargin: enterButton.visible ? 0 : Theme.spacingS
+                            anchors.right: virtualKeyboardButton.visible ? virtualKeyboardButton.left : (enterButton.visible ? enterButton.left : parent.right)
+                            anchors.rightMargin: 0
                             anchors.verticalCenter: parent.verticalCenter
                             iconName: parent.showPassword ? "visibility_off" : "visibility"
                             buttonSize: 32
                             visible: GreeterState.showPasswordInput && GreeterState.passwordBuffer.length > 0 && Greetd.state === GreetdState.Inactive && !GreeterState.unlocking
                             enabled: visible
                             onClicked: parent.showPassword = !parent.showPassword
+                        }
+                        DankActionButton {
+                            id: virtualKeyboardButton
+
+                            anchors.right: enterButton.visible ? enterButton.left : parent.right
+                            anchors.rightMargin: enterButton.visible ? 0 : Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            iconName: "keyboard"
+                            buttonSize: 32
+                            visible: Greetd.state === GreetdState.Inactive && !GreeterState.unlocking
+                            enabled: visible
+                            onClicked: {
+                                if (keyboard_controller.isKeyboardActive) {
+                                    keyboard_controller.hide()
+                                } else {
+                                    keyboard_controller.show()
+                                }
+                            }
                         }
 
                         DankActionButton {
@@ -549,7 +584,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Switch User")
+                            text: I18n.tr("Switch User")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -1256,7 +1291,7 @@ Item {
             if (sessionCmd) {
                 GreetdMemory.setLastSessionId(GreeterState.sessionPaths[GreeterState.currentSessionIndex])
                 GreetdMemory.setLastSuccessfulUser(GreeterState.username)
-                Greetd.launch(sessionCmd.split(" "), ["XDG_SESSION_TYPE=wayland"], true)
+                Greetd.launch(sessionCmd.split(" "), ["XDG_SESSION_TYPE=wayland"])
             }
         }
 
@@ -1325,7 +1360,7 @@ Item {
 
                         StyledText {
                             anchors.centerIn: parent
-                            text: qsTr("Cancel")
+                            text: I18n.tr("Cancel")
                             color: Theme.surfaceText
                             font.pixelSize: Theme.fontSizeMedium
                         }

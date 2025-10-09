@@ -86,7 +86,7 @@ DankPopout {
                     height: 40
 
                     StyledText {
-                        text: qsTr("System Updates")
+                        text: I18n.tr("System Updates")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -171,7 +171,7 @@ DankPopout {
                                     return "Failed to check for updates:\n" + SystemUpdateService.errorMessage;
                                 }
                                 if (!SystemUpdateService.helperAvailable) {
-                                    return "No package manager found. Please install 'paru' or 'yay' to check for updates.";
+                                    return "No package manager found. Please install 'paru' or 'yay' on Arch-based systems to check for updates.";
                                 }
                                 if (SystemUpdateService.isChecking) {
                                     return "Checking for updates...";
@@ -282,7 +282,7 @@ DankPopout {
                             }
 
                             StyledText {
-                                text: qsTr("Update All")
+                                text: I18n.tr("Update All")
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: Font.Medium
                                 color: Theme.primary
@@ -326,7 +326,7 @@ DankPopout {
                             }
 
                             StyledText {
-                                text: qsTr("Close")
+                                text: I18n.tr("Close")
                                 font.pixelSize: Theme.fontSizeMedium
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText

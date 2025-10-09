@@ -50,7 +50,7 @@ Item {
 
                         StyledText {
                             id: positionText
-                            text: qsTr("Dock Position")
+                            text: I18n.tr("Dock Position")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -125,14 +125,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Auto-hide Dock")
+                                text: I18n.tr("Auto-hide Dock")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Hide the dock when not in use and reveal it when hovering near the dock area")
+                                text: I18n.tr("Hide the dock when not in use and reveal it when hovering near the dock area")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -176,14 +176,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Show Dock")
+                                text: I18n.tr("Show Dock")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen")
+                                text: I18n.tr("Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -229,14 +229,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Show on Overview")
+                                text: I18n.tr("Show on Overview")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: "Always show the dock when niri's overview is open"
+                                text: I18n.tr("Always show the dock when niri's overview is open")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -294,14 +294,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Group by App")
+                                text: I18n.tr("Group by App")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Group multiple windows of the same app together with a window count indicator")
+                                text: I18n.tr("Group multiple windows of the same app together with a window count indicator")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -360,7 +360,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Spacing")
+                            text: I18n.tr("Spacing")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -373,7 +373,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Padding")
+                            text: I18n.tr("Padding")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -401,7 +401,7 @@ Item {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("Height to Edge Gap (Exclusive Zone)")
+                            text: I18n.tr("Height to Edge Gap (Exclusive Zone)")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -464,7 +464,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Dock Transparency")
+                            text: I18n.tr("Dock Transparency")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText

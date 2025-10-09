@@ -19,7 +19,7 @@ Item {
             spacing: Theme.spacingXL
 
             StyledText {
-                text: qsTr("Battery not detected - only AC power settings available")
+                text: I18n.tr("Battery not detected - only AC power settings available")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 visible: !BatteryService.batteryAvailable
@@ -51,7 +51,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Idle Settings")
+                            text: I18n.tr("Idle Settings")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -79,7 +79,7 @@ Item {
                         property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
                         property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
 
-                        text: qsTr("Automatically lock after")
+                        text: I18n.tr("Automatically lock after")
                         options: timeoutOptions
 
                         Connections {
@@ -115,7 +115,7 @@ Item {
                         property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
                         property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
 
-                        text: qsTr("Turn off monitors after")
+                        text: I18n.tr("Turn off monitors after")
                         options: timeoutOptions
 
                         Connections {
@@ -151,7 +151,7 @@ Item {
                         property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
                         property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
 
-                        text: qsTr("Suspend system after")
+                        text: I18n.tr("Suspend system after")
                         options: timeoutOptions
 
                         Connections {
@@ -187,7 +187,7 @@ Item {
                         property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
                         property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
 
-                        text: qsTr("Hibernate system after")
+                        text: I18n.tr("Hibernate system after")
                         options: timeoutOptions
                         visible: SessionService.hibernateSupported
 
@@ -221,14 +221,14 @@ Item {
 
                     DankToggle {
                         width: parent.width
-                        text: qsTr("Lock before suspend")
+                        text: I18n.tr("Lock before suspend")
                         description: "Automatically lock the screen when the system prepares to suspend"
                         checked: SessionData.lockBeforeSuspend
                         onToggled: checked => SessionData.setLockBeforeSuspend(checked)
                     }
 
                     StyledText {
-                        text: qsTr("Idle monitoring not supported - requires newer Quickshell version")
+                        text: I18n.tr("Idle monitoring not supported - requires newer Quickshell version")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.error
                         anchors.horizontalCenter: parent.horizontalCenter

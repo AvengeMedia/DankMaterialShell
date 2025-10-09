@@ -183,11 +183,11 @@ Column {
             height: 60
             primaryMessage: {
                 if (!DMSService.dmsAvailable) {
-                    return qsTr("DMS_SOCKET not available")
+                    return I18n.tr("DMS_SOCKET not available")
                 }
-                return qsTr("NM not supported")
+                return I18n.tr("NM not supported")
             }
-            secondaryMessage: qsTr("update dms for NM integration.")
+            secondaryMessage: I18n.tr("update dms for NM integration.")
         }
     }
 

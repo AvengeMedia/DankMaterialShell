@@ -688,7 +688,7 @@ Singleton {
         }
     }
 
-    function connectToWifi(ssid, password = "") {
+    function connectToWifi(ssid, password = "", username = "") {
         if (root.isConnecting) {
             return
         }

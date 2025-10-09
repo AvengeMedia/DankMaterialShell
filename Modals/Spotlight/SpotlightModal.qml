@@ -36,7 +36,7 @@ DankModal {
             if (contentLoader.item.appLauncher) {
                 contentLoader.item.appLauncher.searchQuery = ""
                 contentLoader.item.appLauncher.selectedIndex = 0
-                contentLoader.item.appLauncher.setCategory("All")
+                contentLoader.item.appLauncher.setCategory(I18n.tr("All"))
             }
             if (contentLoader.item.resetScroll) {
                 contentLoader.item.resetScroll()

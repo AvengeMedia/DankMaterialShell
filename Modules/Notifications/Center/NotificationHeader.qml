@@ -19,7 +19,7 @@ Item {
         spacing: Theme.spacingXS
 
         StyledText {
-            text: qsTr("Notifications")
+            text: I18n.tr("Notifications")
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceText
             font.weight: Font.Medium
@@ -53,7 +53,7 @@ Item {
                 StyledText {
                     id: tooltipText
 
-                    text: qsTr("Do Not Disturb")
+                    text: I18n.tr("Do Not Disturb")
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceText
                     font.weight: Font.Medium
@@ -120,7 +120,7 @@ Item {
                 }
 
                 StyledText {
-                    text: qsTr("Clear All")
+                    text: I18n.tr("Clear All")
                     font.pixelSize: Theme.fontSizeSmall
                     color: clearArea.containsMouse ? Theme.primary : Theme.surfaceText
                     font.weight: Font.Medium

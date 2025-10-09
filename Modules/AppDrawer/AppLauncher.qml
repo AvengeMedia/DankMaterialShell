@@ -9,7 +9,7 @@ Item {
     id: root
 
     property string searchQuery: ""
-    property string selectedCategory: "All"
+    property string selectedCategory: I18n.tr("All")
     property string viewMode: "list" // "list" or "grid"
     property int selectedIndex: 0
     property int maxResults: 50
@@ -20,8 +20,8 @@ Item {
     property bool suppressUpdatesWhileLaunching: false
     readonly property var categories: {
         const allCategories = AppSearchService.getAllCategories().filter(cat => cat !== "Education" && cat !== "Science")
-        const result = ["All"]
-        return result.concat(allCategories.filter(cat => cat !== "All"))
+        const result = [I18n.tr("All")]
+        return result.concat(allCategories.filter(cat => cat !== I18n.tr("All")))
     }
     readonly property var categoryIcons: categories.map(category => AppSearchService.getCategoryIcon(category))
     property var appUsageRanking: AppUsageHistoryData.appUsageRanking || {}
@@ -42,10 +42,11 @@ Item {
         keyboardNavigationActive = false
 
         let apps = []
+        const allCategory = I18n.tr("All")
         if (searchQuery.length === 0) {
-            apps = selectedCategory === "All" ? AppSearchService.getAppsInCategory("All") : AppSearchService.getAppsInCategory(selectedCategory).slice(0, maxResults)
+            apps = selectedCategory === allCategory ? AppSearchService.getAppsInCategory(allCategory) : AppSearchService.getAppsInCategory(selectedCategory).slice(0, maxResults)
         } else {
-            if (selectedCategory === "All") {
+            if (selectedCategory === allCategory) {
                 apps = AppSearchService.searchApplications(searchQuery)
             } else {
                 const categoryApps = AppSearchService.getAppsInCategory(selectedCategory)

@@ -25,7 +25,7 @@ Item {
         target: IdleService
         function onLockRequested() {
             console.log("Lock: Received lock request from IdleService")
-            SessionService.lockSession()
+            loader.activeAsync = true
         }
     }
 
@@ -97,7 +97,7 @@ Item {
 
         function lock() {
             console.log("Lock screen requested via IPC")
-            SessionService.lockSession()
+            loader.activeAsync = true
         }
 
         function demo() {

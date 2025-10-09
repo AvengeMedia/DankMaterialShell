@@ -19,29 +19,41 @@ The easiest thing is to run `dms greeter install` or `dms` for interactive insta
 ### Manual
 
 1. Install `greetd` (in most distro's standard repositories)
-2. Copy `assets/dms-niri.kdl` or `assets/dms-hypr.conf` to `/etc/greetd`
+2. Create the `dms-greeter` group and add necessary users:
+```bash
+sudo groupadd dms-greeter
+sudo usermod -aG dms-greeter greeter
+sudo usermod -aG dms-greeter $USER
+```
+3. Set group permissions on DMS directories:
+```bash
+sudo chgrp -R dms-greeter ~/.config/DankMaterialShell
+sudo chmod -R g+rX ~/.config/DankMaterialShell
+sudo chgrp -R dms-greeter ~/.local/state/DankMaterialShell
+sudo chmod -R g+rX ~/.local/state/DankMaterialShell
+sudo chgrp -R dms-greeter ~/.cache/quickshell
+sudo chmod -R g+rX ~/.cache/quickshell
+sudo chgrp -R dms-greeter ~/.config/quickshell
+sudo chmod -R g+rX ~/.config/quickshell
+```
+4. Copy `assets/dms-niri.kdl` or `assets/dms-hypr.conf` to `/etc/greetd`
   - niri if you want to run the greeter under niri, hypr if you want to run the greeter under Hyprland
-3. Copy `assets/greet-niri.sh` or `assets/greet-hyprland.sh` to `/usr/local/bin/start-dms-greetd.sh`
-4. Edit `/etc/greetd/dms-niri.kdl` or `/etc/greetd/dms-hypr.conf` and replace `_DMS_PATH_` with the absolute path to dms, e.g. `/home/joecool/.config/quickshell/dms`
-5. Edit or create `/etc/greetd/config.toml` 
+5. Copy `assets/greet-niri.sh` or `assets/greet-hyprland.sh` to `/usr/local/bin/start-dms-greetd.sh`
+6. Edit `/etc/greetd/dms-niri.kdl` or `/etc/greetd/dms-hypr.conf` and replace `_DMS_PATH_` with the absolute path to dms, e.g. `/home/joecool/.config/quickshell/dms`
+7. Edit or create `/etc/greetd/config.toml`:
 ```toml
 [terminal]
-# The VT to run the greeter on. Can be "next", "current" or a number
-# designating the VT.
 vt = 1
 
-# The default session, also known as the greeter.
 [default_session]
-
-# `agreety` is the bundled agetty/login-lookalike. You can replace `/bin/sh`
-# with whatever you want started, such as `sway`.
-
-# The user to run the command as. The privileges this user must have depends
-# on the greeter. A graphical greeter may for example require the user to be
-# in the `video` group.
 user = "greeter"
-
 command = "/usr/local/bin/start-dms-greetd.sh"
+```
+8. Create greeter config directory with proper permissions:
+```bash
+sudo mkdir -p /etc/greetd/.dms
+sudo chown greeter:dms-greeter /etc/greetd/.dms
+sudo chmod 770 /etc/greetd/.dms
 ```
 
 Enable the greeter with `sudo systemctl enable greetd`
@@ -86,6 +98,8 @@ Wallpapers and themes and weather and clock formats and things are a TODO on the
 
 You can synchronize those configurations with a specific user if you want greeter settings to always mirror the shell.
 
+The greeter uses the `dms-greeter` group for file access permissions, so ensure your user and the greeter user are both members of this group.
+
 ```bash
 # For core settings (theme, clock formats, etc)
 sudo ln -sf ~/.config/DankMaterialShell/settings.json /etc/greetd/.dms/settings.json
@@ -97,4 +111,4 @@ sudo ln -sf ~/.cache/quickshell/dankshell/dms-colors.json /etc/greetd/.dms/dms-c
 
 You can override the configuration path with the `DMS_GREET_CFG_DIR` environment variable, the default is `/etc/greetd/.dms`
 
-It should be writable by the greeter user.
+The `/etc/greetd/.dms` directory should be owned by `greeter:dms-greeter` with `770` permissions.

@@ -1,13 +1,14 @@
 import QtQuick
 import QtQuick.Controls
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Item {
     id: root
 
     property var categories: []
-    property string selectedCategory: "All"
+    property string selectedCategory: I18n.tr("All")
     property bool compact: false
 
     signal categorySelected(string category)

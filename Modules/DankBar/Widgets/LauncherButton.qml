@@ -91,6 +91,7 @@ Item {
             }
             layer.enabled: Theme.effectiveLogoColor !== ""
             layer.effect: MultiEffect {
+                saturation: 0
                 colorization: 1
                 colorizationColor: Theme.effectiveLogoColor
                 brightness: SettingsData.launcherLogoBrightness
@@ -108,6 +109,7 @@ Item {
             source: SettingsData.launcherLogoCustomPath ? "file://" + SettingsData.launcherLogoCustomPath.replace("file://", "") : ""
             layer.enabled: Theme.effectiveLogoColor !== ""
             layer.effect: MultiEffect {
+                saturation: 0
                 colorization: 1
                 colorizationColor: Theme.effectiveLogoColor
                 brightness: SettingsData.launcherLogoBrightness

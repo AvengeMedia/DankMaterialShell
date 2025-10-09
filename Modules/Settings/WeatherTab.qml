@@ -54,14 +54,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Enable Weather")
+                                text: I18n.tr("Enable Weather")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Show weather information in top bar and control center")
+                                text: I18n.tr("Show weather information in top bar and control center")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -120,14 +120,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Use Fahrenheit")
+                                text: I18n.tr("Use Fahrenheit")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Use Fahrenheit instead of Celsius for temperature")
+                                text: I18n.tr("Use Fahrenheit instead of Celsius for temperature")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -193,14 +193,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: qsTr("Auto Location")
+                                text: I18n.tr("Auto Location")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: qsTr("Automatically determine your location using your IP address")
+                                text: I18n.tr("Automatically determine your location using your IP address")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -233,7 +233,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Custom Location")
+                            text: I18n.tr("Custom Location")
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -248,7 +248,7 @@ Item {
                                     spacing: Theme.spacingXS
 
                                     StyledText {
-                                        text: qsTr("Latitude")
+                                        text: I18n.tr("Latitude")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                     }
@@ -299,7 +299,7 @@ Item {
                                     spacing: Theme.spacingXS
 
                                     StyledText {
-                                        text: qsTr("Longitude")
+                                        text: I18n.tr("Longitude")
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                     }
@@ -352,7 +352,7 @@ Item {
                             spacing: Theme.spacingXS
 
                             StyledText {
-                                text: qsTr("Location Search")
+                                text: I18n.tr("Location Search")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 font.weight: Font.Medium
@@ -362,7 +362,7 @@ Item {
                                 id: locationSearchInput
                                 width: parent.width
                                 currentLocation: ""
-                                placeholderText: qsTr("New York, NY")
+                                placeholderText: I18n.tr("New York, NY")
                                 keyNavigationBacktab: longitudeInput
                                 onLocationSelected: (displayName, coordinates) => {
                                                         SettingsData.setWeatherLocation(displayName, coordinates)

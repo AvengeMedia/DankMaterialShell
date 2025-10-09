@@ -6,6 +6,8 @@ import qs.Modals.Clipboard
 Rectangle {
     id: keyboardHints
 
+    readonly property string hintsText: I18n.tr("Shift+Del: Clear All • Esc: Close")
+
     height: ClipboardConstants.keyboardHintsHeight
     radius: Theme.cornerRadius
     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
@@ -26,7 +28,7 @@ Rectangle {
         }
 
         StyledText {
-            text: qsTr("Shift+Del: Clear All • Esc: Close")
+            text: keyboardHints.hintsText
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             anchors.horizontalCenter: parent.horizontalCenter

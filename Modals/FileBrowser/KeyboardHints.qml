@@ -23,7 +23,7 @@ Rectangle {
         spacing: 2
 
         StyledText {
-            text: "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select"
+            text: I18n.tr("Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             width: parent.width
@@ -32,7 +32,7 @@ Rectangle {
         }
 
         StyledText {
-            text: "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close"
+            text: I18n.tr("Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             width: parent.width

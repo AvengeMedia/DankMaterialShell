@@ -59,7 +59,7 @@ Singleton {
         createEmptyFile(fullPath, function() {
             root.tabs = [{
                 id: id,
-                title: qsTr("Untitled"),
+                title: I18n.tr("Untitled"),
                 filePath: filePath,
                 isTemporary: true,
                 lastModified: new Date().toISOString(),
@@ -129,7 +129,7 @@ Singleton {
 
         var newTab = {
             id: id,
-            title: qsTr("Untitled"),
+            title: I18n.tr("Untitled"),
             filePath: filePath,
             isTemporary: true,
             lastModified: new Date().toISOString(),
@@ -170,7 +170,7 @@ Singleton {
             createEmptyFile(baseDir + "/" + filePath, function() {
                 newTabs[0] = {
                     id: id,
-                    title: qsTr("Untitled"),
+                    title: I18n.tr("Untitled"),
                     filePath: filePath,
                     isTemporary: true,
                     lastModified: new Date().toISOString(),

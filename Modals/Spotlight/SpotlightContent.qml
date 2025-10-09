@@ -81,10 +81,6 @@ Item {
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             appLauncher.launchSelected()
                             event.accepted = true
-                        } else if (!searchField.activeFocus && event.text && event.text.length > 0 && event.text.match(/[a-zA-Z0-9\\s]/)) {
-                            searchField.forceActiveFocus()
-                            searchField.insertText(event.text)
-                            event.accepted = true
                         }
                     }
 
@@ -131,7 +127,7 @@ Item {
                 font.pixelSize: Theme.fontSizeLarge
                 enabled: parentModal ? parentModal.spotlightOpen : true
                 placeholderText: ""
-                ignoreLeftRightKeys: true
+                ignoreLeftRightKeys: appLauncher.viewMode !== "list"
                 keyForwardTargets: [spotlightKeyHandler]
                 text: appLauncher.searchQuery
                 onTextEdited: () => {

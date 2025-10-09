@@ -123,7 +123,7 @@ DankModal {
                     }
 
                     StyledText {
-                        text: qsTr("System Monitor Unavailable")
+                        text: I18n.tr("System Monitor Unavailable")
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
                         color: Theme.error
@@ -131,7 +131,7 @@ DankModal {
                     }
 
                     StyledText {
-                        text: "The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature."
+                        text: I18n.tr("The 'dgop' tool is required for system monitoring.\nPlease install dgop to use this feature.")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -154,7 +154,7 @@ DankModal {
                     height: 40
 
                     StyledText {
-                        text: qsTr("System Monitor")
+                        text: I18n.tr("System Monitor")
                         font.pixelSize: Theme.fontSizeLarge + 4
                         font.weight: Font.Bold
                         color: Theme.surfaceText

@@ -98,7 +98,7 @@ Item {
         id: errorText
         visible: pluginService && !root.hasPermission
         anchors.fill: parent
-        text: "This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json"
+        text: qsTr("This plugin does not have 'settings_write' permission.\n\nAdd \"permissions\": [\"settings_read\", \"settings_write\"] to plugin.json")
         color: Theme.error
         font.pixelSize: Theme.fontSizeMedium
         wrapMode: Text.WordWrap

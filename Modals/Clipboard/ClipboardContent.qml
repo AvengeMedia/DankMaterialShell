@@ -30,7 +30,7 @@ Item {
             showKeyboardHints: modal.showKeyboardHints
             onKeyboardHintsToggled: modal.showKeyboardHints = !modal.showKeyboardHints
             onClearAllClicked: {
-                clearConfirmDialog.show("Clear All History?", "This will permanently delete all clipboard history.", function () {
+                clearConfirmDialog.show(I18n.tr("Clear All History?"), I18n.tr("This will permanently delete all clipboard history."), function () {
                     modal.clearAll()
                     modal.hide()
                 }, function () {})
@@ -46,7 +46,6 @@ Item {
             leftIconName: "search"
             showClearButton: true
             focus: true
-            ignoreLeftRightKeys: true
             keyForwardTargets: [modal.modalFocusScope]
             onTextChanged: {
                 modal.searchText = text
@@ -116,7 +115,7 @@ Item {
                 }
                 
                 StyledText {
-                    text: qsTr("No clipboard entries found")
+                    text: I18n.tr("No clipboard entries found")
                     anchors.centerIn: parent
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceVariantText

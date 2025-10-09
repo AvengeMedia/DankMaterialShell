@@ -448,7 +448,7 @@ Rectangle {
                                 }
 
                                 StyledText {
-                                    text: qsTr("Back")
+                                    text: I18n.tr("Back")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter

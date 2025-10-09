@@ -133,7 +133,7 @@ Rectangle {
                     spacing: Theme.spacingXS
 
                     StyledText {
-                        text: qsTr("Health")
+                        text: I18n.tr("Health")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.primary
                         font.weight: Font.Medium
@@ -168,7 +168,7 @@ Rectangle {
                     spacing: Theme.spacingXS
 
                     StyledText {
-                        text: qsTr("Capacity")
+                        text: I18n.tr("Capacity")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.primary
                         font.weight: Font.Medium
@@ -237,7 +237,7 @@ Rectangle {
                         width: parent.width - Theme.iconSize - Theme.spacingM
 
                         StyledText {
-                            text: qsTr("Power Profile Degradation")
+                            text: I18n.tr("Power Profile Degradation")
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.error
                             font.weight: Font.Medium

@@ -30,7 +30,7 @@ Rectangle {
         
         StyledText {
             id: headerText
-            text: qsTr("Input Devices")
+            text: I18n.tr("Input Devices")
             font.pixelSize: Theme.fontSizeLarge
             color: Theme.surfaceText
             font.weight: Font.Medium

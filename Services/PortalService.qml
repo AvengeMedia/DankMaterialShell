@@ -15,17 +15,18 @@ Singleton {
     property bool settingsPortalAvailable: false
     property int systemColorScheme: 0
 
-    property var dmsService: null
     property bool freedeskAvailable: false
+
+    readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
     function init() {}
 
     function getSystemProfileImage() {
-        if (freedeskAvailable && dmsService && dmsService.service) {
+        if (freedeskAvailable) {
             const username = Quickshell.env("USER")
             if (!username) return
 
-            dmsService.service.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
+            DMSService.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
                 if (response.result && response.result.success) {
                     const iconFile = response.result.value || ""
                     if (iconFile && iconFile !== "" && iconFile !== "/var/lib/AccountsService/icons/") {
@@ -51,8 +52,8 @@ Singleton {
             return
         }
 
-        if (freedeskAvailable && dmsService && dmsService.service) {
-            dmsService.service.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
+        if (freedeskAvailable) {
+            DMSService.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
                 if (response.result && response.result.success) {
                     const icon = response.result.value || ""
                     if (icon && icon !== "" && icon !== "/var/lib/AccountsService/icons/") {
@@ -85,8 +86,8 @@ Singleton {
     }
 
     function getSystemColorScheme() {
-        if (freedeskAvailable && dmsService && dmsService.service) {
-            dmsService.service.sendRequest("freedesktop.settings.getColorScheme", null, response => {
+        if (freedeskAvailable) {
+            DMSService.sendRequest("freedesktop.settings.getColorScheme", null, response => {
                 if (response.result) {
                     systemColorScheme = response.result.value || 0
 
@@ -134,8 +135,8 @@ Singleton {
     function setSystemProfileImage(imagePath) {
         if (!accountsServiceAvailable) return
 
-        if (freedeskAvailable && dmsService && dmsService.service) {
-            dmsService.service.sendRequest("freedesktop.accounts.setIconFile", { path: imagePath || "" }, response => {
+        if (freedeskAvailable) {
+            DMSService.sendRequest("freedesktop.accounts.setIconFile", { path: imagePath || "" }, response => {
                 if (response.error) {
                     console.warn("PortalService: Failed to set icon file:", response.error)
                 } else {
@@ -150,65 +151,58 @@ Singleton {
     }
 
     Component.onCompleted: {
-        Qt.callLater(initializeDMSConnection)
-    }
-
-    function initializeDMSConnection() {
-        try {
-            dmsService = Qt.createQmlObject('import QtQuick; import qs.Services; QtObject { property var service: DMSService }', root)
-            if (dmsService && dmsService.service) {
-                dmsService.service.connectionStateChanged.connect(onDMSConnectionStateChanged)
-                dmsService.service.capabilitiesChanged.connect(onDMSCapabilitiesChanged)
-                if (dmsService.service.isConnected) {
-                    onDMSConnected()
-                } else {
-                    Qt.callLater(checkFallback)
-                }
-            } else {
-                Qt.callLater(checkFallback)
-            }
-        } catch (e) {
-            console.warn("PortalService: Failed to initialize DMS connection:", e)
-            Qt.callLater(checkFallback)
-        }
-    }
-
-    function checkFallback() {
-        if (!freedeskAvailable) {
-            console.log("PortalService: DMS not available, using fallback methods")
+        if (socketPath && socketPath.length > 0) {
+            checkDMSCapabilities()
+        } else {
+            console.log("PortalService: DMS_SOCKET not set, using fallback methods")
             checkAccountsServiceFallback()
             checkSettingsPortalFallback()
         }
     }
 
-    function onDMSConnectionStateChanged() {
-        if (dmsService && dmsService.service && dmsService.service.isConnected) {
-            onDMSConnected()
-        }
-    }
+    Connections {
+        target: DMSService
 
-    function onDMSCapabilitiesChanged() {
-        if (dmsService && dmsService.service && dmsService.service.capabilities.includes("freedesktop")) {
-            freedeskAvailable = true
-            checkAccountsService()
-            checkSettingsPortal()
-        }
-    }
-
-    function onDMSConnected() {
-        if (dmsService && dmsService.service && dmsService.service.capabilities && dmsService.service.capabilities.length > 0) {
-            freedeskAvailable = dmsService.service.capabilities.includes("freedesktop")
-            if (freedeskAvailable) {
-                checkAccountsService()
-                checkSettingsPortal()
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected) {
+                checkDMSCapabilities()
             }
         }
     }
 
-    function checkAccountsService() {
-        if (!freedeskAvailable || !dmsService || !dmsService.service) return
+    Connections {
+        target: DMSService
+        enabled: DMSService.isConnected
 
-        dmsService.service.sendRequest("freedesktop.getState", null, response => {
+        function onCapabilitiesChanged() {
+            checkDMSCapabilities()
+        }
+    }
+
+    function checkDMSCapabilities() {
+        if (!DMSService.isConnected) {
+            return
+        }
+
+        if (DMSService.capabilities.length === 0) {
+            return
+        }
+
+        freedeskAvailable = DMSService.capabilities.includes("freedesktop")
+        if (freedeskAvailable) {
+            checkAccountsService()
+            checkSettingsPortal()
+        } else {
+            console.log("PortalService: freedesktop capability not available in DMS, using fallback methods")
+            checkAccountsServiceFallback()
+            checkSettingsPortalFallback()
+        }
+    }
+
+    function checkAccountsService() {
+        if (!freedeskAvailable) return
+
+        DMSService.sendRequest("freedesktop.getState", null, response => {
             if (response.result && response.result.accounts) {
                 accountsServiceAvailable = response.result.accounts.available || false
                 if (accountsServiceAvailable) {
@@ -219,9 +213,9 @@ Singleton {
     }
 
     function checkSettingsPortal() {
-        if (!freedeskAvailable || !dmsService || !dmsService.service) return
+        if (!freedeskAvailable) return
 
-        dmsService.service.sendRequest("freedesktop.getState", null, response => {
+        DMSService.sendRequest("freedesktop.getState", null, response => {
             if (response.result && response.result.settings) {
                 settingsPortalAvailable = response.result.settings.available || false
                 if (settingsPortalAvailable) {

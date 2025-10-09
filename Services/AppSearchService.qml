@@ -152,30 +152,30 @@ Singleton {
             return []
 
         const categoryMap = {
-            "AudioVideo": qsTr("Media"),
-            "Audio": qsTr("Media"),
-            "Video": qsTr("Media"),
-            "Development": qsTr("Development"),
-            "TextEditor": qsTr("Development"),
-            "IDE": qsTr("Development"),
-            "Education": qsTr("Education"),
-            "Game": qsTr("Games"),
-            "Graphics": qsTr("Graphics"),
-            "Photography": qsTr("Graphics"),
-            "Network": qsTr("Internet"),
-            "WebBrowser": qsTr("Internet"),
-            "Email": qsTr("Internet"),
-            "Office": qsTr("Office"),
-            "WordProcessor": qsTr("Office"),
-            "Spreadsheet": qsTr("Office"),
-            "Presentation": qsTr("Office"),
-            "Science": qsTr("Science"),
-            "Settings": qsTr("Settings"),
-            "System": qsTr("System"),
-            "Utility": qsTr("Utilities"),
-            "Accessories": qsTr("Utilities"),
-            "FileManager": qsTr("Utilities"),
-            "TerminalEmulator": qsTr("Utilities")
+            "AudioVideo": I18n.tr("Media"),
+            "Audio": I18n.tr("Media"),
+            "Video": I18n.tr("Media"),
+            "Development": I18n.tr("Development"),
+            "TextEditor": I18n.tr("Development"),
+            "IDE": I18n.tr("Development"),
+            "Education": I18n.tr("Education"),
+            "Game": I18n.tr("Games"),
+            "Graphics": I18n.tr("Graphics"),
+            "Photography": I18n.tr("Graphics"),
+            "Network": I18n.tr("Internet"),
+            "WebBrowser": I18n.tr("Internet"),
+            "Email": I18n.tr("Internet"),
+            "Office": I18n.tr("Office"),
+            "WordProcessor": I18n.tr("Office"),
+            "Spreadsheet": I18n.tr("Office"),
+            "Presentation": I18n.tr("Office"),
+            "Science": I18n.tr("Science"),
+            "Settings": I18n.tr("Settings"),
+            "System": I18n.tr("System"),
+            "Utility": I18n.tr("Utilities"),
+            "Accessories": I18n.tr("Utilities"),
+            "FileManager": I18n.tr("Utilities"),
+            "TerminalEmulator": I18n.tr("Utilities")
         }
 
         const mappedCategories = new Set()
@@ -206,7 +206,7 @@ Singleton {
     }
 
     function getAllCategories() {
-        const categories = new Set([qsTr("All")])
+        const categories = new Set([I18n.tr("All")])
 
         for (const app of applications) {
             const appCategories = getCategoriesForApp(app)
@@ -217,7 +217,7 @@ Singleton {
     }
 
     function getAppsInCategory(category) {
-        if (category === qsTr("All")) {
+        if (category === I18n.tr("All")) {
             return applications
         }
 

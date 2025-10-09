@@ -58,14 +58,14 @@ FocusScope {
                             spacing: Theme.spacingXS
 
                             StyledText {
-                                text: qsTr("Plugin Management")
+                                text: I18n.tr("Plugin Management")
                                 font.pixelSize: Theme.fontSizeLarge
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium
                             }
 
                             StyledText {
-                                text: qsTr("Manage and configure plugins for extending DMS functionality")
+                                text: I18n.tr("Manage and configure plugins for extending DMS functionality")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                             }
@@ -98,7 +98,7 @@ FocusScope {
                                 }
 
                                 StyledText {
-                                    text: qsTr("DMS Plugin Manager Unavailable")
+                                    text: I18n.tr("DMS Plugin Manager Unavailable")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.warning
                                     font.weight: Font.Medium
@@ -107,7 +107,7 @@ FocusScope {
                             }
 
                             StyledText {
-                                text: qsTr("The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.")
+                                text: I18n.tr("The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.")
                                 font.pixelSize: Theme.fontSizeSmall - 1
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -121,7 +121,7 @@ FocusScope {
                         spacing: Theme.spacingM
 
                         DankButton {
-                            text: qsTr("Browse")
+                            text: I18n.tr("Browse")
                             iconName: "store"
                             enabled: DMSService.dmsAvailable
                             onClicked: {
@@ -130,7 +130,7 @@ FocusScope {
                         }
 
                         DankButton {
-                            text: qsTr("Scan")
+                            text: I18n.tr("Scan")
                             iconName: "refresh"
                             onClicked: {
                                 pluginsTab.isRefreshingPlugins = true
@@ -143,7 +143,7 @@ FocusScope {
                         }
 
                         DankButton {
-                            text: qsTr("Create Dir")
+                            text: I18n.tr("Create Dir")
                             iconName: "create_new_folder"
                             onClicked: {
                                 PluginService.createPluginDirectory()
@@ -169,7 +169,7 @@ FocusScope {
                     spacing: Theme.spacingM
 
                     StyledText {
-                        text: qsTr("Plugin Directory")
+                        text: I18n.tr("Plugin Directory")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -183,7 +183,7 @@ FocusScope {
                     }
 
                     StyledText {
-                        text: qsTr("Place plugin directories here. Each plugin should have a plugin.json manifest file.")
+                        text: I18n.tr("Place plugin directories here. Each plugin should have a plugin.json manifest file.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
@@ -207,7 +207,7 @@ FocusScope {
                     spacing: Theme.spacingM
 
                     StyledText {
-                        text: qsTr("Available Plugins")
+                        text: I18n.tr("Available Plugins")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -563,7 +563,7 @@ FocusScope {
 
                         StyledText {
                             width: parent.width
-                            text: "No plugins found.\nPlace plugins in " + PluginService.pluginDirectory
+                            text: I18n.tr("No plugins found.") + "\n" + I18n.tr("Place plugins in") + " " + PluginService.pluginDirectory
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             horizontalAlignment: Text.AlignHCenter
@@ -782,7 +782,7 @@ FocusScope {
 
                         StyledText {
                             id: headerText
-                            text: qsTr("Browse Plugins")
+                            text: I18n.tr("Browse Plugins")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -831,7 +831,7 @@ FocusScope {
                     }
 
                     StyledText {
-                        text: qsTr("Install plugins from the DMS plugin registry")
+                        text: I18n.tr("Install plugins from the DMS plugin registry")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.outline
                         width: parent.width
@@ -853,7 +853,7 @@ FocusScope {
                         showClearButton: true
                         textColor: Theme.surfaceText
                         font.pixelSize: Theme.fontSizeMedium
-                        placeholderText: qsTr("Search plugins...")
+                        placeholderText: I18n.tr("Search plugins...")
                         text: pluginBrowserModal.searchQuery
                         focus: true
                         ignoreLeftRightKeys: true
@@ -889,7 +889,7 @@ FocusScope {
                             }
 
                             StyledText {
-                                text: qsTr("Loading plugins...")
+                                text: I18n.tr("Loading plugins...")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceVariantText
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -969,7 +969,7 @@ FocusScope {
                                                 StyledText {
                                                     id: firstPartyText
                                                     anchors.centerIn: parent
-                                                    text: qsTr("official")
+                                                    text: I18n.tr("official")
                                                     font.pixelSize: Theme.fontSizeSmall - 2
                                                     color: Theme.primary
                                                     font.weight: Font.Medium
@@ -989,7 +989,7 @@ FocusScope {
                                                 StyledText {
                                                     id: thirdPartyText
                                                     anchors.centerIn: parent
-                                                    text: qsTr("3rd party")
+                                                    text: I18n.tr("3rd party")
                                                     font.pixelSize: Theme.fontSizeSmall - 2
                                                     color: Theme.warning
                                                     font.weight: Font.Medium
@@ -1113,7 +1113,7 @@ FocusScope {
                     }
 
                     StyledText {
-                        text: qsTr("No plugins found")
+                        text: I18n.tr("No plugins found")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceVariantText
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -1162,7 +1162,7 @@ FocusScope {
                         }
 
                         StyledText {
-                            text: qsTr("Third-Party Plugin Warning")
+                            text: I18n.tr("Third-Party Plugin Warning")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -1172,7 +1172,7 @@ FocusScope {
 
                     StyledText {
                         width: parent.width
-                        text: "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk."
+                        text: I18n.tr("Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
                         wrapMode: Text.WordWrap
@@ -1183,19 +1183,19 @@ FocusScope {
                         spacing: Theme.spacingS
 
                         StyledText {
-                            text: qsTr("• Plugins may contain bugs or security issues")
+                            text: I18n.tr("• Plugins may contain bugs or security issues")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
 
                         StyledText {
-                            text: qsTr("• Review code before installation when possible")
+                            text: I18n.tr("• Review code before installation when possible")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
 
                         StyledText {
-                            text: qsTr("• Install only from trusted sources")
+                            text: I18n.tr("• Install only from trusted sources")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
@@ -1211,13 +1211,13 @@ FocusScope {
                         spacing: Theme.spacingM
 
                         DankButton {
-                            text: qsTr("Cancel")
+                            text: I18n.tr("Cancel")
                             iconName: "close"
                             onClicked: thirdPartyConfirmModal.close()
                         }
 
                         DankButton {
-                            text: qsTr("I Understand")
+                            text: I18n.tr("I Understand")
                             iconName: "check"
                             onClicked: {
                                 SessionData.setShowThirdPartyPlugins(true)

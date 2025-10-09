@@ -10,6 +10,12 @@ import qs.Widgets
 PanelWindow {
     id: root
 
+    readonly property string powerOptionsText: I18n.tr("Power Options")
+    readonly property string logOutText: I18n.tr("Log Out")
+    readonly property string suspendText: I18n.tr("Suspend")
+    readonly property string rebootText: I18n.tr("Reboot")
+    readonly property string powerOffText: I18n.tr("Power Off")
+
     property bool powerMenuVisible: false
     signal powerActionRequested(string action, string title, string message)
 
@@ -65,7 +71,7 @@ PanelWindow {
                 width: parent.width
 
                 StyledText {
-                    text: qsTr("Power Options")
+                    text: root.powerOptionsText
                     font.pixelSize: Theme.fontSizeLarge
                     color: Theme.surfaceText
                     font.weight: Font.Medium
@@ -118,7 +124,7 @@ PanelWindow {
                         }
 
                         StyledText {
-                            text: qsTr("Log Out")
+                            text: root.logOutText
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -168,7 +174,7 @@ PanelWindow {
                         }
 
                         StyledText {
-                            text: qsTr("Suspend")
+                            text: root.suspendText
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -218,7 +224,7 @@ PanelWindow {
                         }
 
                         StyledText {
-                            text: qsTr("Reboot")
+                            text: root.rebootText
                             font.pixelSize: Theme.fontSizeMedium
                             color: rebootArea.containsMouse ? Theme.warning : Theme.surfaceText
                             font.weight: Font.Medium
@@ -268,7 +274,7 @@ PanelWindow {
                         }
 
                         StyledText {
-                            text: qsTr("Power Off")
+                            text: root.powerOffText
                             font.pixelSize: Theme.fontSizeMedium
                             color: powerOffArea.containsMouse ? Theme.error : Theme.surfaceText
                             font.weight: Font.Medium

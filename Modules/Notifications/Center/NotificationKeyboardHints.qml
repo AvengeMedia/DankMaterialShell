@@ -32,7 +32,7 @@ Rectangle {
         }
 
         StyledText {
-            text: qsTr("Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close")
+            text: I18n.tr("Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             width: parent.width

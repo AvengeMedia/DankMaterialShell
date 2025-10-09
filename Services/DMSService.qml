@@ -32,12 +32,8 @@ Singleton {
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
-            checkSocket()
+            testProcess.running = true
         }
-    }
-
-    function checkSocket() {
-        testProcess.running = true
     }
 
     Process {

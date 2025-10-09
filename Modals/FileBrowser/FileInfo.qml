@@ -134,7 +134,7 @@ Rectangle {
             }
 
             StyledText {
-                text: qsTr("File Information")
+                text: I18n.tr("File Information")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -197,7 +197,7 @@ Rectangle {
     }
 
     StyledText {
-        text: "F1/I: Toggle • F10: Help"
+        text: I18n.tr("F1/I: Toggle • F10: Help")
         font.pixelSize: Theme.fontSizeSmall
         color: Theme.surfaceTextMedium
         anchors.bottom: parent.bottom

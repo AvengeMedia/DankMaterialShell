@@ -166,8 +166,8 @@ Singleton {
         
         try {
             const date = new Date(isoString)
-            if (index === 0) return qsTr("Today")
-            if (index === 1) return qsTr("Tomorrow")
+            if (index === 0) return I18n.tr("Today")
+            if (index === 1) return I18n.tr("Tomorrow")
             
             const locale = Qt.locale()
             return locale.dayName(date.getDay(), Locale.ShortFormat)

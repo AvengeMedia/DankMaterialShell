@@ -13,7 +13,7 @@ Item {
 
     FileBrowserModal {
         id: logoFileBrowser
-        browserTitle: qsTr("Select Launcher Logo")
+        browserTitle: I18n.tr("Select Launcher Logo")
         browserIcon: "image"
         browserType: "generic"
         filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
@@ -62,7 +62,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Launcher Button Logo")
+                            text: I18n.tr("Launcher Button Logo")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -72,7 +72,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: qsTr("Choose the logo displayed on the launcher button in DankBar")
+                        text: I18n.tr("Choose the logo displayed on the launcher button in DankBar")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
@@ -86,12 +86,12 @@ Item {
                             id: logoModeGroup
                             anchors.horizontalCenter: parent.horizontalCenter
                             model: {
-                                const modes = [qsTr("Apps Icon"), qsTr("OS Logo")]
+                                const modes = [I18n.tr("Apps Icon"), I18n.tr("OS Logo")]
                                 if (CompositorService.isNiri || CompositorService.isHyprland) {
                                     const compositorName = CompositorService.isNiri ? "niri" : "Hyprland"
                                     modes.push(compositorName)
                                 }
-                                modes.push(qsTr("Custom"))
+                                modes.push(I18n.tr("Custom"))
                                 return modes
                             }
                             currentIndex: {
@@ -149,7 +149,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.leftMargin: Theme.spacingM
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: SettingsData.launcherLogoCustomPath || qsTr("Select an image file...")
+                                text: SettingsData.launcherLogoCustomPath || I18n.tr("Select an image file...")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: SettingsData.launcherLogoCustomPath ? Theme.surfaceText : Theme.outlineButton
                                 width: parent.width - Theme.spacingM * 2
@@ -166,7 +166,7 @@ Item {
                         }
                     }
 
-                    Row {
+                    Column {
                         width: parent.width
                         spacing: Theme.spacingL
                         visible: SettingsData.launcherLogoMode !== "apps"
@@ -180,61 +180,97 @@ Item {
                         }
 
                         Column {
-                            width: 120
-                            spacing: Theme.spacingS
+                            width: parent.width
+                            spacing: Theme.spacingM
 
                             StyledText {
-                                text: qsTr("Color Override")
+                                text: I18n.tr("Color Override")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceText
                                 font.weight: Font.Medium
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
 
-                            Rectangle {
-                                width: 32
-                                height: 32
-                                radius: 16
-                                color: SettingsData.launcherLogoColorOverride !== "" ? SettingsData.launcherLogoColorOverride : Qt.rgba(255, 255, 255, 0.9)
-                                border.color: Theme.outline
-                                border.width: 1
+                            Row {
                                 anchors.horizontalCenter: parent.horizontalCenter
+                                spacing: Theme.spacingM
 
-                                DankIcon {
-                                    visible: SettingsData.launcherLogoColorOverride === ""
-                                    anchors.centerIn: parent
-                                    name: "palette"
-                                    size: 18
-                                    color: "black"
+                                DankButtonGroup {
+                                    id: colorModeGroup
+                                    model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
+                                    currentIndex: {
+                                        const override = SettingsData.launcherLogoColorOverride
+                                        if (override === "") return 0
+                                        if (override === "primary") return 1
+                                        if (override === "surface") return 2
+                                        return 3
+                                    }
+                                    onSelectionChanged: (index, selected) => {
+                                        if (!selected) return
+                                        if (index === 0) {
+                                            SettingsData.setLauncherLogoColorOverride("")
+                                        } else if (index === 1) {
+                                            SettingsData.setLauncherLogoColorOverride("primary")
+                                        } else if (index === 2) {
+                                            SettingsData.setLauncherLogoColorOverride("surface")
+                                        } else if (index === 3) {
+                                            const currentOverride = SettingsData.launcherLogoColorOverride
+                                            const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface"
+                                            if (isPreset) {
+                                                SettingsData.setLauncherLogoColorOverride("#ffffff")
+                                            }
+                                        }
+                                    }
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        if (PopoutService.colorPickerModal) {
-                                            PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride !== "" ? SettingsData.launcherLogoColorOverride : Qt.rgba(0, 0, 0, 0)
-                                            PopoutService.colorPickerModal.pickerTitle = qsTr("Choose Launcher Logo Color")
-                                            PopoutService.colorPickerModal.onColorSelectedCallback = function(selectedColor) {
-                                                SettingsData.setLauncherLogoColorOverride(selectedColor)
+                                Rectangle {
+                                    visible: {
+                                        const override = SettingsData.launcherLogoColorOverride
+                                        return override !== "" && override !== "primary" && override !== "surface"
+                                    }
+                                    width: 36
+                                    height: 36
+                                    radius: 18
+                                    color: {
+                                        const override = SettingsData.launcherLogoColorOverride
+                                        if (override !== "" && override !== "primary" && override !== "surface") {
+                                            return override
+                                        }
+                                        return "#ffffff"
+                                    }
+                                    border.color: Theme.outline
+                                    border.width: 1
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            if (PopoutService.colorPickerModal) {
+                                                PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride
+                                                PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color")
+                                                PopoutService.colorPickerModal.onColorSelectedCallback = function(selectedColor) {
+                                                    SettingsData.setLauncherLogoColorOverride(selectedColor)
+                                                }
+                                                PopoutService.colorPickerModal.show()
                                             }
-                                            PopoutService.colorPickerModal.show()
                                         }
                                     }
                                 }
                             }
                         }
 
-                        Flow {
-                            width: parent.width - 120 - Theme.spacingL
+                        Column {
+                            width: parent.width
                             spacing: Theme.spacingS
 
                             Column {
                                 width: 120
                                 spacing: Theme.spacingS
+                                anchors.horizontalCenter: parent.horizontalCenter
 
                                 StyledText {
-                                    text: qsTr("Size Offset")
+                                    text: I18n.tr("Size Offset")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceText
                                     font.weight: Font.Medium
@@ -257,85 +293,107 @@ Item {
                                     }
                                 }
                             }
+                        }
 
-                            Column {
-                                width: 120
-                                spacing: Theme.spacingS
+                        Item {
+                            width: parent.width
+                            height: customControlsFlow.height
+                            visible: {
+                                const override = SettingsData.launcherLogoColorOverride
+                                return override !== "" && override !== "primary" && override !== "surface"
+                            }
+                            opacity: visible ? 1 : 0
 
-                                StyledText {
-                                    text: qsTr("Brightness")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Medium
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
-
-                                DankSlider {
-                                    width: 100
-                                    height: 20
-                                    minimum: 0
-                                    maximum: 100
-                                    value: Math.round(SettingsData.launcherLogoBrightness * 100)
-                                    unit: "%"
-                                    showValue: true
-                                    wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    onSliderValueChanged: newValue => {
-                                        SettingsData.setLauncherLogoBrightness(newValue / 100)
-                                    }
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
                                 }
                             }
 
-                            Column {
-                                width: 120
+                            Flow {
+                                id: customControlsFlow
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 spacing: Theme.spacingS
 
-                                StyledText {
-                                    text: qsTr("Contrast")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Medium
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                }
+                                Column {
+                                    width: 120
+                                    spacing: Theme.spacingS
 
-                                DankSlider {
-                                    width: 100
-                                    height: 20
-                                    minimum: 0
-                                    maximum: 200
-                                    value: Math.round(SettingsData.launcherLogoContrast * 100)
-                                    unit: "%"
-                                    showValue: true
-                                    wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    onSliderValueChanged: newValue => {
-                                        SettingsData.setLauncherLogoContrast(newValue / 100)
+                                    StyledText {
+                                        text: I18n.tr("Brightness")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+
+                                    DankSlider {
+                                        width: 100
+                                        height: 20
+                                        minimum: 0
+                                        maximum: 100
+                                        value: Math.round(SettingsData.launcherLogoBrightness * 100)
+                                        unit: "%"
+                                        showValue: true
+                                        wheelEnabled: false
+                                        thumbOutlineColor: Theme.surfaceContainerHigh
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        onSliderValueChanged: newValue => {
+                                            SettingsData.setLauncherLogoBrightness(newValue / 100)
+                                        }
                                     }
                                 }
-                            }
 
-                            Column {
-                                width: 120
-                                spacing: Theme.spacingS
-                                visible: SettingsData.launcherLogoColorOverride !== ""
+                                Column {
+                                    width: 120
+                                    spacing: Theme.spacingS
 
-                                StyledText {
-                                    text: qsTr("Invert on mode change")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    font.weight: Font.Medium
-                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    StyledText {
+                                        text: I18n.tr("Contrast")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+
+                                    DankSlider {
+                                        width: 100
+                                        height: 20
+                                        minimum: 0
+                                        maximum: 200
+                                        value: Math.round(SettingsData.launcherLogoContrast * 100)
+                                        unit: "%"
+                                        showValue: true
+                                        wheelEnabled: false
+                                        thumbOutlineColor: Theme.surfaceContainerHigh
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        onSliderValueChanged: newValue => {
+                                            SettingsData.setLauncherLogoContrast(newValue / 100)
+                                        }
+                                    }
                                 }
 
-                                DankToggle {
-                                    width: 32
-                                    height: 18
-                                    checked: SettingsData.launcherLogoColorInvertOnMode
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    onToggled: checked => {
-                                        SettingsData.setLauncherLogoColorInvertOnMode(checked)
+                                Column {
+                                    width: 120
+                                    spacing: Theme.spacingS
+
+                                    StyledText {
+                                        text: I18n.tr("Invert on mode change")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                    }
+
+                                    DankToggle {
+                                        width: 32
+                                        height: 18
+                                        checked: SettingsData.launcherLogoColorInvertOnMode
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        onToggled: checked => {
+                                            SettingsData.setLauncherLogoColorInvertOnMode(checked)
+                                        }
                                     }
                                 }
                             }
@@ -372,7 +430,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Launch Prefix")
+                            text: I18n.tr("Launch Prefix")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -382,7 +440,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers."
+                        text: I18n.tr("Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
@@ -452,7 +510,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Recently Used Apps")
+                            text: I18n.tr("Recently Used Apps")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
@@ -482,7 +540,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: qsTr("Apps are ordered by usage frequency, then last used, then alphabetically.")
+                        text: I18n.tr("Apps are ordered by usage frequency, then last used, then alphabetically.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
