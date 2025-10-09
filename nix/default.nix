@@ -54,6 +54,23 @@ in {
         quickshell = {
             package = lib.mkPackageOption pkgs "quickshell" {};
         };
+        plugins = lib.mkOption {
+            type = attrsOf (types.submodule ({ config, ... }: {
+                options = {
+                    enable = lib.mkOption {
+                        type = types.bool;
+                        default = true;
+                        description = "Whether to link this plugin";
+                    };
+                    src = lib.mkOption {
+                        type = types.path;
+                        description = "Source to link to DMS plugins directory";
+                    };
+                };
+            }));
+            default = {};
+            description = "DMS Plugins to install";
+        };
     };
 
     config = lib.mkIf cfg.enable
@@ -72,6 +89,11 @@ in {
                 target = "graphical-session.target";
             };
         };
+
+        xdg.configFile = lib.mapAttrs' (name: plugin: {
+            name = "DankMaterialShell/plugins/${name}";
+            value.source = plugin.src;
+        }) (lib.filterAttrs (n: v: v.enable) cfg.plugins);
 
         home.packages =
             [
