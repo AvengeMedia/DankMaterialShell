@@ -114,18 +114,21 @@ in {
             Install.WantedBy = [ config.wayland.systemd.target ];
         };
 
-        xdg.configFile."DankMaterialShell/default-settings.json" = lib.mkIf (cfg.default.settings != { }) {
-            source = jsonFormat.generate "default-settings.json" cfg.default.settings;
-        };
-
         xdg.stateFile."DankMaterialShell/default-session.json" = lib.mkIf (cfg.default.session != { }) {
             source = jsonFormat.generate "default-session.json" cfg.default.session;
         };
 
-        xdg.configFile = lib.mapAttrs' (name: plugin: {
-            name = "DankMaterialShell/plugins/${name}";
-            value.source = plugin.src;
-        }) (lib.filterAttrs (n: v: v.enable) cfg.plugins);
+        xdg.configFile = lib.mkMerge [
+            (lib.mapAttrs' (name: plugin: {
+                name = "DankMaterialShell/plugins/${name}";
+                value.source = plugin.src;
+            }) (lib.filterAttrs (n: v: v.enable) cfg.plugins))
+            {
+                "DankMaterialShell/default-settings.json" = lib.mkIf (cfg.default.settings != { }) {
+                    source = jsonFormat.generate "default-settings.json" cfg.default.settings;
+                };
+            }
+        ];
 
         home.packages =
             [
