@@ -1,0 +1,1391 @@
+{
+    "%1 characters": {
+        "%1 characters": "%1个字符"
+    },
+    "%1/%2": {
+        "%1/%2": "%1/%2"
+    },
+    "(Unnamed)": {
+        "(Unnamed)": "(未命名)"
+    },
+    "- Stateless System Monitoring": {
+        "- Stateless System Monitoring": "- 无状态系统监控"
+    },
+    "- Support Us With a Star ⭐": {
+        "- Support Us With a Star ⭐": "- 给个 Star ⭐来表示支持吧"
+    },
+    "24-Hour Format": {
+        "24-Hour Format": "24小时制"
+    },
+    "24-hour format": {
+        "24-hour format": "24小时制"
+    },
+    "3rd party": {
+        "3rd party": "第三方"
+    },
+    "7-Day Forecast": {
+        "7-Day Forecast": "七日天气预报"
+    },
+    "A file with this name already exists. Do you want to overwrite it?": {
+        "A file with this name already exists. Do you want to overwrite it?": "已存在同名文件，是否覆盖？"
+    },
+    "About": {
+        "About": "关于"
+    },
+    "Access clipboard history": {
+        "Access clipboard history": "访问剪切板记录"
+    },
+    "Access to notifications and do not disturb": {
+        "Access to notifications and do not disturb": "访问通知与请勿打扰"
+    },
+    "Access to system controls and settings": {
+        "Access to system controls and settings": "访问系统控制和设置"
+    },
+    "Actions": {
+        "Actions": "操作"
+    },
+    "Add": {
+        "Add": "添加"
+    },
+    "Add Widget": {
+        "Add Widget": "添加小组件"
+    },
+    "Add Widget to ": {
+        "Add Widget to ": "添加小组件到"
+    },
+    "Add a VPN in NetworkManager": {
+        "Add a VPN in NetworkManager": "在 NetworkManager 中添加 VPN"
+    },
+    "All": {
+        "All": "全部"
+    },
+    "All displays": {
+        "All displays": "所有显示器"
+    },
+    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
+        "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/空格: 返回 • F1/I: 文件信息 • F10: 帮助 • Esc: 关闭"
+    },
+    "Always Show OSD Percentage": {
+        "Always Show OSD Percentage": "始终显示 OSD 百分比"
+    },
+    "Animation Speed": {
+        "Animation Speed": "动画速度"
+    },
+    "Animations": {
+        "Animations": "动画"
+    },
+    "App Launcher": {
+        "App Launcher": "启动器"
+    },
+    "Applications": {
+        "Applications": "应用程序"
+    },
+    "Apply": {
+        "Apply": "应用"
+    },
+    "Apply GTK Colors": {
+        "Apply GTK Colors": "应用 GTK 配色"
+    },
+    "Apply Qt Colors": {
+        "Apply Qt Colors": "应用 Qt 配色"
+    },
+    "Apps Icon": {
+        "Apps Icon": "应用图标"
+    },
+    "Apps are ordered by usage frequency, then last used, then alphabetically.": {
+        "Apps are ordered by usage frequency, then last used, then alphabetically.": "应用按使用频率、最近使用时间和字母顺序排序。"
+    },
+    "Are you sure you want to hibernate the system?": {
+        "Are you sure you want to hibernate the system?": "你确定要让系统休眠吗？"
+    },
+    "Are you sure you want to log out?": {
+        "Are you sure you want to log out?": "你确定要注销吗？"
+    },
+    "Are you sure you want to power off the system?": {
+        "Are you sure you want to power off the system?": "你确定要关机吗？"
+    },
+    "Are you sure you want to reboot the system?": {
+        "Are you sure you want to reboot the system?": "你确定要重启系统吗？"
+    },
+    "Are you sure you want to suspend the system?": {
+        "Are you sure you want to suspend the system?": "你确定要挂起系统吗？"
+    },
+    "Audio Codec": {
+        "Audio Codec": "音频编解码器"
+    },
+    "Audio Codec Selection": {
+        "Audio Codec Selection": "选择音频编解码器"
+    },
+    "Audio Devices": {
+        "Audio Devices": "音频设备"
+    },
+    "Audio Icon": {
+        "Audio Icon": "音量图标"
+    },
+    "Audio Output Devices (": {
+        "Audio Output Devices (": "音频输出设备 ("
+    },
+    "Auto Location": {
+        "Auto Location": "自动定位"
+    },
+    "Auto-hide": {
+        "Auto-hide": "自动隐藏"
+    },
+    "Auto-hide Dock": {
+        "Auto-hide Dock": "自动隐藏程序坞"
+    },
+    "Auto-location": {
+        "Auto-location": "自动定位"
+    },
+    "Auto-saving...": {
+        "Auto-saving...": "自动保存中..."
+    },
+    "Automatic Control": {
+        "Automatic Control": "自动切换"
+    },
+    "Automatic Cycling": {
+        "Automatic Cycling": "自动轮换"
+    },
+    "Automatically cycle through wallpapers in the same folder": {
+        "Automatically cycle through wallpapers in the same folder": "自动轮换文件夹中的壁纸"
+    },
+    "Automatically determine your location using your IP address": {
+        "Automatically determine your location using your IP address": "通过 IP 地址自动检测您的位置"
+    },
+    "Automatically extract colors from wallpaper": {
+        "Automatically extract colors from wallpaper": "自动从壁纸中提取颜色"
+    },
+    "Automatically hide the top bar to expand screen real estate": {
+        "Automatically hide the top bar to expand screen real estate": "自动隐藏顶栏以扩展屏幕可用空间"
+    },
+    "Automatically lock after": {
+        "Automatically lock after": "在此时间后自动锁定"
+    },
+    "Available": {
+        "Available": "可用"
+    },
+    "Available Plugins": {
+        "Available Plugins": "可用插件"
+    },
+    "Available Screens (": {
+        "Available Screens (": "可用显示器 ("
+    },
+    "Back": {
+        "Back": "返回"
+    },
+    "Battery": {
+        "Battery": "电池"
+    },
+    "Battery level and power management": {
+        "Battery level and power management": "电池电量与电源管理"
+    },
+    "Battery not detected - only AC power settings available": {
+        "Battery not detected - only AC power settings available": "未检测到电池，仅电源设置可用"
+    },
+    "Bluetooth Icon": {
+        "Bluetooth Icon": "蓝牙图标"
+    },
+    "Bluetooth Settings": {
+        "Bluetooth Settings": "蓝牙设置"
+    },
+    "Border": {
+        "Border": "边框"
+    },
+    "Brightness": {
+        "Brightness": "亮度"
+    },
+    "Browse": {
+        "Browse": "浏览"
+    },
+    "Browse Plugins": {
+        "Browse Plugins": "浏览插件"
+    },
+    "CPU": {
+        "CPU": "CPU"
+    },
+    "CPU Temperature": {
+        "CPU Temperature": "CPU 温度"
+    },
+    "CPU Usage": {
+        "CPU Usage": "CPU 占用"
+    },
+    "CPU temperature display": {
+        "CPU temperature display": "显示 CPU 温度"
+    },
+    "CPU usage indicator": {
+        "CPU usage indicator": "CPU 占用情况"
+    },
+    "Cancel": {
+        "Cancel": "取消"
+    },
+    "Capacity": {
+        "Capacity": "电池容量"
+    },
+    "Center Section": {
+        "Center Section": "中间区域"
+    },
+    "Check for system updates": {
+        "Check for system updates": "检查系统更新"
+    },
+    "Choose Launcher Logo Color": {
+        "Choose Launcher Logo Color": "设置启动器 Logo 颜色"
+    },
+    "Choose icon": {
+        "Choose icon": "选择图标"
+    },
+    "Choose the logo displayed on the launcher button in DankBar": {
+        "Choose the logo displayed on the launcher button in DankBar": "选择在 Dank Bar 启动器按钮上显示的 Logo"
+    },
+    "Choose where notification popups appear on screen": {
+        "Choose where notification popups appear on screen": "设置通知弹窗的出现位置"
+    },
+    "Clear": {
+        "Clear": "清除"
+    },
+    "Clear All": {
+        "Clear All": "清空"
+    },
+    "Clear All History?": {
+        "Clear All History?": "清空历史记录？"
+    },
+    "Clipboard History": {
+        "Clipboard History": "剪切板历史记录"
+    },
+    "Clipboard Manager": {
+        "Clipboard Manager": "剪切板管理器"
+    },
+    "Clock": {
+        "Clock": "时钟"
+    },
+    "Close": {
+        "Close": "关闭"
+    },
+    "Color Override": {
+        "Color Override": "覆盖颜色"
+    },
+    "Color Picker": {
+        "Color Picker": "取色器"
+    },
+    "Color temperature for night mode": {
+        "Color temperature for night mode": "夜间模式色温"
+    },
+    "Communication": {
+        "Communication": "通讯"
+    },
+    "Compact Mode": {
+        "Compact Mode": "紧凑模式"
+    },
+    "Compositor:": {
+        "Compositor:": "合成器："
+    },
+    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
+        "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "为已命名工作区配置图标。当数字和图标同时启用时，图标优先生效。"
+    },
+    "Configure which displays show shell components": {
+        "Configure which displays show shell components": "配置哪些显示器显示各类组件"
+    },
+    "Connect": {
+        "Connect": "连接"
+    },
+    "Connect to Wi-Fi": {
+        "Connect to Wi-Fi": "连接到Wi-Fi"
+    },
+    "Connected Displays": {
+        "Connected Displays": "已连接显示器"
+    },
+    "Contrast": {
+        "Contrast": "对比度"
+    },
+    "Control Center": {
+        "Control Center": "控制中心"
+    },
+    "Control currently playing media": {
+        "Control currently playing media": "控制当前播放的媒体"
+    },
+    "Control the speed of animations throughout the interface": {
+        "Control the speed of animations throughout the interface": "调节界面动画的整体速度"
+    },
+    "Copied to clipboard": {
+        "Copied to clipboard": "复制到剪切板"
+    },
+    "Copied!": {
+        "Copied!": "复制成功！"
+    },
+    "Copy": {
+        "Copy": "复制"
+    },
+    "Copy PID": {
+        "Copy PID": "复制进程ID"
+    },
+    "Copy Process Name": {
+        "Copy Process Name": "复制进程名"
+    },
+    "Corner Radius (0 = square corners)": {
+        "Corner Radius (0 = square corners)": "圆角半径（0 = 直角）"
+    },
+    "Create Dir": {
+        "Create Dir": "创建目录"
+    },
+    "Critical Priority": {
+        "Critical Priority": "紧急通知"
+    },
+    "Current Items": {
+        "Current Items": "当前项目"
+    },
+    "Current time and date display": {
+        "Current time and date display": "显示当前时间与日期"
+    },
+    "Current weather conditions and temperature": {
+        "Current weather conditions and temperature": "当前天气及气温"
+    },
+    "Custom": {
+        "Custom": "自定义"
+    },
+    "Custom Location": {
+        "Custom Location": "自定义位置"
+    },
+    "Custom Transparency": {
+        "Custom Transparency": "自定义透明度"
+    },
+    "Custom: ": {
+        "Custom: ": "自定义： "
+    },
+    "Customizable empty space": {
+        "Customizable empty space": "可调节留白"
+    },
+    "DEMO MODE - Click anywhere to exit": {
+        "DEMO MODE - Click anywhere to exit": "演示模式 - 点击任意位置退出"
+    },
+    "DMS Plugin Manager Unavailable": {
+        "DMS Plugin Manager Unavailable": "DMS 插件管理器不可用"
+    },
+    "DMS_SOCKET not available": {
+        "DMS_SOCKET not available": "DMS_SOCKET 不可用"
+    },
+    "Daily at:": {
+        "Daily at:": "在每日："
+    },
+    "Dank Bar": {
+        "Dank Bar": "Dank Bar"
+    },
+    "Dank Bar Transparency": {
+        "Dank Bar Transparency": "Dank Bar 透明度"
+    },
+    "Dank Bar Widget Transparency": {
+        "Dank Bar Widget Transparency": "Dank Bar 小组件透明度"
+    },
+    "Dank Suite:": {
+        "Dank Suite:": "Dank 套件："
+    },
+    "DankBar Font Scale": {
+        "DankBar Font Scale": "Dank Bar 字体缩放"
+    },
+    "Date Format": {
+        "Date Format": "日期格式"
+    },
+    "Default": {
+        "Default": "默认"
+    },
+    "Defaults": {
+        "Defaults": "复位"
+    },
+    "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
+        "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: 清除 • Shift+Del: 清空 • 1-9: 操作 • F10: 帮助 • Esc: 关闭"
+    },
+    "Development": {
+        "Development": "开发"
+    },
+    "Device": {
+        "Device": "设备"
+    },
+    "Disconnect": {
+        "Disconnect": "断开连接"
+    },
+    "Disk": {
+        "Disk": "磁盘"
+    },
+    "Disk Usage": {
+        "Disk Usage": "磁盘占用"
+    },
+    "Display Settings": {
+        "Display Settings": "显示设置"
+    },
+    "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
+        "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "显示一个包含固定和运行中应用的程序坞，可放置在屏幕四边任意位置"
+    },
+    "Display all priorities over fullscreen apps": {
+        "Display all priorities over fullscreen apps": "应用全屏时仍显示所有优先级的通知"
+    },
+    "Display currently focused application title": {
+        "Display currently focused application title": "显示当前聚焦应用的标题"
+    },
+    "Display volume and brightness percentage values by default in OSD popups": {
+        "Display volume and brightness percentage values by default in OSD popups": "在OSD弹窗中默认显示音量与亮度数值"
+    },
+    "Displays": {
+        "Displays": "显示"
+    },
+    "Displays the active keyboard layout and allows switching": {
+        "Displays the active keyboard layout and allows switching": "显示当前键盘布局并支持切换"
+    },
+    "Do Not Disturb": {
+        "Do Not Disturb": "勿扰模式"
+    },
+    "Dock": {
+        "Dock": "程序坞"
+    },
+    "Dock Position": {
+        "Dock Position": "程序坞位置"
+    },
+    "Dock Transparency": {
+        "Dock Transparency": "程序坞透明度"
+    },
+    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
+        "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "拖动组件以在各区块内重新排序。点击眼睛图标可隐藏/显示组件（保留间距），点击 X 可彻底移除。"
+    },
+    "Dynamic Theming": {
+        "Dynamic Theming": "动态主题"
+    },
+    "Edge Spacing (0 = edge-to-edge)": {
+        "Edge Spacing (0 = edge-to-edge)": "边缘间距（0 = 紧贴边缘）"
+    },
+    "Education": {
+        "Education": "教育"
+    },
+    "Empty": {
+        "Empty": "空"
+    },
+    "Enable GPU Temperature": {
+        "Enable GPU Temperature": "显示 GPU 温度"
+    },
+    "Enable Weather": {
+        "Enable Weather": "显示天气"
+    },
+    "Enable WiFi": {
+        "Enable WiFi": "启用 Wi-Fi"
+    },
+    "End": {
+        "End": "结束"
+    },
+    "Enter custom lock screen format (e.g., dddd, MMMM d)": {
+        "Enter custom lock screen format (e.g., dddd, MMMM d)": "输入自定义锁屏格式（例如：dddd, MMMM d）"
+    },
+    "Enter custom top bar format (e.g., ddd MMM d)": {
+        "Enter custom top bar format (e.g., ddd MMM d)": "输入自定义顶栏格式（例如：ddd MMM d）"
+    },
+    "Enter filename...": {
+        "Enter filename...": "输入文件名..."
+    },
+    "Exclusive Zone Offset": {
+        "Exclusive Zone Offset": "独占区域偏移量"
+    },
+    "F1/I: Toggle • F10: Help": {
+        "F1/I: Toggle • F10: Help": "F1/I: 切换 • F10: 帮助"
+    },
+    "Feels Like": {
+        "Feels Like": "体感温度"
+    },
+    "File Already Exists": {
+        "File Already Exists": "文件已存在"
+    },
+    "File Information": {
+        "File Information": "文件信息"
+    },
+    "Find in Text": {
+        "Find in Text": "查找文本"
+    },
+    "Find in note...": {
+        "Find in note...": "在便签中查找..."
+    },
+    "Focused Window": {
+        "Focused Window": "当前窗口"
+    },
+    "Font Family": {
+        "Font Family": "字体"
+    },
+    "Font Scale": {
+        "Font Scale": "字体缩放"
+    },
+    "Font Settings": {
+        "Font Settings": "字体设置"
+    },
+    "Font Size": {
+        "Font Size": "字体大小"
+    },
+    "Font Weight": {
+        "Font Weight": "字体粗细"
+    },
+    "Force Kill Process": {
+        "Force Kill Process": "强制结束进程"
+    },
+    "Forget Device": {
+        "Forget Device": "取消配对"
+    },
+    "Forget Network": {
+        "Forget Network": "取消保存"
+    },
+    "Format Legend": {
+        "Format Legend": "参考格式"
+    },
+    "Framework:": {
+        "Framework:": "框架："
+    },
+    "Fun": {
+        "Fun": "娱乐"
+    },
+    "GPU": {
+        "GPU": "GPU"
+    },
+    "GPU Temperature": {
+        "GPU Temperature": "GPU 温度"
+    },
+    "GPU temperature display": {
+        "GPU temperature display": "显示 GPU 温度"
+    },
+    "Games": {
+        "Games": "游戏"
+    },
+    "Github:": {
+        "Github:": "Github:"
+    },
+    "Good": {
+        "Good": "良好"
+    },
+    "Goth Corners": {
+        "Goth Corners": "哥特风格圆角"
+    },
+    "Graphics": {
+        "Graphics": "图形"
+    },
+    "Group by App": {
+        "Group by App": "按应用分组"
+    },
+    "Group multiple windows of the same app together with a window count indicator": {
+        "Group multiple windows of the same app together with a window count indicator": "将同一应用的多个窗口合并显示，并标注窗口数量"
+    },
+    "Health": {
+        "Health": "电池健康"
+    },
+    "Height to Edge Gap (Exclusive Zone)": {
+        "Height to Edge Gap (Exclusive Zone)": "与屏幕边缘的间距（独占区）"
+    },
+    "Hex:": {
+        "Hex:": "十六进制颜色码："
+    },
+    "Hibernate": {
+        "Hibernate": "休眠"
+    },
+    "Hibernate system after": {
+        "Hibernate system after": "在此时间后休眠系统"
+    },
+    "Hide the dock when not in use and reveal it when hovering near the dock area": {
+        "Hide the dock when not in use and reveal it when hovering near the dock area": "在未使用时隐藏程序坞，鼠标悬停到程序坞区域时显示"
+    },
+    "Hour": {
+        "Hour": "小时"
+    },
+    "How often to change wallpaper": {
+        "How often to change wallpaper": "壁纸轮换频率"
+    },
+    "Humidity": {
+        "Humidity": "湿度"
+    },
+    "I Understand": {
+        "I Understand": "我明白以上内容"
+    },
+    "Icon Theme": {
+        "Icon Theme": "图标主题"
+    },
+    "Idle Inhibitor": {
+        "Idle Inhibitor": "待机抑制器"
+    },
+    "Idle Settings": {
+        "Idle Settings": "待机设置"
+    },
+    "Idle monitoring not supported - requires newer Quickshell version": {
+        "Idle monitoring not supported - requires newer Quickshell version": "不支持待机监控 - 请使用新版 Quickshell"
+    },
+    "Image": {
+        "Image": "图像"
+    },
+    "Include Transitions": {
+        "Include Transitions": "包含过渡效果"
+    },
+    "Input Devices": {
+        "Input Devices": "输入设备"
+    },
+    "Install plugins from the DMS plugin registry": {
+        "Install plugins from the DMS plugin registry": "从 DMS 插件库安装插件"
+    },
+    "Internet": {
+        "Internet": "互联网"
+    },
+    "Interval": {
+        "Interval": "轮换间隔"
+    },
+    "Invert on mode change": {
+        "Invert on mode change": "切换模式时反色"
+    },
+    "Keyboard Layout Name": {
+        "Keyboard Layout Name": "键盘布局名称"
+    },
+    "Kill Process": {
+        "Kill Process": "结束进程"
+    },
+    "Language:": {
+        "Language:": "开发语言："
+    },
+    "Latitude": {
+        "Latitude": "纬度"
+    },
+    "Launch": {
+        "Launch": "启动"
+    },
+    "Launch Prefix": {
+        "Launch Prefix": "启动前缀"
+    },
+    "Launch on dGPU": {
+        "Launch on dGPU": "使用独立显卡运行"
+    },
+    "Launcher": {
+        "Launcher": "启动器"
+    },
+    "Launcher Button Logo": {
+        "Launcher Button Logo": "启动器按钮 Logo"
+    },
+    "Light Mode": {
+        "Light Mode": "浅色模式"
+    },
+    "Lines: %1": {
+        "Lines: %1": "行数: %1"
+    },
+    "Loading plugins...": {
+        "Loading plugins...": "正在加载插件…..."
+    },
+    "Location Search": {
+        "Location Search": "位置搜索"
+    },
+    "Lock Screen": {
+        "Lock Screen": "锁屏"
+    },
+    "Lock Screen Format": {
+        "Lock Screen Format": "锁屏格式"
+    },
+    "Lock before suspend": {
+        "Lock before suspend": "挂起前锁屏"
+    },
+    "Log Out": {
+        "Log Out": "注销"
+    },
+    "Long Text": {
+        "Long Text": "长文本"
+    },
+    "Longitude": {
+        "Longitude": "经度"
+    },
+    "Low Priority": {
+        "Low Priority": "次要通知"
+    },
+    "Manage and configure plugins for extending DMS functionality": {
+        "Manage and configure plugins for extending DMS functionality": "管理和配置插件以扩展 DMS 功能"
+    },
+    "Manual Coordinates": {
+        "Manual Coordinates": "手动设置坐标"
+    },
+    "Manual Show/Hide": {
+        "Manual Show/Hide": "手动显示/隐藏"
+    },
+    "Material Colors": {
+        "Material Colors": "Material 配色"
+    },
+    "Matugen Palette": {
+        "Matugen Palette": "Matugen 配色方案"
+    },
+    "Max apps to show": {
+        "Max apps to show": "应用显示上限"
+    },
+    "Media": {
+        "Media": "媒体"
+    },
+    "Media Controls": {
+        "Media Controls": "媒体控制"
+    },
+    "Media Player Settings": {
+        "Media Player Settings": "媒体播放器设置"
+    },
+    "Media Players (": {
+        "Media Players (": "媒体播放器 ("
+    },
+    "Memory": {
+        "Memory": "内存"
+    },
+    "Memory Usage": {
+        "Memory Usage": "内存占用"
+    },
+    "Memory usage indicator": {
+        "Memory usage indicator": "内存占用情况"
+    },
+    "Minute": {
+        "Minute": "分钟"
+    },
+    "Mode:": {
+        "Mode:": "模式："
+    },
+    "Monitor": {
+        "Monitor": "显示器"
+    },
+    "Monitor Selection:": {
+        "Monitor Selection:": "选择显示器："
+    },
+    "Monospace Font": {
+        "Monospace Font": "等宽字体"
+    },
+    "Mount": {
+        "Mount": "挂载"
+    },
+    "NM not supported": {
+        "NM not supported": "不支持 NM"
+    },
+    "Named Workspace Icons": {
+        "Named Workspace Icons": "已命名工作区图标"
+    },
+    "Navigation": {
+        "Navigation": "导航栏"
+    },
+    "Network": {
+        "Network": "网络"
+    },
+    "Network Icon": {
+        "Network Icon": "网络图标"
+    },
+    "Network Info": {
+        "Network Info": "网络信息"
+    },
+    "Network Information": {
+        "Network Information": "网络信息"
+    },
+    "Network Settings": {
+        "Network Settings": "网络设置"
+    },
+    "Network Speed Monitor": {
+        "Network Speed Monitor": "实时网速显示"
+    },
+    "Network download and upload speed display": {
+        "Network download and upload speed display": "显示网络下载与上传速度"
+    },
+    "New": {
+        "New": "新建"
+    },
+    "New York, NY": {
+        "New York, NY": "纽约，美国纽约州"
+    },
+    "Night Mode": {
+        "Night Mode": "夜间模式"
+    },
+    "No Active Players": {
+        "No Active Players": "没有正在播放的音频"
+    },
+    "No Background": {
+        "No Background": "无背景底色"
+    },
+    "No Bluetooth adapter found": {
+        "No Bluetooth adapter found": "未找到蓝牙适配器"
+    },
+    "No Media": {
+        "No Media": "当前无播放内容"
+    },
+    "No VPN profiles found": {
+        "No VPN profiles found": "未找到 VPN 配置"
+    },
+    "No Weather Data Available": {
+        "No Weather Data Available": "暂无天气数据"
+    },
+    "No clipboard entries found": {
+        "No clipboard entries found": "无可用记录"
+    },
+    "No items added yet": {
+        "No items added yet": "暂未添加任何项目"
+    },
+    "No matches": {
+        "No matches": "未找到匹配项"
+    },
+    "No plugins found": {
+        "No plugins found": "未找到插件"
+    },
+    "No plugins found.": {
+        "No plugins found.": "未找到插件"
+    },
+    "Normal Priority": {
+        "Normal Priority": "标准通知"
+    },
+    "Notepad": {
+        "Notepad": "便签"
+    },
+    "Notepad Font Settings": {
+        "Notepad Font Settings": "便签字体设置"
+    },
+    "Nothing to see here": {
+        "Nothing to see here": "空空如也"
+    },
+    "Notification Center": {
+        "Notification Center": "通知中心"
+    },
+    "Notification Overlay": {
+        "Notification Overlay": "全屏时显示通知"
+    },
+    "Notification Popups": {
+        "Notification Popups": "通知弹窗"
+    },
+    "Notification Settings": {
+        "Notification Settings": "通知设置"
+    },
+    "Notification Timeouts": {
+        "Notification Timeouts": "显示时长"
+    },
+    "Notifications": {
+        "Notifications": "通知"
+    },
+    "Numbers": {
+        "Numbers": "数字"
+    },
+    "OS Logo": {
+        "OS Logo": "系统 Logo"
+    },
+    "Office": {
+        "Office": "办公"
+    },
+    "Opacity": {
+        "Opacity": "不透明度"
+    },
+    "Open": {
+        "Open": "打开"
+    },
+    "Open Notepad File": {
+        "Open Notepad File": "打开便签"
+    },
+    "Open search bar to find text": {
+        "Open search bar to find text": "打开搜索栏以查找文本"
+    },
+    "Overview": {
+        "Overview": "概览"
+    },
+    "Overwrite": {
+        "Overwrite": "覆盖"
+    },
+    "Padding": {
+        "Padding": "内边距"
+    },
+    "Per-Mode Wallpapers": {
+        "Per-Mode Wallpapers": "按模式设置壁纸"
+    },
+    "Per-Monitor Wallpapers": {
+        "Per-Monitor Wallpapers": "按显示器设置壁纸"
+    },
+    "Per-Monitor Workspaces": {
+        "Per-Monitor Workspaces": "按显示器划分工作区"
+    },
+    "Percentage": {
+        "Percentage": "占用率"
+    },
+    "Personalization": {
+        "Personalization": "个性化"
+    },
+    "Pin to Dock": {
+        "Pin to Dock": "固定到程序坞"
+    },
+    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
+        "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "此处为插件目录，每个插件应带有一个 plugin.json 描述文件。"
+    },
+    "Place plugins in": {
+        "Place plugins in": "请将插件放置于"
+    },
+    "Plugin Directory": {
+        "Plugin Directory": "插件目录"
+    },
+    "Plugin Management": {
+        "Plugin Management": "插件管理"
+    },
+    "Plugin is disabled - enable in Plugins settings to use": {
+        "Plugin is disabled - enable in Plugins settings to use": "插件已禁用 - 请在插件设置中启用以继续"
+    },
+    "Plugins": {
+        "Plugins": "插件"
+    },
+    "Popup Position": {
+        "Popup Position": "弹出位置"
+    },
+    "Popup Transparency": {
+        "Popup Transparency": "弹窗透明度"
+    },
+    "Position": {
+        "Position": "位置"
+    },
+    "Power": {
+        "Power": "电源"
+    },
+    "Power Off": {
+        "Power Off": "关机"
+    },
+    "Power Options": {
+        "Power Options": "电源菜单"
+    },
+    "Power Profile Degradation": {
+        "Power Profile Degradation": "电源配置性能下降"
+    },
+    "Pressure": {
+        "Pressure": "气压"
+    },
+    "Prevent screen timeout": {
+        "Prevent screen timeout": "防止屏幕超时"
+    },
+    "Primary": {
+        "Primary": "主题色"
+    },
+    "Privacy Indicator": {
+        "Privacy Indicator": "隐私指示器"
+    },
+    "Process": {
+        "Process": "进程"
+    },
+    "QML (Qt Modeling Language)": {
+        "QML (Qt Modeling Language)": "QML (Qt 模板语言)"
+    },
+    "Quick access to application launcher": {
+        "Quick access to application launcher": "快捷访问应用启动器"
+    },
+    "Quick access to color picker": {
+        "Quick access to color picker": "快捷访问取色器"
+    },
+    "Quick access to notepad": {
+        "Quick access to notepad": "快捷访问剪切板"
+    },
+    "Rain Chance": {
+        "Rain Chance": "降雨概率"
+    },
+    "Reboot": {
+        "Reboot": "重启"
+    },
+    "Recent Colors": {
+        "Recent Colors": "最近拾取的颜色"
+    },
+    "Recently Used Apps": {
+        "Recently Used Apps": "最近使用的应用"
+    },
+    "Refresh": {
+        "Refresh": "刷新"
+    },
+    "Remove": {
+        "Remove": "移除"
+    },
+    "Reset": {
+        "Reset": "重置"
+    },
+    "Running Apps": {
+        "Running Apps": "活动应用程序"
+    },
+    "Running Apps Only In Current Workspace": {
+        "Running Apps Only In Current Workspace": "仅显示当前工作区的活动应用"
+    },
+    "Running Apps Settings": {
+        "Running Apps Settings": "活动应用设置"
+    },
+    "Save": {
+        "Save": "保存"
+    },
+    "Save Notepad File": {
+        "Save Notepad File": "保存便签"
+    },
+    "Saved": {
+        "Saved": "已保存"
+    },
+    "Scale DankBar font sizes independently": {
+        "Scale DankBar font sizes independently": "独立调整 Dank Bar 字体缩放"
+    },
+    "Scale all font sizes": {
+        "Scale all font sizes": "缩放所有字体大小"
+    },
+    "Scan": {
+        "Scan": "扫描"
+    },
+    "Science": {
+        "Science": "科学"
+    },
+    "Search for a location...": {
+        "Search for a location...": "搜索位置..."
+    },
+    "Search plugins...": {
+        "Search plugins...": "搜索插件中..."
+    },
+    "Search...": {
+        "Search...": "搜索中..."
+    },
+    "Select Launcher Logo": {
+        "Select Launcher Logo": "选择启动器Logo"
+    },
+    "Select a color from the palette or use custom sliders": {
+        "Select a color from the palette or use custom sliders": "从调色板中选择颜色，或使用自定义滑块"
+    },
+    "Select a widget to add to the ": {
+        "Select a widget to add to the ": "选择一个小组件添加到 "
+    },
+    "Select an image file...": {
+        "Select an image file...": "选择一张图片..."
+    },
+    "Select font weight": {
+        "Select font weight": "选择字体粗细"
+    },
+    "Select monitor to configure wallpaper": {
+        "Select monitor to configure wallpaper": "选择要设置壁纸的屏幕"
+    },
+    "Select monospace font for process list and technical displays": {
+        "Select monospace font for process list and technical displays": "使用等宽字体显示进程和技术内容"
+    },
+    "Select system font family": {
+        "Select system font family": "选择系统字体"
+    },
+    "Select which transitions to include in randomization": {
+        "Select which transitions to include in randomization": "选择在随机轮换中使用的过渡效果"
+    },
+    "Separator": {
+        "Separator": "分隔符"
+    },
+    "Set different wallpapers for each connected monitor": {
+        "Set different wallpapers for each connected monitor": "分别为各个显示器设置壁纸"
+    },
+    "Set different wallpapers for light and dark mode": {
+        "Set different wallpapers for light and dark mode": "分别设置浅色/深色模式下的壁纸"
+    },
+    "Settings": {
+        "Settings": "设置"
+    },
+    "Shift+Del: Clear All • Esc: Close": {
+        "Shift+Del: Clear All • Esc: Close": "Shift+Del: 清空 • Esc: 关闭"
+    },
+    "Show Dock": {
+        "Show Dock": "显示程序坞"
+    },
+    "Show Line Numbers": {
+        "Show Line Numbers": "显示行号"
+    },
+    "Show Power Actions": {
+        "Show Power Actions": "显示电源操作"
+    },
+    "Show Workspace Apps": {
+        "Show Workspace Apps": "显示工作区内应用"
+    },
+    "Show on Overview": {
+        "Show on Overview": "概览中显示"
+    },
+    "Show on all connected displays": {
+        "Show on all connected displays": "在所有已连接的显示器上显示"
+    },
+    "Show on screens:": {
+        "Show on screens:": "选择显示的屏幕："
+    },
+    "Show password": {
+        "Show password": "显示密码"
+    },
+    "Show weather information in top bar and control center": {
+        "Show weather information in top bar and control center": "在顶栏和控制中心显示天气信息"
+    },
+    "Shows all running applications with focus indication": {
+        "Shows all running applications with focus indication": "显示所有正在运行应用程序，并标记焦点所在"
+    },
+    "Shows current workspace and allows switching": {
+        "Shows current workspace and allows switching": "显示当前工作区并支持快速切换"
+    },
+    "Shows when microphone, camera, or screen sharing is active": {
+        "Shows when microphone, camera, or screen sharing is active": "显示麦克风、摄像头或屏幕共享的使用状态"
+    },
+    "Size": {
+        "Size": "尺寸"
+    },
+    "Size Offset": {
+        "Size Offset": "尺寸偏移"
+    },
+    "Spacer": {
+        "Spacer": "空白占位"
+    },
+    "Spacing": {
+        "Spacing": "间距"
+    },
+    "Square Corners": {
+        "Square Corners": "直角边框"
+    },
+    "Start": {
+        "Start": "开始"
+    },
+    "Start typing your notes here...": {
+        "Start typing your notes here...": "请在这里记录你的笔记..."
+    },
+    "Status": {
+        "Status": "状态"
+    },
+    "Storage & Disks": {
+        "Storage & Disks": "存储与磁盘"
+    },
+    "Surface": {
+        "Surface": "表面色"
+    },
+    "Suspend": {
+        "Suspend": "挂起"
+    },
+    "Suspend system after": {
+        "Suspend system after": "在此时间后挂起系统"
+    },
+    "Swap": {
+        "Swap": "虚拟内存"
+    },
+    "Switch User": {
+        "Switch User": "切换用户"
+    },
+    "System": {
+        "System": "系统工具"
+    },
+    "System App Theming": {
+        "System App Theming": "系统应用主题设置"
+    },
+    "System Monitor": {
+        "System Monitor": "系统监测"
+    },
+    "System Monitor Unavailable": {
+        "System Monitor Unavailable": "系统监测不可用"
+    },
+    "System Monitoring:": {
+        "System Monitoring:": "系统监测："
+    },
+    "System Tray": {
+        "System Tray": "系统托盘"
+    },
+    "System Update": {
+        "System Update": "系统更新"
+    },
+    "System Updates": {
+        "System Updates": "系统更新"
+    },
+    "System notification area icons": {
+        "System notification area icons": "系统通知区域图标"
+    },
+    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
+        "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: 导航 • ←→↑↓: 网格导航 • 回车/空格: 选中"
+    },
+    "Technical Details": {
+        "Technical Details": "技术细节"
+    },
+    "Temperature": {
+        "Temperature": "色温"
+    },
+    "Text": {
+        "Text": "文本"
+    },
+    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
+        "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
+    },
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
+        "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 Qt 配置。如需保留当前设置，请先备份 (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0)。"
+    },
+    "Theme & Colors": {
+        "Theme & Colors": "主题与配色"
+    },
+    "Theme Color": {
+        "Theme Color": "主题色"
+    },
+    "Third-Party Plugin Warning": {
+        "Third-Party Plugin Warning": "外部插件警示"
+    },
+    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": {
+        "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "第三方插件由社区开发，DankMaterialShell 不提供官方支持。\\n\\n这些插件可能存在隐私和安全隐患，请自行承担风险。"
+    },
+    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
+        "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "此组件会阻止 GPU 进入省电状态，可能会显著影响笔记本的电池续航。不建议在配备混合显卡的笔记本上使用。"
+    },
+    "This will permanently delete all clipboard history.": {
+        "This will permanently delete all clipboard history.": "此操作会清空剪贴板历史，且无法恢复。"
+    },
+    "Time & Date": {
+        "Time & Date": "时间与日期"
+    },
+    "Today": {
+        "Today": "今日"
+    },
+    "Toggle top bar visibility manually (can be controlled via IPC)": {
+        "Toggle top bar visibility manually (can be controlled via IPC)": "手动切换顶栏可见性（可通过 IPC 控制）"
+    },
+    "Tomorrow": {
+        "Tomorrow": "明日"
+    },
+    "Top Bar Format": {
+        "Top Bar Format": "顶栏格式"
+    },
+    "Transition Effect": {
+        "Transition Effect": "过渡效果"
+    },
+    "Turn off monitors after": {
+        "Turn off monitors after": "在此时间后关闭显示器"
+    },
+    "Unpin from Dock": {
+        "Unpin from Dock": "从程序坞取消固定"
+    },
+    "Unsaved Changes": {
+        "Unsaved Changes": "未保存更改"
+    },
+    "Unsaved changes": {
+        "Unsaved changes": "未保存更改"
+    },
+    "Unsaved note...": {
+        "Unsaved note...": "未保存的便签..."
+    },
+    "Untitled": {
+        "Untitled": "无标题"
+    },
+    "Update All": {
+        "Update All": "更新所有"
+    },
+    "Use 24-hour time format instead of 12-hour AM/PM": {
+        "Use 24-hour time format instead of 12-hour AM/PM": "改用24小时制显示时间"
+    },
+    "Use Fahrenheit": {
+        "Use Fahrenheit": "使用华氏度"
+    },
+    "Use Fahrenheit instead of Celsius for temperature": {
+        "Use Fahrenheit instead of Celsius for temperature": "使用华氏度显示温度"
+    },
+    "Use Monospace Font": {
+        "Use Monospace Font": "使用等宽字体"
+    },
+    "Use light theme instead of dark theme": {
+        "Use light theme instead of dark theme": "使用浅色主题替代深色主题"
+    },
+    "Use%": {
+        "Use%": "使用%"
+    },
+    "Used": {
+        "Used": "已使用"
+    },
+    "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
+        "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "使用所在位置的日出/日落时间，自动调节夜间模式。"
+    },
+    "Utilities": {
+        "Utilities": "实用工具"
+    },
+    "VPN": {
+        "VPN": "VPN"
+    },
+    "VPN Connections": {
+        "VPN Connections": "VPN 连接"
+    },
+    "VPN status and quick connect": {
+        "VPN status and quick connect": "VPN 状态与快速连接"
+    },
+    "Visibility": {
+        "Visibility": "能见度"
+    },
+    "Visual divider between widgets": {
+        "Visual divider between widgets": "组件分隔线"
+    },
+    "Visual effect used when wallpaper changes": {
+        "Visual effect used when wallpaper changes": "壁纸切换时的动画效果"
+    },
+    "Wallpaper": {
+        "Wallpaper": "壁纸"
+    },
+    "Wave Progress Bars": {
+        "Wave Progress Bars": "波形进度条"
+    },
+    "Weather": {
+        "Weather": "天气"
+    },
+    "Weather Widget": {
+        "Weather Widget": "天气小组件"
+    },
+    "WiFi is off": {
+        "WiFi is off": "Wi-Fi 已关闭"
+    },
+    "Widget Management": {
+        "Widget Management": "小组件管理"
+    },
+    "Widget Styling": {
+        "Widget Styling": "小组件样式"
+    },
+    "Widgets": {
+        "Widgets": "小组件"
+    },
+    "Wind": {
+        "Wind": "风速"
+    },
+    "Workspace": {
+        "Workspace": "工作区"
+    },
+    "Workspace Index Numbers": {
+        "Workspace Index Numbers": "工作区序号"
+    },
+    "Workspace Padding": {
+        "Workspace Padding": "工作区内边距"
+    },
+    "Workspace Settings": {
+        "Workspace Settings": "工作区设置"
+    },
+    "Workspace Switcher": {
+        "Workspace Switcher": "工作区切换器"
+    },
+    "You have unsaved changes. Save before closing this tab?": {
+        "You have unsaved changes. Save before closing this tab?": "检测到未保存的更改，是否在关闭此标签页前保存？"
+    },
+    "You have unsaved changes. Save before continuing?": {
+        "You have unsaved changes. Save before continuing?": "检测到未保存的更改，是否在继续前保存？"
+    },
+    "You have unsaved changes. Save before creating a new file?": {
+        "You have unsaved changes. Save before creating a new file?": "检测到未保存的更改，是否在创建新文件前保存？"
+    },
+    "You have unsaved changes. Save before opening a file?": {
+        "You have unsaved changes. Save before opening a file?": "检测到未保存的更改，是否在打开文件前保存？"
+    },
+    "matugen not detected - dynamic theming unavailable": {
+        "matugen not detected - dynamic theming unavailable": "未检测到 Matugen，动态主题不可用"
+    },
+    "official": {
+        "official": "官方"
+    },
+    "update dms for NM integration.": {
+        "update dms for NM integration.": "更新 DMS 以集成 NM"
+    },
+    "• Install only from trusted sources": {
+        "• Install only from trusted sources": "• 仅从可信来源安装"
+    },
+    "• M - Month (1-12)": {
+        "• M - Month (1-12)": "• M - 月（1-12）"
+    },
+    "• MM - Month (01-12)": {
+        "• MM - Month (01-12)": "• M - 月（01-12）"
+    },
+    "• MMM - Month (Jan)": {
+        "• MMM - Month (Jan)": "• MMM - 月份 (1月)"
+    },
+    "• MMMM - Month (January)": {
+        "• MMMM - Month (January)": "• MMMM - 月份 (一月)"
+    },
+    "• Plugins may contain bugs or security issues": {
+        "• Plugins may contain bugs or security issues": "插件可能包含漏洞或安全隐患"
+    },
+    "• Review code before installation when possible": {
+        "• Review code before installation when possible": "• 请尽可能在安装前审查代码"
+    },
+    "• d - Day (1-31)": {
+        "• d - Day (1-31)": "• d - 日（1-31）"
+    },
+    "• dd - Day (01-31)": {
+        "• dd - Day (01-31)": "• dd - 日（01-31）"
+    },
+    "• ddd - Day name (Mon)": {
+        "• ddd - Day name (Mon)": "• ddd - 星期缩写（周一）"
+    },
+    "• dddd - Day name (Monday)": {
+        "• dddd - Day name (Monday)": "• dddd - 星期全称（星期一）"
+    },
+    "• yy - Year (24)": {
+        "• yy - Year (24)": "• yy - 年（24）"
+    },
+    "• yyyy - Year (2024)": {
+        "• yyyy - Year (2024)": "• yy - 年（2024）"
+    }
+}
