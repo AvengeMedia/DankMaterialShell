@@ -6,6 +6,7 @@
     ...
 }: let
     cfg = config.programs.dankMaterialShell;
+    jsonFormat = pkgs.formats.json { };
 in {
     options.programs.dankMaterialShell = with lib.types; {
         enable = lib.mkEnableOption "DankMaterialShell";
@@ -54,6 +55,20 @@ in {
         quickshell = {
             package = lib.mkPackageOption pkgs "quickshell" {};
         };
+
+        default = {
+            settings = lib.mkOption {
+                type = jsonFormat.type;
+                default = { };
+                description = "The default settings are only read if the settings.json file don't exist";
+            };
+            session = lib.mkOption {
+                type = jsonFormat.type;
+                default = { };
+                description = "The default session are only read if the session.json file don't exist";
+            };
+        };
+
         plugins = lib.mkOption {
             type = attrsOf (types.submodule ({ config, ... }: {
                 options = {
@@ -97,6 +112,14 @@ in {
             };
 
             Install.WantedBy = [ config.wayland.systemd.target ];
+        };
+
+        xdg.configFile."DankMaterialShell/default-settings.json" = lib.mkIf (cfg.default.settings != { }) {
+            source = jsonFormat.generate "default-settings.json" cfg.default.settings;
+        };
+
+        xdg.stateFile."DankMaterialShell/default-session.json" = lib.mkIf (cfg.default.session != { }) {
+            source = jsonFormat.generate "default-session.json" cfg.default.session;
         };
 
         xdg.configFile = lib.mapAttrs' (name: plugin: {
