@@ -661,6 +661,16 @@ cp -R ./PLUGINS/ExampleEmojiPlugin ~/.config/DankMaterialShell/plugins
 
 **Only install plugins from TRUSTED sources.** Plugins execute QML and javascript at runtime, plugins from third parties should be reviewed before enabling them in dms.
 
+### nixOS - via home-manager
+
+Add the following to your home-manager config to install a plugin:
+
+```nix
+programs.dankMaterialShell.plugins = {
+    ExampleEmojiPlugin.src = "${inputs.dankMaterialShell}/PLUGINS/ExampleEmojiPlugin";
+};
+```
+
 ### Calendar Setup
 
 Sync your caldev compatible calendar (Google, Office365, etc.) for dashboard integration:
