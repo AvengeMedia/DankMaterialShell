@@ -10,42 +10,40 @@
 
     user = config.services.greetd.settings.default_session.user;
 
-    buildCompositorConfig = conf: pkgs.writeText "dmsgreeter-compositor-config" ''
-        ${(lib.replaceString "_DMS_PATH_" "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms" (lib.fileContents conf))}
-        ${cfg.compositor.extraConfig}
-    '';
-
-    sessionCommands = {
-        niri = ''
-            export PATH=$PATH:${lib.makeBinPath [ config.programs.niri.package ]}
-            niri -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-niri.kdl} \
-        '';
-        hyprland = ''
-            export PATH=$PATH:${lib.makeBinPath [ config.programs.hyprland.package ]}
-            hyprland -c ${buildCompositorConfig ../Modules/Greetd/assets/dms-hypr.conf} \
-        '';
-    };
-
     greeterScript = pkgs.writeShellScriptBin "dms-greeter" ''
-        export QT_QPA_PLATFORM=wayland
-        export XDG_SESSION_TYPE=wayland
-        export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-        export EGL_PLATFORM=gbm
-        export DMS_GREET_CFG_DIR="/var/lib/dmsgreeter/"
-        export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package ]}
-        ${sessionCommands.${cfg.compositor.name}} ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
+        export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package config.programs.${cfg.compositor.name}.package ]}
+        ${lib.escapeShellArgs ([
+            "sh"
+            "${../Modules/Greetd/assets/dms-greeter}"
+            "--cache-dir"
+            "/var/lib/dmsgreeter"
+            "--command"
+            cfg.compositor.name
+            "-p"
+            "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms"
+        ]
+        ++ lib.optionals (cfg.compositor.customConfig != "") [
+            "-C"
+            "${pkgs.writeText "dmsgreeter-compositor-config" cfg.compositor.customConfig}"
+        ])} ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
     '';
 in {
+    imports =
+        let
+            msg = "The option 'programs.dankMaterialShell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dankMaterialShell.greeter.compositor.customConfig' instead.";
+        in
+        [ (lib.mkRemovedOptionModule [ "programs" "dankMaterialShell" "greeter" "compositor" "extraConfig" ] msg) ];
+
     options.programs.dankMaterialShell.greeter = {
         enable = lib.mkEnableOption "DankMaterialShell greeter";
         compositor.name = lib.mkOption {
-            type = types.enum ["niri" "hyprland"];
+            type = types.enum ["niri" "hyprland" "sway"];
             description = "Compositor to run greeter in";
         };
-        compositor.extraConfig = lib.mkOption {
+        compositor.customConfig = lib.mkOption {
             type = types.lines;
             default = "";
-            description = "Exra compositor config to include";
+            description = "Custom compositor config";
         };
         configFiles = lib.mkOption {
             type = types.listOf types.path;
