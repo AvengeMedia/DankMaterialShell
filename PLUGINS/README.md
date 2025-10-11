@@ -771,12 +771,266 @@ The plugin API is currently **experimental**. Breaking changes may occur in mino
 - Plugin update notifications
 - Inter-plugin communication
 
+## Launcher Plugins
+
+Launcher plugins extend the DMS application launcher by adding custom searchable items with trigger-based filtering.
+
+### Overview
+
+Launcher plugins enable you to:
+- Add custom items to the launcher/app drawer
+- Use trigger strings for quick filtering (e.g., `!`, `#`, `@`)
+- Execute custom actions when items are selected
+- Provide searchable, categorized content
+- Integrate seamlessly with the existing launcher
+
+### Plugin Type Configuration
+
+To create a launcher plugin, set the plugin type in `plugin.json`:
+
+```json
+{
+    "id": "myLauncher",
+    "name": "My Launcher Plugin",
+    "type": "launcher",
+    "capabilities": ["launcher"],
+    "component": "./MyLauncher.qml",
+    "settings": "./MySettings.qml",
+    "permissions": ["settings_read", "settings_write"]
+}
+```
+
+### Launcher Component Contract
+
+Create `MyLauncher.qml` with the following interface:
+
+```qml
+import QtQuick
+import qs.Services
+
+Item {
+    id: root
+
+    // Required properties
+    property var pluginService: null
+    property string trigger: "#"
+
+    // Required signals
+    signal itemsChanged()
+
+    // Required: Return array of launcher items
+    function getItems(query) {
+        return [
+            {
+                name: "Item Name",
+                icon: "icon_name",
+                comment: "Description",
+                action: "type:data",
+                categories: ["MyLauncher"]
+            }
+        ]
+    }
+
+    // Required: Execute item action
+    function executeItem(item) {
+        const [type, data] = item.action.split(":", 2)
+        // Handle action based on type
+    }
+
+    Component.onCompleted: {
+        if (pluginService) {
+            trigger = pluginService.loadPluginData("myLauncher", "trigger", "#")
+        }
+    }
+}
+```
+
+### Item Structure
+
+Each item returned by `getItems()` must include:
+
+- `name` (string): Display name shown in launcher
+- `icon` (string): Material Design icon name
+- `comment` (string): Description/subtitle text
+- `action` (string): Action identifier in `type:data` format
+- `categories` (array): Array containing your plugin name
+
+### Trigger System
+
+Triggers control when your plugin's items appear in the launcher:
+
+**Empty Trigger Mode** (No trigger):
+- Items always visible alongside regular apps
+- Search includes your items automatically
+- Configure by saving empty trigger: `trigger: ""`
+
+**Custom Trigger Mode**:
+- Items only appear when trigger is typed
+- Example: Type `#` to show only your plugin's items
+- Type `# query` to search within your plugin
+- Configure any string: `#`, `!`, `@`, `!custom`, etc.
+
+### Trigger Configuration in Settings
+
+Provide a settings component with trigger configuration:
+
+```qml
+import QtQuick
+import QtQuick.Controls
+import qs.Widgets
+
+FocusScope {
+    id: root
+
+    property var pluginService: null
+
+    Column {
+        spacing: 12
+
+        CheckBox {
+            id: noTriggerToggle
+            text: "No trigger (always show)"
+            checked: loadSettings("noTrigger", false)
+
+            onCheckedChanged: {
+                saveSettings("noTrigger", checked)
+                if (checked) {
+                    saveSettings("trigger", "")
+                } else {
+                    saveSettings("trigger", triggerField.text || "#")
+                }
+            }
+        }
+
+        DankTextField {
+            id: triggerField
+            visible: !noTriggerToggle.checked
+            text: loadSettings("trigger", "#")
+            placeholderText: "#"
+
+            onTextEdited: {
+                saveSettings("trigger", text || "#")
+            }
+        }
+    }
+
+    function saveSettings(key, value) {
+        if (pluginService) {
+            pluginService.savePluginData("myLauncher", key, value)
+        }
+    }
+
+    function loadSettings(key, defaultValue) {
+        if (pluginService) {
+            return pluginService.loadPluginData("myLauncher", key, defaultValue)
+        }
+        return defaultValue
+    }
+}
+```
+
+### Action Execution
+
+Handle different action types in `executeItem()`:
+
+```qml
+function executeItem(item) {
+    const actionParts = item.action.split(":")
+    const actionType = actionParts[0]
+    const actionData = actionParts.slice(1).join(":")
+
+    switch (actionType) {
+        case "toast":
+            if (typeof ToastService !== "undefined") {
+                ToastService.showInfo("Plugin", actionData)
+            }
+            break
+        case "copy":
+            // Copy to clipboard
+            break
+        case "script":
+            // Execute command
+            break
+        default:
+            console.warn("Unknown action:", actionType)
+    }
+}
+```
+
+### Search and Filtering
+
+The launcher automatically handles search when:
+
+**With empty trigger**:
+- Your items appear in all searches
+- No prefix needed
+
+**With custom trigger**:
+- Type trigger alone: Shows all your items
+- Type trigger + query: Filters your items by query
+- The query parameter is passed to your `getItems(query)` function
+
+Example `getItems()` implementation:
+
+```qml
+function getItems(query) {
+    const allItems = [
+        {name: "Item 1", ...},
+        {name: "Item 2", ...},
+        {name: "Test Item", ...}
+    ]
+
+    if (!query || query.length === 0) {
+        return allItems
+    }
+
+    const lowerQuery = query.toLowerCase()
+    return allItems.filter(item => {
+        return item.name.toLowerCase().includes(lowerQuery) ||
+               item.comment.toLowerCase().includes(lowerQuery)
+    })
+}
+```
+
+### Integration Flow
+
+1. User opens launcher
+2. If empty trigger: Your items appear alongside apps
+3. If custom trigger: User types trigger (e.g., `#`)
+4. Launcher calls `getItems(query)` on your plugin
+5. Your items displayed with your plugin's category
+6. User selects item and presses Enter
+7. Launcher calls `executeItem(item)` on your plugin
+
+### Best Practices
+
+1. **Unique Triggers**: Choose non-conflicting trigger strings
+2. **Fast Response**: Return results quickly from `getItems()`
+3. **Clear Names**: Use descriptive item names and comments
+4. **Error Handling**: Gracefully handle failures in `executeItem()`
+5. **Cleanup**: Destroy temporary objects after use
+6. **Empty Trigger Support**: Consider if your plugin benefits from always being visible
+
+### Example Plugin
+
+See `PLUGINS/LauncherExample/` for a complete working example demonstrating:
+- Trigger configuration (including empty trigger mode)
+- Multiple action types (toast, copy, script)
+- Search/filtering implementation
+- Settings integration
+- Proper error handling
+
 ## Resources
 
-- **Example Plugins**: [Emoji Picker](./ExampleEmojiPlugin/) [WorldClock](https://github.com/rochacbruno/WorldClock)
+- **Example Plugins**: 
+  - [Emoji Picker](./ExampleEmojiPlugin/) 
+  - [WorldClock](https://github.com/rochacbruno/WorldClock) 
+  - [LauncherExample](./LauncherExample/)
+  - [Calculator](https://github.com/rochacbruno/DankCalculator)
 - **PluginService**: `Services/PluginService.qml`
 - **Settings UI**: `Modules/Settings/PluginsTab.qml`
 - **DankBar Integration**: `Modules/DankBar/DankBar.qml`
+- **Launcher Integration**: `Modules/AppDrawer/AppLauncher.qml`
 - **Theme Reference**: `Common/Theme.qml`
 - **Widget Library**: `Widgets/`
 

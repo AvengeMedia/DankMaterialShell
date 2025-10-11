@@ -1,0 +1,17 @@
+{
+    "id": "launcherExample",
+    "name": "LauncherExample",
+    "description": "Example launcher plugin demonstrating the launcher plugin system",
+    "version": "1.0.0",
+    "author": "DMS Team",
+    "icon": "extension",
+    "type": "launcher",
+    "capabilities": ["launcher"],
+    "component": "./LauncherExampleLauncher.qml",
+    "settings": "./LauncherExampleSettings.qml",
+    "trigger": "#",
+    "permissions": [
+        "settings_read",
+        "settings_write"
+    ]
+}

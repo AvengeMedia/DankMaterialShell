@@ -16,6 +16,7 @@ Singleton {
     property var loadedPlugins: ({})
     property var pluginWidgetComponents: ({})
     property var pluginDaemonComponents: ({})
+    property var pluginLauncherComponents: ({})
     property string pluginDirectory: {
         var configDir = StandardPaths.writableLocation(StandardPaths.ConfigLocation)
         var configDirStr = configDir.toString()
@@ -232,7 +233,8 @@ Singleton {
         }
 
         const isDaemon = plugin.type === "daemon"
-        const map = isDaemon ? pluginDaemonComponents : pluginWidgetComponents
+        const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"))
+        const map = isDaemon ? pluginDaemonComponents : isLauncher ? pluginLauncherComponents : pluginWidgetComponents
 
         const prevInstance = pluginInstances[pluginId]
         if (prevInstance) {
@@ -265,6 +267,10 @@ Singleton {
                 const newDaemons = Object.assign({}, pluginDaemonComponents)
                 newDaemons[pluginId] = comp
                 pluginDaemonComponents = newDaemons
+            } else if (isLauncher) {
+                const newLaunchers = Object.assign({}, pluginLauncherComponents)
+                newLaunchers[pluginId] = comp
+                pluginLauncherComponents = newLaunchers
             } else {
                 const newComponents = Object.assign({}, pluginWidgetComponents)
                 newComponents[pluginId] = comp
@@ -293,6 +299,7 @@ Singleton {
 
         try {
             const isDaemon = plugin.type === "daemon"
+            const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"))
 
             const instance = pluginInstances[pluginId]
             if (instance) {
@@ -306,6 +313,10 @@ Singleton {
                 const newDaemons = Object.assign({}, pluginDaemonComponents)
                 delete newDaemons[pluginId]
                 pluginDaemonComponents = newDaemons
+            } else if (isLauncher && pluginLauncherComponents[pluginId]) {
+                const newLaunchers = Object.assign({}, pluginLauncherComponents)
+                delete newLaunchers[pluginId]
+                pluginLauncherComponents = newLaunchers
             } else if (pluginWidgetComponents[pluginId]) {
                 const newComponents = Object.assign({}, pluginWidgetComponents)
                 delete newComponents[pluginId]
@@ -520,5 +531,62 @@ Singleton {
             console.error("PluginService: Failed to create mkdir process")
             return false
         }
+    }
+
+    // Launcher plugin helper functions
+    function getLauncherPlugins() {
+        const launchers = {}
+        
+        // Check plugins that have launcher components
+        for (const pluginId in pluginLauncherComponents) {
+            const plugin = availablePlugins[pluginId]
+            if (plugin && plugin.loaded) {
+                launchers[pluginId] = plugin
+            }
+        }
+        return launchers
+    }
+
+    function getLauncherPlugin(pluginId) {
+        const plugin = availablePlugins[pluginId]
+        if (plugin && plugin.loaded && pluginLauncherComponents[pluginId]) {
+            return plugin
+        }
+        return null
+    }
+
+    function getPluginTrigger(pluginId) {
+        const plugin = getLauncherPlugin(pluginId)
+        if (plugin) {
+            const customTrigger = SettingsData.getPluginSetting(pluginId, "trigger", plugin.trigger || "!")
+            return customTrigger
+        }
+        return null
+    }
+
+    function getAllPluginTriggers() {
+        const triggers = {}
+        const launchers = getLauncherPlugins()
+
+        for (const pluginId in launchers) {
+            const trigger = getPluginTrigger(pluginId)
+            if (trigger && trigger.trim() !== "") {
+                triggers[trigger] = pluginId
+            }
+        }
+        return triggers
+    }
+
+    function getPluginsWithEmptyTrigger() {
+        const plugins = []
+        const launchers = getLauncherPlugins()
+
+        for (const pluginId in launchers) {
+            const trigger = getPluginTrigger(pluginId)
+            if (!trigger || trigger.trim() === "") {
+                plugins.push(pluginId)
+            }
+        }
+        return plugins
     }
 }
