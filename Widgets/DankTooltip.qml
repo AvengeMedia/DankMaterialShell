@@ -48,13 +48,13 @@ PanelWindow {
 
     margins {
         left: {
-            if (alignLeft) return Math.round(targetX)
-            if (alignRight) return Math.round(targetX - implicitWidth)
-            return Math.round(targetX - implicitWidth / 2)
+            if (alignLeft) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX)))
+            if (alignRight) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX - implicitWidth)))
+            return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)))
         }
         top: {
-            if (alignLeft || alignRight) return Math.round(targetY - implicitHeight / 2)
-            return Math.round(targetY)
+            if (alignLeft || alignRight) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.height ?? Screen.height) - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)))
+            return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.height ?? Screen.height) - implicitHeight - Theme.spacingS, targetY)))
         }
     }
 

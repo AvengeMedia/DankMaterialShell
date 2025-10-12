@@ -17,7 +17,7 @@ Singleton {
     readonly property bool envDisableMatugen: Quickshell.env("DMS_DISABLE_MATUGEN") === "1" || Quickshell.env("DMS_DISABLE_MATUGEN") === "true"
 
     // ! TODO - Synchronize with niri/hyprland gaps?
-    readonly property real popupDistance: 2
+    readonly property real popupDistance: SettingsData.dankBarSpacing
 
     property string currentTheme: "blue"
     property string currentThemeCategory: "generic"

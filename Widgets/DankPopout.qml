@@ -87,9 +87,9 @@ PanelWindow {
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
     readonly property real alignedX: Theme.snap((() => {
         if (SettingsData.dankBarPosition === SettingsData.Position.Left) {
-            return triggerY
+            return triggerY + SettingsData.dankBarBottomGap
         } else if (SettingsData.dankBarPosition === SettingsData.Position.Right) {
-            return screenWidth - triggerY - popupWidth
+            return screenWidth - triggerY - SettingsData.dankBarBottomGap - popupWidth
         } else {
             const centerX = triggerX + (triggerWidth / 2) - (popupWidth / 2)
             return Math.max(Theme.popupDistance, Math.min(screenWidth - popupWidth - Theme.popupDistance, centerX))
@@ -100,9 +100,9 @@ PanelWindow {
             const centerY = triggerX + (triggerWidth / 2) - (popupHeight / 2)
             return Math.max(Theme.popupDistance, Math.min(screenHeight - popupHeight - Theme.popupDistance, centerY))
         } else if (SettingsData.dankBarPosition === SettingsData.Position.Bottom) {
-            return Math.max(Theme.popupDistance, Math.min(screenHeight - popupHeight - Theme.popupDistance, screenHeight - triggerY - popupHeight + Theme.popupDistance))
+            return Math.max(Theme.popupDistance, screenHeight - triggerY - popupHeight)
         } else {
-            return Math.max(Theme.popupDistance, Math.min(screenHeight - popupHeight - Theme.popupDistance, triggerY + Theme.popupDistance))
+            return Math.min(screenHeight - popupHeight - Theme.popupDistance, triggerY)
         }
     })(), dpr)
 
