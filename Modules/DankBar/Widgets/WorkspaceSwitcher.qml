@@ -30,9 +30,9 @@ Rectangle {
         }
         if (CompositorService.isHyprland) {
             const baseList = getHyprlandWorkspaces()
-            // Filter out special:scratch_term
-            const filteredList = baseList.filter(ws => ws.name !== "special:scratch_term" && ws.id !== -98)
-            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
+            // Filter out special workspaces
+			const filteredList = baseList.filter(ws => ws.id > -1)
+            return SettingsData.showWorkspacePadding ? padWorkspaces(filteredList) : filteredList
         }
         return [1]
     }
