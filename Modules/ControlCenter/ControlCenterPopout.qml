@@ -140,6 +140,9 @@ DankPopout {
                         root.close()
                         root.lockRequested()
                     }
+                    onSettingsButtonClicked: {
+                        root.close()
+                    }
                 }
 
                 DragDropGrid {

@@ -11,6 +11,7 @@ Rectangle {
     signal powerButtonClicked()
     signal lockRequested()
     signal editModeToggled()
+    signal settingsButtonClicked()
 
     implicitHeight: 70
     radius: Theme.cornerRadius
@@ -96,6 +97,7 @@ Rectangle {
             iconColor: Theme.surfaceText
             backgroundColor: "transparent"
             onClicked: {
+                root.settingsButtonClicked()
                 settingsModal.show()
             }
         }
