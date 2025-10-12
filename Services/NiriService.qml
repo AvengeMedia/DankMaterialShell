@@ -485,6 +485,10 @@ Singleton {
         return send({"Action": {"DoScreenTransition": {"delay_ms": 0}}})
     }
 
+    function toggleOverview() {
+        return send({"Action": {"ToggleOverview": {}}})
+    }
+
     function switchToWorkspace(workspaceIndex) {
         return send({"Action": {"FocusWorkspace": {"reference": {"Index": workspaceIndex}}}})
     }

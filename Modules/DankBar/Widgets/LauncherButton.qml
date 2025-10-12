@@ -30,8 +30,15 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: {
+            if (mouse.button === Qt.RightButton) {
+                if (CompositorService.isNiri) {
+                    NiriService.toggleOverview()
+                }
+                return
+            }
+            
             root.clicked();
             if (popupTarget && popupTarget.setTriggerPosition) {
                 const globalPos = mapToGlobal(0, 0);
