@@ -60,6 +60,7 @@ DankModal {
         open()
         clipboardHistoryModal.searchText = ""
         clipboardHistoryModal.activeImageLoads = 0
+        clipboardHistoryModal.shouldHaveFocus = true
         refreshClipboard()
         keyboardController.reset()
 
