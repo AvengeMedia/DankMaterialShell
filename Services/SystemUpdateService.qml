@@ -191,11 +191,11 @@ Singleton {
             finalCommand.push(updateCommand)
             updater.command = finalCommand
         } else {
-        const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ")
-        const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : ""
-        const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`
-
-        updater.command = [terminal, "-e", "sh", "-c", updateCommand]
+            const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ")
+            const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : ""
+            const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`
+    
+            updater.command = [terminal, "-e", "sh", "-c", updateCommand]
         }
         updater.running = true
     }
