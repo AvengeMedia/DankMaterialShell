@@ -197,7 +197,6 @@ Singleton {
 
         updater.command = [terminal, "-e", "sh", "-c", updateCommand]
         }
-        console.log(updater.command)
         updater.running = true
     }
 
