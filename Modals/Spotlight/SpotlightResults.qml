@@ -162,7 +162,7 @@ Rectangle {
                 onClicked: mouse => {
                                if (mouse.button === Qt.LeftButton) {
                                    resultsList.itemClicked(index, model)
-                               } else if (mouse.button === Qt.RightButton) {
+                               } else if (mouse.button === Qt.RightButton && !model.isPlugin) {
                                    const globalPos = mapToItem(null, mouse.x, mouse.y)
                                    const modalPos = resultsContainer.parent.mapFromItem(null, globalPos.x, globalPos.y)
                                    resultsList.itemRightClicked(index, model, modalPos.x, modalPos.y)
@@ -314,7 +314,7 @@ Rectangle {
                 onClicked: mouse => {
                                if (mouse.button === Qt.LeftButton) {
                                    resultsGrid.itemClicked(index, model)
-                               } else if (mouse.button === Qt.RightButton) {
+                               } else if (mouse.button === Qt.RightButton && !model.isPlugin) {
                                    const globalPos = mapToItem(null, mouse.x, mouse.y)
                                    const modalPos = resultsContainer.parent.mapFromItem(null, globalPos.x, globalPos.y)
                                    resultsGrid.itemRightClicked(index, model, modalPos.x, modalPos.y)
