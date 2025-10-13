@@ -184,7 +184,126 @@ Item {
                         description: "Use animated wave progress bars for media playback"
                         checked: SettingsData.waveProgressEnabled
                         onToggled: checked => {
-                            return SettingsData.setWaveProgressEnabled(checked)
+                            return SettingsData.setWaveProgressEnabled(checked);
+                        }
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
+                height: updaterSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: updaterSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "refresh"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("System Updater")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Use Custom Command")
+                        description: I18n.tr("Use custom command for update your system")
+                        checked: SettingsData.updaterUseCustomCommand
+                        onToggled: checked => {
+                            if (!checked) {
+                                updaterCustomCommand.text = "";
+                                updaterTerminalCustomClass.text = "";
+                                SettingsData.setUpdaterCustomCommand("");
+                                SettingsData.setUpdaterTerminalAdditionalParams("");
+                            }
+                            return SettingsData.setUpdaterUseCustomCommandEnabled(checked);
+                        }
+                    }
+
+                    Column {
+                        width: parent.width - Theme.spacingM * 2
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingM
+
+                        StyledText {
+                            text: I18n.tr("System update custom command")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: updaterCustomCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "myPkgMngr --sysupdate"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.updaterCustomCommand) {
+                                    text = SettingsData.updaterCustomCommand;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setUpdaterCustomCommand(text.trim());
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width - Theme.spacingM * 2
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingM
+
+                        StyledText {
+                            text: I18n.tr("Terminal custom additional parameters")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: updaterTerminalCustomClass
+                            width: parent.width
+                            height: 48
+                            placeholderText: "-T udpClass"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.updaterTerminalAdditionalParams) {
+                                    text = SettingsData.updaterTerminalAdditionalParams;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setUpdaterTerminalAdditionalParams(text.trim());
+                            }
                         }
                     }
                 }

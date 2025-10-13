@@ -175,6 +175,9 @@ Singleton {
     property int notificationTimeoutCritical: 0
     property int notificationPopupPosition: SettingsData.Position.Top
     property bool osdAlwaysShowValue: false
+    property bool updaterUseCustomCommand: false
+    property string updaterCustomCommand: ""
+    property string updaterTerminalAdditionalParams: ""
     property var screenPreferences: ({})
     property int animationSpeed: SettingsData.AnimationSpeed.Short
     readonly property string defaultFontFamily: "Inter Variable"
@@ -410,6 +413,9 @@ Singleton {
                 notificationTimeoutCritical = settings.notificationTimeoutCritical !== undefined ? settings.notificationTimeoutCritical : 0
                 notificationPopupPosition = settings.notificationPopupPosition !== undefined ? settings.notificationPopupPosition : SettingsData.Position.Top
                 osdAlwaysShowValue = settings.osdAlwaysShowValue !== undefined ? settings.osdAlwaysShowValue : false
+                updaterUseCustomCommand = settings.updaterUseCustomCommand !== undefined ? settings.updaterUseCustomCommand : false;
+                updaterCustomCommand = settings.updaterCustomCommand !== undefined ? settings.updaterCustomCommand : "";
+                updaterTerminalAdditionalParams = settings.updaterTerminalAdditionalParams !== undefined ? settings.updaterTerminalAdditionalParams : "";
                 dankBarSpacing = settings.dankBarSpacing !== undefined ? settings.dankBarSpacing : (settings.topBarSpacing !== undefined ? settings.topBarSpacing : 4)
                 dankBarBottomGap = settings.dankBarBottomGap !== undefined ? settings.dankBarBottomGap : (settings.topBarBottomGap !== undefined ? settings.topBarBottomGap : 0)
                 dankBarInnerPadding = settings.dankBarInnerPadding !== undefined ? settings.dankBarInnerPadding : (settings.topBarInnerPadding !== undefined ? settings.topBarInnerPadding : 4)
@@ -560,6 +566,9 @@ Singleton {
                                                 "notificationTimeoutCritical": notificationTimeoutCritical,
                                                 "notificationPopupPosition": notificationPopupPosition,
                                                 "osdAlwaysShowValue": osdAlwaysShowValue,
+				                "updaterUseCustomCommand": updaterUseCustomCommand,
+				                "updaterCustomCommand": updaterCustomCommand,
+				                "updaterTerminalAdditionalParams": updaterTerminalAdditionalParams,
                                                 "screenPreferences": screenPreferences,
                                                 "animationSpeed": animationSpeed
                                             }, null, 2))
@@ -599,6 +608,21 @@ Singleton {
     function setWaveProgressEnabled(enabled) {
         waveProgressEnabled = enabled
         saveSettings()
+    }
+
+    function setUpdaterUseCustomCommandEnabled(enabled) {
+        updaterUseCustomCommand = enabled;
+        saveSettings();
+    }
+
+    function setUpdaterCustomCommand(command) {
+        updaterCustomCommand = command;
+        saveSettings();
+    }
+
+    function setUpdaterTerminalAdditionalParams(customArgs) {
+        updaterTerminalAdditionalParams = customArgs;
+        saveSettings();
     }
 
     function setWorkspaceNameIcon(workspaceName, iconData) {

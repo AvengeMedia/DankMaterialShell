@@ -176,11 +176,28 @@ Singleton {
         if (!distributionSupported || !pkgManager || updateCount === 0) return
 
         const terminal = Quickshell.env("TERMINAL") || "xterm"
+
+        if (SettingsData.updaterUseCustomCommand && SettingsData.updaterCustomCommand.length > 0) {
+            const updateCommand = `${SettingsData.updaterCustomCommand} && echo "Updates complete! Press Enter to close..." && read`
+            const termClass = SettingsData.updaterTerminalAdditionalParams
+
+            var finalCommand = [terminal]
+            if (termClass.length > 0) {
+                finalCommand = finalCommand.concat(termClass.split(" "))
+            }
+            finalCommand.push("-e")
+            finalCommand.push("sh")
+            finalCommand.push("-c")
+            finalCommand.push(updateCommand)
+            updater.command = finalCommand
+        } else {
         const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ")
         const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : ""
         const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`
 
         updater.command = [terminal, "-e", "sh", "-c", updateCommand]
+        }
+        console.log(updater.command)
         updater.running = true
     }
 
