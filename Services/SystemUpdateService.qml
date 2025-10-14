@@ -256,7 +256,7 @@ Singleton {
     Timer {
         interval: 30 * 60 * 1000
         repeat: true
-        running: distributionSupported && pkgManager
+        running: distributionSupported && (pkgManager || updChecker)
         onTriggered: checkForUpdates()
     }
 }
