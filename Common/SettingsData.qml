@@ -185,6 +185,7 @@ Singleton {
     property int notificationTimeoutCritical: 0
     property int notificationPopupPosition: SettingsData.Position.Top
     property bool osdAlwaysShowValue: false
+    property bool powerActionConfirm: true
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""
@@ -428,6 +429,7 @@ Singleton {
                 notificationTimeoutCritical = settings.notificationTimeoutCritical !== undefined ? settings.notificationTimeoutCritical : 0
                 notificationPopupPosition = settings.notificationPopupPosition !== undefined ? settings.notificationPopupPosition : SettingsData.Position.Top
                 osdAlwaysShowValue = settings.osdAlwaysShowValue !== undefined ? settings.osdAlwaysShowValue : false
+                powerActionConfirm = settings.powerActionConfirm !== undefined ? settings.powerActionConfirm : true
                 updaterUseCustomCommand = settings.updaterUseCustomCommand !== undefined ? settings.updaterUseCustomCommand : false;
                 updaterCustomCommand = settings.updaterCustomCommand !== undefined ? settings.updaterCustomCommand : "";
                 updaterTerminalAdditionalParams = settings.updaterTerminalAdditionalParams !== undefined ? settings.updaterTerminalAdditionalParams : "";
@@ -594,9 +596,10 @@ Singleton {
                                                 "notificationTimeoutCritical": notificationTimeoutCritical,
                                                 "notificationPopupPosition": notificationPopupPosition,
                                                 "osdAlwaysShowValue": osdAlwaysShowValue,
-				                "updaterUseCustomCommand": updaterUseCustomCommand,
-				                "updaterCustomCommand": updaterCustomCommand,
-				                "updaterTerminalAdditionalParams": updaterTerminalAdditionalParams,
+                                                "powerActionConfirm": powerActionConfirm,
+                                                "updaterUseCustomCommand": updaterUseCustomCommand,
+                                                "updaterCustomCommand": updaterCustomCommand,
+                                                "updaterTerminalAdditionalParams": updaterTerminalAdditionalParams,
                                                 "screenPreferences": screenPreferences,
                                                 "animationSpeed": animationSpeed
                                             }, null, 2))
@@ -650,6 +653,11 @@ Singleton {
 
     function setUpdaterTerminalAdditionalParams(customArgs) {
         updaterTerminalAdditionalParams = customArgs;
+        saveSettings();
+    }
+
+    function setPowerActionConfirm(confirm) {
+        powerActionConfirm = confirm;
         saveSettings();
     }
 

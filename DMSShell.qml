@@ -243,39 +243,45 @@ Item {
   }
 
   LazyLoader {
-      id: powerMenuLoader
+    id: powerMenuLoader
 
-      active: false
+    active: false
 
-      PowerMenu {
-          id: powerMenu
+    PowerMenu {
+        id: powerMenu
 
-          onPowerActionRequested: (action, title, message) => {
-                                      powerConfirmModalLoader.active = true
-                                      if (powerConfirmModalLoader.item) {
-                                          powerConfirmModalLoader.item.confirmButtonColor = action === "poweroff" ? Theme.error : action === "reboot" ? Theme.warning : Theme.primary
-                                          powerConfirmModalLoader.item.show(title, message, function () {
-                                              switch (action) {
-                                              case "logout":
-                                                  SessionService.logout()
-                                                  break
-                                              case "suspend":
-                                                  SessionService.suspend()
-                                                  break
-                                              case "hibernate":
-                                                  SessionService.hibernate()
-                                                  break
-                                              case "reboot":
-                                                  SessionService.reboot()
-                                                  break
-                                              case "poweroff":
-                                                  SessionService.poweroff()
-                                                  break
-                                              }
-                                          }, function () {})
-                                      }
-                                  }
-      }
+        onPowerActionRequested: (action, title, message) => {
+            if (SettingsData.powerActionConfirm) {
+                powerConfirmModalLoader.active = true
+                if (powerConfirmModalLoader.item) {
+                    powerConfirmModalLoader.item.confirmButtonColor = action === "poweroff" ? Theme.error : action === "reboot" ? Theme.warning : Theme.primary
+                    powerConfirmModalLoader.item.show(title, message, actionApply(action), function () {})
+                }
+            } else {
+                actionApply(action)
+            }
+        }
+
+        function actionApply(action) {
+            switch (action) {
+            case "logout":
+                SessionService.logout()
+                break
+            case "suspend":
+                SessionService.suspend()
+                break
+            case "hibernate":
+                SessionService.hibernate()
+                break
+            case "reboot":
+                SessionService.reboot()
+                break
+            case "poweroff":
+                SessionService.poweroff()
+                break
+            }
+        }
+    }
   }
 
   LazyLoader {
@@ -416,43 +422,50 @@ Item {
   }
 
   LazyLoader {
-      id: powerMenuModalLoader
+    id: powerMenuModalLoader
 
-      active: false
+    active: false
 
-      PowerMenuModal {
-          id: powerMenuModal
+    PowerMenuModal {
+        id: powerMenuModal
 
-          onPowerActionRequested: (action, title, message) => {
-                                      powerConfirmModalLoader.active = true
-                                      if (powerConfirmModalLoader.item) {
-                                          powerConfirmModalLoader.item.confirmButtonColor = action === "poweroff" ? Theme.error : action === "reboot" ? Theme.warning : Theme.primary
-                                          powerConfirmModalLoader.item.show(title, message, function () {
-                                              switch (action) {
-                                              case "logout":
-                                                  SessionService.logout()
-                                                  break
-                                              case "suspend":
-                                                  SessionService.suspend()
-                                                  break
-                                              case "hibernate":
-                                                  SessionService.hibernate()
-                                                  break
-                                              case "reboot":
-                                                  SessionService.reboot()
-                                                  break
-                                              case "poweroff":
-                                                  SessionService.poweroff()
-                                                  break
-                                              }
-                                          }, function () {})
-                                      }
-                                  }
+        onPowerActionRequested: (action, title, message) => {
+            console.log("CONFIRM: ", SettingsData.powerActionConfirm)
+            if (SettingsData.powerActionConfirm) {
+                powerConfirmModalLoader.active = true
+                if (powerConfirmModalLoader.item) {
+                    powerConfirmModalLoader.item.confirmButtonColor = action === "poweroff" ? Theme.error : action === "reboot" ? Theme.warning : Theme.primary
+                    powerConfirmModalLoader.item.show(title, message, actionApply(action), function () {})
+                }
+            } else {
+                actionApply(action)
+            }
+        }
 
-          Component.onCompleted: {
-              PopoutService.powerMenuModal = powerMenuModal
-          }
-      }
+        function actionApply(action) {
+            switch (action) {
+            case "logout":
+                SessionService.logout()
+                break
+            case "suspend":
+                SessionService.suspend()
+                break
+            case "hibernate":
+                SessionService.hibernate()
+                break
+            case "reboot":
+                SessionService.reboot()
+                break
+            case "poweroff":
+                SessionService.poweroff()
+                break
+            }
+        }
+
+        Component.onCompleted: {
+            PopoutService.powerMenuModal = powerMenuModal
+        }
+    }
   }
 
   DMSShellIPC {

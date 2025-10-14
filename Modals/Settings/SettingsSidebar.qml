@@ -33,8 +33,8 @@ Rectangle {
         "text": I18n.tr("Theme & Colors"),
         "icon": "palette"
     }, {
-        "text": I18n.tr("Idle & Lock Screen"),
-        "icon": "lock"
+        "text": I18n.tr("Power & Battery"),
+        "icon": "power"
     }, {
         "text": I18n.tr("Plugins"),
         "icon": "extension"

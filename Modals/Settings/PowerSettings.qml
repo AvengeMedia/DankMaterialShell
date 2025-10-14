@@ -79,7 +79,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Enable loginctl lock integration")
-                        description: "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen."
+                        description: "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen"
                         checked: SessionService.loginctlAvailable && SessionData.loginctlLockIntegration
                         enabled: SessionService.loginctlAvailable
                         onToggled: checked => {
@@ -313,6 +313,49 @@ Item {
                 }
             }
 
+            StyledRect {
+                width: parent.width
+                height: powerCommandConfirmSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: powerCommandConfirmSection
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "check_circle"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Power Action Confirmation")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Show Confirmation on Power Actions")
+                        description: "Request confirmation on power off, restart, suspend, hibernate and logout actions"
+                        checked: SettingsData.powerActionConfirm
+                        onToggled: checked => SettingsData.setPowerActionConfirm(checked)
+                    }
+                }
+            }
         }
     }
 }
