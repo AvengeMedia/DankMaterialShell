@@ -52,6 +52,11 @@ in {
             default = true;
             description = "Add calendar events support via khal";
         };
+        enableSystemSound = lib.mkOption {
+            type = bool;
+            default = true;
+            description = "Add needed dependencies to have system sound support";
+        };
         quickshell = {
             package = lib.mkPackageOption pkgs "quickshell" {};
         };
@@ -149,6 +154,7 @@ in {
             ++ lib.optional cfg.enableNightMode pkgs.gammastep
             ++ lib.optional cfg.enableDynamicTheming pkgs.matugen
             ++ lib.optional cfg.enableAudioWavelength pkgs.cava
-            ++ lib.optional cfg.enableCalendarEvents pkgs.khal;
+            ++ lib.optional cfg.enableCalendarEvents pkgs.khal
+            ++ lib.optional cfg.enableSystemSound pkgs.kdePackages.qtmultimedia;
     };
 }
