@@ -58,7 +58,7 @@ Singleton {
     }
     readonly property string rawWallpaperPath: {
         if (typeof SessionData === "undefined") return ""
-        
+
         if (SessionData.perMonitorWallpaper) {
             // Use first monitor's wallpaper for dynamic theming
             var screens = Quickshell.screens
@@ -169,7 +169,7 @@ Singleton {
                 "surfaceContainer": getMatugenColor("surface_container", "#1e2023"),
                 "surfaceContainerHigh": getMatugenColor("surface_container_high", "#292b2f"),
                 "surfaceContainerHighest": getMatugenColor("surface_container_highest", "#343740"),
-                "error": "#F2B8B5",
+                "error" : getMatugenColor("error", "#F2B8B5"),
                 "warning": "#FF9800",
                 "info": "#2196F3",
                 "success": "#4CAF50"
