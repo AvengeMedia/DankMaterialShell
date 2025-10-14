@@ -14,13 +14,35 @@ Singleton {
     property bool isChecking: false
     property bool hasError: false
     property string errorMessage: ""
+    property string updChecker: ""
     property string pkgManager: ""
     property string distribution: ""
     property bool distributionSupported: false
     property string shellVersion: ""
 
-    readonly property var archBasedSettings: {
-        "listUpdatesParams": ["-Qu"],
+    readonly property var archBasedUCSettings: {
+        "listUpdatesSettings": {
+            "params": [],
+            "correctExitCodes": [0, 2]   // Exit code 0 = updates available, 2 = no updates
+        },
+        "parserSettings": {
+            "lineRegex": /^(\S+)\s+([^\s]+)\s+->\s+([^\s]+)$/,
+            "entryProducer": function (match) {
+                return {
+                    "name": match[1],
+                    "currentVersion": match[2],
+                    "newVersion": match[3],
+                    "description": `${match[1]} ${match[2]} → ${match[3]}`
+                }
+            }
+        }
+    }
+
+    readonly property var archBasedPMSettings: {
+        "listUpdatesSettings": {
+            "params": ["-Qu"],
+            "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
+        },
         "upgradeSettings": {
             "params": ["-Syu"],
             "requiresSudo": false
@@ -38,27 +60,35 @@ Singleton {
         }
     }
 
-    readonly property var packageManagerParams: {
-        "yay": archBasedSettings,
-        "paru": archBasedSettings,
-        "dnf": {
-            "listUpdatesParams": ["list", "--upgrades", "--quiet", "--color=never"],
-            "upgradeSettings": {
-                "params": ["upgrade"],
-                "requiresSudo": true
-            },
-            "parserSettings": {
-                "lineRegex": /^([^\s]+)\s+([^\s]+)\s+.*$/,
-                "entryProducer": function (match) {
-                    return {
-                        "name": match[1],
-                        "currentVersion": "",
-                        "newVersion": match[2],
-                        "description": `${match[1]} → ${match[2]}`
-                    }
+    readonly property var fedoraBasedPMSettings: {
+        "listUpdatesSettings": {
+            "params": ["list", "--upgrades", "--quiet", "--color=never"],
+            "correctExitCodes": [0, 1]   // Exit code 0 = updates available, 1 = no updates
+        },
+        "upgradeSettings": {
+            "params": ["upgrade"],
+            "requiresSudo": true
+        },
+        "parserSettings": {
+            "lineRegex": /^([^\s]+)\s+([^\s]+)\s+.*$/,
+            "entryProducer": function (match) {
+                return {
+                    "name": match[1],
+                    "currentVersion": "",
+                    "newVersion": match[2],
+                    "description": `${match[1]} → ${match[2]}`
                 }
             }
         }
+    }
+
+    readonly property var updateCheckerParams: {
+        "checkupdates": archBasedUCSettings
+    }
+    readonly property var packageManagerParams: {
+        "yay": archBasedPMSettings,
+        "paru": archBasedPMSettings,
+        "dnf": fedoraBasedPMSettings
     }
     readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros", "fedora"]
     readonly property int updateCount: availableUpdates.length
@@ -75,7 +105,9 @@ Singleton {
                 distributionSupported = supportedDistributions.includes(distribution)
 
                 if (distributionSupported) {
-                    helperDetection.running = true
+                    updateFinderDetection.running = true
+                    pkgManagerDetection.running = true
+                    checkForUpdates()
                 } else {
                     console.warn("SystemUpdate: Unsupported distribution:", distribution)
                 }
@@ -98,19 +130,34 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 shellVersion = text.trim()
-            }            
+            }
         }
     }
 
     Process {
-        id: helperDetection
+        id: updateFinderDetection
+        command: ["sh", "-c", "which checkupdates"]
+
+        onExited: (exitCode) => {
+            if (exitCode === 0) {
+                const exeFound = stdout.text.trim()
+                updChecker = exeFound.split('/').pop()
+            } else {
+                console.warn("SystemUpdate: No update checker found. Will use package manager.")
+            }
+        }
+
+        stdout: StdioCollector {}
+    }
+
+    Process {
+        id: pkgManagerDetection
         command: ["sh", "-c", "which paru || which yay || which dnf"]
 
         onExited: (exitCode) => {
             if (exitCode === 0) {
-                const helperPath = stdout.text.trim()
-                pkgManager = helperPath.split('/').pop()
-                checkForUpdates()
+                const exeFound = stdout.text.trim()
+                pkgManager = exeFound.split('/').pop()
             } else {
                 console.warn("SystemUpdate: No package manager found")
             }
@@ -124,8 +171,10 @@ Singleton {
 
         onExited: (exitCode) => {
             isChecking = false
-            if (exitCode === 0 || exitCode === 1) {
-                // Exit code 0 = updates available, 1 = no updates
+            const correctExitCodes = updChecker.length > 0 ?
+                [updChecker].concat(updateCheckerParams[updChecker].listUpdatesSettings.correctExitCodes) :
+                [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.correctExitCodes)
+            if (correctExitCodes.includes(exitCode)) {
                 parseUpdates(stdout.text)
                 hasError = false
                 errorMessage = ""
@@ -147,11 +196,15 @@ Singleton {
     }
 
     function checkForUpdates() {
-        if (!distributionSupported || !pkgManager || isChecking) return
+        if (!distributionSupported || (!pkgManager || !updChecker) || isChecking) return
 
         isChecking = true
         hasError = false
-        updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesParams)
+        if (updChecker.length > 0) {
+            updateChecker.command = [updChecker].concat(updateCheckerParams[updChecker].listUpdatesSettings.params)
+        } else {
+            updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.params)
+        }
         updateChecker.running = true
     }
 
@@ -194,7 +247,7 @@ Singleton {
             const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ")
             const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : ""
             const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`
-    
+
             updater.command = [terminal, "-e", "sh", "-c", updateCommand]
         }
         updater.running = true
