@@ -1384,7 +1384,7 @@ Item {
             browserTitle: "Select Wallpaper"
             browserIcon: "wallpaper"
             browserType: "wallpaper"
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp", "*.mp4", "*.mkv", "*.webm", "*.avi", "*.mov"]
             onFileSelected: path => {
                                 if (SessionData.perMonitorWallpaper) {
                                     SessionData.setMonitorWallpaper(selectedMonitorName, path)

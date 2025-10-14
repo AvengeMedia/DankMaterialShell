@@ -47,6 +47,14 @@ DankModal {
         return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext)
     }
 
+    function isVideoFile(fileName) {
+        if (!fileName) {
+            return false
+        }
+        const ext = fileName.toLowerCase().split('.').pop()
+        return ['mp4', 'mkv', 'webm', 'avi', 'mov'].includes(ext)
+    }
+
     function getLastPath() {
         const lastPath = browserType === "wallpaper" ? SessionData.wallpaperLastPath : browserType === "profile" ? SessionData.profileLastPath : ""
         return (lastPath && lastPath !== "") ? lastPath : homeDir
@@ -201,6 +209,11 @@ DankModal {
         selectedFilePath = ""
         selectedFileName = ""
         selectedFileIsDir = false
+
+        // Preload thumbnails for video files in new directory
+        if (browserType === "wallpaper") {
+            ThumbnailService.preloadThumbnails(currentPath)
+        }
     }
     onSelectedIndexChanged: {
         if (selectedIndex >= 0 && folderModel && selectedIndex < folderModel.count) {
@@ -667,7 +680,10 @@ DankModal {
                                         if (weMode && delegateRoot.fileIsDir) {
                                             return "file://" + delegateRoot.filePath + "/preview" + weExtensions[weExtIndex]
                                         }
-                                        return (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) ? ("file://" + delegateRoot.filePath) : ""
+                                        if (!delegateRoot.fileIsDir && (isImageFile(delegateRoot.fileName) || isVideoFile(delegateRoot.fileName))) {
+                                            return ThumbnailService.getThumbnail(delegateRoot.filePath)
+                                        }
+                                        return ""
                                     }
                                     onStatusChanged: {
                                         if (weMode && delegateRoot.fileIsDir && status === Image.Error) {
@@ -680,24 +696,38 @@ DankModal {
                                         }
                                     }
                                     fillMode: Image.PreserveAspectCrop
-                                    visible: (!delegateRoot.fileIsDir && isImageFile(delegateRoot.fileName)) || (weMode && delegateRoot.fileIsDir)
+                                    visible: (!delegateRoot.fileIsDir && (isImageFile(delegateRoot.fileName) || isVideoFile(delegateRoot.fileName))) || (weMode && delegateRoot.fileIsDir)
                                     maxCacheSize: weMode ? 225 : 80
                                 }
 
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: "description"
-                                    size: Theme.iconSizeLarge
-                                    color: Theme.primary
-                                    visible: !delegateRoot.fileIsDir && !isImageFile(delegateRoot.fileName)
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: "black"
+                                    opacity: 0.3
+                                    visible: delegateRoot.fileIsDir && !weMode
                                 }
 
                                 DankIcon {
                                     anchors.centerIn: parent
-                                    name: "folder"
+                                    name: delegateRoot.fileIsDir ? "folder" : isVideoFile(delegateRoot.fileName) ? "movie" : "description"
                                     size: Theme.iconSizeLarge
                                     color: Theme.primary
-                                    visible: delegateRoot.fileIsDir && !weMode
+                                    visible: (delegateRoot.fileIsDir && !weMode) || (!delegateRoot.fileIsDir && !isImageFile(delegateRoot.fileName) && !isVideoFile(delegateRoot.fileName))
+                                }
+
+                                // Video overlay for video files
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: "#80000000"
+                                    visible: !delegateRoot.fileIsDir && isVideoFile(delegateRoot.fileName) && parent.status !== Image.Ready
+                                    radius: Theme.cornerRadiusSmall
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "play_circle"
+                                        size: Theme.iconSizeLarge
+                                        color: "white"
+                                    }
                                 }
                             }
 
@@ -731,7 +761,12 @@ DankModal {
                                 } else if (delegateRoot.fileIsDir) {
                                     navigateTo(delegateRoot.filePath)
                                 } else {
-                                    fileSelected(delegateRoot.filePath)
+                                    // For video files, automatically prefix with "gs:" for gSlapper support
+                                    var selectedPath = delegateRoot.filePath
+                                    if (isVideoFile(delegateRoot.fileName) && browserType === "wallpaper") {
+                                        selectedPath = "gs:" + selectedPath
+                                    }
+                                    fileSelected(selectedPath)
                                     fileBrowserModal.close()
                                 }
                             }
@@ -751,7 +786,12 @@ DankModal {
                                     } else if (delegateRoot.fileIsDir) {
                                         navigateTo(delegateRoot.filePath)
                                     } else {
-                                        fileSelected(delegateRoot.filePath)
+                                        // For video files, automatically prefix with "gs:" for gSlapper support
+                                        var selectedPath = delegateRoot.filePath
+                                        if (isVideoFile(delegateRoot.fileName) && browserType === "wallpaper") {
+                                            selectedPath = "gs:" + selectedPath
+                                        }
+                                        fileSelected(selectedPath)
                                         fileBrowserModal.close()
                                     }
                                 }

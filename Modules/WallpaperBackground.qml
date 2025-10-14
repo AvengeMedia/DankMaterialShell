@@ -1,446 +1,182 @@
+import QtCore
 import QtQuick
 import Quickshell
-import Quickshell.Wayland
-import Quickshell.Widgets
 import Quickshell.Io
+import Quickshell.Wlr
 import qs.Common
+import qs.Services
 import qs.Widgets
-import qs.Modules
+import ".."
 
-Variants {
-    model: {
-        if (SessionData.isGreeterMode) {
-            return Quickshell.screens
-        }
-        return SettingsData.getFilteredScreens("wallpaper")
-    }
+LazyLoader {
+    active: true
 
-    PanelWindow {
-        id: wallpaperWindow
+    Variants {
+        model: SettingsData.getFilteredScreens("wallpaper")
 
-        required property var modelData
+        PanelWindow {
+            id: wallpaperWindow
 
-        screen: modelData
+            required property var modelData
 
-        WlrLayershell.layer: WlrLayer.Background
-        WlrLayershell.exclusionMode: ExclusionMode.Ignore
+            screen: modelData
 
-        anchors.top: true
-        anchors.bottom: true
-        anchors.left: true
-        anchors.right: true
+            WlrLayershell.layer: WlrLayer.Background
+            WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
-        color: "transparent"
+            anchors.top: true
+            anchors.bottom: true
+            anchors.left: true
+            anchors.right: true
 
-        Item {
-            id: root
-            anchors.fill: parent
+            color: "black"
 
-            property string source: SessionData.getMonitorWallpaper(modelData.name) || ""
-            property bool isColorSource: source.startsWith("#")
-            property string transitionType: SessionData.wallpaperTransition
-            property string actualTransitionType: transitionType
+            Item {
+                id: root
+                anchors.fill: parent
 
-            Connections {
-                target: SessionData
-                function onIsLightModeChanged() {
-                    if (SessionData.perModeWallpaper) {
-                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || ""
-                        if (newSource !== root.source) {
-                            root.source = newSource
-                        }
-                    }
+                property string source: SessionData.getMonitorWallpaper(modelData.name) || ""
+                property bool isColorSource: source.startsWith("#")
+                property Image current: one
+
+                WallpaperEngineProc {
+                    id: weProc
+                    monitor: modelData.name
                 }
-            }
-            onTransitionTypeChanged: {
-                if (transitionType === "random") {
-                    if (SessionData.includedTransitions.length === 0) {
-                        actualTransitionType = "none"
-                    } else {
-                        actualTransitionType = SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)]
-                    }
-                } else {
-                    actualTransitionType = transitionType
-                }
-            }
 
-            onActualTransitionTypeChanged: {
-                if (actualTransitionType === "none") {
-                    currentWallpaper.visible = true
-                    nextWallpaper.visible = false
-                }
-            }
-            property real transitionProgress: 0
-            property real fillMode: 1.0
-            property vector4d fillColor: Qt.vector4d(0, 0, 0, 1)
-            property real edgeSmoothness: 0.1
-
-            property real wipeDirection: 0
-            property real discCenterX: 0.5
-            property real discCenterY: 0.5
-            property real stripesCount: 16
-            property real stripesAngle: 0
-
-            readonly property bool transitioning: transitionAnimation.running
-
-            property bool hasCurrent: currentWallpaper.status === Image.Ready && !!currentWallpaper.source
-            property bool booting: !hasCurrent && nextWallpaper.status === Image.Ready
-
-            WallpaperEngineProc {
-                id: weProc
-                monitor: modelData.name
-            }
-
-            Component.onDestruction: {
-                weProc.stop()
-            }
-
-            onSourceChanged: {
-                const isWE = source.startsWith("we:")
-                const isColor = source.startsWith("#")
-
-                if (isWE) {
-                    setWallpaperImmediate("")
-                    weProc.start(source.substring(3))
-                } else {
+                Component.onDestruction: {
                     weProc.stop()
-                    if (!source) {
-                        setWallpaperImmediate("")
-                    } else if (isColor) {
-                        setWallpaperImmediate("")
+                    GslapperService.stopVideo(modelData.name)
+                }
+
+                onSourceChanged: {
+                    const isWE = source.startsWith("we:")
+                    const isGS = source.startsWith("gs:")
+                    if (isWE) {
+                        current = null
+                        one.source = ""
+                        two.source = ""
+                        GslapperService.stopVideo(modelData.name)
+                        weProc.start(source.substring(3)) // strip "we:"
+                    } else if (isGS) {
+                        current = null
+                        one.source = ""
+                        two.source = ""
+                        weProc.stop()
+                        const videoPath = source.substring(3) // strip "gs:"
+
+                        if (!SessionData.perMonitorWallpaper) {
+                            // Global mode: Only start from the first monitor to avoid duplicates
+                            // Use comma-separated monitor list for gSlapper dual output
+                            const allScreens = Quickshell.screens
+                            const firstScreenName = allScreens.length > 0 ? allScreens[0].name : ""
+
+                            if (modelData.name === firstScreenName) {
+                                const outputNames = allScreens.map(screen => screen.name).join(",")
+                                console.log("WallpaperBackground: Starting global video with monitors:", outputNames)
+                                GslapperService.startVideo(outputNames, videoPath)
+                            } else {
+                                console.log("WallpaperBackground: Skipping duplicate global video start for monitor:", modelData.name, "(first screen is", firstScreenName + ")")
+                            }
+                        } else if (SessionData.perMonitorWallpaper) {
+                            // Per-monitor mode: start individual process for this specific monitor
+                            console.log("WallpaperBackground: Starting per-monitor video for:", modelData.name)
+                            GslapperService.startVideo(modelData.name, videoPath)
+                        }
                     } else {
-                        // Always set immediately if there's no current wallpaper (startup)
-                        if (!currentWallpaper.source) {
-                            setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
+                        weProc.stop()
+                        GslapperService.stopVideo(modelData.name)
+                        if (!source) {
+                            current = null
+                            one.source = ""
+                            two.source = ""
+                        } else if (isColorSource) {
+                            current = null
+                            one.source = ""
+                            two.source = ""
                         } else {
-                            changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
+                            if (current === one)
+                                two.update()
+                            else
+                                one.update()
                         }
                     }
                 }
-            }
 
-            function setWallpaperImmediate(newSource) {
-                transitionAnimation.stop()
-                root.transitionProgress = 0.0
-                currentWallpaper.source = newSource
-                nextWallpaper.source = ""
-                currentWallpaper.visible = true
-                nextWallpaper.visible = false
-            }
-
-            function changeWallpaper(newPath, force) {
-                if (!force && newPath === currentWallpaper.source)
-                    return
-                if (!newPath || newPath.startsWith("#"))
-                    return
-
-                if (root.transitioning) {
-                    transitionAnimation.stop()
-                    root.transitionProgress = 0
-                    currentWallpaper.source = nextWallpaper.source
-                    nextWallpaper.source = ""
-                }
-
-                // If no current wallpaper, set immediately to avoid scaling issues
-                if (!currentWallpaper.source) {
-                    setWallpaperImmediate(newPath)
-                    return
-                }
-
-                // If transition is "none", set immediately
-                if (root.transitionType === "random") {
-                    if (SessionData.includedTransitions.length === 0) {
-                        root.actualTransitionType = "none"
-                    } else {
-                        root.actualTransitionType = SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)]
+                onIsColorSourceChanged: {
+                    if (isColorSource) {
+                        current = null
+                        one.source = ""
+                        two.source = ""
+                    } else if (source) {
+                        if (current === one)
+                            two.update()
+                        else
+                            one.update()
                     }
                 }
 
-                if (root.actualTransitionType === "none") {
-                    setWallpaperImmediate(newPath)
-                    return
+                Loader {
+                    active: !root.source || root.isColorSource
+                    asynchronous: true
+
+                    sourceComponent: DankBackdrop {
+                        screenName: modelData.name
+                    }
                 }
 
-                if (root.actualTransitionType === "wipe") {
-                    root.wipeDirection = Math.random() * 4
-                } else if (root.actualTransitionType === "disc") {
-                    root.discCenterX = Math.random()
-                    root.discCenterY = Math.random()
-                } else if (root.actualTransitionType === "stripes") {
-                    root.stripesCount = Math.round(Math.random() * 20 + 4)
-                    root.stripesAngle = Math.random() * 360
+                Img {
+                    id: one
                 }
 
-                nextWallpaper.source = newPath
-
-                if (nextWallpaper.status === Image.Ready) {
-                    transitionAnimation.start()
+                Img {
+                    id: two
                 }
-            }
 
-            Loader {
-                anchors.fill: parent
-                active: !root.source || root.isColorSource
-                asynchronous: true
+                component Img: Image {
+                    id: img
 
-                sourceComponent: DankBackdrop {
-                    screenName: modelData.name
-                }
-            }
+                    function update(): void {
+                        source = ""
+                        source = root.source
+                    }
 
-            Rectangle {
-                id: transparentRect
-                anchors.fill: parent
-                color: "transparent"
-                visible: false
-            }
+                    anchors.fill: parent
+                    fillMode: Image.PreserveAspectCrop
+                    smooth: true
+                    asynchronous: true
+                    cache: false
 
-            ShaderEffectSource {
-                id: transparentSource
-                sourceItem: transparentRect
-                hideSource: true
-                live: false
-            }
+                    opacity: 0
 
-            Image {
-                id: currentWallpaper
-                anchors.fill: parent
-                visible: root.actualTransitionType === "none"
-                opacity: 1
-                layer.enabled: false
-                asynchronous: true
-                smooth: true
-                cache: true
-                fillMode: Image.PreserveAspectCrop
-            }
-
-            Image {
-                id: nextWallpaper
-                anchors.fill: parent
-                visible: false
-                opacity: 0
-                layer.enabled: false
-                asynchronous: true
-                smooth: true
-                cache: true
-                fillMode: Image.PreserveAspectCrop
-
-                onStatusChanged: {
-                    if (status !== Image.Ready)
-                        return
-
-                    if (root.actualTransitionType === "none") {
-                        currentWallpaper.source = source
-                        nextWallpaper.source = ""
-                        root.transitionProgress = 0.0
-                    } else {
-                        visible = true
-                        if (!root.transitioning) {
-                            transitionAnimation.start()
+                    onStatusChanged: {
+                        if (status === Image.Ready) {
+                            root.current = this
+                            if (root.current === one && two.source) {
+                                two.source = ""
+                            } else if (root.current === two && one.source) {
+                                one.source = ""
+                            }
                         }
                     }
-                }
-            }
 
-            Loader {
-                id: effectLoader
-                anchors.fill: parent
-                active: root.actualTransitionType !== "none" && (root.hasCurrent || root.booting)
-                sourceComponent: {
-                    switch (root.actualTransitionType) {
-                    case "fade":
-                        return fadeComp
-                    case "wipe":
-                        return wipeComp
-                    case "disc":
-                        return discComp
-                    case "stripes":
-                        return stripesComp
-                    case "iris bloom":
-                        return irisComp
-                    case "pixelate":
-                        return pixelateComp
-                    case "portal":
-                        return portalComp
-                    default:
-                        return null
+                    states: State {
+                        name: "visible"
+                        when: root.current === img
+
+                        PropertyChanges {
+                            img.opacity: 1
+                        }
                     }
-                }
-            }
 
-            Component {
-                id: fadeComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_fade.frag.qsb")
-                }
-            }
-
-            Component {
-                id: wipeComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real direction: root.wipeDirection
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_wipe.frag.qsb")
-                }
-            }
-
-            Component {
-                id: discComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real aspectRatio: root.width / root.height
-                    property real centerX: root.discCenterX
-                    property real centerY: root.discCenterY
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_disc.frag.qsb")
-                }
-            }
-
-            Component {
-                id: stripesComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real aspectRatio: root.width / root.height
-                    property real stripeCount: root.stripesCount
-                    property real angle: root.stripesAngle
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_stripes.frag.qsb")
-                }
-            }
-
-            Component {
-                id: irisComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real centerX: 0.5
-                    property real centerY: 0.5
-                    property real aspectRatio: root.width / root.height
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_iris_bloom.frag.qsb")
-                }
-            }
-
-            Component {
-                id: pixelateComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    property real centerX: root.discCenterX
-                    property real centerY: root.discCenterY
-                    property real aspectRatio: root.width / root.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_pixelate.frag.qsb")
-                }
-            }
-
-            Component {
-                id: portalComp
-                ShaderEffect {
-                    anchors.fill: parent
-                    property variant source1: root.hasCurrent ? currentWallpaper : transparentSource
-                    property variant source2: nextWallpaper
-                    property real progress: root.transitionProgress
-                    property real smoothness: root.edgeSmoothness
-                    property real aspectRatio: root.width / root.height
-                    property real centerX: root.discCenterX
-                    property real centerY: root.discCenterY
-                    property real fillMode: root.fillMode
-                    property vector4d fillColor: root.fillColor
-                    property real imageWidth1: Math.max(1, root.hasCurrent ? source1.sourceSize.width : modelData.width)
-                    property real imageHeight1: Math.max(1, root.hasCurrent ? source1.sourceSize.height : modelData.height)
-                    property real imageWidth2: Math.max(1, source2.sourceSize.width)
-                    property real imageHeight2: Math.max(1, source2.sourceSize.height)
-                    property real screenWidth: modelData.width
-                    property real screenHeight: modelData.height
-                    fragmentShader: Qt.resolvedUrl("../Shaders/qsb/wp_portal.frag.qsb")
-                }
-            }
-
-            NumberAnimation {
-                id: transitionAnimation
-                target: root
-                property: "transitionProgress"
-                from: 0.0
-                to: 1.0
-                duration: root.actualTransitionType === "none" ? 0 : 1000
-                easing.type: Easing.InOutCubic
-                onFinished: {
-                    Qt.callLater(() => {
-                                        if (nextWallpaper.source && nextWallpaper.status === Image.Ready && !nextWallpaper.source.toString().startsWith("#")) {
-                                            currentWallpaper.source = nextWallpaper.source
-                                        }
-                                        nextWallpaper.source = ""
-                                        nextWallpaper.visible = false
-                                        currentWallpaper.visible = root.actualTransitionType === "none"
-                                        root.transitionProgress = 0.0
-                                    })
+                    transitions: Transition {
+                        NumberAnimation {
+                            target: img
+                            properties: "opacity"
+                            duration: Theme.mediumDuration
+                            easing.type: Easing.OutCubic
+                        }
+                    }
                 }
             }
         }
