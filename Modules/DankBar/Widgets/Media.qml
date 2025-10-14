@@ -128,7 +128,6 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (root.popupTarget && root.popupTarget.setTriggerPosition) {
@@ -138,36 +137,6 @@ Rectangle {
                         root.popupTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen)
                     }
                     root.clicked()
-                }
-                onEntered: {
-                    tooltipLoader.active = true
-                    if (tooltipLoader.item && activePlayer) {
-                        const globalPos = parent.mapToGlobal(parent.width / 2, parent.height / 2)
-                        const screenX = root.parentScreen ? root.parentScreen.x : 0
-                        const screenY = root.parentScreen ? root.parentScreen.y : 0
-                        const relativeY = globalPos.y - screenY
-                        const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
-
-                        let identity = activePlayer.identity || ""
-                        let isWebMedia = identity.toLowerCase().includes("firefox") || identity.toLowerCase().includes("chrome") || identity.toLowerCase().includes("chromium")
-                        let title = activePlayer.trackTitle || "Unknown Track"
-                        let subtitle = ""
-                        if (isWebMedia && activePlayer.trackTitle) {
-                            subtitle = activePlayer.trackArtist || identity
-                        } else {
-                            subtitle = activePlayer.trackArtist || ""
-                        }
-                        let tooltipText = subtitle.length > 0 ? title + " • " + subtitle : title
-
-                        const isLeft = root.axis?.edge === "left"
-                        tooltipLoader.item.show(tooltipText, screenX + tooltipX, relativeY, root.parentScreen, isLeft, !isLeft)
-                    }
-                }
-                onExited: {
-                    if (tooltipLoader.item) {
-                        tooltipLoader.item.hide()
-                    }
-                    tooltipLoader.active = false
                 }
             }
         }
@@ -191,8 +160,7 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 enabled: root.playerAvailable
-                hoverEnabled: enabled
-                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                cursorShape: Qt.PointingHandCursor
                 acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                 onClicked: (mouse) => {
                     if (!activePlayer) return
@@ -206,12 +174,6 @@ Rectangle {
                 }
             }
         }
-    }
-
-    Loader {
-        id: tooltipLoader
-        active: false
-        sourceComponent: DankTooltip {}
     }
 
     Row {
@@ -314,9 +276,8 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
-                    enabled: root.playerAvailable && root.opacity > 0 && root.width > 0 && textContainer.visible
-                    hoverEnabled: enabled
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: root.playerAvailable
+                    cursorShape: Qt.PointingHandCursor
                     onPressed: {
                         if (root.popupTarget && root.popupTarget.setTriggerPosition) {
                             const globalPos = mapToGlobal(0, 0)
@@ -356,9 +317,9 @@ Rectangle {
                     id: prevArea
 
                     anchors.fill: parent
-                    enabled: root.playerAvailable && root.width > 0
-                    hoverEnabled: enabled
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: root.playerAvailable
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         if (activePlayer) {
                             activePlayer.previous();
@@ -386,9 +347,8 @@ Rectangle {
 
                 MouseArea {
                     anchors.fill: parent
-                    enabled: root.playerAvailable && root.width > 0
-                    hoverEnabled: enabled
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: root.playerAvailable
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         if (activePlayer) {
                             activePlayer.togglePlaying();
@@ -418,9 +378,9 @@ Rectangle {
                     id: nextArea
 
                     anchors.fill: parent
-                    enabled: root.playerAvailable && root.width > 0
-                    hoverEnabled: enabled
-                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    enabled: root.playerAvailable
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
                     onClicked: {
                         if (activePlayer) {
                             activePlayer.next();

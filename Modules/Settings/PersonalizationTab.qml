@@ -1190,6 +1190,182 @@ Item {
                     }
                 }
             }
+
+            StyledRect {
+                width: parent.width
+                height: soundsSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: soundsSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "volume_up"
+                            size: Theme.iconSize
+                            color: SettingsData.soundsEnabled ? Theme.primary : Theme.surfaceVariantText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            width: parent.width - Theme.iconSize - Theme.spacingM - soundsToggle.width - Theme.spacingM
+                            spacing: Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            StyledText {
+                                text: I18n.tr("Enable System Sounds")
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Play sounds for system events")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                            }
+                        }
+
+                        DankToggle {
+                            id: soundsToggle
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            checked: SettingsData.soundsEnabled
+                            onToggled: checked => {
+                                SettingsData.setSoundsEnabled(checked)
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingM
+                        visible: SettingsData.soundsEnabled
+                        leftPadding: Theme.iconSize + Theme.spacingM
+
+                        Rectangle {
+                            width: parent.width - parent.leftPadding
+                            height: 1
+                            color: Theme.outline
+                            opacity: 0.2
+                        }
+
+                        Row {
+                            width: parent.width - parent.leftPadding
+                            spacing: Theme.spacingM
+
+                            Column {
+                                width: parent.width - notificationSoundToggle.width - Theme.spacingM
+                                spacing: Theme.spacingXS
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                StyledText {
+                                    text: I18n.tr("New Notification")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Play sound when new notification arrives")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                }
+                            }
+
+                            DankToggle {
+                                id: notificationSoundToggle
+
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: SettingsData.soundNewNotification
+                                onToggled: checked => {
+                                    SettingsData.setSoundNewNotification(checked)
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width - parent.leftPadding
+                            spacing: Theme.spacingM
+
+                            Column {
+                                width: parent.width - volumeSoundToggle.width - Theme.spacingM
+                                spacing: Theme.spacingXS
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                StyledText {
+                                    text: I18n.tr("Volume Changed")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Play sound when volume is adjusted")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                }
+                            }
+
+                            DankToggle {
+                                id: volumeSoundToggle
+
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: SettingsData.soundVolumeChanged
+                                onToggled: checked => {
+                                    SettingsData.setSoundVolumeChanged(checked)
+                                }
+                            }
+                        }
+
+                        Row {
+                            width: parent.width - parent.leftPadding
+                            spacing: Theme.spacingM
+                            visible: BatteryService.batteryAvailable
+
+                            Column {
+                                width: parent.width - pluggedInSoundToggle.width - Theme.spacingM
+                                spacing: Theme.spacingXS
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                StyledText {
+                                    text: I18n.tr("Plugged In")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Play sound when power cable is connected")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                }
+                            }
+
+                            DankToggle {
+                                id: pluggedInSoundToggle
+
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: SettingsData.soundPluggedIn
+                                onToggled: checked => {
+                                    SettingsData.setSoundPluggedIn(checked)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

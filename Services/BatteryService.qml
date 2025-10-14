@@ -3,12 +3,41 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtMultimedia
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.UPower
+import qs.Common
 
 Singleton {
     id: root
+
+    property bool suppressSound: true
+    property bool previousPluggedState: false
+
+    Timer {
+        id: startupTimer
+        interval: 500
+        repeat: false
+        running: true
+        onTriggered: root.suppressSound = false
+    }
+
+    MediaPlayer {
+        id: powerPlugSound
+        source: Qt.resolvedUrl("../assets/sounds/plasma/power-plug.ogg")
+        audioOutput: AudioOutput {
+            volume: 1.0
+        }
+    }
+
+    MediaPlayer {
+        id: powerUnplugSound
+        source: Qt.resolvedUrl("../assets/sounds/plasma/power-unplug.ogg")
+        audioOutput: AudioOutput {
+            volume: 1.0
+        }
+    }
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
 
@@ -24,6 +53,23 @@ Singleton {
     readonly property bool isCharging: batteryAvailable && device.state === UPowerDeviceState.Charging && device.changeRate > 0
     readonly property bool isPluggedIn: batteryAvailable && (device.state !== UPowerDeviceState.Discharging && device.state !== UPowerDeviceState.Empty)
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
+
+    onIsPluggedInChanged: {
+        if (suppressSound || !batteryAvailable) {
+            previousPluggedState = isPluggedIn
+            return
+        }
+
+        if (SettingsData.soundsEnabled && SettingsData.soundPluggedIn) {
+            if (isPluggedIn && !previousPluggedState) {
+                powerPlugSound.play()
+            } else if (!isPluggedIn && previousPluggedState) {
+                powerUnplugSound.play()
+            }
+        }
+
+        previousPluggedState = isPluggedIn
+    }
     readonly property string batteryHealth: {
         if (!batteryAvailable) {
             return "N/A"

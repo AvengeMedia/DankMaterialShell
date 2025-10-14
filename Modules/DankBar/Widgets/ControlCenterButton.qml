@@ -115,7 +115,6 @@ Rectangle {
                     if (AudioService.sink && AudioService.sink.audio) {
                         AudioService.sink.audio.muted = false
                         AudioService.sink.audio.volume = newVolume / 100
-                        AudioService.volumeChanged()
                     }
                     wheelEvent.accepted = true
                 }
@@ -220,7 +219,6 @@ Rectangle {
                     if (AudioService.sink && AudioService.sink.audio) {
                         AudioService.sink.audio.muted = false;
                         AudioService.sink.audio.volume = newVolume / 100;
-                        AudioService.volumeChanged();
                     }
                     wheelEvent.accepted = true;
                 }

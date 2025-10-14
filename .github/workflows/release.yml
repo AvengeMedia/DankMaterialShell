@@ -61,12 +61,14 @@ jobs:
           ## Assets
 
           ### Complete Packages
-          - **`dms-full-amd64.tar.gz`** - Complete package for x86_64 systems (CLI binary + QML source + installation guide)
-          - **`dms-full-arm64.tar.gz`** - Complete package for ARM64 systems (CLI binary + QML source + installation guide)
+          - **`dms-full-amd64.tar.gz`** - Complete package for x86_64 systems (CLI binaries + QML source + installation guide)
+          - **`dms-full-arm64.tar.gz`** - Complete package for ARM64 systems (CLI binaries + QML source + installation guide)
 
           ### Individual Components
           - **`dms-cli-amd64.gz`** - DMS CLI binary for x86_64 systems
           - **`dms-cli-arm64.gz`** - DMS CLI binary for ARM64 systems
+          - **`dms-distropkg-amd64.gz`** - DMS CLI binary built with distro_package tag for AMD64 systems
+          - **`dms-distropkg-arm64.gz`** - DMS CLI binary built with distro_package tag for ARM64 systems
           - **`dms-qml.tar.gz`** - QML source code only
 
           ### Checksums
@@ -112,14 +114,16 @@ jobs:
           # Download DMS CLI binaries from the danklinux repo
           gh release download "${TAG}" -R "${DMS_REPO}" --dir ./_dms_assets
 
-          # Rename CLI binaries to dms-cli-* format
+          # Rename CLI binaries to dms-cli-* format and copy distropkg binaries
           for file in _dms_assets/dms-*.gz*; do
             if [ -f "$file" ]; then
               basename=$(basename "$file")
-              # dms-amd64.gz -> dms-cli-amd64.gz
-              # dms-amd64.gz.sha256 -> dms-cli-amd64.gz.sha256
-              newname=$(echo "$basename" | sed 's/^dms-/dms-cli-/')
-              cp "$file" "_release_assets/$newname"
+              if [[ "$basename" == dms-distropkg-* ]]; then
+                cp "$file" "_release_assets/$basename"
+              else
+                newname=$(echo "$basename" | sed 's/^dms-/dms-cli-/')
+                cp "$file" "_release_assets/$newname"
+              fi
             fi
           done
 
@@ -148,6 +152,12 @@ jobs:
               chmod +x _temp_full/bin/dms
             fi
 
+            # Copy distropkg binary if it exists
+            if [ -f "_dms_assets/dms-distropkg-${arch}.gz" ]; then
+              gunzip -c "_dms_assets/dms-distropkg-${arch}.gz" > _temp_full/bin/dms-distropkg
+              chmod +x _temp_full/bin/dms-distropkg
+            fi
+
             # Create INSTALL.md
             cat > _temp_full/INSTALL.md << 'EOF'
           # DankMaterialShell Installation
@@ -166,7 +176,7 @@ jobs:
              cp -r dms ~/.config/quickshell/
              ```
 
-          2. **Install the DMS CLI binary:**
+          2. **Install the DMS CLI binaries:**
              ```bash
              sudo install -m 755 bin/dms /usr/local/bin/dms
              # or install to a local directory:

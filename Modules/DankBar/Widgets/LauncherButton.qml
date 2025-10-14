@@ -31,7 +31,7 @@ Item {
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onPressed: {
+        onPressed: function (mouse){
             if (mouse.button === Qt.RightButton) {
                 if (CompositorService.isNiri) {
                     NiriService.toggleOverview()

@@ -394,4 +394,12 @@ Singleton {
                         }
                     })
     }
+
+    function lockSession(callback) {
+        sendRequest("loginctl.lock", null, callback)
+    }
+
+    function unlockSession(callback) {
+        sendRequest("loginctl.unlock", null, callback)
+    }
 }

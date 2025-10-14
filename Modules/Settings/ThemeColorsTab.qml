@@ -14,6 +14,8 @@ Item {
 
     property var cachedFontFamilies: []
     property var cachedMonoFamilies: []
+    property var cachedIconThemes: []
+    property var cachedMatugenSchemes: []
     property bool fontsEnumerated: false
 
     function enumerateFonts() {
@@ -55,6 +57,9 @@ Item {
             enumerateFonts()
             fontsEnumerated = true
         }
+        SettingsData.detectAvailableIconThemes()
+        cachedIconThemes = SettingsData.availableIconThemes
+        cachedMatugenSchemes = Theme.availableMatugenSchemes.map(function (option) { return option.label })
     }
 
     DankFlickable {
@@ -623,7 +628,7 @@ Item {
                                 id: matugenPaletteDropdown
                                 text: I18n.tr("Matugen Palette")
                                 description: "Select the palette algorithm used for wallpaper-based colors"
-                                options: Theme.availableMatugenSchemes.map(function (option) { return option.label })
+                                options: cachedMatugenSchemes
                                 currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
                                 enabled: Theme.matugenAvailable
                                 opacity: enabled ? 1 : 0.4
@@ -1202,10 +1207,7 @@ Item {
                             enableFuzzySearch: true
                             popupWidthOffset: 100
                             maxPopupHeight: 236
-                            options: {
-                                SettingsData.detectAvailableIconThemes()
-                                return SettingsData.availableIconThemes
-                            }
+                            options: cachedIconThemes
                             onValueChanged: value => {
                                                 SettingsData.setIconTheme(value)
                                                 if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" &&

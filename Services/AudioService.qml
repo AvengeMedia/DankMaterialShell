@@ -3,9 +3,11 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtMultimedia
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import qs.Common
 
 Singleton {
     id: root
@@ -23,6 +25,32 @@ Singleton {
         repeat: false
         running: true
         onTriggered: root.suppressOSD = false
+    }
+
+    MediaPlayer {
+        id: volumeChangeSound
+        source: Qt.resolvedUrl("../assets/sounds/freedesktop/audio-volume-change.oga")
+        audioOutput: AudioOutput {
+            volume: 1.0
+        }
+    }
+
+    Timer {
+        id: volumeSoundDebounce
+        interval: 50
+        repeat: false
+        onTriggered: {
+            if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged && !root.suppressOSD) {
+                volumeChangeSound.play()
+            }
+        }
+    }
+
+    Connections {
+        target: root.sink?.audio
+        function onVolumeChanged() {
+            volumeSoundDebounce.restart()
+        }
     }
 
     function displayName(node) {

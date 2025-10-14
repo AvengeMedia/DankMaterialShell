@@ -54,26 +54,8 @@ Item {
 
   WallpaperBackground {}
 
-  LazyLoader {
-      id: lockLoader
-      active: false
-
-      Lock {
-          id: lock
-          anchors.fill: parent
-
-          Component.onCompleted: {
-              IdleService.lockComponent = lock
-          }
-      }
-  }
-
-  Timer {
-      id: lockInitTimer
-      interval: 100
-      running: true
-      repeat: false
-      onTriggered: lockLoader.active = true
+  Lock {
+      id: lock
   }
 
   Loader {
@@ -195,7 +177,7 @@ Item {
           powerMenuModalLoader: controlCenterLoader.powerModalLoaderRef
 
           onLockRequested: {
-              lockLoader.item.activate()
+              lock.activate()
           }
 
           Component.onCompleted: {

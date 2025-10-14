@@ -1,5 +1,6 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets

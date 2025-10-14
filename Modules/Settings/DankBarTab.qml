@@ -1154,6 +1154,105 @@ Item {
                         }
                     }
 
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankToggle {
+                            width: parent.width
+                            text: I18n.tr("Auto Popup Gaps")
+                            description: I18n.tr("Automatically calculate popup distance from bar edge.")
+                            checked: SettingsData.popupGapsAuto
+                            onToggled: checked => {
+                                SettingsData.setPopupGapsAuto(checked)
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            leftPadding: Theme.spacingM
+                            spacing: Theme.spacingM
+                            visible: !SettingsData.popupGapsAuto
+
+                            Rectangle {
+                                width: parent.width - parent.leftPadding
+                                height: 1
+                                color: Theme.outline
+                                opacity: 0.2
+                            }
+
+                            Column {
+                                width: parent.width - parent.leftPadding
+                                spacing: Theme.spacingS
+
+                                Row {
+                                    width: parent.width
+                                    spacing: Theme.spacingS
+
+                                    StyledText {
+                                        text: I18n.tr("Manual Gap Size")
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceText
+                                        font.weight: Font.Medium
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Item {
+                                        width: parent.width - manualGapSizeText.implicitWidth - resetManualGapSizeBtn.width - Theme.spacingS - Theme.spacingM
+                                        height: 1
+
+                                        StyledText {
+                                            id: manualGapSizeText
+                                            visible: false
+                                            text: I18n.tr("Manual Gap Size")
+                                            font.pixelSize: Theme.fontSizeSmall
+                                        }
+                                    }
+
+                                    DankActionButton {
+                                        id: resetManualGapSizeBtn
+                                        buttonSize: 20
+                                        iconName: "refresh"
+                                        iconSize: 12
+                                        backgroundColor: Theme.surfaceContainerHigh
+                                        iconColor: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        onClicked: {
+                                            SettingsData.setPopupGapsManual(4)
+                                        }
+                                    }
+
+                                    Item {
+                                        width: Theme.spacingS
+                                        height: 1
+                                    }
+                                }
+
+                                DankSlider {
+                                    id: popupGapsManualSlider
+                                    width: parent.width
+                                    height: 24
+                                    value: SettingsData.popupGapsManual
+                                    minimum: 0
+                                    maximum: 50
+                                    unit: ""
+                                    showValue: true
+                                    wheelEnabled: false
+                                    thumbOutlineColor: Theme.surfaceContainerHigh
+                                    onSliderValueChanged: newValue => {
+                                        SettingsData.setPopupGapsManual(newValue)
+                                    }
+
+                                    Binding {
+                                        target: popupGapsManualSlider
+                                        property: "value"
+                                        value: SettingsData.popupGapsManual
+                                        restoreMode: Binding.RestoreBinding
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     DankToggle {
                         width: parent.width

@@ -14,21 +14,23 @@ URL:            https://github.com/AvengeMedia/DankMaterialShell
 VCS:            {{{ git_dir_vcs }}}
 Source0:        {{{ git_dir_pack }}}
 
-# DMS CLI tool sources - compiled from danklinux
-Source1:        https://github.com/AvengeMedia/danklinux/archive/refs/heads/master.tar.gz#/danklinux-master.tar.gz
+# DMS CLI from danklinux latest release
+Source1:        https://github.com/AvengeMedia/danklinux/releases/latest/download/dms-distropkg-amd64.gz
+
+# DGOP binary from dgop latest release
+Source2:        https://github.com/AvengeMedia/dgop/releases/latest/download/dgop-linux-amd64.gz
 
 BuildRequires:  git-core
-BuildRequires:  golang >= 1.21
 BuildRequires:  rpkg
+BuildRequires:  gzip
 
-# Core requirements - Shell and fonts
-# Requires:     (quickshell or quickshell-git)
-Requires:       dms-cli = %{version}-%{release}
+# Core requirements
+Requires:       (quickshell or quickshell-git)
+Requires:       dms-cli
 Requires:       dgop
 Requires:       fira-code-fonts
 Requires:       material-symbols-fonts
 Requires:       rsms-inter-fonts
-Requires:       quickshell-git
 
 # Core utilities (Highly recommended for DMS functionality)
 Recommends:     brightnessctl
@@ -61,43 +63,47 @@ URL:            https://github.com/AvengeMedia/danklinux
 Command-line interface for DankMaterialShell configuration and management.
 Provides native DBus bindings, NetworkManager integration, and system utilities.
 
+%package -n dgop
+Summary:        Stateless CPU/GPU monitor for DankMaterialShell
+License:        MIT
+URL:            https://github.com/AvengeMedia/dgop
+Provides:       dgop
+
+%description -n dgop
+DGOP is a stateless system monitoring tool that provides CPU, GPU, memory, and 
+network statistics. Designed for integration with DankMaterialShell but can be 
+used standalone. This package always includes the latest stable dgop release.
+
 %prep
 {{{ git_dir_setup_macro }}}
 
-# Extract danklinux for building dms CLI
-tar -xzf %{SOURCE1} -C %{_builddir}
+# Extract CLI binary
+gunzip -c %{SOURCE1} > %{_builddir}/dms-cli
+chmod +x %{_builddir}/dms-cli
+
+# Extract DGOP binary
+gunzip -c %{SOURCE2} > %{_builddir}/dgop
+chmod +x %{_builddir}/dgop
 
 %build
-# Compile dms CLI from danklinux source
-pushd %{_builddir}/danklinux-master
-
-# Use RPM version and build info
-BUILD_TIME=$(date -u '+%%Y-%%m-%%d_%%H:%%M:%%S')
-
-# Build with CGO disabled and version info
-export CGO_ENABLED=0
-export GOFLAGS="-trimpath -mod=readonly -modcacherw"
-
-go build \
-    -tags distro_binary \
-    -ldflags="-s -w -X main.Version=%{version}-%{release} -X main.buildTime=${BUILD_TIME} -X main.commit=%{version}" \
-    -o dms \
-    ./cmd/dms
-
-popd
+# DMS QML is source-only, binaries are prebuilt from releases
 
 %install
 # Install dms-cli binary
-install -Dm755 %{_builddir}/danklinux-master/dms %{buildroot}%{_bindir}/dms
+install -Dm755 %{_builddir}/dms-cli %{buildroot}%{_bindir}/dms
+
+# Install dgop binary
+install -Dm755 %{_builddir}/dgop %{buildroot}%{_bindir}/dgop
 
 # Install shell files to XDG config location
 install -dm755 %{buildroot}%{_sysconfdir}/xdg/quickshell/dms
-cp -r ./* %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/
+cp -r * %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/
 
-# Remove git-related files
+# Remove build files
 rm -rf %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/.git*
 rm -f %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/.gitignore
 rm -rf %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/.github
+rm -f %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/*.spec
 
 %files
 %license LICENSE
@@ -106,6 +112,9 @@ rm -rf %{buildroot}%{_sysconfdir}/xdg/quickshell/dms/.github
 
 %files -n dms-cli
 %{_bindir}/dms
+
+%files -n dgop
+%{_bindir}/dgop
 
 %changelog
 {{{ git_dir_changelog }}}

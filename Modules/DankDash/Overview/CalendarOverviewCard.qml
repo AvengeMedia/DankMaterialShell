@@ -130,7 +130,14 @@ Rectangle {
                 anchors.rightMargin: Theme.spacingS
                 height: 40
                 anchors.verticalCenter: parent.verticalCenter
-                text: hasEvents ? (Qt.formatDate(selectedDate, "MMM d") + " • " + (selectedDateEvents.length === 1 ? "1 event" : selectedDateEvents.length + " events")) : Qt.formatDate(selectedDate, "MMM d")
+                text: {
+                    const dateStr = Qt.formatDate(selectedDate, "MMM d")
+                    if (selectedDateEvents && selectedDateEvents.length > 0) {
+                        const eventCount = selectedDateEvents.length === 1 ? I18n.tr("1 event") : selectedDateEvents.length + " " + I18n.tr("events")
+                        return dateStr + " • " + eventCount
+                    }
+                    return dateStr
+                }
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -392,7 +399,7 @@ Rectangle {
                         width: parent.width
                         text: {
                             if (!modelData || modelData.allDay) {
-                                return "All day"
+                                return I18n.tr("All day")
                             } else if (modelData.start && modelData.end) {
                                 const timeFormat = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP"
                                 const startTime = Qt.formatTime(modelData.start, timeFormat)

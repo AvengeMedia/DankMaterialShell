@@ -1,0 +1,77 @@
+alarm-clock-elapsed
+        Copyright: Tim/corsica_s
+        URL: http://www.freesound.org/samplesViewSingle.php?id=67091
+        License: CC-BY-SA (relicensed with permission from author)
+
+audio-channel-front-center
+audio-channel-front-left
+audio-channel-front-right
+audio-channel-rear-center
+audio-channel-rear-left
+audio-channel-rear-right
+audio-channel-side-left
+audio-channel-side-right
+audio-test-signal
+        Copyright: The ALSA developers
+        URL: http://git.alsa-project.org/?p=alsa-utils.git;a=tree;f=speaker-test/samples;hb=HEAD
+        License: GPLv2+
+
+audio-volume-change
+        Copyright: Lucas McCallister
+        URL: http://www.freesound.org/samplesViewSingle.php?id=67091
+        License: CC-BY-SA (relicensed with permission from author)
+
+trash-empty
+        Copyright: Dr. Richard Boulanger et al
+        URL: http://www.archive.org/details/Berklee44v10
+        License: CC-BY Attribution 3.0 Unported
+
+complete
+        Copyright: Dr. Richard Boulanger et al
+        URL: http://www.archive.org/details/Berklee44v11
+        License: CC-BY Attribution 3.0 Unported
+
+bell
+        Copyright: Dr. Richard Boulanger et al
+        URL: http://www.archive.org/details/Berklee44v12
+        License: CC-BY Attribution 3.0 Unported
+
+
+camera-shutter
+screen-capture
+        Copyright: freesound user horsthorstensen
+        URL: http://www.freesound.org/samplesViewSingle.php?id=72714
+        License: CC-BY-SA (relicensed with permission from author)
+
+device-added
+device-removed
+power-plug
+power-unplug
+network-connectivity-established
+network-connectivity-lost
+message
+dialog-information
+dialog-warning
+        Copyright: Ivica Bukvic
+        URL: http://gnome-look.org/content/show.php/%22Borealis%22+sound+theme?content=12584
+        License: CC-BY-SA
+
+
+message-new-instant
+
+phone-incoming-call
+phone-outgoing-busy
+phone-outgoing-calling
+        Copyright: Damien Sandras
+        URL: http://git.gnome.org/cgit/ekiga/tree/sounds
+        License: GPLv2+
+
+service-login
+service-logout
+        Copyright: The Pidgin developers
+        License: GPLv2
+
+suspend-error
+        Created by Richard Hughes
+        Copyright: Red Hat, Inc.
+        License: CC-BY-SA

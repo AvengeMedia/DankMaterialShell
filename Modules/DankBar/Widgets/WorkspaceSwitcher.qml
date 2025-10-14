@@ -241,7 +241,6 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        hoverEnabled: true
         acceptedButtons: Qt.NoButton
 
         property real scrollAccumulator: 0
@@ -416,9 +415,7 @@ Rectangle {
                 MouseArea {
                     id: mouseArea
 
-                    anchors.centerIn: parent
-                    width: root.isVertical ? parent.width + Theme.spacingXL : parent.width
-                    height: root.isVertical ? parent.height : parent.height + Theme.spacingXL
+                    anchors.fill: parent
                     hoverEnabled: !isPlaceholder
                     cursorShape: isPlaceholder ? Qt.ArrowCursor : Qt.PointingHandCursor
                     enabled: !isPlaceholder

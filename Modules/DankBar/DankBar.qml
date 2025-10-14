@@ -302,7 +302,7 @@ Item {
 
         property bool reveal: {
             if (CompositorService.isNiri && NiriService.inOverview) {
-                return SettingsData.dankBarOpenOnOverview
+                return SettingsData.dankBarOpenOnOverview || topBarMouseArea.containsMouse || hasActivePopout || revealSticky
             }
             return SettingsData.dankBarVisible && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky)
         }
@@ -385,7 +385,6 @@ Item {
                 top: barWindow.isVertical ? parent.top : undefined
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
-            // Only enable mouse handling while hidden (for reveal-on-edge logic).
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview
             hoverEnabled: SettingsData.dankBarAutoHide && !topBarCore.reveal && !inOverview
             acceptedButtons: Qt.NoButton

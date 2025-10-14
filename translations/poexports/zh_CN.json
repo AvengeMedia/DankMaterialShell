@@ -63,7 +63,7 @@
         "All displays": "所有显示器"
     },
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
-        "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/空格: 返回 • F1/I: 文件信息 • F10: 帮助 • Esc: 关闭"
+        "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/退格: 返回 • F1/I: 文件信息 • F10: 帮助 • Esc: 关闭"
     },
     "Always Show OSD Percentage": {
         "Always Show OSD Percentage": "始终显示 OSD 百分比"
@@ -947,9 +947,6 @@
     "Process": {
         "Process": "进程"
     },
-    "QML (Qt Modeling Language)": {
-        "QML (Qt Modeling Language)": "QML (Qt 模板语言)"
-    },
     "Quick access to application launcher": {
         "Quick access to application launcher": "快捷访问应用启动器"
     },
@@ -1182,7 +1179,7 @@
         "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "未设置 DMS_SOCKET 环境变量或套接字不可用，无法使用自动插件管理。"
     },
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
-        "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 Qt 配置。如需保留当前设置，请先备份 (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0)。"
+        "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下设置将修改您的 GTK 和 Qt 配置。如需保留当前配置，请先备份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
     },
     "Theme & Colors": {
         "Theme & Colors": "主题与配色"
@@ -1387,5 +1384,77 @@
     },
     "• yyyy - Year (2024)": {
         "• yyyy - Year (2024)": "• yy - 年（2024）"
+    },
+    "Border Color": {
+        "Border Color": "边框颜色"
+    },
+    "Border Opacity": {
+        "Border Opacity": "边框透明度"
+    },
+    "Border Thickness": {
+        "Border Thickness": "边框厚度"
+    },
+    "Choose the border accent color": {
+        "Choose the border accent color": "选择边框强调色"
+    },
+    "Enable loginctl lock integration": {
+        "Enable loginctl lock integration": "启用 loginctl 锁定集成"
+    },
+    "Execute templates from ~/.config/matugen/config.toml": {
+        "Execute templates from ~/.config/matugen/config.toml": "从 ~/.config/matugen/config.toml 执行模板"
+    },
+    "QML, JavaScript, Go": {
+        "QML, JavaScript, Go": "QML, JavaScript, Go"
+    },
+    "Run User Templates": {
+        "Run User Templates": "运行用户模板"
+    },
+    "Current Weather": {
+        "Current Weather": "当前天气"
+    },
+    "DMS out of date": {
+        "DMS out of date": "DMS 不是最新版本"
+    },
+    "Gamma Control": {
+        "Gamma Control": "伽马控制"
+    },
+    "Idle & Lock Screen": {
+        "Idle & Lock Screen": "待机与锁屏"
+    },
+    "Matugen Settings": {
+        "Matugen Settings": "Matugen 设置"
+    },
+    "Time & Weather": {
+        "Time & Weather": "时间与天气"
+    },
+    "To update, run the following command:": {
+        "To update, run the following command:": "请运行以下命令以更新："
+    },
+    "loginctl not available - lock integration requires DMS socket connection": {
+        "loginctl not available - lock integration requires DMS socket connection": "loginctl 不可用 - 启用锁定集成需连接 DMS socket"
+    },
+    "Auto Popup Gaps": {
+        "Auto Popup Gaps": ""
+    },
+    "Automatically calculate popup distance from bar edge.": {
+        "Automatically calculate popup distance from bar edge.": ""
+    },
+    "Manual Gap Size": {
+        "Manual Gap Size": ""
+    },
+    "System Updater": {
+        "System Updater": ""
+    },
+    "System update custom command": {
+        "System update custom command": ""
+    },
+    "Terminal custom additional parameters": {
+        "Terminal custom additional parameters": ""
+    },
+    "Use Custom Command": {
+        "Use Custom Command": ""
+    },
+    "Use custom command for update your system": {
+        "Use custom command for update your system": ""
     }
 }

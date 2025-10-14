@@ -22,7 +22,7 @@ Rectangle {
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
     readonly property var sortedToplevels: {
         if (SettingsData.runningAppsCurrentWorkspace) {
-            return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, parentScreen.name);
+            return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, parentScreen?.name);
         }
         return CompositorService.sortedToplevels;
     }

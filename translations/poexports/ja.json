@@ -947,9 +947,6 @@
     "Process": {
         "Process": "プロセス"
     },
-    "QML (Qt Modeling Language)": {
-        "QML (Qt Modeling Language)": "QML (Qt モデリング言語)"
-    },
     "Quick access to application launcher": {
         "Quick access to application launcher": "アプリケーションランチャーへのクイックアクセス"
     },
@@ -1387,5 +1384,77 @@
     },
     "• yyyy - Year (2024)": {
         "• yyyy - Year (2024)": "• yyyy - 年（2024年）"
+    },
+    "Border Color": {
+        "Border Color": "ボーダーの色"
+    },
+    "Border Opacity": {
+        "Border Opacity": "ボーダーの透明度"
+    },
+    "Border Thickness": {
+        "Border Thickness": "ボーダーの太さ"
+    },
+    "Choose the border accent color": {
+        "Choose the border accent color": "ボーダーの強調色を選ぶ"
+    },
+    "Enable loginctl lock integration": {
+        "Enable loginctl lock integration": "ログインロックの統合を有効に"
+    },
+    "Execute templates from ~/.config/matugen/config.toml": {
+        "Execute templates from ~/.config/matugen/config.toml": "~/.config/matugen/config.tomlからテンプレを実行"
+    },
+    "QML, JavaScript, Go": {
+        "QML, JavaScript, Go": "QML, JavaScript, Go"
+    },
+    "Run User Templates": {
+        "Run User Templates": "ユーザーのテンプレを実行"
+    },
+    "Current Weather": {
+        "Current Weather": "現在の天気"
+    },
+    "DMS out of date": {
+        "DMS out of date": "DMSに更新があります"
+    },
+    "Gamma Control": {
+        "Gamma Control": "ガンマ設定"
+    },
+    "Idle & Lock Screen": {
+        "Idle & Lock Screen": "アイドルおよびロックスクリーン"
+    },
+    "Matugen Settings": {
+        "Matugen Settings": "Matugen設定"
+    },
+    "Time & Weather": {
+        "Time & Weather": "時間および天気"
+    },
+    "To update, run the following command:": {
+        "To update, run the following command:": "更新するには以下のコマンドを実行してください："
+    },
+    "loginctl not available - lock integration requires DMS socket connection": {
+        "loginctl not available - lock integration requires DMS socket connection": "loginctlが利用できません- ロック統合のためにDMS socketの接続が必要です。"
+    },
+    "Auto Popup Gaps": {
+        "Auto Popup Gaps": ""
+    },
+    "Automatically calculate popup distance from bar edge.": {
+        "Automatically calculate popup distance from bar edge.": ""
+    },
+    "Manual Gap Size": {
+        "Manual Gap Size": ""
+    },
+    "System Updater": {
+        "System Updater": ""
+    },
+    "System update custom command": {
+        "System update custom command": ""
+    },
+    "Terminal custom additional parameters": {
+        "Terminal custom additional parameters": ""
+    },
+    "Use Custom Command": {
+        "Use Custom Command": ""
+    },
+    "Use custom command for update your system": {
+        "Use custom command for update your system": ""
     }
 }
