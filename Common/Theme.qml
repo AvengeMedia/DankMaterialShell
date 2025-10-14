@@ -82,7 +82,46 @@ Singleton {
 
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir])
-        matugenCheck.running = true
+        Proc.runCommand("matugenCheck", ["which", "matugen"], (output, code) => {
+            matugenAvailable = (code === 0) && !envDisableMatugen
+            const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
+
+            if (!matugenAvailable || isGreeterMode) {
+                return
+            }
+
+            const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode)
+            const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default"
+
+            if (currentTheme === dynamic) {
+                if (wallpaperPath) {
+                    Quickshell.execDetached(["rm", "-f", stateDir + "/matugen.key"])
+                    const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
+                    if (wallpaperPath.startsWith("#")) {
+                        setDesiredTheme("hex", wallpaperPath, isLight, iconTheme, selectedMatugenType)
+                    } else {
+                        setDesiredTheme("image", wallpaperPath, isLight, iconTheme, selectedMatugenType)
+                    }
+                }
+            } else {
+                let primaryColor
+                let matugenType
+                if (currentTheme === "custom") {
+                    if (customThemeData && customThemeData.primary) {
+                        primaryColor = customThemeData.primary
+                        matugenType = customThemeData.matugen_type
+                    }
+                } else {
+                    primaryColor = currentThemeData.primary
+                    matugenType = currentThemeData.matugen_type
+                }
+
+                if (primaryColor) {
+                    Quickshell.execDetached(["rm", "-f", stateDir + "/matugen.key"])
+                    setDesiredTheme("hex", primaryColor, isLight, iconTheme, matugenType)
+                }
+            }
+        }, 0)
         if (typeof SessionData !== "undefined") {
             SessionData.isLightModeChanged.connect(root.onLightModeChanged)
         }
@@ -669,8 +708,17 @@ Singleton {
         }
 
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode) ? "true" : "false"
-        gtkApplier.command = [shellDir + "/scripts/gtk.sh", configDir, isLight, shellDir]
-        gtkApplier.running = true
+        Proc.runCommand("gtkApplier", [shellDir + "/scripts/gtk.sh", configDir, isLight, shellDir], (output, exitCode) => {
+            if (exitCode === 0) {
+                if (typeof ToastService !== "undefined" && typeof NiriService !== "undefined" && !NiriService.matugenSuppression) {
+                    ToastService.showInfo("GTK colors applied successfully")
+                }
+            } else {
+                if (typeof ToastService !== "undefined") {
+                    ToastService.showError("Failed to apply GTK colors")
+                }
+            }
+        })
     }
 
     function applyQtColors() {
@@ -681,8 +729,17 @@ Singleton {
             return
         }
 
-        qtApplier.command = [shellDir + "/scripts/qt.sh", configDir]
-        qtApplier.running = true
+        Proc.runCommand("qtApplier", [shellDir + "/scripts/qt.sh", configDir], (output, exitCode) => {
+            if (exitCode === 0) {
+                if (typeof ToastService !== "undefined") {
+                    ToastService.showInfo("Qt colors applied successfully")
+                }
+            } else {
+                if (typeof ToastService !== "undefined") {
+                    ToastService.showError("Failed to apply Qt colors")
+                }
+            }
+        })
     }
 
     function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
@@ -751,57 +808,6 @@ Singleton {
 
 
     Process {
-        id: matugenCheck
-        command: ["which", "matugen"]
-        onExited: code => {
-            matugenAvailable = (code === 0) && !envDisableMatugen
-            const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
-
-            if (!matugenAvailable || isGreeterMode) {
-                return
-            }
-
-            const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode)
-            const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default"
-
-            if (currentTheme === dynamic) {
-                if (wallpaperPath) {
-                    Quickshell.execDetached(["rm", "-f", stateDir + "/matugen.key"])
-                    const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
-                    if (wallpaperPath.startsWith("#")) {
-                        setDesiredTheme("hex", wallpaperPath, isLight, iconTheme, selectedMatugenType)
-                    } else {
-                        setDesiredTheme("image", wallpaperPath, isLight, iconTheme, selectedMatugenType)
-                    }
-                }
-            } else {
-                let primaryColor
-                let matugenType
-                if (currentTheme === "custom") {
-                    if (customThemeData && customThemeData.primary) {
-                        primaryColor = customThemeData.primary
-                        matugenType = customThemeData.matugen_type
-                    }
-                } else {
-                    primaryColor = currentThemeData.primary
-                    matugenType = currentThemeData.matugen_type
-                }
-
-                if (primaryColor) {
-                    Quickshell.execDetached(["rm", "-f", stateDir + "/matugen.key"])
-                    setDesiredTheme("hex", primaryColor, isLight, iconTheme, matugenType)
-                }
-            }
-        }
-    }
-
-
-
-    Process {
-        id: ensureStateDir
-    }
-
-    Process {
         id: systemThemeGenerator
         running: false
 
@@ -813,56 +819,6 @@ Singleton {
                     ToastService.showError("Theme worker failed (" + exitCode + ")")
                 }
                 console.warn("Theme worker failed with exit code:", exitCode)
-            }
-        }
-    }
-
-    Process {
-        id: gtkApplier
-        running: false
-
-        stdout: StdioCollector {
-            id: gtkStdout
-        }
-
-        stderr: StdioCollector {
-            id: gtkStderr
-        }
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                if (typeof ToastService !== "undefined" && typeof NiriService !== "undefined" && !NiriService.matugenSuppression) {
-                    ToastService.showInfo("GTK colors applied successfully")
-                }
-            } else {
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showError("Failed to apply GTK colors: " + gtkStderr.text)
-                }
-            }
-        }
-    }
-
-    Process {
-        id: qtApplier
-        running: false
-
-        stdout: StdioCollector {
-            id: qtStdout
-        }
-
-        stderr: StdioCollector {
-            id: qtStderr
-        }
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showInfo("Qt colors applied successfully")
-                }
-            } else {
-                if (typeof ToastService !== "undefined") {
-                    ToastService.showError("Failed to apply Qt colors: " + qtStderr.text)
-                }
             }
         }
     }

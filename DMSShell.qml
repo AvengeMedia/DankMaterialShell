@@ -66,7 +66,13 @@ Item {
       property bool initialized: false
 
       sourceComponent: DankBar {
-          onColorPickerRequested: colorPickerModal.show()
+          onColorPickerRequested: {
+              if (colorPickerModal.shouldBeVisible) {
+                  colorPickerModal.close()
+              } else {
+                  colorPickerModal.show()
+              }
+          }
       }
 
       Component.onCompleted: {

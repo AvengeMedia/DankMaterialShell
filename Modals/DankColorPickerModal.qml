@@ -2,17 +2,16 @@ import QtQuick
 import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
 import qs.Common
+import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-PanelWindow {
+DankModal {
     id: root
 
     property string pickerTitle: "Choose Color"
-    property color selectedColor: Theme.primary
-    property bool shouldBeVisible: false
+    property color selectedColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary
     property var onColorSelectedCallback: null
 
     signal colorSelected(color selectedColor)
@@ -25,23 +24,24 @@ PanelWindow {
     property real gradientX: 0
     property real gradientY: 0
 
-    function open() {
-        currentColor = selectedColor
-        updateFromColor(currentColor)
-        shouldBeVisible = true
-        Qt.callLater(() => colorContent.forceActiveFocus())
-    }
-
-    function close() {
-        shouldBeVisible = false
-        onColorSelectedCallback = null
-    }
+    readonly property var standardColors: [
+        "#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4",
+        "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722",
+        "#d32f2f", "#c2185b", "#7b1fa2", "#512da8", "#303f9f", "#1976d2", "#0288d1", "#0097a7",
+        "#00796b", "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000", "#f57c00", "#e64a19",
+        "#c62828", "#ad1457", "#6a1b9a", "#4527a0", "#283593", "#1565c0", "#0277bd", "#00838f",
+        "#00695c", "#2e7d32", "#558b2f", "#9e9d24", "#f9a825", "#ff8f00", "#ef6c00", "#d84315",
+        "#ffffff", "#9e9e9e", "#212121"
+    ]
 
     function show() {
+        currentColor = selectedColor
+        updateFromColor(currentColor)
         open()
     }
 
     function hide() {
+        onColorSelectedCallback = null
         close()
     }
 
@@ -74,96 +74,50 @@ PanelWindow {
         saturation = Math.max(0, Math.min(1, x))
         value = Math.max(0, Math.min(1, 1 - y))
         updateColor()
+        selectedColor = currentColor
     }
 
     function pickColorFromScreen() {
-        close()
-        hyprpickerProcess.running = true
-    }
-
-    Process {
-        id: hyprpickerProcess
-        running: false
-        command: ["hyprpicker", "--format=hex"]
-
-        stdout: SplitParser {
-            onRead: data => {
-                const colorStr = data.trim()
-                if (colorStr.length >= 7 && colorStr.startsWith('#')) {
-                    root.currentColor = colorStr
-                    root.updateFromColor(root.currentColor)
-                    hexInput.text = root.currentColor.toString()
-                    copyColorToClipboard(colorStr)
-                    root.open()
-                }
+        hide()
+        Proc.runCommand("hyprpicker", ["hyprpicker", "--format=hex"], (output, errorCode) => {
+            if (errorCode !== 0) {
+                console.warn("hyprpicker exited with code:", errorCode)
+                root.show()
+                return
             }
-        }
-
-        onExited: (exitCode, exitStatus) => {
-            if (exitCode !== 0) {
-                console.warn("hyprpicker exited with code:", exitCode)
+            const colorStr = output.trim()
+            if (colorStr.length >= 7 && colorStr.startsWith('#')) {
+                const pickedColor = Qt.color(colorStr)
+                root.selectedColor = pickedColor
+                root.currentColor = pickedColor
+                root.updateFromColor(pickedColor)
+                copyColorToClipboard(colorStr)
+                root.show()
             }
-            root.open()
-        }
+        })
     }
 
-    readonly property var standardColors: [
-        "#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4",
-        "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722",
-        "#d32f2f", "#c2185b", "#7b1fa2", "#512da8", "#303f9f", "#1976d2", "#0288d1", "#0097a7",
-        "#00796b", "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000", "#f57c00", "#e64a19",
-        "#c62828", "#ad1457", "#6a1b9a", "#4527a0", "#283593", "#1565c0", "#0277bd", "#00838f",
-        "#00695c", "#2e7d32", "#558b2f", "#9e9d24", "#f9a825", "#ff8f00", "#ef6c00", "#d84315",
-        "#ffffff", "#9e9e9e", "#212121"
-    ]
+    width: 680
+    height: 680
+    backgroundColor: Theme.surfaceContainer
+    cornerRadius: Theme.cornerRadius
+    borderColor: Theme.outlineMedium
+    borderWidth: 1
+    keepContentLoaded: true
 
-    visible: shouldBeVisible
+    onBackgroundClicked: hide()
 
-    WlrLayershell.namespace: "quickshell:color-picker"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-    color: "transparent"
-
-    anchors {
-        top: true
-        left: true
-        right: true
-        bottom: true
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: root.close()
-
-        Rectangle {
-            color: "#80000000"
-            anchors.fill: parent
-        }
-    }
-
-    Rectangle {
-        anchors.centerIn: parent
-        width: 680
-        height: 680
-        radius: Theme.cornerRadius
-        color: Theme.surfaceContainer
-        border.color: Theme.outlineMedium
-        border.width: 1
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {} // Prevent clicks from propagating to background
-        }
-
+    content: Component {
         FocusScope {
             id: colorContent
 
+            property alias hexInput: hexInput
+
             anchors.fill: parent
-            focus: root.shouldBeVisible
+            focus: true
 
             Keys.onEscapePressed: event => {
-                root.close()
+                root.hide()
                 event.accepted = true
             }
 
@@ -199,7 +153,7 @@ PanelWindow {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: () => {
-                            pickColorFromScreen()
+                            root.pickColorFromScreen()
                         }
                     }
 
@@ -208,7 +162,7 @@ PanelWindow {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: () => {
-                            root.close()
+                            root.hide()
                         }
                     }
                 }
@@ -329,12 +283,14 @@ PanelWindow {
                                 const h = Math.max(0, Math.min(1, mouse.y / height))
                                 root.hue = h
                                 root.updateColor()
+                                root.selectedColor = root.currentColor
                             }
                             onPositionChanged: mouse => {
                                 if (pressed) {
                                     const h = Math.max(0, Math.min(1, mouse.y / height))
                                     root.hue = h
                                     root.updateColor()
+                                    root.selectedColor = root.currentColor
                                 }
                             }
                         }
@@ -373,8 +329,10 @@ PanelWindow {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: () => {
-                                    root.currentColor = modelData
-                                    root.updateFromColor(root.currentColor)
+                                    const pickedColor = Qt.color(modelData)
+                                    root.selectedColor = pickedColor
+                                    root.currentColor = pickedColor
+                                    root.updateFromColor(pickedColor)
                                 }
                             }
                         }
@@ -429,8 +387,10 @@ PanelWindow {
                                             enabled: index < SessionData.recentColors.length
                                             onClicked: () => {
                                                 if (index < SessionData.recentColors.length) {
-                                                    root.currentColor = SessionData.recentColors[index]
-                                                    root.updateFromColor(root.currentColor)
+                                                    const pickedColor = SessionData.recentColors[index]
+                                                    root.selectedColor = pickedColor
+                                                    root.currentColor = pickedColor
+                                                    root.updateFromColor(pickedColor)
                                                 }
                                             }
                                         }
@@ -459,6 +419,7 @@ PanelWindow {
                                 onSliderValueChanged: (newValue) => {
                                     root.alpha = newValue / 100
                                     root.updateColor()
+                                    root.selectedColor = root.currentColor
                                 }
                             }
                         }
@@ -509,6 +470,7 @@ PanelWindow {
                             if (!hexPattern.test(text)) return
                             const color = Qt.color(text)
                             if (color) {
+                                root.selectedColor = color
                                 root.currentColor = color
                                 root.updateFromColor(color)
                             }
@@ -530,9 +492,9 @@ PanelWindow {
                                 root.currentColor = color
                                 root.updateFromColor(color)
                                 root.selectedColor = root.currentColor
-                                colorSelected(root.currentColor)
+                                root.colorSelected(root.currentColor)
                                 SessionData.addRecentColor(root.currentColor)
-                                root.close()
+                                root.hide()
                             }
                         }
                     }
@@ -549,8 +511,8 @@ PanelWindow {
                         backgroundColor: "transparent"
                         textColor: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
-                        onClicked: root.close()
-                        
+                        onClicked: root.hide()
+
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.cornerRadius
@@ -570,7 +532,7 @@ PanelWindow {
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
                             const colorString = root.currentColor.toString()
-                            copyColorToClipboard(colorString)
+                            root.copyColorToClipboard(colorString)
                         }
                     }
                 }

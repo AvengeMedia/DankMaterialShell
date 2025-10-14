@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Io
 import Quickshell.Widgets
 import qs.Common
 
@@ -16,19 +15,16 @@ IconImage {
     asynchronous: true
     layer.enabled: hasColorOverride
 
-    Process {
-        running: true
-        command: ["sh", "-c", ". /etc/os-release && echo $LOGO"]
-
-        stdout: StdioCollector {
-            onStreamFinished: () => {
-                if (text.trim() === "cachyos") {
-                    source = "file:///usr/share/icons/cachyos.svg"
-                    return
-                }
-                source = Quickshell.iconPath(text.trim(), true)
+    Component.onCompleted: {
+        Proc.runCommand("systemLogo", ["sh", "-c", ". /etc/os-release && echo $LOGO"], (output, exitCode) => {
+            if (exitCode !== 0) return
+            const logo = output.trim()
+            if (logo === "cachyos") {
+                source = "file:///usr/share/icons/cachyos.svg"
+                return
             }
-        }
+            source = Quickshell.iconPath(logo, true)
+        }, 0)
     }
 
     layer.effect: MultiEffect {

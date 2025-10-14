@@ -275,7 +275,7 @@ Column {
             // Match count display
             StyledText {
                 Layout.alignment: Qt.AlignVCenter
-                text: matchCount > 0 ? I18n.tr("%1/%2").arg(currentMatchIndex + 1).arg(matchCount) : searchQuery.length > 0 ? I18n.tr("No matches") : ""
+                text: matchCount > 0 ? "%1/%2".arg(currentMatchIndex + 1).arg(matchCount) : searchQuery.length > 0 ? I18n.tr("No matches") : ""
                 font.pixelSize: Theme.fontSizeSmall
                 color: matchCount > 0 ? Theme.primary : Theme.surfaceTextMedium
                 visible: searchQuery.length > 0

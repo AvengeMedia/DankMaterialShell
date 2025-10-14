@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Controls
-import Quickshell.Io
 import qs.Common
 import qs.Widgets
 
@@ -31,8 +30,6 @@ Item {
     function resetSearchState() {
         locationSearchTimer.stop()
         dropdownHideTimer.stop()
-        if (locationSearcher.running)
-            locationSearcher.running = false
         isLoading = false
         searchResultsModel.clear()
     }
@@ -52,17 +49,52 @@ Item {
         repeat: false
         onTriggered: {
             if (locationInput.text.length > 2) {
-                if (locationSearcher.running)
-                    locationSearcher.running = false
-
                 searchResultsModel.clear()
                 root.isLoading = true
                 const searchLocation = locationInput.text
                 root.currentSearchText = searchLocation
                 const encodedLocation = encodeURIComponent(searchLocation)
                 const curlCommand = `curl -4 -s --connect-timeout 5 --max-time 10 'https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=5&addressdetails=1'`
-                locationSearcher.command = ["bash", "-c", curlCommand]
-                locationSearcher.running = true
+                Proc.runCommand("locationSearch", ["bash", "-c", curlCommand], (output, exitCode) => {
+                    root.isLoading = false
+                    if (exitCode !== 0) {
+                        searchResultsModel.clear()
+                        return
+                    }
+                    if (root.currentSearchText !== locationInput.text)
+                        return
+
+                    const raw = output.trim()
+                    searchResultsModel.clear()
+                    if (!raw || raw[0] !== "[") {
+                        return
+                    }
+                    try {
+                        const data = JSON.parse(raw)
+                        if (data.length === 0) {
+                            return
+                        }
+                        for (var i = 0; i < Math.min(data.length, 5); i++) {
+                            const location = data[i]
+                            if (location.display_name && location.lat && location.lon) {
+                                const parts = location.display_name.split(', ')
+                                let cleanName = parts[0]
+                                if (parts.length > 1) {
+                                    const state = parts[parts.length - 2]
+                                    if (state && state !== cleanName)
+                                        cleanName += `, ${state}`
+                                }
+                                const query = `${location.lat},${location.lon}`
+                                searchResultsModel.append({
+                                                              "name": cleanName,
+                                                              "query": query
+                                                          })
+                            }
+                        }
+                    } catch (e) {
+
+                    }
+                })
             }
         }
     }
@@ -76,58 +108,6 @@ Item {
         onTriggered: {
             if (!locationInput.getActiveFocus() && !searchDropdown.hovered)
                 root.resetSearchState()
-        }
-    }
-
-    Process {
-        id: locationSearcher
-
-        command: ["bash", "-c", "echo"]
-        running: false
-        onExited: exitCode => {
-                      root.isLoading = false
-                      if (exitCode !== 0) {
-                          searchResultsModel.clear()
-                      }
-                  }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (root.currentSearchText !== locationInput.text)
-                    return
-
-                const raw = text.trim()
-                root.isLoading = false
-                searchResultsModel.clear()
-                if (!raw || raw[0] !== "[") {
-                    return
-                }
-                try {
-                    const data = JSON.parse(raw)
-                    if (data.length === 0) {
-                        return
-                    }
-                    for (var i = 0; i < Math.min(data.length, 5); i++) {
-                        const location = data[i]
-                        if (location.display_name && location.lat && location.lon) {
-                            const parts = location.display_name.split(', ')
-                            let cleanName = parts[0]
-                            if (parts.length > 1) {
-                                const state = parts[parts.length - 2]
-                                if (state && state !== cleanName)
-                                    cleanName += `, ${state}`
-                            }
-                            const query = `${location.lat},${location.lon}`
-                            searchResultsModel.append({
-                                                          "name": cleanName,
-                                                          "query": query
-                                                      })
-                        }
-                    }
-                } catch (e) {
-
-                }
-            }
         }
     }
 

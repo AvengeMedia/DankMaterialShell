@@ -4,9 +4,9 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import qs.Common
 
 Singleton {
     id: root
@@ -160,7 +160,20 @@ Singleton {
         }
 
         if (niriSocket && niriSocket.length > 0) {
-            niriSocketCheck.running = true
+            Proc.runCommand("niriSocketCheck", ["test", "-S", root.niriSocket], (output, exitCode) => {
+                if (exitCode === 0) {
+                    root.isNiri = true
+                    root.isHyprland = false
+                    root.compositor = "niri"
+                    console.log("CompositorService: Detected Niri with socket:", root.niriSocket)
+                    NiriService.generateNiriBinds()
+                } else {
+                    root.isHyprland = false
+                    root.isNiri = true
+                    root.compositor = "niri"
+                    console.warn("CompositorService: Niri socket check failed, defaulting to Niri anyway")
+                }
+            }, 0)
         } else {
             isHyprland = false
             isNiri = false
@@ -187,25 +200,5 @@ Singleton {
             return Hyprland.dispatch("dpms on")
         }
         console.warn("CompositorService: Cannot power on monitors, unknown compositor")
-    }
-
-    Process {
-        id: niriSocketCheck
-        command: ["test", "-S", root.niriSocket]
-
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                root.isNiri = true
-                root.isHyprland = false
-                root.compositor = "niri"
-                console.log("CompositorService: Detected Niri with socket:", root.niriSocket)
-                NiriService.generateNiriBinds()
-            } else {
-                root.isHyprland = false
-                root.isNiri = true
-                root.compositor = "niri"
-                console.warn("CompositorService: Niri socket check failed, defaulting to Niri anyway")
-            }
-        }
     }
 }

@@ -98,29 +98,6 @@ Rectangle {
     }
 
 
-    Process {
-        id: hyprlandLayoutProcess
-        running: false
-        command: ["hyprctl", "-j", "devices"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const data = JSON.parse(text)
-                    // Find the main keyboard and get its active keymap
-                    const mainKeyboard = data.keyboards.find(kb => kb.main === true)
-                    root.hyprlandKeyboard = mainKeyboard.name
-                    if (mainKeyboard && mainKeyboard.active_keymap) {
-                        root.currentLayout = mainKeyboard.active_keymap
-                    } else {
-                        root.currentLayout = "Unknown"
-                    }
-                } catch (e) {
-                    root.currentLayout = "Unknown"
-                }
-            }
-        }
-    }
-
     Timer {
         id: updateTimer
         interval: 1000
@@ -139,7 +116,24 @@ Rectangle {
         if (CompositorService.isNiri) {
             root.currentLayout = NiriService.getCurrentKeyboardLayoutName()
         } else if (CompositorService.isHyprland) {
-            hyprlandLayoutProcess.running = true
+            Proc.runCommand("hyprlandLayout", ["hyprctl", "-j", "devices"], (output, exitCode) => {
+                if (exitCode !== 0) {
+                    root.currentLayout = "Unknown"
+                    return
+                }
+                try {
+                    const data = JSON.parse(output)
+                    const mainKeyboard = data.keyboards.find(kb => kb.main === true)
+                    root.hyprlandKeyboard = mainKeyboard.name
+                    if (mainKeyboard && mainKeyboard.active_keymap) {
+                        root.currentLayout = mainKeyboard.active_keymap
+                    } else {
+                        root.currentLayout = "Unknown"
+                    }
+                } catch (e) {
+                    root.currentLayout = "Unknown"
+                }
+            })
         }
     }
 }
