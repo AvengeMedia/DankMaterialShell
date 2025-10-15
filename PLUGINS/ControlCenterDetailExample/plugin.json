@@ -4,8 +4,9 @@
     "description": "Example plugin with Control Center detail dropdown",
     "version": "1.0.0",
     "author": "DankMaterialShell",
-    "icon": "settings",
     "type": "widget",
+    "capabilities": ["control-center"],
     "component": "./DetailExampleWidget.qml",
+    "icon": "settings",
     "permissions": ["settings_read", "settings_write"]
 }

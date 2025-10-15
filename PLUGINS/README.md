@@ -2,6 +2,10 @@
 
 Create widgets for DankBar and Control Center using dynamically-loaded QML components.
 
+## Plugin Registry
+
+Browse and discover community plugins at **https://plugins.danklinux.com/**
+
 ## Overview
 
 Plugins let you add custom widgets to DankBar and Control Center. They're discovered from `~/.config/DankMaterialShell/plugins/` and managed via PluginService.
@@ -45,7 +49,9 @@ $CONFIGPATH/DankMaterialShell/plugins/YourPlugin/
 
 ### Plugin Manifest (plugin.json)
 
-The manifest file defines plugin metadata and configuration:
+The manifest file defines plugin metadata and configuration.
+
+**JSON Schema:** See `plugin-schema.json` for the complete specification and validation schema.
 
 ```json
 {
@@ -54,9 +60,13 @@ The manifest file defines plugin metadata and configuration:
     "description": "Brief description of what your plugin does",
     "version": "1.0.0",
     "author": "Your Name",
-    "icon": "material_icon_name",
+    "type": "widget",
+    "capabilities": ["thing-my-plugin-does"],
     "component": "./YourWidget.qml",
+    "icon": "material_icon_name",
     "settings": "./YourSettings.qml",
+    "requires_dms": ">=0.1.0",
+    "requires": ["some-system-tool"],
     "permissions": [
         "settings_read",
         "settings_write"
@@ -67,15 +77,22 @@ The manifest file defines plugin metadata and configuration:
 **Required Fields:**
 - `id`: Unique plugin identifier (camelCase, no spaces)
 - `name`: Human-readable plugin name
-- `component`: Relative path to widget QML file
+- `description`: Short description of plugin functionality (displayed in UI)
+- `version`: Semantic version string (e.g., "1.0.0")
+- `author`: Plugin creator name or email
+- `type`: Plugin type - "widget", "daemon", or "launcher"
+- `capabilities`: Array of plugin capabilities  (e.g., ["dankbar-widget"], ["control-center"], ["monitoring"])
+- `component`: Relative path to main QML component file
+
+**Required for Launcher Type:**
+- `trigger`: Trigger string for launcher activation (e.g., "=", "#", "!")
 
 **Optional Fields:**
-- `description`: Short description of plugin functionality (displayed in UI)
-- `version`: Semantic version string (displayed in UI)
-- `author`: Plugin creator name (displayed in UI)
 - `icon`: Material Design icon name (displayed in UI)
 - `settings`: Path to settings component (enables settings UI)
-- `permissions`: Required capabilities (enforced by PluginSettings component)
+- `requires_dms`: Minimum DMS version requirement (e.g., ">=0.1.18", ">0.1.0")
+- `requires`: Array of required system tools/dependencies (e.g., ["wl-copy", "curl"])
+- `permissions`: Required DMS permissions (e.g., ["settings_read", "settings_write"])
 
 **Permissions:**
 
@@ -574,9 +591,12 @@ Create `plugin.json`:
     "description": "A sample plugin",
     "version": "1.0.0",
     "author": "Your Name",
-    "icon": "extension",
+    "type": "widget",
+    "capabilities": ["my-functionality"],
     "component": "./MyWidget.qml",
+    "icon": "extension",
     "settings": "./MySettings.qml",
+    "requires_dms": ">=0.1.0",
     "permissions": ["settings_read", "settings_write"]
 }
 ```
@@ -709,6 +729,231 @@ Or edit `$CONFIGPATH/quickshell/dms/config.json`:
 8. **Versioning**: Use semantic versioning for updates
 9. **Dependencies**: Document external library requirements
 
+## Clipboard Access
+
+Plugins that need to copy text to the clipboard **must** use the Wayland clipboard utility `wl-copy` through Quickshell's `execDetached` function.
+
+### Correct Method
+
+Import Quickshell and use `execDetached` with `wl-copy`:
+
+```qml
+import QtQuick
+import Quickshell
+
+Item {
+    function copyToClipboard(text) {
+        Quickshell.execDetached(["sh", "-c", "echo -n '" + text + "' | wl-copy"])
+    }
+}
+```
+
+### Example Usage
+
+From the ExampleEmojiPlugin (EmojiWidget.qml:136):
+
+```qml
+MouseArea {
+    onClicked: {
+        Quickshell.execDetached(["sh", "-c", "echo -n '" + modelData + "' | wl-copy"])
+        ToastService.showInfo("Copied " + modelData + " to clipboard")
+        popoutColumn.closePopout()
+    }
+}
+```
+
+### Important Notes
+
+1. **Do NOT** use `globalThis.clipboard` or similar JavaScript APIs - they don't exist in the QML runtime
+2. **Always** import `Quickshell` at the top of your QML file
+3. **Use** `echo -n` to prevent adding a trailing newline to the clipboard content
+4. The `-c` flag for `sh` is required to execute the pipe command properly
+5. Consider showing a toast notification to confirm the copy action to users
+
+### Dependencies
+
+This method requires `wl-copy` from the `wl-clipboard` package, which is standard on Wayland systems.
+
+## Running External Commands
+
+Plugins that need to execute external commands and capture their output should use the `Proc` singleton, which provides debounced command execution with automatic cleanup.
+
+### Correct Method
+
+Import the `Proc` singleton from `qs.Common` and use `runCommand`:
+
+```qml
+import QtQuick
+import qs.Common
+
+Item {
+    function fetchData() {
+        Proc.runCommand(
+            "myPlugin.fetchData",
+            ["curl", "-s", "https://api.example.com/data"],
+            (stdout, exitCode) => {
+                if (exitCode === 0) {
+                    console.log("Success:", stdout)
+                    processData(stdout)
+                } else {
+                    console.error("Command failed with exit code:", exitCode)
+                }
+            },
+            100
+        )
+    }
+}
+```
+
+### Function Signature
+
+```qml
+Proc.runCommand(id, command, callback, debounceMs)
+```
+
+**Parameters:**
+- `id` (string): Unique identifier for this command. Used for debouncing - multiple calls with the same ID within the debounce window will only execute the last one
+- `command` (array): Command and arguments as an array (e.g., `["sh", "-c", "echo hello"]`)
+- `callback` (function): Callback function receiving `(stdout, exitCode)` when the command completes
+  - `stdout` (string): Captured standard output from the command
+  - `exitCode` (number): Exit code of the process (0 typically means success)
+- `debounceMs` (number, optional): Debounce delay in milliseconds. Defaults to 50ms if not specified
+
+### Key Features
+
+1. **Automatic Cleanup**: Process objects are automatically destroyed after completion
+2. **Debouncing**: Rapid successive calls with the same ID are debounced, only executing the last one
+3. **Output Capture**: Automatically captures stdout for processing
+4. **Error Handling**: Exit codes are passed to the callback for error detection
+
+### Example Usage
+
+#### Simple Command Execution
+
+```qml
+import QtQuick
+import qs.Common
+
+Item {
+    function checkNetwork() {
+        Proc.runCommand(
+            "myPlugin.ping",
+            ["ping", "-c", "1", "8.8.8.8"],
+            (output, exitCode) => {
+                if (exitCode === 0) {
+                    console.log("Network is up")
+                } else {
+                    console.log("Network is down")
+                }
+            }
+        )
+    }
+}
+```
+
+#### Parsing Command Output
+
+```qml
+import QtQuick
+import qs.Common
+
+Item {
+    property var diskUsage: ({})
+
+    function updateDiskUsage() {
+        Proc.runCommand(
+            "myPlugin.df",
+            ["df", "-h", "/home"],
+            (output, exitCode) => {
+                if (exitCode === 0) {
+                    const lines = output.trim().split("\n")
+                    if (lines.length > 1) {
+                        const parts = lines[1].split(/\s+/)
+                        diskUsage = {
+                            total: parts[1],
+                            used: parts[2],
+                            available: parts[3],
+                            percent: parts[4]
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+```
+
+#### Shell Commands with Pipes
+
+```qml
+import QtQuick
+import qs.Common
+
+Item {
+    function getTopProcess() {
+        Proc.runCommand(
+            "myPlugin.topProcess",
+            ["sh", "-c", "ps aux | sort -nrk 3,3 | head -n 1"],
+            (output, exitCode) => {
+                if (exitCode === 0) {
+                    console.log("Top process:", output)
+                }
+            }
+        )
+    }
+}
+```
+
+#### Debouncing Rapid Updates
+
+```qml
+import QtQuick
+import qs.Common
+import qs.Widgets
+
+Item {
+    DankTextField {
+        id: searchField
+        placeholderText: "Search files..."
+
+        onTextChanged: {
+            Proc.runCommand(
+                "myPlugin.search",
+                ["find", "/home", "-name", "*" + text + "*"],
+                (output, exitCode) => {
+                    if (exitCode === 0) {
+                        updateSearchResults(output)
+                    }
+                },
+                500
+            )
+        }
+    }
+}
+```
+
+### Important Notes
+
+1. **Unique IDs**: Use descriptive, namespaced IDs (e.g., `"myPlugin.actionName"`) to avoid conflicts
+2. **Debouncing**: Use appropriate debounce delays for your use case:
+   - Fast updates (50-100ms): System monitoring, real-time data
+   - User input (300-500ms): Search fields, text input processing
+   - Network requests (500-1000ms): API calls, web scraping
+3. **Error Handling**: Always check the exit code in your callback before processing output
+4. **Shell Commands**: Use `["sh", "-c", "command"]` for complex shell commands with pipes or redirects
+5. **Security**: Sanitize user input before passing to commands to prevent command injection
+6. **Performance**: Avoid running expensive commands too frequently - use debouncing wisely
+
+### Comparison with Other Methods
+
+**Proc.runCommand** vs **Quickshell.execDetached**:
+- Use `Proc.runCommand` when you need to capture output or check exit codes
+- Use `Quickshell.execDetached` for fire-and-forget operations (like clipboard copy)
+
+**Proc.runCommand** vs **Process component**:
+- Use `Proc.runCommand` for simple, one-off command executions with automatic cleanup
+- Use `Process` component for long-running processes or when you need fine-grained control
+
 ## Debugging
 
 ### Console Logging
@@ -792,10 +1037,16 @@ To create a launcher plugin, set the plugin type in `plugin.json`:
 {
     "id": "myLauncher",
     "name": "My Launcher Plugin",
+    "description": "A custom launcher plugin for quick actions",
+    "version": "1.0.0",
+    "author": "Your Name",
     "type": "launcher",
-    "capabilities": ["launcher"],
+    "capabilities": ["show-thing"],
     "component": "./MyLauncher.qml",
+    "trigger": "#",
+    "icon": "search",
     "settings": "./MySettings.qml",
+    "requires_dms": ">=0.1.18",
     "permissions": ["settings_read", "settings_write"]
 }
 ```
@@ -1022,9 +1273,10 @@ See `PLUGINS/LauncherExample/` for a complete working example demonstrating:
 
 ## Resources
 
-- **Example Plugins**: 
-  - [Emoji Picker](./ExampleEmojiPlugin/) 
-  - [WorldClock](https://github.com/rochacbruno/WorldClock) 
+- **Plugin Schema**: `plugin-schema.json` - JSON Schema for validation
+- **Example Plugins**:
+  - [Emoji Picker](./ExampleEmojiPlugin/)
+  - [WorldClock](https://github.com/rochacbruno/WorldClock)
   - [LauncherExample](./LauncherExample/)
   - [Calculator](https://github.com/rochacbruno/DankCalculator)
 - **PluginService**: `Services/PluginService.qml`
@@ -1039,7 +1291,8 @@ See `PLUGINS/LauncherExample/` for a complete working example demonstrating:
 Share your plugins with the community:
 
 1. Create a public repository with your plugin
-2. Include comprehensive README.md
+2. Validate your `plugin.json` against `plugin-schema.json`
+3. Include comprehensive README.md
 4. Add example screenshots
 5. Document dependencies and permissions
 

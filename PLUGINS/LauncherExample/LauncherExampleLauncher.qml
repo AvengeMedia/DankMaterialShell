@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Services
 
 Item {
@@ -111,13 +112,8 @@ Item {
     }
 
     function copyToClipboard(text) {
-        if (typeof globalThis !== "undefined" && globalThis.clipboard) {
-            globalThis.clipboard.setText(text)
-            showToast("Copied to clipboard: " + text)
-        } else {
-            console.log("LauncherExample: Would copy to clipboard:", text)
-            showToast("Copy feature not available")
-        }
+        Quickshell.execDetached(["sh", "-c", "echo -n '" + text + "' | wl-copy"])
+        showToast("Copied to clipboard: " + text)
     }
 
     function runScript(command) {

@@ -4,8 +4,10 @@
     "description": "Display cycling emojis in your bar with a handy emoji picker popout",
     "version": "1.0.0",
     "author": "AvengeMedia",
-    "icon": "mood",
+    "type": "widget",
+    "capabilities": ["emoji-search", "clipboard", "dankbar-widget"],
     "component": "./EmojiWidget.qml",
+    "icon": "mood",
     "settings": "./EmojiSettings.qml",
     "permissions": [
         "settings_read",

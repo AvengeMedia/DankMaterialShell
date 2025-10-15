@@ -4,8 +4,10 @@
     "description": "Demonstrates dynamic variant creation for plugins",
     "version": "1.0.0",
     "author": "DMS",
-    "icon": "widgets",
+    "type": "widget",
+    "capabilities": ["multiple-usecases", "variants"],
     "component": "./VariantWidget.qml",
+    "icon": "widgets",
     "settings": "./VariantSettings.qml",
     "permissions": [
         "settings_read",
