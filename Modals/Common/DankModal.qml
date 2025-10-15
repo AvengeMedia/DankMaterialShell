@@ -12,6 +12,7 @@ PanelWindow {
 
     property alias content: contentLoader.sourceComponent
     property alias contentLoader: contentLoader
+    property Item directContent: null
     property real width: 400
     property real height: 300
     readonly property real screenWidth: screen ? screen.width : 1920
@@ -200,14 +201,44 @@ PanelWindow {
             focus: root.shouldBeVisible
             clip: false
 
+            Item {
+                id: directContentWrapper
+
+                anchors.fill: parent
+                visible: root.directContent !== null
+                focus: true
+                clip: false
+
+                Component.onCompleted: {
+                    if (root.directContent) {
+                        root.directContent.parent = directContentWrapper
+                        root.directContent.anchors.fill = directContentWrapper
+                        Qt.callLater(() => root.directContent.forceActiveFocus())
+                    }
+                }
+
+                Connections {
+                    function onDirectContentChanged() {
+                        if (root.directContent) {
+                            root.directContent.parent = directContentWrapper
+                            root.directContent.anchors.fill = directContentWrapper
+                            Qt.callLater(() => root.directContent.forceActiveFocus())
+                        }
+                    }
+
+                    target: root
+                }
+            }
+
             Loader {
                 id: contentLoader
 
                 anchors.fill: parent
-                active: root.keepContentLoaded || root.shouldBeVisible || root.visible
+                active: root.directContent === null && (root.keepContentLoaded || root.shouldBeVisible || root.visible)
                 asynchronous: false
                 focus: true
                 clip: false
+                visible: root.directContent === null
 
                 onLoaded: {
                     if (item) {

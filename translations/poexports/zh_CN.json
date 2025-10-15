@@ -2,9 +2,6 @@
     "%1 characters": {
         "%1 characters": "%1个字符"
     },
-    "%1/%2": {
-        "%1/%2": "%1/%2"
-    },
     "(Unnamed)": {
         "(Unnamed)": "(未命名)"
     },
@@ -70,9 +67,6 @@
     },
     "Animation Speed": {
         "Animation Speed": "动画速度"
-    },
-    "Animations": {
-        "Animations": "动画"
     },
     "App Launcher": {
         "App Launcher": "启动器"
@@ -302,9 +296,6 @@
     "Control currently playing media": {
         "Control currently playing media": "控制当前播放的媒体"
     },
-    "Control the speed of animations throughout the interface": {
-        "Control the speed of animations throughout the interface": "调节界面动画的整体速度"
-    },
     "Copied to clipboard": {
         "Copied to clipboard": "复制到剪切板"
     },
@@ -406,9 +397,6 @@
     },
     "Disk Usage": {
         "Disk Usage": "磁盘占用"
-    },
-    "Display Settings": {
-        "Display Settings": "显示设置"
     },
     "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
         "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "显示一个包含固定和运行中应用的程序坞，可放置在屏幕四边任意位置"
@@ -920,9 +908,6 @@
     "Position": {
         "Position": "位置"
     },
-    "Power": {
-        "Power": "电源"
-    },
     "Power Off": {
         "Power Off": "关机"
     },
@@ -1199,9 +1184,6 @@
     "This will permanently delete all clipboard history.": {
         "This will permanently delete all clipboard history.": "此操作会清空剪贴板历史，且无法恢复。"
     },
-    "Time & Date": {
-        "Time & Date": "时间与日期"
-    },
     "Today": {
         "Today": "今日"
     },
@@ -1418,9 +1400,6 @@
     "Gamma Control": {
         "Gamma Control": "伽马控制"
     },
-    "Idle & Lock Screen": {
-        "Idle & Lock Screen": "待机与锁屏"
-    },
     "Matugen Settings": {
         "Matugen Settings": "Matugen 设置"
     },
@@ -1434,27 +1413,126 @@
         "loginctl not available - lock integration requires DMS socket connection": "loginctl 不可用 - 启用锁定集成需连接 DMS socket"
     },
     "Auto Popup Gaps": {
-        "Auto Popup Gaps": ""
+        "Auto Popup Gaps": "自动弹窗间距"
     },
     "Automatically calculate popup distance from bar edge.": {
-        "Automatically calculate popup distance from bar edge.": ""
+        "Automatically calculate popup distance from bar edge.": "自动计算弹出窗口与顶栏边缘的距离。"
     },
     "Manual Gap Size": {
-        "Manual Gap Size": ""
+        "Manual Gap Size": "手动设置间距大小"
     },
     "System Updater": {
-        "System Updater": ""
+        "System Updater": "系统更新器"
     },
     "System update custom command": {
-        "System update custom command": ""
+        "System update custom command": "自定义系统更新命令"
     },
     "Terminal custom additional parameters": {
-        "Terminal custom additional parameters": ""
+        "Terminal custom additional parameters": "终端自定义附加参数"
     },
     "Use Custom Command": {
-        "Use Custom Command": ""
+        "Use Custom Command": "使用自定义命令"
     },
     "Use custom command for update your system": {
-        "Use custom command for update your system": ""
+        "Use custom command for update your system": "使用自定义命令来更新系统"
+    },
+    "1 event": {
+        "1 event": "1个事件"
+    },
+    "All day": {
+        "All day": "每天"
+    },
+    "Anonymous Identity (optional)": {
+        "Anonymous Identity (optional)": "匿名身份（可选）"
+    },
+    "Automatically lock the screen when the system prepares to suspend": {
+        "Automatically lock the screen when the system prepares to suspend": "当系统准备挂起时自动锁定屏幕"
+    },
+    "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
+        "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "将锁屏绑定到来自 loginctl 的 dbus 信号。如使用外部锁屏程序，请禁用此项"
+    },
+    "Enable System Sounds": {
+        "Enable System Sounds": "启用系统声音"
+    },
+    "Enable fingerprint authentication": {
+        "Enable fingerprint authentication": "启用指纹认证"
+    },
+    "Enter credentials for ": {
+        "Enter credentials for ": "输入凭据"
+    },
+    "Enter password for ": {
+        "Enter password for ": "输入密码"
+    },
+    "New Notification": {
+        "New Notification": "新通知"
+    },
+    "Password": {
+        "Password": "密码"
+    },
+    "Play sound when new notification arrives": {
+        "Play sound when new notification arrives": "有新通知时播放声音"
+    },
+    "Play sound when power cable is connected": {
+        "Play sound when power cable is connected": "当电源线连接时播放声音"
+    },
+    "Play sound when volume is adjusted": {
+        "Play sound when volume is adjusted": "当音量调整时播放声音"
+    },
+    "Play sounds for system events": {
+        "Play sounds for system events": "为系统事件播放声音"
+    },
+    "Plugged In": {
+        "Plugged In": "已接入"
+    },
+    "Power & Security": {
+        "Power & Security": "电源与安全"
+    },
+    "Power Action Confirmation": {
+        "Power Action Confirmation": "电源操作确认"
+    },
+    "Realm / Domain (optional)": {
+        "Realm / Domain (optional)": "Realm /域（可选）"
+    },
+    "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
+        "Request confirmation on power off, restart, suspend, hibernate and logout actions": "关机、重启、挂起、休眠和注销前请求确认"
+    },
+    "Server Domain for certificate (optional)": {
+        "Server Domain for certificate (optional)": "证书的服务器域（可选）"
+    },
+    "Show Confirmation on Power Actions": {
+        "Show Confirmation on Power Actions": "显示电源操作确认弹窗"
+    },
+    "Show power, restart, and logout buttons on the lock screen": {
+        "Show power, restart, and logout buttons on the lock screen": "在锁屏界面上显示电源、重新启动和注销按钮"
+    },
+    "Sort Alphabetically": {
+        "Sort Alphabetically": "按字母顺序排序"
+    },
+    "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
+        "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "使用指纹识别进行锁屏验证（需要录入指纹）"
+    },
+    "Username": {
+        "Username": "用户名"
+    },
+    "Volume Changed": {
+        "Volume Changed": "音量变化"
+    },
+    "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
+        "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "启用后，应用按字母顺序排序；禁用则按使用频率排序"
+    },
+    "events": {
+        "events": "事件"
+    },
+    "Select system sound theme": {
+        "Select system sound theme": ""
+    },
+    "Sound Theme": {
+        "Sound Theme": ""
+    },
+    "Use System Theme": {
+        "Use System Theme": ""
+    },
+    "Use sound theme from system settings": {
+        "Use sound theme from system settings": ""
     }
 }

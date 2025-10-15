@@ -61,6 +61,9 @@ Item {
     Component.onCompleted: {
         WallpaperCyclingService.cyclingActive
         fontEnumerationTimer.start()
+        if (AudioService.gsettingsAvailable) {
+            AudioService.scanSoundThemes()
+        }
     }
 
     DankFlickable {
@@ -1261,6 +1264,72 @@ Item {
                             height: 1
                             color: Theme.outline
                             opacity: 0.2
+                        }
+
+                        Row {
+                            width: parent.width - parent.leftPadding
+                            spacing: Theme.spacingM
+                            visible: AudioService.gsettingsAvailable
+
+                            Column {
+                                width: parent.width - useSystemSoundThemeToggle.width - Theme.spacingM
+                                spacing: Theme.spacingXS
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                StyledText {
+                                    text: I18n.tr("Use System Theme")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Use sound theme from system settings")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                }
+                            }
+
+                            DankToggle {
+                                id: useSystemSoundThemeToggle
+
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: SettingsData.useSystemSoundTheme
+                                onToggled: checked => {
+                                    SettingsData.setUseSystemSoundTheme(checked)
+                                }
+                            }
+                        }
+
+                        DankDropdown {
+                            id: soundThemeDropdown
+
+                            width: parent.width - parent.leftPadding
+                            text: I18n.tr("Sound Theme")
+                            description: I18n.tr("Select system sound theme")
+                            visible: SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0
+                            enabled: SettingsData.useSystemSoundTheme && AudioService.availableSoundThemes.length > 0
+                            options: AudioService.availableSoundThemes
+                            currentValue: {
+                                const theme = AudioService.currentSoundTheme
+                                if (theme && AudioService.availableSoundThemes.includes(theme)) {
+                                    return theme
+                                }
+                                return AudioService.availableSoundThemes.length > 0 ? AudioService.availableSoundThemes[0] : ""
+                            }
+                            onValueChanged: value => {
+                                if (value && value !== AudioService.currentSoundTheme) {
+                                    AudioService.setSoundTheme(value)
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            width: parent.width - parent.leftPadding
+                            height: 1
+                            color: Theme.outline
+                            opacity: 0.2
+                            visible: AudioService.gsettingsAvailable
                         }
 
                         Row {

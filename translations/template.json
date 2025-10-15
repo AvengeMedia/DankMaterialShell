@@ -7,13 +7,6 @@
     "comment": ""
   },
   {
-    "term": "%1/%2",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "(Unnamed)",
     "translation": "",
     "context": "",
@@ -2646,6 +2639,13 @@
     "comment": ""
   },
   {
+    "term": "Select system sound theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Select which transitions to include in randomization",
     "translation": "",
     "context": "",
@@ -2808,6 +2808,13 @@
   },
   {
     "term": "Sort Alphabetically",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Sound Theme",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3199,6 +3206,13 @@
     "comment": ""
   },
   {
+    "term": "Use System Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use custom command for update your system",
     "translation": "",
     "context": "",
@@ -3214,6 +3228,13 @@
   },
   {
     "term": "Use light theme instead of dark theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use sound theme from system settings",
     "translation": "",
     "context": "",
     "reference": "",

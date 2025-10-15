@@ -6,12 +6,6 @@
     "comment": ""
   },
   {
-    "term": "%1/%2",
-    "context": "%1/%2",
-    "reference": "Modules/Notepad/NotepadTextEditor.qml:278",
-    "comment": ""
-  },
-  {
     "term": "(Unnamed)",
     "context": "(Unnamed)",
     "reference": "Modules/Dock/DockContextMenu.qml:235",
@@ -44,7 +38,7 @@
   {
     "term": "24-hour format",
     "context": "24-hour format",
-    "reference": "Modules/Settings/PersonalizationTab.qml:834",
+    "reference": "Modules/Settings/PersonalizationTab.qml:837",
     "comment": ""
   },
   {
@@ -62,7 +56,7 @@
   {
     "term": "A file with this name already exists. Do you want to overwrite it?",
     "context": "A file with this name already exists. Do you want to overwrite it?",
-    "reference": "Modals/FileBrowser/FileBrowserModal.qml:928",
+    "reference": "Modals/FileBrowser/FileBrowserModal.qml:930",
     "comment": ""
   },
   {
@@ -104,7 +98,7 @@
   {
     "term": "Add Widget",
     "context": "Add Widget",
-    "reference": "Modules/Settings/WidgetsTabSection.qml:670, Modules/ControlCenter/Components/EditControls.qml:58, Modules/ControlCenter/Components/EditControls.qml:158",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:670, Modules/ControlCenter/Components/EditControls.qml:58, Modules/ControlCenter/Components/EditControls.qml:159",
     "comment": ""
   },
   {
@@ -122,7 +116,7 @@
   {
     "term": "All",
     "context": "All",
-    "reference": "Services/AppSearchService.qml:217, Services/AppSearchService.qml:233, Modals/Spotlight/SpotlightModal.qml:39, Modules/AppDrawer/CategorySelector.qml:11, Modules/AppDrawer/AppLauncher.qml:12, Modules/AppDrawer/AppLauncher.qml:23, Modules/AppDrawer/AppLauncher.qml:24, Modules/AppDrawer/AppLauncher.qml:41, Modules/AppDrawer/AppLauncher.qml:42, Modules/AppDrawer/AppLauncher.qml:76, Modules/AppDrawer/AppDrawerPopout.qml:45",
+    "reference": "Services/AppSearchService.qml:217, Services/AppSearchService.qml:233, Modals/Spotlight/SpotlightModal.qml:59, Modules/AppDrawer/CategorySelector.qml:11, Modules/AppDrawer/AppLauncher.qml:12, Modules/AppDrawer/AppLauncher.qml:23, Modules/AppDrawer/AppLauncher.qml:24, Modules/AppDrawer/AppLauncher.qml:41, Modules/AppDrawer/AppLauncher.qml:42, Modules/AppDrawer/AppLauncher.qml:76, Modules/AppDrawer/AppDrawerPopout.qml:45",
     "comment": ""
   },
   {
@@ -152,7 +146,7 @@
   {
     "term": "Animation Speed",
     "context": "Animation Speed",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1167",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1170",
     "comment": ""
   },
   {
@@ -176,7 +170,7 @@
   {
     "term": "Apply",
     "context": "Apply",
-    "reference": "Modals/DankColorPickerModal.qml:521",
+    "reference": "Modals/DankColorPickerModal.qml:483",
     "comment": ""
   },
   {
@@ -308,7 +302,7 @@
   {
     "term": "Automatic Cycling",
     "context": "Automatic Cycling",
-    "reference": "Modules/Settings/PersonalizationTab.qml:587",
+    "reference": "Modules/Settings/PersonalizationTab.qml:590",
     "comment": ""
   },
   {
@@ -320,7 +314,7 @@
   {
     "term": "Automatically cycle through wallpapers in the same folder",
     "context": "Automatically cycle through wallpapers in the same folder",
-    "reference": "Modules/Settings/PersonalizationTab.qml:594",
+    "reference": "Modules/Settings/PersonalizationTab.qml:597",
     "comment": ""
   },
   {
@@ -332,7 +326,7 @@
   {
     "term": "Automatically extract colors from wallpaper",
     "context": "Automatically extract colors from wallpaper",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1025",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1028",
     "comment": ""
   },
   {
@@ -488,7 +482,7 @@
   {
     "term": "Cancel",
     "context": "Cancel",
-    "reference": "Modals/DankColorPickerModal.qml:548, Modals/WifiPasswordModal.qml:491, Modals/FileBrowser/FileBrowserModal.qml:950, Modules/Settings/PluginsTab.qml:1220",
+    "reference": "Modals/DankColorPickerModal.qml:510, Modals/WifiPasswordModal.qml:491, Modals/FileBrowser/FileBrowserModal.qml:952, Modules/Settings/PluginsTab.qml:1220",
     "comment": ""
   },
   {
@@ -578,7 +572,7 @@
   {
     "term": "Close",
     "context": "Close",
-    "reference": "Modules/SystemUpdatePopout.qml:329, Modals/NetworkInfoModal.qml:129, Modules/DankBar/Widgets/RunningApps.qml:614",
+    "reference": "Modules/SystemUpdatePopout.qml:333, Modals/NetworkInfoModal.qml:129, Modules/DankBar/Widgets/RunningApps.qml:614",
     "comment": ""
   },
   {
@@ -680,7 +674,7 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "Modals/DankColorPickerModal.qml:567",
+    "reference": "Modals/DankColorPickerModal.qml:529",
     "comment": ""
   },
   {
@@ -794,7 +788,7 @@
   {
     "term": "Daily at:",
     "context": "Daily at:",
-    "reference": "Modules/Settings/PersonalizationTab.qml:759",
+    "reference": "Modules/Settings/PersonalizationTab.qml:762",
     "comment": ""
   },
   {
@@ -842,7 +836,7 @@
   {
     "term": "Defaults",
     "context": "Defaults",
-    "reference": "Modules/ControlCenter/Components/EditControls.qml:192",
+    "reference": "Modules/ControlCenter/Components/EditControls.qml:193",
     "comment": ""
   },
   {
@@ -950,7 +944,7 @@
   {
     "term": "Dynamic Theming",
     "context": "Dynamic Theming",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1018",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1021",
     "comment": ""
   },
   {
@@ -980,7 +974,7 @@
   {
     "term": "Enable System Sounds",
     "context": "Enable System Sounds",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1228",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1231",
     "comment": ""
   },
   {
@@ -1034,7 +1028,7 @@
   {
     "term": "Enter filename...",
     "context": "Enter filename...",
-    "reference": "Modals/FileBrowser/FileBrowserModal.qml:783",
+    "reference": "Modals/FileBrowser/FileBrowserModal.qml:785",
     "comment": ""
   },
   {
@@ -1052,7 +1046,7 @@
   {
     "term": "Execute templates from ~/.config/matugen/config.toml",
     "context": "Execute templates from ~/.config/matugen/config.toml",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1109",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1112",
     "comment": ""
   },
   {
@@ -1070,7 +1064,7 @@
   {
     "term": "File Already Exists",
     "context": "File Already Exists",
-    "reference": "Modals/FileBrowser/FileBrowserModal.qml:920",
+    "reference": "Modals/FileBrowser/FileBrowserModal.qml:922",
     "comment": ""
   },
   {
@@ -1244,7 +1238,7 @@
   {
     "term": "Hex:",
     "context": "Hex:",
-    "reference": "Modals/DankColorPickerModal.qml:483",
+    "reference": "Modals/DankColorPickerModal.qml:444",
     "comment": ""
   },
   {
@@ -1274,7 +1268,7 @@
   {
     "term": "How often to change wallpaper",
     "context": "How often to change wallpaper",
-    "reference": "Modules/Settings/PersonalizationTab.qml:705",
+    "reference": "Modules/Settings/PersonalizationTab.qml:708",
     "comment": ""
   },
   {
@@ -1322,7 +1316,7 @@
   {
     "term": "Include Transitions",
     "context": "Include Transitions",
-    "reference": "Modules/Settings/PersonalizationTab.qml:870",
+    "reference": "Modules/Settings/PersonalizationTab.qml:873",
     "comment": ""
   },
   {
@@ -1346,7 +1340,7 @@
   {
     "term": "Interval",
     "context": "Interval",
-    "reference": "Modules/Settings/PersonalizationTab.qml:704",
+    "reference": "Modules/Settings/PersonalizationTab.qml:707",
     "comment": ""
   },
   {
@@ -1412,7 +1406,7 @@
   {
     "term": "Light Mode",
     "context": "Light Mode",
-    "reference": "Modules/Settings/PersonalizationTab.qml:938",
+    "reference": "Modules/Settings/PersonalizationTab.qml:941",
     "comment": ""
   },
   {
@@ -1502,19 +1496,19 @@
   {
     "term": "Material Colors",
     "context": "Material Colors",
-    "reference": "Modals/DankColorPickerModal.qml:349",
+    "reference": "Modals/DankColorPickerModal.qml:305",
     "comment": ""
   },
   {
     "term": "Matugen Palette",
     "context": "Matugen Palette",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:629, Modules/Settings/PersonalizationTab.qml:1050",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:629, Modules/Settings/PersonalizationTab.qml:1053",
     "comment": ""
   },
   {
     "term": "Matugen Settings",
     "context": "Matugen Settings",
-    "reference": "Modules/Settings/PersonalizationTab.qml:993",
+    "reference": "Modules/Settings/PersonalizationTab.qml:996",
     "comment": ""
   },
   {
@@ -1574,19 +1568,19 @@
   {
     "term": "Mode:",
     "context": "Mode:",
-    "reference": "Modules/Settings/PersonalizationTab.qml:636",
+    "reference": "Modules/Settings/PersonalizationTab.qml:639",
     "comment": ""
   },
   {
     "term": "Monitor",
     "context": "Monitor",
-    "reference": "Modules/Settings/PersonalizationTab.qml:539",
+    "reference": "Modules/Settings/PersonalizationTab.qml:542",
     "comment": ""
   },
   {
     "term": "Monitor Selection:",
     "context": "Monitor Selection:",
-    "reference": "Modules/Settings/PersonalizationTab.qml:530",
+    "reference": "Modules/Settings/PersonalizationTab.qml:533",
     "comment": ""
   },
   {
@@ -1670,7 +1664,7 @@
   {
     "term": "New Notification",
     "context": "New Notification",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1276",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1345",
     "comment": ""
   },
   {
@@ -1760,7 +1754,7 @@
   {
     "term": "Notepad",
     "context": "Notepad",
-    "reference": "DMSShell.qml:400, Modules/Settings/DankBarTab.qml:175",
+    "reference": "DMSShell.qml:406, Modules/Settings/DankBarTab.qml:175",
     "comment": ""
   },
   {
@@ -1832,7 +1826,7 @@
   {
     "term": "Opacity",
     "context": "Opacity",
-    "reference": "Modals/DankColorPickerModal.qml:447",
+    "reference": "Modals/DankColorPickerModal.qml:407",
     "comment": ""
   },
   {
@@ -1862,7 +1856,7 @@
   {
     "term": "Overwrite",
     "context": "Overwrite",
-    "reference": "Modals/FileBrowser/FileBrowserModal.qml:976",
+    "reference": "Modals/FileBrowser/FileBrowserModal.qml:978",
     "comment": ""
   },
   {
@@ -1880,13 +1874,13 @@
   {
     "term": "Per-Mode Wallpapers",
     "context": "Per-Mode Wallpapers",
-    "reference": "Modules/Settings/PersonalizationTab.qml:441",
+    "reference": "Modules/Settings/PersonalizationTab.qml:444",
     "comment": ""
   },
   {
     "term": "Per-Monitor Wallpapers",
     "context": "Per-Monitor Wallpapers",
-    "reference": "Modules/Settings/PersonalizationTab.qml:498",
+    "reference": "Modules/Settings/PersonalizationTab.qml:501",
     "comment": ""
   },
   {
@@ -1928,31 +1922,31 @@
   {
     "term": "Play sound when new notification arrives",
     "context": "Play sound when new notification arrives",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1282",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1351",
     "comment": ""
   },
   {
     "term": "Play sound when power cable is connected",
     "context": "Play sound when power cable is connected",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1351",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1420",
     "comment": ""
   },
   {
     "term": "Play sound when volume is adjusted",
     "context": "Play sound when volume is adjusted",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1316",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1385",
     "comment": ""
   },
   {
     "term": "Play sounds for system events",
     "context": "Play sounds for system events",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1235",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1238",
     "comment": ""
   },
   {
     "term": "Plugged In",
     "context": "Plugged In",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1345",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1414",
     "comment": ""
   },
   {
@@ -2102,7 +2096,7 @@
   {
     "term": "Recent Colors",
     "context": "Recent Colors",
-    "reference": "Modals/DankColorPickerModal.qml:397",
+    "reference": "Modals/DankColorPickerModal.qml:355",
     "comment": ""
   },
   {
@@ -2132,13 +2126,13 @@
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modules/Settings/DankBarTab.qml:1675, Modules/ControlCenter/Components/EditControls.qml:226",
+    "reference": "Modules/Settings/DankBarTab.qml:1675, Modules/ControlCenter/Components/EditControls.qml:227",
     "comment": ""
   },
   {
     "term": "Run User Templates",
     "context": "Run User Templates",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1102",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1105",
     "comment": ""
   },
   {
@@ -2162,7 +2156,7 @@
   {
     "term": "Save",
     "context": "Save",
-    "reference": "Modals/FileBrowser/FileBrowserModal.qml:816, Modules/Notepad/NotepadTextEditor.qml:511, Modules/Notepad/Notepad.qml:476",
+    "reference": "Modals/FileBrowser/FileBrowserModal.qml:818, Modules/Notepad/NotepadTextEditor.qml:511, Modules/Notepad/Notepad.qml:476",
     "comment": ""
   },
   {
@@ -2204,7 +2198,7 @@
   {
     "term": "Search for a location...",
     "context": "Search for a location...",
-    "reference": "Widgets/DankLocationSearch.qml:22",
+    "reference": "Widgets/DankLocationSearch.qml:21",
     "comment": ""
   },
   {
@@ -2216,7 +2210,7 @@
   {
     "term": "Search...",
     "context": "Search...",
-    "reference": "Widgets/DankDropdown.qml:263",
+    "reference": "Widgets/DankDropdown.qml:264",
     "comment": ""
   },
   {
@@ -2228,7 +2222,7 @@
   {
     "term": "Select a color from the palette or use custom sliders",
     "context": "Select a color from the palette or use custom sliders",
-    "reference": "Modals/DankColorPickerModal.qml:191",
+    "reference": "Modals/DankColorPickerModal.qml:145",
     "comment": ""
   },
   {
@@ -2252,7 +2246,7 @@
   {
     "term": "Select monitor to configure wallpaper",
     "context": "Select monitor to configure wallpaper",
-    "reference": "Modules/Settings/PersonalizationTab.qml:540",
+    "reference": "Modules/Settings/PersonalizationTab.qml:543",
     "comment": ""
   },
   {
@@ -2268,9 +2262,15 @@
     "comment": ""
   },
   {
+    "term": "Select system sound theme",
+    "context": "Select system sound theme",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1309",
+    "comment": ""
+  },
+  {
     "term": "Select which transitions to include in randomization",
     "context": "Select which transitions to include in randomization",
-    "reference": "Modules/Settings/PersonalizationTab.qml:877",
+    "reference": "Modules/Settings/PersonalizationTab.qml:880",
     "comment": ""
   },
   {
@@ -2288,13 +2288,13 @@
   {
     "term": "Set different wallpapers for each connected monitor",
     "context": "Set different wallpapers for each connected monitor",
-    "reference": "Modules/Settings/PersonalizationTab.qml:505",
+    "reference": "Modules/Settings/PersonalizationTab.qml:508",
     "comment": ""
   },
   {
     "term": "Set different wallpapers for light and dark mode",
     "context": "Set different wallpapers for light and dark mode",
-    "reference": "Modules/Settings/PersonalizationTab.qml:448",
+    "reference": "Modules/Settings/PersonalizationTab.qml:451",
     "comment": ""
   },
   {
@@ -2409,6 +2409,12 @@
     "term": "Sort Alphabetically",
     "context": "Sort Alphabetically",
     "reference": "Modules/Settings/LauncherTab.qml:488",
+    "comment": ""
+  },
+  {
+    "term": "Sound Theme",
+    "context": "Sound Theme",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1308",
     "comment": ""
   },
   {
@@ -2534,7 +2540,7 @@
   {
     "term": "System Updates",
     "context": "System Updates",
-    "reference": "Modules/SystemUpdatePopout.qml:89",
+    "reference": "Modules/SystemUpdatePopout.qml:93",
     "comment": ""
   },
   {
@@ -2666,7 +2672,7 @@
   {
     "term": "Transition Effect",
     "context": "Transition Effect",
-    "reference": "Modules/Settings/PersonalizationTab.qml:851",
+    "reference": "Modules/Settings/PersonalizationTab.qml:854",
     "comment": ""
   },
   {
@@ -2708,7 +2714,7 @@
   {
     "term": "Update All",
     "context": "Update All",
-    "reference": "Modules/SystemUpdatePopout.qml:285",
+    "reference": "Modules/SystemUpdatePopout.qml:289",
     "comment": ""
   },
   {
@@ -2742,6 +2748,12 @@
     "comment": ""
   },
   {
+    "term": "Use System Theme",
+    "context": "Use System Theme",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1280",
+    "comment": ""
+  },
+  {
     "term": "Use custom command for update your system",
     "context": "Use custom command for update your system",
     "reference": "Modules/Settings/WidgetTweaksTab.qml:231",
@@ -2756,7 +2768,13 @@
   {
     "term": "Use light theme instead of dark theme",
     "context": "Use light theme instead of dark theme",
-    "reference": "Modules/Settings/PersonalizationTab.qml:945",
+    "reference": "Modules/Settings/PersonalizationTab.qml:948",
+    "comment": ""
+  },
+  {
+    "term": "Use sound theme from system settings",
+    "context": "Use sound theme from system settings",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1286",
     "comment": ""
   },
   {
@@ -2822,19 +2840,19 @@
   {
     "term": "Visual effect used when wallpaper changes",
     "context": "Visual effect used when wallpaper changes",
-    "reference": "Modules/Settings/PersonalizationTab.qml:852",
+    "reference": "Modules/Settings/PersonalizationTab.qml:855",
     "comment": ""
   },
   {
     "term": "Volume Changed",
     "context": "Volume Changed",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1310",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1379",
     "comment": ""
   },
   {
     "term": "Wallpaper",
     "context": "Wallpaper",
-    "reference": "Modules/Settings/PersonalizationTab.qml:107",
+    "reference": "Modules/Settings/PersonalizationTab.qml:110",
     "comment": ""
   },
   {
@@ -2960,7 +2978,7 @@
   {
     "term": "matugen not detected - dynamic theming unavailable",
     "context": "matugen not detected - dynamic theming unavailable",
-    "reference": "Modules/Settings/PersonalizationTab.qml:1129",
+    "reference": "Modules/Settings/PersonalizationTab.qml:1132",
     "comment": ""
   },
   {

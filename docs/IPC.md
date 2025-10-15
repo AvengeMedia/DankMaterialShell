@@ -418,6 +418,12 @@ Application launcher modal control.
 - `open` - Show the spotlight launcher
 - `close` - Hide the spotlight launcher
 - `toggle` - Toggle spotlight launcher visibility
+- `openQuery <query>` - Show the spotlight launcher with pre-filled search query
+  - Parameters: `query` - Search text to pre-fill in the search box
+  - Returns: Success confirmation
+- `toggleQuery <query>` - Toggle spotlight launcher with pre-filled search query
+  - Parameters: `query` - Search text to pre-fill in the search box (only used when opening)
+  - Returns: Success confirmation
 
 ### Target: `clipboard`
 Clipboard history modal control.
@@ -509,6 +515,10 @@ File browser controls for selecting wallpapers and profile images.
 ```bash
 # Open application launcher
 dms ipc call spotlight toggle
+
+# Open spotlight with pre-filled search
+dms ipc call spotlight openQuery browser
+dms ipc call spotlight toggleQuery "!"
 
 # Show clipboard history
 dms ipc call clipboard open

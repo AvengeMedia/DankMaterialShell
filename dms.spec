@@ -6,7 +6,7 @@
 
 Name:           dms
 Version:        %{version}
-Release:        1%{?dist}
+Release:        0.git%{?dist}
 Summary:        %{pkg_summary}
 
 License:        GPL-3.0-only

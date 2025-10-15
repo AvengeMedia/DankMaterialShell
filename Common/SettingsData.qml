@@ -168,6 +168,7 @@ Singleton {
     onNotepadLastCustomTransparencyChanged: saveSettings()
 
     property bool soundsEnabled: true
+    property bool useSystemSoundTheme: false
     property bool soundNewNotification: true
     property bool soundVolumeChanged: true
     property bool soundPluggedIn: true
@@ -416,6 +417,7 @@ Singleton {
                 notepadTransparencyOverride = settings.notepadTransparencyOverride !== undefined ? settings.notepadTransparencyOverride : -1
                 notepadLastCustomTransparency = settings.notepadLastCustomTransparency !== undefined ? settings.notepadLastCustomTransparency : 0.95
                 soundsEnabled = settings.soundsEnabled !== undefined ? settings.soundsEnabled : true
+                useSystemSoundTheme = settings.useSystemSoundTheme !== undefined ? settings.useSystemSoundTheme : false
                 soundNewNotification = settings.soundNewNotification !== undefined ? settings.soundNewNotification : true
                 soundVolumeChanged = settings.soundVolumeChanged !== undefined ? settings.soundVolumeChanged : true
                 soundPluggedIn = settings.soundPluggedIn !== undefined ? settings.soundPluggedIn : true
@@ -582,6 +584,7 @@ Singleton {
                                                 "notepadTransparencyOverride": notepadTransparencyOverride,
                                                 "notepadLastCustomTransparency": notepadLastCustomTransparency,
                                                 "soundsEnabled": soundsEnabled,
+                                                "useSystemSoundTheme": useSystemSoundTheme,
                                                 "soundNewNotification": soundNewNotification,
                                                 "soundVolumeChanged": soundVolumeChanged,
                                                 "soundPluggedIn": soundPluggedIn,
@@ -677,7 +680,7 @@ Singleton {
             "fontWeight", "fontScale", "dankBarFontScale", "notepadUseMonospace",
             "notepadFontFamily", "notepadFontSize", "notepadShowLineNumbers",
             "notepadTransparencyOverride", "notepadLastCustomTransparency", "soundsEnabled",
-            "soundNewNotification", "soundVolumeChanged", "soundPluggedIn", "gtkThemingEnabled",
+            "useSystemSoundTheme", "soundNewNotification", "soundVolumeChanged", "soundPluggedIn", "gtkThemingEnabled",
             "qtThemingEnabled", "showDock", "dockAutoHide", "dockGroupByApp",
             "dockOpenOnOverview", "dockPosition", "dockSpacing", "dockBottomGap",
             "cornerRadius", "notificationOverlayEnabled", "dankBarAutoHide",
@@ -1360,6 +1363,11 @@ Singleton {
 
     function setSoundsEnabled(enabled) {
         soundsEnabled = enabled
+        saveSettings()
+    }
+
+    function setUseSystemSoundTheme(enabled) {
+        useSystemSoundTheme = enabled
         saveSettings()
     }
 

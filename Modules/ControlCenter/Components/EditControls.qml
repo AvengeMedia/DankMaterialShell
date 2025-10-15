@@ -69,6 +69,7 @@ Row {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 spacing: Theme.spacingS
+                clip: true
                 model: root.availableWidgets
 
                 delegate: Rectangle {

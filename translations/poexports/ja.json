@@ -2,9 +2,6 @@
     "%1 characters": {
         "%1 characters": "%1 文字"
     },
-    "%1/%2": {
-        "%1/%2": "%1/%2"
-    },
     "(Unnamed)": {
         "(Unnamed)": "（名前なし）"
     },
@@ -70,9 +67,6 @@
     },
     "Animation Speed": {
         "Animation Speed": "アニメーション速度"
-    },
-    "Animations": {
-        "Animations": "アニメーション"
     },
     "App Launcher": {
         "App Launcher": "アプリランチャー"
@@ -302,9 +296,6 @@
     "Control currently playing media": {
         "Control currently playing media": "現在再生中のメディアを制御"
     },
-    "Control the speed of animations throughout the interface": {
-        "Control the speed of animations throughout the interface": "インターフェース全体のアニメーションの速度を制御"
-    },
     "Copied to clipboard": {
         "Copied to clipboard": "クリップボードにコピーしました"
     },
@@ -406,9 +397,6 @@
     },
     "Disk Usage": {
         "Disk Usage": "ディスク使用率"
-    },
-    "Display Settings": {
-        "Display Settings": "表示設定"
     },
     "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
         "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "画面の上、下、左、右の端に配置できる、ピン留めされた実行中のアプリケーションを含むドックを表示します"
@@ -920,9 +908,6 @@
     "Position": {
         "Position": "位置"
     },
-    "Power": {
-        "Power": "電源"
-    },
     "Power Off": {
         "Power Off": "電源オフ"
     },
@@ -1199,9 +1184,6 @@
     "This will permanently delete all clipboard history.": {
         "This will permanently delete all clipboard history.": "これはすべてのクリップボード履歴を完全に削除します。"
     },
-    "Time & Date": {
-        "Time & Date": "時間と日付"
-    },
     "Today": {
         "Today": "今日"
     },
@@ -1418,9 +1400,6 @@
     "Gamma Control": {
         "Gamma Control": "ガンマ設定"
     },
-    "Idle & Lock Screen": {
-        "Idle & Lock Screen": "アイドルおよびロックスクリーン"
-    },
     "Matugen Settings": {
         "Matugen Settings": "Matugen設定"
     },
@@ -1434,27 +1413,126 @@
         "loginctl not available - lock integration requires DMS socket connection": "loginctlが利用できません- ロック統合のためにDMS socketの接続が必要です。"
     },
     "Auto Popup Gaps": {
-        "Auto Popup Gaps": ""
+        "Auto Popup Gaps": "自動ポップアップギャップ"
     },
     "Automatically calculate popup distance from bar edge.": {
-        "Automatically calculate popup distance from bar edge.": ""
+        "Automatically calculate popup distance from bar edge.": "バーの端からのポップアップ距離を自動的に計算。"
     },
     "Manual Gap Size": {
-        "Manual Gap Size": ""
+        "Manual Gap Size": "手動ギャップサイズ"
     },
     "System Updater": {
-        "System Updater": ""
+        "System Updater": "システムアップデーター"
     },
     "System update custom command": {
-        "System update custom command": ""
+        "System update custom command": "システム更新カスタムコマンド"
     },
     "Terminal custom additional parameters": {
-        "Terminal custom additional parameters": ""
+        "Terminal custom additional parameters": "端末のカスタム追加パラメーター"
     },
     "Use Custom Command": {
-        "Use Custom Command": ""
+        "Use Custom Command": "カスタムコマンドを使用"
     },
     "Use custom command for update your system": {
-        "Use custom command for update your system": ""
+        "Use custom command for update your system": "カスタムコマンドを使用してシステムを更新"
+    },
+    "1 event": {
+        "1 event": "1件のイベント"
+    },
+    "All day": {
+        "All day": "毎日"
+    },
+    "Anonymous Identity (optional)": {
+        "Anonymous Identity (optional)": "匿名 ID (オプション)"
+    },
+    "Automatically lock the screen when the system prepares to suspend": {
+        "Automatically lock the screen when the system prepares to suspend": "システムが一時停止の準備中に自動的に画面をロック"
+    },
+    "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
+        "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "ロック画面をloginctlからのdbus信号にバインド。外部ロック画面を使用している場合は無効に"
+    },
+    "Enable System Sounds": {
+        "Enable System Sounds": "システムサウンドを有効に"
+    },
+    "Enable fingerprint authentication": {
+        "Enable fingerprint authentication": "指紋認証を有効に"
+    },
+    "Enter credentials for ": {
+        "Enter credentials for ": "資格情報を入力"
+    },
+    "Enter password for ": {
+        "Enter password for ": "パスワードを入力"
+    },
+    "New Notification": {
+        "New Notification": "新しい通知"
+    },
+    "Password": {
+        "Password": "パスワード"
+    },
+    "Play sound when new notification arrives": {
+        "Play sound when new notification arrives": "新しい通知が届いたときにサウンドを再生"
+    },
+    "Play sound when power cable is connected": {
+        "Play sound when power cable is connected": "電源ケーブルを接続したときにサウンドを再生"
+    },
+    "Play sound when volume is adjusted": {
+        "Play sound when volume is adjusted": "音量を調整したときにサウンドを再生"
+    },
+    "Play sounds for system events": {
+        "Play sounds for system events": "システムイベントが発生したときにサウンドを再生"
+    },
+    "Plugged In": {
+        "Plugged In": "接続"
+    },
+    "Power & Security": {
+        "Power & Security": "電源とセキュリティ"
+    },
+    "Power Action Confirmation": {
+        "Power Action Confirmation": "電源アクションの確認"
+    },
+    "Realm / Domain (optional)": {
+        "Realm / Domain (optional)": "レルム/ドメイン(オプション)"
+    },
+    "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
+        "Request confirmation on power off, restart, suspend, hibernate and logout actions": "電源オフ、再起動、一時停止、休止状態、ログアウトアクションの確認を要求"
+    },
+    "Server Domain for certificate (optional)": {
+        "Server Domain for certificate (optional)": "証明書のサーバードメイン(オプション)"
+    },
+    "Show Confirmation on Power Actions": {
+        "Show Confirmation on Power Actions": "電源アクションの確認を表示"
+    },
+    "Show power, restart, and logout buttons on the lock screen": {
+        "Show power, restart, and logout buttons on the lock screen": "ロック画面に電源ボタン、再起動ボタン、ログアウトボタンを表示"
+    },
+    "Sort Alphabetically": {
+        "Sort Alphabetically": "アルファベット順に並べ替える"
+    },
+    "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
+        "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "ロック画面認証に指紋リーダーを使用(登録された指紋が必要)"
+    },
+    "Username": {
+        "Username": "ユーザー名"
+    },
+    "Volume Changed": {
+        "Volume Changed": "音量変更"
+    },
+    "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
+        "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "有効にすると、アプリはアルファベット順に並べ替えられます。無効にすると、アプリは使用頻度で並べ替えられます。"
+    },
+    "events": {
+        "events": "イベント"
+    },
+    "Select system sound theme": {
+        "Select system sound theme": ""
+    },
+    "Sound Theme": {
+        "Sound Theme": ""
+    },
+    "Use System Theme": {
+        "Use System Theme": ""
+    },
+    "Use sound theme from system settings": {
+        "Use sound theme from system settings": ""
     }
 }
