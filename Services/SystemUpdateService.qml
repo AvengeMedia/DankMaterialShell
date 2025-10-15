@@ -197,7 +197,7 @@ Singleton {
     }
 
     function checkForUpdates() {
-        if (!distributionSupported || (!pkgManager || !updChecker) || isChecking) return
+        if (!distributionSupported || (!pkgManager && !updChecker) || isChecking) return
 
         isChecking = true
         hasError = false
