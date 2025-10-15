@@ -2,7 +2,7 @@ name: POEditor Diff & Sync
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch: {}
 
 concurrency:
@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   diff-and-trigger:
+    if: github.repository == 'AvengeMedia/DankMaterialShell'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
