@@ -220,7 +220,7 @@ DankPopout {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: parent.width - 24 - Theme.spacingM
+                                        width: parent.width - Theme.spacingM
                                         spacing: 2
 
                                         StyledText {
@@ -262,14 +262,14 @@ DankPopout {
                     width: parent.width
                     height: 48
                     spacing: Theme.spacingM
-                    
+
                     Rectangle {
                         width: (parent.width - Theme.spacingM) / 2
                         height: parent.height
                         radius: Theme.cornerRadius
                         color: updateMouseArea.containsMouse ? Theme.primaryHover : Theme.secondaryHover
                         opacity: SystemUpdateService.updateCount > 0 ? 1.0 : 0.5
-                        
+
                         Behavior on color {
                             ColorAnimation { duration: Theme.shortDuration }
                         }
@@ -306,14 +306,14 @@ DankPopout {
                             }
                         }
                     }
-                    
+
 
                     Rectangle {
                         width: (parent.width - Theme.spacingM) / 2
                         height: parent.height
                         radius: Theme.cornerRadius
                         color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.secondaryHover
-                            
+
                         Behavior on color {
                             ColorAnimation { duration: Theme.shortDuration }
                         }
