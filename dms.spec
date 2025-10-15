@@ -5,8 +5,9 @@
 %global pkg_summary DankMaterialShell - Material 3 inspired shell for Wayland compositors
 
 Name:           dms
+Epoch:          1
 Version:        %{version}
-Release:        0.git%{?dist}
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 
 License:        GPL-3.0-only

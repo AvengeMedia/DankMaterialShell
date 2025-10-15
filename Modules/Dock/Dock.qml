@@ -91,7 +91,12 @@ Variants {
     }
 
     screen: modelData
-    visible: SettingsData.showDock || (CompositorService.isNiri && SettingsData.dockOpenOnOverview && NiriService.inOverview)
+    visible: {
+        if (CompositorService.isNiri && NiriService.inOverview) {
+            return SettingsData.dockOpenOnOverview
+        }
+        return SettingsData.showDock
+    }
     color: "transparent"
 
 

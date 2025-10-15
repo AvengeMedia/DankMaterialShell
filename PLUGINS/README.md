@@ -561,6 +561,10 @@ PluginService.getWidgetComponents(): object
 // Data Persistence
 PluginService.savePluginData(pluginId: string, key: string, value: any): bool
 PluginService.loadPluginData(pluginId: string, key: string, defaultValue: any): any
+
+// Global Variables - Shared state across all plugin instances
+PluginService.getGlobalVar(pluginId: string, varName: string, defaultValue: any): any
+PluginService.setGlobalVar(pluginId: string, varName: string, value: any): void
 ```
 
 ### Signals
@@ -569,7 +573,123 @@ PluginService.loadPluginData(pluginId: string, key: string, defaultValue: any): 
 PluginService.pluginLoaded(pluginId: string)
 PluginService.pluginUnloaded(pluginId: string)
 PluginService.pluginLoadFailed(pluginId: string, error: string)
+PluginService.globalVarChanged(pluginId: string, varName: string)
 ```
+
+## Plugin Global Variables
+
+Plugins can share state across multiple instances using global variables. This is useful when you have the same widget displayed on multiple monitors or multiple instances of the same widget on different bars.
+
+### Why Use Global Variables?
+
+Unlike regular properties which are scoped to each component instance, global variables are synchronized across all instances of your plugin. This enables:
+
+- **Multi-monitor consistency**: Same data displayed across all monitors
+- **Multi-instance widgets**: Multiple instances of the same widget sharing state
+- **Cross-component communication**: Share data between widget and settings components
+
+### Using PluginGlobalVar
+
+The `PluginGlobalVar` helper component provides reactive global variable access:
+
+```qml
+import QtQuick
+import qs.Widgets
+import qs.Modules.Plugins
+
+PluginComponent {
+    PluginGlobalVar {
+        id: globalCounter
+        varName: "counter"
+        defaultValue: 0
+    }
+
+    horizontalBarPill: Component {
+        StyledRect {
+            width: content.implicitWidth + Theme.spacingM * 2
+            height: parent.widgetThickness
+            radius: Theme.cornerRadius
+            color: Theme.surfaceContainerHigh
+
+            StyledText {
+                id: content
+                anchors.centerIn: parent
+                text: "Count: " + globalCounter.value
+                color: Theme.surfaceText
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: globalCounter.set(globalCounter.value + 1)
+            }
+        }
+    }
+}
+```
+
+**PluginGlobalVar Properties:**
+- `varName` (required): Name of the global variable
+- `defaultValue` (optional): Default value if not set
+- `value` (readonly): Current value of the global variable
+
+**PluginGlobalVar Methods:**
+- `set(newValue)`: Update the global variable (triggers reactivity across all instances)
+
+### Using PluginService API Directly
+
+For more control, use the PluginService API directly:
+
+```qml
+import QtQuick
+import qs.Services
+import qs.Modules.Plugins
+
+PluginComponent {
+    property int counter: PluginService.getGlobalVar("myPlugin", "counter", 0)
+
+    Connections {
+        target: PluginService
+        function onGlobalVarChanged(pluginId, varName) {
+            if (pluginId === "myPlugin" && varName === "counter") {
+                counter = PluginService.getGlobalVar("myPlugin", "counter", 0)
+            }
+        }
+    }
+
+    horizontalBarPill: Component {
+        StyledRect {
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    const current = PluginService.getGlobalVar("myPlugin", "counter", 0)
+                    PluginService.setGlobalVar("myPlugin", "counter", current + 1)
+                }
+            }
+        }
+    }
+}
+```
+
+### Global Variables vs Settings
+
+**Global Variables** (`getGlobalVar`/`setGlobalVar`):
+- Runtime state only (not persisted to disk)
+- Synchronized across all plugin instances
+- Changes trigger `globalVarChanged` signal for reactivity
+- Use for: counters, current selection, temporary UI state
+
+**Settings** (`savePluginData`/`loadPluginData`):
+- Persisted to `settings.json` across sessions
+- Loaded once per plugin instance
+- Use for: user preferences, API keys, configuration
+
+### Important Notes
+
+1. **Reactivity**: Global variables are reactive - all instances update when a value changes
+2. **Namespacing**: Variables are namespaced by plugin ID to avoid conflicts
+3. **Type Safety**: Values can be any QML/JavaScript type (numbers, strings, objects, arrays)
+4. **Not Persistent**: Global variables are cleared when the shell restarts (use settings for persistence)
+5. **Performance**: Efficient for frequent updates - changes only trigger updates for the specific variable
 
 ## Creating a Plugin
 

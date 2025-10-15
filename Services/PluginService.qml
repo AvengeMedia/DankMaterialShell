@@ -30,12 +30,14 @@ Singleton {
     property var knownManifests: ({})
     property var pathToPluginId: ({})
     property var pluginInstances: ({})
+    property var globalVars: ({})
 
     signal pluginLoaded(string pluginId)
     signal pluginUnloaded(string pluginId)
     signal pluginLoadFailed(string pluginId, string error)
     signal pluginDataChanged(string pluginId)
     signal pluginListUpdated()
+    signal globalVarChanged(string pluginId, string varName)
 
     Timer {
         id: resyncDebounce
@@ -588,5 +590,23 @@ Singleton {
             }
         }
         return plugins
+    }
+
+    function getGlobalVar(pluginId, varName, defaultValue) {
+        if (globalVars[pluginId] && varName in globalVars[pluginId]) {
+            return globalVars[pluginId][varName]
+        }
+        return defaultValue
+    }
+
+    function setGlobalVar(pluginId, varName, value) {
+        const newGlobals = Object.assign({}, globalVars)
+        if (!newGlobals[pluginId]) {
+            newGlobals[pluginId] = {}
+        }
+        newGlobals[pluginId] = Object.assign({}, newGlobals[pluginId])
+        newGlobals[pluginId][varName] = value
+        globalVars = newGlobals
+        globalVarChanged(pluginId, varName)
     }
 }
