@@ -178,29 +178,49 @@ Singleton {
     }
 
     function _logout() {
-        if (CompositorService.isNiri) {
-            NiriService.quit()
-            return
-        }
+        if (SettingsData.customPowerActionLogout.length === 0) {
+            if (CompositorService.isNiri) {
+                NiriService.quit()
+                return
+            }
 
-        // Hyprland fallback
-        Hyprland.dispatch("exit")
+            // Hyprland fallback
+            Hyprland.dispatch("exit")
+        } else {
+            Quickshell.execDetached(SettingsData.customPowerActionLogout.split(" "))
+        }
     }
 
     function suspend() {
-        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend"])
+        if (SettingsData.customPowerActionSuspend.length === 0) {
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend"])
+        } else {
+            Quickshell.execDetached(SettingsData.customPowerActionSuspend.split(" "))
+        }
     }
 
     function hibernate() {
-        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "hibernate"])
+        if (SettingsData.customPowerActionHibernate.length === 0) {
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "hibernate"])
+        } else {
+            Quickshell.execDetached(SettingsData.customPowerActionHibernate.split(" "))
+        }
     }
 
     function reboot() {
-        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "reboot"])
+        if (SettingsData.customPowerActionReboot.length === 0) {
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "reboot"])
+        } else {
+            Quickshell.execDetached(SettingsData.customPowerActionReboot.split(" "))
+        }
     }
 
     function poweroff() {
-        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "poweroff"])
+        if (SettingsData.customPowerActionPowerOff.length === 0) {
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "poweroff"])
+        } else {
+            Quickshell.execDetached(SettingsData.customPowerActionPowerOff.split(" "))
+        }
     }
 
     // * Idle Inhibitor
