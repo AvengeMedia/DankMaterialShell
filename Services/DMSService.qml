@@ -40,6 +40,7 @@ Singleton {
     signal networkStateUpdate(var data)
     signal loginctlStateUpdate(var data)
     signal loginctlEvent(var event)
+    signal capabilitiesReceived()
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -256,6 +257,8 @@ Singleton {
             if (apiVersion < expectedApiVersion) {
                 ToastService.showError("DMS server is outdated (API v" + apiVersion + ", expected v" + expectedApiVersion + ")")
             }
+
+            capabilitiesReceived()
         } else if (service === "network") {
             networkStateUpdate(data)
         } else if (service === "loginctl") {

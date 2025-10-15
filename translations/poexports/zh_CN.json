@@ -1422,7 +1422,7 @@
         "Manual Gap Size": "手动设置间距大小"
     },
     "System Updater": {
-        "System Updater": "系统更新器"
+        "System Updater": "系统更新"
     },
     "System update custom command": {
         "System update custom command": "自定义系统更新命令"
@@ -1458,7 +1458,7 @@
         "Enable fingerprint authentication": "启用指纹认证"
     },
     "Enter credentials for ": {
-        "Enter credentials for ": "输入凭据"
+        "Enter credentials for ": "输入凭据 "
     },
     "Enter password for ": {
         "Enter password for ": "输入密码"
@@ -1473,7 +1473,7 @@
         "Play sound when new notification arrives": "有新通知时播放声音"
     },
     "Play sound when power cable is connected": {
-        "Play sound when power cable is connected": "当电源线连接时播放声音"
+        "Play sound when power cable is connected": "连接电源线时播放声音"
     },
     "Play sound when volume is adjusted": {
         "Play sound when volume is adjusted": "当音量调整时播放声音"
@@ -1482,7 +1482,7 @@
         "Play sounds for system events": "为系统事件播放声音"
     },
     "Plugged In": {
-        "Plugged In": "已接入"
+        "Plugged In": "连接电源"
     },
     "Power & Security": {
         "Power & Security": "电源与安全"
@@ -1524,15 +1524,15 @@
         "events": "事件"
     },
     "Select system sound theme": {
-        "Select system sound theme": ""
+        "Select system sound theme": "选择系统声音主题"
     },
     "Sound Theme": {
-        "Sound Theme": ""
+        "Sound Theme": "声音主题"
     },
     "Use System Theme": {
-        "Use System Theme": ""
+        "Use System Theme": "使用系统主题"
     },
     "Use sound theme from system settings": {
-        "Use sound theme from system settings": ""
+        "Use sound theme from system settings": "使用系统设置中的声音主题"
     }
 }

@@ -4,8 +4,9 @@
     "description": "Example plugin with Control Center toggle widget",
     "version": "1.0.0",
     "author": "DankMaterialShell",
-    "icon": "toggle_on",
     "type": "widget",
+    "capabilities": ["control-center"],
     "component": "./ControlCenterExampleWidget.qml",
+    "icon": "toggle_on",
     "permissions": ["settings_read", "settings_write"]
 }

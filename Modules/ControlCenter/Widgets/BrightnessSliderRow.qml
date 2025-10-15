@@ -8,8 +8,48 @@ import qs.Widgets
 Row {
     id: root
 
+    property string deviceName: ""
+    property string instanceId: ""
+
+    signal iconClicked()
+
     height: 40
     spacing: 0
+
+    property string targetDeviceName: {
+        if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
+            return ""
+        }
+
+        if (deviceName && deviceName.length > 0) {
+            const found = DisplayService.devices.find(dev => dev.name === deviceName)
+            return found ? found.name : ""
+        }
+
+        const currentDeviceName = DisplayService.currentDevice
+        if (currentDeviceName) {
+            const found = DisplayService.devices.find(dev => dev.name === currentDeviceName)
+            return found ? found.name : ""
+        }
+
+        return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : ""
+    }
+
+    property var targetDevice: {
+        if (!targetDeviceName || !DisplayService.devices) {
+            return null
+        }
+
+        return DisplayService.devices.find(dev => dev.name === targetDeviceName) || null
+    }
+
+    property real targetBrightness: {
+        if (!targetDeviceName) {
+            return 0
+        }
+
+        return DisplayService.getDeviceBrightness(targetDeviceName)
+    }
 
     Rectangle {
         width: Theme.iconSize + Theme.spacingS * 2
@@ -24,23 +64,18 @@ Row {
             id: iconArea
             anchors.fill: parent
             hoverEnabled: true
-            cursorShape: DisplayService.devices.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+            cursorShape: DisplayService.devices && DisplayService.devices.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
 
-            onClicked: function(event) {
-                if (DisplayService.devices.length > 1) {
-                    if (deviceMenu.visible) {
-                        deviceMenu.close()
-                    } else {
-                        deviceMenu.popup(iconArea, 0, iconArea.height + Theme.spacingXS)
-                    }
-                    event.accepted = true
+            onClicked: {
+                if (DisplayService.devices && DisplayService.devices.length > 1) {
+                    root.iconClicked()
                 }
             }
 
             onEntered: {
                 tooltipLoader.active = true
                 if (tooltipLoader.item) {
-                    const tooltipText = DisplayService.currentDevice ? "bl device: " + DisplayService.currentDevice : "Backlight Control"
+                    const tooltipText = targetDevice ? "bl device: " + targetDevice.name : "Backlight Control"
                     const p = iconArea.mapToItem(null, iconArea.width / 2, 0)
                     tooltipLoader.item.show(tooltipText, p.x, p.y - 40, null)
                 }
@@ -56,15 +91,23 @@ Row {
             DankIcon {
                 anchors.centerIn: parent
                 name: {
-                    if (!DisplayService.brightnessAvailable) return "brightness_low"
+                    if (!DisplayService.brightnessAvailable || !targetDevice) {
+                        return "brightness_low"
+                    }
 
-                    let brightness = DisplayService.brightnessLevel
-                    if (brightness <= 33) return "brightness_low"
-                    if (brightness <= 66) return "brightness_medium"
-                    return "brightness_high"
+                    if (targetDevice.class === "backlight" || targetDevice.class === "ddc") {
+                        const brightness = targetBrightness
+                        if (brightness <= 33) return "brightness_low"
+                        if (brightness <= 66) return "brightness_medium"
+                        return "brightness_high"
+                    } else if (targetDevice.name.includes("kbd")) {
+                        return "keyboard"
+                    } else {
+                        return "lightbulb"
+                    }
                 }
                 size: Theme.iconSize
-                color: DisplayService.brightnessAvailable && DisplayService.brightnessLevel > 0 ? Theme.primary : Theme.surfaceText
+                color: DisplayService.brightnessAvailable && targetDevice && targetBrightness > 0 ? Theme.primary : Theme.surfaceText
             }
         }
     }
@@ -72,86 +115,17 @@ Row {
     DankSlider {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
-        enabled: DisplayService.brightnessAvailable
+        enabled: DisplayService.brightnessAvailable && targetDeviceName.length > 0
         minimum: 1
         maximum: 100
-        value: {
-            let level = DisplayService.brightnessLevel
-            if (level > 100) {
-                let deviceInfo = DisplayService.getCurrentDeviceInfo()
-                if (deviceInfo && deviceInfo.max > 0) {
-                    return Math.round((level / deviceInfo.max) * 100)
-                }
-                return 50
-            }
-            return level
-        }
+        value: targetBrightness
         onSliderValueChanged: function(newValue) {
-            if (DisplayService.brightnessAvailable) {
-                DisplayService.setBrightness(newValue)
+            if (DisplayService.brightnessAvailable && targetDeviceName) {
+                DisplayService.setBrightness(newValue, targetDeviceName)
             }
         }
         thumbOutlineColor: Theme.surfaceContainer
         trackColor: Theme.surfaceContainerHigh
-    }
-
-    Menu {
-        id: deviceMenu
-        width: 200
-        closePolicy: Popup.CloseOnEscape
-        
-        background: Rectangle {
-            color: Theme.popupBackground()
-            radius: Theme.cornerRadius
-            border.width: 0
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-        }
-        
-        Instantiator {
-            model: DisplayService.devices
-            delegate: MenuItem {
-                required property var modelData
-                required property int index
-                
-                property string deviceName: modelData.name || ""
-                property string deviceClass: modelData.class || ""
-                
-                text: deviceName
-                font.pixelSize: Theme.fontSizeMedium
-                height: 40
-                
-                indicator: Rectangle {
-                    visible: DisplayService.currentDevice === parent.deviceName
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.leftMargin: Theme.spacingS
-                    width: 4
-                    height: parent.height - Theme.spacingS * 2
-                    radius: 2
-                    color: Theme.primary
-                }
-                
-                contentItem: StyledText {
-                    text: parent.text
-                    font: parent.font
-                    color: DisplayService.currentDevice === parent.deviceName ? Theme.primary : Theme.surfaceText
-                    leftPadding: Theme.spacingL
-                    verticalAlignment: Text.AlignVCenter
-                }
-                
-                background: Rectangle {
-                    color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
-                    radius: Theme.cornerRadius / 2
-                }
-                
-                onTriggered: {
-                    DisplayService.setCurrentDevice(deviceName, true)
-                    deviceMenu.close()
-                }
-            }
-            onObjectAdded: (index, object) => deviceMenu.insertItem(index, object)
-            onObjectRemoved: (index, object) => deviceMenu.removeItem(object)
-        }
     }
 
     Loader {

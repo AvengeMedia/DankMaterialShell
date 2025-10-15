@@ -29,22 +29,18 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # create/update VERSION file to match incoming tag
           echo "${TAG}" > VERSION
-          if ! git diff --quiet -- VERSION; then
-            git add VERSION
-            git commit -m "Add VERSION file for ${TAG} (from DMS)"
+
+          git add -A VERSION
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update VERSION to ${TAG} (from DMS)"
           fi
 
-          # If tag doesn't exist (or differs), (re)create it
-          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists"
-          else
-            git tag "${TAG}"
-          fi
+          git tag -f "${TAG}"
 
-          # Push commit (if any) and tag
-          git push --follow-tags origin HEAD
+          git push origin HEAD
+          git push -f origin "${TAG}"
 
       - name: Generate Changelog
         id: changelog

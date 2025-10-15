@@ -24,17 +24,32 @@ Singleton {
 
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
 
+    // List of laptop batteries
+    readonly property var batteries: UPower.devices.values.filter(dev => dev.isLaptopBattery)
+
+    readonly property bool usePreferred: preferredBatteryOverride && preferredBatteryOverride.length > 0
+
+    // Main battery (for backward compatibility)
     readonly property UPowerDevice device: {
         var preferredDev
-        if (preferredBatteryOverride && preferredBatteryOverride.length > 0) {
-            preferredDev = UPower.devices.values.find(dev => dev.nativePath.toLowerCase().includes(preferredBatteryOverride.toLowerCase()))
+        if (usePreferred) {
+            preferredDev = batteries.find(dev => dev.nativePath.toLowerCase().includes(preferredBatteryOverride.toLowerCase()))
         }
-        return preferredDev || UPower.devices.values.find(dev => dev.isLaptopBattery) || null
+        return preferredDev || batteries[0] || null
     }
-    readonly property bool batteryAvailable: device && device.ready
-    readonly property real batteryLevel: batteryAvailable ? Math.round(device.percentage * 100) : 0
-    readonly property bool isCharging: batteryAvailable && device.state === UPowerDeviceState.Charging && device.changeRate > 0
-    readonly property bool isPluggedIn: batteryAvailable && (device.state !== UPowerDeviceState.Discharging && device.state !== UPowerDeviceState.Empty)
+    // Whether at least one battery is available
+    readonly property bool batteryAvailable: batteries.length > 0
+    // Aggregated charge level (percentage)
+    readonly property real batteryLevel: {
+        if (!batteryAvailable)
+        return 0
+        return Math.round((batteryEnergy * 100) / batteryCapacity)
+    }
+    // Is any battery charging (at least one has changeRate > 0)
+    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging && b.changeRate > 0)
+
+    // Is the system plugged in (none of the batteries are discharging or empty)
+    readonly property bool isPluggedIn: batteryAvailable && batteries.every(b => b.state !== UPowerDeviceState.Discharging)
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
 
     onIsPluggedInChanged: {
@@ -53,29 +68,56 @@ Singleton {
 
         previousPluggedState = isPluggedIn
     }
-    readonly property string batteryHealth: {
-        if (!batteryAvailable) {
-            return "N/A"
-        }
 
-        if (device.healthSupported && device.healthPercentage > 0) {
-            return `${Math.round(device.healthPercentage)}%`
-        }
-
-        return "N/A"
+    // Aggregated charge/discharge rate
+    readonly property real changeRate: {
+        if (!batteryAvailable) return 0
+        if (usePreferred && device && device.ready) return device.changeRate
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.changeRate, 0) : 0
     }
-    readonly property real batteryCapacity: batteryAvailable && device.energyCapacity > 0 ? device.energyCapacity : 0
+
+    // Aggregated battery health
+    readonly property string batteryHealth: {
+        if (!batteryAvailable) return "N/A"
+
+        // If a preferred battery is selected and ready
+        if (usePreferred && device && device.ready && device.healthSupported) return `${Math.round(device.healthPercentage)}%`
+
+        // Otherwise, calculate the average health of all laptop batteries
+        const validBatteries = batteries.filter(b => b.healthSupported && b.healthPercentage > 0)
+        if (validBatteries.length === 0) return "N/A"
+
+        const avgHealth = validBatteries.reduce((sum, b) => sum + b.healthPercentage, 0) / validBatteries.length
+        return `${Math.round(avgHealth)}%`
+    }
+
+    readonly property real batteryEnergy: {
+        if (!batteryAvailable) return 0
+        if (usePreferred && device && device.ready) return device.energy
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energy, 0) : 0
+    }
+
+    // Total battery capacity (Wh)
+    readonly property real batteryCapacity: {
+        if (!batteryAvailable) return 0
+        if (usePreferred && device && device.ready) return device.energyCapacity
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energyCapacity, 0) : 0
+    }
+
+    // Aggregated battery status
     readonly property string batteryStatus: {
         if (!batteryAvailable) {
             return "No Battery"
         }
 
-        if (device.state === UPowerDeviceState.Charging && device.changeRate <= 0) {
-            return "Plugged In"
-        }
+        if (isCharging && !batteries.some(b => b.changeRate > 0)) return "Plugged In"
 
-        return UPowerDeviceState.toString(device.state)
+        const states = batteries.map(b => b.state)
+        if (states.every(s => s === states[0])) return UPowerDeviceState.toString(states[0])
+
+        return isCharging ? "Charging" : (isPluggedIn ? "Plugged In" : "Discharging")
     }
+
     readonly property bool suggestPowerSaver: batteryAvailable && isLowBattery && UPower.onBattery && (typeof PowerProfiles !== "undefined" && PowerProfiles.profile !== PowerProfile.PowerSaver)
 
     readonly property var bluetoothDevices: {
@@ -95,25 +137,20 @@ Singleton {
         return btDevices
     }
 
+    // Format time remaining for charge/discharge
     function formatTimeRemaining() {
         if (!batteryAvailable) {
             return "Unknown"
         }
 
-        const timeSeconds = isCharging ? device.timeToFull : device.timeToEmpty
+        let totalTime = 0
+        totalTime = (isCharging) ? ((batteryCapacity - batteryEnergy) / changeRate) : (batteryEnergy / changeRate)
+        const avgTime = Math.abs(totalTime * 3600)
+        if (!avgTime || avgTime <= 0 || avgTime > 86400) return "Unknown"
 
-        if (!timeSeconds || timeSeconds <= 0 || timeSeconds > 86400) {
-            return "Unknown"
-        }
-
-        const hours = Math.floor(timeSeconds / 3600)
-        const minutes = Math.floor((timeSeconds % 3600) / 60)
-
-        if (hours > 0) {
-            return `${hours}h ${minutes}m`
-        }
-
-        return `${minutes}m`
+        const hours = Math.floor(avgTime / 3600)
+        const minutes = Math.floor((avgTime % 3600) / 60)
+        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`
     }
 
     function getBatteryIcon() {

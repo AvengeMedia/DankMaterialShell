@@ -61,7 +61,9 @@ Item {
             property bool gothCornersEnabled: SettingsData.dankBarGothCornersEnabled
             property real wingtipsRadius: Theme.cornerRadius
             readonly property real _wingR: Math.max(0, wingtipsRadius)
-            readonly property color _bgColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency)
+            readonly property color _surfaceContainer: Theme.surfaceContainer
+            readonly property real _backgroundAlpha: topBarCore?.backgroundTransparency ?? SettingsData.dankBarTransparency
+            readonly property color _bgColor: Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
             readonly property real _dpr: {
                 if (CompositorService.isNiri && barWindow.screen) {
                     const niriScale = NiriService.displayScales[barWindow.screen.name]

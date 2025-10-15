@@ -10,13 +10,14 @@ IconImage {
     property real contrastOverride: 1
 
     readonly property bool hasColorOverride: colorOverride !== ""
+    readonly property string uniqueId: `systemLogo_${Math.random()}`
 
     smooth: true
     asynchronous: true
     layer.enabled: hasColorOverride
 
     Component.onCompleted: {
-        Proc.runCommand("systemLogo", ["sh", "-c", ". /etc/os-release && echo $LOGO"], (output, exitCode) => {
+        Proc.runCommand(uniqueId, ["sh", "-c", ". /etc/os-release && echo $LOGO"], (output, exitCode) => {
             if (exitCode !== 0) return
             const logo = output.trim()
             if (logo === "cachyos") {

@@ -1,5 +1,7 @@
 import QtQuick
+import Quickshell.Hyprland
 import qs.Common
+import qs.Services
 
 Item {
     id: root
@@ -15,6 +17,18 @@ Item {
     anchors.rightMargin: -(SettingsData.dankBarGothCornersEnabled && axis.isVertical && axis.edge === "left" ? barWindow._wingR : 0)
     anchors.topMargin: -(SettingsData.dankBarGothCornersEnabled && !axis.isVertical && axis.edge === "bottom" ? barWindow._wingR : 0)
     anchors.bottomMargin: -(SettingsData.dankBarGothCornersEnabled && !axis.isVertical && axis.edge === "top" ? barWindow._wingR : 0)
+
+    readonly property real dpr: {
+        if (CompositorService.isNiri && barWindow.screen) {
+            const niriScale = NiriService.displayScales[barWindow.screen.name]
+            if (niriScale !== undefined) return niriScale
+        }
+        if (CompositorService.isHyprland && barWindow.screen) {
+            const hyprlandMonitor = Hyprland.monitors.values.find(m => m.name === barWindow.screen.name)
+            if (hyprlandMonitor?.scale !== undefined) return hyprlandMonitor.scale
+        }
+        return barWindow.screen?.devicePixelRatio || 1
+    }
 
     function requestRepaint() {
         debounceTimer.restart()
@@ -38,12 +52,12 @@ Item {
         renderTarget: Canvas.FramebufferObject
         renderStrategy: Canvas.Cooperative
 
-        readonly property real correctWidth: root.width
-        readonly property real correctHeight: root.height
-        canvasSize: Qt.size(Math.ceil(correctWidth), Math.ceil(correctHeight))
+        readonly property real correctWidth: Theme.px(root.width, dpr)
+        readonly property real correctHeight: Theme.px(root.height, dpr)
+        canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? barWindow._wingR : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
+        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
 
         onWingChanged: root.requestRepaint()
         onRtChanged: root.requestRepaint()
@@ -51,6 +65,11 @@ Item {
         onCorrectHeightChanged: root.requestRepaint()
         onVisibleChanged: if (visible) root.requestRepaint()
         Component.onCompleted: root.requestRepaint()
+
+        Connections {
+            target: root
+            function onDprChanged() { root.requestRepaint() }
+        }
 
         Connections {
             target: barWindow
@@ -101,7 +120,7 @@ Item {
             }
 
             ctx.reset()
-            ctx.clearRect(0, 0, Math.ceil(W), Math.ceil(H_raw))
+            ctx.clearRect(0, 0, W, H_raw)
 
             ctx.save()
             if (isBottom) {
@@ -130,12 +149,12 @@ Item {
         renderTarget: Canvas.FramebufferObject
         renderStrategy: Canvas.Cooperative
 
-        readonly property real correctWidth: root.width
-        readonly property real correctHeight: root.height
-        canvasSize: Qt.size(Math.ceil(correctWidth), Math.ceil(correctHeight))
+        readonly property real correctWidth: Theme.px(root.width, dpr)
+        readonly property real correctHeight: Theme.px(root.height, dpr)
+        canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? barWindow._wingR : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
+        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
         property real alphaTint: (barWindow._bgColor?.a ?? 1) < 0.99 ? (Theme.stateLayerOpacity ?? 0) : 0
 
         onWingChanged: root.requestRepaint()
@@ -145,6 +164,11 @@ Item {
         onCorrectHeightChanged: root.requestRepaint()
         onVisibleChanged: if (visible) root.requestRepaint()
         Component.onCompleted: root.requestRepaint()
+
+        Connections {
+            target: root
+            function onDprChanged() { root.requestRepaint() }
+        }
 
         Connections {
             target: barWindow
@@ -195,7 +219,7 @@ Item {
             }
 
             ctx.reset()
-            ctx.clearRect(0, 0, Math.ceil(W), Math.ceil(H_raw))
+            ctx.clearRect(0, 0, W, H_raw)
 
             ctx.save()
             if (isBottom) {
@@ -225,12 +249,12 @@ Item {
         renderTarget: Canvas.FramebufferObject
         renderStrategy: Canvas.Cooperative
 
-        readonly property real correctWidth: root.width
-        readonly property real correctHeight: root.height
-        canvasSize: Qt.size(Math.ceil(correctWidth), Math.ceil(correctHeight))
+        readonly property real correctWidth: Theme.px(root.width, dpr)
+        readonly property real correctHeight: Theme.px(root.height, dpr)
+        canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? barWindow._wingR : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.cornerRadius
+        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
         property bool borderEnabled: SettingsData.dankBarBorderEnabled
 
         onWingChanged: root.requestRepaint()
@@ -240,6 +264,11 @@ Item {
         onCorrectHeightChanged: root.requestRepaint()
         onVisibleChanged: if (visible) root.requestRepaint()
         Component.onCompleted: root.requestRepaint()
+
+        Connections {
+            target: root
+            function onDprChanged() { root.requestRepaint() }
+        }
 
         Connections {
             target: Theme
@@ -257,6 +286,7 @@ Item {
             function onDankBarBorderThicknessChanged() { root.requestRepaint() }
             function onDankBarSpacingChanged() { root.requestRepaint() }
             function onDankBarSquareCornersChanged() { root.requestRepaint() }
+            function onDankBarTransparencyChanged() { root.requestRepaint() }
         }
 
         onPaint: {
@@ -309,7 +339,7 @@ Item {
             }
 
             ctx.reset()
-            ctx.clearRect(0, 0, Math.ceil(W), Math.ceil(H_raw))
+            ctx.clearRect(0, 0, W, H_raw)
 
             ctx.save()
             if (isBottom) {

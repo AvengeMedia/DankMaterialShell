@@ -160,6 +160,8 @@ DankPopout {
                         root.expandedWidgetData = widgetData
                         if (widgetData.id === "diskUsage") {
                             root.toggleSection("diskUsage_" + (widgetData.instanceId || "default"))
+                        } else if (widgetData.id === "brightnessSlider") {
+                            root.toggleSection("brightnessSlider_" + (widgetData.instanceId || "default"))
                         } else {
                             root.toggleSection(widgetData.id)
                         }
@@ -167,6 +169,7 @@ DankPopout {
                     onRemoveWidget: (index) => widgetModel.removeWidget(index)
                     onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
                     onToggleWidgetSize: (index) => widgetModel.toggleWidgetSize(index)
+                    onCollapseRequested: root.collapseAll()
                 }
 
                 EditControls {

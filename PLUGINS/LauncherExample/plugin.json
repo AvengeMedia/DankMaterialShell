@@ -6,7 +6,7 @@
     "author": "DMS Team",
     "icon": "extension",
     "type": "launcher",
-    "capabilities": ["launcher"],
+    "capabilities": ["clipboard", "command-execution"],
     "component": "./LauncherExampleLauncher.qml",
     "settings": "./LauncherExampleSettings.qml",
     "trigger": "#",

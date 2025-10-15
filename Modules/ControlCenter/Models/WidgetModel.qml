@@ -105,7 +105,8 @@ QtObject {
             "icon": "brightness_6",
             "type": "slider",
             "enabled": DisplayService.brightnessAvailable,
-            "warning": !DisplayService.brightnessAvailable ? "Brightness control not available" : undefined
+            "warning": !DisplayService.brightnessAvailable ? "Brightness control not available" : undefined,
+            "allowMultiple": true
         }, {
             "id": "inputVolumeSlider",
             "text": "Input Volume Slider",

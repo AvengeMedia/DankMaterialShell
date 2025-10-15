@@ -235,6 +235,11 @@ Singleton {
     property bool osdAlwaysShowValue: false
 
     property bool powerActionConfirm: true
+    property string customPowerActionLogout: ""
+    property string customPowerActionSuspend: ""
+    property string customPowerActionHibernate: ""
+    property string customPowerActionReboot: ""
+    property string customPowerActionPowerOff: ""
 
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
@@ -441,6 +446,11 @@ Singleton {
                 notificationPopupPosition = settings.notificationPopupPosition !== undefined ? settings.notificationPopupPosition : SettingsData.Position.Top
                 osdAlwaysShowValue = settings.osdAlwaysShowValue !== undefined ? settings.osdAlwaysShowValue : false
                 powerActionConfirm = settings.powerActionConfirm !== undefined ? settings.powerActionConfirm : true
+                customPowerActionLogout = settings.customPowerActionLogout != undefined ? settings.customPowerActionLogout : ""
+                customPowerActionSuspend = settings.customPowerActionSuspend != undefined ? settings.customPowerActionSuspend : ""
+                customPowerActionHibernate = settings.customPowerActionHibernate != undefined ? settings.customPowerActionHibernate : ""
+                customPowerActionReboot = settings.customPowerActionReboot != undefined ? settings.customPowerActionReboot : ""
+                customPowerActionPowerOff = settings.customPowerActionPowerOff != undefined ? settings.customPowerActionPowerOff : ""
                 updaterUseCustomCommand = settings.updaterUseCustomCommand !== undefined ? settings.updaterUseCustomCommand : false;
                 updaterCustomCommand = settings.updaterCustomCommand !== undefined ? settings.updaterCustomCommand : "";
                 updaterTerminalAdditionalParams = settings.updaterTerminalAdditionalParams !== undefined ? settings.updaterTerminalAdditionalParams : "";
@@ -627,6 +637,11 @@ Singleton {
                                                 "notificationPopupPosition": notificationPopupPosition,
                                                 "osdAlwaysShowValue": osdAlwaysShowValue,
                                                 "powerActionConfirm": powerActionConfirm,
+                                                "customPowerActionLogout": customPowerActionLogout,
+                                                "customPowerActionSuspend": customPowerActionSuspend,
+                                                "customPowerActionHibernate": customPowerActionHibernate,
+                                                "customPowerActionReboot": customPowerActionReboot,
+                                                "customPowerActionPowerOff": customPowerActionPowerOff,
                                                 "updaterUseCustomCommand": updaterUseCustomCommand,
                                                 "updaterCustomCommand": updaterCustomCommand,
                                                 "updaterTerminalAdditionalParams": updaterTerminalAdditionalParams,
@@ -692,6 +707,8 @@ Singleton {
             "hideBrightnessSlider", "widgetBackgroundColor", "surfaceBase",
             "notificationTimeoutLow", "notificationTimeoutNormal", "notificationTimeoutCritical",
             "notificationPopupPosition", "osdAlwaysShowValue", "powerActionConfirm",
+            "customPowerActionLogout", "customPowerActionSuspend", "customPowerActionHibernate",
+            "customPowerActionReboot", "customPowerActionPowerOff",
             "updaterUseCustomCommand", "updaterCustomCommand", "updaterTerminalAdditionalParams",
             "screenPreferences", "animationSpeed", "acMonitorTimeout", "acLockTimeout",
             "acSuspendTimeout", "acHibernateTimeout", "batteryMonitorTimeout", "batteryLockTimeout",
@@ -1669,6 +1686,31 @@ Singleton {
 
     function setPowerActionConfirm(confirm) {
         powerActionConfirm = confirm;
+        saveSettings();
+    }
+
+    function setCustomPowerActionLogout(command) {
+        customPowerActionLogout = command;
+        saveSettings();
+    }
+
+    function setCustomPowerActionSuspend(command) {
+        customPowerActionSuspend = command;
+        saveSettings();
+    }
+
+    function setCustomPowerActionHibernate(command) {
+        customPowerActionHibernate = command;
+        saveSettings();
+    }
+
+    function setCustomPowerActionReboot(command) {
+        customPowerActionReboot = command;
+        saveSettings();
+    }
+
+    function setCustomPowerActionPowerOff(command) {
+        customPowerActionPowerOff = command;
         saveSettings();
     }
 

@@ -1,0 +1,110 @@
+name: POEditor Diff & Sync
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch: {}
+
+concurrency:
+  group: poeditor-sync
+  cancel-in-progress: false
+
+jobs:
+  diff-and-trigger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: ja
+            po_lang: "ja"
+            repo_file: "translations/poexports/ja.json"
+            webhook_secret: "POEDITOR_WEBHOOK_JA"
+
+          - name: zh_hans
+            po_lang: "zh-Hans"
+            repo_file: "translations/poexports/zh_CN.json"
+            webhook_secret: "POEDITOR_WEBHOOK_ZH_HANS"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Export from POEditor (key/value JSON) and compare
+        id: diffcheck
+        env:
+          API_TOKEN: ${{ secrets.POEDITOR_API_TOKEN }}
+          PROJECT_ID: ${{ secrets.POEDITOR_PROJECT_ID }}
+          PO_LANG: ${{ matrix.po_lang }}
+          REPO_FILE: ${{ matrix.repo_file }}
+        run: |
+          set -euo pipefail
+
+          # 1) Request an export URL for key/value json
+          echo "::group::POEditor export request"
+          RESP=$(curl -sS -X POST https://api.poeditor.com/v2/projects/export \
+            -d api_token="$API_TOKEN" \
+            -d id="$PROJECT_ID" \
+            -d language="$PO_LANG" \
+            -d type="key_value_json")
+          echo "$RESP" | jq -r '.'
+          STATUS=$(echo "$RESP" | jq -r '.response.status')
+          if [[ "$STATUS" != "success" ]]; then
+            echo "POEditor export request failed: $RESP" >&2
+            exit 1
+          fi
+          URL=$(echo "$RESP" | jq -r '.result.url')
+          if [[ -z "$URL" || "$URL" == "null" ]]; then
+            echo "No export URL returned from POEditor." >&2
+            exit 1
+          fi
+          echo "::endgroup::"
+
+          # 2) Download exported content
+          curl -sS -L "$URL" -o /tmp/po_export.json
+
+          # 3) Normalize JSON (sorted keys) for stable diff
+          jq -S . /tmp/po_export.json > /tmp/po_export.norm.json
+
+          # 4) Normalize repo file (or empty {}) and diff
+          if [[ -f "$REPO_FILE" ]]; then
+            jq -S . "$REPO_FILE" > /tmp/repo.norm.json || echo "{}" > /tmp/repo.norm.json
+          else
+            echo "{}" > /tmp/repo.norm.json
+          fi
+
+          # 5) Set output changed=true|false
+          if diff -q /tmp/po_export.norm.json /tmp/repo.norm.json >/dev/null; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes for $PO_LANG"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Detected changes for $PO_LANG"
+          fi
+
+      - name: Trigger POEditor webhook for this language, if changed
+        if: steps.diffcheck.outputs.changed == 'true'
+        env:
+          WEBHOOK_URL: ${{ secrets[matrix.webhook_secret] }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${WEBHOOK_URL:-}" ]]; then
+            echo "Missing webhook secret for this language: ${{ matrix.webhook_secret }}" >&2
+            exit 1
+          fi
+          echo "Calling POEditor export webhook for ${{ matrix.name }}"
+          for attempt in 1 2 3; do
+            code=$(curl -sS -o /tmp/resp.txt -w '%{http_code}' -X POST "$WEBHOOK_URL" || true)
+            if [[ "$code" == "200" || "$code" == "204" ]]; then
+              echo "Webhook OK ($code)"
+              exit 0
+            fi
+            echo "Attempt $attempt failed ($code) → $(cat /tmp/resp.txt)"
+            sleep $((attempt*3))
+          done
+          echo "Webhook failed after retries." >&2
+          exit 1

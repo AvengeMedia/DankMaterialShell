@@ -20,6 +20,11 @@ Column {
     signal removeWidget(int index)
     signal moveWidget(int fromIndex, int toIndex)
     signal toggleWidgetSize(int index)
+    signal collapseRequested()
+
+    function requestCollapse() {
+        collapseRequested()
+    }
 
     spacing: editMode ? Theme.spacingL : Theme.spacingS
 
@@ -82,7 +87,7 @@ Column {
                             const widgets = SettingsData.controlCenterWidgets || []
                             for (var i = 0; i < widgets.length; i++) {
                                 if (widgets[i].id === modelData.id) {
-                                    if (modelData.id === "diskUsage") {
+                                    if (modelData.id === "diskUsage" || modelData.id === "brightnessSlider") {
                                         if (widgets[i].instanceId === modelData.instanceId) {
                                             return i
                                         }
@@ -164,6 +169,11 @@ Column {
                         return rowWidgets.some(w => w.id === "diskUsage" && w.instanceId === expandedInstanceId)
                     }
 
+                    if (root.expandedSection.startsWith("brightnessSlider_") && root.expandedWidgetData) {
+                        const expandedInstanceId = root.expandedWidgetData.instanceId
+                        return rowWidgets.some(w => w.id === "brightnessSlider" && w.instanceId === expandedInstanceId)
+                    }
+
                     return rowIndex === root.expandedRowIndex
                 }
                 visible: active
@@ -171,6 +181,7 @@ Column {
                 expandedWidgetData: root.expandedWidgetData
                 bluetoothCodecSelector: root.bluetoothCodecSelector
                 widgetModel: root.model
+                collapseCallback: root.requestCollapse
             }
         }
     }
@@ -467,10 +478,19 @@ Column {
             height: 16
 
             BrightnessSliderRow {
+                id: brightnessSliderRow
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
+                deviceName: widgetData.deviceName || ""
+                instanceId: widgetData.instanceId || ""
                 property color sliderTrackColor: Theme.surfaceContainerHigh
+
+                onIconClicked: {
+                    if (!root.editMode && DisplayService.devices && DisplayService.devices.length > 1) {
+                        root.expandClicked(widgetData, widgetIndex)
+                    }
+                }
             }
         }
     }

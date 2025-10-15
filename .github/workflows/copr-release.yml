@@ -110,6 +110,7 @@ jobs:
           Recommends:     brightnessctl
           Recommends:     cava
           Recommends:     cliphist
+          Recommends:     ghostty
           Recommends:     hyprpicker
           Recommends:     matugen
           Recommends:     wl-clipboard

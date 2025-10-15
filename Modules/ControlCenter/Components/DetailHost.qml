@@ -13,6 +13,7 @@ Item {
 
     property var pluginDetailInstance: null
     property var widgetModel: null
+    property var collapseCallback: null
 
     Loader {
         id: pluginDetailLoader
@@ -30,6 +31,54 @@ Item {
         y: Theme.spacingS
         active: false
         sourceComponent: null
+    }
+
+    Connections {
+        target: coreDetailLoader.item
+        enabled: root.expandedSection.startsWith("brightnessSlider_")
+        ignoreUnknownSignals: true
+
+        function onDeviceNameChanged(newDeviceName) {
+            if (root.expandedWidgetData && root.expandedWidgetData.id === "brightnessSlider") {
+                const widgets = SettingsData.controlCenterWidgets || []
+                const newWidgets = widgets.map(w => {
+                    if (w.id === "brightnessSlider" && w.instanceId === root.expandedWidgetData.instanceId) {
+                        const updatedWidget = Object.assign({}, w)
+                        updatedWidget.deviceName = newDeviceName
+                        return updatedWidget
+                    }
+                    return w
+                })
+                SettingsData.setControlCenterWidgets(newWidgets)
+                if (root.collapseCallback) {
+                    root.collapseCallback()
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: coreDetailLoader.item
+        enabled: root.expandedSection.startsWith("diskUsage_")
+        ignoreUnknownSignals: true
+
+        function onMountPathChanged(newMountPath) {
+            if (root.expandedWidgetData && root.expandedWidgetData.id === "diskUsage") {
+                const widgets = SettingsData.controlCenterWidgets || []
+                const newWidgets = widgets.map(w => {
+                    if (w.id === "diskUsage" && w.instanceId === root.expandedWidgetData.instanceId) {
+                        const updatedWidget = Object.assign({}, w)
+                        updatedWidget.mountPath = newMountPath
+                        return updatedWidget
+                    }
+                    return w
+                })
+                SettingsData.setControlCenterWidgets(newWidgets)
+                if (root.collapseCallback) {
+                    root.collapseCallback()
+                }
+            }
+        }
     }
 
     onExpandedSectionChanged: {
@@ -91,6 +140,12 @@ Item {
             return
         }
 
+        if (root.expandedSection.startsWith("brightnessSlider_")) {
+            coreDetailLoader.sourceComponent = brightnessDetailComponent
+            coreDetailLoader.active = parent.height > 0
+            return
+        }
+
         switch (root.expandedSection) {
         case "network":
         case "wifi": coreDetailLoader.sourceComponent = networkDetailComponent; break
@@ -144,22 +199,14 @@ Item {
         DiskUsageDetail {
             currentMountPath: root.expandedWidgetData?.mountPath || "/"
             instanceId: root.expandedWidgetData?.instanceId || ""
+        }
+    }
 
-
-            onMountPathChanged: (newMountPath) => {
-                if (root.expandedWidgetData && root.expandedWidgetData.id === "diskUsage") {
-                    const widgets = SettingsData.controlCenterWidgets || []
-                    const newWidgets = widgets.map(w => {
-                        if (w.id === "diskUsage" && w.instanceId === root.expandedWidgetData.instanceId) {
-                            const updatedWidget = Object.assign({}, w)
-                            updatedWidget.mountPath = newMountPath
-                            return updatedWidget
-                        }
-                        return w
-                    })
-                    SettingsData.setControlCenterWidgets(newWidgets)
-                }
-            }
+    Component {
+        id: brightnessDetailComponent
+        BrightnessDetail {
+            currentDeviceName: root.expandedWidgetData?.deviceName || ""
+            instanceId: root.expandedWidgetData?.instanceId || ""
         }
     }
 }

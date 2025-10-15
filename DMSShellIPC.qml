@@ -13,6 +13,7 @@ Item {
     required property var controlCenterLoader
     required property var dankDashPopoutLoader
     required property var notepadSlideoutVariants
+    required property var hyprKeybindsModalLoader
 
     IpcHandler {
         function open() {
@@ -261,5 +262,92 @@ Item {
         }
 
         target: "inhibit"
+    }
+
+    IpcHandler {
+        function list(): string {
+            return MprisController.availablePlayers.map(p => p.identity).join("\n")
+        }
+
+        function play(): void {
+            if (MprisController.activePlayer && MprisController.activePlayer.canPlay) {
+                MprisController.activePlayer.play()
+            }
+        }
+
+        function pause(): void {
+            if (MprisController.activePlayer && MprisController.activePlayer.canPause) {
+                MprisController.activePlayer.pause()
+            }
+        }
+
+        function playPause(): void {
+            if (MprisController.activePlayer && MprisController.activePlayer.canTogglePlaying) {
+                MprisController.activePlayer.togglePlaying()
+            }
+        }
+
+        function previous(): void {
+            if (MprisController.activePlayer && MprisController.activePlayer.canGoPrevious) {
+                MprisController.activePlayer.previous()
+            }
+        }
+
+        function next(): void {
+            if (MprisController.activePlayer && MprisController.activePlayer.canGoNext) {
+                MprisController.activePlayer.next()
+            }
+        }
+
+        function stop(): void {
+            if (MprisController.activePlayer) {
+                MprisController.activePlayer.stop()
+            }
+        }
+
+        target: "mpris"
+    }
+
+    IpcHandler {
+        function openBinds(): string {
+            if (!CompositorService.isHyprland) {
+                return "HYPR_NOT_AVAILABLE"
+            }
+            root.hyprKeybindsModalLoader.active = true
+            if (root.hyprKeybindsModalLoader.item) {
+                root.hyprKeybindsModalLoader.item.open()
+                return "HYPR_KEYBINDS_OPEN_SUCCESS"
+            }
+            return "HYPR_KEYBINDS_OPEN_FAILED"
+        }
+
+        function closeBinds(): string {
+            if (!CompositorService.isHyprland) {
+                return "HYPR_NOT_AVAILABLE"
+            }
+            if (root.hyprKeybindsModalLoader.item) {
+                root.hyprKeybindsModalLoader.item.close()
+                return "HYPR_KEYBINDS_CLOSE_SUCCESS"
+            }
+            return "HYPR_KEYBINDS_CLOSE_FAILED"
+        }
+
+        function toggleBinds(): string {
+            if (!CompositorService.isHyprland) {
+                return "HYPR_NOT_AVAILABLE"
+            }
+            root.hyprKeybindsModalLoader.active = true
+            if (root.hyprKeybindsModalLoader.item) {
+                if (root.hyprKeybindsModalLoader.item.shouldBeVisible) {
+                    root.hyprKeybindsModalLoader.item.close()
+                } else {
+                    root.hyprKeybindsModalLoader.item.open()
+                }
+                return "HYPR_KEYBINDS_TOGGLE_SUCCESS"
+            }
+            return "HYPR_KEYBINDS_TOGGLE_FAILED"
+        }
+
+        target: "hypr"
     }
 }

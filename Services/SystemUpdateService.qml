@@ -126,7 +126,10 @@ Singleton {
 
     Process {
         id: versionDetection
-        command: ["sh", "-c", "if [ -d .git ]; then echo \"(git) $(git rev-parse --short HEAD)\"; elif [ -f VERSION ]; then cat VERSION; fi"]
+        command: [
+            "sh", "-c",
+            `cd "${Quickshell.shellDir}" && if [ -d .git ]; then echo "(git) $(git rev-parse --short HEAD)"; elif [ -f VERSION ]; then cat VERSION; fi`
+        ]
 
         stdout: StdioCollector {
             onStreamFinished: {
@@ -197,7 +200,7 @@ Singleton {
     }
 
     function checkForUpdates() {
-        if (!distributionSupported || (!pkgManager || !updChecker) || isChecking) return
+        if (!distributionSupported || (!pkgManager && !updChecker) || isChecking) return
 
         isChecking = true
         hasError = false

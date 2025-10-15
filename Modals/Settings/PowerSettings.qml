@@ -356,6 +356,202 @@ Item {
                     }
                 }
             }
+
+            StyledRect {
+                width: parent.width
+                height: powerCommandCustomization.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: powerCommandCustomization
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingL
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "developer_mode"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Custom Power Actions")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+
+                        StyledText {
+                            text: I18n.tr("Command or script to run instead of the standard logout procedure")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: customLogoutCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/usr/bin/myLogout.sh"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.customPowerActionLogout) {
+                                    text = SettingsData.customPowerActionLogout;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setCustomPowerActionLogout(text.trim());
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+
+                        StyledText {
+                            text: I18n.tr("Command or script to run instead of the standard suspend procedure")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: customSuspendCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/usr/bin/mySuspend.sh"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.customPowerActionSuspend) {
+                                    text = SettingsData.customPowerActionSuspend;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setCustomPowerActionSuspend(text.trim());
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+
+                        StyledText {
+                            text: I18n.tr("Command or script to run instead of the standard hibernate procedure")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: customHibernateCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/usr/bin/myHibernate.sh"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.customPowerActionHibernate) {
+                                    text = SettingsData.customPowerActionHibernate;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setCustomPowerActionHibernate(text.trim());
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+
+                        StyledText {
+                            text: I18n.tr("Command or script to run instead of the standard reboot procedure")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: customRebootCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/usr/bin/myReboot.sh"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.customPowerActionReboot) {
+                                    text = SettingsData.customPowerActionReboot;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setCustomPowerActionReboot(text.trim());
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        anchors.left: parent.left
+
+                        StyledText {
+                            text: I18n.tr("Command or script to run instead of the standard power off procedure")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: customPowerOffCommand
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/usr/bin/myPowerOff.sh"
+                            backgroundColor: Theme.surfaceVariant
+                            normalBorderColor: Theme.primarySelected
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.customPowerActionPowerOff) {
+                                    text = SettingsData.customPowerActionPowerOff;
+                                }
+                            }
+
+                            onTextEdited: {
+                                SettingsData.setCustomPowerActionPowerOff(text.trim());
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

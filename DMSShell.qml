@@ -473,12 +473,27 @@ Item {
     }
   }
 
+  LazyLoader {
+      id: hyprKeybindsModalLoader
+
+      active: false
+
+      HyprKeybindsModal {
+          id: hyprKeybindsModal
+
+          Component.onCompleted: {
+              PopoutService.hyprKeybindsModal = hyprKeybindsModal
+          }
+      }
+  }
+
   DMSShellIPC {
       powerMenuModalLoader: powerMenuModalLoader
       processListModalLoader: processListModalLoader
       controlCenterLoader: controlCenterLoader
       dankDashPopoutLoader: dankDashPopoutLoader
       notepadSlideoutVariants: notepadSlideoutVariants
+      hyprKeybindsModalLoader: hyprKeybindsModalLoader
   }
 
   Variants {

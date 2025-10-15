@@ -1,4 +1,4 @@
-# Spec for DMS - uses rpkg macros for both stable and git builds
+# Spec for DMS - uses rpkg macros for git builds
 
 %global debug_package %{nil}
 %global version {{{ git_dir_version }}}
@@ -27,7 +27,7 @@ BuildRequires:  golang >= 1.24
 BuildRequires:  make
 
 # Core requirements
-Requires:       (quickshell or quickshell-git)
+Requires:       (quickshell-git or quickshell)
 Requires:       dms-cli
 Requires:       dgop
 Requires:       fira-code-fonts
@@ -44,6 +44,7 @@ Recommends:     wl-clipboard
 
 # Recommended system packages
 Recommends:     gammastep
+Recommends:     ghostty
 Recommends:     NetworkManager
 Recommends:     qt6-qtmultimedia
 Suggests:       qt6ct

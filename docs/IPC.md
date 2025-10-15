@@ -511,6 +511,26 @@ File browser controls for selecting wallpapers and profile images.
   - `profile` - Opens profile image file browser in Pictures directory
   - Both browsers support common image formats (jpg, jpeg, png, bmp, gif, webp)
 
+### Target: `hypr`
+Hyprland keybinds cheatsheet modal control (Hyprland only).
+
+**Functions:**
+- `openBinds` - Show Hyprland keybinds cheatsheet modal
+  - Returns: Success/failure message
+  - Note: Returns "HYPR_NOT_AVAILABLE" if not running Hyprland
+- `closeBinds` - Hide Hyprland keybinds cheatsheet modal
+  - Returns: Success/failure message
+  - Note: Returns "HYPR_NOT_AVAILABLE" if not running Hyprland
+- `toggleBinds` - Toggle Hyprland keybinds cheatsheet modal visibility
+  - Returns: Success/failure message
+  - Note: Returns "HYPR_NOT_AVAILABLE" if not running Hyprland
+
+**Description:**
+Displays an auto-categorized cheatsheet of all Hyprland keybinds parsed from `~/.config/hypr`. Keybinds are organized into three columns:
+- **Window / Monitor** - Window and monitor management keybinds (sorted by dispatcher)
+- **Workspace** - Workspace switching and management (sorted by dispatcher)
+- **Execute** - Application launchers and commands (sorted by keybind)
+
 ### Modal Examples
 ```bash
 # Open application launcher
@@ -546,14 +566,19 @@ dms ipc call dash open weather
 # Open file browsers
 dms ipc call file browse wallpaper
 dms ipc call file browse profile
+
+# Show Hyprland keybinds cheatsheet (Hyprland only)
+dms ipc call hypr toggleBinds
+dms ipc call hypr openBinds
 ```
 
 ## Common Usage Patterns
 
 ### Keybinding Integration
 
-These IPC commands are designed to be used with window manager keybindings. Example niri configuration:
+These IPC commands are designed to be used with window manager keybindings.
 
+**Example niri configuration:**
 ```kdl
 binds {
     Mod+Space { spawn "qs" "-c" "dms" "ipc" "call" "spotlight" "toggle"; }
@@ -563,6 +588,17 @@ binds {
     XF86AudioRaiseVolume { spawn "qs" "-c" "dms" "ipc" "call" "audio" "increment" "3"; }
     XF86MonBrightnessUp { spawn "qs" "-c" "dms" "ipc" "call" "brightness" "increment" "5" ""; }
 }
+```
+
+**Example Hyprland configuration:**
+```conf
+bind = SUPER, Space, exec, qs -c dms ipc call spotlight toggle
+bind = SUPER, V, exec, qs -c dms ipc call clipboard toggle
+bind = SUPER, P, exec, qs -c dms ipc call notepad toggle
+bind = SUPER, X, exec, qs -c dms ipc call powermenu toggle
+bind = SUPER, slash, exec, qs -c dms ipc call hypr toggleBinds
+bind = , XF86AudioRaiseVolume, exec, qs -c dms ipc call audio increment 3
+bind = , XF86MonBrightnessUp, exec, qs -c dms ipc call brightness increment 5 ""
 ```
 
 ### Scripting and Automation

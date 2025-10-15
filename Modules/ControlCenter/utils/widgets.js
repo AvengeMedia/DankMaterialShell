@@ -15,6 +15,11 @@ function addWidget(widgetId) {
         widget.mountPath = "/"
     }
 
+    if (widgetId === "brightnessSlider") {
+        widget.instanceId = generateUniqueId()
+        widget.deviceName = ""
+    }
+
     widgets.push(widget)
     SettingsData.setControlCenterWidgets(widgets)
 }
