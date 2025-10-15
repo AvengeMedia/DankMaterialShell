@@ -41,10 +41,7 @@ Item {
         antialiasing: true
         preferredRendererType: Shape.CurveRenderer
         z: 0
-        
-        layer.enabled: true
-        layer.smooth: true
-        layer.samples: 4
+        layer.enabled: false
         
         readonly property real centerX: width / 2
         readonly property real centerY: height / 2

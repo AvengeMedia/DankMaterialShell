@@ -823,7 +823,7 @@ Item {
                                 parentScreen: barWindow.screen
                                 widgetThickness: barWindow.widgetThickness
                                 isAtBottom: SettingsData.dankBarPosition === SettingsData.Position.Bottom
-                                visible: SettingsData.getFilteredScreens("systemTray").includes(barWindow.screen)
+                                visible: SettingsData.getFilteredScreens("systemTray").includes(barWindow.screen) && SystemTray.items.values.length > 0
                             }
                         }
 

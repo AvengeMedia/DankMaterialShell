@@ -22,7 +22,7 @@ Item {
         command: []
         onExited: (code) => {
             if (pendingSceneId !== "") {
-                const cacheHome = StandardPaths.writableLocation(StandardPaths.CacheLocation).toString()
+                const cacheHome = StandardPaths.writableLocation(StandardPaths.GenericCacheLocation).toString()
                 const baseDir = Paths.strip(cacheHome)
                 const outDir = baseDir + "/DankMaterialShell/we_screenshots" 
                 const outPath = outDir + "/" + pendingSceneId + ".jpg"

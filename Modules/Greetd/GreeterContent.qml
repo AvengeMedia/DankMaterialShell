@@ -166,7 +166,7 @@ Item {
         source: {
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
             if (screenName && currentWallpaper && currentWallpaper.startsWith("we:")) {
-                const cacheHome = StandardPaths.writableLocation(StandardPaths.CacheLocation).toString()
+                const cacheHome = StandardPaths.writableLocation(StandardPaths.GenericCacheLocation).toString()
                 const baseDir = Paths.strip(cacheHome)
                 const screenshotPath = baseDir + "/DankMaterialShell/we_screenshots" + "/" + currentWallpaper.substring(3) + ".jpg"
                 return screenshotPath

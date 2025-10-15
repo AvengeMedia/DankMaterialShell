@@ -14,6 +14,8 @@ import "StockThemes.js" as StockThemes
 Singleton {
     id: root
 
+    readonly property string stateDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation).toString()) + "/DankMaterialShell"
+
     readonly property bool envDisableMatugen: Quickshell.env("DMS_DISABLE_MATUGEN") === "1" || Quickshell.env("DMS_DISABLE_MATUGEN") === "true"
 
     readonly property real popupDistance: {
@@ -24,6 +26,7 @@ Singleton {
     property string currentTheme: "blue"
     property string currentThemeCategory: "generic"
     property bool isLightMode: typeof SessionData !== "undefined" ? SessionData.isLightMode : false
+    property bool colorsFileLoadFailed: false
 
     readonly property string dynamic: "dynamic"
     readonly property string custom : "custom"
@@ -78,8 +81,6 @@ Singleton {
     property var matugenColors: ({})
     property var customThemeData: null
 
-    readonly property string stateDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.CacheLocation).toString()) + "/DankMaterialShell"
-
     Component.onCompleted: {
         Quickshell.execDetached(["mkdir", "-p", stateDir])
         Proc.runCommand("matugenCheck", ["which", "matugen"], (output, code) => {
@@ -87,6 +88,20 @@ Singleton {
             const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
 
             if (!matugenAvailable || isGreeterMode) {
+                return
+            }
+
+            if (colorsFileLoadFailed && currentTheme === dynamic && wallpaperPath) {
+                console.log("Theme: Matugen now available, regenerating colors for dynamic theme")
+                const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode)
+                const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default"
+                Quickshell.execDetached(["rm", "-f", stateDir + "/matugen.key"])
+                const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
+                if (wallpaperPath.startsWith("#")) {
+                    setDesiredTheme("hex", wallpaperPath, isLight, iconTheme, selectedMatugenType)
+                } else {
+                    setDesiredTheme("image", wallpaperPath, isLight, iconTheme, selectedMatugenType)
+                }
                 return
             }
 
@@ -623,9 +638,11 @@ Singleton {
 
     function setDesiredTheme(kind, value, isLight, iconTheme, matugenType) {
         if (!matugenAvailable) {
-            console.warn("matugen not available or disabled - cannot set system theme")
+            console.warn("Theme: matugen not available or disabled - cannot set system theme")
             return
         }
+
+        console.log("Theme: Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", "type:", matugenType)
 
         if (typeof NiriService !== "undefined" && CompositorService.isNiri) {
             NiriService.suppressNextToast()
@@ -647,12 +664,13 @@ Singleton {
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`])
         workerRunning = true
         if (rawWallpaperPath.startsWith("we:")) {
-            console.log("calling matugen worker")
+            console.log("Theme: Starting matugen worker (WE wallpaper)")
             systemThemeGenerator.command = [
                 "sh", "-c",
                 `sleep 1 && ${shellDir}/scripts/matugen-worker.sh '${stateDir}' '${shellDir}' '${configDir}' --run`
             ]
         } else {
+            console.log("Theme: Starting matugen worker")
             systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, "--run"]
         }
         systemThemeGenerator.running = true
@@ -814,11 +832,19 @@ Singleton {
         onExited: exitCode => {
             workerRunning = false
 
-            if (exitCode !== 0 && exitCode !== 2) {
+            if (exitCode === 0) {
+                console.log("Theme: Matugen worker completed successfully")
+                if (currentTheme === dynamic) {
+                    console.log("Theme: Reloading dynamic colors file")
+                    dynamicColorsFileView.reload()
+                }
+            } else if (exitCode === 2) {
+                console.log("Theme: Matugen worker completed with code 2 (no changes needed)")
+            } else {
                 if (typeof ToastService !== "undefined") {
                     ToastService.showError("Theme worker failed (" + exitCode + ")")
                 }
-                console.warn("Theme worker failed with exit code:", exitCode)
+                console.warn("Theme: Matugen worker failed with exit code:", exitCode)
             }
         }
     }
@@ -882,6 +908,8 @@ Singleton {
 
         onLoaded: {
             if (currentTheme === dynamic) {
+                console.log("Theme: Dynamic colors file loaded successfully")
+                colorsFileLoadFailed = false
                 parseAndLoadColors()
             }
         }
@@ -893,9 +921,19 @@ Singleton {
         }
 
         onLoadFailed: function (error) {
-            if (currentTheme === dynamic && typeof ToastService !== "undefined") {
-                ToastService.showError("Failed to read dynamic colors: " + error)
+            if (currentTheme === dynamic) {
+                console.log("Theme: Dynamic colors file load failed, marking for regeneration")
+                colorsFileLoadFailed = true
+                const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
+                if (!isGreeterMode && matugenAvailable && wallpaperPath) {
+                    console.log("Theme: Matugen available, triggering immediate regeneration")
+                    generateSystemThemesFromCurrentTheme()
+                }
             }
+        }
+
+        onPathChanged: {
+            colorsFileLoadFailed = false
         }
     }
 
