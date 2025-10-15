@@ -25,63 +25,14 @@ Singleton {
     readonly property string preferredBatteryOverride: Quickshell.env("DMS_PREFERRED_BATTERY")
 
     // List of laptop batteries
-    property var batteries: []
+    readonly property var batteries: UPower.devices.values.filter(dev => dev.isLaptopBattery)
 
-    // Connections to monitor UPower devices model changes
-    property var devicesConnection: Connections {
-        target: UPower.devices
-
-        function onRowsInserted() {
-            Qt.callLater(root.updateBatteries)
-        }
-        function onRowsRemoved() {
-            Qt.callLater(root.updateBatteries)
-        }
-        function onModelReset() {
-            Qt.callLater(root.updateBatteries)
-        }
-        function onDataChanged() {
-            Qt.callLater(root.updateBatteries)
-        }
-    }
-
-    // Timer to periodically refresh battery information
-    property var updateTimer: Timer {
-        interval: 2000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.updateBatteries()
-    }
-
-    // Update the list of available batteries
-    function updateBatteries() {
-        const arr = []
-        const model = UPower.devices
-
-        if (!model) {
-            batteries = arr
-            return
-        }
-
-        const rowCount = model.rowCount ? model.rowCount() : 0
-
-        for (var i = 0; i < rowCount; i++) {
-            const index = model.index(i, 0)
-            const dev = model.data(index, 0x0100) // Qt.UserRole
-
-            if (dev && dev.ready && dev.isLaptopBattery) {
-                arr.push(dev)
-            }
-        }
-
-        batteries = arr
-    }
+    readonly property bool usePreferred: preferredBatteryOverride && preferredBatteryOverride.length > 0
 
     // Main battery (for backward compatibility)
     readonly property UPowerDevice device: {
         var preferredDev
-        if (preferredBatteryOverride && preferredBatteryOverride.length > 0) {
+        if (usePreferred) {
             preferredDev = batteries.find(dev => dev.nativePath.toLowerCase().includes(preferredBatteryOverride.toLowerCase()))
         }
         return preferredDev || batteries[0] || null
@@ -94,8 +45,11 @@ Singleton {
         return 0
         return Math.round((batteryEnergy * 100) / batteryCapacity)
     }
-    readonly property bool isCharging: batteryAvailable && device.state === UPowerDeviceState.Charging && device.changeRate > 0
-    readonly property bool isPluggedIn: batteryAvailable && (device.state !== UPowerDeviceState.Discharging && device.state !== UPowerDeviceState.Empty)
+    // Is any battery charging (at least one has changeRate > 0)
+    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging && b.changeRate > 0)
+
+    // Is the system plugged in (none of the batteries are discharging or empty)
+    readonly property bool isPluggedIn: batteryAvailable && batteries.every(b => b.state !== UPowerDeviceState.Discharging)
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
 
     onIsPluggedInChanged: {
@@ -118,43 +72,36 @@ Singleton {
     // Aggregated charge/discharge rate
     readonly property real changeRate: {
         if (!batteryAvailable) return 0
-        let total = 0
-        for (let b of batteries)
-            total += b.changeRate
-        return total
+        if (usePreferred && device && device.ready) return device.changeRate
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.changeRate, 0) : 0
     }
 
     // Aggregated battery health
     readonly property string batteryHealth: {
-        if (!batteryAvailable) {
-            return "N/A"
-        }
-        let sum = 0
-        let count = 0
-        for (let b of batteries) {
-            if (b.healthSupported && b.healthPercentage > 0) {
-                sum += b.healthPercentage
-                count++
-            }
-        }
-        return count > 0 ? `${Math.round(sum / count)}%` : "N/A"
+        if (!batteryAvailable) return "N/A"
+
+        // If a preferred battery is selected and ready
+        if (usePreferred && device && device.ready && device.healthSupported) return `${Math.round(device.healthPercentage)}%`
+
+        // Otherwise, calculate the average health of all laptop batteries
+        const validBatteries = batteries.filter(b => b.healthSupported && b.healthPercentage > 0)
+        if (validBatteries.length === 0) return "N/A"
+
+        const avgHealth = validBatteries.reduce((sum, b) => sum + b.healthPercentage, 0) / validBatteries.length
+        return `${Math.round(avgHealth)}%`
     }
 
     readonly property real batteryEnergy: {
         if (!batteryAvailable) return 0
-        let total = 0
-        for (let b of batteries)
-            total += b.energy
-        return total
+        if (usePreferred && device && device.ready) return device.energy
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energy, 0) : 0
     }
 
     // Total battery capacity (Wh)
     readonly property real batteryCapacity: {
         if (!batteryAvailable) return 0
-        let total = 0
-        for (let b of batteries)
-            total += b.energyCapacity
-        return total
+        if (usePreferred && device && device.ready) return device.energyCapacity
+        return batteries.length > 0 ? batteries.reduce((sum, b) => sum + b.energyCapacity, 0) : 0
     }
 
     // Aggregated battery status

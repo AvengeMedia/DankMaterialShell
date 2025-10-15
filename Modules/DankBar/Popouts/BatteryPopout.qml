@@ -368,7 +368,7 @@ DankPopout {
                 Column {
                     width: parent.width
                     spacing: Theme.spacingS
-                    visible: BatteryService.batteries.length > 1
+                    visible: !BatteryService.usePreferred && BatteryService.batteries.length > 1
 
                     StyledText {
                         text: I18n.tr("Individual Batteries")
@@ -531,7 +531,10 @@ DankPopout {
                                             spacing: 2
 
                                             StyledText {
-                                                text: modelData.state === UPowerDeviceState.Charging ? I18n.tr("To Full") : I18n.tr("Left")
+                                                text: modelData.state === UPowerDeviceState.Charging
+                                                                          ? I18n.tr("To Full")
+                                                                          : modelData.state === UPowerDeviceState.Discharging
+                                                                              ? I18n.tr("Left") : ""
                                                 font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceTextMedium
                                                 font.weight: Font.Medium
@@ -540,7 +543,11 @@ DankPopout {
 
                                             StyledText {
                                                 text: {
-                                                    const time = modelData.state === UPowerDeviceState.Charging ? modelData.timeToFull : (3600 * modelData.energy) / BatteryService.changeRate
+                                                      const time = modelData.state === UPowerDeviceState.Charging
+                                                                   ? modelData.timeToFull
+                                                                   : modelData.state === UPowerDeviceState.Discharging && BatteryService.changeRate > 0
+                                                                       ? (3600 * modelData.energy) / BatteryService.changeRate : 0
+
                                                     if (!time || time <= 0 || time > 86400)
                                                         return "N/A"
 
