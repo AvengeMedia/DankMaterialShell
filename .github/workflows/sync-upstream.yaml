@@ -1,0 +1,37 @@
+name: Sync Fork (Preserve Local Changes)
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # every day at 3 AM UTC
+  workflow_dispatch:     # allow manual trigger from Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # fetch full history 
+
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/AvengeMedia/DankMaterialShell.git
+          git fetch upstream
+
+      - name: Merge upstream changes into master
+        run: |
+          git checkout master
+          git merge upstream/master --no-edit || true
+
+      - name: Push merged changes back to your fork
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push origin master
