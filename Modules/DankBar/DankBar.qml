@@ -97,16 +97,15 @@ Item {
                 if (SettingsData.forceStatusBarLayoutRefresh) {
                     SettingsData.forceStatusBarLayoutRefresh.connect(() => {
                         Qt.callLater(() => {
-                            stackLoader.visible = false
+                            stackContainer.visible = false
                             Qt.callLater(() => {
-                                stackLoader.visible = true
+                                stackContainer.visible = true
                             })
                         })
                     })
                 }
 
                 updateGpuTempConfig()
-                Qt.callLater(() => Qt.callLater(forceWidgetRefresh))
 
                 inhibitorInitTimer.start()
             }
@@ -132,9 +131,6 @@ Item {
                     console.log("DankBar: Plugin unloaded:", pluginId)
                     SettingsData.widgetDataChanged()
                 }
-            }
-
-            function forceWidgetRefresh() {
             }
 
             function updateGpuTempConfig() {

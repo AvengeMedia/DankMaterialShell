@@ -13,18 +13,19 @@ Singleton {
 
     function runCommand(id, command, callback, debounceMs) {
         const wait = (typeof debounceMs === "number" && debounceMs >= 0) ? debounceMs : defaultDebounceMs
+        let procId = id ? id : Math.random()        
 
-        if (!_procDebouncers[id]) {
+        if (!_procDebouncers[procId]) {
             const t = Qt.createQmlObject('import QtQuick; Timer { repeat: false }', root)
-            t.triggered.connect(function() { _launchProc(id) })
-            _procDebouncers[id] = { timer: t, command: command, callback: callback, waitMs: wait }
+            t.triggered.connect(function() { _launchProc(procId) })
+            _procDebouncers[procId] = { timer: t, command: command, callback: callback, waitMs: wait }
         } else {
-            _procDebouncers[id].command = command
-            _procDebouncers[id].callback = callback
-            _procDebouncers[id].waitMs = wait
+            _procDebouncers[procId].command = command
+            _procDebouncers[procId].callback = callback
+            _procDebouncers[procId].waitMs = wait
         }
 
-        const entry = _procDebouncers[id]
+        const entry = _procDebouncers[procId]
         entry.timer.interval = entry.waitMs
         entry.timer.restart()
     }

@@ -116,7 +116,7 @@ Rectangle {
         if (CompositorService.isNiri) {
             root.currentLayout = NiriService.getCurrentKeyboardLayoutName()
         } else if (CompositorService.isHyprland) {
-            Proc.runCommand("hyprlandLayout", ["hyprctl", "-j", "devices"], (output, exitCode) => {
+            Proc.runCommand(null, ["hyprctl", "-j", "devices"], (output, exitCode) => {
                 if (exitCode !== 0) {
                     root.currentLayout = "Unknown"
                     return
