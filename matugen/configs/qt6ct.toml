@@ -1,3 +1,0 @@
-[templates.qt6ct]
-input_path = './matugen/templates/qtct-colors.conf'
-output_path = '~/.config/qt6ct/colors/matugen.conf'
