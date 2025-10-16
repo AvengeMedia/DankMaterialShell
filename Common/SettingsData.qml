@@ -60,6 +60,7 @@ Singleton {
     property real cornerRadius: 12
 
     property bool use24HourClock: true
+    property bool showSeconds: false
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property int animationSpeed: SettingsData.AnimationSpeed.Short
@@ -319,6 +320,7 @@ Singleton {
                 popupTransparency = settings.popupTransparency !== undefined ? (settings.popupTransparency > 1 ? settings.popupTransparency / 100 : settings.popupTransparency) : 1.0
                 dockTransparency = settings.dockTransparency !== undefined ? (settings.dockTransparency > 1 ? settings.dockTransparency / 100 : settings.dockTransparency) : 1
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
+                showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : true
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
                 weatherLocation = settings.weatherLocation !== undefined ? settings.weatherLocation : "New York, NY"
@@ -526,6 +528,7 @@ Singleton {
                                                 "popupTransparency": popupTransparency,
                                                 "dockTransparency": dockTransparency,
                                                 "use24HourClock": use24HourClock,
+                                                "showSeconds": showSeconds,
                                                 "useFahrenheit": useFahrenheit,
                                                 "nightModeEnabled": nightModeEnabled,
                                                 "weatherLocation": weatherLocation,
@@ -676,7 +679,7 @@ Singleton {
         const validKeys = [
             "currentThemeName", "customThemeFile", "matugenScheme", "runUserMatugenTemplates",
             "dankBarTransparency", "dankBarWidgetTransparency", "popupTransparency", "dockTransparency",
-            "use24HourClock", "useFahrenheit", "nightModeEnabled", "weatherLocation",
+            "use24HourClock", "showSeconds", "useFahrenheit", "nightModeEnabled", "weatherLocation",
             "weatherCoordinates", "useAutoLocation", "weatherEnabled", "showLauncherButton",
             "showWorkspaceSwitcher", "showFocusedWindow", "showWeather", "showMusic",
             "showClipboard", "showCpuUsage", "showMemUsage", "showCpuTemp", "showGpuTemp",
@@ -741,9 +744,9 @@ Singleton {
 
     function getEffectiveTimeFormat() {
         if (use24HourClock) {
-            return Locale.ShortFormat
+            return showSeconds ? "hh:mm:ss" : "hh:mm"
         } else {
-            return "h:mm AP"
+            return showSeconds ? "h:mm:ss AP": "h:mm AP"
         }
     }
 
@@ -1014,6 +1017,11 @@ Singleton {
 
     function setClockFormat(use24Hour) {
         use24HourClock = use24Hour
+        saveSettings()
+    }
+
+    function setTimeFormat(useSec) {
+        showSeconds = useSec
         saveSettings()
     }
 

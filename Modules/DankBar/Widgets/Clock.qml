@@ -98,6 +98,30 @@ Rectangle {
             }
         }
 
+        Row {
+            visible: SettingsData.showSeconds
+            spacing: 0
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            StyledText {
+                text: String(systemClock?.date?.getSeconds()).padStart(2, '0').charAt(0)
+                font.pixelSize: Theme.barTextSize(barThickness)
+                color: Theme.surfaceText
+                font.weight: Font.Normal
+                width: 9
+                horizontalAlignment: Text.AlignHCenter
+            }
+
+            StyledText {
+                text: String(systemClock?.date?.getSeconds()).padStart(2, '0').charAt(1)
+                font.pixelSize: Theme.barTextSize(barThickness)
+                color: Theme.surfaceText
+                font.weight: Font.Normal
+                width: 9
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+
         Item {
             width: 12
             height: Theme.spacingM
@@ -191,8 +215,7 @@ Rectangle {
 
         StyledText {
             text: {
-                const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP"
-                return systemClock?.date?.toLocaleTimeString(Qt.locale(), format)
+                return systemClock?.date?.toLocaleTimeString(Qt.locale(), SettingsData.getEffectiveTimeFormat())
             }
             font.pixelSize: Theme.barTextSize(barThickness)
             color: Theme.surfaceText
