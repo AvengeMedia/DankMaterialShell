@@ -5,6 +5,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.Common
 
 Singleton {
     id: root
@@ -81,39 +82,34 @@ Singleton {
     }
 
     function getSystemColorScheme() {
+        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
+            return
+        }
         if (!freedeskAvailable) return
 
         DMSService.sendRequest("freedesktop.settings.getColorScheme", null, response => {
             if (response.result) {
                 systemColorScheme = response.result.value || 0
-
-                if (typeof Theme !== "undefined") {
-                    const shouldBeLightMode = (systemColorScheme === 2)
-                    if (Theme.isLightMode !== shouldBeLightMode) {
-                        Theme.isLightMode = shouldBeLightMode
-                        if (typeof SessionData !== "undefined") {
-                            SessionData.setLightMode(shouldBeLightMode)
-                        }
-                    }
-                }
             }
         })
     }
 
     function setLightMode(isLightMode) {
+        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
+            return
+        }
         if (settingsPortalAvailable) {
             setSystemColorScheme(isLightMode)
         }
     }
 
     function setSystemColorScheme(isLightMode) {
+        if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
+            return
+        }
         if (!settingsPortalAvailable || !freedeskAvailable) return
 
-        DMSService.sendRequest("freedesktop.settings.setColorScheme", { preferDark: !isLightMode }, response => {
-            if (!response.error) {
-                Qt.callLater(() => getSystemColorScheme())
-            }
-        })
+        DMSService.sendRequest("freedesktop.settings.setColorScheme", { preferDark: !isLightMode }, response => {})
     }
 
     function setSystemIconTheme(themeName) {
@@ -202,7 +198,7 @@ Singleton {
         DMSService.sendRequest("freedesktop.getState", null, response => {
             if (response.result && response.result.settings) {
                 settingsPortalAvailable = response.result.settings.available || false
-                if (settingsPortalAvailable) {
+                if (settingsPortalAvailable && SettingsData.syncModeWithPortal) {
                     getSystemColorScheme()
                 }
             }

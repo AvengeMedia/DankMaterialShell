@@ -1136,6 +1136,62 @@ Item {
                 }
             }
 
+            StyledRect {
+                width: parent.width
+                height: portalSyncSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+
+                Row {
+                    id: portalSyncSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "sync"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Column {
+                        width: parent.width - Theme.iconSize - Theme.spacingM - syncToggle.width - Theme.spacingM
+                        spacing: Theme.spacingXS
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        StyledText {
+                            text: I18n.tr("Sync Mode with Portal")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Sync dark mode with settings portals for system-wide theme hints")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
+                    }
+
+                    DankToggle {
+                        id: syncToggle
+
+                        width: 48
+                        height: 32
+                        checked: SettingsData.syncModeWithPortal
+                        anchors.verticalCenter: parent.verticalCenter
+                        onToggled: checked => SettingsData.setSyncModeWithPortal(checked)
+                    }
+                }
+            }
+
             // System Configuration Warning
             Rectangle {
                 width: parent.width

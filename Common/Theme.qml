@@ -381,11 +381,10 @@ Singleton {
         }
 
         const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
-        isLightMode = light
         if (savePrefs && typeof SessionData !== "undefined" && !isGreeterMode)
-            SessionData.setLightMode(isLightMode)
+            SessionData.setLightMode(light)
         if (!isGreeterMode) {
-            PortalService.setLightMode(isLightMode)
+            PortalService.setLightMode(light)
             generateSystemThemesFromCurrentTheme()
         }
     }

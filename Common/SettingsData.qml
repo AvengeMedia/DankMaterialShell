@@ -187,6 +187,7 @@ Singleton {
 
     property bool gtkThemingEnabled: false
     property bool qtThemingEnabled: false
+    property bool syncModeWithPortal: true
 
     property bool showDock: false
     property bool dockAutoHide: false
@@ -428,6 +429,7 @@ Singleton {
                 soundPluggedIn = settings.soundPluggedIn !== undefined ? settings.soundPluggedIn : true
                 gtkThemingEnabled = settings.gtkThemingEnabled !== undefined ? settings.gtkThemingEnabled : false
                 qtThemingEnabled = settings.qtThemingEnabled !== undefined ? settings.qtThemingEnabled : false
+                syncModeWithPortal = settings.syncModeWithPortal !== undefined ? settings.syncModeWithPortal : true
                 showDock = settings.showDock !== undefined ? settings.showDock : false
                 dockAutoHide = settings.dockAutoHide !== undefined ? settings.dockAutoHide : false
                 dockGroupByApp = settings.dockGroupByApp !== undefined ? settings.dockGroupByApp : false
@@ -600,6 +602,7 @@ Singleton {
                                                 "soundPluggedIn": soundPluggedIn,
                                                 "gtkThemingEnabled": gtkThemingEnabled,
                                                 "qtThemingEnabled": qtThemingEnabled,
+                                                "syncModeWithPortal": syncModeWithPortal,
                                                 "showDock": showDock,
                                                 "dockAutoHide": dockAutoHide,
                                                 "dockGroupByApp": dockGroupByApp,
@@ -696,7 +699,7 @@ Singleton {
             "notepadFontFamily", "notepadFontSize", "notepadShowLineNumbers",
             "notepadTransparencyOverride", "notepadLastCustomTransparency", "soundsEnabled",
             "useSystemSoundTheme", "soundNewNotification", "soundVolumeChanged", "soundPluggedIn", "gtkThemingEnabled",
-            "qtThemingEnabled", "showDock", "dockAutoHide", "dockGroupByApp",
+            "qtThemingEnabled", "syncModeWithPortal", "showDock", "dockAutoHide", "dockGroupByApp",
             "dockOpenOnOverview", "dockPosition", "dockSpacing", "dockBottomGap",
             "cornerRadius", "notificationOverlayEnabled", "dankBarAutoHide",
             "dankBarOpenOnOverview", "dankBarVisible", "dankBarSpacing", "dankBarBottomGap",
@@ -1472,6 +1475,11 @@ Singleton {
         if (enabled && typeof Theme !== "undefined") {
             Theme.generateSystemThemesFromCurrentTheme()
         }
+    }
+
+    function setSyncModeWithPortal(enabled) {
+        syncModeWithPortal = enabled
+        saveSettings()
     }
 
     function setShowDock(enabled) {

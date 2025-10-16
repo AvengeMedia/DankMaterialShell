@@ -620,8 +620,9 @@ Column {
                 }
                 case "darkMode":
                 {
+                    const newMode = !SessionData.isLightMode
                     Theme.screenTransition()
-                    Theme.setLightMode(!SessionData.isLightMode)
+                    Theme.setLightMode(newMode)
                     break
                 }
                 case "doNotDisturb":
@@ -700,8 +701,9 @@ Column {
                 }
                 case "darkMode":
                 {
+                    const newMode = !SessionData.isLightMode
                     Theme.screenTransition()
-                    Theme.setLightMode(!SessionData.isLightMode)
+                    Theme.setLightMode(newMode)
                     break
                 }
                 case "doNotDisturb":

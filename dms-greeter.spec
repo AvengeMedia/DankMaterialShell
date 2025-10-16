@@ -86,24 +86,41 @@ if [ -x /usr/sbin/semanage ]; then
     restorecon -v %{_bindir}/dms-greeter 2>/dev/null || true
 fi
 
-# Auto-configure greetd if config file exists and contains no dms-greeter command
+# Auto-configure greetd config
 GREETD_CONFIG="/etc/greetd/config.toml"
-if [ -f "$GREETD_CONFIG" ] && ! grep -q "dms-greeter" "$GREETD_CONFIG"; then
+CONFIG_STATUS="Not modified (already configured)"
+
+# Check if niri or hyprland exists
+COMPOSITOR="niri"
+if ! command -v niri >/dev/null 2>&1; then
+    if command -v Hyprland >/dev/null 2>&1; then
+        COMPOSITOR="hyprland"
+    fi
+fi
+
+# If config doesn't exist, create a default one
+if [ ! -f "$GREETD_CONFIG" ]; then
+    mkdir -p /etc/greetd
+    cat > "$GREETD_CONFIG" << 'GREETD_EOF'
+[terminal]
+vt = 1
+
+[default_session]
+user = "greeter"
+command = "/usr/bin/dms-greeter --command COMPOSITOR_PLACEHOLDER"
+GREETD_EOF
+    sed -i "s|COMPOSITOR_PLACEHOLDER|$COMPOSITOR|" "$GREETD_CONFIG"
+    CONFIG_STATUS="Created new config with $COMPOSITOR ✓"
+# If config exists and doesn't have dms-greeter, update it
+elif ! grep -q "dms-greeter" "$GREETD_CONFIG"; then
     # Backup existing config
     BACKUP_FILE="${GREETD_CONFIG}.backup-$(date +%%Y%%m%%d-%%H%%M%%S)"
     cp "$GREETD_CONFIG" "$BACKUP_FILE" 2>/dev/null || true
 
-    # Check if niri or hyprland exists
-    COMPOSITOR="niri"
-    if ! command -v niri >/dev/null 2>&1; then
-        if command -v Hyprland >/dev/null 2>&1; then
-            COMPOSITOR="hyprland"
-        fi
-    fi
-
     # Update command in default_session section
     sed -i "/^\[default_session\]/,/^\[/ s|^command =.*|command = \"/usr/bin/dms-greeter --command $COMPOSITOR\"|" "$GREETD_CONFIG"
     sed -i '/^\[default_session\]/,/^\[/ s|^user =.*|user = "greeter"|' "$GREETD_CONFIG"
+    CONFIG_STATUS="Updated existing config (backed up) with $COMPOSITOR ✓"
 fi
 
 cat << EOF
@@ -115,7 +132,7 @@ cat << EOF
 Configuration status:
   - Greeter cache directory: /var/cache/dms-greeter (created with proper permissions)
   - SELinux contexts: Applied (if semanage available)
-  - Greetd config: $([ -f "$GREETD_CONFIG" ] && grep -q "dms-greeter" "$GREETD_CONFIG" && echo "Auto-configured ✓" || echo "Needs manual setup")
+  - Greetd config: $CONFIG_STATUS
 
 Next steps to enable the greeter:
 
