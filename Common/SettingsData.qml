@@ -60,6 +60,7 @@ Singleton {
     property real cornerRadius: 12
 
     property bool use24HourClock: true
+    property bool showSeconds: false
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property int animationSpeed: SettingsData.AnimationSpeed.Short
@@ -196,6 +197,7 @@ Singleton {
     property int dockPosition: SettingsData.Position.Bottom
     property real dockSpacing: 4
     property real dockBottomGap: 0
+    property real dockIconSize: 40
 
     property bool notificationOverlayEnabled: false
     property bool dankBarAutoHide: false
@@ -320,6 +322,7 @@ Singleton {
                 popupTransparency = settings.popupTransparency !== undefined ? (settings.popupTransparency > 1 ? settings.popupTransparency / 100 : settings.popupTransparency) : 1.0
                 dockTransparency = settings.dockTransparency !== undefined ? (settings.dockTransparency > 1 ? settings.dockTransparency / 100 : settings.dockTransparency) : 1
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true
+                showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
                 weatherLocation = settings.weatherLocation !== undefined ? settings.weatherLocation : "New York, NY"
@@ -436,6 +439,7 @@ Singleton {
                 dockPosition = settings.dockPosition !== undefined ? settings.dockPosition : SettingsData.Position.Bottom
                 dockSpacing = settings.dockSpacing !== undefined ? settings.dockSpacing : 4
                 dockBottomGap = settings.dockBottomGap !== undefined ? settings.dockBottomGap : 0
+                dockIconSize = settings.dockIconSize !== undefined ? settings.dockIconSize : 40
                 cornerRadius = settings.cornerRadius !== undefined ? settings.cornerRadius : 12
                 notificationOverlayEnabled = settings.notificationOverlayEnabled !== undefined ? settings.notificationOverlayEnabled : false
                 dankBarAutoHide = settings.dankBarAutoHide !== undefined ? settings.dankBarAutoHide : (settings.topBarAutoHide !== undefined ? settings.topBarAutoHide : false)
@@ -528,6 +532,7 @@ Singleton {
                                                 "popupTransparency": popupTransparency,
                                                 "dockTransparency": dockTransparency,
                                                 "use24HourClock": use24HourClock,
+                                                "showSeconds": showSeconds,
                                                 "useFahrenheit": useFahrenheit,
                                                 "nightModeEnabled": nightModeEnabled,
                                                 "weatherLocation": weatherLocation,
@@ -610,6 +615,7 @@ Singleton {
                                                 "dockPosition": dockPosition,
                                                 "dockSpacing": dockSpacing,
                                                 "dockBottomGap": dockBottomGap,
+                                                "dockIconSize": dockIconSize,
                                                 "cornerRadius": cornerRadius,
                                                 "notificationOverlayEnabled": notificationOverlayEnabled,
                                                 "dankBarAutoHide": dankBarAutoHide,
@@ -679,7 +685,7 @@ Singleton {
         const validKeys = [
             "currentThemeName", "customThemeFile", "matugenScheme", "runUserMatugenTemplates",
             "dankBarTransparency", "dankBarWidgetTransparency", "popupTransparency", "dockTransparency",
-            "use24HourClock", "useFahrenheit", "nightModeEnabled", "weatherLocation",
+            "use24HourClock", "showSeconds", "useFahrenheit", "nightModeEnabled", "weatherLocation",
             "weatherCoordinates", "useAutoLocation", "weatherEnabled", "showLauncherButton",
             "showWorkspaceSwitcher", "showFocusedWindow", "showWeather", "showMusic",
             "showClipboard", "showCpuUsage", "showMemUsage", "showCpuTemp", "showGpuTemp",
@@ -700,7 +706,7 @@ Singleton {
             "notepadTransparencyOverride", "notepadLastCustomTransparency", "soundsEnabled",
             "useSystemSoundTheme", "soundNewNotification", "soundVolumeChanged", "soundPluggedIn", "gtkThemingEnabled",
             "qtThemingEnabled", "syncModeWithPortal", "showDock", "dockAutoHide", "dockGroupByApp",
-            "dockOpenOnOverview", "dockPosition", "dockSpacing", "dockBottomGap",
+            "dockOpenOnOverview", "dockPosition", "dockSpacing", "dockBottomGap", "dockIconSize",
             "cornerRadius", "notificationOverlayEnabled", "dankBarAutoHide",
             "dankBarOpenOnOverview", "dankBarVisible", "dankBarSpacing", "dankBarBottomGap",
             "dankBarInnerPadding", "dankBarSquareCorners", "dankBarNoBackground",
@@ -744,9 +750,9 @@ Singleton {
 
     function getEffectiveTimeFormat() {
         if (use24HourClock) {
-            return Locale.ShortFormat
+            return showSeconds ? "hh:mm:ss" : "hh:mm"
         } else {
-            return "h:mm AP"
+            return showSeconds ? "h:mm:ss AP": "h:mm AP"
         }
     }
 
@@ -1017,6 +1023,11 @@ Singleton {
 
     function setClockFormat(use24Hour) {
         use24HourClock = use24Hour
+        saveSettings()
+    }
+
+    function setTimeFormat(useSec) {
+        showSeconds = useSec
         saveSettings()
     }
 
@@ -1545,6 +1556,11 @@ Singleton {
 
     function setDockBottomGap(gap) {
         dockBottomGap = gap
+        saveSettings()
+    }
+
+    function setDockIconSize(size) {
+        dockIconSize = size
         saveSettings()
     }
 

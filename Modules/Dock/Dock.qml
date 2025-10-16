@@ -34,8 +34,8 @@ Variants {
     property real backgroundTransparency: SettingsData.dockTransparency
     property bool groupByApp: SettingsData.dockGroupByApp
 
-    readonly property real widgetHeight: Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
-    readonly property real effectiveBarHeight: Math.max(widgetHeight + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+    readonly property real widgetHeight: SettingsData.dockIconSize
+    readonly property real effectiveBarHeight: widgetHeight + SettingsData.dockSpacing * 2 + 10
     readonly property real barSpacing: {
         const barIsHorizontal = (SettingsData.dankBarPosition === SettingsData.Position.Top || SettingsData.dankBarPosition === SettingsData.Position.Bottom)
         const barIsVertical = (SettingsData.dankBarPosition === SettingsData.Position.Left || SettingsData.dankBarPosition === SettingsData.Position.Right)
@@ -103,11 +103,38 @@ Variants {
     exclusiveZone: {
         if (!SettingsData.showDock || autoHide) return -1
         if (barSpacing > 0) return -1
-        return px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap)
+        return px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap)
+    }
+
+    property real animationHeadroom: Math.ceil(SettingsData.dockIconSize * 0.35)
+
+    implicitWidth: isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+    implicitHeight: !isVertical ? (px(effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockIconSize * 0.3) + animationHeadroom) : 0
+
+    Item {
+        id: maskItem
+        parent: dock.contentItem
+        visible: false
+        x: {
+            const baseX = dockCore.x + dockMouseArea.x
+            if (isVertical && SettingsData.dockPosition === SettingsData.Position.Right) {
+                return baseX - animationHeadroom
+            }
+            return baseX
+        }
+        y: {
+            const baseY = dockCore.y + dockMouseArea.y
+            if (!isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom) {
+                return baseY - animationHeadroom
+            }
+            return baseY
+        }
+        width: dockMouseArea.width + (isVertical ? animationHeadroom : 0)
+        height: dockMouseArea.height + (!isVertical ? animationHeadroom : 0)
     }
 
     mask: Region {
-        item: dockMouseArea
+        item: maskItem
     }
 
     property var hoveredButton: {
@@ -136,9 +163,75 @@ Variants {
         return null
     }
 
+    DankTooltip {
+        id: dockTooltip
+        targetScreen: dock.screen
+    }
+
+    Timer {
+        id: tooltipRevealDelay
+        interval: 250
+        repeat: false
+        onTriggered: dock.showTooltipForHoveredButton()
+    }
+
+    function showTooltipForHoveredButton() {
+        dockTooltip.hide()
+        if (dock.hoveredButton && dock.reveal && !slideXAnimation.running && !slideYAnimation.running) {
+            const buttonGlobalPos = dock.hoveredButton.mapToGlobal(0, 0)
+            const tooltipText = dock.hoveredButton.tooltipText || ""
+            if (tooltipText) {
+                const screenX = dock.screen ? (dock.screen.x || 0) : 0
+                const screenY = dock.screen ? (dock.screen.y || 0) : 0
+                const screenHeight = dock.screen ? dock.screen.height : 0
+                if (!dock.isVertical) {
+                    const isBottom = SettingsData.dockPosition === SettingsData.Position.Bottom
+                    const globalX = buttonGlobalPos.x + dock.hoveredButton.width / 2
+                    const screenRelativeY = isBottom
+                        ? (screenHeight - dock.effectiveBarHeight - SettingsData.dockSpacing - SettingsData.dockBottomGap - 35)
+                        : (buttonGlobalPos.y - screenY + dock.hoveredButton.height + Theme.spacingS)
+                    dockTooltip.show(tooltipText,
+                                   globalX,
+                                   screenRelativeY,
+                                   dock.screen,
+                                   false, false)
+                } else {
+                    const isLeft = SettingsData.dockPosition === SettingsData.Position.Left
+                    const tooltipOffset = dock.effectiveBarHeight + SettingsData.dockSpacing + Theme.spacingXS
+                    const tooltipX = isLeft ? tooltipOffset : (dock.screen.width - tooltipOffset)
+                    const screenRelativeY = buttonGlobalPos.y - screenY + dock.hoveredButton.height / 2
+                    dockTooltip.show(tooltipText,
+                                   screenX + tooltipX,
+                                   screenRelativeY,
+                                   dock.screen,
+                                   isLeft,
+                                   !isLeft)
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: dock
+        function onRevealChanged() {
+            if (!dock.reveal) {
+                tooltipRevealDelay.stop()
+                dockTooltip.hide()
+            } else {
+                tooltipRevealDelay.restart()
+            }
+        }
+
+        function onHoveredButtonChanged() {
+            dock.showTooltipForHoveredButton()
+        }
+    }
+
     Item {
         id: dockCore
         anchors.fill: parent
+        x: isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? animationHeadroom : 0
+        y: !isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? animationHeadroom : 0
 
         Connections {
             target: dockMouseArea
@@ -164,16 +257,16 @@ Variants {
 
             height: {
                 if (dock.isVertical) {
-                    return dock.reveal ? Math.min(dockBackground.implicitHeight + 32, maxDockHeight) : Math.min(Math.max(dockBackground.implicitHeight + 64, 200), screenHeight * 0.5)
+                    return dock.reveal ? Math.min(dockBackground.implicitHeight + 4, maxDockHeight) : Math.min(Math.max(dockBackground.implicitHeight + 64, 200), screenHeight * 0.5)
                 } else {
-                    return dock.reveal ? px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 1
+                    return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 1
                 }
             }
             width: {
                 if (dock.isVertical) {
-                    return dock.reveal ? px(58 + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 1
+                    return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap) : 1
                 } else {
-                    return dock.reveal ? Math.min(dockBackground.implicitWidth + 32, maxDockWidth) : Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
+                    return dock.reveal ? Math.min(dockBackground.implicitWidth + 4, maxDockWidth) : Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
                 }
             }
             anchors {
@@ -204,69 +297,14 @@ Variants {
             Item {
                 id: dockContainer
                 anchors.fill: parent
-
-                Item {
-                    id: appTooltip
-                    z: 1000
-                    anchors.fill: parent
-
-                    property string tooltipText: dock.hoveredButton ? dock.hoveredButton.tooltipText : ""
-                    property bool shouldShow: dock.hoveredButton !== null && tooltipText !== "" && dock.reveal && !slideXAnimation.running && !slideYAnimation.running
-
-                    Rectangle {
-                        id: tooltipBackground
-                        width: tooltipLabel.contentWidth + 24
-                        height: tooltipLabel.contentHeight + 12
-
-                        visible: appTooltip.shouldShow && tooltipLabel.contentWidth > 0
-                        color: Theme.surfaceContainer
-                        radius: Theme.cornerRadius
-                        border.width: 1
-                        border.color: Theme.outlineMedium
-
-                        x: {
-                            if (!dock.hoveredButton || !visible) return 0
-                            const buttonPos = dock.hoveredButton.mapToItem(dockContainer, 0, 0)
-                            if (!dock.isVertical) {
-                                return buttonPos.x + dock.hoveredButton.width / 2 - width / 2
-                            } else {
-                                if (SettingsData.dockPosition === SettingsData.Position.Right) {
-                                    return buttonPos.x - width - Theme.spacingS
-                                } else {
-                                    return buttonPos.x + dock.hoveredButton.width + Theme.spacingS
-                                }
-                            }
-                        }
-                        y: {
-                            if (!dock.hoveredButton || !visible) return 0
-                            const buttonPos = dock.hoveredButton.mapToItem(dockContainer, 0, 0)
-                            if (!dock.isVertical) {
-                                if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
-                                    return buttonPos.y - height - Theme.spacingS
-                                } else {
-                                    return buttonPos.y + dock.hoveredButton.height + Theme.spacingS
-                                }
-                            } else {
-                                return buttonPos.y + dock.hoveredButton.height / 2 - height / 2
-                            }
-                        }
-
-                        StyledText {
-                            id: tooltipLabel
-                            anchors.centerIn: parent
-                            text: appTooltip.tooltipText
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                        }
-                    }
-                }
+                clip: false
 
                 transform: Translate {
                     id: dockSlide
                     x: {
                         if (!dock.isVertical) return 0
                         if (dock.reveal) return 0
-                        const hideDistance = 58 + SettingsData.dockSpacing + SettingsData.dockBottomGap + 10
+                        const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + 10
                         if (SettingsData.dockPosition === SettingsData.Position.Right) {
                             return hideDistance
                         } else {
@@ -276,7 +314,7 @@ Variants {
                     y: {
                         if (dock.isVertical) return 0
                         if (dock.reveal) return 0
-                        const hideDistance = 58 + SettingsData.dockSpacing + SettingsData.dockBottomGap + 10
+                        const hideDistance = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + 10
                         if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
                             return hideDistance
                         } else {
@@ -305,17 +343,17 @@ Variants {
                     id: dockBackground
                     objectName: "dockBackground"
                     anchors {
-                        top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? undefined : parent.top) : undefined
+                        top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top ? parent.top : undefined) : undefined
                         bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? parent.bottom : undefined) : undefined
                         horizontalCenter: !dock.isVertical ? parent.horizontalCenter : undefined
-                        left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? undefined : parent.left) : undefined
+                        left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined) : undefined
                         right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined) : undefined
                         verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
                     }
-                    anchors.topMargin: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? 0 : barSpacing + 4) : 0
-                    anchors.bottomMargin: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? barSpacing + 1 : 0) : 0
-                    anchors.leftMargin: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? 0 : barSpacing + 4) : 0
-                    anchors.rightMargin: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? barSpacing + 1 : 0) : 0
+                    anchors.topMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Top ? barSpacing + 1 : 0
+                    anchors.bottomMargin: !dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Bottom ? barSpacing + 1 : 0
+                    anchors.leftMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? barSpacing + 1 : 0
+                    anchors.rightMargin: dock.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? barSpacing + 1 : 0
 
                     implicitWidth: dock.isVertical ? (dockApps.implicitHeight + SettingsData.dockSpacing * 2) : (dockApps.implicitWidth + SettingsData.dockSpacing * 2)
                     implicitHeight: dock.isVertical ? (dockApps.implicitWidth + SettingsData.dockSpacing * 2) : (dockApps.implicitHeight + SettingsData.dockSpacing * 2)
@@ -326,33 +364,34 @@ Variants {
                     radius: Theme.cornerRadius
                     border.width: 1
                     border.color: Theme.outlineMedium
-                    layer.enabled: true
+                    clip: false
 
                     Rectangle {
                         anchors.fill: parent
                         color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
                         radius: parent.radius
                     }
+                }
 
-                    DockApps {
-                        id: dockApps
+                DockApps {
+                    id: dockApps
 
-                        anchors.top: !dock.isVertical ? parent.top : undefined
-                        anchors.bottom: !dock.isVertical ? parent.bottom : undefined
-                        anchors.horizontalCenter: !dock.isVertical ? parent.horizontalCenter : undefined
-                        anchors.left: dock.isVertical ? parent.left : undefined
-                        anchors.right: dock.isVertical ? parent.right : undefined
-                        anchors.verticalCenter: dock.isVertical ? parent.verticalCenter : undefined
-                        anchors.topMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
-                        anchors.bottomMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
-                        anchors.leftMargin: dock.isVertical ? SettingsData.dockSpacing : 0
-                        anchors.rightMargin: dock.isVertical ? SettingsData.dockSpacing : 0
+                    anchors.top: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Top ? dockBackground.top : undefined) : undefined
+                    anchors.bottom: !dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Bottom ? dockBackground.bottom : undefined) : undefined
+                    anchors.horizontalCenter: !dock.isVertical ? dockBackground.horizontalCenter : undefined
+                    anchors.left: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Left ? dockBackground.left : undefined) : undefined
+                    anchors.right: dock.isVertical ? (SettingsData.dockPosition === SettingsData.Position.Right ? dockBackground.right : undefined) : undefined
+                    anchors.verticalCenter: dock.isVertical ? dockBackground.verticalCenter : undefined
+                    anchors.topMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
+                    anchors.bottomMargin: !dock.isVertical ? SettingsData.dockSpacing : 0
+                    anchors.leftMargin: dock.isVertical ? SettingsData.dockSpacing : 0
+                    anchors.rightMargin: dock.isVertical ? SettingsData.dockSpacing : 0
 
-                        contextMenu: dockVariants.contextMenu
-                        groupByApp: dock.groupByApp
-                        isVertical: dock.isVertical
-                        dockScreen: dock.screen
-                    }
+                    contextMenu: dockVariants.contextMenu
+                    groupByApp: dock.groupByApp
+                    isVertical: dock.isVertical
+                    dockScreen: dock.screen
+                    iconSize: dock.widgetHeight
                 }
             }
         }

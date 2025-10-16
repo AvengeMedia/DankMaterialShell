@@ -15,7 +15,9 @@ Item {
     property bool groupByApp: false
     property bool isVertical: false
     property var dockScreen: null
+    property real iconSize: 40
 
+    clip: false
     implicitWidth: isVertical ? appLayout.height : appLayout.width
     implicitHeight: isVertical ? appLayout.width : appLayout.height
 
@@ -37,14 +39,18 @@ Item {
 
     Item {
         id: appLayout
-        anchors.centerIn: parent
         width: layoutFlow.width
         height: layoutFlow.height
+        anchors.horizontalCenter: root.isVertical ? undefined : parent.horizontalCenter
+        anchors.verticalCenter: root.isVertical ? parent.verticalCenter : undefined
+        anchors.left: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Left ? parent.left : undefined
+        anchors.right: root.isVertical && SettingsData.dockPosition === SettingsData.Position.Right ? parent.right : undefined
+        anchors.top: root.isVertical ? undefined : parent.top
 
         Flow {
             id: layoutFlow
             flow: root.isVertical ? Flow.TopToBottom : Flow.LeftToRight
-            spacing: 8
+            spacing: Math.min(8, Math.max(4, root.iconSize * 0.08))
 
         Repeater {
             id: repeater
@@ -193,17 +199,25 @@ Item {
             delegate: Item {
                 id: delegateItem
                 property alias dockButton: button
+                clip: false
 
-                width: model.type === "separator" ? 16 : 40
-                height: 40
+                width: model.type === "separator" ? (root.isVertical ? root.iconSize : 8) : (root.isVertical ? root.iconSize : root.iconSize * 1.2)
+                height: model.type === "separator" ? (root.isVertical ? 8 : root.iconSize) : (root.isVertical ? root.iconSize * 1.2 : root.iconSize)
 
                 Rectangle {
                     visible: model.type === "separator"
-                    width: 2
-                    height: 20
+                    width: root.isVertical ? root.iconSize * 0.5 : 2
+                    height: root.isVertical ? 2 : root.iconSize * 0.5
                     color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
                     radius: 1
                     anchors.centerIn: parent
+                }
+
+                MouseArea {
+                    visible: model.type === "separator"
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    acceptedButtons: Qt.NoButton
                 }
 
                 DockAppButton {
@@ -211,8 +225,9 @@ Item {
                     visible: model.type !== "separator"
                     anchors.centerIn: parent
 
-                    width: 40
-                    height: 40
+                    width: delegateItem.width
+                    height: delegateItem.height
+                    actualIconSize: root.iconSize
 
                     appData: model
                     contextMenu: root.contextMenu
@@ -220,7 +235,6 @@ Item {
                     index: model.index
                     parentDockScreen: root.dockScreen
 
-                    // Override tooltip for windows to show window title
                     showWindowTitle: model.type === "window" || model.type === "grouped"
                     windowTitle: model.windowTitle || ""
                 }

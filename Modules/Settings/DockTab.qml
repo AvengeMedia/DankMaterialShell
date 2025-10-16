@@ -329,6 +329,69 @@ Item {
                 }
             }
 
+            // Icon Size Section
+            StyledRect {
+                width: parent.width
+                height: iconSizeSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+                visible: SettingsData.showDock
+                opacity: visible ? 1 : 0
+
+                Column {
+                    id: iconSizeSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "photo_size_select_large"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Icon Size")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankSlider {
+                        width: parent.width
+                        height: 24
+                        value: SettingsData.dockIconSize
+                        minimum: 24
+                        maximum: 96
+                        unit: ""
+                        showValue: true
+                        wheelEnabled: false
+                        thumbOutlineColor: Theme.surfaceContainerHigh
+                        onSliderValueChanged: newValue => {
+                                                  SettingsData.setDockIconSize(newValue)
+                                              }
+                    }
+                }
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.mediumDuration
+                        easing.type: Theme.emphasizedEasing
+                    }
+                }
+            }
+
             // Dock Spacing Section
             StyledRect {
                 width: parent.width

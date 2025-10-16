@@ -9,7 +9,6 @@ import qs.Widgets
 PanelWindow {
     id: root
 
-    property bool showContextMenu: false
     property var appData: null
     property var anchorItem: null
     property real dockVisibleHeight: 40
@@ -18,25 +17,24 @@ PanelWindow {
     property var desktopEntry: null
 
     function showForButton(button, data, dockHeight, hidePinOption, entry, dockScreen) {
+        if (dockScreen) {
+            root.screen = dockScreen
+        }
+
         anchorItem = button
         appData = data
         dockVisibleHeight = dockHeight || 40
         hidePin = hidePinOption || false
         desktopEntry = entry || null
 
-        if (dockScreen) {
-            root.screen = dockScreen
-        }
-
-        showContextMenu = true
+        visible = true
     }
     function close() {
-        showContextMenu = false
+        visible = false
     }
 
-    screen: Quickshell.screens[0]
-
-    visible: showContextMenu
+    screen: null
+    visible: false
     WlrLayershell.layer: WlrLayershell.Overlay
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -168,7 +166,7 @@ PanelWindow {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1
 
-        opacity: root.showContextMenu ? 1 : 0
+        opacity: root.visible ? 1 : 0
         visible: opacity > 0
 
         Behavior on opacity {

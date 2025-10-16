@@ -376,7 +376,7 @@ Rectangle {
                         return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5;
                     }
                 }
-                radius: Math.min(width, height) / 2
+                radius: Theme.cornerRadius
                 color: isActive ? Theme.primary : isUrgent ? Theme.error : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
                 border.width: isUrgent && !isActive ? 2 : 0

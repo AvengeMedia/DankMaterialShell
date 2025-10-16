@@ -114,12 +114,14 @@ in {
                     ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
                 fi
             fi
+
+            mv dms-colors.json colors.json || :
             chown ${user}: * || :
         '';
         programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
             "${cfg.configHome}/.config/DankMaterialShell/settings.json"
             "${cfg.configHome}/.local/state/DankMaterialShell/session.json"
-            "${cfg.configHome}/.cache/quickshell/dankshell/dms-colors.json"
+            "${cfg.configHome}/.cache/DankMaterialShell/dms-colors.json"
         ];
     };
 }

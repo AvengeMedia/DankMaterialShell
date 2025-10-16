@@ -190,8 +190,7 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
                 text: {
-                    const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP"
-                    return systemClock.date.toLocaleTimeString(Qt.locale(), format)
+                    return systemClock.date.toLocaleTimeString(Qt.locale(), SettingsData.getEffectiveTimeFormat())
                 }
                 font.pixelSize: 120
                 font.weight: Font.Light

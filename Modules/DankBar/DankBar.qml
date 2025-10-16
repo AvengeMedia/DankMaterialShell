@@ -28,6 +28,20 @@ Item {
         delegate: PanelWindow {
             id: barWindow
 
+            readonly property var dBarLayer: {
+                switch (Quickshell.env("DMS_DANKBAR_LAYER")) {
+                    case "bottom":
+                        return WlrLayer.Bottom
+                    case "overlay":
+                        return WlrLayer.Overlay
+                    case "background":
+                        return WlrLayer.background
+                    default:
+                        return WlrLayer.Top
+                }
+            }
+
+            WlrLayershell.layer: dBarLayer
             WlrLayershell.namespace: "quickshell:bar"
 
             property var modelData: item

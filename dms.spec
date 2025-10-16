@@ -46,7 +46,6 @@ Recommends:     wl-clipboard
 
 # Recommended system packages
 Recommends:     gammastep
-Recommends:     ghostty
 Recommends:     NetworkManager
 Recommends:     qt6-qtmultimedia
 Suggests:       qt6ct
