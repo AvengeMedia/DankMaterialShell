@@ -75,10 +75,7 @@ Loader {
 
     onLoaded: {
         if (item) {
-            contentItemReady(item)
-            if (widgetId === "spacer") {
-                item.spacerSize = Qt.binding(() => spacerSize)
-            }
+            contentItemReady(item)            
             if (axis && "isVertical" in item) {
                 try {
                     item.isVertical = axis.isVertical
