@@ -15,6 +15,7 @@ Item {
     property var contextMenu: null
     property var dockApps: null
     property int index: -1
+    property var parentDockScreen: null
     property bool longPressing: false
     property bool dragging: false
     property point dragStartPos: Qt.point(0, 0)
@@ -317,7 +318,7 @@ Item {
                                    }
                                } else {
                                    if (contextMenu) {
-                                       contextMenu.showForButton(root, appData, 65, true, cachedDesktopEntry)
+                                       contextMenu.showForButton(root, appData, 65, true, cachedDesktopEntry, parentDockScreen)
                                    }
                                }
                            }
@@ -334,7 +335,7 @@ Item {
                                }
                            } else if (appData && appData.type === "grouped") {
                                if (contextMenu) {
-                                   contextMenu.showForButton(root, appData, 40, false, cachedDesktopEntry)
+                                   contextMenu.showForButton(root, appData, 40, false, cachedDesktopEntry, parentDockScreen)
                                }
                            } else if (appData && appData.appId) {
                                const desktopEntry = cachedDesktopEntry
@@ -351,7 +352,7 @@ Item {
                            }
                        } else if (mouse.button === Qt.RightButton) {
                            if (contextMenu && appData) {
-                               contextMenu.showForButton(root, appData, 40, false, cachedDesktopEntry)
+                               contextMenu.showForButton(root, appData, 40, false, cachedDesktopEntry, parentDockScreen)
                            } else {
                                console.warn("No context menu or appData available")
                            }

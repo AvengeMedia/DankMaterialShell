@@ -41,6 +41,7 @@ Recommends:     cava
 Recommends:     cliphist
 Recommends:     hyprpicker
 Recommends:     matugen
+Recommends:     quickshell-git
 Recommends:     wl-clipboard
 
 # Recommended system packages

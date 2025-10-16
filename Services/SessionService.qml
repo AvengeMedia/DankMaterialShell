@@ -192,6 +192,14 @@ Singleton {
     }
 
     function suspend() {
+        if (SettingsData.lockBeforeSuspend) {
+            DMSService.lockSession(response => {
+                if (response.error) {
+                    console.warn("Lock: Failed to call loginctl.lock:", response.error)
+                }
+            })            
+        }
+
         if (SettingsData.customPowerActionSuspend.length === 0) {
             Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend"])
         } else {

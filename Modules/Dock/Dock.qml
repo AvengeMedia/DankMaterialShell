@@ -110,81 +110,30 @@ Variants {
         item: dockMouseArea
     }
 
-    Rectangle {
-        id: appTooltip
-        z: 1000
-
-        property var hoveredButton: {
-            if (!dockApps.children[0]) {
-                return null
-            }
-            const layoutItem = dockApps.children[0]
-            const flowLayout = layoutItem.children[0]
-            let repeater = null
-            for (var i = 0; i < flowLayout.children.length; i++) {
-                const child = flowLayout.children[i]
-                if (child && typeof child.count !== "undefined" && typeof child.itemAt === "function") {
-                    repeater = child
-                    break
-                }
-            }
-            if (!repeater || !repeater.itemAt) {
-                return null
-            }
-            for (var i = 0; i < repeater.count; i++) {
-                const item = repeater.itemAt(i)
-                if (item && item.dockButton && item.dockButton.showTooltip) {
-                    return item.dockButton
-                }
-            }
+    property var hoveredButton: {
+        if (!dockApps.children[0]) {
             return null
         }
-
-        property string tooltipText: hoveredButton ? hoveredButton.tooltipText : ""
-
-        visible: hoveredButton !== null && tooltipText !== ""
-        width: px(tooltipLabel.implicitWidth + 24)
-        height: px(tooltipLabel.implicitHeight + 12)
-
-        color: Theme.surfaceContainer
-        radius: Theme.cornerRadius
-        border.width: 1
-        border.color: Theme.outlineMedium
-
-        x: {
-            if (!hoveredButton) return 0
-            const buttonPos = hoveredButton.mapToItem(dock.contentItem, 0, 0)
-            if (!dock.isVertical) {
-                return buttonPos.x + hoveredButton.width / 2 - width / 2
-            } else {
-                if (SettingsData.dockPosition === SettingsData.Position.Right) {
-                    return buttonPos.x - width - Theme.spacingS
-                } else {
-                    return buttonPos.x + hoveredButton.width + Theme.spacingS
-                }
+        const layoutItem = dockApps.children[0]
+        const flowLayout = layoutItem.children[0]
+        let repeater = null
+        for (var i = 0; i < flowLayout.children.length; i++) {
+            const child = flowLayout.children[i]
+            if (child && typeof child.count !== "undefined" && typeof child.itemAt === "function") {
+                repeater = child
+                break
             }
         }
-        y: {
-            if (!hoveredButton) return 0
-            const buttonPos = hoveredButton.mapToItem(dock.contentItem, 0, 0)
-            if (!dock.isVertical) {
-                if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
-                    return buttonPos.y - height - Theme.spacingS
-                } else {
-                    return buttonPos.y + hoveredButton.height + Theme.spacingS
-                }
-            } else {
-                return buttonPos.y + hoveredButton.height / 2 - height / 2
+        if (!repeater || !repeater.itemAt) {
+            return null
+        }
+        for (var i = 0; i < repeater.count; i++) {
+            const item = repeater.itemAt(i)
+            if (item && item.dockButton && item.dockButton.showTooltip) {
+                return item.dockButton
             }
         }
-
-        StyledText {
-            id: tooltipLabel
-            anchors.centerIn: parent
-            text: appTooltip.tooltipText
-            font.pixelSize: Theme.fontSizeSmall
-            color: Theme.surfaceText
-        }
+        return null
     }
 
     Item {
@@ -256,6 +205,62 @@ Variants {
                 id: dockContainer
                 anchors.fill: parent
 
+                Item {
+                    id: appTooltip
+                    z: 1000
+                    anchors.fill: parent
+
+                    property string tooltipText: dock.hoveredButton ? dock.hoveredButton.tooltipText : ""
+                    property bool shouldShow: dock.hoveredButton !== null && tooltipText !== "" && dock.reveal && !slideXAnimation.running && !slideYAnimation.running
+
+                    Rectangle {
+                        id: tooltipBackground
+                        width: tooltipLabel.contentWidth + 24
+                        height: tooltipLabel.contentHeight + 12
+
+                        visible: appTooltip.shouldShow && tooltipLabel.contentWidth > 0
+                        color: Theme.surfaceContainer
+                        radius: Theme.cornerRadius
+                        border.width: 1
+                        border.color: Theme.outlineMedium
+
+                        x: {
+                            if (!dock.hoveredButton || !visible) return 0
+                            const buttonPos = dock.hoveredButton.mapToItem(dockContainer, 0, 0)
+                            if (!dock.isVertical) {
+                                return buttonPos.x + dock.hoveredButton.width / 2 - width / 2
+                            } else {
+                                if (SettingsData.dockPosition === SettingsData.Position.Right) {
+                                    return buttonPos.x - width - Theme.spacingS
+                                } else {
+                                    return buttonPos.x + dock.hoveredButton.width + Theme.spacingS
+                                }
+                            }
+                        }
+                        y: {
+                            if (!dock.hoveredButton || !visible) return 0
+                            const buttonPos = dock.hoveredButton.mapToItem(dockContainer, 0, 0)
+                            if (!dock.isVertical) {
+                                if (SettingsData.dockPosition === SettingsData.Position.Bottom) {
+                                    return buttonPos.y - height - Theme.spacingS
+                                } else {
+                                    return buttonPos.y + dock.hoveredButton.height + Theme.spacingS
+                                }
+                            } else {
+                                return buttonPos.y + dock.hoveredButton.height / 2 - height / 2
+                            }
+                        }
+
+                        StyledText {
+                            id: tooltipLabel
+                            anchors.centerIn: parent
+                            text: appTooltip.tooltipText
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                        }
+                    }
+                }
+
                 transform: Translate {
                     id: dockSlide
                     x: {
@@ -281,6 +286,7 @@ Variants {
 
                     Behavior on x {
                         NumberAnimation {
+                            id: slideXAnimation
                             duration: 200
                             easing.type: Easing.OutCubic
                         }
@@ -288,6 +294,7 @@ Variants {
 
                     Behavior on y {
                         NumberAnimation {
+                            id: slideYAnimation
                             duration: 200
                             easing.type: Easing.OutCubic
                         }
@@ -344,6 +351,7 @@ Variants {
                         contextMenu: dockVariants.contextMenu
                         groupByApp: dock.groupByApp
                         isVertical: dock.isVertical
+                        dockScreen: dock.screen
                     }
                 }
             }

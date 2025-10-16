@@ -17,22 +17,15 @@ PanelWindow {
     property bool hidePin: false
     property var desktopEntry: null
 
-    function showForButton(button, data, dockHeight, hidePinOption, entry) {
+    function showForButton(button, data, dockHeight, hidePinOption, entry, dockScreen) {
         anchorItem = button
         appData = data
         dockVisibleHeight = dockHeight || 40
         hidePin = hidePinOption || false
         desktopEntry = entry || null
 
-        const dockWindow = button.Window.window
-        if (dockWindow) {
-            for (var i = 0; i < Quickshell.screens.length; i++) {
-                const s = Quickshell.screens[i]
-                if (dockWindow.x >= s.x && dockWindow.x < s.x + s.width) {
-                    root.screen = s
-                    break
-                }
-            }
+        if (dockScreen) {
+            root.screen = dockScreen
         }
 
         showContextMenu = true

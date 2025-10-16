@@ -724,7 +724,7 @@ window-rule {
         const sourceBindsPath = Paths.strip(Qt.resolvedUrl("niri-binds.kdl"))
 
         writeBindsProcess.bindsPath = bindsPath
-        writeBindsProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cp "${sourceBindsPath}" "${bindsPath}"`]
+        writeBindsProcess.command = ["sh", "-c", `mkdir -p "${niriDmsDir}" && cp --no-preserve=mode "${sourceBindsPath}" "${bindsPath}"`]
         writeBindsProcess.running = true
     }
 }

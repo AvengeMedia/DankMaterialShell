@@ -14,6 +14,7 @@ Item {
     property int pinnedAppCount: 0
     property bool groupByApp: false
     property bool isVertical: false
+    property var dockScreen: null
 
     implicitWidth: isVertical ? appLayout.height : appLayout.width
     implicitHeight: isVertical ? appLayout.width : appLayout.height
@@ -217,6 +218,7 @@ Item {
                     contextMenu: root.contextMenu
                     dockApps: root
                     index: model.index
+                    parentDockScreen: root.dockScreen
 
                     // Override tooltip for windows to show window title
                     showWindowTitle: model.type === "window" || model.type === "grouped"
