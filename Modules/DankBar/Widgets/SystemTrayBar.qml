@@ -153,7 +153,10 @@ Rectangle {
 
                             const name = split[0];
                             const path = split[1];
-                            const fileName = name.substring(name.lastIndexOf("/") + 1);
+                            let fileName = name.substring(name.lastIndexOf("/") + 1);
+                            if (fileName.startsWith("dropboxstatus")) {
+                                fileName = `hicolor/16x16/status/${fileName}`;
+                            }
                             return `file://${path}/${fileName}`;
                         }
                         if (icon.startsWith("/") && !icon.startsWith("file://")) {
