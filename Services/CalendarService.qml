@@ -174,17 +174,42 @@ Singleton {
                             // Parse time if available and not all-day
                             let timeStr = event['start-time']
                             if (timeStr) {
-                                let timeParts = timeStr.match(/(\d+):(\d+)/)
+                                // Match time with optional seconds and AM/PM
+                                let timeParts = timeStr.match(/(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
                                 if (timeParts) {
-                                    startTime.setHours(parseInt(timeParts[1]),
-                                                       parseInt(timeParts[2]))
+                                    let hours = parseInt(timeParts[1])
+                                    let minutes = parseInt(timeParts[2])
+
+                                    // Handle AM/PM conversion if present
+                                    if (timeParts[3]) {
+                                        let period = timeParts[3].toUpperCase()
+                                        if (period === 'PM' && hours !== 12) {
+                                            hours += 12
+                                        } else if (period === 'AM' && hours === 12) {
+                                            hours = 0
+                                        }
+                                    }
+
+                                    startTime.setHours(hours, minutes)
                                     if (event['end-time']) {
                                         let endTimeParts = event['end-time'].match(
-                                            /(\d+):(\d+)/)
-                                        if (endTimeParts)
-                                        endTime.setHours(
-                                            parseInt(endTimeParts[1]),
-                                            parseInt(endTimeParts[2]))
+                                            /(\d+):(\d+)(?::\d+)?\s*(AM|PM)?/i)
+                                        if (endTimeParts) {
+                                            let endHours = parseInt(endTimeParts[1])
+                                            let endMinutes = parseInt(endTimeParts[2])
+
+                                            // Handle AM/PM conversion if present
+                                            if (endTimeParts[3]) {
+                                                let endPeriod = endTimeParts[3].toUpperCase()
+                                                if (endPeriod === 'PM' && endHours !== 12) {
+                                                    endHours += 12
+                                                } else if (endPeriod === 'AM' && endHours === 12) {
+                                                    endHours = 0
+                                                }
+                                            }
+
+                                            endTime.setHours(endHours, endMinutes)
+                                        }
                                     } else {
                                         // Default to 1 hour duration on same day
                                         endTime = new Date(startTime)
