@@ -524,7 +524,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width
+                            width: parent.width - (Theme.iconSize + Theme.spacingM)
                             spacing: Theme.spacingS
                             visible: SessionData.perMonitorWallpaper
                             leftPadding: Theme.iconSize + Theme.spacingM
@@ -645,7 +645,7 @@ Item {
                                 Item {
                                     width: 200
                                     height: 45 + Theme.spacingM
-                                    
+
                                     DankTabBar {
                                         id: modeTabBar
 
