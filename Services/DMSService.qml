@@ -14,7 +14,7 @@ Singleton {
     property bool dmsAvailable: false
     property var capabilities: []
     property int apiVersion: 0
-    readonly property int expectedApiVersion: 1
+    readonly property int expectedApiVersion: 5
     property var availablePlugins: []
     property var installedPlugins: []
     property bool isConnected: false
