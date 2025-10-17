@@ -99,6 +99,7 @@ Singleton {
 
     property bool showWorkspaceIndex: false
     property bool showWorkspacePadding: false
+    property bool workspaceScrolling: false
     property bool showWorkspaceApps: false
     property int maxWorkspaceIcons: 3
     property bool workspacesPerMonitor: true
@@ -361,6 +362,7 @@ Singleton {
                 ]
                 showWorkspaceIndex = settings.showWorkspaceIndex !== undefined ? settings.showWorkspaceIndex : false
                 showWorkspacePadding = settings.showWorkspacePadding !== undefined ? settings.showWorkspacePadding : false
+                workspaceScrolling = settings.workspaceScrolling !== undefined ? settings.workspaceScrolling : false
                 showWorkspaceApps = settings.showWorkspaceApps !== undefined ? settings.showWorkspaceApps : false
                 maxWorkspaceIcons = settings.maxWorkspaceIcons !== undefined ? settings.maxWorkspaceIcons : 3
                 workspaceNameIcons = settings.workspaceNameIcons !== undefined ? settings.workspaceNameIcons : ({})
@@ -561,6 +563,7 @@ Singleton {
                                                 "controlCenterShowAudioIcon": controlCenterShowAudioIcon,
                                                 "controlCenterWidgets": controlCenterWidgets,
                                                 "showWorkspaceIndex": showWorkspaceIndex,
+                                                "workspaceScrolling": workspaceScrolling,
                                                 "showWorkspacePadding": showWorkspacePadding,
                                                 "showWorkspaceApps": showWorkspaceApps,
                                                 "maxWorkspaceIcons": maxWorkspaceIcons,
@@ -692,7 +695,7 @@ Singleton {
             "selectedGpuIndex", "enabledGpuPciIds", "showSystemTray", "showClock",
             "showNotificationButton", "showBattery", "showControlCenterButton",
             "controlCenterShowNetworkIcon", "controlCenterShowBluetoothIcon", "controlCenterShowAudioIcon",
-            "controlCenterWidgets", "showWorkspaceIndex", "showWorkspacePadding", "showWorkspaceApps",
+            "controlCenterWidgets", "showWorkspaceIndex", "workspaceScrolling", "showWorkspacePadding", "showWorkspaceApps",
             "maxWorkspaceIcons", "workspacesPerMonitor", "workspaceNameIcons", "waveProgressEnabled",
             "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode",
             "runningAppsCurrentWorkspace", "clockDateFormat", "lockDateFormat", "mediaSize",
@@ -1153,6 +1156,11 @@ Singleton {
 
     function setShowWorkspaceIndex(enabled) {
         showWorkspaceIndex = enabled
+        saveSettings()
+    }
+    
+    function setWorkspaceScrolling(enabled) {
+        workspaceScrolling = enabled
         saveSettings()
     }
 

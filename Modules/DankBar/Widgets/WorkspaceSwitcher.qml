@@ -15,6 +15,9 @@ Rectangle {
     property string screenName: ""
     property real widgetHeight: 30
     property real barThickness: 48
+    readonly property var sortedToplevels: {
+        return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, parentScreen?.name);
+    }
     property int currentWorkspace: {
         if (CompositorService.isNiri) {
             return getNiriActiveWorkspace()
@@ -252,14 +255,84 @@ Rectangle {
                      const direction = deltaY < 0 ? 1 : -1
 
                      if (isMouseWheel) {
-                         switchWorkspace(direction)
+                        if (!SettingsData.workspaceScrolling) {
+                            switchWorkspace(direction)
+                        }
+                        else {
+                            const windows = root.sortedToplevels;
+                            if (windows.length < 2) {
+                                return;
+                            }
+                         let currentIndex = -1;
+                         for (let i = 0; i < windows.length; i++) {
+                            if (windows[i].activated) {
+                                currentIndex = i;
+                                break;
+                            }
+                            
+                         }
+                         let nextIndex;
+                         if (deltaY < 0) {
+                            if (currentIndex === -1) {
+                                nextIndex = 0;
+                            } else {
+                                nextIndex = currentIndex +1;
+                            }
+                         } else {
+                            if (currentIndex === -1) {
+                                nextIndex = windows.length -1;
+                            } else {
+                                nextIndex = currentIndex - 1
+                            }
+                         }
+                         const nextWindow = windows[nextIndex];
+                         if (nextWindow) {
+                            nextWindow.activate();
+                         }
+                        }
+                         
                      } else {
                          scrollAccumulator += deltaY
 
                          if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
                              const touchDirection = scrollAccumulator < 0 ? 1 : -1
-                             switchWorkspace(touchDirection)
-                             scrollAccumulator = 0
+                             if (!SettingsData.workspaceScrolling) {
+                                switchWorkspace(touchDirection)
+                             }
+                             else {
+                                const windows = root.sortedToplevels;
+                                if (windows.length < 2) {
+                                    return;
+                                }
+                                let currentIndex = -1;
+                                for (let i = 0; i < windows.length; i++) {
+                                    if (windows[i].activated) {
+                                        currentIndex = i;
+                                        break;
+                                    }
+                            
+                                }
+                                let nextIndex;
+                                if (deltaY < 0) {
+                                    if (currentIndex === -1) {
+                                    nextIndex = 0;
+                                } else {
+                                    nextIndex = currentIndex +1;
+                                }
+                            } else {
+                                if (currentIndex === -1) {
+                                    nextIndex = windows.length -1;
+                                } else {
+                                    nextIndex = currentIndex - 1
+                                }
+                            }
+                            const nextWindow = windows[nextIndex];
+                            if (nextWindow) {
+                                nextWindow.activate();
+                            }
+                        }
+                             
+                            scrollAccumulator = 0
                          }
                      }
 
