@@ -186,20 +186,30 @@ sudo dnf copr enable avengemedia/dms && sudo dnf install dms
 sudo dnf copr enable avengemedia/dms-git && sudo dnf install dms
 ```
 
-#### nixOS - via flake
+#### NixOS - via flake
 
 ```bash
 nix profile install github:AvengeMedia/DankMaterialShell
 ```
 
-#### nixOS - via home-manager
+#### NixOS - via home-manager
 
 To install using home-manager, you need to add this repo into your flake inputs:
 
 ``` nix
+dgop = {
+  url = "github:AvengeMedia/dgop";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+dms-cli = {
+  url = "github:AvengeMedia/danklinux";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
 dankMaterialShell = {
   url = "github:AvengeMedia/DankMaterialShell";
   inputs.nixpkgs.follows = "nixpkgs";
+  inputs.dgop.follows = "dgop";
+  inputs.dms-cli.follows = "dms-cli";
 };
 ```
 
@@ -674,7 +684,7 @@ cp -R ./PLUGINS/ExampleEmojiPlugin ~/.config/DankMaterialShell/plugins
 
 **Only install plugins from TRUSTED sources.** Plugins execute QML and javascript at runtime, plugins from third parties should be reviewed before enabling them in dms.
 
-### nixOS - via home-manager
+### NixOS - via home-manager
 
 Add the following to your home-manager config to install a plugin:
 
