@@ -479,7 +479,7 @@ Singleton {
             details += "IPv4 informations:\\n"
             
             for (const ip4 of info.IPv4s.ips) {
-                details += "   IPv4 address: " + ip4 + "\\n"
+                details += "    IPv4 address: " + ip4 + "\\n"
             }
             details += "    Gateway: " + info.IPv4s.gateway + "\\n"
             details += "    DNS: " + info.IPv4s.dns + "\\n"
@@ -488,7 +488,7 @@ Singleton {
                 details += "\\nIPv6 informations:\\n"
                 
                 for (const ip6 of info.IPv6s.ips) {
-                    details += "   IPv6 address: " + ip6 + "\\n"
+                    details += "    IPv6 address: " + ip6 + "\\n"
                 }
                 if (info.IPv6s.gateway.length > 0) {
                     details += "    Gateway: " + info.IPv6s.gateway + "\\n"
