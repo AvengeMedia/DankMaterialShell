@@ -20,6 +20,8 @@ Singleton {
     property bool ethernetConnected: false
     property string ethernetConnectionUuid: ""
 
+    property var wiredConnections: []
+
     property string wifiIP: ""
     property string wifiInterface: ""
     property bool wifiConnected: false
@@ -69,6 +71,10 @@ Singleton {
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
+    
+    property string networkWiredInfoUUID: ""
+    property string networkWiredInfoDetails: ""
+    property bool networkWiredInfoLoading: false
 
     property int refCount: 0
     property bool stateInitialized: false
@@ -179,6 +185,8 @@ Singleton {
         ethernetConnected = state.ethernetConnected || false
         ethernetConnectionUuid = state.ethernetConnectionUuid || ""
 
+        wiredConnections = state.wiredConnections || []
+
         wifiIP = state.wifiIP || ""
         wifiInterface = state.wifiDevice || ""
         wifiConnected = state.wifiConnected || false
@@ -218,6 +226,31 @@ Singleton {
         lastConnectionError = state.lastError || ""
 
         connectionChanged()
+    }
+    
+    function connectToSpecificWiredConfig(uuid) {
+        if (!networkAvailable || isConnecting) return
+
+        isConnecting = true
+        connectionError = ""
+        connectionStatus = "connecting"
+
+        const params = { uuid: uuid }
+
+        DMSService.sendRequest("network.ethernet.connect.config", params, response => {
+            if (response.error) {
+                connectionError = response.error
+                lastConnectionError = response.error
+                connectionStatus = "failed"
+                ToastService.showError(`Failed to activate configuration`)
+            } else {
+                connectionError = ""
+                connectionStatus = "connected"
+                ToastService.showInfo(`Configuration activated`)
+            }
+
+            isConnecting = false
+        })
     }
 
     function scanWifi() {
@@ -413,6 +446,61 @@ Singleton {
         autoScan = false
         autoRefreshEnabled = false
     }
+    
+    function fetchWiredNetworkInfo(uuid) {
+        if (!networkAvailable) return
+
+        networkWiredInfoUUID = uuid
+        networkWiredInfoLoading = true
+        networkWiredInfoDetails = "Loading network information..."
+
+        DMSService.sendRequest("network.ethernet.info", { uuid: uuid }, response => {
+            networkWiredInfoLoading = false
+
+            if (response.error) {
+                networkWiredInfoDetails = "Failed to fetch network information"
+            } else if (response.result) {
+                formatWiredNetworkInfo(response.result)
+            }
+        })
+    }
+
+    function formatWiredNetworkInfo(info) {
+        let details = ""
+
+        if (!info) {
+            details = "Network information not found or network not available."
+        } else {
+            details += "Inteface: " + info.iface + "\\n"
+            details += "Driver: " + info.driver + "\\n"
+            details += "MAC Addr: " + info.hwAddr + "\\n"
+            details += "Speed: " + info.speed + " Mb/s\\n\\n"
+            
+            details += "IPv4 informations:\\n"
+            
+            for (const ip4 of info.IPv4s.ips) {
+                details += "   IPv4 address: " + ip4 + "\\n"
+            }
+            details += "    Gateway: " + info.IPv4s.gateway + "\\n"
+            details += "    DNS: " + info.IPv4s.dns + "\\n"
+            
+            if (info.IPv6s.ips) {
+                details += "\\nIPv6 informations:\\n"
+                
+                for (const ip6 of info.IPv6s.ips) {
+                    details += "   IPv6 address: " + ip6 + "\\n"
+                }
+                if (info.IPv6s.gateway.length > 0) {
+                    details += "    Gateway: " + info.IPv6s.gateway + "\\n"
+                }
+                if (info.IPv6s.dns.length > 0) {
+                    details += "    DNS: " + info.IPv6s.dns + "\\n"
+                }
+            }
+        }
+
+        networkWiredInfoDetails = details
+    }
 
     function fetchNetworkInfo(ssid) {
         if (!networkAvailable) return
@@ -480,6 +568,17 @@ Singleton {
             "saved": network.saved,
             "connected": network.connected,
             "bssid": network.bssid
+        }
+    }
+
+    function getWiredNetworkInfo(uuid) {
+        const network = wiredConnections.find(n => n.uuid === uuid)
+        if (!network) {
+            return null
+        }
+
+        return {
+            "uuid": uuid,
         }
     }
 

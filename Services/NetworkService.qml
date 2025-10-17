@@ -19,6 +19,8 @@ Singleton {
     property bool ethernetConnected: activeService?.ethernetConnected ?? false
     property string ethernetConnectionUuid: activeService?.ethernetConnectionUuid ?? ""
 
+    property var wiredConnections: activeService?.wiredConnections ?? []
+
     property string wifiIP: activeService?.wifiIP ?? ""
     property string wifiInterface: activeService?.wifiInterface ?? ""
     property bool wifiConnected: activeService?.wifiConnected ?? false
@@ -57,6 +59,10 @@ Singleton {
     property string networkInfoSSID: activeService?.networkInfoSSID ?? ""
     property string networkInfoDetails: activeService?.networkInfoDetails ?? ""
     property bool networkInfoLoading: activeService?.networkInfoLoading ?? false
+    
+    property string networkWiredInfoUUID: activeService?.networkWiredInfoUUID ?? ""
+    property string networkWiredInfoDetails: activeService?.networkWiredInfoDetails ?? ""
+    property bool networkWiredInfoLoading: activeService?.networkWiredInfoLoading ?? false
 
     property int refCount: activeService?.refCount ?? 0
     property bool stateInitialized: activeService?.stateInitialized ?? false
@@ -221,6 +227,12 @@ Singleton {
         }
     }
 
+    function fetchWiredNetworkInfo(uuid) {
+        if (activeService && activeService.fetchWiredNetworkInfo) {
+            activeService.fetchWiredNetworkInfo(uuid)
+        }
+    }
+
     function getNetworkInfo(ssid) {
         if (activeService && activeService.getNetworkInfo) {
             return activeService.getNetworkInfo(ssid)
@@ -228,9 +240,22 @@ Singleton {
         return null
     }
 
+    function getWiredNetworkInfo(uuid) {
+        if (activeService && activeService.getWiredNetworkInfo) {
+            return activeService.getWiredNetworkInfo(uuid)
+        }
+        return null
+    }
+
     function refreshNetworkState() {
         if (activeService && activeService.refreshNetworkState) {
             activeService.refreshNetworkState()
+        }
+    }
+    
+    function connectToSpecificWiredConfig(uuid) {
+        if (activeService && activeService.connectToSpecificWiredConfig) {
+            activeService.connectToSpecificWiredConfig(uuid)
         }
     }
 }

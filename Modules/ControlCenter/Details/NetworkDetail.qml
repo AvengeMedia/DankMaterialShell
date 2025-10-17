@@ -29,6 +29,22 @@ Rectangle {
         NetworkService.removeRef()
     }
     
+    property int currentPreferenceIndex: {
+        const pref = NetworkService.userPreference
+        const status = NetworkService.networkStatus
+        let index = 1
+
+        if (pref === "ethernet") {
+            index = 0
+        } else if (pref === "wifi") {
+            index = 1
+        } else {
+            index = status === "ethernet" ? 0 : 1
+        }
+
+        return index
+    }
+
     Row {
         id: headerRow
         anchors.left: parent.left
@@ -38,7 +54,7 @@ Rectangle {
         anchors.rightMargin: Theme.spacingM
         anchors.topMargin: Theme.spacingS
         height: 40
-        
+
         StyledText {
             id: headerText
             text: I18n.tr("Network Settings")
@@ -47,32 +63,16 @@ Rectangle {
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
         }
-        
+
         Item {
             width: Math.max(0, parent.width - headerText.implicitWidth - preferenceControls.width - Theme.spacingM)
             height: parent.height
         }
-        
+
         DankButtonGroup {
             id: preferenceControls
             anchors.verticalCenter: parent.verticalCenter
-            visible: NetworkService.ethernetConnected
-
-            property int currentPreferenceIndex: {
-                const pref = NetworkService.userPreference
-                const status = NetworkService.networkStatus
-                let index = 1
-
-                if (pref === "ethernet") {
-                    index = 0
-                } else if (pref === "wifi") {
-                    index = 1
-                } else {
-                    index = status === "ethernet" ? 0 : 1
-                }
-
-                return index
-            }
+            visible: true
 
             model: ["Ethernet", "WiFi"]
             currentIndex: currentPreferenceIndex
@@ -92,7 +92,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
-        visible: NetworkService.wifiToggling
+        visible: currentPreferenceIndex === 1 && NetworkService.wifiToggling
         height: visible ? 80 : 0
 
         Column {
@@ -131,7 +131,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
-        visible: !NetworkService.wifiEnabled && !NetworkService.wifiToggling
+        visible: currentPreferenceIndex === 1 && !NetworkService.wifiEnabled && !NetworkService.wifiToggling
         height: visible ? 120 : 0
         
         Column {
@@ -179,7 +179,179 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: NetworkService.toggleWifiRadio()
                 }
-                
+
+            }
+        }
+    }
+
+    DankFlickable {
+        id: wiredContent
+        anchors.top: headerRow.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: Theme.spacingM
+        anchors.topMargin: Theme.spacingM
+        visible: currentPreferenceIndex === 0
+        contentHeight: wiredColumn.height
+        clip: true
+
+        Column {
+            id: wiredColumn
+            width: parent.width
+            spacing: Theme.spacingS
+
+            Repeater {
+                model: sortedNetworks
+
+                property var sortedNetworks: {
+                    const currentUuid = NetworkService.ethernetConnectionUuid
+                    const networks = NetworkService.wiredConnections
+                    let sorted = [...networks]
+                    sorted.sort((a, b) => {
+                        if (a.isActive && !b.isActive) return -1
+                        if (!a.isActive && b.isActive) return 1
+                        return a.id.localeCompare(b.id)
+                    })
+                    return sorted
+                }
+                delegate: Rectangle {
+                    required property var modelData
+                    required property int index
+
+                    width: parent.width
+                    height: 50
+                    radius: Theme.cornerRadius
+                    color: wiredNetworkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
+                    border.color: Theme.primary
+                    border.width: 0
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.leftMargin: Theme.spacingM
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "lan"
+                            size: Theme.iconSize - 4
+                            color: modelData.isActive ? Theme.primary : Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 200
+
+                            StyledText {
+                                text: modelData.id || "Unknown Config"
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: modelData.isActive ? Theme.primary : Theme.surfaceText
+                                font.weight: modelData.isActive ? Font.Medium : Font.Normal
+                                elide: Text.ElideRight
+                                width: parent.width
+                            }
+                        }
+                    }
+                    
+                    DankActionButton {
+                        id: wiredOptionsButton
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        iconName: "more_horiz"
+                        buttonSize: 28
+                        onClicked: {
+                            if (wiredNetworkContextMenu.visible) {
+                                wiredNetworkContextMenu.close()
+                            } else {
+                                wiredNetworkContextMenu.currentID = modelData.id
+                                wiredNetworkContextMenu.currentUUID = modelData.uuid                               
+                                wiredNetworkContextMenu.currentConnected = modelData.isActive
+                                wiredNetworkContextMenu.popup(wiredOptionsButton, -wiredNetworkContextMenu.width + wiredOptionsButton.width, wiredOptionsButton.height + Theme.spacingXS)
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: wiredNetworkMouseArea
+                        anchors.fill: parent
+                        anchors.rightMargin: wiredOptionsButton.width + Theme.spacingS
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: function(event) {
+                            if (modelData.uuid !== NetworkService.ethernetConnectionUuid) {
+                                NetworkService.connectToSpecificWiredConfig(modelData.uuid)
+                            }
+                            event.accepted = true
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    
+    Menu {
+        id: wiredNetworkContextMenu
+        width: 150
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        property string currentID: ""
+        property string currentUUID: ""
+        property bool currentConnected: false
+
+        background: Rectangle {
+            color: Theme.popupBackground()
+            radius: Theme.cornerRadius
+            border.width: 0
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        }
+
+        MenuItem {
+            text: "Activate"
+            height: !wiredNetworkContextMenu.currentConnected ? 32 : 0
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                if (!networkContextMenu.currentConnected) {
+                    NetworkService.connectToSpecificWiredConfig(wiredNetworkContextMenu.currentUUID)
+                }
+            }
+        }
+
+        MenuItem {
+            text: I18n.tr("Network Info")
+            height: wiredNetworkContextMenu.currentConnected ? 32 : 0
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                let networkData = NetworkService.getWiredNetworkInfo(wiredNetworkContextMenu.currentUUID)
+                networkWiredInfoModal.showNetworkInfo(wiredNetworkContextMenu.currentID, networkData)
             }
         }
     }
@@ -192,10 +364,10 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.margins: Theme.spacingM
         anchors.topMargin: Theme.spacingM
-        visible: NetworkService.wifiInterface && NetworkService.wifiEnabled && !NetworkService.wifiToggling
+        visible: currentPreferenceIndex === 1 && NetworkService.wifiEnabled && !NetworkService.wifiToggling
         contentHeight: wifiColumn.height
         clip: true
-        
+
         Column {
             id: wifiColumn
             width: parent.width
@@ -282,20 +454,20 @@ Rectangle {
                                 spacing: Theme.spacingXS
 
                                 StyledText {
-                                    text: modelData.ssid === NetworkService.currentWifiSSID ? "Connected" : (modelData.secured ? "Secured" : "Open")
+                                    text: modelData.ssid === NetworkService.currentWifiSSID ? "Connected •" : (modelData.secured ? "Secured •" : "Open •")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                 }
                                 
                                 StyledText {
-                                    text: modelData.saved ? "• Saved" : ""
+                                    text: modelData.saved ? "Saved" : ""
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.primary
                                     visible: text.length > 0
                                 }
                                 
                                 StyledText {
-                                    text: "• " + modelData.signal + "%"
+                                    text: (modelData.saved ? "• " : "") + modelData.signal + "%"
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                 }
@@ -449,6 +621,8 @@ Rectangle {
     NetworkInfoModal {
         id: networkInfoModal
     }
-
-
+    
+    NetworkWiredInfoModal {
+        id: networkWiredInfoModal
+    }
 }

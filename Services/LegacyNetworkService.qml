@@ -20,6 +20,8 @@ Singleton {
     property bool ethernetConnected: false
     property string ethernetConnectionUuid: ""
 
+    property var wiredConnections: []
+    
     property string wifiIP: ""
     property string wifiInterface: ""
     property bool wifiConnected: false
@@ -73,6 +75,10 @@ Singleton {
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
+    
+    property string networkWiredInfoUUID: ""
+    property string networkWiredInfoDetails: ""
+    property bool networkWiredInfoLoading: false
 
     signal networksUpdated
     signal connectionChanged
