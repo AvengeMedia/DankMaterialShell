@@ -15,6 +15,15 @@ Singleton {
     readonly property bool enabled: (adapter && adapter.enabled) ?? false
     readonly property bool discovering: (adapter && adapter.discovering) ?? false
     readonly property var devices: adapter ? adapter.devices : null
+    readonly property bool connected: {
+        if (!adapter || !adapter.devices) {
+            return false
+        }
+
+        let isConnected = false
+        adapter.devices.values.forEach(dev => { if (dev.connected) isConnected = true })
+        return isConnected
+    }
     readonly property var pairedDevices: {
         if (!adapter || !adapter.devices) {
             return []

@@ -67,7 +67,7 @@ Rectangle {
         DankIcon {
             name: "bluetooth"
             size: Theme.barIconSize(barThickness)
-            color: BluetoothService.enabled ? Theme.primary : Theme.outlineButton
+            color: BluetoothService.connected ? Theme.primary : Theme.outlineButton
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
         }
@@ -169,7 +169,7 @@ Rectangle {
 
             name: "bluetooth"
             size: Theme.barIconSize(barThickness)
-            color: BluetoothService.enabled ? Theme.primary : Theme.outlineButton
+            color: BluetoothService.connected ? Theme.primary : Theme.outlineButton
             anchors.verticalCenter: parent.verticalCenter
             visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
         }
