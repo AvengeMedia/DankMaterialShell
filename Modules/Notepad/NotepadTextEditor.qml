@@ -75,14 +75,14 @@ Column {
 
     property string lastTextForLineModel: ""
     property var lineModel: []
-    
+
     function updateLineModel() {
         if (!SettingsData.notepadShowLineNumbers) {
             lineModel = []
             lastTextForLineModel = ""
             return
         }
-        
+
         if (textArea.text !== lastTextForLineModel || lineModel.length === 0) {
             lastTextForLineModel = textArea.text
             lineModel = textArea.text.split('\n')
@@ -129,10 +129,10 @@ Column {
     function highlightCurrentMatch() {
         if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
             const match = searchMatches[currentMatchIndex]
-            
+
             textArea.cursorPosition = match.start
             textArea.moveCursorSelection(match.end, TextEdit.SelectCharacters)
-            
+
             const flickable = textArea.parent
             if (flickable && flickable.contentY !== undefined) {
                 const lineHeight = textArea.font.pixelSize * 1.5
@@ -219,11 +219,11 @@ Column {
                 verticalAlignment: TextInput.AlignVCenter
                 selectByMouse: true
                 clip: true
-                
+
                 Component.onCompleted: {
                     text = root.searchQuery
                 }
-                
+
                 Connections {
                     target: root
                     function onSearchQueryChanged() {
@@ -232,7 +232,7 @@ Column {
                         }
                     }
                 }
-                
+
                 onTextChanged: {
                     if (root.searchQuery !== text) {
                         root.searchQuery = text
@@ -260,7 +260,7 @@ Column {
                     event.accepted = true
                 }
             }
-            
+
             // Placeholder text
             StyledText {
                 Layout.fillWidth: true

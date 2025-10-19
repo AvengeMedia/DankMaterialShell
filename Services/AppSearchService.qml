@@ -11,7 +11,7 @@ Singleton {
     id: root
 
     property var applications: DesktopEntries.applications.values.filter(app => !app.noDisplay && !app.runInTerminal)
-    
+
 
 
     function searchApplications(query) {
@@ -266,7 +266,7 @@ Singleton {
 
     function getPluginCategoryIcon(category) {
         if (typeof PluginService === "undefined") return null
-        
+
         const launchers = PluginService.getLauncherPlugins()
         for (const pluginId in launchers) {
             const plugin = launchers[pluginId]
@@ -296,7 +296,7 @@ Singleton {
 
     function getPluginItems(category, query) {
         if (typeof PluginService === "undefined") return []
-        
+
         const launchers = PluginService.getLauncherPlugins()
         for (const pluginId in launchers) {
             const plugin = launchers[pluginId]
@@ -338,42 +338,42 @@ Singleton {
 
     function executePluginItem(item, pluginId) {
         if (typeof PluginService === "undefined") return false
-        
+
         const component = PluginService.pluginLauncherComponents[pluginId]
         if (!component) return false
-        
+
         try {
             const instance = component.createObject(root, {
                 "pluginService": PluginService
             })
-            
+
             if (instance && typeof instance.executeItem === "function") {
                 instance.executeItem(item)
                 instance.destroy()
                 return true
             }
-            
+
             if (instance) {
                 instance.destroy()
             }
         } catch (e) {
             console.warn("AppSearchService: Error executing item from plugin", pluginId, ":", e)
         }
-        
+
         return false
     }
 
     function searchPluginItems(query) {
         if (typeof PluginService === "undefined") return []
-        
+
         let allItems = []
         const launchers = PluginService.getLauncherPlugins()
-        
+
         for (const pluginId in launchers) {
             const items = getPluginItemsForPlugin(pluginId, query)
             allItems = allItems.concat(items)
         }
-        
+
         return allItems
     }
 }

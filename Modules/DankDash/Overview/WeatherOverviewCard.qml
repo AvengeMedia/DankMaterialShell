@@ -47,18 +47,18 @@ Card {
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingL
         visible: WeatherService.weather.available && WeatherService.weather.temp !== 0
-        
+
         DankIcon {
             name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
             size: 48
             color: Theme.primary
             anchors.verticalCenter: parent.verticalCenter
         }
-        
+
         Column {
             spacing: Theme.spacingXS
             anchors.verticalCenter: parent.verticalCenter
-            
+
             StyledText {
                 text: {
                     const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
@@ -71,7 +71,7 @@ Card {
                 color: Theme.surfaceText
                 font.weight: Font.Light
             }
-            
+
             StyledText {
                 text: WeatherService.getWeatherCondition(WeatherService.weather.wCode)
                 font.pixelSize: Theme.fontSizeSmall

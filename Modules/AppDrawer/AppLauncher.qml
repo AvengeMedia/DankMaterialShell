@@ -285,12 +285,12 @@ Item {
         }
 
         const triggers = PluginService.getAllPluginTriggers()
-        
+
         for (const trigger in triggers) {
             if (query.startsWith(trigger)) {
                 const pluginId = triggers[trigger]
                 const plugin = PluginService.getLauncherPlugin(pluginId)
-                
+
                 if (plugin) {
                     const remainingQuery = query.substring(trigger.length).trim()
                     const result = {
@@ -304,7 +304,7 @@ Item {
                 }
             }
         }
-        
+
         return { triggered: false, pluginCategory: "", query: "" }
     }
 

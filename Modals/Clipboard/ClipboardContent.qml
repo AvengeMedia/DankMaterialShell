@@ -84,7 +84,7 @@ Item {
                 id: clipboardListView
                 anchors.fill: parent
                 model: filteredModel
-                
+
                 currentIndex: clipboardContent.modal ? clipboardContent.modal.selectedIndex : 0
                 spacing: Theme.spacingXS
                 interactive: true
@@ -94,7 +94,7 @@ Item {
                 boundsMovement: Flickable.FollowBoundsBehavior
                 pressDelay: 0
                 flickableDirection: Flickable.VerticalFlick
-                
+
                 function ensureVisible(index) {
                     if (index < 0 || index >= count) {
                         return
@@ -108,13 +108,13 @@ Item {
                         contentY = itemBottom - height
                     }
                 }
-                
+
                 onCurrentIndexChanged: {
                     if (clipboardContent.modal && clipboardContent.modal.keyboardNavigationActive && currentIndex >= 0) {
                         ensureVisible(currentIndex)
                     }
                 }
-                
+
                 StyledText {
                     text: I18n.tr("No clipboard entries found")
                     anchors.centerIn: parent
@@ -122,11 +122,11 @@ Item {
                     color: Theme.surfaceVariantText
                     visible: filteredModel.count === 0
                 }
-                
+
                 delegate: ClipboardEntry {
                     required property int index
                     required property var model
-                    
+
                     width: clipboardListView.width
                     height: ClipboardConstants.itemHeight
                     entryData: model.entry

@@ -28,7 +28,7 @@ Rectangle {
     Component.onDestruction: {
         NetworkService.removeRef()
     }
-    
+
     property int currentPreferenceIndex: {
         if (DMSService.apiVersion < 5) {
             return 1
@@ -88,7 +88,7 @@ Rectangle {
             }
         }
     }
-    
+
     Item {
         id: wifiToggleContent
         anchors.top: headerRow.bottom
@@ -127,7 +127,7 @@ Rectangle {
             }
         }
     }
-    
+
     Item {
         id: wifiOffContent
         anchors.top: headerRow.bottom
@@ -137,19 +137,19 @@ Rectangle {
         anchors.topMargin: Theme.spacingM
         visible: currentPreferenceIndex === 1 && !NetworkService.wifiEnabled && !NetworkService.wifiToggling
         height: visible ? 120 : 0
-        
+
         Column {
             anchors.centerIn: parent
             spacing: Theme.spacingL
             width: parent.width
-            
+
             DankIcon {
                 anchors.horizontalCenter: parent.horizontalCenter
                 name: "wifi_off"
                 size: 48
                 color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             }
-            
+
             StyledText {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: I18n.tr("WiFi is off")
@@ -158,7 +158,7 @@ Rectangle {
                 font.weight: Font.Medium
                 horizontalAlignment: Text.AlignHCenter
             }
-            
+
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 120
@@ -167,7 +167,7 @@ Rectangle {
                 color: enableWifiButton.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
                 border.width: 0
                 border.color: Theme.primary
-                
+
                 StyledText {
                     anchors.centerIn: parent
                     text: I18n.tr("Enable WiFi")
@@ -175,7 +175,7 @@ Rectangle {
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
                 }
-                
+
                 MouseArea {
                     id: enableWifiButton
                     anchors.fill: parent
@@ -257,7 +257,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     DankActionButton {
                         id: wiredOptionsButton
                         anchors.right: parent.right
@@ -295,7 +295,7 @@ Rectangle {
             }
         }
     }
-    
+
     Menu {
         id: wiredNetworkContextMenu
         width: 150
@@ -376,7 +376,7 @@ Rectangle {
             id: wifiColumn
             width: parent.width
             spacing: Theme.spacingS
-            
+
             Item {
                 width: parent.width
                 height: 200
@@ -397,7 +397,7 @@ Rectangle {
                     }
                 }
             }
-            
+
             Repeater {
                 model: sortedNetworks
 
@@ -415,20 +415,20 @@ Rectangle {
                 delegate: Rectangle {
                     required property var modelData
                     required property int index
-                    
+
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
                     color: networkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
                     border.color: modelData.ssid === NetworkService.currentWifiSSID ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: 0
-                    
+
                     Row {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: Theme.spacingM
                         spacing: Theme.spacingS
-                        
+
                         DankIcon {
                             name: {
                                 let strength = modelData.signal || 0
@@ -440,11 +440,11 @@ Rectangle {
                             color: modelData.ssid === NetworkService.currentWifiSSID ? Theme.primary : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 200
-                            
+
                             StyledText {
                                 text: modelData.ssid || "Unknown Network"
                                 font.pixelSize: Theme.fontSizeMedium
@@ -462,14 +462,14 @@ Rectangle {
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                 }
-                                
+
                                 StyledText {
                                     text: modelData.saved ? "Saved" : ""
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.primary
                                     visible: text.length > 0
                                 }
-                                
+
                                 StyledText {
                                     text: (modelData.saved ? "• " : "") + modelData.signal + "%"
                                     font.pixelSize: Theme.fontSizeSmall
@@ -478,7 +478,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     DankActionButton {
                         id: optionsButton
                         anchors.right: parent.right
@@ -499,7 +499,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     MouseArea {
                         id: networkMouseArea
                         anchors.fill: parent
@@ -517,34 +517,34 @@ Rectangle {
                             event.accepted = true
                         }
                     }
-                    
+
                 }
             }
         }
     }
-    
+
     Menu {
         id: networkContextMenu
         width: 150
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-        
+
         property string currentSSID: ""
         property bool currentSecured: false
         property bool currentConnected: false
         property bool currentSaved: false
         property int currentSignal: 0
-        
+
         background: Rectangle {
             color: Theme.popupBackground()
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         }
-        
+
         MenuItem {
             text: networkContextMenu.currentConnected ? "Disconnect" : "Connect"
             height: 32
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -552,12 +552,12 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 if (networkContextMenu.currentConnected) {
                     NetworkService.disconnectWifi()
@@ -570,11 +570,11 @@ Rectangle {
                 }
             }
         }
-        
+
         MenuItem {
             text: I18n.tr("Network Info")
             height: 32
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -582,23 +582,23 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 let networkData = NetworkService.getNetworkInfo(networkContextMenu.currentSSID)
                 networkInfoModal.showNetworkInfo(networkContextMenu.currentSSID, networkData)
             }
         }
-        
+
         MenuItem {
             text: I18n.tr("Forget Network")
             height: networkContextMenu.currentSaved || networkContextMenu.currentConnected ? 32 : 0
             visible: networkContextMenu.currentSaved || networkContextMenu.currentConnected
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -606,18 +606,18 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 NetworkService.forgetWifiNetwork(networkContextMenu.currentSSID)
             }
         }
     }
-    
+
     WifiPasswordModal {
         id: wifiPasswordModal
     }
@@ -625,7 +625,7 @@ Rectangle {
     NetworkInfoModal {
         id: networkInfoModal
     }
-    
+
     NetworkWiredInfoModal {
         id: networkWiredInfoModal
     }

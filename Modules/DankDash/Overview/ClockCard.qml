@@ -35,7 +35,7 @@ Card {
                     width: 28
                     horizontalAlignment: Text.AlignHCenter
                 }
-                
+
                 StyledText {
                     text: {
                         if (SettingsData.use24HourClock) {
@@ -53,7 +53,7 @@ Card {
                     horizontalAlignment: Text.AlignHCenter
                 }
             }
-            
+
             Row {
                 spacing: 0
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -66,7 +66,7 @@ Card {
                     width: 28
                     horizontalAlignment: Text.AlignHCenter
                 }
-                
+
                 StyledText {
                     text: String(systemClock?.date?.getMinutes()).padStart(2, '0').charAt(1)
                     font.pixelSize: 48
@@ -102,7 +102,7 @@ Card {
             }
 
         }
-        
+
         StyledText {
             text: systemClock?.date?.toLocaleDateString(Qt.locale(), "MMM dd")
             font.pixelSize: Theme.fontSizeSmall

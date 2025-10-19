@@ -132,7 +132,7 @@ Item {
                             anchors.left: tempText.right
                             anchors.leftMargin: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
-                            
+
                             MouseArea {
                                 anchors.fill: parent
                                 hoverEnabled: true
@@ -540,7 +540,7 @@ Item {
                         width: (parent.width - Theme.spacingXS * 6) / 7
                         height: parent.height
                         radius: Theme.cornerRadius
-                        
+
                         property var dayDate: {
                             const date = new Date()
                             date.setDate(date.getDate() + index)

@@ -83,12 +83,12 @@ Item {
         hoverEnabled: true
         preventStealing: true
         propagateComposedEvents: false
-        
+
         onClicked: root.hide()
         onWheel: (wheel) => { wheel.accepted = true }
         onPositionChanged: (mouse) => { mouse.accepted = true }
     }
-    
+
     Rectangle {
         id: modalBackground
         anchors.fill: parent

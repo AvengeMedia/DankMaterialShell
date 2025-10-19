@@ -98,10 +98,10 @@ Item {
         bottomRightRadius: 0
         color: Theme.primary
         visible: false
-        
+
         property bool animationEnabled: false
         property bool initialSetupComplete: false
-        
+
         Behavior on x {
             enabled: indicator.animationEnabled
             NumberAnimation {
@@ -109,7 +109,7 @@ Item {
                 easing.type: Theme.standardEasing
             }
         }
-        
+
         Behavior on width {
             enabled: indicator.animationEnabled
             NumberAnimation {
@@ -130,21 +130,21 @@ Item {
         if (tabRepeater.count === 0 || currentIndex < 0 || currentIndex >= tabRepeater.count) {
             return
         }
-        
+
         const item = tabRepeater.itemAt(currentIndex)
         if (!item || item.isAction) {
             return
         }
-        
+
         const tabPos = item.mapToItem(tabBar, 0, 0)
         const tabCenterX = tabPos.x + item.width / 2
         const indicatorWidth = 60
-        
+
         if (tabPos.x < 10 && currentIndex > 0) {
             Qt.callLater(() => updateIndicator(enableAnimation))
             return
         }
-        
+
         indicator.animationEnabled = enableAnimation
         indicator.width = indicatorWidth
         indicator.x = tabCenterX - indicatorWidth / 2

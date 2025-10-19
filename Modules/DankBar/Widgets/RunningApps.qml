@@ -82,20 +82,20 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
-        
+
         property real scrollAccumulator: 0
         property real touchpadThreshold: 500
-        
+
         onWheel: (wheel) => {
             const deltaY = wheel.angleDelta.y;
             const isMouseWheel = Math.abs(deltaY) >= 120
                 && (Math.abs(deltaY) % 120) === 0;
-            
+
             const windows = root.sortedToplevels;
             if (windows.length < 2) {
                 return;
             }
-            
+
             if (isMouseWheel) {
                 // Direct mouse wheel action
                 let currentIndex = -1;
@@ -128,7 +128,7 @@ Rectangle {
             } else {
                 // Touchpad - accumulate small deltas
                 scrollAccumulator += deltaY;
-                
+
                 if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
                     let currentIndex = -1;
                     for (let i = 0; i < windows.length; i++) {
@@ -157,11 +157,11 @@ Rectangle {
                     if (nextWindow) {
                         nextWindow.activate();
                     }
-                    
+
                     scrollAccumulator = 0;
                 }
             }
-            
+
             wheel.accepted = true;
         }
     }
@@ -640,51 +640,51 @@ Rectangle {
 
         sourceComponent: DankTooltip {}
     }
-    
+
     Loader {
         id: windowContextMenuLoader
         active: false
         sourceComponent: PanelWindow {
             id: contextMenuWindow
-            
+
             property var currentWindow: null
             property bool isVisible: false
             property point anchorPos: Qt.point(0, 0)
-            
+
             function showAt(x, y) {
                 screen = root.parentScreen;
                 anchorPos = Qt.point(x, y);
                 isVisible = true;
                 visible = true;
             }
-            
+
             function close() {
                 isVisible = false;
                 visible = false;
                 windowContextMenuLoader.active = false;
             }
-            
+
             implicitWidth: 100
             implicitHeight: 40
             visible: false
             color: "transparent"
-            
+
             WlrLayershell.layer: WlrLayershell.Overlay
             WlrLayershell.exclusiveZone: -1
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-            
+
             anchors {
                 top: true
                 left: true
                 right: true
                 bottom: true
             }
-            
+
             MouseArea {
                 anchors.fill: parent
                 onClicked: contextMenuWindow.close();
             }
-            
+
             Rectangle {
                 x: {
                     const left = 10;
@@ -699,13 +699,13 @@ Rectangle {
                 radius: Theme.cornerRadius
                 border.width: 1
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
-                
+
                 Rectangle {
                     anchors.fill: parent
                     radius: parent.radius
                     color: closeMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 }
-                
+
                 StyledText {
                     anchors.centerIn: parent
                     text: I18n.tr("Close")
@@ -713,7 +713,7 @@ Rectangle {
                     color: Theme.surfaceText
                     font.weight: Font.Normal
                 }
-                
+
                 MouseArea {
                     id: closeMouseArea
                     anchors.fill: parent

@@ -1172,7 +1172,7 @@ Singleton {
         showWorkspaceIndex = enabled
         saveSettings()
     }
-    
+
     function setWorkspaceScrolling(enabled) {
         workspaceScrolling = enabled
         saveSettings()

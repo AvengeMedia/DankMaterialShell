@@ -17,7 +17,7 @@ Rectangle {
     color: Theme.surfaceContainerHigh
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
-    
+
     Row {
         id: headerRow
         anchors.left: parent.left
@@ -27,7 +27,7 @@ Rectangle {
         anchors.rightMargin: Theme.spacingM
         anchors.topMargin: Theme.spacingS
         height: 40
-        
+
         StyledText {
             id: headerText
             text: I18n.tr("Audio Devices")
@@ -121,34 +121,34 @@ Rectangle {
         anchors.topMargin: volumeSlider.visible ? Theme.spacingS : Theme.spacingM
         contentHeight: audioColumn.height
         clip: true
-        
+
         Column {
             id: audioColumn
             width: parent.width
             spacing: Theme.spacingS
-            
+
             Repeater {
                 model: Pipewire.nodes.values.filter(node => {
                     return node.audio && node.isSink && !node.isStream
                 })
-                
+
                 delegate: Rectangle {
                     required property var modelData
                     required property int index
-                    
+
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
                     color: deviceMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
                     border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: 0
-                    
+
                     Row {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: Theme.spacingM
                         spacing: Theme.spacingS
-                        
+
                         DankIcon {
                             name: {
                                 if (modelData.name.includes("bluez"))
@@ -164,11 +164,11 @@ Rectangle {
                             color: modelData === AudioService.sink ? Theme.primary : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: parent.parent.width - parent.parent.anchors.leftMargin - parent.spacing - Theme.iconSize - Theme.spacingM
-                            
+
                             StyledText {
                                 text: AudioService.displayName(modelData)
                                 font.pixelSize: Theme.fontSizeMedium
@@ -178,7 +178,7 @@ Rectangle {
                                 width: parent.width
                                 wrapMode: Text.NoWrap
                             }
-                            
+
                             StyledText {
                                 text: modelData === AudioService.sink ? "Active" : "Available"
                                 font.pixelSize: Theme.fontSizeSmall
@@ -189,7 +189,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent

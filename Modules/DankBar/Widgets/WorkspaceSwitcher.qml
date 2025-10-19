@@ -290,7 +290,7 @@ Rectangle {
                             nextWindow.activate();
                          }
                         }
-                         
+
                      } else {
                          scrollAccumulator += deltaY
 
@@ -331,7 +331,7 @@ Rectangle {
                                 nextWindow.activate();
                             }
                         }
-                             
+
                             scrollAccumulator = 0
                          }
                      }

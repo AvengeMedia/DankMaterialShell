@@ -16,7 +16,7 @@ Singleton {
         return [fullUnderscore, fullHyphen, _lang].filter(c => c && c !== "en");
     }
 
-  
+
     readonly property url translationsFolder: Qt.resolvedUrl("../translations/poexports")
 
     property string currentLocale: "en"

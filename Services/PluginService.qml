@@ -538,7 +538,7 @@ Singleton {
     // Launcher plugin helper functions
     function getLauncherPlugins() {
         const launchers = {}
-        
+
         // Check plugins that have launcher components
         for (const pluginId in pluginLauncherComponents) {
             const plugin = availablePlugins[pluginId]

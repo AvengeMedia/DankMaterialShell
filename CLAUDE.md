@@ -191,9 +191,9 @@ shell.qml           # Main entry point (minimal orchestration)
 
    Singleton {
        id: root
-       
+
        property type value: defaultValue
-       
+
        function performAction() { /* implementation */ }
    }
    ```
@@ -251,23 +251,23 @@ shell.qml           # Main entry point (minimal orchestration)
    // For regular components
    Item {
        id: root
-       
+
        property type name: value
-       
+
        signal customSignal(type param)
-       
+
        onSignal: { /* handler */ }
-       
+
        Component { /* children */ }
    }
-   
+
    // For services (singletons)
    Singleton {
        id: root
-       
+
        property bool featureAvailable: false
        property type currentValue: defaultValue
-       
+
        function performAction(param) { /* implementation */ }
    }
    ```
@@ -305,7 +305,7 @@ shell.qml           # Main entry point (minimal orchestration)
    ```qml
    // In services - detect capabilities
    property bool brightnessAvailable: false
-   
+
    // In modules - adapt UI accordingly
    DankSlider {
        visible: DisplayService.brightnessAvailable
@@ -335,7 +335,7 @@ shell.qml           # Main entry point (minimal orchestration)
    console.log("Info message")           // General info
    console.warn("Warning message")       // Warnings
    console.error("Error message")        // Errors
-   
+
    // Include context in service operations
    onExited: (exitCode) => {
        if (exitCode !== 0) {

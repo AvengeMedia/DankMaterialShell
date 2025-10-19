@@ -71,7 +71,7 @@ Singleton {
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
-    
+
     property string networkWiredInfoUUID: ""
     property string networkWiredInfoDetails: ""
     property bool networkWiredInfoLoading: false
@@ -227,7 +227,7 @@ Singleton {
 
         connectionChanged()
     }
-    
+
     function connectToSpecificWiredConfig(uuid) {
         if (!networkAvailable || isConnecting) return
 
@@ -446,7 +446,7 @@ Singleton {
         autoScan = false
         autoRefreshEnabled = false
     }
-    
+
     function fetchWiredNetworkInfo(uuid) {
         if (!networkAvailable) return
 
@@ -475,18 +475,18 @@ Singleton {
             details += "Driver: " + info.driver + "\\n"
             details += "MAC Addr: " + info.hwAddr + "\\n"
             details += "Speed: " + info.speed + " Mb/s\\n\\n"
-            
+
             details += "IPv4 informations:\\n"
-            
+
             for (const ip4 of info.IPv4s.ips) {
                 details += "    IPv4 address: " + ip4 + "\\n"
             }
             details += "    Gateway: " + info.IPv4s.gateway + "\\n"
             details += "    DNS: " + info.IPv4s.dns + "\\n"
-            
+
             if (info.IPv6s.ips) {
                 details += "\\nIPv6 informations:\\n"
-                
+
                 for (const ip6 of info.IPv6s.ips) {
                     details += "    IPv6 address: " + ip6 + "\\n"
                 }

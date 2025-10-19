@@ -371,7 +371,7 @@ Item {
             widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
             widgets = SettingsData.dankBarRightWidgets.slice()
-        
+
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
             var widgetId = typeof widget === "string" ? widget : widget.id
@@ -401,7 +401,7 @@ Item {
                 }
             }
         }
-        
+
         if (sectionId === "left")
             SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")

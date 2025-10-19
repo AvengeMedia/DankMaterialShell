@@ -59,7 +59,7 @@ Singleton {
     property string networkInfoSSID: activeService?.networkInfoSSID ?? ""
     property string networkInfoDetails: activeService?.networkInfoDetails ?? ""
     property bool networkInfoLoading: activeService?.networkInfoLoading ?? false
-    
+
     property string networkWiredInfoUUID: activeService?.networkWiredInfoUUID ?? ""
     property string networkWiredInfoDetails: activeService?.networkWiredInfoDetails ?? ""
     property bool networkWiredInfoLoading: activeService?.networkWiredInfoLoading ?? false
@@ -252,7 +252,7 @@ Singleton {
             activeService.refreshNetworkState()
         }
     }
-    
+
     function connectToSpecificWiredConfig(uuid) {
         if (activeService && activeService.connectToSpecificWiredConfig) {
             activeService.connectToSpecificWiredConfig(uuid)

@@ -14,7 +14,7 @@ Item {
 
     Component.onCompleted: {
         console.log("LauncherExample: Plugin loaded")
-        
+
         // Load custom trigger from settings
         if (pluginService) {
             trigger = pluginService.loadPluginData("launcherExample", "trigger", "#")
@@ -119,7 +119,7 @@ Item {
     function runScript(command) {
         console.log("LauncherExample: Would run script:", command)
         showToast("Script executed: " + command)
-        
+
         // In a real plugin, you might create a Process component here
         // For demo purposes, we just show what would happen
     }

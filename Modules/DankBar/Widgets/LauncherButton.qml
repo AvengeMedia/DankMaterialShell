@@ -38,7 +38,7 @@ Item {
                 }
                 return
             }
-            
+
             root.clicked();
             if (popupTarget && popupTarget.setTriggerPosition) {
                 const globalPos = mapToGlobal(0, 0);

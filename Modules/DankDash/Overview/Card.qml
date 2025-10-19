@@ -4,9 +4,9 @@ import qs.Common
 
 Rectangle {
     id: card
-    
+
     property int pad: Theme.spacingM
-    
+
     radius: Theme.cornerRadius
     color: Theme.surfaceContainerHigh
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)

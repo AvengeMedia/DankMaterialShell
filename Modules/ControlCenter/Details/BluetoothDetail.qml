@@ -12,11 +12,11 @@ Rectangle {
     color: Theme.surfaceContainerHigh
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
-    
+
     property var bluetoothCodecModalRef: null
-    
+
     signal showCodecSelector(var device)
-    
+
     function updateDeviceCodecDisplay(deviceAddress, codecName) {
         for (let i = 0; i < pairedRepeater.count; i++) {
             let item = pairedRepeater.itemAt(i)
@@ -26,7 +26,7 @@ Rectangle {
             }
         }
     }
-    
+
     Row {
         id: headerRow
         anchors.left: parent.left
@@ -36,7 +36,7 @@ Rectangle {
         anchors.rightMargin: Theme.spacingM
         anchors.topMargin: Theme.spacingS
         height: 40
-        
+
         StyledText {
             id: headerText
             text: I18n.tr("Bluetooth Settings")
@@ -45,12 +45,12 @@ Rectangle {
             font.weight: Font.Medium
             anchors.verticalCenter: parent.verticalCenter
         }
-        
+
         Item {
             width: Math.max(0, parent.width - headerText.implicitWidth - scanButton.width - Theme.spacingM)
             height: parent.height
         }
-        
+
         Rectangle {
             id: scanButton
             width: 100
@@ -64,18 +64,18 @@ Rectangle {
             border.color: BluetoothService.adapter && BluetoothService.adapter.enabled ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
             border.width: 0
             visible: BluetoothService.adapter && BluetoothService.adapter.enabled
-            
+
             Row {
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
-                
+
                 DankIcon {
                     name: BluetoothService.adapter && BluetoothService.adapter.discovering ? "stop" : "bluetooth_searching"
                     size: 18
                     color: BluetoothService.adapter && BluetoothService.adapter.enabled ? Theme.primary : Theme.surfaceVariantText
                     anchors.verticalCenter: parent.verticalCenter
                 }
-                
+
                 StyledText {
                     text: BluetoothService.adapter && BluetoothService.adapter.discovering ? "Scanning" : "Scan"
                     color: BluetoothService.adapter && BluetoothService.adapter.enabled ? Theme.primary : Theme.surfaceVariantText
@@ -84,7 +84,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
-            
+
             MouseArea {
                 id: scanMouseArea
                 anchors.fill: parent
@@ -98,7 +98,7 @@ Rectangle {
             }
         }
     }
-    
+
     DankFlickable {
         id: bluetoothContent
         anchors.top: headerRow.bottom
@@ -110,19 +110,19 @@ Rectangle {
         visible: BluetoothService.adapter && BluetoothService.adapter.enabled
         contentHeight: bluetoothColumn.height
         clip: true
-        
+
         Column {
             id: bluetoothColumn
             width: parent.width
             spacing: Theme.spacingS
-            
-            
+
+
             Repeater {
                 id: pairedRepeater
                 model: {
                     if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
                         return []
-                    
+
                     let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
                     devices.sort((a, b) => {
                         if (a.connected && !b.connected) return -1
@@ -131,17 +131,17 @@ Rectangle {
                     })
                     return devices
                 }
-                
+
                 delegate: Rectangle {
                     required property var modelData
                     required property int index
-                    
+
                     property string currentCodec: BluetoothService.deviceCodecs[modelData.address] || ""
-                    
+
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    
+
                     Component.onCompleted: {
                         if (modelData.connected && BluetoothService.isAudioDevice(modelData)) {
                             BluetoothService.refreshDeviceCodec(modelData)
@@ -162,13 +162,13 @@ Rectangle {
                         return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     }
                     border.width: 0
-                    
+
                     Row {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: Theme.spacingM
                         spacing: Theme.spacingS
-                        
+
                         DankIcon {
                             name: BluetoothService.getDeviceIcon(modelData)
                             size: Theme.iconSize - 4
@@ -181,11 +181,11 @@ Rectangle {
                             }
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 200
-                            
+
                             StyledText {
                                 text: modelData.name || modelData.deviceName || "Unknown Device"
                                 font.pixelSize: Theme.fontSizeMedium
@@ -194,10 +194,10 @@ Rectangle {
                                 elide: Text.ElideRight
                                 width: parent.width
                             }
-                            
+
                             Row {
                                 spacing: Theme.spacingXS
-                                
+
                                 StyledText {
                                     text: {
                                         if (modelData.state === BluetoothDeviceState.Connecting)
@@ -218,12 +218,12 @@ Rectangle {
                                         return Theme.surfaceVariantText
                                     }
                                 }
-                                
+
                                 StyledText {
                                     text: {
                                         if (modelData.batteryAvailable && modelData.battery > 0)
                                             return "• " + Math.round(modelData.battery * 100) + "%"
-                                        
+
                                         var btBattery = BatteryService.bluetoothDevices.find(dev => {
                                             return dev.name === (modelData.name || modelData.deviceName) ||
                                                    dev.name.toLowerCase().includes((modelData.name || modelData.deviceName).toLowerCase()) ||
@@ -235,7 +235,7 @@ Rectangle {
                                     color: Theme.surfaceVariantText
                                     visible: text.length > 0
                                 }
-                                
+
                                 StyledText {
                                     text: modelData.signalStrength !== undefined && modelData.signalStrength > 0 ? "• " + modelData.signalStrength + "%" : ""
                                     font.pixelSize: Theme.fontSizeSmall
@@ -245,7 +245,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     DankActionButton {
                         id: pairedOptionsButton
                         anchors.right: parent.right
@@ -262,7 +262,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent
@@ -279,26 +279,26 @@ Rectangle {
                     }
                 }
             }
-            
+
             Rectangle {
                 width: parent.width
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                 visible: pairedRepeater.count > 0 && availableRepeater.count > 0
             }
-            
-            
+
+
             Item {
                 width: parent.width
                 height: 80
                 visible: BluetoothService.adapter && BluetoothService.adapter.discovering && availableRepeater.count === 0
-                
+
                 DankIcon {
                     anchors.centerIn: parent
                     name: "sync"
                     size: 24
                     color: Qt.rgba(Theme.surfaceText.r || 0.8, Theme.surfaceText.g || 0.8, Theme.surfaceText.b || 0.8, 0.4)
-                    
+
                     RotationAnimation on rotation {
                         running: parent.visible && BluetoothService.adapter && BluetoothService.adapter.discovering && availableRepeater.count === 0
                         loops: Animation.Infinite
@@ -308,27 +308,27 @@ Rectangle {
                     }
                 }
             }
-            
+
             Repeater {
                 id: availableRepeater
                 model: {
                     if (!BluetoothService.adapter || !BluetoothService.adapter.discovering || !Bluetooth.devices)
                         return []
-                    
+
                     var filtered = Bluetooth.devices.values.filter(dev => {
                         return dev && !dev.paired && !dev.pairing && !dev.blocked &&
                                (dev.signalStrength === undefined || dev.signalStrength > 0)
                     })
                     return BluetoothService.sortDevices(filtered)
                 }
-                
+
                 delegate: Rectangle {
                     required property var modelData
                     required property int index
-                    
+
                     property bool canConnect: BluetoothService.canConnect(modelData)
                     property bool isBusy: BluetoothService.isDeviceBusy(modelData)
-                    
+
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
@@ -336,24 +336,24 @@ Rectangle {
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: 0
                     opacity: canConnect ? 1 : 0.6
-                    
+
                     Row {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: Theme.spacingM
                         spacing: Theme.spacingS
-                        
+
                         DankIcon {
                             name: BluetoothService.getDeviceIcon(modelData)
                             size: Theme.iconSize - 4
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: 200
-                            
+
                             StyledText {
                                 text: modelData.name || modelData.deviceName || "Unknown Device"
                                 font.pixelSize: Theme.fontSizeMedium
@@ -361,10 +361,10 @@ Rectangle {
                                 elide: Text.ElideRight
                                 width: parent.width
                             }
-                            
+
                             Row {
                                 spacing: Theme.spacingXS
-                                
+
                                 StyledText {
                                     text: {
                                         if (modelData.pairing) return "Pairing..."
@@ -374,7 +374,7 @@ Rectangle {
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceVariantText
                                 }
-                                
+
                                 StyledText {
                                     text: modelData.signalStrength !== undefined && modelData.signalStrength > 0 ? "• " + modelData.signalStrength + "%" : ""
                                     font.pixelSize: Theme.fontSizeSmall
@@ -384,7 +384,7 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                     StyledText {
                         anchors.right: parent.right
                         anchors.rightMargin: Theme.spacingM
@@ -398,7 +398,7 @@ Rectangle {
                         color: canConnect ? Theme.primary : Theme.surfaceVariantText
                         font.weight: Font.Medium
                     }
-                    
+
                     MouseArea {
                         id: availableMouseArea
                         anchors.fill: parent
@@ -411,15 +411,15 @@ Rectangle {
                             }
                         }
                     }
-                    
+
                 }
             }
-            
+
             Item {
                 width: parent.width
                 height: 60
                 visible: !BluetoothService.adapter
-                
+
                 StyledText {
                     anchors.centerIn: parent
                     text: I18n.tr("No Bluetooth adapter found")
@@ -429,25 +429,25 @@ Rectangle {
             }
         }
     }
-    
+
     Menu {
         id: bluetoothContextMenu
         width: 150
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-        
+
         property var currentDevice: null
-        
+
         background: Rectangle {
             color: Theme.popupBackground()
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
         }
-        
+
         MenuItem {
             text: bluetoothContextMenu.currentDevice && bluetoothContextMenu.currentDevice.connected ? "Disconnect" : "Connect"
             height: 32
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -455,12 +455,12 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 if (bluetoothContextMenu.currentDevice) {
                     if (bluetoothContextMenu.currentDevice.connected) {
@@ -471,12 +471,12 @@ Rectangle {
                 }
             }
         }
-        
+
         MenuItem {
             text: I18n.tr("Audio Codec")
             height: bluetoothContextMenu.currentDevice && BluetoothService.isAudioDevice(bluetoothContextMenu.currentDevice) && bluetoothContextMenu.currentDevice.connected ? 32 : 0
             visible: bluetoothContextMenu.currentDevice && BluetoothService.isAudioDevice(bluetoothContextMenu.currentDevice) && bluetoothContextMenu.currentDevice.connected
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -484,23 +484,23 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 if (bluetoothContextMenu.currentDevice) {
                     showCodecSelector(bluetoothContextMenu.currentDevice)
                 }
             }
         }
-        
+
         MenuItem {
             text: I18n.tr("Forget Device")
             height: 32
-            
+
             contentItem: StyledText {
                 text: parent.text
                 font.pixelSize: Theme.fontSizeSmall
@@ -508,12 +508,12 @@ Rectangle {
                 leftPadding: Theme.spacingS
                 verticalAlignment: Text.AlignVCenter
             }
-            
+
             background: Rectangle {
                 color: parent.hovered ? Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.08) : "transparent"
                 radius: Theme.cornerRadius / 2
             }
-            
+
             onTriggered: {
                 if (bluetoothContextMenu.currentDevice) {
                     bluetoothContextMenu.currentDevice.forget()
@@ -521,5 +521,5 @@ Rectangle {
             }
         }
     }
-    
+
 }

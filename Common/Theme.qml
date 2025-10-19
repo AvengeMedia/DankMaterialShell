@@ -61,7 +61,7 @@ Singleton {
     }
     readonly property string rawWallpaperPath: {
         if (typeof SessionData === "undefined") return ""
-        
+
         if (SessionData.perMonitorWallpaper) {
             // Use first monitor's wallpaper for dynamic theming
             var screens = Quickshell.screens

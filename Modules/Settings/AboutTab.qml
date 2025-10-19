@@ -366,7 +366,7 @@ Item {
 
                         Row {
                             spacing: 4
-                            
+
                             StyledText {
                                 text: `<a href="https://github.com/YaLTeR/niri" style="text-decoration:none; color:${Theme.primary};">niri</a>`
                                 font.pixelSize: Theme.fontSizeMedium
@@ -383,14 +383,14 @@ Item {
                                     propagateComposedEvents: true
                                 }
                             }
-                            
+
                             StyledText {
                                 text: "&"
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceVariantText
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-                            
+
                             StyledText {
                                 text: `<a href="https://github.com/hyprwm/Hyprland" style="text-decoration:none; color:${Theme.primary};">hyprland</a>`
                                 font.pixelSize: Theme.fontSizeMedium
@@ -418,7 +418,7 @@ Item {
 
                         Row {
                             spacing: 4
-                            
+
                             StyledText {
                                 text: `<a href="https://github.com/AvengeMedia/DankMaterialShell" style="text-decoration:none; color:${Theme.primary};">DankMaterialShell</a>`
                                 font.pixelSize: Theme.fontSizeMedium
@@ -435,7 +435,7 @@ Item {
                                     propagateComposedEvents: true
                                 }
                             }
-                            
+
                             StyledText {
                                 text: I18n.tr("- Support Us With a Star ⭐")
                                 font.pixelSize: Theme.fontSizeMedium
@@ -453,7 +453,7 @@ Item {
 
                         Row {
                             spacing: 4
-                            
+
                             StyledText {
                                 text: `<a href="https://github.com/AvengeMedia/dgop" style="text-decoration:none; color:${Theme.primary};">dgop</a>`
                                 font.pixelSize: Theme.fontSizeMedium
@@ -470,7 +470,7 @@ Item {
                                     propagateComposedEvents: true
                                 }
                             }
-                            
+
                             StyledText {
                                 text: I18n.tr("- Stateless System Monitoring")
                                 font.pixelSize: Theme.fontSizeMedium
@@ -488,7 +488,7 @@ Item {
 
                         Row {
                             spacing: 4
-                            
+
                             StyledText {
                                 text: `<a href="https://danklinux.com" style="text-decoration:none; color:${Theme.primary};">danklinux.com</a>`
                                 font.pixelSize: Theme.fontSizeMedium
