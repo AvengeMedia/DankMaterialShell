@@ -259,7 +259,7 @@ EOF
       cat "$CONFIG_DIR/ghostty/config-dankcolors" >> "$TMP"
       mv "$TMP" "$CONFIG_DIR/ghostty/config-dankcolors"
       if [[ -f "$CONFIG_DIR/ghostty/config" ]] && grep -q "^[^#]*config-dankcolors" "$CONFIG_DIR/ghostty/config" 2>/dev/null; then
-        pkill -USR2 -x ghostty >/dev/null 2>&1 || true
+        pkill -USR2 -x 'ghostty|.ghostty-wrappe' >/dev/null 2>&1 || true
       fi
     fi
   fi
