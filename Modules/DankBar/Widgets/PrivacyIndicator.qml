@@ -60,9 +60,8 @@ Rectangle {
 
             DankIcon {
                 name: {
-                    let muted = AudioService.source.audio.muted
-                    let volume = AudioService.source.audio.volume
-                    if (muted || volume === 0.0) return "mic_off"
+                    let muted = AudioService.source.audio.muted || AudioService.source.audio.volume === 0.0
+                    if (muted) return "mic_off"
                     return "mic"
                 }
                 size: Theme.iconSizeSmall
@@ -131,9 +130,8 @@ Rectangle {
 
             DankIcon {
                 name: {
-                    let muted = AudioService.source.audio.muted
-                    let volume = AudioService.source.audio.volume
-                    if (muted || volume === 0.0) return "mic_off"
+                    let muted = AudioService.source.audio.muted || AudioService.source.audio.volume === 0.0
+                    if (muted) return "mic_off"
                     return "mic"
                 }
                 size: Theme.iconSizeSmall
