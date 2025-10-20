@@ -339,6 +339,7 @@ Singleton {
             if (SettingsData.loginctlLockIntegration) {
                 syncLockBeforeSuspend()
             }
+            syncSleepInhibitor()
         }
     }
 
@@ -407,7 +408,7 @@ Singleton {
         if (!DMSService.apiVersion || DMSService.apiVersion < 4) return
 
         DMSService.sendRequest("loginctl.setSleepInhibitorEnabled", {
-            enabled: SettingsData.loginctlLockIntegration
+            enabled: SettingsData.loginctlLockIntegration && SettingsData.lockBeforeSuspend
         }, response => {
             if (response.error) {
                 console.warn("SessionService: Failed to sync sleep inhibitor:", response.error)
