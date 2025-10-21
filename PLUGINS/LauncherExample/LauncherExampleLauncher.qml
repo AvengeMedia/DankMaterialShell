@@ -26,35 +26,35 @@ Item {
         const baseItems = [
             {
                 name: "Test Item 1",
-                icon: "lightbulb",
+                icon: "material:lightbulb",
                 comment: "This is a test item that shows a toast notification",
                 action: "toast:Test Item 1 executed!",
                 categories: ["LauncherExample"]
             },
             {
-                name: "Test Item 2", 
-                icon: "star",
+                name: "Test Item 2",
+                icon: "material:star",
                 comment: "Another test item with different action",
                 action: "toast:Test Item 2 clicked!",
                 categories: ["LauncherExample"]
             },
             {
                 name: "Test Item 3",
-                icon: "favorite",
+                icon: "material:favorite",
                 comment: "Third test item for demonstration",
                 action: "toast:Test Item 3 activated!",
                 categories: ["LauncherExample"]
             },
             {
                 name: "Example Copy Action",
-                icon: "content_copy",
+                icon: "material:content_copy",
                 comment: "Demonstrates copying text to clipboard",
                 action: "copy:This text was copied by the launcher plugin!",
                 categories: ["LauncherExample"]
             },
             {
                 name: "Example Script Action",
-                icon: "terminal",
+                icon: "material:terminal",
                 comment: "Demonstrates running a simple command",
                 action: "script:echo 'Hello from launcher plugin!'",
                 categories: ["LauncherExample"]

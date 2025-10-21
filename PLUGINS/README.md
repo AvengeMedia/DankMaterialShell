@@ -1221,10 +1221,50 @@ Item {
 Each item returned by `getItems()` must include:
 
 - `name` (string): Display name shown in launcher
-- `icon` (string): Material Design icon name
+- `icon` (string, optional): Icon specification (see Icon Types below)
 - `comment` (string): Description/subtitle text
 - `action` (string): Action identifier in `type:data` format
 - `categories` (array): Array containing your plugin name
+
+### Icon Types
+
+The `icon` field supports three formats:
+
+**1. Material Design Icons** - Use the `material:` prefix:
+```javascript
+{
+    name: "My Item",
+    icon: "material:lightbulb",  // Material Symbols Rounded font
+    comment: "Uses Material Design icon",
+    action: "toast:Hello!",
+    categories: ["MyPlugin"]
+}
+```
+Available icons: Any icon from Material Symbols font (e.g., `lightbulb`, `star`, `favorite`, `settings`, `terminal`, `translate`, `sentiment_satisfied`)
+
+**2. Desktop Theme Icons** - Use icon name directly:
+```javascript
+{
+    name: "Firefox",
+    icon: "firefox",  // Uses system icon theme
+    comment: "Launches Firefox browser",
+    action: "exec:firefox",
+    categories: ["MyPlugin"]
+}
+```
+Uses the user's installed icon theme. Common examples: `firefox`, `chrome`, `folder`, `text-editor`
+
+**3. No Icon** - Omit the `icon` field entirely:
+```javascript
+{
+    name: "😀  Grinning Face",
+    // No icon field - emoji/unicode in name displays without icon area
+    comment: "Copy emoji to clipboard",
+    action: "copy:😀",
+    categories: ["MyPlugin"]
+}
+```
+When `icon` is omitted, the launcher hides the icon area and displays only the text, giving full width to the item name. Perfect for emoji pickers or text-only items.
 
 ### Trigger System
 
