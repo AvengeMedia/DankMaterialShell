@@ -32,10 +32,10 @@ in {
             default = true;
             description = "Add needed dependencies to have brightness/backlight support";
         };
-        enableNightMode = lib.mkOption {
+        enableColorPicker = lib.mkOption {
             type = bool;
             default = true;
-            description = "Add needed dependencies to have night mode support";
+            description = "Add needed dependencies to have color picking support";
         };
         enableDynamicTheming = lib.mkOption {
             type = bool;
@@ -151,6 +151,7 @@ in {
             ++ lib.optionals cfg.enableClipboard [pkgs.cliphist pkgs.wl-clipboard]
             ++ lib.optionals cfg.enableVPN [pkgs.glib pkgs.networkmanager]
             ++ lib.optional cfg.enableBrightnessControl pkgs.brightnessctl
+            ++ lib.optional cfg.enableColorPicker pkgs.hyprpicker
             ++ lib.optional cfg.enableDynamicTheming pkgs.matugen
             ++ lib.optional cfg.enableAudioWavelength pkgs.cava
             ++ lib.optional cfg.enableCalendarEvents pkgs.khal
