@@ -1016,6 +1016,179 @@ Item {
                 }
             }
 
+            // Animation Settings
+            StyledRect {
+                width: parent.width
+                height: animationSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.surfaceContainerHigh
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+
+                Column {
+                    id: animationSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "animation"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Animation Speed")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    Item {
+                        width: parent.width
+                        height: childrenRect.height
+
+                        DankButtonGroup {
+                            id: animationSpeedGroup
+                            x: (parent.width - width) / 2
+                            model: ["None", "Short", "Medium", "Long", "Custom"]
+                            selectionMode: "single"
+                            currentIndex: SettingsData.animationSpeed
+                            onSelectionChanged: (index, selected) => {
+                                if (selected) {
+                                    SettingsData.setAnimationSpeed(index)
+                                }
+                            }
+
+                            Connections {
+                                target: SettingsData
+                                function onAnimationSpeedChanged() {
+                                    animationSpeedGroup.currentIndex = SettingsData.animationSpeed
+                                }
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: Theme.outline
+                            opacity: 0.2
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: Theme.spacingS
+
+                            Row {
+                                width: parent.width
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    text: I18n.tr("Duration")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Item {
+                                    width: 1
+                                    height: 1
+                                }
+
+                                StyledText {
+                                    text: Theme.currentAnimationBaseDuration + "ms"
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    color: Theme.primary
+                                    font.weight: Font.Medium
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            Row {
+                                width: parent.width
+                                height: 40
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    text: "0ms"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Item {
+                                    width: parent.width - 100
+                                    height: 40
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    DankSlider {
+                                        id: customDurationSlider
+                                        anchors.fill: parent
+                                        minimum: 0
+                                        maximum: 750
+                                        value: Theme.currentAnimationBaseDuration
+                                        unit: "ms"
+                                        showValue: false
+                                        wheelEnabled: false
+
+                                        onSliderValueChanged: (newValue) => {
+                                            SettingsData.setAnimationSpeed(SettingsData.AnimationSpeed.Custom)
+                                            SettingsData.setCustomAnimationDuration(newValue)
+                                        }
+
+                                        Connections {
+                                            target: SettingsData
+                                            function onAnimationSpeedChanged() {
+                                                if (SettingsData.animationSpeed !== SettingsData.AnimationSpeed.Custom) {
+                                                    customDurationSlider.value = Theme.currentAnimationBaseDuration
+                                                }
+                                            }
+                                        }
+
+                                        Connections {
+                                            target: Theme
+                                            function onCurrentAnimationBaseDurationChanged() {
+                                                if (SettingsData.animationSpeed !== SettingsData.AnimationSpeed.Custom) {
+                                                    customDurationSlider.value = Theme.currentAnimationBaseDuration
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                StyledText {
+                                    text: "750ms"
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Select a preset or drag the slider to customize")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
+                        }
+                    }
+                }
+            }
+
             StyledRect {
                 width: parent.width
                 height: dynamicThemeSection.implicitHeight + Theme.spacingL * 2
@@ -1101,7 +1274,7 @@ Item {
                     DankDropdown {
                         id: personalizationMatugenPaletteDropdown
                         text: I18n.tr("Matugen Palette")
-                        description: "Select the palette algorithm used for wallpaper-based colors"
+                        description: I18n.tr("Select the palette algorithm used for wallpaper-based colors")
                         options: Theme.availableMatugenSchemes.map(function (option) { return option.label })
                         currentValue: Theme.getMatugenScheme(SettingsData.matugenScheme).label
                         enabled: Theme.matugenAvailable
@@ -1185,62 +1358,6 @@ Item {
                         visible: ToastService.wallpaperErrorStatus === "matugen_missing"
                         width: parent.width
                         leftPadding: Theme.iconSize + Theme.spacingM
-                    }
-                }
-            }
-
-            // Animation Settings
-            StyledRect {
-                width: parent.width
-                height: animationSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-                border.width: 0
-
-                Column {
-                    id: animationSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "animation"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Animation Speed")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    Item {
-                        width: parent.width
-                        height: childrenRect.height
-
-                        DankButtonGroup {
-                            id: animationSpeedGroup
-                            x: (parent.width - width) / 2
-                            model: ["None", "Shortest", "Short", "Medium", "Long"]
-                            selectionMode: "single"
-                            currentIndex: SettingsData.animationSpeed
-                            onSelectionChanged: (index, selected) => {
-                                if (selected) {
-                                    SettingsData.setAnimationSpeed(index)
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -1503,6 +1620,7 @@ Item {
             browserTitle: "Select Wallpaper"
             browserIcon: "wallpaper"
             browserType: "wallpaper"
+            showHiddenFiles: true
             fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
             onFileSelected: path => {
                                 if (SessionData.perMonitorWallpaper) {

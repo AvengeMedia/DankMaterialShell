@@ -371,7 +371,7 @@ Item {
             widgets = SettingsData.dankBarCenterWidgets.slice()
         else if (sectionId === "right")
             widgets = SettingsData.dankBarRightWidgets.slice()
-        
+
         if (widgetIndex >= 0 && widgetIndex < widgets.length) {
             var widget = widgets[widgetIndex]
             var widgetId = typeof widget === "string" ? widget : widget.id
@@ -401,7 +401,7 @@ Item {
                 }
             }
         }
-        
+
         if (sectionId === "left")
             SettingsData.setDankBarLeftWidgets(widgets)
         else if (sectionId === "center")
@@ -705,7 +705,7 @@ Item {
                         DankButtonGroup {
                             id: positionButtonGroup
                             anchors.verticalCenter: parent.verticalCenter
-                            model: ["Top", "Bottom", "Left", "Right"]
+                            model: [I18n.tr("Top"), I18n.tr("Bottom"), I18n.tr("Left"), I18n.tr("Right")]
                             currentIndex: {
                                 switch (SettingsData.dankBarPosition) {
                                     case SettingsData.Position.Top: return 0
@@ -1740,7 +1740,7 @@ Item {
                         id: leftSection
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
-                        title: SettingsData.dankBarIsVertical ? "Top Section" : "Left Section"
+                        title: SettingsData.dankBarIsVertical ? I18n.tr("Top Section") : I18n.tr("Left Section")
                         titleIcon: "format_align_left"
                         sectionId: "left"
                         allWidgets: dankBarTab.baseWidgetDefinitions
@@ -1892,7 +1892,7 @@ Item {
                         id: rightSection
                         anchors.fill: parent
                         anchors.margins: Theme.spacingL
-                        title: SettingsData.dankBarIsVertical ? "Bottom Section" : "Right Section"
+                        title: SettingsData.dankBarIsVertical ? I18n.tr("Bottom Section") : I18n.tr("Right Section")
                         titleIcon: "format_align_right"
                         sectionId: "right"
                         allWidgets: dankBarTab.baseWidgetDefinitions

@@ -21,7 +21,7 @@ PanelWindow {
     property bool exiting: false
     property bool _isDestroying: false
     property bool _finalized: false
-    readonly property string clearText: I18n.tr("Clear")
+    readonly property string clearText: I18n.tr("Dismiss")
 
     signal entered
     signal exitFinished
@@ -512,7 +512,7 @@ PanelWindow {
 
                 anchors.fill: parent
                 hoverEnabled: true
-                acceptedButtons: Qt.LeftButton
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 propagateComposedEvents: true
                 z: -1
                 onEntered: {
@@ -523,9 +523,20 @@ PanelWindow {
                     if (notificationData && notificationData.popup && notificationData.timer)
                         notificationData.timer.restart()
                 }
-                onClicked: {
-                    if (notificationData && !win.exiting)
-                        notificationData.popup = false
+                onClicked: (mouse) => {
+                    if (!notificationData || win.exiting)
+                        return
+
+                    if (mouse.button === Qt.RightButton) {
+                        NotificationService.dismissNotification(notificationData)
+                    } else if (mouse.button === Qt.LeftButton) {
+                        if (notificationData.actions && notificationData.actions.length > 0) {
+                            notificationData.actions[0].invoke()
+                            NotificationService.dismissNotification(notificationData)
+                        } else {
+                            notificationData.popup = false
+                        }
+                    }
                 }
             }
         }

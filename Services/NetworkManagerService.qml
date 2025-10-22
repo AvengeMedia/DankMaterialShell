@@ -71,7 +71,7 @@ Singleton {
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
-    
+
     property string networkWiredInfoUUID: ""
     property string networkWiredInfoDetails: ""
     property bool networkWiredInfoLoading: false
@@ -79,8 +79,21 @@ Singleton {
     property int refCount: 0
     property bool stateInitialized: false
 
+    property string credentialsToken: ""
+    property string credentialsSSID: ""
+    property string credentialsSetting: ""
+    property var credentialsFields: []
+    property var credentialsHints: []
+    property string credentialsReason: ""
+    property bool credentialsRequested: false
+
+    property string pendingConnectionSSID: ""
+    property var pendingConnectionStartTime: 0
+    property bool wasConnecting: false
+
     signal networksUpdated
     signal connectionChanged
+    signal credentialsNeeded(string token, string ssid, string setting, var fields, var hints, string reason)
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
@@ -120,6 +133,10 @@ Singleton {
         function onCapabilitiesChanged() {
             checkDMSCapabilities()
         }
+
+        function onCredentialsRequest(data) {
+            handleCredentialsRequest(data)
+        }
     }
 
     function checkDMSCapabilities() {
@@ -141,6 +158,18 @@ Singleton {
             stateInitialized = true
             getState()
         }
+    }
+
+    function handleCredentialsRequest(data) {
+        credentialsToken = data.token || ""
+        credentialsSSID = data.ssid || ""
+        credentialsSetting = data.setting || "802-11-wireless-security"
+        credentialsFields = data.fields || ["psk"]
+        credentialsHints = data.hints || []
+        credentialsReason = data.reason || "Credentials required"
+        credentialsRequested = true
+
+        credentialsNeeded(credentialsToken, credentialsSSID, credentialsSetting, credentialsFields, credentialsHints, credentialsReason)
     }
 
     function addRef() {
@@ -177,6 +206,9 @@ Singleton {
     }
 
     function updateState(state) {
+        const previousConnecting = isConnecting
+        const previousConnectingSSID = connectingSSID
+
         networkStatus = state.networkStatus || "disconnected"
         primaryConnection = state.primaryConnection || ""
 
@@ -225,9 +257,48 @@ Singleton {
         connectionError = state.lastError || ""
         lastConnectionError = state.lastError || ""
 
+        if (pendingConnectionSSID) {
+            if (wifiConnected && currentWifiSSID === pendingConnectionSSID && wifiIP) {
+                if (DMSService.verboseLogs) {
+                    const elapsed = Date.now() - pendingConnectionStartTime
+                    console.log("NetworkManagerService: Successfully connected to", pendingConnectionSSID, "in", elapsed, "ms")
+                }
+                ToastService.showInfo(`Connected to ${pendingConnectionSSID}`)
+
+                if (userPreference === "wifi" || userPreference === "auto") {
+                    setConnectionPriority("wifi")
+                }
+
+                pendingConnectionSSID = ""
+                connectionStatus = "connected"
+            } else if (previousConnecting && !isConnecting && !wifiConnected) {
+                const elapsed = Date.now() - pendingConnectionStartTime
+
+                if (elapsed < 5000) {
+                    if (DMSService.verboseLogs) {
+                        console.log("NetworkManagerService: Quick connection failure, likely authentication error")
+                    }
+                    connectionStatus = "invalid_password"
+                } else {
+                    if (DMSService.verboseLogs) {
+                        console.log("NetworkManagerService: Connection failed for", pendingConnectionSSID)
+                    }
+                    if (connectionError === "connection-failed") {
+                        ToastService.showError(I18n.tr("Connection failed. Check password and try again."))
+                    } else if (connectionError) {
+                        ToastService.showError(I18n.tr("Failed to connect to ") + pendingConnectionSSID)
+                    }
+                    connectionStatus = "failed"
+                    pendingConnectionSSID = ""
+                }
+            }
+        }
+
+        wasConnecting = isConnecting
+
         connectionChanged()
     }
-    
+
     function connectToSpecificWiredConfig(uuid) {
         if (!networkAvailable || isConnecting) return
 
@@ -242,11 +313,11 @@ Singleton {
                 connectionError = response.error
                 lastConnectionError = response.error
                 connectionStatus = "failed"
-                ToastService.showError(`Failed to activate configuration`)
+                ToastService.showError(I18n.tr("Failed to activate configuration"))
             } else {
                 connectionError = ""
                 connectionStatus = "connected"
-                ToastService.showInfo(`Configuration activated`)
+                ToastService.showInfo(I18n.tr("Configuration activated"))
             }
 
             isConnecting = false
@@ -280,42 +351,47 @@ Singleton {
     function connectToWifi(ssid, password = "", username = "", anonymousIdentity = "", domainSuffixMatch = "") {
         if (!networkAvailable || isConnecting) return
 
-        connectingSSID = ssid
+        pendingConnectionSSID = ssid
+        pendingConnectionStartTime = Date.now()
         connectionError = ""
         connectionStatus = "connecting"
+        credentialsRequested = false
 
         const params = { ssid: ssid }
-        if (password) params.password = password
-        if (username) params.username = username
-        if (anonymousIdentity) params.anonymousIdentity = anonymousIdentity
-        if (domainSuffixMatch) params.domainSuffixMatch = domainSuffixMatch
+
+        if (DMSService.apiVersion >= 7) {
+            if (password || username) {
+                params.password = password
+                if (username) params.username = username
+                if (anonymousIdentity) params.anonymousIdentity = anonymousIdentity
+                if (domainSuffixMatch) params.domainSuffixMatch = domainSuffixMatch
+                params.interactive = false
+            } else {
+                params.interactive = true
+            }
+        } else {
+            if (password) params.password = password
+            if (username) params.username = username
+            if (anonymousIdentity) params.anonymousIdentity = anonymousIdentity
+            if (domainSuffixMatch) params.domainSuffixMatch = domainSuffixMatch
+        }
 
         DMSService.sendRequest("network.wifi.connect", params, response => {
             if (response.error) {
+                if (DMSService.verboseLogs) {
+                    console.log("NetworkManagerService: Connection request failed:", response.error)
+                }
+
                 connectionError = response.error
                 lastConnectionError = response.error
-                connectionStatus = response.error.includes("password") || response.error.includes("authentication")
-                    ? "invalid_password"
-                    : "failed"
-
-                if (connectionStatus === "invalid_password") {
-                    passwordDialogShouldReopen = true
-                    ToastService.showError(`Invalid password for ${ssid}`)
-                } else {
-                    ToastService.showError(`Failed to connect to ${ssid}`)
-                }
+                pendingConnectionSSID = ""
+                connectionStatus = "failed"
+                ToastService.showError(I18n.tr("Failed to start connection to ") + ssid)
             } else {
-                connectionError = ""
-                connectionStatus = "connected"
-                ToastService.showInfo(`Connected to ${ssid}`)
-
-                if (userPreference === "wifi" || userPreference === "auto") {
-                    setConnectionPriority("wifi")
+                if (DMSService.verboseLogs) {
+                    console.log("NetworkManagerService: Connection request sent for", ssid)
                 }
             }
-
-            isConnecting = false
-            connectingSSID = ""
         })
     }
 
@@ -324,11 +400,56 @@ Singleton {
 
         DMSService.sendRequest("network.wifi.disconnect", null, response => {
             if (response.error) {
-                ToastService.showError("Failed to disconnect WiFi")
+                ToastService.showError(I18n.tr("Failed to disconnect WiFi"))
             } else {
-                ToastService.showInfo("Disconnected from WiFi")
+                ToastService.showInfo(I18n.tr("Disconnected from WiFi"))
                 currentWifiSSID = ""
                 connectionStatus = ""
+            }
+        })
+    }
+
+    function submitCredentials(token, secrets, save) {
+        if (!networkAvailable || DMSService.apiVersion < 7) return
+
+        const params = {
+            token: token,
+            secrets: secrets,
+            save: save || false
+        }
+
+        if (DMSService.verboseLogs) {
+            console.log("NetworkManagerService: Submitting credentials for token", token)
+        }
+
+        credentialsRequested = false
+
+        DMSService.sendRequest("network.credentials.submit", params, response => {
+            if (response.error) {
+                console.warn("NetworkManagerService: Failed to submit credentials:", response.error)
+            }
+        })
+    }
+
+    function cancelCredentials(token) {
+        if (!networkAvailable || DMSService.apiVersion < 7) return
+
+        const params = {
+            token: token,
+            cancel: true
+        }
+
+        if (DMSService.verboseLogs) {
+            console.log("NetworkManagerService: Cancelling credentials for token", token)
+        }
+
+        credentialsRequested = false
+        pendingConnectionSSID = ""
+        connectionStatus = "cancelled"
+
+        DMSService.sendRequest("network.credentials.submit", params, response => {
+            if (response.error) {
+                console.warn("NetworkManagerService: Failed to cancel credentials:", response.error)
             }
         })
     }
@@ -341,7 +462,7 @@ Singleton {
             if (response.error) {
                 console.warn("Failed to forget network:", response.error)
             } else {
-                ToastService.showInfo(`Forgot network ${ssid}`)
+                ToastService.showInfo(I18n.tr("Forgot network ") + ssid)
 
                 savedConnections = savedConnections.filter(s => s.ssid !== ssid)
                 savedWifiNetworks = savedWifiNetworks.filter(s => s.ssid !== ssid)
@@ -374,7 +495,7 @@ Singleton {
                 console.warn("Failed to toggle WiFi:", response.error)
             } else if (response.result) {
                 wifiEnabled = response.result.enabled
-                ToastService.showInfo(wifiEnabled ? "WiFi enabled" : "WiFi disabled")
+                ToastService.showInfo(wifiEnabled ? I18n.tr("WiFi enabled") : I18n.tr("WiFi disabled"))
             }
         })
     }
@@ -384,9 +505,9 @@ Singleton {
 
         DMSService.sendRequest("network.wifi.enable", null, response => {
             if (response.error) {
-                ToastService.showError("Failed to enable WiFi")
+                ToastService.showError(I18n.tr("Failed to enable WiFi"))
             } else {
-                ToastService.showInfo("WiFi enabled")
+                ToastService.showInfo(I18n.tr("WiFi enabled"))
             }
         })
     }
@@ -446,7 +567,7 @@ Singleton {
         autoScan = false
         autoRefreshEnabled = false
     }
-    
+
     function fetchWiredNetworkInfo(uuid) {
         if (!networkAvailable) return
 
@@ -475,18 +596,18 @@ Singleton {
             details += "Driver: " + info.driver + "\\n"
             details += "MAC Addr: " + info.hwAddr + "\\n"
             details += "Speed: " + info.speed + " Mb/s\\n\\n"
-            
+
             details += "IPv4 informations:\\n"
-            
+
             for (const ip4 of info.IPv4s.ips) {
                 details += "    IPv4 address: " + ip4 + "\\n"
             }
             details += "    Gateway: " + info.IPv4s.gateway + "\\n"
             details += "    DNS: " + info.IPv4s.dns + "\\n"
-            
+
             if (info.IPv6s.ips) {
                 details += "\\nIPv6 informations:\\n"
-                
+
                 for (const ip6 of info.IPv6s.ips) {
                     details += "    IPv6 address: " + ip6 + "\\n"
                 }

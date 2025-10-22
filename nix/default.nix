@@ -32,10 +32,10 @@ in {
             default = true;
             description = "Add needed dependencies to have brightness/backlight support";
         };
-        enableNightMode = lib.mkOption {
+        enableColorPicker = lib.mkOption {
             type = bool;
             default = true;
-            description = "Add needed dependencies to have night mode support";
+            description = "Add needed dependencies to have color picking support";
         };
         enableDynamicTheming = lib.mkOption {
             type = bool;
@@ -99,9 +99,7 @@ in {
             enable = true;
             package = cfg.quickshell.package;
 
-            configs.dms = "${
-                dmsPkgs.dankMaterialShell
-            }/etc/xdg/quickshell/DankMaterialShell";
+            configs.dms = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
         };
 
         systemd.user.services.dms = lib.mkIf cfg.enableSystemd {
@@ -151,7 +149,7 @@ in {
             ++ lib.optionals cfg.enableClipboard [pkgs.cliphist pkgs.wl-clipboard]
             ++ lib.optionals cfg.enableVPN [pkgs.glib pkgs.networkmanager]
             ++ lib.optional cfg.enableBrightnessControl pkgs.brightnessctl
-            ++ lib.optional cfg.enableNightMode pkgs.gammastep
+            ++ lib.optional cfg.enableColorPicker pkgs.hyprpicker
             ++ lib.optional cfg.enableDynamicTheming pkgs.matugen
             ++ lib.optional cfg.enableAudioWavelength pkgs.cava
             ++ lib.optional cfg.enableCalendarEvents pkgs.khal

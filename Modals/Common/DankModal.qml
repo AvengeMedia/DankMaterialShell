@@ -35,8 +35,11 @@ PanelWindow {
     property bool closeOnEscapeKey: true
     property bool closeOnBackgroundClick: true
     property string animationType: "scale"
-    property int animationDuration: Theme.shortDuration
-    property var animationEasing: Theme.emphasizedEasing
+    property int animationDuration: Theme.expressiveDurations.expressiveDefaultSpatial
+    property real animationScaleCollapsed: 0.96
+    property real animationOffset: Theme.spacingL
+    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property color backgroundColor: Theme.surfaceContainer
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 1
@@ -104,7 +107,7 @@ PanelWindow {
     Timer {
         id: closeTimer
 
-        interval: animationDuration + 100
+        interval: animationDuration + 120
         onTriggered: {
             visible = false
         }
@@ -139,7 +142,8 @@ PanelWindow {
         Behavior on opacity {
             NumberAnimation {
                 duration: root.animationDuration
-                easing.type: root.animationEasing
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
             }
         }
     }
@@ -176,23 +180,67 @@ PanelWindow {
         border.width: root.borderWidth
         clip: false
         layer.enabled: true
+        layer.smooth: true
         opacity: root.shouldBeVisible ? 1 : 0
-        transform: root.animationType === "slide" ? slideTransform : null
+        transform: [scaleTransform, motionTransform]
+
+        Scale {
+            id: scaleTransform
+
+            origin.x: contentContainer.width / 2
+            origin.y: contentContainer.height / 2
+            xScale: root.shouldBeVisible ? 1 : root.animationScaleCollapsed
+            yScale: root.shouldBeVisible ? 1 : root.animationScaleCollapsed
+
+            Behavior on xScale {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+
+            Behavior on yScale {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+        }
 
         Translate {
-            id: slideTransform
+            id: motionTransform
 
-            readonly property real rawX: root.shouldBeVisible ? 0 : 15
-            readonly property real rawY: root.shouldBeVisible ? 0 : -30
+            readonly property bool slide: root.animationType === "slide"
+            readonly property real hiddenX: slide ? 15 : 0
+            readonly property real hiddenY: slide ? -30 : root.animationOffset
 
-            x: Theme.snap(rawX, root.dpr)
-            y: Theme.snap(rawY, root.dpr)
+            x: Theme.snap(root.shouldBeVisible ? 0 : hiddenX, root.dpr)
+            y: Theme.snap(root.shouldBeVisible ? 0 : hiddenY, root.dpr)
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
         }
 
         Behavior on opacity {
             NumberAnimation {
                 duration: animationDuration
-                easing.type: animationEasing
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
             }
         }
 

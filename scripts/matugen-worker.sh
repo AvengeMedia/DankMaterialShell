@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ $# -lt 4 ]; then
-    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR --run" >&2
+if [ $# -lt 5 ]; then
+    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL --run" >&2
     exit 1
 fi
 
 STATE_DIR="$1"
 SHELL_DIR="$2"
 CONFIG_DIR="$3"
+SYNC_MODE_WITH_PORTAL="$4"
 
 if [ ! -d "$STATE_DIR" ]; then
     echo "Error: STATE_DIR '$STATE_DIR' does not exist" >&2
@@ -25,10 +26,10 @@ if [ ! -d "$CONFIG_DIR" ]; then
     exit 1
 fi
 
-shift 3  # Remove STATE_DIR, SHELL_DIR, and CONFIG_DIR from arguments
+shift 4
 
 if [[ "${1:-}" != "--run" ]]; then
-  echo "usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR --run" >&2
+  echo "usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL --run" >&2
   exit 1
 fi
 
@@ -60,6 +61,27 @@ key_of() {
   [[ -z "$surface_base" ]] && surface_base="sc"
   [[ -z "$run_user_templates" ]] && run_user_templates="true"
   echo "${kind}|${value}|${mode}|${icon}|${matugen_type}|${surface_base}|${run_user_templates}" | sha256sum | cut -d' ' -f1
+}
+
+set_system_color_scheme() {
+  local mode="$1"
+
+  if [[ "$SYNC_MODE_WITH_PORTAL" != "true" ]]; then
+    return 0
+  fi
+
+  local target_scheme
+  if [[ "$mode" == "light" ]]; then
+    target_scheme="default"
+  else
+    target_scheme="prefer-dark"
+  fi
+
+  if command -v gsettings >/dev/null 2>&1; then
+    gsettings set org.gnome.desktop.interface color-scheme "$target_scheme" >/dev/null 2>&1 || true
+  elif command -v dconf >/dev/null 2>&1; then
+    dconf write /org/gnome/desktop/interface/color-scheme "'$target_scheme'" >/dev/null 2>&1 || true
+  fi
 }
 
 build_once() {
@@ -99,6 +121,15 @@ input_path = '$SHELL_DIR/matugen/templates/dank.json'
 output_path = '$STATE_DIR/dms-colors.json'
 
 EOF
+
+  # If light mode, use gtk3 light config
+  if [[ "$mode" == "light" ]]; then
+    cat "$SHELL_DIR/matugen/configs/gtk3-light.toml" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
+  else
+    cat "$SHELL_DIR/matugen/configs/gtk3-dark.toml" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
+  fi
 
   if command -v niri >/dev/null 2>&1; then
     cat "$SHELL_DIR/matugen/configs/niri.toml" >> "$TMP_CFG"
@@ -141,12 +172,6 @@ EOF
     echo "" >> "$TMP_CFG"
   done
   
-  # GTK3 colors based on colloid
-  COLLOID_TEMPLATE="$SHELL_DIR/matugen/templates/gtk3-colors.css"
-  
-  sed -i "/\[templates\.gtk3\]/,/^$/ s|input_path = './matugen/templates/gtk-colors.css'|input_path = '$COLLOID_TEMPLATE'|" "$TMP_CFG"
-  sed -i "s|input_path = './matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" "$TMP_CFG"
-
   # Handle surface shifting if needed
   if [[ "$surface_base" == "s" ]]; then
     TMP_TEMPLATES_DIR="$(mktemp -d)"
@@ -170,11 +195,7 @@ EOF
     # Update config to use shifted templates
     sed -i "s|input_path = '$SHELL_DIR/matugen/templates/|input_path = '$TMP_TEMPLATES_DIR/|g" "$TMP_CFG"
     sed -i "s|input_path = '$USER_MATUGEN_DIR/templates/|input_path = '$TMP_TEMPLATES_DIR/|g" "$TMP_CFG"
-
-    # Handle the special colloid template path
-    if [[ -f "$TMP_TEMPLATES_DIR/gtk3-colors.css" ]]; then
-      sed -i "/\[templates\.gtk3\]/,/^$/ s|input_path = '$COLLOID_TEMPLATE'|input_path = '$TMP_TEMPLATES_DIR/gtk3-colors.css'|" "$TMP_CFG"
-    fi
+    sed -i "s|input_path = '\\./matugen/templates/|input_path = '$TMP_TEMPLATES_DIR/|g" "$TMP_CFG"
   fi
 
   pushd "$SHELL_DIR" >/dev/null
@@ -238,9 +259,26 @@ EOF
   rm -f "$TMP_CONTENT_CFG"
   popd >/dev/null
 
-  echo "$JSON" | grep -q '"primary"' || { echo "matugen JSON missing primary" >&2; return 2; }
+  echo "$JSON" | grep -q '"primary"' || { echo "matugen JSON missing primary" >&2; set_system_color_scheme "$mode"; return 2; }
   printf "%s" "$JSON" > "$LAST_JSON"
-  
+
+  GTK_CSS="$CONFIG_DIR/gtk-3.0/gtk.css"
+  SHOULD_RUN_HOOK=false
+
+  if [[ -L "$GTK_CSS" ]]; then
+    LINK_TARGET=$(readlink "$GTK_CSS")
+    if [[ "$LINK_TARGET" == *"dank-colors.css"* ]]; then
+      SHOULD_RUN_HOOK=true
+    fi
+  elif [[ -f "$GTK_CSS" ]] && grep -q "dank-colors.css" "$GTK_CSS"; then
+    SHOULD_RUN_HOOK=true
+  fi
+
+  if [[ "$SHOULD_RUN_HOOK" == "true" ]]; then
+    gsettings set org.gnome.desktop.interface gtk-theme "" >/dev/null 2>&1 || true
+    gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-${mode}" >/dev/null 2>&1 || true
+  fi
+
   if [ "$mode" = "light" ]; then
     SECTION=$(echo "$JSON" | sed -n 's/.*"light":{\([^}]*\)}.*/\1/p')
   else
@@ -273,6 +311,8 @@ EOF
       mv "$TMP" "$CONFIG_DIR/kitty/dank-theme.conf"
     fi
   fi
+
+  set_system_color_scheme "$mode"
 }
 
 if command -v pywalfox >/dev/null 2>&1 && [[ -f "$HOME/.cache/wal/colors.json" ]]; then

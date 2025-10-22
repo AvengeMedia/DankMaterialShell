@@ -12,42 +12,42 @@ Item {
     property var variantComponents: [{
         "id": "dankBar",
         "name": "Dank Bar",
-        "description": "System bar with widgets and system information",
+        "description": I18n.tr("System bar with widgets and system information"),
         "icon": "toolbar"
     }, {
         "id": "dock",
-        "name": "Application Dock",
-        "description": "Bottom dock for pinned and running applications",
+        "name": I18n.tr("Application Dock"),
+        "description": I18n.tr("Bottom dock for pinned and running applications"),
         "icon": "dock"
     }, {
         "id": "notifications",
-        "name": "Notification Popups",
-        "description": "Notification toast popups",
+        "name": I18n.tr("Notification Popups"),
+        "description": I18n.tr("Notification toast popups"),
         "icon": "notifications"
     }, {
         "id": "wallpaper",
-        "name": "Wallpaper",
-        "description": "Desktop background images",
+        "name": I18n.tr("Wallpaper"),
+        "description": I18n.tr("Desktop background images"),
         "icon": "wallpaper"
     }, {
         "id": "osd",
-        "name": "On-Screen Displays",
-        "description": "Volume, brightness, and other system OSDs",
+        "name": I18n.tr("On-Screen Displays"),
+        "description": I18n.tr("Volume, brightness, and other system OSDs"),
         "icon": "picture_in_picture"
     }, {
         "id": "toast",
-        "name": "Toast Messages",
-        "description": "System toast notifications",
+        "name": I18n.tr("Toast Messages"),
+        "description": I18n.tr("System toast notifications"),
         "icon": "campaign"
     }, {
         "id": "notepad",
-        "name": "Notepad Slideout",
-        "description": "Quick note-taking slideout panel",
+        "name": I18n.tr("Notepad Slideout"),
+        "description": I18n.tr("Quick note-taking slideout panel"),
         "icon": "sticky_note_2"
     }, {
         "id": "systemTray",
-        "name": "System Tray",
-        "description": "System tray icons",
+        "name": I18n.tr("System Tray"),
+        "description": I18n.tr("System tray icons"),
         "icon": "notifications"
     }]
 
@@ -116,8 +116,9 @@ Item {
 
                         width: parent.width
                         text: I18n.tr("Night Mode")
-                        description: "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates."
+                        description: DisplayService.gammaControlAvailable ? I18n.tr("Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.") : I18n.tr("Gamma control not available. Requires DMS API v6+.")
                         checked: DisplayService.nightModeEnabled
+                        enabled: DisplayService.gammaControlAvailable
                         onToggled: checked => {
                                        DisplayService.toggleNightMode()
                                    }
@@ -136,6 +137,7 @@ Item {
                         spacing: 0
                         leftPadding: Theme.spacingM
                         rightPadding: Theme.spacingM
+                        visible: DisplayService.gammaControlAvailable
 
                         DankDropdown {
                             width: parent.width - parent.leftPadding - parent.rightPadding
@@ -160,8 +162,9 @@ Item {
                         id: automaticToggle
                         width: parent.width
                         text: I18n.tr("Automatic Control")
-                        description: "Only adjust gamma based on time or location rules."
+                        description: I18n.tr("Only adjust gamma based on time or location rules.")
                         checked: SessionData.nightModeAutoEnabled
+                        visible: DisplayService.gammaControlAvailable
                         onToggled: checked => {
                                        if (checked && !DisplayService.nightModeEnabled) {
                                            DisplayService.toggleNightMode()
@@ -183,7 +186,7 @@ Item {
                         id: automaticSettings
                         width: parent.width
                         spacing: Theme.spacingS
-                        visible: SessionData.nightModeAutoEnabled
+                        visible: SessionData.nightModeAutoEnabled && DisplayService.gammaControlAvailable
 
                         Connections {
                             target: SessionData
@@ -360,27 +363,28 @@ Item {
                             width: parent.width
 
                             DankToggle {
+                                id: ipLocationToggle
                                 width: parent.width
-                                text: I18n.tr("Auto-location")
-                                description: DisplayService.geoclueAvailable ? "Use automatic location detection (geoclue2)" : "Geoclue service not running - cannot auto-detect location"
-                                checked: SessionData.nightModeLocationProvider === "geoclue2"
-                                enabled: DisplayService.geoclueAvailable
+                                text: I18n.tr("Use IP Location")
+                                description: I18n.tr("Automatically detect location based on IP address")
+                                checked: SessionData.nightModeUseIPLocation || false
                                 onToggled: checked => {
-                                               if (checked && DisplayService.geoclueAvailable) {
-                                                   SessionData.setNightModeLocationProvider("geoclue2")
-                                                   SessionData.setLatitude(0.0)
-                                                   SessionData.setLongitude(0.0)
-                                               } else {
-                                                   SessionData.setNightModeLocationProvider("")
-                                               }
-                                           }
+                                    SessionData.setNightModeUseIPLocation(checked)
+                                }
+
+                                Connections {
+                                    target: SessionData
+                                    function onNightModeUseIPLocationChanged() {
+                                        ipLocationToggle.checked = SessionData.nightModeUseIPLocation
+                                    }
+                                }
                             }
 
                             Column {
                                 width: parent.width
                                 spacing: Theme.spacingM
-                                visible: SessionData.nightModeLocationProvider !== "geoclue2"
                                 leftPadding: Theme.spacingM
+                                visible: !SessionData.nightModeUseIPLocation
 
                                 StyledText {
                                     text: I18n.tr("Manual Coordinates")
@@ -405,9 +409,9 @@ Item {
                                             height: 40
                                             text: SessionData.latitude.toString()
                                             placeholderText: "0.0"
-                                            onTextChanged: {
-                                                const lat = parseFloat(text) || 0.0
-                                                if (lat >= -90 && lat <= 90) {
+                                            onEditingFinished: {
+                                                const lat = parseFloat(text)
+                                                if (!isNaN(lat) && lat >= -90 && lat <= 90 && lat !== SessionData.latitude) {
                                                     SessionData.setLatitude(lat)
                                                 }
                                             }
@@ -428,9 +432,9 @@ Item {
                                             height: 40
                                             text: SessionData.longitude.toString()
                                             placeholderText: "0.0"
-                                            onTextChanged: {
-                                                const lon = parseFloat(text) || 0.0
-                                                if (lon >= -180 && lon <= 180) {
+                                            onEditingFinished: {
+                                                const lon = parseFloat(text)
+                                                if (!isNaN(lon) && lon >= -180 && lon <= 180 && lon !== SessionData.longitude) {
                                                     SessionData.setLongitude(lon)
                                                 }
                                             }

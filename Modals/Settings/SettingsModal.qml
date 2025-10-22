@@ -102,6 +102,7 @@ DankModal {
         browserTitle: "Select Profile Image"
         browserIcon: "person"
         browserType: "profile"
+        showHiddenFiles: true
         fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
         onFileSelected: (path) => {
             PortalService.setProfileImage(path);
@@ -120,6 +121,7 @@ DankModal {
         browserTitle: "Select Wallpaper"
         browserIcon: "wallpaper"
         browserType: "wallpaper"
+        showHiddenFiles: true
         fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
         onFileSelected: (path) => {
             SessionData.setWallpaper(path);

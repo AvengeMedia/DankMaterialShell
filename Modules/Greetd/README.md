@@ -31,31 +31,10 @@ sudo systemctl enable greetd
 
 #### Syncing themes (Optional)
 
-To sync your wallpaper and theme with the greeter login screen:
-
-```bash
-dms-greeter-sync
-```
-
-Then logout/login for changes to take effect. Your wallpaper and theme will appear on the greeter!
+To sync your wallpaper and theme with the greeter login screen, follow the manual setup below:
 
 <details>
-<summary>What does dms-greeter-sync do?</summary>
-
-The `dms-greeter-sync` helper automatically:
-- Adds you to the greeter group
-- Sets minimal ACL permissions on parent directories (traverse only)
-- Sets group ownership on your DMS config directories
-- Creates symlinks to share your theme files with the greeter
-
-This uses standard Linux ACLs (Access Control Lists) - the same security model used by GNOME, KDE, and systemd. The greeter user only gets traverse permission through your directories and can only read the specific theme files you share.
-
-</details>
-
-<details>
-<summary>Manual theme syncing (advanced)</summary>
-
-If you prefer to set up theme syncing manually:
+<summary>Manual theme syncing</summary>
 
 ```bash
 # Add yourself to greeter group
@@ -100,6 +79,7 @@ The package automatically:
 - Sets up directories and permissions
 - Configures greetd with auto-detected compositor
 - Applies SELinux contexts
+- Installs the `dms-greeter-sync` helper script
 
 Then disable existing display manager and enable greetd:
 
@@ -108,13 +88,28 @@ sudo systemctl disable gdm sddm lightdm
 sudo systemctl enable greetd
 ```
 
-**Optional:** Sync your theme with the greeter:
+#### Syncing themes (Optional)
+
+The RPM package includes the `dms-greeter-sync` helper for easy theme syncing:
 
 ```bash
 dms-greeter-sync
 ```
 
 Then logout/login to see your wallpaper on the greeter!
+
+<details>
+<summary>What does dms-greeter-sync do?</summary>
+
+The `dms-greeter-sync` helper automatically:
+- Adds you to the greeter group
+- Sets minimal ACL permissions on parent directories (traverse only)
+- Sets group ownership on your DMS config directories
+- Creates symlinks to share your theme files with the greeter
+
+This uses standard Linux ACLs (Access Control Lists) - the same security model used by GNOME, KDE, and systemd. The greeter user only gets traverse permission through your directories and can only read the specific theme files you share.
+
+</details>
 
 ### Automatic
 
@@ -167,12 +162,7 @@ sudo systemctl disable gdm sddm lightdm
 sudo systemctl enable greetd
 ```
 
-8. (Optional) Install the `dms-greeter-sync` helper for easy theme syncing:
-```bash
-# Download or copy the dms-greeter-sync script from the spec file
-sudo cp /path/to/dms-greeter-sync /usr/local/bin/dms-greeter-sync
-sudo chmod +x /usr/local/bin/dms-greeter-sync
-```
+8. (Optional) Set up theme syncing using the manual ACL method described in the Configuration → Personalization section below
 
 #### Legacy installation (deprecated)
 

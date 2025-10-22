@@ -168,6 +168,13 @@
     "comment": ""
   },
   {
+    "term": "Always show a minimum of 3 workspaces, even if fewer are available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Animation Speed",
     "translation": "",
     "context": "",
@@ -183,6 +190,13 @@
   },
   {
     "term": "App Launcher",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Application Dock",
     "translation": "",
     "context": "",
     "reference": "",
@@ -211,6 +225,13 @@
   },
   {
     "term": "Apply Qt Colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -329,13 +350,6 @@
     "comment": ""
   },
   {
-    "term": "Auto-location",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Auto-saving...",
     "translation": "",
     "context": "",
@@ -365,6 +379,13 @@
   },
   {
     "term": "Automatically cycle through wallpapers in the same folder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Automatically detect location based on IP address",
     "translation": "",
     "context": "",
     "reference": "",
@@ -428,6 +449,13 @@
   },
   {
     "term": "Back",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Balanced palette with focused accents (default).",
     "translation": "",
     "context": "",
     "reference": "",
@@ -498,6 +526,27 @@
   },
   {
     "term": "Border Thickness",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bottom",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bottom Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bottom dock for pinned and running applications",
     "translation": "",
     "context": "",
     "reference": "",
@@ -700,6 +749,13 @@
     "comment": ""
   },
   {
+    "term": "Colorful mix of bright contrasting accents.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Command or script to run instead of the standard hibernate procedure",
     "translation": "",
     "context": "",
@@ -763,6 +819,13 @@
     "comment": ""
   },
   {
+    "term": "Configuration activated",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.",
     "translation": "",
     "context": "",
@@ -792,6 +855,13 @@
   },
   {
     "term": "Connected Displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Connection failed. Check password and try again.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1043,6 +1113,20 @@
     "comment": ""
   },
   {
+    "term": "Derives colors that closely match the underlying image.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Desktop background images",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Development",
     "translation": "",
     "context": "",
@@ -1064,6 +1148,13 @@
     "comment": ""
   },
   {
+    "term": "Disconnected from WiFi",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Disk",
     "translation": "",
     "context": "",
@@ -1078,6 +1169,13 @@
     "comment": ""
   },
   {
+    "term": "Dismiss",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen",
     "translation": "",
     "context": "",
@@ -1086,6 +1184,13 @@
   },
   {
     "term": "Display all priorities over fullscreen apps",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Display application icons in workspace indicators",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1114,6 +1219,13 @@
   },
   {
     "term": "Displays the active keyboard layout and allows switching",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Diverse palette spanning the full spectrum.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1156,6 +1268,13 @@
   },
   {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Duration",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1295,6 +1414,55 @@
     "comment": ""
   },
   {
+    "term": "Failed to activate configuration",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to connect to ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to disconnect WiFi",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to enable WiFi",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to set profile image",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to set profile image: ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to start connection to ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Feels Like",
     "translation": "",
     "context": "",
@@ -1393,6 +1561,13 @@
     "comment": ""
   },
   {
+    "term": "Forgot network ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Format Legend",
     "translation": "",
     "context": "",
@@ -1443,6 +1618,13 @@
   },
   {
     "term": "Gamma Control",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Gamma control not available. Requires DMS API v6+.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1533,6 +1715,20 @@
     "comment": ""
   },
   {
+    "term": "High-contrast palette for strong visual distinction.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "High-fidelity palette that preserves source hues.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Hour",
     "translation": "",
     "context": "",
@@ -1610,6 +1806,13 @@
     "comment": ""
   },
   {
+    "term": "Incorrect password",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Individual Batteries",
     "translation": "",
     "context": "",
@@ -1673,6 +1876,41 @@
     "comment": ""
   },
   {
+    "term": "Last launched %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 day%2 ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 hour%2 ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched %1 minute%2 ago",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Last launched just now",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Latitude",
     "translation": "",
     "context": "",
@@ -1722,6 +1960,13 @@
     "comment": ""
   },
   {
+    "term": "Left Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Light Mode",
     "translation": "",
     "context": "",
@@ -1730,6 +1975,13 @@
   },
   {
     "term": "Lines: %1",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Lively palette with saturated accents.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1904,6 +2156,13 @@
     "comment": ""
   },
   {
+    "term": "Minimal palette built around a single hue.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Minute",
     "translation": "",
     "context": "",
@@ -1940,6 +2199,13 @@
   },
   {
     "term": "Mount",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Muted palette with subdued, calming tones.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2142,6 +2408,13 @@
     "comment": ""
   },
   {
+    "term": "Notepad Slideout",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Nothing to see here",
     "translation": "",
     "context": "",
@@ -2184,6 +2457,13 @@
     "comment": ""
   },
   {
+    "term": "Notification toast popups",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Notifications",
     "translation": "",
     "context": "",
@@ -2206,6 +2486,20 @@
   },
   {
     "term": "Office",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "On-Screen Displays",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Only adjust gamma based on time or location rules.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2290,6 +2584,13 @@
   },
   {
     "term": "Percentage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Permission denied to set profile image.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2478,6 +2779,20 @@
     "comment": ""
   },
   {
+    "term": "Profile Image Error",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Profile image is too large. Please use a smaller image.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "QML, JavaScript, Go",
     "translation": "",
     "context": "",
@@ -2500,6 +2815,13 @@
   },
   {
     "term": "Quick access to notepad",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Quick note-taking slideout panel",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2541,6 +2863,13 @@
     "comment": ""
   },
   {
+    "term": "Reload Plugin",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remove",
     "translation": "",
     "context": "",
@@ -2556,6 +2885,20 @@
   },
   {
     "term": "Reset",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Right",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Right Section",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2639,6 +2982,13 @@
     "comment": ""
   },
   {
+    "term": "Scroll through windows, rather than workspaces",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Search for a location...",
     "translation": "",
     "context": "",
@@ -2668,6 +3018,13 @@
   },
   {
     "term": "Select a color from the palette or use custom sliders",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select a preset or drag the slider to customize",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2723,7 +3080,21 @@
     "comment": ""
   },
   {
+    "term": "Select the palette algorithm used for wallpaper-based colors",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Select which transitions to include in randomization",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Selected image file not found.",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2821,6 +3192,20 @@
     "comment": ""
   },
   {
+    "term": "Show only apps running in current workspace",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show only workspaces belonging to each specific monitor.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show password",
     "translation": "",
     "context": "",
@@ -2843,6 +3228,13 @@
   },
   {
     "term": "Show weather information in top bar and control center",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show workspace index numbers in the top bar workspace switcher",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3059,7 +3451,28 @@
     "comment": ""
   },
   {
+    "term": "System bar with widgets and system information",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "System notification area icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "System toast notifications",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "System tray icons",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3185,6 +3598,13 @@
     "comment": ""
   },
   {
+    "term": "Toast Messages",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Today",
     "translation": "",
     "context": "",
@@ -3206,7 +3626,21 @@
     "comment": ""
   },
   {
+    "term": "Top",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Top Bar Format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Top Section",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3221,6 +3655,13 @@
   },
   {
     "term": "Turn off monitors after",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Uninstall Plugin",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3269,6 +3710,13 @@
     "comment": ""
   },
   {
+    "term": "Update Plugin",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use 24-hour time format instead of 12-hour AM/PM",
     "translation": "",
     "context": "",
@@ -3297,6 +3745,13 @@
     "comment": ""
   },
   {
+    "term": "Use IP Location",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use Monospace Font",
     "translation": "",
     "context": "",
@@ -3305,6 +3760,13 @@
   },
   {
     "term": "Use System Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use animated wave progress bars for media playback",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3395,6 +3857,13 @@
     "comment": ""
   },
   {
+    "term": "Vibrant palette with playful saturation.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Visibility",
     "translation": "",
     "context": "",
@@ -3423,7 +3892,21 @@
     "comment": ""
   },
   {
+    "term": "Volume, brightness, and other system OSDs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Wallpaper",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Wallpapers",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3452,6 +3935,20 @@
   },
   {
     "term": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "WiFi disabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "WiFi enabled",
     "translation": "",
     "context": "",
     "reference": "",

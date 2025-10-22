@@ -21,7 +21,7 @@ Singleton {
     property string ethernetConnectionUuid: ""
 
     property var wiredConnections: []
-    
+
     property string wifiIP: ""
     property string wifiInterface: ""
     property bool wifiConnected: false
@@ -75,7 +75,7 @@ Singleton {
     property string networkInfoSSID: ""
     property string networkInfoDetails: ""
     property bool networkInfoLoading: false
-    
+
     property string networkWiredInfoUUID: ""
     property string networkWiredInfoDetails: ""
     property bool networkWiredInfoLoading: false
@@ -158,12 +158,12 @@ Singleton {
                         }
                         return
                     }
-                    
+
                     if (line.includes("StateChanged") || 
                         line.includes("PrimaryConnectionChanged") || 
                         line.includes("WirelessEnabled") || 
                         (line.includes("ActiveConnection") && line.includes("State"))) {
-                        
+
                         if (now - nmStateMonitor.lastRefreshTime > nmStateMonitor.minRefreshInterval) {
                             nmStateMonitor.lastRefreshTime = now
                             refreshNetworkState()

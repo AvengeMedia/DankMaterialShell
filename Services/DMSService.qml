@@ -41,6 +41,7 @@ Singleton {
     signal loginctlStateUpdate(var data)
     signal loginctlEvent(var event)
     signal capabilitiesReceived()
+    signal credentialsRequest(var data)
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -261,6 +262,8 @@ Singleton {
             capabilitiesReceived()
         } else if (service === "network") {
             networkStateUpdate(data)
+        } else if (service === "network.credentials") {
+            credentialsRequest(data)
         } else if (service === "loginctl") {
             if (data.event) {
                 loginctlEvent(data)

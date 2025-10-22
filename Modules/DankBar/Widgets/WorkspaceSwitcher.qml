@@ -7,7 +7,7 @@ import qs.Common
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+Item {
     id: root
 
     property bool isVertical: axis?.isVertical ?? false
@@ -15,6 +15,8 @@ Rectangle {
     property string screenName: ""
     property real widgetHeight: 30
     property real barThickness: 48
+    property var hyprlandOverviewLoader: null
+    property var parentScreen: null
     readonly property var sortedToplevels: {
         return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
     }
@@ -200,9 +202,9 @@ Rectangle {
         return currentMonitor.activeWorkspace?.id ?? 1
     }
 
-    readonly property real padding: isVertical
-        ? Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
-        : (widgetHeight - workspaceRow.implicitHeight) / 2
+    readonly property real padding: Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
+    readonly property real visualWidth: isVertical ? widgetHeight : (workspaceRow.implicitWidth + padding * 2)
+    readonly property real visualHeight: isVertical ? (workspaceRow.implicitHeight + padding * 2) : widgetHeight
 
     function getRealWorkspaces() {
         return root.workspaceList.filter(ws => {
@@ -231,23 +233,36 @@ Rectangle {
         }
     }
 
-    width: isVertical ? widgetHeight : (workspaceRow.implicitWidth + padding * 2)
-    height: isVertical ? (workspaceRow.implicitHeight + padding * 2) : widgetHeight
-    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-    color: {
-        if (SettingsData.dankBarNoBackground)
-            return "transparent"
-        const baseColor = Theme.widgetBaseBackgroundColor
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency)
-    }
+    width: isVertical ? barThickness : visualWidth
+    height: isVertical ? visualHeight : barThickness
     visible: CompositorService.isNiri || CompositorService.isHyprland
+
+    Rectangle {
+        id: visualBackground
+        width: root.visualWidth
+        height: root.visualHeight
+        anchors.centerIn: parent
+        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
+        color: {
+            if (SettingsData.dankBarNoBackground)
+                return "transparent"
+            const baseColor = Theme.widgetBaseBackgroundColor
+            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency)
+        }
+    }
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.NoButton
+        acceptedButtons: Qt.RightButton
 
         property real scrollAccumulator: 0
         property real touchpadThreshold: 500
+
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton && CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
+                root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen
+            }
+        }
 
         onWheel: wheel => {
                      const deltaY = wheel.angleDelta.y
@@ -290,7 +305,7 @@ Rectangle {
                             nextWindow.activate();
                          }
                         }
-                         
+
                      } else {
                          scrollAccumulator += deltaY
 
@@ -331,7 +346,7 @@ Rectangle {
                                 nextWindow.activate();
                             }
                         }
-                             
+
                             scrollAccumulator = 0
                          }
                      }
@@ -350,7 +365,7 @@ Rectangle {
         Repeater {
             model: root.workspaceList
 
-            Rectangle {
+            Item {
                 id: delegateRoot
 
                 property bool isActive: {
@@ -381,6 +396,33 @@ Rectangle {
                 property var loadedIconData: null
                 property bool loadedHasIcon: false
                 property var loadedIcons: []
+
+                readonly property real visualWidth: {
+                    if (root.isVertical) {
+                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5
+                    } else {
+                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
+                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
+                            const iconsWidth = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0)
+                            const baseWidth = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7
+                            return baseWidth + iconsWidth
+                        }
+                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7
+                    }
+                }
+                readonly property real visualHeight: {
+                    if (root.isVertical) {
+                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
+                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
+                            const iconsHeight = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0)
+                            const baseHeight = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7
+                            return baseHeight + iconsHeight
+                        }
+                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7
+                    } else {
+                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5
+                    }
+                }
 
                 Timer {
                     id: dataUpdateTimer
@@ -423,92 +465,54 @@ Rectangle {
                     dataUpdateTimer.restart()
                 }
 
-                width: {
-                    if (root.isVertical) {
-                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5;
-                    } else {
-                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
-                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons);
-                            const iconsWidth = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0);
-                            const baseWidth = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7;
-                            return baseWidth + iconsWidth;
-                        }
-                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7;
-                    }
-                }
-                height: {
-                    if (root.isVertical) {
-                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
-                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons);
-                            const iconsHeight = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0);
-                            const baseHeight = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7;
-                            return baseHeight + iconsHeight;
-                        }
-                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7;
-                    } else {
-                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5;
-                    }
-                }
-                radius: Theme.cornerRadius
-                color: isActive ? Theme.primary : isUrgent ? Theme.error : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
+                width: root.isVertical ? root.barThickness : visualWidth
+                height: root.isVertical ? visualHeight : root.barThickness
 
-                border.width: isUrgent && !isActive ? 2 : 0
-                border.color: isUrgent && !isActive ? Theme.error : Theme.withAlpha(Theme.error, 0)
+                Rectangle {
+                    id: visualContent
+                    width: delegateRoot.visualWidth
+                    height: delegateRoot.visualHeight
+                    anchors.centerIn: parent
+                    radius: Theme.cornerRadius
+                    color: isActive ? Theme.primary : isUrgent ? Theme.error : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
-                Behavior on width {
-                    enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
-                    }
-                }
+                    border.width: isUrgent && !isActive ? 2 : 0
+                    border.color: isUrgent && !isActive ? Theme.error : Theme.withAlpha(Theme.error, 0)
 
-                Behavior on height {
-                    enabled: root.isVertical && (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
-                    NumberAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
-                    }
-                }
-
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.mediumDuration
-                        easing.type: Theme.emphasizedEasing
-                    }
-                }
-
-                Behavior on border.width {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.emphasizedEasing
-                    }
-                }
-
-                MouseArea {
-                    id: mouseArea
-
-                    anchors.fill: parent
-                    hoverEnabled: !isPlaceholder
-                    cursorShape: isPlaceholder ? Qt.ArrowCursor : Qt.PointingHandCursor
-                    enabled: !isPlaceholder
-                    onClicked: {
-                        if (isPlaceholder) {
-                            return
-                        }
-
-                        if (CompositorService.isNiri) {
-                            NiriService.switchToWorkspace(modelData - 1)
-                        } else if (CompositorService.isHyprland && modelData?.id) {
-                            Hyprland.dispatch(`workspace ${modelData.id}`)
+                    Behavior on width {
+                        enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
                         }
                     }
-                }
 
-                Loader {
-                    id: appIconsLoader
-                    anchors.fill: parent
-                    active: SettingsData.showWorkspaceApps
+                    Behavior on height {
+                        enabled: root.isVertical && (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+
+                    Behavior on border.width {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+
+                    Loader {
+                        id: appIconsLoader
+                        anchors.fill: parent
+                        active: SettingsData.showWorkspaceApps
                     sourceComponent: Item {
                         Loader {
                             id: contentRow
@@ -709,8 +713,27 @@ Rectangle {
                         }
                     }
                 }
+                }
 
-                // --- LOGIC / TRIGGERS ---
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: !isPlaceholder
+                    cursorShape: isPlaceholder ? Qt.ArrowCursor : Qt.PointingHandCursor
+                    enabled: !isPlaceholder
+                    onClicked: {
+                        if (isPlaceholder) {
+                            return
+                        }
+
+                        if (CompositorService.isNiri) {
+                            NiriService.switchToWorkspace(modelData - 1)
+                        } else if (CompositorService.isHyprland && modelData?.id) {
+                            Hyprland.dispatch(`workspace ${modelData.id}`)
+                        }
+                    }
+                }
+
                 Component.onCompleted: updateAllData()
 
                 Connections {

@@ -3,124 +3,95 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import qs.Common
+import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
 
-Item {
+BasePill {
     id: root
 
     property bool isActive: false
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
-    property string section: "left"
-    property var popupTarget: null
-    property var parentScreen: null
-    property real widgetThickness: 30
-    property real barThickness: 48
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
+    property var hyprlandOverviewLoader: null
 
-    signal clicked()
+    content: Component {
+        Item {
+            implicitWidth: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
 
-    width: widgetThickness
-    height: widgetThickness
-
-    MouseArea {
-        id: launcherArea
-
-        anchors.fill: parent
-        hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton | Qt.RightButton
-        onPressed: function (mouse){
-            if (mouse.button === Qt.RightButton) {
-                if (CompositorService.isNiri) {
-                    NiriService.toggleOverview()
-                }
-                return
+            DankIcon {
+                visible: SettingsData.launcherLogoMode === "apps"
+                anchors.centerIn: parent
+                name: "apps"
+                size: Theme.barIconSize(root.barThickness, -4)
+                color: Theme.surfaceText
             }
-            
-            root.clicked();
-            if (popupTarget && popupTarget.setTriggerPosition) {
-                const globalPos = mapToGlobal(0, 0);
-                const currentScreen = parentScreen || Screen;
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
-                popupTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen);
+
+            SystemLogo {
+                visible: SettingsData.launcherLogoMode === "os"
+                anchors.centerIn: parent
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                colorOverride: Theme.effectiveLogoColor
+                brightnessOverride: SettingsData.launcherLogoBrightness
+                contrastOverride: SettingsData.launcherLogoContrast
+            }
+
+            IconImage {
+                visible: SettingsData.launcherLogoMode === "compositor"
+                anchors.centerIn: parent
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                smooth: true
+                asynchronous: true
+                source: {
+                    if (CompositorService.isNiri) {
+                        return "file://" + Theme.shellDir + "/assets/niri.svg"
+                    } else if (CompositorService.isHyprland) {
+                        return "file://" + Theme.shellDir + "/assets/hyprland.svg"
+                    }
+                    return ""
+                }
+                layer.enabled: Theme.effectiveLogoColor !== ""
+                layer.effect: MultiEffect {
+                    saturation: 0
+                    colorization: 1
+                    colorizationColor: Theme.effectiveLogoColor
+                    brightness: SettingsData.launcherLogoBrightness
+                    contrast: SettingsData.launcherLogoContrast
+                }
+            }
+
+            IconImage {
+                visible: SettingsData.launcherLogoMode === "custom" && SettingsData.launcherLogoCustomPath !== ""
+                anchors.centerIn: parent
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
+                smooth: true
+                asynchronous: true
+                source: SettingsData.launcherLogoCustomPath ? "file://" + SettingsData.launcherLogoCustomPath.replace("file://", "") : ""
+                layer.enabled: Theme.effectiveLogoColor !== ""
+                layer.effect: MultiEffect {
+                    saturation: 0
+                    colorization: 1
+                    colorizationColor: Theme.effectiveLogoColor
+                    brightness: SettingsData.launcherLogoBrightness
+                    contrast: SettingsData.launcherLogoContrast
+                }
             }
         }
     }
 
-    Rectangle {
-        id: launcherContent
-
+    MouseArea {
+        id: customMouseArea
         anchors.fill: parent
-        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-        color: {
-            if (SettingsData.dankBarNoBackground) {
-                return "transparent";
-            }
-
-            const baseColor = launcherArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
-            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
-        }
-
-        DankIcon {
-            visible: SettingsData.launcherLogoMode === "apps"
-            anchors.centerIn: parent
-            name: "apps"
-            size: Theme.barIconSize(barThickness, -4)
-            color: Theme.surfaceText
-        }
-
-        SystemLogo {
-            visible: SettingsData.launcherLogoMode === "os"
-            anchors.centerIn: parent
-            width: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            height: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            colorOverride: Theme.effectiveLogoColor
-            brightnessOverride: SettingsData.launcherLogoBrightness
-            contrastOverride: SettingsData.launcherLogoContrast
-        }
-
-        IconImage {
-            visible: SettingsData.launcherLogoMode === "compositor"
-            anchors.centerIn: parent
-            width: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            height: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            smooth: true
-            asynchronous: true
-            source: {
-                if (CompositorService.isNiri) {
-                    return "file://" + Theme.shellDir + "/assets/niri.svg"
-                } else if (CompositorService.isHyprland) {
-                    return "file://" + Theme.shellDir + "/assets/hyprland.svg"
-                }
-                return ""
-            }
-            layer.enabled: Theme.effectiveLogoColor !== ""
-            layer.effect: MultiEffect {
-                saturation: 0
-                colorization: 1
-                colorizationColor: Theme.effectiveLogoColor
-                brightness: SettingsData.launcherLogoBrightness
-                contrast: SettingsData.launcherLogoContrast
-            }
-        }
-
-        IconImage {
-            visible: SettingsData.launcherLogoMode === "custom" && SettingsData.launcherLogoCustomPath !== ""
-            anchors.centerIn: parent
-            width: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            height: Theme.barIconSize(barThickness, SettingsData.launcherLogoSizeOffset)
-            smooth: true
-            asynchronous: true
-            source: SettingsData.launcherLogoCustomPath ? "file://" + SettingsData.launcherLogoCustomPath.replace("file://", "") : ""
-            layer.enabled: Theme.effectiveLogoColor !== ""
-            layer.effect: MultiEffect {
-                saturation: 0
-                colorization: 1
-                colorizationColor: Theme.effectiveLogoColor
-                brightness: SettingsData.launcherLogoBrightness
-                contrast: SettingsData.launcherLogoContrast
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.RightButton
+        onPressed: function (mouse){
+            if (CompositorService.isNiri) {
+                NiriService.toggleOverview()
+            } else if (root.hyprlandOverviewLoader?.item) {
+                root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen
             }
         }
     }

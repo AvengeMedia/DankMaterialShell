@@ -3,36 +3,69 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import qs.Modules.Plugins
 import qs.Modules.ProcessList
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+BasePill {
     id: root
 
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
-    property real widgetThickness: 30
-    property real barThickness: 48
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
     property string currentLayout: ""
     property string hyprlandKeyboard: ""
 
-    width: isVertical ? widgetThickness : (contentRow.implicitWidth + horizontalPadding * 2)
-    height: isVertical ? (contentColumn.implicitHeight + horizontalPadding * 2) : widgetThickness
-    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-    color: {
-        if (SettingsData.dankBarNoBackground) {
-            return "transparent";
-        }
+    content: Component {
+        Item {
+            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : contentRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? contentColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
 
-        const baseColor = mouseArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
+            Column {
+                id: contentColumn
+                visible: root.isVerticalOrientation
+                anchors.centerIn: parent
+                spacing: 1
+
+                DankIcon {
+                    name: "keyboard"
+                    size: Theme.barIconSize(root.barThickness)
+                    color: Theme.surfaceText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                StyledText {
+                    text: {
+                        if (!root.currentLayout) return ""
+                        const parts = root.currentLayout.split(" ")
+                        if (parts.length > 0) {
+                            return parts[0].substring(0, 2).toUpperCase()
+                        }
+                        return root.currentLayout.substring(0, 2).toUpperCase()
+                    }
+                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            Row {
+                id: contentRow
+                visible: !root.isVerticalOrientation
+                anchors.centerIn: parent
+                spacing: Theme.spacingS
+
+                StyledText {
+                    text: root.currentLayout
+                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+        }
     }
 
     MouseArea {
-        id: mouseArea
-
+        z: 1
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
@@ -50,53 +83,6 @@ Rectangle {
             }
         }
     }
-
-    Column {
-        id: contentColumn
-
-        anchors.centerIn: parent
-        spacing: 1
-        visible: root.isVertical
-
-        DankIcon {
-            name: "keyboard"
-            size: Theme.barIconSize(barThickness)
-            color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        StyledText {
-            text: {
-                if (!currentLayout) return ""
-                const parts = currentLayout.split(" ")
-                if (parts.length > 0) {
-                    return parts[0].substring(0, 2).toUpperCase()
-                }
-                return currentLayout.substring(0, 2).toUpperCase()
-            }
-            font.pixelSize: Theme.barTextSize(barThickness)
-            font.weight: Font.Medium
-            color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
-
-    Row {
-        id: contentRow
-
-        anchors.centerIn: parent
-        spacing: Theme.spacingS
-        visible: !root.isVertical
-
-        StyledText {
-            text: currentLayout
-            font.pixelSize: Theme.barTextSize(barThickness)
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-    }
-
 
     Timer {
         id: updateTimer

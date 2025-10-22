@@ -1,26 +1,20 @@
 import QtQuick
 import QtQuick.Controls
 import qs.Common
+import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+BasePill {
     id: root
 
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
     property bool showPercentage: true
     property bool showIcon: true
     property var toggleProcessList
-    property string section: "right"
-    property var popupTarget: null
-    property var parentScreen: null
+    property var popoutTarget: null
     property var widgetData: null
-    property real barThickness: 48
-    property real widgetThickness: 30
     property int selectedGpuIndex: (widgetData && widgetData.selectedGpuIndex !== undefined) ? widgetData.selectedGpuIndex : 0
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
     property real displayTemp: {
         if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
             return 0;
@@ -34,7 +28,6 @@ Rectangle {
     }
 
     function updateWidgetPciId(pciId) {
-        // Find and update this widget's pciId in the settings
         const sections = ["left", "center", "right"];
         for (let s = 0; s < sections.length; s++) {
             const sectionId = sections[s];
@@ -68,17 +61,6 @@ Rectangle {
         }
     }
 
-    width: isVertical ? widgetThickness : (gpuTempContent.implicitWidth + horizontalPadding * 2)
-    height: isVertical ? (gpuTempColumn.implicitHeight + horizontalPadding * 2) : widgetThickness
-    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-    color: {
-        if (SettingsData.dankBarNoBackground) {
-            return "transparent";
-        }
-
-        const baseColor = gpuArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
-    }
     Component.onCompleted: {
         DgopService.addRef(["gpu"]);
         if (widgetData && widgetData.pciId) {
@@ -92,12 +74,10 @@ Rectangle {
         if (widgetData && widgetData.pciId) {
             DgopService.removeGpuPciId(widgetData.pciId);
         }
-
     }
 
     Connections {
         function onWidgetDataChanged() {
-            // Force property re-evaluation by triggering change detection
             root.selectedGpuIndex = Qt.binding(() => {
                 return (root.widgetData && root.widgetData.selectedGpuIndex !== undefined) ? root.widgetData.selectedGpuIndex : 0;
             });
@@ -106,120 +86,124 @@ Rectangle {
         target: SettingsData
     }
 
-    MouseArea {
-        id: gpuArea
+    content: Component {
+        Item {
+            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : gpuTempContent.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? gpuTempColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
 
+            Column {
+                id: gpuTempColumn
+                visible: root.isVerticalOrientation
+                anchors.centerIn: parent
+                spacing: 1
+
+                DankIcon {
+                    name: "auto_awesome_mosaic"
+                    size: Theme.barIconSize(root.barThickness)
+                    color: {
+                        if (root.displayTemp > 80) {
+                            return Theme.tempDanger;
+                        }
+
+                        if (root.displayTemp > 65) {
+                            return Theme.tempWarning;
+                        }
+
+                        return Theme.surfaceText;
+                    }
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                StyledText {
+                    text: {
+                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
+                            return "--";
+                        }
+
+                        return Math.round(root.displayTemp).toString();
+                    }
+                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            Row {
+                id: gpuTempContent
+                visible: !root.isVerticalOrientation
+                anchors.centerIn: parent
+                spacing: 3
+
+                DankIcon {
+                    name: "auto_awesome_mosaic"
+                    size: Theme.barIconSize(root.barThickness)
+                    color: {
+                        if (root.displayTemp > 80) {
+                            return Theme.tempDanger;
+                        }
+
+                        if (root.displayTemp > 65) {
+                            return Theme.tempWarning;
+                        }
+
+                        return Theme.surfaceText;
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                StyledText {
+                    text: {
+                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
+                            return "--°";
+                        }
+
+                        return Math.round(root.displayTemp) + "°";
+                    }
+                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.weight: Font.Medium
+                    color: Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                    horizontalAlignment: Text.AlignLeft
+                    elide: Text.ElideNone
+
+                    StyledTextMetrics {
+                        id: gpuTempBaseline
+                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.weight: Font.Medium
+                        text: "100°"
+                    }
+
+                    width: root.minimumWidth ? Math.max(gpuTempBaseline.width, paintedWidth) : paintedWidth
+
+                    Behavior on width {
+                        NumberAnimation {
+                            duration: 120
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    MouseArea {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popupTarget && popupTarget.setTriggerPosition) {
-                const globalPos = mapToGlobal(0, 0)
+            if (popoutTarget && popoutTarget.setTriggerPosition) {
+                const globalPos = root.visualContent.mapToGlobal(0, 0)
                 const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                popupTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
+                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
+                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
             }
             DgopService.setSortBy("cpu");
             if (root.toggleProcessList) {
                 root.toggleProcessList();
             }
-
         }
-    }
-
-    Column {
-        id: gpuTempColumn
-        visible: root.isVertical
-        anchors.centerIn: parent
-        spacing: 1
-
-        DankIcon {
-            name: "auto_awesome_mosaic"
-            size: Theme.barIconSize(barThickness)
-            color: {
-                if (root.displayTemp > 80) {
-                    return Theme.tempDanger;
-                }
-
-                if (root.displayTemp > 65) {
-                    return Theme.tempWarning;
-                }
-
-                return Theme.surfaceText;
-            }
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-
-        StyledText {
-            text: {
-                if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                    return "--";
-                }
-
-                return Math.round(root.displayTemp).toString();
-            }
-            font.pixelSize: Theme.barTextSize(barThickness)
-            font.weight: Font.Medium
-            color: Theme.surfaceText
-            anchors.horizontalCenter: parent.horizontalCenter
-        }
-    }
-
-    Row {
-        id: gpuTempContent
-        visible: !root.isVertical
-        anchors.centerIn: parent
-        spacing: 3
-
-        DankIcon {
-            name: "auto_awesome_mosaic"
-            size: Theme.barIconSize(barThickness)
-            color: {
-                if (root.displayTemp > 80) {
-                    return Theme.tempDanger;
-                }
-
-                if (root.displayTemp > 65) {
-                    return Theme.tempWarning;
-                }
-
-                return Theme.surfaceText;
-            }
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        StyledText {
-            text: {
-                if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                    return "--°";
-                }
-
-                return Math.round(root.displayTemp) + "°";
-            }
-            font.pixelSize: Theme.barTextSize(barThickness)
-            font.weight: Font.Medium
-            color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
-            horizontalAlignment: Text.AlignLeft
-            elide: Text.ElideNone
-
-            StyledTextMetrics {
-                id: gpuTempBaseline
-                font.pixelSize: Theme.barTextSize(barThickness)
-                font.weight: Font.Medium
-                text: "100°"
-            }
-
-            width: root.minimumWidth ? Math.max(gpuTempBaseline.width, paintedWidth) : paintedWidth
-
-            Behavior on width {
-                NumberAnimation {
-                    duration: 120
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
-
     }
 
     Timer {
@@ -231,13 +215,10 @@ Rectangle {
             if (DgopService.availableGpus && DgopService.availableGpus.length > 0) {
                 const firstGpu = DgopService.availableGpus[0];
                 if (firstGpu && firstGpu.pciId) {
-                    // Save the first GPU's PCI ID to this widget's settings
                     updateWidgetPciId(firstGpu.pciId);
                     DgopService.addGpuPciId(firstGpu.pciId);
                 }
             }
         }
     }
-
-
 }

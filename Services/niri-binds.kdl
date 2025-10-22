@@ -19,6 +19,10 @@ binds {
         spawn "dms" "ipc" "call" "notifications" "toggle"; 
     }
 
+    Mod+Y hotkey-overlay-title="Browse Wallpapers" {
+        spawn "dms" "ipc" "call" "dankdash" "wallpaper";
+    }
+
     Mod+Shift+N hotkey-overlay-title="Notepad" {
       spawn "dms" "ipc" "call" "notepad" "toggle";  
     }

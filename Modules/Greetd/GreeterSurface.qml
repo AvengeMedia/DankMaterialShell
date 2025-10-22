@@ -1,18 +1,34 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Greetd
+import qs.Common
 
-WlSessionLockSurface {
-    id: root
+Variants {
+    model: Quickshell.screens
 
-    required property WlSessionLock lock
+    PanelWindow {
+        id: root
 
-    color: "transparent"
+        property var modelData
 
-    GreeterContent {
-        anchors.fill: parent
-        screenName: root.screen?.name ?? ""
-        sessionLock: root.lock
+        screen: modelData
+        anchors {
+            left: true
+            right: true
+            top: true
+            bottom: true
+        }
+        exclusionMode: ExclusionMode.Normal
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        color: "transparent"
+
+        GreeterContent {
+            anchors.fill: parent
+            screenName: root.screen?.name ?? ""
+        }
     }
 }

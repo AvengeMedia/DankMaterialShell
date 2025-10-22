@@ -516,6 +516,19 @@ Singleton {
         resyncDebounce.restart()
     }
 
+    function forceRescanPlugin(pluginId) {
+        const plugin = availablePlugins[pluginId]
+        if (plugin && plugin.manifestPath) {
+            const manifestPath = plugin.manifestPath
+            const source = plugin.source || "user"
+            delete knownManifests[manifestPath]
+            const newMap = Object.assign({}, availablePlugins)
+            delete newMap[pluginId]
+            availablePlugins = newMap
+            loadPluginManifestFile(manifestPath, source, Date.now())
+        }
+    }
+
     function createPluginDirectory() {
         const mkdirProcess = Qt.createComponent("data:text/plain,import Quickshell.Io; Process { }")
         if (mkdirProcess.status === Component.Ready) {
@@ -538,7 +551,7 @@ Singleton {
     // Launcher plugin helper functions
     function getLauncherPlugins() {
         const launchers = {}
-        
+
         // Check plugins that have launcher components
         for (const pluginId in pluginLauncherComponents) {
             const plugin = availablePlugins[pluginId]

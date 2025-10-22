@@ -244,7 +244,6 @@ Item {
     Canvas {
         id: barBorder
         anchors.fill: parent
-        antialiasing: false
         visible: SettingsData.dankBarBorderEnabled
         renderTarget: Canvas.FramebufferObject
         renderStrategy: Canvas.Cooperative
@@ -256,6 +255,8 @@ Item {
         property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
         property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
         property bool borderEnabled: SettingsData.dankBarBorderEnabled
+
+        antialiasing: rt > 0 || wing > 0
 
         onWingChanged: root.requestRepaint()
         onRtChanged: root.requestRepaint()
@@ -306,38 +307,6 @@ Item {
             const spacing = SettingsData.dankBarSpacing
             const hasEdgeGap = spacing > 0 || RT > 0
 
-            function drawTopBorder() {
-                ctx.beginPath()
-
-                if (!hasEdgeGap) {
-                    ctx.moveTo(0, H)
-                    ctx.lineTo(W, H)
-                } else {
-                    ctx.moveTo(RT, 0)
-                    ctx.lineTo(W - RT, 0)
-                    ctx.arcTo(W, 0, W, RT, RT)
-                    ctx.lineTo(W, H)
-
-                    if (R > 0) {
-                        ctx.lineTo(W, H + R)
-                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
-                        ctx.lineTo(R, H)
-                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
-                        ctx.lineTo(0, H + R)
-                    } else {
-                        ctx.lineTo(W, H - RT)
-                        ctx.arcTo(W, H, W - RT, H, RT)
-                        ctx.lineTo(RT, H)
-                        ctx.arcTo(0, H, 0, H - RT, RT)
-                    }
-
-                    ctx.lineTo(0, RT)
-                    ctx.arcTo(0, 0, RT, 0, RT)
-                }
-
-                ctx.closePath()
-            }
-
             ctx.reset()
             ctx.clearRect(0, 0, W, H_raw)
 
@@ -353,20 +322,85 @@ Item {
                 ctx.rotate(Math.PI / 2)
             }
 
-            drawTopBorder()
-            ctx.restore()
+            const uiThickness = Math.max(1, SettingsData.dankBarBorderThickness ?? 1)
+            const devThickness = Math.max(1, Math.round(Theme.px(uiThickness, dpr)))
 
             const key = SettingsData.dankBarBorderColor || "surfaceText"
             const base = (key === "surfaceText") ? Theme.surfaceText
                        : (key === "primary") ? Theme.primary
                        : Theme.secondary
             const color = Theme.withAlpha(base, SettingsData.dankBarBorderOpacity ?? 1.0)
-            const thickness = Math.max(1, SettingsData.dankBarBorderThickness ?? 1)
 
             ctx.globalCompositeOperation = "source-over"
-            ctx.lineWidth = thickness
-            ctx.strokeStyle = color
-            ctx.stroke()
+            ctx.fillStyle = color
+
+            function drawTopBorder() {
+                if (!hasEdgeGap) {
+                    ctx.beginPath()
+                    ctx.rect(0, H - devThickness, W, devThickness)
+                    ctx.fill()
+                } else {
+                    const thk = devThickness
+                    const RTi = Math.max(0, RT - thk)
+                    const Ri = Math.max(0, R - thk)
+
+                    ctx.beginPath()
+
+                    if (R > 0 && Ri > 0) {
+                        ctx.moveTo(RT, 0)
+                        ctx.lineTo(W - RT, 0)
+                        ctx.arcTo(W, 0, W, RT, RT)
+                        ctx.lineTo(W, H)
+                        ctx.lineTo(W, H + R)
+                        ctx.arc(W - R, H + R, R, 0, -Math.PI / 2, true)
+                        ctx.lineTo(R, H)
+                        ctx.arc(R, H + R, R, -Math.PI / 2, -Math.PI, true)
+                        ctx.lineTo(0, H + R)
+                        ctx.lineTo(0, RT)
+                        ctx.arcTo(0, 0, RT, 0, RT)
+                        ctx.closePath()
+
+                        ctx.moveTo(RT, thk)
+                        ctx.arcTo(thk, thk, thk, RT, RTi)
+                        ctx.lineTo(thk, H + R)
+                        ctx.arc(R, H + R, Ri, -Math.PI, -Math.PI / 2, false)
+                        ctx.lineTo(W - R, H + thk)
+                        ctx.arc(W - R, H + R, Ri, -Math.PI / 2, 0, false)
+                        ctx.lineTo(W - thk, H + R)
+                        ctx.lineTo(W - thk, RT)
+                        ctx.arcTo(W - thk, thk, W - RT, thk, RTi)
+                        ctx.lineTo(RT, thk)
+                        ctx.closePath()
+                    } else {
+                        ctx.moveTo(RT, 0)
+                        ctx.lineTo(W - RT, 0)
+                        ctx.arcTo(W, 0, W, RT, RT)
+                        ctx.lineTo(W, H - RT)
+                        ctx.arcTo(W, H, W - RT, H, RT)
+                        ctx.lineTo(RT, H)
+                        ctx.arcTo(0, H, 0, H - RT, RT)
+                        ctx.lineTo(0, RT)
+                        ctx.arcTo(0, 0, RT, 0, RT)
+                        ctx.closePath()
+
+                        ctx.moveTo(RT, thk)
+                        ctx.arcTo(thk, thk, thk, RT, RTi)
+                        ctx.lineTo(thk, H - RT)
+                        ctx.arcTo(thk, H - thk, RT, H - thk, RTi)
+                        ctx.lineTo(W - RT, H - thk)
+                        ctx.arcTo(W - thk, H - thk, W - thk, H - RT, RTi)
+                        ctx.lineTo(W - thk, RT)
+                        ctx.arcTo(W - thk, thk, W - RT, thk, RTi)
+                        ctx.lineTo(RT, thk)
+                        ctx.closePath()
+                    }
+
+                    ctx.fill("evenodd")
+                }
+            }
+
+            drawTopBorder()
+            ctx.restore()
         }
     }
 }

@@ -7,7 +7,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
 import Quickshell.Services.Pam
-import Quickshell.Services.Mpris
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -15,8 +14,6 @@ import qs.Modules.Lock
 
 Item {
     id: root
-
-    required property var sessionLock
 
     readonly property string xdgDataDirs: Quickshell.env("XDG_DATA_DIRS")
     property string screenName: ""
@@ -117,21 +114,6 @@ Item {
         onTriggered: updateHyprlandLayout()
     }
 
-    // ! This was for development and testing, just leaving so people can see how I did it.
-    // Timer {
-    //     id: autoUnlockTimer
-    //     interval: 10000
-    //     running: true
-    //     onTriggered: {
-    //         root.sessionLock.locked = false
-    //         GreeterState.unlocking = true
-    //         const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex]
-    //         if (sessionCmd) {
-    //             GreetdMemory.setLastSessionId(sessionCmd.split(" ")[0])
-    //             Greetd.launch(sessionCmd.split(" "), [], true)
-    //         }
-    //     }
-    // }
 
     Connections {
         target: GreetdMemory
@@ -173,7 +155,7 @@ Item {
             }
             return (currentWallpaper && !currentWallpaper.startsWith("#")) ? currentWallpaper : ""
         }
-        fillMode: Image.PreserveAspectCrop
+        fillMode: Theme.getFillMode(SettingsData.wallpaperFillMode)
         smooth: true
         asynchronous: false
         cache: true
@@ -673,180 +655,11 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: MprisController.activePlayer
-            }
-
-            Row {
-                spacing: Theme.spacingS
-                visible: MprisController.activePlayer
-                anchors.verticalCenter: parent.verticalCenter
-
-                Item {
-                    width: 20
-                    height: Theme.iconSize
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Loader {
-                        active: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing
-
-                        sourceComponent: Component {
-                            Ref {
-                                service: CavaService
-                            }
-                        }
-                    }
-
-                    Timer {
-                        running: !CavaService.cavaAvailable && MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing
-                        interval: 256
-                        repeat: true
-                        onTriggered: {
-                            CavaService.values = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25]
-                        }
-                    }
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 1.5
-
-                        Repeater {
-                            model: 6
-
-                            Rectangle {
-                                width: 2
-                                height: {
-                                    if (MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing && CavaService.values.length > index) {
-                                        const rawLevel = CavaService.values[index] || 0
-                                        const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100
-                                        const maxHeight = Theme.iconSize - 2
-                                        const minHeight = 3
-                                        return minHeight + (scaledLevel / 100) * (maxHeight - minHeight)
-                                    }
-                                    return 3
-                                }
-                                radius: 1.5
-                                color: "white"
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                Behavior on height {
-                                    NumberAnimation {
-                                        duration: Anims.durShort
-                                        easing.type: Easing.BezierSpline
-                                        easing.bezierCurve: Anims.standardDecel
-                                    }
-                                }
-                            }
-                        }
-                    }
+                visible: {
+                    const keyboardVisible = (CompositorService.isNiri && NiriService.keyboardLayoutNames.length > 1) ||
+                                          (CompositorService.isHyprland && hyprlandLayoutCount > 1)
+                    return keyboardVisible && WeatherService.weather.available
                 }
-
-                StyledText {
-                    text: {
-                        const player = MprisController.activePlayer
-                        if (!player?.trackTitle)
-                            return ""
-                        const title = player.trackTitle
-                        const artist = player.trackArtist || ""
-                        return artist ? title + " • " + artist : title
-                    }
-                    font.pixelSize: Theme.fontSizeLarge
-                    color: "white"
-                    opacity: 0.9
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    width: Math.min(implicitWidth, 400)
-                    wrapMode: Text.NoWrap
-                    maximumLineCount: 1
-                }
-
-                Row {
-                    spacing: Theme.spacingXS
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Rectangle {
-                        width: 20
-                        height: 20
-                        radius: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: prevArea.containsMouse ? Qt.rgba(255, 255, 255, 0.2) : "transparent"
-                        visible: MprisController.activePlayer
-                        opacity: (MprisController.activePlayer?.canGoPrevious ?? false) ? 1 : 0.3
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: "skip_previous"
-                            size: 12
-                            color: "white"
-                        }
-
-                        MouseArea {
-                            id: prevArea
-                            anchors.fill: parent
-                            enabled: MprisController.activePlayer?.canGoPrevious ?? false
-                            hoverEnabled: enabled
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.previous()
-                        }
-                    }
-
-                    Rectangle {
-                        width: 24
-                        height: 24
-                        radius: 12
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? Qt.rgba(255, 255, 255, 0.9) : Qt.rgba(255, 255, 255, 0.2)
-                        visible: MprisController.activePlayer
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
-                            size: 14
-                            color: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? "black" : "white"
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            enabled: MprisController.activePlayer
-                            hoverEnabled: enabled
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.togglePlaying()
-                        }
-                    }
-
-                    Rectangle {
-                        width: 20
-                        height: 20
-                        radius: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: nextArea.containsMouse ? Qt.rgba(255, 255, 255, 0.2) : "transparent"
-                        visible: MprisController.activePlayer
-                        opacity: (MprisController.activePlayer?.canGoNext ?? false) ? 1 : 0.3
-
-                        DankIcon {
-                            anchors.centerIn: parent
-                            name: "skip_next"
-                            size: 12
-                            color: "white"
-                        }
-
-                        MouseArea {
-                            id: nextArea
-                            anchors.fill: parent
-                            enabled: MprisController.activePlayer?.canGoNext ?? false
-                            hoverEnabled: enabled
-                            cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.next()
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: 24
-                color: Qt.rgba(255, 255, 255, 0.2)
-                anchors.verticalCenter: parent.verticalCenter
-                visible: MprisController.activePlayer && WeatherService.weather.available
             }
 
             Row {
@@ -1247,7 +1060,6 @@ Item {
         }
 
         function onReadyToLaunch() {
-            root.sessionLock.locked = false
             GreeterState.unlocking = true
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex]
             if (sessionCmd) {

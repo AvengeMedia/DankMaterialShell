@@ -128,9 +128,9 @@ Item {
 
     function getAudioDeviceIcon(device) {
         if (!device || !device.name) return "speaker"
-        
+
         const name = device.name.toLowerCase()
-        
+
         if (name.includes("bluez") || name.includes("bluetooth"))
             return "headset"
         if (name.includes("hdmi"))
@@ -139,10 +139,10 @@ Item {
             return "headset"
         if (name.includes("analog") || name.includes("built-in"))
             return "speaker"
-        
+
         return "speaker"
     }
-    
+
     function getVolumeIcon(sink) {
         if (!sink || !sink.audio) return "volume_off"
 
@@ -262,8 +262,8 @@ Item {
             maybeFinishSwitch()
         }
     }
-    
-    
+
+
 
     property bool isSeeking: false
 
@@ -325,7 +325,7 @@ Item {
                     return mouse.x < item.x || mouse.x > item.x + item.width ||
                            mouse.y < item.y || mouse.y > item.y + item.height
                 }
-                
+
                 if (playerSelectorButton.playersExpanded && clickOutside(playerSelectorDropdown)) {
                     playerSelectorButton.playersExpanded = false
                 }
@@ -400,11 +400,11 @@ Item {
                     easing.bezierCurve: Anims.standard
                 }
             }
-            
+
             Column {
                 anchors.fill: parent
                 anchors.margins: Theme.spacingM
-                
+
                 StyledText {
                     text: I18n.tr("Audio Output Devices (") + audioDevicesDropdown.availableDevices.length + ")"
                     font.pixelSize: Theme.fontSizeMedium
@@ -414,49 +414,49 @@ Item {
                     horizontalAlignment: Text.AlignHCenter
                     bottomPadding: Theme.spacingM
                 }
-                
+
                 DankFlickable {
                     width: parent.width
                     height: parent.height - 40 
                     contentHeight: deviceColumn.height
                     clip: true
-                    
+
                     Column {
                         id: deviceColumn
                         width: parent.width
                         spacing: Theme.spacingS
-                        
+
                         Repeater {
                             model: audioDevicesDropdown.availableDevices
                             delegate: Rectangle {
                                 required property var modelData
                                 required property int index
-                                
+
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
                                 color: deviceMouseAreaLeft.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.surfaceContainerHigh
                                 border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                 border.width: modelData === AudioService.sink ? 2 : 1
-                                
+
                                 Row {
                                     anchors.left: parent.left
                                     anchors.leftMargin: Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: Theme.spacingM
                                     width: parent.width - Theme.spacingM * 2
-                                    
+
                                     DankIcon {
                                         name: getAudioDeviceIcon(modelData)
                                         size: 20
                                         color: modelData === AudioService.sink ? Theme.primary : Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
-                                    
+
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
                                         width: parent.width - 20 - Theme.spacingM * 2
-                                        
+
                                         StyledText {
                                             text: AudioService.displayName(modelData)
                                             font.pixelSize: Theme.fontSizeMedium
@@ -466,7 +466,7 @@ Item {
                                             width: parent.width
                                             wrapMode: Text.NoWrap
                                         }
-                                        
+
                                         StyledText {
                                             text: modelData === AudioService.sink ? "Active" : "Available"
                                             font.pixelSize: Theme.fontSizeSmall
@@ -477,7 +477,7 @@ Item {
                                         }
                                     }
                                 }
-                                
+
                                 MouseArea {
                                     id: deviceMouseAreaLeft
                                     anchors.fill: parent
@@ -490,7 +490,7 @@ Item {
                                         audioDevicesButton.devicesExpanded = false
                                     }
                                 }
-                                
+
                                 Behavior on border.color { ColorAnimation { duration: Anims.durShort } }
                             }
                         }
@@ -793,7 +793,7 @@ Item {
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
-                        
+
                         StyledText {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
@@ -812,7 +812,7 @@ Item {
                     Item {
                         width: parent.width
                         height: 50
-                        
+
                         Row {
                             anchors.centerIn: parent
                             spacing: Theme.spacingM

@@ -61,7 +61,7 @@ Singleton {
     }
     readonly property string rawWallpaperPath: {
         if (typeof SessionData === "undefined") return ""
-        
+
         if (SessionData.perMonitorWallpaper) {
             // Use first monitor's wallpaper for dynamic theming
             var screens = Quickshell.screens
@@ -195,14 +195,16 @@ Singleton {
     }
 
     readonly property var availableMatugenSchemes: [
-        ({ "value": "scheme-tonal-spot", "label": "Tonal Spot", "description": "Balanced palette with focused accents (default)." }),
-        ({ "value": "scheme-content", "label": "Content", "description": "Derives colors that closely match the underlying image." }),
-        ({ "value": "scheme-expressive", "label": "Expressive", "description": "Vibrant palette with playful saturation." }),
-        ({ "value": "scheme-fidelity", "label": "Fidelity", "description": "High-fidelity palette that preserves source hues." }),
-        ({ "value": "scheme-fruit-salad", "label": "Fruit Salad", "description": "Colorful mix of bright contrasting accents." }),
-        ({ "value": "scheme-monochrome", "label": "Monochrome", "description": "Minimal palette built around a single hue." }),
-        ({ "value": "scheme-neutral", "label": "Neutral", "description": "Muted palette with subdued, calming tones." }),
-        ({ "value": "scheme-rainbow", "label": "Rainbow", "description": "Diverse palette spanning the full spectrum." })
+        ({ "value": "scheme-tonal-spot", "label": "Tonal Spot", "description": I18n.tr("Balanced palette with focused accents (default).") }),
+        ({ "value": "scheme-vibrant-spot", "label": "Vibrant Spot", "description": I18n.tr("Lively palette with saturated accents.") }),
+        ({ "value": "scheme-dynamic-contrast", "label": "Dynamic Contrast", "description": I18n.tr("High-contrast palette for strong visual distinction.") }),
+        ({ "value": "scheme-content", "label": "Content", "description": I18n.tr("Derives colors that closely match the underlying image.") }),
+        ({ "value": "scheme-expressive", "label": "Expressive", "description": I18n.tr("Vibrant palette with playful saturation.") }),
+        ({ "value": "scheme-fidelity", "label": "Fidelity", "description": I18n.tr("High-fidelity palette that preserves source hues.") }),
+        ({ "value": "scheme-fruit-salad", "label": "Fruit Salad", "description": I18n.tr("Colorful mix of bright contrasting accents.") }),
+        ({ "value": "scheme-monochrome", "label": "Monochrome", "description": I18n.tr("Minimal palette built around a single hue.") }),
+        ({ "value": "scheme-neutral", "label": "Neutral", "description": I18n.tr("Muted palette with subdued, calming tones.") }),
+        ({ "value": "scheme-rainbow", "label": "Rainbow", "description": I18n.tr("Diverse palette spanning the full spectrum.") })
     ]
 
     function getMatugenScheme(value) {
@@ -313,6 +315,61 @@ Singleton {
     property int standardEasing: Easing.OutCubic
     property int emphasizedEasing: Easing.OutQuart
 
+    readonly property var expressiveCurves: {
+        "emphasized": [0.05, 0, 2 / 15, 0.06, 1 / 6, 0.4, 5 / 24, 0.82, 0.25, 1, 1, 1],
+        "emphasizedAccel": [0.3, 0, 0.8, 0.15, 1, 1],
+        "emphasizedDecel": [0.05, 0.7, 0.1, 1, 1, 1],
+        "standard": [0.2, 0, 0, 1, 1, 1],
+        "standardAccel": [0.3, 0, 1, 1, 1, 1],
+        "standardDecel": [0, 0, 0, 1, 1, 1],
+        "expressiveFastSpatial": [0.42, 1.67, 0.21, 0.9, 1, 1],
+        "expressiveDefaultSpatial": [0.38, 1.21, 0.22, 1, 1, 1],
+        "expressiveEffects": [0.34, 0.8, 0.34, 1, 1, 1]
+    }
+
+    readonly property var animationPresetDurations: {
+        "none": 0,
+        "short": 250,
+        "medium": 500,
+        "long": 750
+    }
+
+    readonly property int currentAnimationBaseDuration: {
+        if (typeof SettingsData === "undefined") return 500
+        
+        if (SettingsData.animationSpeed === SettingsData.AnimationSpeed.Custom) {
+            return SettingsData.customAnimationDuration
+        }
+        
+        const presetMap = [0, 250, 500, 750]
+        return presetMap[SettingsData.animationSpeed] !== undefined ? presetMap[SettingsData.animationSpeed] : 500
+    }
+
+    readonly property var expressiveDurations: {
+        if (typeof SettingsData === "undefined") {
+            return {
+                "fast": 200,
+                "normal": 400,
+                "large": 600,
+                "extraLarge": 1000,
+                "expressiveFastSpatial": 350,
+                "expressiveDefaultSpatial": 500,
+                "expressiveEffects": 200
+            }
+        }
+
+        const baseDuration = currentAnimationBaseDuration
+        return {
+            "fast": baseDuration * 0.4,
+            "normal": baseDuration * 0.8,
+            "large": baseDuration * 1.2,
+            "extraLarge": baseDuration * 2.0,
+            "expressiveFastSpatial": baseDuration * 0.7,
+            "expressiveDefaultSpatial": baseDuration,
+            "expressiveEffects": baseDuration * 0.4
+        }
+    }
+
     property real cornerRadius: typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12
     property real spacingXS: 4
     property real spacingS: 8
@@ -384,7 +441,10 @@ Singleton {
         if (savePrefs && typeof SessionData !== "undefined" && !isGreeterMode)
             SessionData.setLightMode(light)
         if (!isGreeterMode) {
-            PortalService.setLightMode(light)
+            // Skip with matugen becuase, our script runner will do it.
+            if (!matugenAvailable) {
+                PortalService.setLightMode(light)
+            }
             generateSystemThemesFromCurrentTheme()
         }
     }
@@ -662,15 +722,16 @@ Singleton {
 
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`])
         workerRunning = true
+        const syncModeWithPortal = (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal) ? "true" : "false"
         if (rawWallpaperPath.startsWith("we:")) {
             console.log("Theme: Starting matugen worker (WE wallpaper)")
             systemThemeGenerator.command = [
                 "sh", "-c",
-                `sleep 1 && ${shellDir}/scripts/matugen-worker.sh '${stateDir}' '${shellDir}' '${configDir}' --run`
+                `sleep 1 && ${shellDir}/scripts/matugen-worker.sh '${stateDir}' '${shellDir}' '${configDir}' '${syncModeWithPortal}' --run`
             ]
         } else {
             console.log("Theme: Starting matugen worker")
-            systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, "--run"]
+            systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, "--run"]
         }
         systemThemeGenerator.running = true
     }
@@ -760,6 +821,21 @@ Singleton {
     }
 
     function withAlpha(c, a) { return Qt.rgba(c.r, c.g, c.b, a); }
+
+    function getFillMode(modeName) {
+        switch(modeName) {
+            case "Stretch": return Image.Stretch
+            case "Fit":
+            case "PreserveAspectFit": return Image.PreserveAspectFit
+            case "Fill":
+            case "PreserveAspectCrop": return Image.PreserveAspectCrop
+            case "Tile": return Image.Tile
+            case "TileVertically": return Image.TileVertically
+            case "TileHorizontally": return Image.TileHorizontally
+            case "Pad": return Image.Pad
+            default: return Image.PreserveAspectCrop
+        }
+    }
 
     function snap(value, dpr) {
         const s = dpr || 1

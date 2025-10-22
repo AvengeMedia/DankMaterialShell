@@ -71,6 +71,9 @@
   "Always Show OSD Percentage": {
     "Always Show OSD Percentage": "Sempre mostrar porcetagem no OSD"
   },
+  "Always show a minimum of 3 workspaces, even if fewer are available": {
+    "Always show a minimum of 3 workspaces, even if fewer are available": ""
+  },
   "Animation Speed": {
     "Animation Speed": "Velocidade de Animação"
   },
@@ -79,6 +82,9 @@
   },
   "App Launcher": {
     "App Launcher": "Lançador de Apps"
+  },
+  "Application Dock": {
+    "Application Dock": ""
   },
   "Applications": {
     "Applications": "Aplicativos"
@@ -91,6 +97,9 @@
   },
   "Apply Qt Colors": {
     "Apply Qt Colors": "Aplicar cores no QT"
+  },
+  "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
+    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": ""
   },
   "Apps Icon": {
     "Apps Icon": "Ícones de Apps"
@@ -158,6 +167,9 @@
   "Automatically cycle through wallpapers in the same folder": {
     "Automatically cycle through wallpapers in the same folder": "Circular automaticamente dentre os papéis de parede na mesma pasta"
   },
+  "Automatically detect location based on IP address": {
+    "Automatically detect location based on IP address": ""
+  },
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "Detectar automaticamente a sua localização usando o seu endereço de IP"
   },
@@ -184,6 +196,9 @@
   },
   "Back": {
     "Back": "Voltar"
+  },
+  "Balanced palette with focused accents (default).": {
+    "Balanced palette with focused accents (default).": ""
   },
   "Battery": {
     "Battery": "Bateria"
@@ -214,6 +229,15 @@
   },
   "Border Thickness": {
     "Border Thickness": "Espessura da Borda"
+  },
+  "Bottom": {
+    "Bottom": ""
+  },
+  "Bottom Section": {
+    "Bottom Section": ""
+  },
+  "Bottom dock for pinned and running applications": {
+    "Bottom dock for pinned and running applications": ""
   },
   "Brightness": {
     "Brightness": "Brilho"
@@ -299,6 +323,9 @@
   "Color temperature for night mode": {
     "Color temperature for night mode": "Temperatura da cor para o modo noturno"
   },
+  "Colorful mix of bright contrasting accents.": {
+    "Colorful mix of bright contrasting accents.": ""
+  },
   "Command or script to run instead of the standard hibernate procedure": {
     "Command or script to run instead of the standard hibernate procedure": "Comando ou script serão executados em vez do procedimento padrão de hibernação"
   },
@@ -326,6 +353,9 @@
   "Compositor:": {
     "Compositor:": "Compositor:"
   },
+  "Configuration activated": {
+    "Configuration activated": ""
+  },
   "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "Configurações de ícones para área de trabalho nomeadas. Ícones tem prioridade sobre números, isso quando ambos estão habilitados. "
   },
@@ -340,6 +370,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "Telas Conectadas"
+  },
+  "Connection failed. Check password and try again.": {
+    "Connection failed. Check password and try again.": ""
   },
   "Contrast": {
     "Contrast": "Contraste"
@@ -446,6 +479,12 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Limpar • Shift+Del: Limpar Tudo • 1-9: Ações • F10: Ajuda • Esc: Fechar"
   },
+  "Derives colors that closely match the underlying image.": {
+    "Derives colors that closely match the underlying image.": ""
+  },
+  "Desktop background images": {
+    "Desktop background images": ""
+  },
   "Development": {
     "Development": "Desenvolvimento"
   },
@@ -455,17 +494,26 @@
   "Disconnect": {
     "Disconnect": "Desconectar"
   },
+  "Disconnected from WiFi": {
+    "Disconnected from WiFi": ""
+  },
   "Disk": {
     "Disk": "Disco"
   },
   "Disk Usage": {
     "Disk Usage": "Uso de Disco"
   },
+  "Dismiss": {
+    "Dismiss": ""
+  },
   "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
     "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "Exibir um dock com aplicativos que estão sendo utilizados, e que pode ser posicionada no superior, inferior, esquerda ou direita dos cantos da tela"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Exibir todas as prioridades em aplicativos de tela cheia"
+  },
+  "Display application icons in workspace indicators": {
+    "Display application icons in workspace indicators": ""
   },
   "Display currently focused application title": {
     "Display currently focused application title": "Mostrar título do app em foco"
@@ -478,6 +526,9 @@
   },
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "Exibir Layout ativo do teclado, e permitir alterações"
+  },
+  "Diverse palette spanning the full spectrum.": {
+    "Diverse palette spanning the full spectrum.": ""
   },
   "Do Not Disturb": {
     "Do Not Disturb": "Não Perturbe "
@@ -496,6 +547,9 @@
   },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Arraste Widgets para reordená-los nas seções. Use o ícone de olho para esconder ou mostrá-los (manter o espaçamento), ou clique no X para removê-los por completo."
+  },
+  "Duration": {
+    "Duration": ""
   },
   "Dynamic Theming": {
     "Dynamic Theming": "Tematização Dinâmica"
@@ -554,6 +608,27 @@
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Ativar • F10: Ajuda"
   },
+  "Failed to activate configuration": {
+    "Failed to activate configuration": ""
+  },
+  "Failed to connect to ": {
+    "Failed to connect to ": ""
+  },
+  "Failed to disconnect WiFi": {
+    "Failed to disconnect WiFi": ""
+  },
+  "Failed to enable WiFi": {
+    "Failed to enable WiFi": ""
+  },
+  "Failed to set profile image": {
+    "Failed to set profile image": ""
+  },
+  "Failed to set profile image: ": {
+    "Failed to set profile image: ": ""
+  },
+  "Failed to start connection to ": {
+    "Failed to start connection to ": ""
+  },
   "Feels Like": {
     "Feels Like": "Sensação Térmica"
   },
@@ -596,6 +671,9 @@
   "Forget Network": {
     "Forget Network": "Esquecer Internet"
   },
+  "Forgot network ": {
+    "Forgot network ": ""
+  },
   "Format Legend": {
     "Format Legend": "Formatar Legenda"
   },
@@ -619,6 +697,12 @@
   },
   "Gamma Control": {
     "Gamma Control": "Controle de Gama"
+  },
+  "Gamma control not available. Requires DMS API v6+.": {
+    "Gamma control not available. Requires DMS API v6+.": ""
+  },
+  "Geoclue service not running - cannot auto-detect location": {
+    "Geoclue service not running - cannot auto-detect location": ""
   },
   "Github:": {
     "Github:": "Github:"
@@ -656,6 +740,12 @@
   "Hide the dock when not in use and reveal it when hovering near the dock area": {
     "Hide the dock when not in use and reveal it when hovering near the dock area": "Esconder a dock quando não usada e mostrar ao passar o mouse próximo da área"
   },
+  "High-contrast palette for strong visual distinction.": {
+    "High-contrast palette for strong visual distinction.": ""
+  },
+  "High-fidelity palette that preserves source hues.": {
+    "High-fidelity palette that preserves source hues.": ""
+  },
   "Hour": {
     "Hour": "Hora"
   },
@@ -689,6 +779,9 @@
   "Include Transitions": {
     "Include Transitions": "Incluir Transições"
   },
+  "Incorrect password": {
+    "Incorrect password": ""
+  },
   "Individual Batteries": {
     "Individual Batteries": "Baterias Individuais"
   },
@@ -716,6 +809,21 @@
   "Language:": {
     "Language:": "Linguagem:"
   },
+  "Last launched %1": {
+    "Last launched %1": ""
+  },
+  "Last launched %1 day%2 ago": {
+    "Last launched %1 day%2 ago": ""
+  },
+  "Last launched %1 hour%2 ago": {
+    "Last launched %1 hour%2 ago": ""
+  },
+  "Last launched %1 minute%2 ago": {
+    "Last launched %1 minute%2 ago": ""
+  },
+  "Last launched just now": {
+    "Last launched just now": ""
+  },
   "Latitude": {
     "Latitude": "Latitude"
   },
@@ -737,11 +845,17 @@
   "Left": {
     "Left": "Esquerda"
   },
+  "Left Section": {
+    "Left Section": ""
+  },
   "Light Mode": {
     "Light Mode": "Modo Claro"
   },
   "Lines: %1": {
     "Lines: %1": "Linhas: %1"
+  },
+  "Lively palette with saturated accents.": {
+    "Lively palette with saturated accents.": ""
   },
   "Loading plugins...": {
     "Loading plugins...": "Carregando plugins..."
@@ -815,6 +929,9 @@
   "Memory usage indicator": {
     "Memory usage indicator": "Indicador de uso de memória"
   },
+  "Minimal palette built around a single hue.": {
+    "Minimal palette built around a single hue.": ""
+  },
   "Minute": {
     "Minute": "Minuto"
   },
@@ -832,6 +949,9 @@
   },
   "Mount": {
     "Mount": "Ponto de montagem"
+  },
+  "Muted palette with subdued, calming tones.": {
+    "Muted palette with subdued, calming tones.": ""
   },
   "NM not supported": {
     "NM not supported": "NM não suportado"
@@ -917,6 +1037,9 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "Configurações da Fonte do Bloco de Notas"
   },
+  "Notepad Slideout": {
+    "Notepad Slideout": ""
+  },
   "Nothing to see here": {
     "Nothing to see here": "Nada para ver aqui"
   },
@@ -935,6 +1058,9 @@
   "Notification Timeouts": {
     "Notification Timeouts": "Tempo Máximo de Notificação"
   },
+  "Notification toast popups": {
+    "Notification toast popups": ""
+  },
   "Notifications": {
     "Notifications": "Notificações"
   },
@@ -946,6 +1072,12 @@
   },
   "Office": {
     "Office": "Escritório"
+  },
+  "On-Screen Displays": {
+    "On-Screen Displays": ""
+  },
+  "Only adjust gamma based on time or location rules.": {
+    "Only adjust gamma based on time or location rules.": ""
   },
   "Opacity": {
     "Opacity": "Opacidade"
@@ -982,6 +1114,9 @@
   },
   "Percentage": {
     "Percentage": "Porcetagem"
+  },
+  "Permission denied to set profile image.": {
+    "Permission denied to set profile image.": ""
   },
   "Personalization": {
     "Personalization": "Personalização"
@@ -1061,6 +1196,12 @@
   "Process": {
     "Process": "Processo"
   },
+  "Profile Image Error": {
+    "Profile Image Error": ""
+  },
+  "Profile image is too large. Please use a smaller image.": {
+    "Profile image is too large. Please use a smaller image.": ""
+  },
   "QML, JavaScript, Go": {
     "QML, JavaScript, Go": "QML, JavaScript, Go"
   },
@@ -1073,11 +1214,11 @@
   "Quick access to notepad": {
     "Quick access to notepad": "Acesso rápido ao bloco de notas"
   },
+  "Quick note-taking slideout panel": {
+    "Quick note-taking slideout panel": ""
+  },
   "Rain Chance": {
     "Rain Chance": "Chance de Chuva"
-  },
-  "Realm / Domain (optional)": {
-    "Realm / Domain (optional)": "Domínio / Realm (opcional)"
   },
   "Reboot": {
     "Reboot": "Reiniciar"
@@ -1091,6 +1232,9 @@
   "Refresh": {
     "Refresh": "Recarregar"
   },
+  "Reload Plugin": {
+    "Reload Plugin": ""
+  },
   "Remove": {
     "Remove": "Remover"
   },
@@ -1099,6 +1243,12 @@
   },
   "Reset": {
     "Reset": "Resetar"
+  },
+  "Right": {
+    "Right": ""
+  },
+  "Right Section": {
+    "Right Section": ""
   },
   "Run User Templates": {
     "Run User Templates": "Executar Templates do Usuário"
@@ -1133,6 +1283,9 @@
   "Science": {
     "Science": "Ciência"
   },
+  "Scroll through windows, rather than workspaces": {
+    "Scroll through windows, rather than workspaces": ""
+  },
   "Search for a location...": {
     "Search for a location...": "Procurar um local..."
   },
@@ -1147,6 +1300,9 @@
   },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "Escolha uma cor na paleta ou use controles deslizantes"
+  },
+  "Select a preset or drag the slider to customize": {
+    "Select a preset or drag the slider to customize": ""
   },
   "Select a widget to add to the ": {
     "Select a widget to add to the ": "Selecione um widget para adicionar a "
@@ -1169,14 +1325,17 @@
   "Select system sound theme": {
     "Select system sound theme": "Selecionar tema do som do sistema"
   },
+  "Select the palette algorithm used for wallpaper-based colors": {
+    "Select the palette algorithm used for wallpaper-based colors": ""
+  },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "Selecionar quais transições incluir na randomização"
   },
+  "Selected image file not found.": {
+    "Selected image file not found.": ""
+  },
   "Separator": {
     "Separator": "Separador"
-  },
-  "Server Domain for certificate (optional)": {
-    "Server Domain for certificate (optional)": "Certificado de Domínio do Servidor (opcional)"
   },
   "Set different wallpapers for each connected monitor": {
     "Set different wallpapers for each connected monitor": "Use papéis de paredes diferentes para cada monitor conectado"
@@ -1214,6 +1373,12 @@
   "Show on screens:": {
     "Show on screens:": "Mostrar nas telas:"
   },
+  "Show only apps running in current workspace": {
+    "Show only apps running in current workspace": ""
+  },
+  "Show only workspaces belonging to each specific monitor.": {
+    "Show only workspaces belonging to each specific monitor.": ""
+  },
   "Show password": {
     "Show password": "Mostrar senha"
   },
@@ -1225,6 +1390,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "Mostrar informação de clima na barra superior e na central de controle"
+  },
+  "Show workspace index numbers in the top bar workspace switcher": {
+    "Show workspace index numbers in the top bar workspace switcher": ""
   },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "Mostra todos os aplicativos em execução, destacando o que está em foco"
@@ -1316,8 +1484,17 @@
   "System Updates": {
     "System Updates": "Atualizações do Sistema"
   },
+  "System bar with widgets and system information": {
+    "System bar with widgets and system information": ""
+  },
   "System notification area icons": {
     "System notification area icons": "Área de ícones de notificações do sistema"
+  },
+  "System toast notifications": {
+    "System toast notifications": ""
+  },
+  "System tray icons": {
+    "System tray icons": ""
   },
   "System update custom command": {
     "System update custom command": "Comando personalizado para atualização do sistema"
@@ -1370,6 +1547,9 @@
   "To update, run the following command:": {
     "To update, run the following command:": "Para atualizar, execute o seguinte comando:"
   },
+  "Toast Messages": {
+    "Toast Messages": ""
+  },
   "Today": {
     "Today": "Hoje"
   },
@@ -1379,14 +1559,23 @@
   "Tomorrow": {
     "Tomorrow": "Amanhã"
   },
+  "Top": {
+    "Top": ""
+  },
   "Top Bar Format": {
     "Top Bar Format": "Formato da Barra Superior"
+  },
+  "Top Section": {
+    "Top Section": ""
   },
   "Transition Effect": {
     "Transition Effect": "Efeito de Transição"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "Desligar monitores depois de"
+  },
+  "Uninstall Plugin": {
+    "Uninstall Plugin": ""
   },
   "Unpin from Dock": {
     "Unpin from Dock": "Desafixar do Dock"
@@ -1406,6 +1595,9 @@
   "Update All": {
     "Update All": "Atualizar Tudo"
   },
+  "Update Plugin": {
+    "Update Plugin": ""
+  },
   "Use 24-hour time format instead of 12-hour AM/PM": {
     "Use 24-hour time format instead of 12-hour AM/PM": "Usar relógio de 24 horas em vez de 12 horas com AM/PM"
   },
@@ -1418,11 +1610,20 @@
   "Use Fahrenheit instead of Celsius for temperature": {
     "Use Fahrenheit instead of Celsius for temperature": "Usar Fahrenheit em vez de Celsius para temperatura"
   },
+  "Use IP Location": {
+    "Use IP Location": ""
+  },
   "Use Monospace Font": {
     "Use Monospace Font": "Usar Fonte Monoespaçada"
   },
   "Use System Theme": {
     "Use System Theme": "Usar Tema do Sistema"
+  },
+  "Use animated wave progress bars for media playback": {
+    "Use animated wave progress bars for media playback": ""
+  },
+  "Use automatic location detection (geoclue2)": {
+    "Use automatic location detection (geoclue2)": ""
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "Usar comando personalizado para atualizar seu sistema"
@@ -1460,6 +1661,9 @@
   "VPN status and quick connect": {
     "VPN status and quick connect": "Status de VPN e conexão rápida"
   },
+  "Vibrant palette with playful saturation.": {
+    "Vibrant palette with playful saturation.": ""
+  },
   "Visibility": {
     "Visibility": "Visibilidade"
   },
@@ -1472,8 +1676,14 @@
   "Volume Changed": {
     "Volume Changed": "Volume Alterado"
   },
+  "Volume, brightness, and other system OSDs": {
+    "Volume, brightness, and other system OSDs": ""
+  },
   "Wallpaper": {
     "Wallpaper": "Papel de parede"
+  },
+  "Wallpapers": {
+    "Wallpapers": ""
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Barra de Progresso de Ondas"
@@ -1486,6 +1696,12 @@
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Quando ativado, apps são ordenados alfabeticamente. Quando desativado, apps são ordenados por frequência de uso"
+  },
+  "WiFi disabled": {
+    "WiFi disabled": ""
+  },
+  "WiFi enabled": {
+    "WiFi enabled": ""
   },
   "WiFi is off": {
     "WiFi is off": "WiFi desligado"

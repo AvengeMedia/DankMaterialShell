@@ -58,7 +58,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Workspace Index Numbers")
-                        description: "Show workspace index numbers in the top bar workspace switcher"
+                        description: I18n.tr("Show workspace index numbers in the top bar workspace switcher")
                         checked: SettingsData.showWorkspaceIndex
                         onToggled: checked => {
                                        return SettingsData.setShowWorkspaceIndex(
@@ -68,7 +68,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Window Scrolling")
-                        description: "Scroll through windows, rather than workspaces"
+                        description: I18n.tr("Scroll through windows, rather than workspaces")
                         checked: SettingsData.workspaceScrolling
                         visible: CompositorService.isNiri
                         onToggled: checked => {
@@ -79,7 +79,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Workspace Padding")
-                        description: "Always show a minimum of 3 workspaces, even if fewer are available"
+                        description: I18n.tr("Always show a minimum of 3 workspaces, even if fewer are available")
                         checked: SettingsData.showWorkspacePadding
                         onToggled: checked => {
                                        return SettingsData.setShowWorkspacePadding(
@@ -90,7 +90,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Show Workspace Apps")
-                        description: "Display application icons in workspace indicators"
+                        description: I18n.tr("Display application icons in workspace indicators")
                         checked: SettingsData.showWorkspaceApps
                         onToggled: checked => {
                                        return SettingsData.setShowWorkspaceApps(
@@ -143,7 +143,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Per-Monitor Workspaces")
-                        description: "Show only workspaces belonging to each specific monitor."
+                        description: I18n.tr("Show only workspaces belonging to each specific monitor.")
                         checked: SettingsData.workspacesPerMonitor
                         onToggled: checked => {
                             return SettingsData.setWorkspacesPerMonitor(checked);
@@ -191,7 +191,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Wave Progress Bars")
-                        description: "Use animated wave progress bars for media playback"
+                        description: I18n.tr("Use animated wave progress bars for media playback")
                         checked: SettingsData.waveProgressEnabled
                         onToggled: checked => {
                             return SettingsData.setWaveProgressEnabled(checked);
@@ -386,7 +386,7 @@ Item {
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Running Apps Only In Current Workspace")
-                        description: "Show only apps running in current workspace"
+                        description: I18n.tr("Show only apps running in current workspace")
                         checked: SettingsData.runningAppsCurrentWorkspace
                         onToggled: checked => {
                                        return SettingsData.setRunningAppsCurrentWorkspace(

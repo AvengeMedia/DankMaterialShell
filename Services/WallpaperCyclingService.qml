@@ -302,7 +302,7 @@ Singleton {
 
     function cyclePrevForMonitor(screenName) {
         if (!screenName) return
-        
+
         var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
         if (currentWallpaper) {
             cycleToPrevWallpaper(screenName, currentWallpaper)
@@ -370,10 +370,10 @@ Singleton {
 
     Process {
         id: cyclingProcess
-        
+
         property string targetScreenName: ""
         property string currentWallpaper: ""
-        
+
         running: false
 
         stdout: StdioCollector {
@@ -404,10 +404,10 @@ Singleton {
 
     Process {
         id: prevCyclingProcess
-        
+
         property string targetScreenName: ""
         property string currentWallpaper: ""
-        
+
         running: false
 
         stdout: StdioCollector {

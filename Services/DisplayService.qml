@@ -38,13 +38,8 @@ Singleton {
 
     property bool nightModeEnabled: false
     property bool automationAvailable: false
-    property bool geoclueAvailable: false
-    property bool isAutomaticNightTime: false
-
-    function buildGammastepCommand(gammastepArgs) {
-        const commandStr = "pkill gammastep; " + ["gammastep"].concat(gammastepArgs).join(" ")
-        return ["sh", "-c", commandStr]
-    }
+    property bool gammaControlAvailable: false
+    readonly property int dayTemp: 6500
 
     function setBrightnessInternal(percentage, device) {
         const clampedValue = Math.max(1, Math.min(100, percentage))
@@ -216,34 +211,49 @@ Singleton {
 
     // Night Mode Functions - Simplified
     function enableNightMode() {
-        if (!automationAvailable) {
-            gammaStepTestProcess.running = true
+        if (!gammaControlAvailable) {
+            ToastService.showWarning("Night mode failed: DMS gamma control not available")
             return
         }
 
         nightModeEnabled = true
         SessionData.setNightModeEnabled(true)
 
-        // Apply immediately or start automation
-        if (SessionData.nightModeAutoEnabled) {
-            startAutomation()
-        } else {
-            applyNightModeDirectly()
-        }
+        DMSService.sendRequest("wayland.gamma.setEnabled", {
+            "enabled": true
+        }, response => {
+            if (response.error) {
+                console.error("DisplayService: Failed to enable gamma control:", response.error)
+                ToastService.showError("Failed to enable night mode: " + response.error)
+                nightModeEnabled = false
+                SessionData.setNightModeEnabled(false)
+                return
+            }
+
+            if (SessionData.nightModeAutoEnabled) {
+                startAutomation()
+            } else {
+                applyNightModeDirectly()
+            }
+        })
     }
 
     function disableNightMode() {
         nightModeEnabled = false
         SessionData.setNightModeEnabled(false)
-        stopAutomation()
-        // Nuclear approach - kill ALL gammastep processes multiple times
-        Quickshell.execDetached(["pkill", "-f", "gammastep"])
-        Quickshell.execDetached(["pkill", "-9", "gammastep"])
-        Quickshell.execDetached(["killall", "gammastep"])
-        // Also stop all related processes
-        gammaStepProcess.running = false
-        automationProcess.running = false
-        gammaStepTestProcess.running = false
+
+        if (!gammaControlAvailable) {
+            return
+        }
+
+        DMSService.sendRequest("wayland.gamma.setEnabled", {
+            "enabled": false
+        }, response => {
+            if (response.error) {
+                console.error("DisplayService: Failed to disable gamma control:", response.error)
+                ToastService.showError("Failed to disable night mode: " + response.error)
+            }
+        })
     }
 
     function toggleNightMode() {
@@ -255,14 +265,35 @@ Singleton {
     }
 
     function applyNightModeDirectly() {
-        const temperature = SessionData.nightModeTemperature || 4500
-        gammaStepProcess.command = buildGammastepCommand(["-m", "wayland", "-O", String(temperature)])
-        gammaStepProcess.running = true
-    }
+        const temperature = SessionData.nightModeTemperature || 4000
 
-    function resetToNormalMode() {
-        // Just kill gammastep to return to normal display temperature
-        Quickshell.execDetached(["pkill", "gammastep"])
+        DMSService.sendRequest("wayland.gamma.setManualTimes", {
+            "sunrise": null,
+            "sunset": null
+        }, response => {
+            if (response.error) {
+                console.error("DisplayService: Failed to clear manual times:", response.error)
+                return
+            }
+
+            DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                "use": false
+            }, response => {
+                if (response.error) {
+                    console.error("DisplayService: Failed to disable IP location:", response.error)
+                    return
+                }
+
+                DMSService.sendRequest("wayland.gamma.setTemperature", {
+                    "temp": temperature
+                }, response => {
+                    if (response.error) {
+                        console.error("DisplayService: Failed to set temperature:", response.error)
+                        ToastService.showError("Failed to set night mode temperature: " + response.error)
+                    }
+                })
+            })
+        })
     }
 
     function startAutomation() {
@@ -282,70 +313,103 @@ Singleton {
         }
     }
 
-    function stopAutomation() {
-        automationProcess.running = false
-        gammaStepProcess.running = false
-        isAutomaticNightTime = false
-        // Nuclear approach - kill ALL gammastep processes multiple times
-        Quickshell.execDetached(["pkill", "-f", "gammastep"])
-        Quickshell.execDetached(["pkill", "-9", "gammastep"])
-        Quickshell.execDetached(["killall", "gammastep"])
-    }
-
     function startTimeBasedMode() {
-        checkTimeBasedMode()
+        const temperature = SessionData.nightModeTemperature || 4000
+        const sunriseHour = SessionData.nightModeEndHour
+        const sunriseMinute = SessionData.nightModeEndMinute
+        const sunsetHour = SessionData.nightModeStartHour
+        const sunsetMinute = SessionData.nightModeStartMinute
+
+        const sunrise = `${String(sunriseHour).padStart(2, '0')}:${String(sunriseMinute).padStart(2, '0')}`
+        const sunset = `${String(sunsetHour).padStart(2, '0')}:${String(sunsetMinute).padStart(2, '0')}`
+
+        DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+            "use": false
+        }, response => {
+            if (response.error) {
+                console.error("DisplayService: Failed to disable IP location:", response.error)
+                return
+            }
+
+            DMSService.sendRequest("wayland.gamma.setTemperature", {
+                "low": temperature,
+                "high": dayTemp
+            }, response => {
+                if (response.error) {
+                    console.error("DisplayService: Failed to set temperature:", response.error)
+                    ToastService.showError("Failed to set night mode temperature: " + response.error)
+                    return
+                }
+
+                DMSService.sendRequest("wayland.gamma.setManualTimes", {
+                    "sunrise": sunrise,
+                    "sunset": sunset
+                }, response => {
+                    if (response.error) {
+                        console.error("DisplayService: Failed to set manual times:", response.error)
+                        ToastService.showError("Failed to set night mode schedule: " + response.error)
+                    }
+                })
+            })
+        })
     }
 
     function startLocationBasedMode() {
-        const temperature = SessionData.nightModeTemperature || 4500
+        const temperature = SessionData.nightModeTemperature || 4000
         const dayTemp = 6500
 
-        if (SessionData.latitude !== 0.0 && SessionData.longitude !== 0.0) {
-            automationProcess.command = buildGammastepCommand(["-m", "wayland", "-l", `${SessionData.latitude.toFixed(6)}:${SessionData.longitude.toFixed(6)}`, "-t", `${dayTemp}:${temperature}`, "-v"])
-            automationProcess.running = true
-            return
-        }
-
-        if (SessionData.nightModeLocationProvider === "geoclue2") {
-            automationProcess.command = buildGammastepCommand(["-m", "wayland", "-l", "geoclue2", "-t", `${dayTemp}:${temperature}`, "-v"])
-            automationProcess.running = true
-            return
-        }
-
-        console.warn("DisplayService: Location mode selected but no coordinates or geoclue provider set")
-    }
-
-    function checkTimeBasedMode() {
-        if (!nightModeEnabled || !SessionData.nightModeAutoEnabled || SessionData.nightModeAutoMode !== "time") {
-            return
-        }
-
-        const currentTime = systemClock.hours * 60 + systemClock.minutes
-
-        const startMinutes = SessionData.nightModeStartHour * 60 + SessionData.nightModeStartMinute
-        const endMinutes = SessionData.nightModeEndHour * 60 + SessionData.nightModeEndMinute
-
-        let shouldBeNight = false
-
-        if (startMinutes > endMinutes) {
-            shouldBeNight = (currentTime >= startMinutes) || (currentTime < endMinutes)
-        } else {
-            shouldBeNight = (currentTime >= startMinutes) && (currentTime < endMinutes)
-        }
-
-        if (shouldBeNight !== isAutomaticNightTime) {
-            isAutomaticNightTime = shouldBeNight
-
-            if (shouldBeNight) {
-                applyNightModeDirectly()
-            } else {
-                resetToNormalMode()
+        DMSService.sendRequest("wayland.gamma.setManualTimes", {
+            "sunrise": null,
+            "sunset": null
+        }, response => {
+            if (response.error) {
+                console.error("DisplayService: Failed to clear manual times:", response.error)
+                return
             }
-        }
-    }
 
-    function detectLocationProviders() {
-        geoclueDetectionProcess.running = true
+            DMSService.sendRequest("wayland.gamma.setTemperature", {
+                "low": temperature,
+                "high": dayTemp
+            }, response => {
+                if (response.error) {
+                    console.error("DisplayService: Failed to set temperature:", response.error)
+                    ToastService.showError("Failed to set night mode temperature: " + response.error)
+                    return
+                }
+
+                if (SessionData.nightModeUseIPLocation) {
+                    DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                        "use": true
+                    }, response => {
+                        if (response.error) {
+                            console.error("DisplayService: Failed to enable IP location:", response.error)
+                            ToastService.showError("Failed to enable IP location: " + response.error)
+                        }
+                    })
+                } else if (SessionData.latitude !== 0.0 && SessionData.longitude !== 0.0) {
+                    DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                        "use": false
+                    }, response => {
+                        if (response.error) {
+                            console.error("DisplayService: Failed to disable IP location:", response.error)
+                            return
+                        }
+
+                        DMSService.sendRequest("wayland.gamma.setLocation", {
+                            "latitude": SessionData.latitude,
+                            "longitude": SessionData.longitude
+                        }, response => {
+                            if (response.error) {
+                                console.error("DisplayService: Failed to set location:", response.error)
+                                ToastService.showError("Failed to set night mode location: " + response.error)
+                            }
+                        })
+                    })
+                } else {
+                    console.warn("DisplayService: Location mode selected but no coordinates set and IP location disabled")
+                }
+            })
+        })
     }
 
     function setNightModeAutomationMode(mode) {
@@ -353,9 +417,6 @@ Singleton {
     }
 
     function evaluateNightMode() {
-        // Always stop all processes first to clean slate
-        stopAutomation()
-
         if (!nightModeEnabled) {
             return
         }
@@ -369,8 +430,50 @@ Singleton {
         }
     }
 
-    function checkNightModeAvailability() {
-        gammastepAvailabilityProcess.running = true
+    function checkGammaControlAvailability() {
+        if (!DMSService.isConnected) {
+            return
+        }
+
+        if (DMSService.apiVersion < 6) {
+            gammaControlAvailable = false
+            automationAvailable = false
+            return
+        }
+
+        if (!DMSService.capabilities.includes("gamma")) {
+            gammaControlAvailable = false
+            automationAvailable = false
+            return
+        }
+
+        DMSService.sendRequest("wayland.gamma.getState", null, response => {
+            if (response.error) {
+                gammaControlAvailable = false
+                automationAvailable = false
+                console.error("DisplayService: Gamma control not available:", response.error)
+            } else {
+                gammaControlAvailable = true
+                automationAvailable = true
+
+                if (nightModeEnabled) {
+                    DMSService.sendRequest("wayland.gamma.setEnabled", {
+                        "enabled": true
+                    }, enableResponse => {
+                        if (enableResponse.error) {
+                            console.error("DisplayService: Failed to enable gamma control on startup:", enableResponse.error)
+                            return
+                        }
+
+                        if (SessionData.nightModeAutoEnabled) {
+                            startAutomation()
+                        } else {
+                            applyNightModeDirectly()
+                        }
+                    })
+                }
+            }
+        })
     }
 
     Timer {
@@ -392,25 +495,7 @@ Singleton {
     Component.onCompleted: {
         ddcDetectionProcess.running = true
         refreshDevices()
-        checkNightModeAvailability()
-
-        // Initialize night mode state from session
         nightModeEnabled = SessionData.nightModeEnabled
-    }
-
-    Component.onDestruction: {
-        gammaStepProcess.running = false
-        automationProcess.running = false
-    }
-
-    SystemClock {
-        id: systemClock
-        precision: SystemClock.Minutes
-        onDateChanged: {
-            if (nightModeEnabled && SessionData.nightModeAutoEnabled && SessionData.nightModeAutoMode === "time") {
-                checkTimeBasedMode()
-            }
-        }
     }
 
     Process {
@@ -679,83 +764,20 @@ Singleton {
         }
     }
 
-    Process {
-        id: gammastepAvailabilityProcess
-        command: ["which", "gammastep"]
-        running: false
+    Connections {
+        target: DMSService
 
-        onExited: function (exitCode) {
-            automationAvailable = (exitCode === 0)
-            if (automationAvailable) {
-                detectLocationProviders()
-
-                // If night mode should be enabled on startup
-                if (nightModeEnabled && SessionData.nightModeAutoEnabled) {
-                    startAutomation()
-                } else if (nightModeEnabled) {
-                    applyNightModeDirectly()
-                }
+        function onConnectionStateChanged() {
+            if (DMSService.isConnected) {
+                checkGammaControlAvailability()
             } else {
-                console.log("DisplayService: gammastep not available")
+                gammaControlAvailable = false
+                automationAvailable = false
             }
         }
-    }
 
-    Process {
-        id: geoclueDetectionProcess
-        command: ["sh", "-c", "busctl --system list | grep -qF org.freedesktop.GeoClue2"]
-        running: false
-
-        onExited: function (exitCode) {
-            geoclueAvailable = (exitCode === 0)
-        }
-    }
-
-    Process {
-        id: gammaStepTestProcess
-        command: ["which", "gammastep"]
-        running: false
-
-        onExited: function (exitCode) {
-            if (exitCode === 0) {
-                automationAvailable = true
-                nightModeEnabled = true
-                SessionData.setNightModeEnabled(true)
-
-                if (SessionData.nightModeAutoEnabled) {
-                    startAutomation()
-                } else {
-                    applyNightModeDirectly()
-                }
-            } else {
-                console.warn("DisplayService: gammastep not found")
-                ToastService.showWarning("Night mode failed: gammastep not found")
-            }
-        }
-    }
-
-    Process {
-        id: gammaStepProcess
-        running: false
-
-        onExited: function (exitCode) {
-            if (nightModeEnabled && exitCode !== 0 && exitCode !== 15) {
-                console.warn("DisplayService: Night mode process failed:", exitCode)
-            }
-        }
-    }
-
-    Process {
-        id: automationProcess
-        running: false
-        property string processType: "automation"
-
-        onExited: function (exitCode) {
-            if (nightModeEnabled && SessionData.nightModeAutoEnabled && exitCode !== 0 && exitCode !== 15) {
-                console.warn("DisplayService: Night mode automation failed:", exitCode)
-                // Location mode failed
-                console.warn("DisplayService: Location-based night mode failed")
-            }
+        function onCapabilitiesReceived() {
+            checkGammaControlAvailability()
         }
     }
 
@@ -795,7 +817,7 @@ Singleton {
         function onLongitudeChanged() {
             evaluateNightMode()
         }
-        function onNightModeLocationProviderChanged() {
+        function onNightModeUseIPLocationChanged() {
             evaluateNightMode()
         }
     }

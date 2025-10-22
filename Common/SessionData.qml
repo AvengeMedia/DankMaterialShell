@@ -49,6 +49,7 @@ Singleton {
     property int nightModeEndMinute: 0
     property real latitude: 0.0
     property real longitude: 0.0
+    property bool nightModeUseIPLocation: false
     property string nightModeLocationProvider: ""
 
     property var pinnedApps: []
@@ -112,6 +113,7 @@ Singleton {
                 }
                 latitude = settings.latitude !== undefined ? settings.latitude : 0.0
                 longitude = settings.longitude !== undefined ? settings.longitude : 0.0
+                nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false
                 nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : ""
                 pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : []
                 selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0
@@ -171,6 +173,7 @@ Singleton {
                                                 "nightModeEndMinute": nightModeEndMinute,
                                                 "latitude": latitude,
                                                 "longitude": longitude,
+                                                "nightModeUseIPLocation": nightModeUseIPLocation,
                                                 "nightModeLocationProvider": nightModeLocationProvider,
                                                 "pinnedApps": pinnedApps,
                                                 "selectedGpuIndex": selectedGpuIndex,
@@ -247,11 +250,11 @@ Singleton {
             "monitorWallpapersDark", "doNotDisturb", "nightModeEnabled",
             "nightModeTemperature", "nightModeAutoEnabled", "nightModeAutoMode",
             "nightModeStartHour", "nightModeStartMinute", "nightModeEndHour",
-            "nightModeEndMinute", "latitude", "longitude", "nightModeLocationProvider",
+            "nightModeEndMinute", "latitude", "longitude", "nightModeUseIPLocation", "nightModeLocationProvider",
             "pinnedApps", "selectedGpuIndex", "nvidiaGpuTempEnabled",
             "nonNvidiaGpuTempEnabled", "enabledGpuPciIds", "wallpaperCyclingEnabled",
             "wallpaperCyclingMode", "wallpaperCyclingInterval", "wallpaperCyclingTime",
-            "monitorCyclingSettings", "lastBrightnessDevice", "wallpaperTransition",
+            "monitorCyclingSettings", "lastBrightnessDevice", "launchPrefix", "wallpaperTransition",
             "includedTransitions", "recentColors", "showThirdPartyPlugins", "configVersion"
         ]
 
@@ -533,6 +536,11 @@ Singleton {
 
     function setNightModeEndMinute(minute) {
         nightModeEndMinute = minute
+        saveSettings()
+    }
+
+    function setNightModeUseIPLocation(use) {
+        nightModeUseIPLocation = use
         saveSettings()
     }
 

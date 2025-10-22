@@ -8,6 +8,10 @@ import qs.Widgets
 Item {
     id: root
 
+    // DEVELOPER NOTE: This component manages the AppDrawer launcher (accessed via DankBar icon).
+    // Changes to launcher behavior, especially item rendering, filtering, or model structure,
+    // likely require corresponding updates in Modals/Spotlight/SpotlightResults.qml and vice versa.
+
     property string searchQuery: ""
     property string selectedCategory: I18n.tr("All")
     property string viewMode: "list" // "list" or "grid"
@@ -163,7 +167,7 @@ Item {
                              filteredModel.append({
                                                       "name": app.name || "",
                                                       "exec": app.execString || app.exec || app.action || "",
-                                                      "icon": app.icon || "application-x-executable",
+                                                      "icon": app.icon !== undefined ? app.icon : (isPluginItem ? "" : "application-x-executable"),
                                                       "comment": app.comment || "",
                                                       "categories": app.categories || [],
                                                       "isPlugin": isPluginItem,
@@ -285,12 +289,12 @@ Item {
         }
 
         const triggers = PluginService.getAllPluginTriggers()
-        
+
         for (const trigger in triggers) {
             if (query.startsWith(trigger)) {
                 const pluginId = triggers[trigger]
                 const plugin = PluginService.getLauncherPlugin(pluginId)
-                
+
                 if (plugin) {
                     const remainingQuery = query.substring(trigger.length).trim()
                     const result = {
@@ -304,7 +308,7 @@ Item {
                 }
             }
         }
-        
+
         return { triggered: false, pluginCategory: "", query: "" }
     }
 

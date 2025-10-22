@@ -12,6 +12,7 @@ FocusScope {
     property string expandedPluginId: ""
     property bool isRefreshingPlugins: false
     property var parentModal: null
+    property var installedPluginsData: ({})
     focus: true
 
 
@@ -245,9 +246,13 @@ FocusScope {
                                 property var pluginPermissions: pluginData ? (pluginData.permissions || []) : []
                                 property bool hasSettings: pluginData && pluginData.settings !== undefined && pluginData.settings !== ""
                                 property bool isExpanded: pluginsTab.expandedPluginId === pluginId
+                                property bool hasUpdate: {
+                                    if (DMSService.apiVersion < 8) return true
+                                    return pluginsTab.installedPluginsData[pluginDirectoryName] || pluginsTab.installedPluginsData[pluginId] || pluginsTab.installedPluginsData[pluginName] || false
+                                }
 
 
-                                color: pluginMouseArea.containsMouse ? Theme.surfacePressed : (isExpanded ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh)
+                                color: (pluginMouseArea.containsMouse || updateArea.containsMouse || uninstallArea.containsMouse || reloadArea.containsMouse) ? Theme.surfacePressed : (isExpanded ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh)
                                 border.width: 0
 
                                 MouseArea {
@@ -326,7 +331,7 @@ FocusScope {
                                                 height: 28
                                                 radius: 14
                                                 color: updateArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
-                                                visible: DMSService.dmsAvailable && PluginService.isPluginLoaded(pluginDelegate.pluginId)
+                                                visible: DMSService.dmsAvailable && PluginService.isPluginLoaded(pluginDelegate.pluginId) && pluginDelegate.hasUpdate
 
                                                 DankIcon {
                                                     anchors.centerIn: parent
@@ -343,14 +348,31 @@ FocusScope {
                                                     onClicked: {
                                                         const currentPluginDirName = pluginDelegate.pluginDirectoryName
                                                         const currentPluginName = pluginDelegate.pluginName
+                                                        const currentPluginId = pluginDelegate.pluginId
                                                         DMSService.update(currentPluginDirName, response => {
                                                             if (response.error) {
                                                                 ToastService.showError("Update failed: " + response.error)
                                                             } else {
                                                                 ToastService.showInfo("Plugin updated: " + currentPluginName)
-                                                                PluginService.scanPlugins()
+                                                                PluginService.forceRescanPlugin(currentPluginId)
+                                                                if (DMSService.apiVersion >= 8) {
+                                                                    DMSService.listInstalled()
+                                                                }
                                                             }
                                                         })
+                                                    }
+                                                    onEntered: {
+                                                        tooltipLoader.active = true
+                                                        if (tooltipLoader.item) {
+                                                            const p = mapToItem(null, width / 2, 0)
+                                                            tooltipLoader.item.show(I18n.tr("Update Plugin"), p.x, p.y - 40, null)
+                                                        }
+                                                    }
+                                                    onExited: {
+                                                        if (tooltipLoader.item) {
+                                                            tooltipLoader.item.hide()
+                                                        }
+                                                        tooltipLoader.active = false
                                                     }
                                                 }
                                             }
@@ -389,6 +411,19 @@ FocusScope {
                                                             }
                                                         })
                                                     }
+                                                    onEntered: {
+                                                        tooltipLoader.active = true
+                                                        if (tooltipLoader.item) {
+                                                            const p = mapToItem(null, width / 2, 0)
+                                                            tooltipLoader.item.show(I18n.tr("Uninstall Plugin"), p.x, p.y - 40, null)
+                                                        }
+                                                    }
+                                                    onExited: {
+                                                        if (tooltipLoader.item) {
+                                                            tooltipLoader.item.hide()
+                                                        }
+                                                        tooltipLoader.active = false
+                                                    }
                                                 }
                                             }
 
@@ -421,6 +456,19 @@ FocusScope {
                                                             ToastService.showError("Failed to reload plugin: " + currentPluginName)
                                                             pluginsTab.isReloading = false
                                                         }
+                                                    }
+                                                    onEntered: {
+                                                        tooltipLoader.active = true
+                                                        if (tooltipLoader.item) {
+                                                            const p = mapToItem(null, width / 2, 0)
+                                                            tooltipLoader.item.show(I18n.tr("Reload Plugin"), p.x, p.y - 40, null)
+                                                        }
+                                                    }
+                                                    onExited: {
+                                                        if (tooltipLoader.item) {
+                                                            tooltipLoader.item.hide()
+                                                        }
+                                                        tooltipLoader.active = false
                                                     }
                                                 }
                                             }
@@ -561,6 +609,12 @@ FocusScope {
                                         visible: pluginDelegate.isExpanded && (!settingsLoader.active || settingsLoader.status === Loader.Error)
                                     }
                                 }
+
+                                Loader {
+                                    id: tooltipLoader
+                                    active: false
+                                    sourceComponent: DankTooltip {}
+                                }
                             }
                         }
 
@@ -604,6 +658,9 @@ FocusScope {
             }
         }
         function onPluginListUpdated() {
+            if (DMSService.apiVersion >= 8) {
+                DMSService.listInstalled()
+            }
             refreshPluginList()
         }
     }
@@ -615,6 +672,21 @@ FocusScope {
             pluginBrowserModal.allPlugins = plugins
             pluginBrowserModal.updateFilteredPlugins()
         }
+        function onInstalledPluginsReceived(plugins) {
+            var pluginMap = {}
+            for (var i = 0; i < plugins.length; i++) {
+                var plugin = plugins[i]
+                var hasUpdate = plugin.hasUpdate || false
+                if (plugin.path) {
+                    pluginMap[plugin.path] = hasUpdate
+                }
+                if (plugin.name) {
+                    pluginMap[plugin.name] = hasUpdate
+                }
+            }
+            installedPluginsData = pluginMap
+            Qt.callLater(refreshPluginList)
+        }
         function onOperationSuccess(message) {
             ToastService.showInfo(message)
         }
@@ -625,6 +697,9 @@ FocusScope {
 
     Component.onCompleted: {
         pluginBrowserModal.parentModal = pluginsTab.parentModal
+        if (DMSService.dmsAvailable && DMSService.apiVersion >= 8) {
+            DMSService.listInstalled()
+        }
     }
 
     DankModal {
@@ -701,6 +776,9 @@ FocusScope {
         function refreshPlugins() {
             isLoading = true
             DMSService.listPlugins()
+            if (DMSService.apiVersion >= 8) {
+                DMSService.listInstalled()
+            }
         }
 
         function show() {

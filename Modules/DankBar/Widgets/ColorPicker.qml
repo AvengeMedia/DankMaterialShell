@@ -1,54 +1,36 @@
 import QtQuick
 import qs.Common
+import qs.Modules.Plugins
 import qs.Widgets
 
-Rectangle {
+BasePill {
     id: root
 
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
     property bool isActive: false
-    property string section: "right"
-    property var popupTarget: null
-    property var parentScreen: null
-    property real widgetThickness: 30
-    property real barThickness: 48
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
 
-    signal clicked()
+    signal colorPickerRequested()
 
-    width: isVertical ? widgetThickness : (colorPickerIcon.width + horizontalPadding * 2)
-    height: isVertical ? (colorPickerIcon.height + horizontalPadding * 2) : widgetThickness
-    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-    color: {
-        if (SettingsData.dankBarNoBackground) {
-            return "transparent";
+    content: Component {
+        Item {
+            implicitWidth: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+
+            DankIcon {
+                anchors.centerIn: parent
+                name: "palette"
+                size: Theme.barIconSize(root.barThickness, -4)
+                color: root.isActive ? Theme.primary : Theme.surfaceText
+            }
         }
-
-        const baseColor = colorPickerArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
-    }
-
-    DankIcon {
-        id: colorPickerIcon
-
-        anchors.centerIn: parent
-        name: "palette"
-        size: Theme.barIconSize(barThickness, -4)
-        color: colorPickerArea.containsMouse || root.isActive ? Theme.primary : Theme.surfaceText
     }
 
     MouseArea {
-        id: colorPickerArea
-
+        z: 1
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         onPressed: {
-            root.colorPickerRequested();
+            root.colorPickerRequested()
         }
     }
-
-    signal colorPickerRequested()
-
 }

@@ -449,7 +449,7 @@ Item {
                     DankTextField {
                         width: parent.width
                         text: SettingsData.launchPrefix
-                        placeholderText: "Enter launch prefix (e.g., 'uwsm-app')"
+                        placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
                         onTextEdited: {
                             SettingsData.setLaunchPrefix(text)
                         }
@@ -688,21 +688,25 @@ Item {
                                                 var diffDays = Math.floor(
                                                             diffMs / (1000 * 60 * 60 * 24))
                                                 if (diffMins < 1)
-                                                    return "Last launched just now"
+                                                    return I18n.tr("Last launched just now")
 
                                                 if (diffMins < 60)
-                                                    return "Last launched " + diffMins + " minute"
-                                                            + (diffMins === 1 ? "" : "s") + " ago"
+                                                    return I18n.tr("Last launched %1 minute%2 ago")
+                                                            .arg(diffMins)
+                                                            .arg(diffMins === 1 ? "" : "s")
 
                                                 if (diffHours < 24)
-                                                    return "Last launched " + diffHours + " hour"
-                                                            + (diffHours === 1 ? "" : "s") + " ago"
+                                                    return I18n.tr("Last launched %1 hour%2 ago")
+                                                            .arg(diffHours)
+                                                            .arg(diffHours === 1 ? "" : "s")
 
                                                 if (diffDays < 7)
-                                                    return "Last launched " + diffDays + " day"
-                                                            + (diffDays === 1 ? "" : "s") + " ago"
+                                                    return I18n.tr("Last launched %1 day%2 ago")
+                                                            .arg(diffDays)
+                                                            .arg(diffDays === 1 ? "" : "s")
 
-                                                return "Last launched " + date.toLocaleDateString()
+                                                return I18n.tr("Last launched %1")
+                                                        .arg(date.toLocaleDateString())
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText

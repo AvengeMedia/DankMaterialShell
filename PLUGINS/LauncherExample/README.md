@@ -88,12 +88,40 @@ function executeItem(item): void
 ```javascript
 {
     name: "Item Name",           // Display name
-    icon: "icon_name",           // Material icon
+    icon: "icon_name",           // Icon (optional, see Icon Types below)
     comment: "Description",      // Subtitle text
     action: "type:data",         // Action to execute
     categories: ["PluginName"]   // Category array
 }
 ```
+
+**Icon Types**:
+
+The `icon` field supports three formats:
+
+1. **Material Design Icons** - Use `material:` prefix:
+   ```javascript
+   icon: "material:lightbulb"  // Material Symbols Rounded font
+   ```
+   Examples: `material:star`, `material:favorite`, `material:settings`
+
+2. **Desktop Theme Icons** - Use icon name directly:
+   ```javascript
+   icon: "firefox"  // Uses system icon theme
+   ```
+   Examples: `firefox`, `chrome`, `folder`, `text-editor`
+
+3. **No Icon** - Omit the `icon` field entirely:
+   ```javascript
+   {
+       name: "😀  Grinning Face",
+       // No icon field
+       comment: "Copy emoji",
+       action: "copy:😀",
+       categories: ["MyPlugin"]
+   }
+   ```
+   Perfect for emoji pickers or text-only items where the icon area should be hidden
 
 **Action Format**: `type:data` where:
 - `type` - Action handler (toast, copy, script, etc.)

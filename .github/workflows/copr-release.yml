@@ -106,7 +106,6 @@ jobs:
           Recommends:     hyprpicker
           Recommends:     matugen
           Recommends:     wl-clipboard
-          Recommends:     gammastep
           Recommends:     NetworkManager
           Recommends:     qt6-qtmultimedia
           Suggests:       qt6ct

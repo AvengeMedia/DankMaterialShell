@@ -92,12 +92,12 @@ Rectangle {
         anchors.fill: parent
         anchors.margins: Theme.spacingM
         spacing: Theme.spacingS
-        
+
         Item {
             width: parent.width
             height: 40
             visible: showEventDetails
-            
+
             Rectangle {
                 width: 32
                 height: 32
@@ -122,7 +122,7 @@ Rectangle {
                     onClicked: root.showEventDetails = false
                 }
             }
-            
+
             StyledText {
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -149,7 +149,7 @@ Rectangle {
             width: parent.width
             height: 28
             visible: !showEventDetails
-            
+
             Rectangle {
                 width: 28
                 height: 28
@@ -215,7 +215,7 @@ Rectangle {
                 }
             }
         }
-        
+
         Row {
             width: parent.width
             height: 18
@@ -248,14 +248,14 @@ Rectangle {
                 }
             }
         }
-        
+
         Grid {
             id: calendarGrid
             visible: !showEventDetails
-            
+
             property date displayDate: systemClock.date
             property date selectedDate: systemClock.date
-            
+
             readonly property date firstDay: {
                 const firstOfMonth = new Date(displayDate.getFullYear(), displayDate.getMonth(), 1)
                 return startOfWeek(firstOfMonth)
@@ -341,7 +341,7 @@ Rectangle {
             visible: showEventDetails
             clip: true
             spacing: Theme.spacingXS
-            
+
             delegate: Rectangle {
                 width: parent ? parent.width : 0
                 height: eventContent.implicitHeight + Theme.spacingS
@@ -377,7 +377,7 @@ Rectangle {
 
                 Column {
                     id: eventContent
-                    
+
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
@@ -419,7 +419,7 @@ Rectangle {
 
                 MouseArea {
                     id: eventMouseArea
-                    
+
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: modelData.url ? Qt.PointingHandCursor : Qt.ArrowCursor

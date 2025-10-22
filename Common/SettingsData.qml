@@ -25,10 +25,10 @@ Singleton {
 
     enum AnimationSpeed {
         None,
-        Shortest,
         Short,
         Medium,
-        Long
+        Long,
+        Custom
     }
 
     readonly property string defaultFontFamily: "Inter Variable"
@@ -64,6 +64,7 @@ Singleton {
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property int animationSpeed: SettingsData.AnimationSpeed.Short
+    property int customAnimationDuration: 500
     property string wallpaperFillMode: "Fill"
 
     property bool showLauncherButton: true
@@ -206,6 +207,9 @@ Singleton {
     property bool dankBarAutoHide: false
     property bool dankBarOpenOnOverview: false
     property bool dankBarVisible: true
+    property int overviewRows: 2
+    property int overviewColumns: 5
+    property real overviewScale: 0.16
     property real dankBarSpacing: 4
     property real dankBarBottomGap: 0
     property real dankBarInnerPadding: 4
@@ -489,6 +493,7 @@ Singleton {
                 screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({})
                 wallpaperFillMode = settings.wallpaperFillMode !== undefined ? settings.wallpaperFillMode : "Fill"
                 animationSpeed = settings.animationSpeed !== undefined ? settings.animationSpeed : SettingsData.AnimationSpeed.Short
+                customAnimationDuration = settings.customAnimationDuration !== undefined ? settings.customAnimationDuration : 500
                 acMonitorTimeout = settings.acMonitorTimeout !== undefined ? settings.acMonitorTimeout : 0
                 acLockTimeout = settings.acLockTimeout !== undefined ? settings.acLockTimeout : 0
                 acSuspendTimeout = settings.acSuspendTimeout !== undefined ? settings.acSuspendTimeout : 0
@@ -668,6 +673,7 @@ Singleton {
                                                 "updaterTerminalAdditionalParams": updaterTerminalAdditionalParams,
                                                 "screenPreferences": screenPreferences,
                                                 "animationSpeed": animationSpeed,
+                                                "customAnimationDuration": customAnimationDuration,
                                                 "acMonitorTimeout": acMonitorTimeout,
                                                 "acLockTimeout": acLockTimeout,
                                                 "acSuspendTimeout": acSuspendTimeout,
@@ -731,7 +737,7 @@ Singleton {
             "customPowerActionLock", "customPowerActionLogout", "customPowerActionSuspend",
             "customPowerActionHibernate", "customPowerActionReboot", "customPowerActionPowerOff",
             "updaterUseCustomCommand", "updaterCustomCommand", "updaterTerminalAdditionalParams",
-            "screenPreferences", "animationSpeed", "acMonitorTimeout", "acLockTimeout",
+            "screenPreferences", "animationSpeed", "customAnimationDuration", "acMonitorTimeout", "acLockTimeout",
             "acSuspendTimeout", "acHibernateTimeout", "batteryMonitorTimeout", "batteryLockTimeout",
             "batterySuspendTimeout", "batteryHibernateTimeout", "lockBeforeSuspend",
             "loginctlLockIntegration", "launchPrefix", "configVersion"
@@ -1058,6 +1064,11 @@ Singleton {
         saveSettings()
     }
 
+    function setCustomAnimationDuration(duration) {
+        customAnimationDuration = duration
+        saveSettings()
+    }
+
     function setWallpaperFillMode(mode) {
         wallpaperFillMode = mode
         saveSettings()
@@ -1172,7 +1183,7 @@ Singleton {
         showWorkspaceIndex = enabled
         saveSettings()
     }
-    
+
     function setWorkspaceScrolling(enabled) {
         workspaceScrolling = enabled
         saveSettings()

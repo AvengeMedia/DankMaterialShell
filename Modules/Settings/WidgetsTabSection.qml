@@ -734,11 +734,11 @@ Column {
         modal: true
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        
+
         onOpened: {
             console.log("Control Center context menu opened")
         }
-        
+
         onClosed: {
             console.log("Control Center context menu closed")
         }

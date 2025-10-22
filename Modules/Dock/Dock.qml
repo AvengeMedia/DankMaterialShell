@@ -252,8 +252,8 @@ Variants {
             property real currentScreen: modelData ? modelData : dock.screen
             property real screenWidth: currentScreen ? currentScreen.geometry.width : 1920
             property real screenHeight: currentScreen ? currentScreen.geometry.height : 1080
-            property real maxDockWidth: Math.min(screenWidth * 0.8, 1200)
-            property real maxDockHeight: Math.min(screenHeight * 0.8, 1200)
+            property real maxDockWidth: screenWidth * 0.98
+            property real maxDockHeight: screenHeight * 0.98
 
             height: {
                 if (dock.isVertical) {

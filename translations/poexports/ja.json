@@ -71,6 +71,9 @@
   "Always Show OSD Percentage": {
     "Always Show OSD Percentage": "常に OSD パーセンテージを表示"
   },
+  "Always show a minimum of 3 workspaces, even if fewer are available": {
+    "Always show a minimum of 3 workspaces, even if fewer are available": "使用可能なワークスペースが少ない場合でも、常に最低 3 つを表示"
+  },
   "Animation Speed": {
     "Animation Speed": "アニメーション速度"
   },
@@ -79,6 +82,9 @@
   },
   "App Launcher": {
     "App Launcher": "アプリランチャー"
+  },
+  "Application Dock": {
+    "Application Dock": "アプリドック"
   },
   "Applications": {
     "Applications": "アプリ"
@@ -91,6 +97,9 @@
   },
   "Apply Qt Colors": {
     "Apply Qt Colors": "Qtカラーを適用"
+  },
+  "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
+    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "目の疲れを軽減するために、暖色系の色温度を適用します。以下の自動化設定で、いつアクティブにするか制御できます。"
   },
   "Apps Icon": {
     "Apps Icon": "アプリアイコン"
@@ -158,6 +167,9 @@
   "Automatically cycle through wallpapers in the same folder": {
     "Automatically cycle through wallpapers in the same folder": "同じフォルダ内の壁紙を自動的に切り替える"
   },
+  "Automatically detect location based on IP address": {
+    "Automatically detect location based on IP address": "IPアドレスに基づいて位置を自動的に検出"
+  },
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "IPアドレスを使用して現在地を自動的に特定します"
   },
@@ -184,6 +196,9 @@
   },
   "Back": {
     "Back": "戻る"
+  },
+  "Balanced palette with focused accents (default).": {
+    "Balanced palette with focused accents (default).": "アクセントに焦点を絞ったバランスの取れたパレット(デフォルト)。"
   },
   "Battery": {
     "Battery": "バッテリー"
@@ -214,6 +229,15 @@
   },
   "Border Thickness": {
     "Border Thickness": "ボーダーの太さ"
+  },
+  "Bottom": {
+    "Bottom": "ボトム"
+  },
+  "Bottom Section": {
+    "Bottom Section": "ボトムセクション"
+  },
+  "Bottom dock for pinned and running applications": {
+    "Bottom dock for pinned and running applications": "固定および実行中のアプリケーション用のボトムドック"
   },
   "Brightness": {
     "Brightness": "明るさ"
@@ -299,6 +323,9 @@
   "Color temperature for night mode": {
     "Color temperature for night mode": "ナイトモードの色温度"
   },
+  "Colorful mix of bright contrasting accents.": {
+    "Colorful mix of bright contrasting accents.": "明るいコントラストのアクセントのカラフルなミックス。"
+  },
   "Command or script to run instead of the standard hibernate procedure": {
     "Command or script to run instead of the standard hibernate procedure": "標準の休止状態手順の代わりにコマンドまたはスクリプトで実行"
   },
@@ -326,6 +353,9 @@
   "Compositor:": {
     "Compositor:": "コンポジター："
   },
+  "Configuration activated": {
+    "Configuration activated": "設定が適用されました"
+  },
   "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "名前付きワークスペースのアイコンを設定します。両方が有効になっている場合、アイコンが数字よりも優先されます。"
   },
@@ -340,6 +370,9 @@
   },
   "Connected Displays": {
     "Connected Displays": "接続されたディスプレイ"
+  },
+  "Connection failed. Check password and try again.": {
+    "Connection failed. Check password and try again.": "接続に失敗しました。パスワードを確認して、もう一度やり直してください。"
   },
   "Contrast": {
     "Contrast": "コントラスト"
@@ -446,6 +479,12 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: クリア • Shift+Del: すべてクリア • 1-9: アクション • F10: ヘルプ • Esc: 閉じる"
   },
+  "Derives colors that closely match the underlying image.": {
+    "Derives colors that closely match the underlying image.": "下にある画像に密接に一致する色を導き出します。"
+  },
+  "Desktop background images": {
+    "Desktop background images": "デスクトップの背景画像"
+  },
   "Development": {
     "Development": "開発"
   },
@@ -455,17 +494,26 @@
   "Disconnect": {
     "Disconnect": "切断"
   },
+  "Disconnected from WiFi": {
+    "Disconnected from WiFi": "WiFiから切断されました"
+  },
   "Disk": {
     "Disk": "ディスク"
   },
   "Disk Usage": {
     "Disk Usage": "ディスク使用率"
   },
+  "Dismiss": {
+    "Dismiss": "解除"
+  },
   "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
     "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "画面の上、下、左、右の端に配置できる、ピン留めされた実行中のアプリケーションを含むドックを表示します"
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "フルスクリーンアプリよりもすべての優先度を表示する"
+  },
+  "Display application icons in workspace indicators": {
+    "Display application icons in workspace indicators": "ワークスペース インジケーターにアプリのアイコンを表示"
   },
   "Display currently focused application title": {
     "Display currently focused application title": "現在フォーカスされているアプリケーションのタイトルを表示"
@@ -478,6 +526,9 @@
   },
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "アクティブなキーボードレイアウトを表示、切り替えを可能に"
+  },
+  "Diverse palette spanning the full spectrum.": {
+    "Diverse palette spanning the full spectrum.": "全スペクトルにまたがる多様なパレット。"
   },
   "Do Not Disturb": {
     "Do Not Disturb": "サイレントモード"
@@ -496,6 +547,9 @@
   },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "ウィジェットをドラッグしてセクション内で順序を変更できます。目のアイコンでウィジェットを表示/非表示に（スペースは維持）、Xで完全に削除できます。"
+  },
+  "Duration": {
+    "Duration": "期間"
   },
   "Dynamic Theming": {
     "Dynamic Theming": "ダイナミックテーマ"
@@ -554,6 +608,27 @@
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: 切り替え • F10: ヘルプ"
   },
+  "Failed to activate configuration": {
+    "Failed to activate configuration": "設定が適用できませんでした"
+  },
+  "Failed to connect to ": {
+    "Failed to connect to ": "接続ができませんでした "
+  },
+  "Failed to disconnect WiFi": {
+    "Failed to disconnect WiFi": "WiFiの切断ができませんでした"
+  },
+  "Failed to enable WiFi": {
+    "Failed to enable WiFi": "WiFiを有効化にできませんでした"
+  },
+  "Failed to set profile image": {
+    "Failed to set profile image": "プロフィール画像の設定に失敗しました"
+  },
+  "Failed to set profile image: ": {
+    "Failed to set profile image: ": "プロフィール画像の設定に失敗しました: "
+  },
+  "Failed to start connection to ": {
+    "Failed to start connection to ": "接続ができませんでした "
+  },
   "Feels Like": {
     "Feels Like": "どうやら"
   },
@@ -596,6 +671,9 @@
   "Forget Network": {
     "Forget Network": "ネットワークを忘れる"
   },
+  "Forgot network ": {
+    "Forgot network ": "ネットワークを削除しました "
+  },
   "Format Legend": {
     "Format Legend": "フォーマット凡例"
   },
@@ -619,6 +697,12 @@
   },
   "Gamma Control": {
     "Gamma Control": "ガンマ設定"
+  },
+  "Gamma control not available. Requires DMS API v6+.": {
+    "Gamma control not available. Requires DMS API v6+.": "ガンマ制御は使用できません。DMS API v6+ が必要です。"
+  },
+  "Geoclue service not running - cannot auto-detect location": {
+    "Geoclue service not running - cannot auto-detect location": "ジオクルー サービスが実行されていない - 位置を自動検出できません"
   },
   "Github:": {
     "Github:": "GitHub:"
@@ -656,6 +740,12 @@
   "Hide the dock when not in use and reveal it when hovering near the dock area": {
     "Hide the dock when not in use and reveal it when hovering near the dock area": "使用していないときはドックを非表示にし、ドックエリアの近くにホバーすると表示されます"
   },
+  "High-contrast palette for strong visual distinction.": {
+    "High-contrast palette for strong visual distinction.": "視覚的な区別を強くするためのハイコントラストパレット。"
+  },
+  "High-fidelity palette that preserves source hues.": {
+    "High-fidelity palette that preserves source hues.": "ソースの色相を保持する忠実度の高いパレット。"
+  },
   "Hour": {
     "Hour": "時間"
   },
@@ -689,6 +779,9 @@
   "Include Transitions": {
     "Include Transitions": "トランジションを含める"
   },
+  "Incorrect password": {
+    "Incorrect password": "パスワードが間違っています"
+  },
   "Individual Batteries": {
     "Individual Batteries": "バッテリーごと"
   },
@@ -716,6 +809,21 @@
   "Language:": {
     "Language:": "言語："
   },
+  "Last launched %1": {
+    "Last launched %1": "最終起動日 %1"
+  },
+  "Last launched %1 day%2 ago": {
+    "Last launched %1 day%2 ago": "最終起動日 %1 日%2 前"
+  },
+  "Last launched %1 hour%2 ago": {
+    "Last launched %1 hour%2 ago": "最終起動日 %1 時間%2 前"
+  },
+  "Last launched %1 minute%2 ago": {
+    "Last launched %1 minute%2 ago": "最終起動日 %1 分%2 前"
+  },
+  "Last launched just now": {
+    "Last launched just now": "ただいま起動しました"
+  },
   "Latitude": {
     "Latitude": "緯度"
   },
@@ -737,11 +845,17 @@
   "Left": {
     "Left": "左"
   },
+  "Left Section": {
+    "Left Section": "左セクション"
+  },
   "Light Mode": {
     "Light Mode": "ライトモード"
   },
   "Lines: %1": {
     "Lines: %1": "行数: %1"
+  },
+  "Lively palette with saturated accents.": {
+    "Lively palette with saturated accents.": "彩度の高いアクセントを備えた生き生きとしたパレット。"
   },
   "Loading plugins...": {
     "Loading plugins...": "プラグインを読み込んでいます..."
@@ -815,6 +929,9 @@
   "Memory usage indicator": {
     "Memory usage indicator": "メモリ使用率インジケーター"
   },
+  "Minimal palette built around a single hue.": {
+    "Minimal palette built around a single hue.": "単一の色相を中心に構築された最小限のパレット。"
+  },
   "Minute": {
     "Minute": "分"
   },
@@ -832,6 +949,9 @@
   },
   "Mount": {
     "Mount": "マウント"
+  },
+  "Muted palette with subdued, calming tones.": {
+    "Muted palette with subdued, calming tones.": "落ち着いた色調のパレット。"
   },
   "NM not supported": {
     "NM not supported": "NMが利用できません"
@@ -917,6 +1037,9 @@
   "Notepad Font Settings": {
     "Notepad Font Settings": "メモ帳のフォント設定"
   },
+  "Notepad Slideout": {
+    "Notepad Slideout": "メモ帳スライドアウト"
+  },
   "Nothing to see here": {
     "Nothing to see here": "ここには何もありません"
   },
@@ -935,6 +1058,9 @@
   "Notification Timeouts": {
     "Notification Timeouts": "通知タイムアウト"
   },
+  "Notification toast popups": {
+    "Notification toast popups": "通知トーストポップアップ"
+  },
   "Notifications": {
     "Notifications": "通知"
   },
@@ -946,6 +1072,12 @@
   },
   "Office": {
     "Office": "オフィス"
+  },
+  "On-Screen Displays": {
+    "On-Screen Displays": "オンスクリーンディスプレイ"
+  },
+  "Only adjust gamma based on time or location rules.": {
+    "Only adjust gamma based on time or location rules.": "ガンマは、時間または場所のルールに基づいてのみ調整します。"
   },
   "Opacity": {
     "Opacity": "不透明度"
@@ -982,6 +1114,9 @@
   },
   "Percentage": {
     "Percentage": "百分率"
+  },
+  "Permission denied to set profile image.": {
+    "Permission denied to set profile image.": "プロフィール画像の設定権限が拒否されました。"
   },
   "Personalization": {
     "Personalization": "パーソナライゼーション"
@@ -1061,6 +1196,12 @@
   "Process": {
     "Process": "プロセス"
   },
+  "Profile Image Error": {
+    "Profile Image Error": "プロフィール画像エラー"
+  },
+  "Profile image is too large. Please use a smaller image.": {
+    "Profile image is too large. Please use a smaller image.": "プロフィール画像が大きすぎます。より小さい画像を使用してください。"
+  },
   "QML, JavaScript, Go": {
     "QML, JavaScript, Go": "QML, JavaScript, Go"
   },
@@ -1073,11 +1214,11 @@
   "Quick access to notepad": {
     "Quick access to notepad": "メモ帳へのクイックアクセス"
   },
+  "Quick note-taking slideout panel": {
+    "Quick note-taking slideout panel": "クイックノート作成スライドアウトパネル"
+  },
   "Rain Chance": {
     "Rain Chance": "降水確率"
-  },
-  "Realm / Domain (optional)": {
-    "Realm / Domain (optional)": "レルム/ドメイン(オプション)"
   },
   "Reboot": {
     "Reboot": "再起動"
@@ -1091,6 +1232,9 @@
   "Refresh": {
     "Refresh": "リフレッシュ"
   },
+  "Reload Plugin": {
+    "Reload Plugin": ""
+  },
   "Remove": {
     "Remove": "削除"
   },
@@ -1099,6 +1243,12 @@
   },
   "Reset": {
     "Reset": "リセット"
+  },
+  "Right": {
+    "Right": "右"
+  },
+  "Right Section": {
+    "Right Section": "右セクション"
   },
   "Run User Templates": {
     "Run User Templates": "ユーザーのテンプレを実行"
@@ -1133,6 +1283,9 @@
   "Science": {
     "Science": "科学"
   },
+  "Scroll through windows, rather than workspaces": {
+    "Scroll through windows, rather than workspaces": "ワークスペースではなくウィンドウをスクロール"
+  },
   "Search for a location...": {
     "Search for a location...": "ロケーションを検索..."
   },
@@ -1147,6 +1300,9 @@
   },
   "Select a color from the palette or use custom sliders": {
     "Select a color from the palette or use custom sliders": "パレットから色を選ぶか、カスタムスライダーを使用します"
+  },
+  "Select a preset or drag the slider to customize": {
+    "Select a preset or drag the slider to customize": "プリセットを選択するか、スライダーをドラッグしてカスタマイズします"
   },
   "Select a widget to add to the ": {
     "Select a widget to add to the ": "追加するウィジェットを選ぶ "
@@ -1169,14 +1325,17 @@
   "Select system sound theme": {
     "Select system sound theme": "システムサウンドテーマを選ぶ"
   },
+  "Select the palette algorithm used for wallpaper-based colors": {
+    "Select the palette algorithm used for wallpaper-based colors": "壁紙ベースの色で、使用するパレットアルゴリズムを選ぶ"
+  },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "含めたいトランジションをランダム化に選択"
   },
+  "Selected image file not found.": {
+    "Selected image file not found.": "選択した画像ファイルが見つかりませんでした。"
+  },
   "Separator": {
     "Separator": "区切り"
-  },
-  "Server Domain for certificate (optional)": {
-    "Server Domain for certificate (optional)": "証明書のサーバードメイン(オプション)"
   },
   "Set different wallpapers for each connected monitor": {
     "Set different wallpapers for each connected monitor": "接続されているモニターごとに異なる壁紙を設定する"
@@ -1214,6 +1373,12 @@
   "Show on screens:": {
     "Show on screens:": "画面に表示:"
   },
+  "Show only apps running in current workspace": {
+    "Show only apps running in current workspace": "現在のワークスペースで実行されているアプリのみを表示"
+  },
+  "Show only workspaces belonging to each specific monitor.": {
+    "Show only workspaces belonging to each specific monitor.": "各特定のモニターに属するワークスペースのみを表示。"
+  },
   "Show password": {
     "Show password": "パスワードを表示"
   },
@@ -1225,6 +1390,9 @@
   },
   "Show weather information in top bar and control center": {
     "Show weather information in top bar and control center": "トップバーとコントロールセンターに天気情報を表示"
+  },
+  "Show workspace index numbers in the top bar workspace switcher": {
+    "Show workspace index numbers in the top bar workspace switcher": "上部バーのワークスペーススイッチャーにワークスペースインデックス番号を表示"
   },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "実行中のすべてのアプリケーションをフォーカス状態で表示"
@@ -1316,8 +1484,17 @@
   "System Updates": {
     "System Updates": "システムアップデート"
   },
+  "System bar with widgets and system information": {
+    "System bar with widgets and system information": "ウィジェットとシステム情報を含むシステムバー"
+  },
   "System notification area icons": {
     "System notification area icons": "システム通知エリアアイコン"
+  },
+  "System toast notifications": {
+    "System toast notifications": "システムトースト通知"
+  },
+  "System tray icons": {
+    "System tray icons": "システムトレイアイコン"
   },
   "System update custom command": {
     "System update custom command": "システム更新カスタムコマンド"
@@ -1370,6 +1547,9 @@
   "To update, run the following command:": {
     "To update, run the following command:": "更新するには以下のコマンドを実行してください："
   },
+  "Toast Messages": {
+    "Toast Messages": "トーストメッセージ"
+  },
   "Today": {
     "Today": "今日"
   },
@@ -1379,14 +1559,23 @@
   "Tomorrow": {
     "Tomorrow": "明日"
   },
+  "Top": {
+    "Top": "トップ"
+  },
   "Top Bar Format": {
     "Top Bar Format": "トップバー形式"
+  },
+  "Top Section": {
+    "Top Section": "トップセクション"
   },
   "Transition Effect": {
     "Transition Effect": "トランジション効果"
   },
   "Turn off monitors after": {
     "Turn off monitors after": "後にモニターの電源を切る"
+  },
+  "Uninstall Plugin": {
+    "Uninstall Plugin": ""
   },
   "Unpin from Dock": {
     "Unpin from Dock": "ドックから固定を解除"
@@ -1406,6 +1595,9 @@
   "Update All": {
     "Update All": "すべて更新"
   },
+  "Update Plugin": {
+    "Update Plugin": ""
+  },
   "Use 24-hour time format instead of 12-hour AM/PM": {
     "Use 24-hour time format instead of 12-hour AM/PM": "12時間制のAM/PMではなく、24時間表記を使用"
   },
@@ -1418,11 +1610,20 @@
   "Use Fahrenheit instead of Celsius for temperature": {
     "Use Fahrenheit instead of Celsius for temperature": "温度は摂氏ではなく華氏を使用"
   },
+  "Use IP Location": {
+    "Use IP Location": "IP ロケーションの使用"
+  },
   "Use Monospace Font": {
     "Use Monospace Font": "等幅フォントを使用"
   },
   "Use System Theme": {
     "Use System Theme": "システムテーマを使用"
+  },
+  "Use animated wave progress bars for media playback": {
+    "Use animated wave progress bars for media playback": "アニメーション化されたウェーブの進行状況バーをメディア再生に使用"
+  },
+  "Use automatic location detection (geoclue2)": {
+    "Use automatic location detection (geoclue2)": "自動位置検出 (geoclue2) を使用"
   },
   "Use custom command for update your system": {
     "Use custom command for update your system": "カスタムコマンドを使用してシステムを更新"
@@ -1460,6 +1661,9 @@
   "VPN status and quick connect": {
     "VPN status and quick connect": "VPNステータスとクイック接続"
   },
+  "Vibrant palette with playful saturation.": {
+    "Vibrant palette with playful saturation.": "遊び心のある彩度の鮮やかなパレット。"
+  },
   "Visibility": {
     "Visibility": "可視性"
   },
@@ -1472,8 +1676,14 @@
   "Volume Changed": {
     "Volume Changed": "音量変更"
   },
+  "Volume, brightness, and other system OSDs": {
+    "Volume, brightness, and other system OSDs": "音量、明るさ、その他のシステム OSD"
+  },
   "Wallpaper": {
     "Wallpaper": "壁紙"
+  },
+  "Wallpapers": {
+    "Wallpapers": "壁紙"
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "ウェーブプログレスバー"
@@ -1486,6 +1696,12 @@
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "有効にすると、アプリはアルファベット順に並べ替えられます。無効にすると、アプリは使用頻度で並べ替えられます。"
+  },
+  "WiFi disabled": {
+    "WiFi disabled": "WiFiを無効化にしました"
+  },
+  "WiFi enabled": {
+    "WiFi enabled": "WiFiを有効化にしました"
   },
   "WiFi is off": {
     "WiFi is off": "Wi-Fiはオフ中"

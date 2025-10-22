@@ -17,8 +17,90 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Extract source strings from codebase
+        env:
+          API_TOKEN: ${{ secrets.POEDITOR_API_TOKEN }}
+          PROJECT_ID: ${{ secrets.POEDITOR_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+
+          echo "::group::Extracting strings from QML files"
+          python3 translations/extract_translations.py
+          echo "::endgroup::"
+
+          echo "::group::Checking for changes in en.json"
+          if [[ -f "translations/en.json" ]]; then
+            jq -S . "translations/en.json" > /tmp/en_new.json
+            if [[ -f "translations/en.json.orig" ]]; then
+              jq -S . "translations/en.json.orig" > /tmp/en_old.json
+            else
+              git show HEAD:translations/en.json > /tmp/en_old.json 2>/dev/null || echo "[]" > /tmp/en_old.json
+              jq -S . /tmp/en_old.json > /tmp/en_old.json.tmp && mv /tmp/en_old.json.tmp /tmp/en_old.json
+            fi
+
+            if diff -q /tmp/en_new.json /tmp/en_old.json >/dev/null 2>&1; then
+              echo "No changes in source strings"
+              echo "source_changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Detected changes in source strings"
+              echo "source_changed=true" >> "$GITHUB_OUTPUT"
+
+              echo "::group::Uploading source strings to POEditor"
+              RESP=$(curl -sS -X POST https://api.poeditor.com/v2/projects/upload \
+                -F api_token="$API_TOKEN" \
+                -F id="$PROJECT_ID" \
+                -F updating="terms" \
+                -F file=@"translations/en.json")
+
+              STATUS=$(echo "$RESP" | jq -r '.response.status')
+              if [[ "$STATUS" != "success" ]]; then
+                echo "::warning::POEditor upload failed: $RESP"
+              else
+                TERMS_ADDED=$(echo "$RESP" | jq -r '.result.terms.added // 0')
+                TERMS_UPDATED=$(echo "$RESP" | jq -r '.result.terms.updated // 0')
+                TERMS_DELETED=$(echo "$RESP" | jq -r '.result.terms.deleted // 0')
+                echo "Terms added: $TERMS_ADDED, updated: $TERMS_UPDATED, deleted: $TERMS_DELETED"
+              fi
+              echo "::endgroup::"
+            fi
+          else
+            echo "::warning::translations/en.json not found"
+            echo "source_changed=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "::endgroup::"
+        id: extract
+
+      - name: Commit and push source strings
+        if: steps.extract.outputs.source_changed == 'true'
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add translations/en.json translations/template.json
+          git commit -m "i18n: update source strings from codebase"
+
+          for attempt in 1 2 3; do
+            if git push; then
+              echo "Successfully pushed source string updates"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed, pulling and retrying..."
+            git pull --rebase
+            sleep $((attempt*2))
+          done
+
+          echo "Failed to push after retries" >&2
+          exit 1
 
       - name: Export and update translations from POEditor
         env:

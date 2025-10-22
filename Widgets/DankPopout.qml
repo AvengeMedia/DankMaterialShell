@@ -19,9 +19,13 @@ PanelWindow {
     property real triggerWidth: 40
     property string triggerSection: ""
     property string positioning: "center"
-    property int animationDuration: Theme.shortDuration
-    property var animationEasing: Theme.emphasizedEasing
+    property int animationDuration: Theme.expressiveDurations.expressiveDefaultSpatial
+    property real animationScaleCollapsed: 0.96
+    property real animationOffset: Theme.spacingL
+    property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
+    property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property bool shouldBeVisible: false
+    property int keyboardFocusMode: WlrKeyboardFocus.OnDemand
 
     signal opened
     signal popoutClosed
@@ -48,7 +52,7 @@ PanelWindow {
 
     Timer {
         id: closeTimer
-        interval: animationDuration + 50
+        interval: animationDuration + 120
         onTriggered: {
             if (!shouldBeVisible) {
                 visible = false
@@ -60,7 +64,7 @@ PanelWindow {
     color: "transparent"
     WlrLayershell.layer: WlrLayershell.Top
     WlrLayershell.exclusiveZone: -1
-    WlrLayershell.keyboardFocus: shouldBeVisible ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None 
+    WlrLayershell.keyboardFocus: shouldBeVisible ? keyboardFocusMode : WlrKeyboardFocus.None 
 
     anchors {
         top: true
@@ -126,13 +130,72 @@ PanelWindow {
         height: alignedHeight
         active: root.visible
         asynchronous: false
+        transformOrigin: Item.Center
         layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true"
+        layer.smooth: true
         opacity: shouldBeVisible ? 1 : 0
+        transform: [scaleTransform, motionTransform]
+
+        Scale {
+            id: scaleTransform
+
+            origin.x: contentLoader.width / 2
+            origin.y: contentLoader.height / 2
+            xScale: root.shouldBeVisible ? 1 : root.animationScaleCollapsed
+            yScale: root.shouldBeVisible ? 1 : root.animationScaleCollapsed
+
+            Behavior on xScale {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+
+            Behavior on yScale {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+        }
+
+        Translate {
+            id: motionTransform
+
+            readonly property bool barTop: SettingsData.dankBarPosition === SettingsData.Position.Top
+            readonly property bool barBottom: SettingsData.dankBarPosition === SettingsData.Position.Bottom
+            readonly property bool barLeft: SettingsData.dankBarPosition === SettingsData.Position.Left
+            readonly property bool barRight: SettingsData.dankBarPosition === SettingsData.Position.Right
+            readonly property real hiddenX: barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0)
+            readonly property real hiddenY: barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0)
+
+            x: Theme.snap(root.shouldBeVisible ? 0 : hiddenX, root.dpr)
+            y: Theme.snap(root.shouldBeVisible ? 0 : hiddenY, root.dpr)
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+        }
 
         Behavior on opacity {
             NumberAnimation {
                 duration: animationDuration
-                easing.type: animationEasing
+                easing.type: Easing.BezierSpline
+                easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
             }
         }
     }

@@ -59,7 +59,7 @@ Singleton {
     property string networkInfoSSID: activeService?.networkInfoSSID ?? ""
     property string networkInfoDetails: activeService?.networkInfoDetails ?? ""
     property bool networkInfoLoading: activeService?.networkInfoLoading ?? false
-    
+
     property string networkWiredInfoUUID: activeService?.networkWiredInfoUUID ?? ""
     property string networkWiredInfoDetails: activeService?.networkWiredInfoDetails ?? ""
     property bool networkWiredInfoLoading: activeService?.networkWiredInfoLoading ?? false
@@ -69,8 +69,17 @@ Singleton {
 
     property bool subscriptionConnected: activeService?.subscriptionConnected ?? false
 
+    property string credentialsToken: activeService?.credentialsToken ?? ""
+    property string credentialsSSID: activeService?.credentialsSSID ?? ""
+    property string credentialsSetting: activeService?.credentialsSetting ?? ""
+    property var credentialsFields: activeService?.credentialsFields ?? []
+    property var credentialsHints: activeService?.credentialsHints ?? []
+    property string credentialsReason: activeService?.credentialsReason ?? ""
+    property bool credentialsRequested: activeService?.credentialsRequested ?? false
+
     signal networksUpdated
     signal connectionChanged
+    signal credentialsNeeded(string token, string ssid, string setting, var fields, var hints, string reason)
 
     property bool usingLegacy: false
     property var activeService: null
@@ -121,6 +130,9 @@ Singleton {
             }
             if (activeService.connectionChanged) {
                 activeService.connectionChanged.connect(root.connectionChanged)
+            }
+            if (activeService.credentialsNeeded) {
+                activeService.credentialsNeeded.connect(root.credentialsNeeded)
             }
         }
     }
@@ -252,10 +264,22 @@ Singleton {
             activeService.refreshNetworkState()
         }
     }
-    
+
     function connectToSpecificWiredConfig(uuid) {
         if (activeService && activeService.connectToSpecificWiredConfig) {
             activeService.connectToSpecificWiredConfig(uuid)
+        }
+    }
+
+    function submitCredentials(token, secrets, save) {
+        if (activeService && activeService.submitCredentials) {
+            activeService.submitCredentials(token, secrets, save)
+        }
+    }
+
+    function cancelCredentials(token) {
+        if (activeService && activeService.cancelCredentials) {
+            activeService.cancelCredentials(token)
         }
     }
 }

@@ -1,6 +1,6 @@
 pragma Singleton
 
-pragma ComponentBehavior: Bound
+pragma ComponentBehavior
 
 import QtQuick
 import Quickshell
@@ -18,28 +18,33 @@ Singleton {
 
     property bool freedeskAvailable: false
     property string colorSchemeCommand: ""
+    property string pendingProfileImage: ""
 
     readonly property string socketPath: Quickshell.env("DMS_SOCKET")
 
     function init() {}
 
     function getSystemProfileImage() {
-        if (!freedeskAvailable) return
+        if (!freedeskAvailable)
+            return
 
         const username = Quickshell.env("USER")
-        if (!username) return
+        if (!username)
+            return
 
-        DMSService.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
-            if (response.result && response.result.success) {
-                const iconFile = response.result.value || ""
-                if (iconFile && iconFile !== "" && iconFile !== "/var/lib/AccountsService/icons/") {
-                    systemProfileImage = iconFile
-                    if (!profileImage || profileImage === "") {
-                        profileImage = iconFile
-                    }
-                }
-            }
-        })
+        DMSService.sendRequest("freedesktop.accounts.getUserIconFile", {
+                                   "username": username
+                               }, response => {
+                                   if (response.result && response.result.success) {
+                                       const iconFile = response.result.value || ""
+                                       if (iconFile && iconFile !== "" && iconFile !== "/var/lib/AccountsService/icons/") {
+                                           systemProfileImage = iconFile
+                                           if (!profileImage || profileImage === "") {
+                                               profileImage = iconFile
+                                           }
+                                       }
+                                   }
+                               })
     }
 
     function getUserProfileImage(username) {
@@ -57,28 +62,28 @@ Singleton {
             return
         }
 
-        DMSService.sendRequest("freedesktop.accounts.getUserIconFile", { username: username }, response => {
-            if (response.result && response.result.success) {
-                const icon = response.result.value || ""
-                if (icon && icon !== "" && icon !== "/var/lib/AccountsService/icons/") {
-                    profileImage = icon
-                } else {
-                    profileImage = ""
-                }
-            } else {
-                profileImage = ""
-            }
-        })
+        DMSService.sendRequest("freedesktop.accounts.getUserIconFile", {
+                                   "username": username
+                               }, response => {
+                                   if (response.result && response.result.success) {
+                                       const icon = response.result.value || ""
+                                       if (icon && icon !== "" && icon !== "/var/lib/AccountsService/icons/") {
+                                           profileImage = icon
+                                       } else {
+                                           profileImage = ""
+                                       }
+                                   } else {
+                                       profileImage = ""
+                                   }
+                               })
     }
 
     function setProfileImage(imagePath) {
-        profileImage = imagePath
         if (accountsServiceAvailable) {
-            if (imagePath) {
-                setSystemProfileImage(imagePath)
-            } else {
-                setSystemProfileImage("")
-            }
+            pendingProfileImage = imagePath
+            setSystemProfileImage(imagePath || "")
+        } else {
+            profileImage = imagePath
         }
     }
 
@@ -86,13 +91,14 @@ Singleton {
         if (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal === false) {
             return
         }
-        if (!freedeskAvailable) return
+        if (!freedeskAvailable)
+            return
 
         DMSService.sendRequest("freedesktop.settings.getColorScheme", null, response => {
-            if (response.result) {
-                systemColorScheme = response.result.value || 0
-            }
-        })
+                                   if (response.result) {
+                                       systemColorScheme = response.result.value || 0
+                                   }
+                               })
     }
 
     function setLightMode(isLightMode) {
@@ -107,7 +113,7 @@ Singleton {
             return
         }
 
-        const targetScheme = isLightMode ? "default": "prefer-dark"
+        const targetScheme = isLightMode ? "default" : "prefer-dark"
 
         if (colorSchemeCommand === "gsettings") {
             Quickshell.execDetached(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", targetScheme])
@@ -118,25 +124,50 @@ Singleton {
     }
 
     function setSystemIconTheme(themeName) {
-        if (!settingsPortalAvailable || !freedeskAvailable) return
+        if (!settingsPortalAvailable || !freedeskAvailable)
+            return
 
-        DMSService.sendRequest("freedesktop.settings.setIconTheme", { iconTheme: themeName }, response => {
-            if (response.error) {
-                console.warn("PortalService: Failed to set icon theme:", response.error)
-            }
-        })
+        DMSService.sendRequest("freedesktop.settings.setIconTheme", {
+                                   "iconTheme": themeName
+                               }, response => {
+                                   if (response.error) {
+                                       console.warn("PortalService: Failed to set icon theme:", response.error)
+                                   }
+                               })
     }
 
     function setSystemProfileImage(imagePath) {
-        if (!accountsServiceAvailable || !freedeskAvailable) return
+        if (!accountsServiceAvailable || !freedeskAvailable)
+            return
 
-        DMSService.sendRequest("freedesktop.accounts.setIconFile", { path: imagePath || "" }, response => {
-            if (response.error) {
-                console.warn("PortalService: Failed to set icon file:", response.error)
-            } else {
-                Qt.callLater(() => getSystemProfileImage())
-            }
-        })
+        DMSService.sendRequest("freedesktop.accounts.setIconFile", {
+                                   "path": imagePath || ""
+                               }, response => {
+                                   if (response.error) {
+                                       console.warn("PortalService: Failed to set icon file:", response.error)
+
+                                       const errorMsg = response.error.toString()
+                                       let userMessage = I18n.tr("Failed to set profile image")
+
+                                       if (errorMsg.includes("too large")) {
+                                           userMessage = I18n.tr("Profile image is too large. Please use a smaller image.")
+                                       } else if (errorMsg.includes("permission")) {
+                                           userMessage = I18n.tr("Permission denied to set profile image.")
+                                       } else if (errorMsg.includes("not found") || errorMsg.includes("does not exist")) {
+                                           userMessage = I18n.tr("Selected image file not found.")
+                                       } else {
+                                           userMessage = I18n.tr("Failed to set profile image: ") + errorMsg.split(":").pop().trim()
+                                       }
+
+                                       Quickshell.execDetached(["notify-send", "-u", "normal", "-a", "DMS", "-i", "error", I18n.tr("Profile Image Error"), userMessage])
+
+                                       pendingProfileImage = ""
+                                   } else {
+                                       profileImage = pendingProfileImage
+                                       pendingProfileImage = ""
+                                       Qt.callLater(() => getSystemProfileImage())
+                                   }
+                               })
     }
 
     Component.onCompleted: {
@@ -186,29 +217,31 @@ Singleton {
     }
 
     function checkAccountsService() {
-        if (!freedeskAvailable) return
+        if (!freedeskAvailable)
+            return
 
         DMSService.sendRequest("freedesktop.getState", null, response => {
-            if (response.result && response.result.accounts) {
-                accountsServiceAvailable = response.result.accounts.available || false
-                if (accountsServiceAvailable) {
-                    getSystemProfileImage()
-                }
-            }
-        })
+                                   if (response.result && response.result.accounts) {
+                                       accountsServiceAvailable = response.result.accounts.available || false
+                                       if (accountsServiceAvailable) {
+                                           getSystemProfileImage()
+                                       }
+                                   }
+                               })
     }
 
     function checkSettingsPortal() {
-        if (!freedeskAvailable) return
+        if (!freedeskAvailable)
+            return
 
         DMSService.sendRequest("freedesktop.getState", null, response => {
-            if (response.result && response.result.settings) {
-                settingsPortalAvailable = response.result.settings.available || false
-                if (settingsPortalAvailable && SettingsData.syncModeWithPortal) {
-                    getSystemColorScheme()
-                }
-            }
-        })
+                                   if (response.result && response.result.settings) {
+                                       settingsPortalAvailable = response.result.settings.available || false
+                                       if (settingsPortalAvailable && SettingsData.syncModeWithPortal) {
+                                           getSystemColorScheme()
+                                       }
+                                   }
+                               })
     }
 
     function getGreeterUserProfileImage(username) {
@@ -216,10 +249,7 @@ Singleton {
             profileImage = ""
             return
         }
-        userProfileCheckProcess.command = [
-            "bash", "-c",
-            `uid=$(id -u ${username} 2>/dev/null) && [ -n "$uid" ] && dbus-send --system --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User$uid org.freedesktop.DBus.Properties.Get string:org.freedesktop.Accounts.User string:IconFile 2>/dev/null | grep -oP 'string "\\K[^"]+' || echo ""`
-        ]
+        userProfileCheckProcess.command = ["bash", "-c", `uid=$(id -u ${username} 2>/dev/null) && [ -n "$uid" ] && dbus-send --system --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User$uid org.freedesktop.DBus.Properties.Get string:org.freedesktop.Accounts.User string:IconFile 2>/dev/null | grep -oP 'string "\\K[^"]+' || echo ""`]
         userProfileCheckProcess.running = true
     }
 

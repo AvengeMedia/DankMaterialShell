@@ -230,18 +230,6 @@ Column {
                         return "bluetooth_disabled"
                     if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
                         return "bluetooth_disabled"
-                    const primaryDevice = (() => {
-                                               if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
-                                               return null
-                                               let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
-                                               for (let device of devices) {
-                                                   if (device && device.connected)
-                                                   return device
-                                               }
-                                               return null
-                                           })()
-                    if (primaryDevice)
-                        return BluetoothService.getDeviceIcon(primaryDevice)
                     return "bluetooth"
                 }
                 case "audioOutput":

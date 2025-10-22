@@ -3,90 +3,20 @@
 * Generated with Matugen
 */
 
-@define-color accent_color {{colors.primary.default.hex}};
-@define-color accent_fg_color {{colors.on_primary.default.hex}};
+@define-color accent_color {{colors.primary_fixed_dim.default.hex}};
+@define-color accent_fg_color {{colors.on_primary_fixed.default.hex}};
 @define-color accent_bg_color {{colors.primary_fixed_dim.default.hex}};
-@define-color window_bg_color {{colors.surface_container.default.hex}};
+@define-color window_bg_color {{colors.surface_dim.default.hex}};
 @define-color window_fg_color {{colors.on_surface.default.hex}};
-@define-color headerbar_bg_color {{colors.surface_container.default.hex}};
+@define-color headerbar_bg_color {{colors.surface_dim.default.hex}};
 @define-color headerbar_fg_color {{colors.on_surface.default.hex}};
-@define-color popover_bg_color {{colors.surface_container.default.hex}};
+@define-color popover_bg_color {{colors.surface_dim.default.hex}};
 @define-color popover_fg_color {{colors.on_surface.default.hex}};
-@define-color view_bg_color {{colors.surface_container.default.hex}};
+@define-color view_bg_color {{colors.surface.default.hex}};
 @define-color view_fg_color {{colors.on_surface.default.hex}};
-@define-color card_bg_color {{colors.surface_container.default.hex}};
+@define-color card_bg_color {{colors.surface.default.hex}};
 @define-color card_fg_color {{colors.on_surface.default.hex}};
 @define-color sidebar_bg_color @window_bg_color;
 @define-color sidebar_fg_color @window_fg_color;
 @define-color sidebar_border_color @window_bg_color;
 @define-color sidebar_backdrop_color @window_bg_color;
-
-/* Titlebar and headerbar specific colors for window decorations */
-@define-color theme_bg_color {{colors.surface_container.default.hex}};
-@define-color theme_fg_color {{colors.on_surface.default.hex}};
-@define-color theme_base_color {{colors.surface_container.default.hex}};
-@define-color theme_text_color {{colors.on_surface.default.hex}};
-@define-color theme_selected_bg_color {{colors.primary.default.hex}};
-@define-color theme_selected_fg_color {{colors.on_primary.default.hex}};
-@define-color theme_button_background_normal {{colors.surface_container_high.default.hex}};
-@define-color theme_button_foreground_normal {{colors.on_surface.default.hex}};
-@define-color theme_button_background_hover alpha({{colors.on_surface.default.hex}}, 0.08);
-@define-color theme_button_foreground_hover {{colors.on_surface.default.hex}};
-@define-color theme_button_background_active alpha({{colors.on_surface.default.hex}}, 0.12);
-@define-color theme_button_foreground_active {{colors.on_surface.default.hex}};
-@define-color theme_button_background_disabled alpha({{colors.on_surface.default.hex}}, 0.04);
-@define-color theme_button_foreground_disabled alpha({{colors.on_surface.default.hex}}, 0.38);
-
-/* Additional headerbar-specific colors for GTK4 compatibility */
-@define-color headerbar_backdrop_color {{colors.surface_container_low.default.hex}};
-@define-color headerbar_border_color {{colors.outline.default.hex}};
-@define-color headerbar_darker_shade_color {{colors.outline_variant.default.hex}};
-@define-color headerbar_shade_color {{colors.surface_variant.default.hex}};
-
-/* Window control and decoration colors */
-@define-color wm_bg_a {{colors.surface_container.default.hex}};
-@define-color wm_bg_b {{colors.surface_container_high.default.hex}};
-@define-color wm_border_a {{colors.outline.default.hex}};
-@define-color wm_border_b {{colors.outline_variant.default.hex}};
-@define-color wm_shadow {{colors.shadow.default.hex}};
-@define-color wm_outline {{colors.outline.default.hex}};
-
-/* Menu and popover colors */
-@define-color menu_bg_color {{colors.surface_container.default.hex}};
-@define-color menu_fg_color {{colors.on_surface.default.hex}};
-@define-color menu_selected_bg_color {{colors.primary.default.hex}};
-@define-color menu_selected_fg_color {{colors.on_primary.default.hex}};
-
-/* Button and control colors */
-@define-color button_bg_color {{colors.surface_container_high.default.hex}};
-@define-color button_fg_color {{colors.on_surface.default.hex}};
-@define-color button_border_color {{colors.outline_variant.default.hex}};
-@define-color button_active_bg_color {{colors.primary.default.hex}};
-@define-color button_active_fg_color {{colors.on_primary.default.hex}};
-
-/* Entry and input colors */
-@define-color entry_bg_color {{colors.surface_variant.default.hex}};
-@define-color entry_fg_color {{colors.on_surface_variant.default.hex}};
-@define-color entry_border_color {{colors.outline.default.hex}};
-@define-color entry_focus_border_color {{colors.primary.default.hex}};
-
-/* Scrollbar colors */
-@define-color scrollbar_bg_color {{colors.surface_variant.default.hex}};
-@define-color scrollbar_fg_color {{colors.on_surface_variant.default.hex}};
-@define-color scrollbar_hover_color {{colors.primary.default.hex}};
-
-/* Selection and highlight colors */
-@define-color selection_bg_color {{colors.primary.default.hex}};
-@define-color selection_fg_color {{colors.on_primary.default.hex}};
-
-/* Tooltip colors */
-@define-color tooltip_bg_color {{colors.inverse_surface.default.hex}};
-@define-color tooltip_fg_color {{colors.inverse_on_surface.default.hex}};
-
-/* Warning and error colors */
-@define-color warning_color {{colors.tertiary.default.hex}};
-@define-color warning_fg_color {{colors.on_tertiary.default.hex}};
-@define-color error_color {{colors.error.default.hex}};
-@define-color error_fg_color {{colors.on_error.default.hex}};
-@define-color success_color {{colors.tertiary_container.default.hex}};
-@define-color success_fg_color {{colors.on_tertiary_container.default.hex}};

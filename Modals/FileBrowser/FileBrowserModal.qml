@@ -111,18 +111,18 @@ DankModal {
         if (!normalizedPath.startsWith("file://")) {
             normalizedPath = "file://" + filePath
         }
-        
+
         // Check if file exists by looking through the folder model
         var exists = false
         var fileName = filePath.split('/').pop()
-        
+
         for (var i = 0; i < folderModel.count; i++) {
             if (folderModel.get(i, "fileName") === fileName && !folderModel.get(i, "fileIsDir")) {
                 exists = true
                 break
             }
         }
-        
+
         if (exists) {
             pendingFilePath = normalizedPath
             showOverwriteConfirmation = true
@@ -139,7 +139,7 @@ DankModal {
     Component.onCompleted: {
         currentPath = getLastPath()
     }
-    
+
     property var steamPaths: [
         StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.steam/steam/steamapps/workshop/content/431960",
         StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.local/share/Steam/steamapps/workshop/content/431960",
@@ -147,17 +147,17 @@ DankModal {
         StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/snap/steam/common/.local/share/Steam/steamapps/workshop/content/431960"
     ]
     property int currentPathIndex: 0
-    
+
     function discoverWallpaperEngine() {
         currentPathIndex = 0
         checkNextPath()
     }
-    
+
     function checkNextPath() {
         if (currentPathIndex >= steamPaths.length) {
             return
         }
-        
+
         const wePath = steamPaths[currentPathIndex]
         const cleanPath = wePath.replace(/^file:\/\//, '')
         weDiscoveryProcess.command = ["test", "-d", cleanPath]
@@ -451,13 +451,13 @@ DankModal {
             executeKeyboardSelection(targetIndex)
         }
     }
-    
+
     Process {
         id: weDiscoveryProcess
-        
+
         property string wePath: ""
         running: false
-        
+
         onExited: exitCode => {
             if (exitCode === 0) {
                 fileBrowserModal.weAvailable = true
@@ -532,7 +532,7 @@ DankModal {
                                 }
                             }
                         }
-                        
+
                         DankActionButton {
                             circular: false
                             iconName: "info"
@@ -875,26 +875,26 @@ DankModal {
                 id: overwriteDialog
                 anchors.fill: parent
                 visible: showOverwriteConfirmation
-                
+
                 Keys.onEscapePressed: {
                     showOverwriteConfirmation = false
                     pendingFilePath = ""
                 }
-                
+
                 Keys.onReturnPressed: {
                     showOverwriteConfirmation = false
                     fileSelected(pendingFilePath)
                     pendingFilePath = ""
                     Qt.callLater(() => fileBrowserModal.close())
                 }
-                
+
                 focus: showOverwriteConfirmation
-                
+
                 Rectangle {
                     anchors.fill: parent
                     color: Theme.shadowStrong
                     opacity: 0.8
-                    
+
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
@@ -903,7 +903,7 @@ DankModal {
                         }
                     }
                 }
-                
+
                 StyledRect {
                     anchors.centerIn: parent
                     width: 400
@@ -912,12 +912,12 @@ DankModal {
                     radius: Theme.cornerRadius
                     border.color: Theme.outlineMedium
                     border.width: 1
-                    
+
                     Column {
                         anchors.centerIn: parent
                         width: parent.width - Theme.spacingL * 2
                         spacing: Theme.spacingM
-                        
+
                         StyledText {
                             text: I18n.tr("File Already Exists")
                             font.pixelSize: Theme.fontSizeLarge
@@ -925,7 +925,7 @@ DankModal {
                             color: Theme.surfaceText
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
-                        
+
                         StyledText {
                             text: I18n.tr("A file with this name already exists. Do you want to overwrite it?")
                             font.pixelSize: Theme.fontSizeMedium
@@ -934,11 +934,11 @@ DankModal {
                             wrapMode: Text.WordWrap
                             horizontalAlignment: Text.AlignHCenter
                         }
-                        
+
                         Row {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: Theme.spacingM
-                            
+
                             StyledRect {
                                 width: 80
                                 height: 36
@@ -946,7 +946,7 @@ DankModal {
                                 color: cancelArea.containsMouse ? Theme.surfaceVariantHover : Theme.surfaceVariant
                                 border.color: Theme.outline
                                 border.width: 1
-                                
+
                                 StyledText {
                                     anchors.centerIn: parent
                                     text: I18n.tr("Cancel")
@@ -954,7 +954,7 @@ DankModal {
                                     color: Theme.surfaceText
                                     font.weight: Font.Medium
                                 }
-                                
+
                                 MouseArea {
                                     id: cancelArea
                                     anchors.fill: parent
@@ -966,13 +966,13 @@ DankModal {
                                     }
                                 }
                             }
-                            
+
                             StyledRect {
                                 width: 90
                                 height: 36
                                 radius: Theme.cornerRadius
                                 color: overwriteArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                                
+
                                 StyledText {
                                     anchors.centerIn: parent
                                     text: I18n.tr("Overwrite")
@@ -980,7 +980,7 @@ DankModal {
                                     color: Theme.background
                                     font.weight: Font.Medium
                                 }
-                                
+
                                 MouseArea {
                                     id: overwriteArea
                                     anchors.fill: parent

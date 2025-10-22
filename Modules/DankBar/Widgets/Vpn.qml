@@ -1,46 +1,35 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
 
-Rectangle {
+BasePill {
     id: root
 
     Ref {
         service: VpnService
     }
 
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
-    property int widgetThickness: 28
-    property int barThickness: 32
-    property string section: "right"
-    property var popupTarget: null
-    property var parentScreen: null
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
+    property var popoutTarget: null
 
     signal toggleVpnPopup()
 
-    width: isVertical ? widgetThickness : (Theme.iconSize + horizontalPadding * 2)
-    height: isVertical ? (Theme.iconSize + horizontalPadding * 2) : widgetThickness
-    radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-    color: {
-        if (SettingsData.dankBarNoBackground) {
-            return "transparent";
+    content: Component {
+        Item {
+            implicitWidth: root.widgetThickness - root.horizontalPadding * 2
+            implicitHeight: root.widgetThickness - root.horizontalPadding * 2
+
+            DankIcon {
+                id: icon
+
+                name: VpnService.isBusy ? "sync" : (VpnService.connected ? "vpn_lock" : "vpn_key_off")
+                size: Theme.barIconSize(root.barThickness, -4)
+                color: VpnService.connected ? Theme.primary : Theme.surfaceText
+                anchors.centerIn: parent
+            }
         }
-
-        const baseColor = clickArea.containsMouse ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
-        return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
-    }
-
-    DankIcon {
-        id: icon
-
-        name: VpnService.isBusy ? "sync" : (VpnService.connected ? "vpn_lock" : "vpn_key_off")
-        size: Theme.barIconSize(barThickness, -4)
-        color: VpnService.connected ? Theme.primary : Theme.surfaceText
-        anchors.centerIn: parent
     }
 
     Loader {
@@ -55,17 +44,18 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popupTarget && popupTarget.setTriggerPosition) {
-                const globalPos = mapToGlobal(0, 0)
+            if (popoutTarget && popoutTarget.setTriggerPosition) {
+                const globalPos = root.visualContent.mapToGlobal(0, 0)
                 const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                popupTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
+                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
+                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
             }
             root.toggleVpnPopup();
         }
         onEntered: {
-            if (root.parentScreen && !(popupTarget && popupTarget.shouldBeVisible)) {
+            if (root.parentScreen && !(popoutTarget && popoutTarget.shouldBeVisible)) {
                 tooltipLoader.active = true
                 if (tooltipLoader.item) {
                     let tooltipText = ""
@@ -80,7 +70,7 @@ Rectangle {
                         }
                     }
 
-                    if (root.isVertical) {
+                    if (root.isVerticalOrientation) {
                         const globalPos = mapToGlobal(width / 2, height / 2)
                         const screenX = root.parentScreen ? root.parentScreen.x : 0
                         const screenY = root.parentScreen ? root.parentScreen.y : 0
@@ -103,5 +93,4 @@ Rectangle {
             tooltipLoader.active = false
         }
     }
-
 }

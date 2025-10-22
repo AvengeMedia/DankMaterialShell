@@ -23,6 +23,7 @@ Item {
     signal colorPickerRequested
 
     property alias barVariants: barVariants
+    property var hyprlandOverviewLoader: null
 
     function triggerControlCenterOnFocusedScreen() {
         let focusedScreenName = ""
@@ -48,6 +49,30 @@ Item {
         return false
     }
 
+    function triggerWallpaperBrowserOnFocusedScreen() {
+        let focusedScreenName = ""
+        if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
+            focusedScreenName = Hyprland.focusedWorkspace.monitor.name
+        } else if (CompositorService.isNiri && NiriService.currentOutput) {
+            focusedScreenName = NiriService.currentOutput
+        }
+
+        if (!focusedScreenName && barVariants.instances.length > 0) {
+            const firstBar = barVariants.instances[0]
+            firstBar.triggerWallpaperBrowser()
+            return true
+        }
+
+        for (var i = 0; i < barVariants.instances.length; i++) {
+            const barInstance = barVariants.instances[i]
+            if (barInstance.modelData && barInstance.modelData.name === focusedScreenName) {
+                barInstance.triggerWallpaperBrowser()
+                return true
+            }
+        }
+        return false
+    }
+
     Variants {
         id: barVariants
         model: SettingsData.getFilteredScreens("dankBar")
@@ -56,6 +81,7 @@ Item {
             id: barWindow
 
             property var controlCenterButtonRef: null
+            property var clockButtonRef: null
 
             function triggerControlCenter() {
                 controlCenterLoader.active = true
@@ -76,6 +102,27 @@ Item {
                 if (controlCenterLoader.item.shouldBeVisible && NetworkService.wifiEnabled) {
                     NetworkService.scanWifi()
                 }
+            }
+
+            function triggerWallpaperBrowser() {
+                dankDashPopoutLoader.active = true
+                if (!dankDashPopoutLoader.item) {
+                    return
+                }
+
+                if (clockButtonRef && dankDashPopoutLoader.item.setTriggerPosition) {
+                    const globalPos = clockButtonRef.mapToGlobal(0, 0)
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, clockButtonRef.width)
+                    const section = clockButtonRef.section || "center"
+                    dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen)
+                } else {
+                    dankDashPopoutLoader.item.triggerScreen = barWindow.screen
+                }
+
+                if (!dankDashPopoutLoader.item.dashVisible) {
+                    dankDashPopoutLoader.item.currentTabIndex = 2
+                }
+                dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
             }
 
             readonly property var dBarLayer: {
@@ -499,9 +546,9 @@ Item {
                                 anchors.fill: parent
                                 anchors.leftMargin: !barWindow.isVertical ? Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8) : SettingsData.dankBarInnerPadding / 2
                                 anchors.rightMargin: !barWindow.isVertical ? Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8) : SettingsData.dankBarInnerPadding / 2
-                                anchors.topMargin: !barWindow.isVertical ? SettingsData.dankBarInnerPadding / 2 : Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
-                                anchors.bottomMargin: !barWindow.isVertical ? SettingsData.dankBarInnerPadding / 2 : Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
-                                clip: true
+                                anchors.topMargin: !barWindow.isVertical ? 0 : Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                                anchors.bottomMargin: !barWindow.isVertical ? 0 : Math.max(Theme.spacingXS, SettingsData.dankBarInnerPadding * 0.8)
+                                clip: false
 
                                 property int componentMapRevision: 0
 
@@ -754,6 +801,7 @@ Item {
                                     ClipboardButton {
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent)
                                         parentScreen: barWindow.screen
                                         onClicked: {
@@ -770,8 +818,9 @@ Item {
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
                                         section: topBarContent.getWidgetSection(parent)
-                                        popupTarget: appDrawerLoader.item
+                                        popoutTarget: appDrawerLoader.item
                                         parentScreen: barWindow.screen
+                                        hyprlandOverviewLoader: root.hyprlandOverviewLoader
                                         onClicked: {
                                             appDrawerLoader.active = true
                                             appDrawerLoader.item?.toggle()
@@ -783,8 +832,12 @@ Item {
                                     id: workspaceSwitcherComponent
 
                                     WorkspaceSwitcher {
+                                        axis: barWindow.axis
                                         screenName: barWindow.screenName
                                         widgetHeight: barWindow.widgetThickness
+                                        barThickness: barWindow.effectiveBarThickness
+                                        parentScreen: barWindow.screen
+                                        hyprlandOverviewLoader: root.hyprlandOverviewLoader
                                     }
                                 }
 
@@ -792,8 +845,10 @@ Item {
                                     id: focusedWindowComponent
 
                                     FocusedApp {
+                                        axis: barWindow.axis
                                         availableWidth: topBarContent.leftToMediaGap
                                         widgetThickness: barWindow.widgetThickness
+                                        barThickness: barWindow.effectiveBarThickness
                                         parentScreen: barWindow.screen
                                     }
                                 }
@@ -813,15 +868,27 @@ Item {
                                     id: clockComponent
 
                                     Clock {
+                                        axis: barWindow.axis
                                         compactMode: topBarContent.overlapping
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
                                         section: topBarContent.getWidgetSection(parent) || "center"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             dankDashPopoutLoader.active = true
                                             return dankDashPopoutLoader.item
                                         }
                                         parentScreen: barWindow.screen
+
+                                        Component.onCompleted: {
+                                            barWindow.clockButtonRef = this
+                                        }
+
+                                        Component.onDestruction: {
+                                            if (barWindow.clockButtonRef === this) {
+                                                barWindow.clockButtonRef = null
+                                            }
+                                        }
+
                                         onClockClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
@@ -836,11 +903,12 @@ Item {
                                     id: mediaComponent
 
                                     Media {
+                                        axis: barWindow.axis
                                         compactMode: topBarContent.spacingTight || topBarContent.overlapping
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
                                         section: topBarContent.getWidgetSection(parent) || "center"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             dankDashPopoutLoader.active = true
                                             return dankDashPopoutLoader.item
                                         }
@@ -859,10 +927,11 @@ Item {
                                     id: weatherComponent
 
                                     Weather {
+                                        axis: barWindow.axis
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
                                         section: topBarContent.getWidgetSection(parent) || "center"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             dankDashPopoutLoader.active = true
                                             return dankDashPopoutLoader.item
                                         }
@@ -871,7 +940,7 @@ Item {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
                                                 dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
-                                                dankDashPopoutLoader.item.currentTabIndex = 2
+                                                dankDashPopoutLoader.item.currentTabIndex = 3
                                             }
                                         }
                                     }
@@ -905,8 +974,9 @@ Item {
                                     CpuMonitor {
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             processListPopoutLoader.active = true
                                             return processListPopoutLoader.item
                                         }
@@ -925,8 +995,9 @@ Item {
                                     RamMonitor {
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             processListPopoutLoader.active = true
                                             return processListPopoutLoader.item
                                         }
@@ -955,8 +1026,9 @@ Item {
                                     CpuTemperature {
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             processListPopoutLoader.active = true
                                             return processListPopoutLoader.item
                                         }
@@ -975,8 +1047,9 @@ Item {
                                     GpuTemperature {
                                         barThickness: barWindow.effectiveBarThickness
                                         widgetThickness: barWindow.widgetThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             processListPopoutLoader.active = true
                                             return processListPopoutLoader.item
                                         }
@@ -1003,8 +1076,9 @@ Item {
                                         isActive: notificationCenterLoader.item ? notificationCenterLoader.item.shouldBeVisible : false
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             notificationCenterLoader.active = true
                                             return notificationCenterLoader.item
                                         }
@@ -1023,8 +1097,9 @@ Item {
                                         batteryPopupVisible: batteryPopoutLoader.item ? batteryPopoutLoader.item.shouldBeVisible : false
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             batteryPopoutLoader.active = true
                                             return batteryPopoutLoader.item
                                         }
@@ -1042,8 +1117,9 @@ Item {
                                     Vpn {
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             vpnPopoutLoader.active = true
                                             return vpnPopoutLoader.item
                                         }
@@ -1062,8 +1138,9 @@ Item {
                                         isActive: controlCenterLoader.item ? controlCenterLoader.item.shouldBeVisible : false
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             controlCenterLoader.active = true
                                             return controlCenterLoader.item
                                         }
@@ -1157,9 +1234,9 @@ Item {
                                     id: notepadButtonComponent
 
                                     NotepadButton {
-                                        isVertical: barWindow.isVertical
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
                                         parentScreen: barWindow.screen
                                     }
@@ -1186,8 +1263,9 @@ Item {
                                         isActive: systemUpdateLoader.item ? systemUpdateLoader.item.shouldBeVisible : false
                                         widgetThickness: barWindow.widgetThickness
                                         barThickness: barWindow.effectiveBarThickness
+                                        axis: barWindow.axis
                                         section: topBarContent.getWidgetSection(parent) || "right"
-                                        popupTarget: {
+                                        popoutTarget: {
                                             systemUpdateLoader.active = true
                                             return systemUpdateLoader.item
                                         }

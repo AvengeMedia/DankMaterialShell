@@ -20,7 +20,7 @@ Scope {
 
     function lock() {
         if (SettingsData.customPowerActionLock && SettingsData.customPowerActionLock.length > 0) {
-            Quickshell.execDetached(SettingsData.customPowerActionLock.split(" "))
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock])
             return
         }
         if (!processingExternalEvent && SettingsData.loginctlLockIntegration && DMSService.isConnected) {
@@ -110,7 +110,16 @@ Scope {
         target: "lock"
 
         function lock() {
-            root.lock()
+            if (!root.processingExternalEvent && SettingsData.loginctlLockIntegration && DMSService.isConnected) {
+                DMSService.lockSession(response => {
+                    if (response.error) {
+                        console.warn("Lock: Failed to call loginctl.lock:", response.error)
+                        root.shouldLock = true
+                    }
+                })
+            } else {
+                root.shouldLock = true
+            }
         }
 
         function demo() {
