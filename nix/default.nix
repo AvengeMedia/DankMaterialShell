@@ -99,9 +99,7 @@ in {
             enable = true;
             package = cfg.quickshell.package;
 
-            configs.dms = "${
-                dmsPkgs.dankMaterialShell
-            }/etc/xdg/quickshell/DankMaterialShell";
+            configs.dms = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
         };
 
         systemd.user.services.dms = lib.mkIf cfg.enableSystemd {

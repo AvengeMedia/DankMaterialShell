@@ -2,11 +2,7 @@
     description = "Dank Material Shell";
 
     inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-        quickshell = {
-            url = "git+https://git.outfoxxed.me/quickshell/quickshell";
-            inputs.nixpkgs.follows = "nixpkgs";
-        };
+        nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
         dgop = {
             url = "github:AvengeMedia/dgop";
             inputs.nixpkgs.follows = "nixpkgs";
@@ -20,7 +16,6 @@
     outputs = {
         self,
         nixpkgs,
-        quickshell,
         dgop,
         dms-cli,
         ...
@@ -38,17 +33,36 @@
         formatter = forEachSystem (_: pkgs: pkgs.alejandra);
 
         packages = forEachSystem (system: pkgs: {
-            dankMaterialShell = pkgs.stdenvNoCC.mkDerivation {
-                name = "dankMaterialShell";
-                src = ./.;
+            dankMaterialShell = let
+                mkDate = longDate: pkgs.lib.concatStringsSep "-" [
+                    (builtins.substring 0 4 longDate)
+                    (builtins.substring 4 2 longDate)
+                    (builtins.substring 6 2 longDate)
+                ];
+            in pkgs.stdenvNoCC.mkDerivation {
+                pname = "dankMaterialShell";
+                version = pkgs.lib.removePrefix "v" (pkgs.lib.trim (builtins.readFile ./VERSION))
+                    + "+date=" + mkDate (self.lastModifiedDate or "19700101")
+                    + "_" + (self.shortRev or "dirty");
+                src = pkgs.lib.cleanSourceWith {
+                    src = ./.;
+                    filter = path: type:
+                        !(builtins.any (prefix: pkgs.lib.path.hasPrefix (./. + prefix) (/. + path)) [
+                            /.github
+                            /.gitignore
+                            /dms.spec
+                            /dms-greeter.spec
+                            /nix
+                            /flake.nix
+                            /flake.lock
+                            /alejandra.toml
+                        ]);
+                };
                 installPhase = ''
-                    mkdir -p $out/etc/xdg/quickshell/DankMaterialShell
-                    cp -r . $out/etc/xdg/quickshell/DankMaterialShell
-                    ln -s $out/etc/xdg/quickshell/DankMaterialShell $out/etc/xdg/quickshell/dms
+                    mkdir -p $out/etc/xdg/quickshell/dms
+                    cp -r . $out/etc/xdg/quickshell/dms
                 '';
             };
-
-            quickshell = quickshell.packages.${system}.default;
 
             default = self.packages.${system}.dankMaterialShell;
         });
