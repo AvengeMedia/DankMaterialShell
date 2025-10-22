@@ -16,7 +16,7 @@ Rectangle {
     property real widgetHeight: 30
     property real barThickness: 48
     readonly property var sortedToplevels: {
-        return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, parentScreen?.name);
+        return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
     }
     property int currentWorkspace: {
         if (CompositorService.isNiri) {
