@@ -424,6 +424,25 @@ Item {
                     }
                 }
 
+		MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: !isPlaceholder
+                    cursorShape: isPlaceholder ? Qt.ArrowCursor : Qt.PointingHandCursor
+                    enabled: !isPlaceholder
+                    onClicked: {
+                        if (isPlaceholder) {
+                            return
+                        }
+
+                        if (CompositorService.isNiri) {
+                            NiriService.switchToWorkspace(modelData - 1)
+                        } else if (CompositorService.isHyprland && modelData?.id) {
+                            Hyprland.dispatch(`workspace ${modelData.id}`)
+                        }
+                    }
+                }
+
                 Timer {
                     id: dataUpdateTimer
                     interval: 50
@@ -715,25 +734,6 @@ Item {
                 }
                 }
 
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: parent
-                    hoverEnabled: !isPlaceholder
-                    cursorShape: isPlaceholder ? Qt.ArrowCursor : Qt.PointingHandCursor
-                    enabled: !isPlaceholder
-                    onClicked: {
-                        if (isPlaceholder) {
-                            return
-                        }
-
-                        if (CompositorService.isNiri) {
-                            NiriService.switchToWorkspace(modelData - 1)
-                        } else if (CompositorService.isHyprland && modelData?.id) {
-                            Hyprland.dispatch(`workspace ${modelData.id}`)
-                        }
-                    }
-                }
-
                 Component.onCompleted: updateAllData()
 
                 Connections {
@@ -745,6 +745,7 @@ Item {
                     enabled: CompositorService.isNiri
                     function onAllWorkspacesChanged() { delegateRoot.updateAllData() }
                     function onWindowUrgentChanged() { delegateRoot.updateAllData() }
+		    function onWindowsChanged() { delegateRoot.updateAllData() }
                 }
                 Connections {
                     target: SettingsData
