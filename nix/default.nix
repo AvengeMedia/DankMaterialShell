@@ -8,6 +8,9 @@
     cfg = config.programs.dankMaterialShell;
     jsonFormat = pkgs.formats.json { };
 in {
+    imports = [
+        (lib.mkRemovedOptionModule ["programs" "dankMaterialShell" "enableNightMode"] "Night mode is now always available.")
+    ];
     options.programs.dankMaterialShell = with lib.types; {
         enable = lib.mkEnableOption "DankMaterialShell";
 
