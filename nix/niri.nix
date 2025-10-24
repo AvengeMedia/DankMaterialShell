@@ -90,9 +90,15 @@ in {
             })
 
             (lib.mkIf cfg.niri.enableSpawn {
-                spawn-at-startup = [
-                    {command = ["dms" "run"];}
-                ];
+                spawn-at-startup =
+                    [
+                        {command = ["dms" "run"];}
+                    ]
+                    ++ lib.optionals cfg.enableClipboard [
+                        {
+                            command = ["wl-paste" "--watch" "cliphist" "store"];
+                        }
+                    ];
             })
         ];
     };
