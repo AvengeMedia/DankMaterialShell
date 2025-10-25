@@ -271,6 +271,12 @@ Singleton {
             if (root.isChecking) {
                 return "ERROR: already checking"
             }
+            if (!distributionSupported) {
+                return "ERROR: distribution not supported"
+            }
+            if (!pkgManager && !updChecker) {
+                return "ERROR: update checker not available"
+            }
             root.checkForUpdates()
             return "SUCCESS: Now checking..."
         }
