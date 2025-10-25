@@ -88,7 +88,7 @@ in {
             settings.default_session.command = lib.mkDefault (lib.getExe greeterScript);
         };
         fonts.packages = with pkgs; [
-            fira-code
+            (nerdfonts.override { fonts = [ "FiraCode" ]; })
             inter
             material-symbols
         ];

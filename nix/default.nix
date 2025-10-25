@@ -140,7 +140,7 @@ in {
             [
                 pkgs.material-symbols
                 pkgs.inter
-                pkgs.fira-code
+                (pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; })
 
                 pkgs.ddcutil
                 pkgs.libsForQt5.qt5ct

@@ -96,10 +96,12 @@ Item {
                          if (!byApp[key]) {
                              const moddedId = Paths.moddedAppId(keyBase)
                              const isSteamApp = moddedId.toLowerCase().includes("steam_app")
+                             const nerdIcon = AppIconService.getNerdFontIcon(keyBase) || ""
                              const icon = isSteamApp ? "" : Quickshell.iconPath(DesktopEntries.heuristicLookup(moddedId)?.icon, true)
                              byApp[key] = {
                                  "type": "icon",
                                  "icon": icon,
+                                 "nerdIcon": nerdIcon,
                                  "isSteamApp": isSteamApp,
                                  "active": !!(w.activated || (CompositorService.isNiri && w.is_focused)),
                                  "count": 1,
@@ -568,13 +570,26 @@ Item {
                                         width: 18
                                         height: 18
 
+                                        Text {
+                                            id: nerdIcon
+                                            anchors.fill: parent
+                                            text: modelData.nerdIcon || ""
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 14
+                                            color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceText
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                            opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
+                                            visible: modelData.nerdIcon && modelData.nerdIcon !== ""
+                                        }
+
                                         IconImage {
                                             id: appIcon
                                             property var windowId: modelData.windowId
                                             anchors.fill: parent
                                             source: modelData.icon
                                             opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                            visible: !modelData.isSteamApp
+                                            visible: (!modelData.nerdIcon || modelData.nerdIcon === "") && !modelData.isSteamApp
                                         }
 
                                         DankIcon {
@@ -583,7 +598,7 @@ Item {
                                             name: "sports_esports"
                                             color: Theme.surfaceText
                                             opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                            visible: modelData.isSteamApp
+                                            visible: (!modelData.nerdIcon || modelData.nerdIcon === "") && modelData.isSteamApp
                                         }
 
                                         MouseArea {
@@ -637,13 +652,26 @@ Item {
                                         width: 18
                                         height: 18
 
+                                        Text {
+                                            id: nerdIcon
+                                            anchors.fill: parent
+                                            text: modelData.nerdIcon || ""
+                                            font.family: "FiraCode Nerd Font"
+                                            font.pixelSize: 14
+                                            color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceText
+                                            horizontalAlignment: Text.AlignHCenter
+                                            verticalAlignment: Text.AlignVCenter
+                                            opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
+                                            visible: modelData.nerdIcon && modelData.nerdIcon !== ""
+                                        }
+
                                         IconImage {
                                             id: appIcon
                                             property var windowId: modelData.windowId
                                             anchors.fill: parent
                                             source: modelData.icon
                                             opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                            visible: !modelData.isSteamApp
+                                            visible: (!modelData.nerdIcon || modelData.nerdIcon === "") && !modelData.isSteamApp
                                         }
 
                                         DankIcon {
@@ -652,7 +680,7 @@ Item {
                                             name: "sports_esports"
                                             color: Theme.surfaceText
                                             opacity: modelData.active ? 1.0 : appMouseArea.containsMouse ? 0.8 : 0.6
-                                            visible: modelData.isSteamApp
+                                            visible: (!modelData.nerdIcon || modelData.nerdIcon === "") && modelData.isSteamApp
                                         }
 
                                         MouseArea {

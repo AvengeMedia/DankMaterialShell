@@ -268,7 +268,7 @@ sudo dnf copr enable avengemedia/danklinux && sudo dnf install quickshell-git
 ```
 
 #### 2. Install fonts
-*Inter Variable* and *Fira Code* are not strictly required, but they are the default fonts of dms.
+*Inter Variable* and *FiraCode Nerd Font* are not strictly required, but they are the default fonts of dms.
 
 #### 2.1 Install Material Symbols
 ```bash
@@ -279,10 +279,15 @@ sudo curl -L "https://github.com/google/material-design-icons/raw/master/variabl
 sudo curl -L "https://github.com/rsms/inter/raw/refs/tags/v4.1/docs/font-files/InterVariable.ttf" -o /usr/share/fonts/InterVariable.ttf
 ```
 
-#### 2.3 Install Fira Code (monospace font)
+#### 2.3 Install FiraCode Nerd Font (monospace font with icon glyphs)
 ```bash
-sudo curl -L "https://github.com/tonsky/FiraCode/releases/latest/download/FiraCode-Regular.ttf" -o /usr/share/fonts/FiraCode-Regular.ttf
+sudo curl -L "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.tar.xz" -o /tmp/FiraCode.tar.xz
+sudo mkdir -p /usr/share/fonts/nerd-fonts
+sudo tar -xJf /tmp/FiraCode.tar.xz -C /usr/share/fonts/nerd-fonts/
+rm /tmp/FiraCode.tar.xz
 ```
+
+**Note:** FiraCode Nerd Font includes the standard Fira Code font plus thousands of icon glyphs from Font Awesome, Material Design Icons, and more. This enables brand-specific application icons in the workspace indicators.
 
 #### 2.4 Refresh font cache
 ```bash

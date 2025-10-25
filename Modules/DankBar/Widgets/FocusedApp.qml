@@ -91,6 +91,7 @@ BasePill {
 
     content: Component {
         Item {
+            id: contentItem
             implicitWidth: {
                 if (!root.hasWindowsOnCurrentWorkspace) return 0
                 if (root.isVerticalOrientation) return root.widgetThickness - root.horizontalPadding * 2
@@ -100,13 +101,33 @@ BasePill {
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
             clip: false
 
+            property string nerdFontIcon: {
+                if (!activeWindow || !activeWindow.appId) return ""
+                return AppIconService.getNerdFontIcon(activeWindow.appId) || ""
+            }
+
+            Text {
+                id: nerdIcon
+                anchors.centerIn: parent
+                width: 18
+                height: 18
+                text: contentItem.nerdFontIcon
+                font.family: "FiraCode Nerd Font"
+                font.pixelSize: 14
+                color: Theme.surfaceText
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                visible: root.isVerticalOrientation && activeWindow && contentItem.nerdFontIcon !== ""
+            }
+
             IconImage {
                 id: appIcon
                 anchors.centerIn: parent
                 width: 18
                 height: 18
-                visible: root.isVerticalOrientation && activeWindow && status === Image.Ready
+                visible: root.isVerticalOrientation && activeWindow && status === Image.Ready && contentItem.nerdFontIcon === ""
                 source: {
+                    if (contentItem.nerdFontIcon !== "") return ""
                     if (!activeWindow || !activeWindow.appId) return ""
                     const moddedId = Paths.moddedAppId(activeWindow.appId)
                     if (moddedId.toLowerCase().includes("steam_app")) return ""
@@ -123,6 +144,7 @@ BasePill {
                 name: "sports_esports"
                 color: Theme.surfaceText
                 visible: {
+                    if (contentItem.nerdFontIcon !== "") return false
                     if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId) return false
                     const moddedId = Paths.moddedAppId(activeWindow.appId)
                     return moddedId.toLowerCase().includes("steam_app")
@@ -132,6 +154,7 @@ BasePill {
             Text {
                 anchors.centerIn: parent
                 visible: {
+                    if (contentItem.nerdFontIcon !== "") return false
                     if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId) return false
                     if (appIcon.status === Image.Ready) return false
                     const moddedId = Paths.moddedAppId(activeWindow.appId)

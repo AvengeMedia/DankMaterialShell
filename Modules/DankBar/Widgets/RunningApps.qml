@@ -276,7 +276,24 @@ Item {
                             }
                         }
 
-                        // App icon
+                        property string nerdFontIcon: AppIconService.getNerdFontIcon(appId) || ""
+
+                        Text {
+                            id: nerdIcon
+                            anchors.left: parent.left
+                            anchors.leftMargin: SettingsData.runningAppsCompactMode ? (parent.width - 18) / 2 : Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 18
+                            height: 18
+                            text: visualContent.nerdFontIcon
+                            font.family: "FiraCode Nerd Font"
+                            font.pixelSize: 14
+                            color: Theme.surfaceText
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            visible: visualContent.nerdFontIcon !== ""
+                        }
+
                         IconImage {
                             id: iconImg
                             anchors.left: parent.left
@@ -285,6 +302,9 @@ Item {
                             width: 18
                             height: 18
                             source: {
+                                if (visualContent.nerdFontIcon !== "") {
+                                    return ""
+                                }
                                 const moddedId = Paths.moddedAppId(appId)
                                 if (moddedId.toLowerCase().includes("steam_app")) {
                                     return ""
@@ -294,7 +314,7 @@ Item {
                             smooth: true
                             mipmap: true
                             asynchronous: true
-                            visible: status === Image.Ready
+                            visible: status === Image.Ready && visualContent.nerdFontIcon === ""
                         }
 
                         DankIcon {
@@ -305,15 +325,20 @@ Item {
                             name: "sports_esports"
                             color: Theme.surfaceText
                             visible: {
+                                if (visualContent.nerdFontIcon !== "") {
+                                    return false
+                                }
                                 const moddedId = Paths.moddedAppId(appId)
                                 return moddedId.toLowerCase().includes("steam_app")
                             }
                         }
 
-                        // Fallback text if no icon found
                         Text {
                             anchors.centerIn: parent
                             visible: {
+                                if (visualContent.nerdFontIcon !== "") {
+                                    return false
+                                }
                                 const moddedId = Paths.moddedAppId(appId)
                                 const isSteamApp = moddedId.toLowerCase().includes("steam_app")
                                 return !iconImg.visible && !isSteamApp
