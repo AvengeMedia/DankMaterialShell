@@ -263,4 +263,16 @@ Singleton {
         running: refCount > 0 && distributionSupported && (pkgManager || updChecker)
         onTriggered: checkForUpdates()
     }
+    
+    IpcHandler {
+        target: "systemupdater"
+
+        function updatestatus(): string {
+            if (root.isChecking) {
+                return "ERROR: already checking"
+            }
+            root.checkForUpdates()
+            return "SUCCESS: Now checking..."
+        }
+    }
 }

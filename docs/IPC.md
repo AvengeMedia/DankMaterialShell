@@ -407,6 +407,21 @@ dms ipc call bar hide
 dms ipc call bar status
 ```
 
+## Target: `systemupdater`
+
+System updater external check request.
+
+### Functions
+
+**`updatestatus`**
+- Trigger a system update check
+- Returns: Success confirmation
+
+### Examples
+```bash
+dms ipc call systemupdater updatestatus
+```
+
 ## Modal Controls
 
 These targets control various modal windows and overlays.
