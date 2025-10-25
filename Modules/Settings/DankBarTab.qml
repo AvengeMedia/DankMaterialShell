@@ -1781,6 +1781,9 @@ Item {
                                                   } else if (widgetId === "runningApps") {
                                                       SettingsData.setRunningAppsCompactMode(
                                                           value)
+                                                  } else if (widgetId === "keyboard_layout_name") {
+                                                      SettingsData.setKeyboardLayoutNameCompactMode(
+                                                          value)
                                                   }
                                               }
                         onControlCenterSettingChanged: (sectionId, widgetIndex, settingName, value) => {
@@ -1857,6 +1860,9 @@ Item {
                                                   } else if (widgetId === "runningApps") {
                                                       SettingsData.setRunningAppsCompactMode(
                                                           value)
+                                                  } else if (widgetId === "keyboard_layout_name") {
+                                                      SettingsData.setKeyboardLayoutNameCompactMode(
+                                                          value)
                                                   }
                                               }
                         onControlCenterSettingChanged: (sectionId, widgetIndex, settingName, value) => {
@@ -1932,6 +1938,9 @@ Item {
                                                           value)
                                                   } else if (widgetId === "runningApps") {
                                                       SettingsData.setRunningAppsCompactMode(
+                                                          value)
+                                                  } else if (widgetId === "keyboard_layout_name") {
+                                                      SettingsData.setKeyboardLayoutNameCompactMode(
                                                           value)
                                                   }
                                               }

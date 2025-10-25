@@ -11,6 +11,7 @@ import qs.Widgets
 BasePill {
     id: root
 
+    property bool compactMode: SettingsData.keyboardLayoutNameCompactMode
     property string currentLayout: ""
     property string hyprlandKeyboard: ""
 
@@ -110,8 +111,29 @@ BasePill {
                     const data = JSON.parse(output)
                     const mainKeyboard = data.keyboards.find(kb => kb.main === true)
                     root.hyprlandKeyboard = mainKeyboard.name
-                    if (mainKeyboard && mainKeyboard.active_keymap) {
-                        root.currentLayout = mainKeyboard.active_keymap
+
+                    if (mainKeyboard) {
+    					const layout = mainKeyboard.layout
+    					const variant = mainKeyboard.variant
+    					const index = mainKeyboard.active_layout_index
+
+                        if (root.compactMode && layout && variant && index !== undefined) {
+    						const layouts = mainKeyboard.layout.split(",")
+    						const variants = mainKeyboard.variant.split(",")
+    						const index = mainKeyboard.active_layout_index
+    						
+    						if (layouts[index] && variants[index] !== undefined) {
+    							if (variants[index] !== "") {
+    								root.currentLayout = layouts[index] + "-" + variants[index]
+                                } else {
+    								root.currentLayout = layouts[index]
+                                }
+                            } else {
+    							root.currentLayout = "Unknown"
+                            }
+                        } else if (mainKeyboard && mainKeyboard.active_keymap) {
+                            root.currentLayout = mainKeyboard.active_keymap
+                        } 
                     } else {
                         root.currentLayout = "Unknown"
                     }

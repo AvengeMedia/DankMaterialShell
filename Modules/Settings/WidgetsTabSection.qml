@@ -321,6 +321,7 @@ Column {
                                      || modelData.id === "music"
                                      || modelData.id === "focusedWindow"
                                      || modelData.id === "runningApps"
+									 || modelData.id === "keyboard_layout_name"
 
                             DankActionButton {
                                 id: smallSizeButton
@@ -406,6 +407,7 @@ Column {
                                 visible: modelData.id === "clock"
                                          || modelData.id === "focusedWindow"
                                          || modelData.id === "runningApps"
+										 || modelData.id === "keyboard_layout_name"
                                 iconName: {
                                     if (modelData.id === "clock")
                                         return SettingsData.clockCompactMode ? "zoom_out" : "zoom_in"
@@ -413,6 +415,8 @@ Column {
                                         return SettingsData.focusedWindowCompactMode ? "zoom_out" : "zoom_in"
                                     if (modelData.id === "runningApps")
                                         return SettingsData.runningAppsCompactMode ? "zoom_out" : "zoom_in"
+                                    if (modelData.id === "keyboard_layout_name")
+										return SettingsData.keyboardLayoutNameCompactMode ? "zoom_out" : "zoom_in"
                                     return "zoom_in"
                                 }
                                 iconSize: 16
@@ -423,6 +427,8 @@ Column {
                                         return SettingsData.focusedWindowCompactMode ? Theme.primary : Theme.outline
                                     if (modelData.id === "runningApps")
                                         return SettingsData.runningAppsCompactMode ? Theme.primary : Theme.outline
+                                    if (modelData.id === "keyboard_layout_name")
+                                        return SettingsData.keyboardLayoutNameCompactMode ? Theme.primary : Theme.outline
                                     return Theme.outline
                                 }
                                 onClicked: {
@@ -438,6 +444,10 @@ Column {
                                         root.compactModeChanged(
                                                     "runningApps",
                                                     !SettingsData.runningAppsCompactMode)
+                                    } else if (modelData.id === "keyboard_layout_name") {
+										root.compactModeChanged(
+													"keyboard_layout_name",
+													!SettingsData.keyboardLayoutNameCompactMode)
                                     }
                                 }
                                 onEntered: {
@@ -450,6 +460,8 @@ Column {
                                             tooltipText = SettingsData.focusedWindowCompactMode ? "Full Size" : "Compact"
                                         } else if (modelData.id === "runningApps") {
                                             tooltipText = SettingsData.runningAppsCompactMode ? "Full Size" : "Compact"
+                                        } else  if (modelData.id === "keyboard_layout_name") {
+                                            tooltipText = SettingsData.keyboardLayoutNameCompactMode ? "Full Size" : "Compact"
                                         }
                                         const p = compactModeButton.mapToItem(null, compactModeButton.width / 2, 0)
                                         compactTooltipLoader.item.show(tooltipText, p.x, p.y - 40, null)
