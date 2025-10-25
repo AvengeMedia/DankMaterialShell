@@ -368,7 +368,7 @@ QtObject {
                     onClose()
                 event.accepted = true
             }
-        } else if (event.key === Qt.Key_Down || event.key === 16777237) {
+        } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J || event.key === 16777237) {
             if (!keyboardNavigationActive) {
                 keyboardNavigationActive = true
                 rebuildFlatNavigation() // Ensure we have fresh navigation data
@@ -385,7 +385,7 @@ QtObject {
                 selectNext()
                 event.accepted = true
             }
-        } else if (event.key === Qt.Key_Up || event.key === 16777235) {
+        } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === 16777235) {
             if (!keyboardNavigationActive) {
                 keyboardNavigationActive = true
                 rebuildFlatNavigation() // Ensure we have fresh navigation data
