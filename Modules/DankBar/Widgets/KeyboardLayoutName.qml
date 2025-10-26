@@ -123,17 +123,19 @@ BasePill {
     						const index = mainKeyboard.active_layout_index
     						
     						if (layouts[index] && variants[index] !== undefined) {
-    							if (variants[index] !== "") {
-    								root.currentLayout = layouts[index] + "-" + variants[index]
-                                } else {
+    							if (variants[index] === "") {
     								root.currentLayout = layouts[index]
+                                } else {
+    								root.currentLayout = layouts[index] + "-" + variants[index]
                                 }
                             } else {
     							root.currentLayout = "Unknown"
                             }
                         } else if (mainKeyboard && mainKeyboard.active_keymap) {
                             root.currentLayout = mainKeyboard.active_keymap
-                        } 
+                        } else {
+                            root.currentLayout = "Unknown"
+                        }
                     } else {
                         root.currentLayout = "Unknown"
                     }
