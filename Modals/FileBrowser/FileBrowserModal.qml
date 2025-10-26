@@ -12,6 +12,12 @@ DankModal {
     id: fileBrowserModal
 
     property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+    property string docsDir: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+    property string musicDir: StandardPaths.writableLocation(StandardPaths.MusicLocation)
+    property string videosDir: StandardPaths.writableLocation(StandardPaths.MoviesLocation)
+    property string picsDir: StandardPaths.writableLocation(StandardPaths.PicturesLocation)
+    property string downloadDir: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
+    property string desktopDir: StandardPaths.writableLocation(StandardPaths.DesktopLocation)
     property string currentPath: ""
     property var fileExtensions: ["*.*"]
     property alias filterExtensions: fileBrowserModal.fileExtensions
@@ -312,27 +318,27 @@ DankModal {
             "icon": "home"
         }, {
             "name": "Documents",
-            "path": homeDir + "/Documents",
+            "path": docsDir,
             "icon": "description"
         }, {
             "name": "Downloads",
-            "path": homeDir + "/Downloads",
+            "path": downloadDir,
             "icon": "download"
         }, {
             "name": "Pictures",
-            "path": homeDir + "/Pictures",
+            "path": picsDir,
             "icon": "image"
         }, {
             "name": "Music",
-            "path": homeDir + "/Music",
+            "path": musicDir,
             "icon": "music_note"
         }, {
             "name": "Videos",
-            "path": homeDir + "/Videos",
+            "path": videosDir,
             "icon": "movie"
         }, {
             "name": "Desktop",
-            "path": homeDir + "/Desktop",
+            "path": desktopDir,
             "icon": "computer"
         }]
 
