@@ -573,6 +573,12 @@ Singleton {
     function getPluginTrigger(pluginId) {
         const plugin = getLauncherPlugin(pluginId)
         if (plugin) {
+            // Check if noTrigger is set (always active mode)
+            const noTrigger = SettingsData.getPluginSetting(pluginId, "noTrigger", false)
+            if (noTrigger) {
+                return ""
+            }
+            // Otherwise load the custom trigger, defaulting to plugin manifest trigger
             const customTrigger = SettingsData.getPluginSetting(pluginId, "trigger", plugin.trigger || "!")
             return customTrigger
         }
