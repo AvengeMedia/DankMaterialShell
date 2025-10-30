@@ -37,6 +37,7 @@ Singleton {
     signal connectionStateChanged()
 
     signal networkStateUpdate(var data)
+    signal cupsStateUpdate(var data)
     signal loginctlStateUpdate(var data)
     signal loginctlEvent(var event)
     signal capabilitiesReceived()
@@ -267,6 +268,8 @@ Singleton {
             }
         } else if (service === "bluetooth.pairing") {
             bluetoothPairingRequest(data)
+        } else if (service === "cups") {
+            cupsStateUpdate(data)
         } else if (service === "dwl") {
             dwlStateUpdate(data)
         }
