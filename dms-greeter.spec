@@ -16,6 +16,8 @@ Source0:        {{{ git_dir_pack }}}
 
 BuildRequires:  git-core
 BuildRequires:  rpkg
+# For the _tmpfilesdir macro.
+BuildRequires: systemd-rpm-macros
 
 Requires:       greetd
 Requires:       (quickshell-git or quickshell)
