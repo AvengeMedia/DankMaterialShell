@@ -150,7 +150,7 @@ chmod 755 %{buildroot}%{_bindir}/dms-greeter-sync
 install -Dm644 Modules/Greetd/README.md %{buildroot}%{_docdir}/dms-greeter/README.md
 
 # Create cache directory for greeter data
-install -dm750 %{buildroot}%{_localstatedir}/cache/dms-greeter
+install -Dpm0644 ./systemd/tmpfiles-dms-greeter.conf %{buildroot}%{_tmpfilesdir}/dms-greeter.conf
 
 # Create greeter home directory
 install -dm755 %{buildroot}%{_sharedstatedir}/greeter
@@ -181,8 +181,7 @@ fi
 %{_bindir}/dms-greeter
 %{_bindir}/dms-greeter-sync
 %{_datadir}/quickshell/dms-greeter/
-%dir %{_localstatedir}/cache/dms-greeter
-%dir %{_sharedstatedir}/greeter
+%{_tmpfilesdir}/%{name}.conf
 
 %pre
 # Create greeter user/group if they don't exist (greetd expects this)
