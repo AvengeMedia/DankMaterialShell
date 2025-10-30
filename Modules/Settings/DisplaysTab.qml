@@ -697,7 +697,7 @@ Item {
                                         text: I18n.tr("Show on Last Display")
                                         description: I18n.tr("Always show when there's only one connected display")
                                         checked: displaysTab.getShowOnLastDisplay(parent.componentId)
-                                        visible: !displaysTab.getScreenPreferences(parent.componentId).includes("all") && ["dankBar", "dock", "notifications", "osd", "toast"].includes(parent.componentId)
+                                        visible: !displaysTab.getScreenPreferences(parent.componentId).includes("all") && ["dankBar", "dock", "notifications", "osd", "toast", "notepad", "systemTray"].includes(parent.componentId)
                                         onToggled: (checked) => {
                                             displaysTab.setShowOnLastDisplay(parent.componentId, checked);
                                         }
