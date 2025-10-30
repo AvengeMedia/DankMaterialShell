@@ -181,8 +181,8 @@ fi
 %{_bindir}/dms-greeter
 %{_bindir}/dms-greeter-sync
 %{_datadir}/quickshell/dms-greeter/
-%dir %attr(0750,greeter,greeter) %{_localstatedir}/cache/dms-greeter
-%dir %attr(0755,greeter,greeter) %{_sharedstatedir}/greeter
+%dir %{_localstatedir}/cache/dms-greeter
+%dir %{_sharedstatedir}/greeter
 
 %pre
 # Create greeter user/group if they don't exist (greetd expects this)
