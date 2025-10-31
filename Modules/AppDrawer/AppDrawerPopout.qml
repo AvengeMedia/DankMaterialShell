@@ -408,7 +408,9 @@ DankPopout {
 
                                         property string iconValue: model.icon || ""
                                         property bool isMaterial: iconValue.indexOf("material:") === 0
+                                        property bool isUnicode: iconValue.indexOf("unicode:") === 0
                                         property string materialName: isMaterial ? iconValue.substring(9) : ""
+                                        property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
 
                                         DankIcon {
                                             anchors.centerIn: parent
@@ -418,15 +420,23 @@ DankPopout {
                                             visible: parent.isMaterial
                                         }
 
+                                        StyledText {
+                                            anchors.centerIn: parent
+                                            text: parent.unicodeChar
+                                            font.pixelSize: appList.iconSize * 0.7
+                                            color: Theme.surfaceText
+                                            visible: parent.isUnicode
+                                        }
+
                                         IconImage {
                                             id: listIconImg
 
                                             anchors.fill: parent
                                             anchors.margins: Theme.spacingXS
-                                            source: parent.isMaterial ? "" : Quickshell.iconPath(parent.iconValue, true)
+                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
                                             smooth: true
                                             asynchronous: true
-                                            visible: !parent.isMaterial && status === Image.Ready
+                                            visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
                                         }
 
                                         Rectangle {
@@ -434,7 +444,7 @@ DankPopout {
                                             anchors.leftMargin: Theme.spacingS
                                             anchors.rightMargin: Theme.spacingS
                                             anchors.bottomMargin: Theme.spacingM
-                                            visible: !parent.isMaterial && listIconImg.status !== Image.Ready
+                                            visible: !parent.isMaterial && !parent.isUnicode && listIconImg.status !== Image.Ready
                                             color: Theme.surfaceLight
                                             radius: Theme.cornerRadius
                                             border.width: 0
@@ -597,7 +607,9 @@ DankPopout {
 
                                         property string iconValue: model.icon || ""
                                         property bool isMaterial: iconValue.indexOf("material:") === 0
+                                        property bool isUnicode: iconValue.indexOf("unicode:") === 0
                                         property string materialName: isMaterial ? iconValue.substring(9) : ""
+                                        property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
 
                                         DankIcon {
                                             anchors.centerIn: parent
@@ -607,6 +619,14 @@ DankPopout {
                                             visible: parent.isMaterial
                                         }
 
+                                        StyledText {
+                                            anchors.centerIn: parent
+                                            text: parent.unicodeChar
+                                            font.pixelSize: parent.iconSize * 0.8
+                                            color: Theme.surfaceText
+                                            visible: parent.isUnicode
+                                        }
+
                                         IconImage {
                                             id: gridIconImg
 
@@ -614,10 +634,10 @@ DankPopout {
                             anchors.leftMargin: Theme.spacingS
                             anchors.rightMargin: Theme.spacingS
                             anchors.bottomMargin: Theme.spacingS
-                                            source: parent.isMaterial ? "" : Quickshell.iconPath(parent.iconValue, true)
+                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
                                             smooth: true
                                             asynchronous: true
-                                            visible: !parent.isMaterial && status === Image.Ready
+                                            visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
                                         }
 
                                         Rectangle {
@@ -625,7 +645,7 @@ DankPopout {
                             anchors.leftMargin: Theme.spacingS
                             anchors.rightMargin: Theme.spacingS
                             anchors.bottomMargin: Theme.spacingS
-                                            visible: !parent.isMaterial && gridIconImg.status !== Image.Ready
+                                            visible: !parent.isMaterial && !parent.isUnicode && gridIconImg.status !== Image.Ready
                                             color: Theme.surfaceLight
                                             radius: Theme.cornerRadius
                                             border.width: 0

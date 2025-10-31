@@ -92,7 +92,9 @@ Rectangle {
 
                     property string iconValue: model.icon || ""
                     property bool isMaterial: iconValue.indexOf("material:") === 0
+                    property bool isUnicode: iconValue.indexOf("unicode:") === 0
                     property string materialName: isMaterial ? iconValue.substring(9) : ""
+                    property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -102,18 +104,26 @@ Rectangle {
                         visible: parent.isMaterial
                     }
 
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: parent.unicodeChar
+                        font.pixelSize: resultsList.iconSize * 0.8
+                        color: Theme.surfaceText
+                        visible: parent.isUnicode
+                    }
+
                     IconImage {
                         id: listIconImg
 
                         anchors.fill: parent
-                        source: parent.isMaterial ? "" : Quickshell.iconPath(parent.iconValue, true)
+                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
                         asynchronous: true
-                        visible: !parent.isMaterial && status === Image.Ready
+                        visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
                     }
 
                     Rectangle {
                         anchors.fill: parent
-                        visible: !parent.isMaterial && !listIconImg.visible
+                        visible: !parent.isMaterial && !parent.isUnicode && !listIconImg.visible
                         color: Theme.surfaceLight
                         radius: Theme.cornerRadius
                         border.width: 1
@@ -270,7 +280,9 @@ Rectangle {
 
                     property string iconValue: model.icon || ""
                     property bool isMaterial: iconValue.indexOf("material:") === 0
+                    property bool isUnicode: iconValue.indexOf("unicode:") === 0
                     property string materialName: isMaterial ? iconValue.substring(9) : ""
+                    property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -280,19 +292,27 @@ Rectangle {
                         visible: parent.isMaterial
                     }
 
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: parent.unicodeChar
+                        font.pixelSize: parent.iconSize * 0.8
+                        color: Theme.surfaceText
+                        visible: parent.isUnicode
+                    }
+
                     IconImage {
                         id: gridIconImg
 
                         anchors.fill: parent
-                        source: parent.isMaterial ? "" : Quickshell.iconPath(parent.iconValue, true)
+                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
                         smooth: true
                         asynchronous: true
-                        visible: !parent.isMaterial && status === Image.Ready
+                        visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
                     }
 
                     Rectangle {
                         anchors.fill: parent
-                        visible: !parent.isMaterial && !gridIconImg.visible
+                        visible: !parent.isMaterial && !parent.isUnicode && !gridIconImg.visible
                         color: Theme.surfaceLight
                         radius: Theme.cornerRadius
                         border.width: 1

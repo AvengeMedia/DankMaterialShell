@@ -46,6 +46,13 @@ Item {
                 categories: ["LauncherExample"]
             },
             {
+                name: "Unicode Icon Example",
+                icon: "unicode:🚀",
+                comment: "Demonstrates unicode/emoji icon support",
+                action: "toast:Unicode icons work great!",
+                categories: ["LauncherExample"]
+            },
+            {
                 name: "Example Copy Action",
                 icon: "material:content_copy",
                 comment: "Demonstrates copying text to clipboard",

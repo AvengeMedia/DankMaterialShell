@@ -1228,7 +1228,7 @@ Each item returned by `getItems()` must include:
 
 ### Icon Types
 
-The `icon` field supports three formats:
+The `icon` field supports four formats:
 
 **1. Material Design Icons** - Use the `material:` prefix:
 ```javascript
@@ -1242,7 +1242,19 @@ The `icon` field supports three formats:
 ```
 Available icons: Any icon from Material Symbols font (e.g., `lightbulb`, `star`, `favorite`, `settings`, `terminal`, `translate`, `sentiment_satisfied`)
 
-**2. Desktop Theme Icons** - Use icon name directly:
+**2. Unicode/Emoji Icons** - Use the `unicode:` prefix:
+```javascript
+{
+    name: "Grinning Face",
+    icon: "unicode:😀",  // Unicode character or emoji
+    comment: "Copy emoji to clipboard",
+    action: "copy:😀",
+    categories: ["MyPlugin"]
+}
+```
+Display any Unicode character or emoji as the icon. The character is rendered at 70-80% of the icon size with proper theming. Perfect for emoji pickers, symbol selectors, or character libraries.
+
+**3. Desktop Theme Icons** - Use icon name directly:
 ```javascript
 {
     name: "Firefox",
@@ -1254,7 +1266,7 @@ Available icons: Any icon from Material Symbols font (e.g., `lightbulb`, `star`,
 ```
 Uses the user's installed icon theme. Common examples: `firefox`, `chrome`, `folder`, `text-editor`
 
-**3. No Icon** - Omit the `icon` field entirely:
+**4. No Icon** - Omit the `icon` field entirely:
 ```javascript
 {
     name: "😀  Grinning Face",
@@ -1264,7 +1276,7 @@ Uses the user's installed icon theme. Common examples: `firefox`, `chrome`, `fol
     categories: ["MyPlugin"]
 }
 ```
-When `icon` is omitted, the launcher hides the icon area and displays only the text, giving full width to the item name. Perfect for emoji pickers or text-only items.
+When `icon` is omitted, the launcher hides the icon area and displays only the text, giving full width to the item name. Useful when you want emojis or symbols to be part of the item name itself.
 
 ### Trigger System
 

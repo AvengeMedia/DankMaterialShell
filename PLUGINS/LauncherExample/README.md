@@ -97,7 +97,7 @@ function executeItem(item): void
 
 **Icon Types**:
 
-The `icon` field supports three formats:
+The `icon` field supports four formats:
 
 1. **Material Design Icons** - Use `material:` prefix:
    ```javascript
@@ -105,13 +105,19 @@ The `icon` field supports three formats:
    ```
    Examples: `material:star`, `material:favorite`, `material:settings`
 
-2. **Desktop Theme Icons** - Use icon name directly:
+2. **Unicode/Emoji Icons** - Use `unicode:` prefix:
+   ```javascript
+   icon: "unicode:🚀"  // Unicode character or emoji
+   ```
+   Display any Unicode character or emoji as the icon. Examples: `unicode:😀`, `unicode:⚡`, `unicode:🎨`
+
+3. **Desktop Theme Icons** - Use icon name directly:
    ```javascript
    icon: "firefox"  // Uses system icon theme
    ```
    Examples: `firefox`, `chrome`, `folder`, `text-editor`
 
-3. **No Icon** - Omit the `icon` field entirely:
+4. **No Icon** - Omit the `icon` field entirely:
    ```javascript
    {
        name: "😀  Grinning Face",
@@ -121,7 +127,7 @@ The `icon` field supports three formats:
        categories: ["MyPlugin"]
    }
    ```
-   Perfect for emoji pickers or text-only items where the icon area should be hidden
+   When icon is omitted, the launcher hides the icon area and displays only text
 
 **Action Format**: `type:data` where:
 - `type` - Action handler (toast, copy, script, etc.)
