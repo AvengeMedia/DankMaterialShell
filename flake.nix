@@ -25,9 +25,9 @@
             ["aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux"]
             (system: fn system nixpkgs.legacyPackages.${system});
         buildDmsPkgs = pkgs: {
-            dmsCli = dms-cli.packages.${pkgs.system}.default;
-            dgop = dgop.packages.${pkgs.system}.dgop;
-            dankMaterialShell = self.packages.${pkgs.system}.dankMaterialShell;
+            dmsCli = dms-cli.packages.${pkgs.stdenv.hostPlatform.system}.default;
+            dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
+            dankMaterialShell = self.packages.${pkgs.stdenv.hostPlatform.system}.dankMaterialShell;
         };
     in {
         formatter = forEachSystem (_: pkgs: pkgs.alejandra);
