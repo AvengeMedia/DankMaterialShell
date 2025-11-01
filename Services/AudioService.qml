@@ -7,6 +7,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
+import QtMultimedia
 import qs.Common
 
 Singleton {
@@ -29,6 +30,21 @@ Singleton {
     property var criticalNotificationSound: null
 
     signal micMuteChanged
+
+    MediaDevices {
+        id: mediaDevices
+    }
+
+    Connections {
+        target: mediaDevices
+        function onDefaultAudioOutputChanged() {
+            if (soundsAvailable) {
+                console.log("AudioService: Default audio output changed, recreating sound players")
+                destroySoundPlayers()
+                createSoundPlayers()
+            }
+        }
+    }
 
     Timer {
         id: startupTimer
@@ -270,55 +286,11 @@ Singleton {
         }
 
         try {
-            const volumeChangePath = getSoundPath("audio-volume-change")
-            volumeChangeSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${volumeChangePath}"
-                    audioOutput: AudioOutput { volume: 1.0 }
-                }
-            `, root, "AudioService.VolumeChangeSound")
-
-            const powerPlugPath = getSoundPath("power-plug")
-            powerPlugSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${powerPlugPath}"
-                    audioOutput: AudioOutput { volume: 1.0 }
-                }
-            `, root, "AudioService.PowerPlugSound")
-
-            const powerUnplugPath = getSoundPath("power-unplug")
-            powerUnplugSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${powerUnplugPath}"
-                    audioOutput: AudioOutput { volume: 1.0 }
-                }
-            `, root, "AudioService.PowerUnplugSound")
-
-            const messagePath = getSoundPath("message")
-            normalNotificationSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${messagePath}"
-                    audioOutput: AudioOutput { volume: 1.0 }
-                }
-            `, root, "AudioService.NormalNotificationSound")
-
-            const messageNewInstantPath = getSoundPath("message-new-instant")
-            criticalNotificationSound = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                MediaPlayer {
-                    source: "${messageNewInstantPath}"
-                    audioOutput: AudioOutput { volume: 1.0 }
-                }
-            `, root, "AudioService.CriticalNotificationSound")
+            volumeChangeSound = volumeChangeSoundComponent.createObject(root)
+            powerPlugSound = powerPlugSoundComponent.createObject(root)
+            powerUnplugSound = powerUnplugSoundComponent.createObject(root)
+            normalNotificationSound = normalNotificationSoundComponent.createObject(root)
+            criticalNotificationSound = criticalNotificationSoundComponent.createObject(root)
         } catch (e) {
             console.warn("AudioService: Error creating sound players:", e)
         }
@@ -560,6 +532,61 @@ Singleton {
             }
 
             return result
+        }
+    }
+
+    Component {
+        id: volumeChangeSoundComponent
+        MediaPlayer {
+            source: getSoundPath("audio-volume-change")
+            audioOutput: AudioOutput {
+                device: mediaDevices.defaultAudioOutput
+                volume: 1.0
+            }
+        }
+    }
+
+    Component {
+        id: powerPlugSoundComponent
+        MediaPlayer {
+            source: getSoundPath("power-plug")
+            audioOutput: AudioOutput {
+                device: mediaDevices.defaultAudioOutput
+                volume: 1.0
+            }
+        }
+    }
+
+    Component {
+        id: powerUnplugSoundComponent
+        MediaPlayer {
+            source: getSoundPath("power-unplug")
+            audioOutput: AudioOutput {
+                device: mediaDevices.defaultAudioOutput
+                volume: 1.0
+            }
+        }
+    }
+
+    Component {
+        id: normalNotificationSoundComponent
+        MediaPlayer {
+            source: getSoundPath("message")
+            audioOutput: AudioOutput {
+                device: mediaDevices.defaultAudioOutput
+                volume: 1.0
+            }
+        }
+    }
+
+    Component {
+        id: criticalNotificationSoundComponent
+        MediaPlayer {
+            source: getSoundPath("message-new-instant")
+            audioOutput: AudioOutput {
+                device: mediaDevices.defaultAudioOutput
+                volume: 1.0
+            }
         }
     }
 
