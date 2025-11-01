@@ -130,26 +130,9 @@ Item {
                             CachingImage {
                                 anchors.fill: parent
                                 anchors.margins: 1
-                                property var weExtensions: [".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tga"]
-                                property int weExtIndex: 0
                                 source: {
                                     var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                    if (currentWallpaper && currentWallpaper.startsWith("we:")) {
-                                        var sceneId = currentWallpaper.substring(3)
-                                        return StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.local/share/Steam/steamapps/workshop/content/431960/" + sceneId + "/preview" + weExtensions[weExtIndex]
-                                    }
                                     return (currentWallpaper !== "" && !currentWallpaper.startsWith("#")) ? "file://" + currentWallpaper : ""
-                                }
-                                onStatusChanged: {
-                                    var currentWallpaper = SessionData.perMonitorWallpaper ? SessionData.getMonitorWallpaper(selectedMonitorName) : SessionData.wallpaperPath
-                                    if (currentWallpaper && currentWallpaper.startsWith("we:") && status === Image.Error) {
-                                        if (weExtIndex < weExtensions.length - 1) {
-                                            weExtIndex++
-                                            source = StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/.local/share/Steam/steamapps/workshop/content/431960/" + currentWallpaper.substring(3) + "/preview" + weExtensions[weExtIndex]
-                                        } else {
-                                            visible = false
-                                        }
-                                    }
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 visible: {

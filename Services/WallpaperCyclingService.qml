@@ -123,7 +123,7 @@ Singleton {
             var settings = SessionData.getMonitorCyclingSettings(screenName)
             var wallpaper = SessionData.getMonitorWallpaper(screenName)
 
-            if (settings.enabled && wallpaper && !wallpaper.startsWith("#") && !wallpaper.startsWith("we:")) {
+            if (settings.enabled && wallpaper && !wallpaper.startsWith("#")) {
                 startMonitorCycling(screenName, settings)
             } else {
                 stopMonitorCycling(screenName)
@@ -330,7 +330,7 @@ Singleton {
             var settings = SessionData.getMonitorCyclingSettings(screenName)
             var wallpaper = SessionData.getMonitorWallpaper(screenName)
 
-            if (settings.enabled && settings.mode === "time" && wallpaper && !wallpaper.startsWith("#") && !wallpaper.startsWith("we:")) {
+            if (settings.enabled && settings.mode === "time" && wallpaper && !wallpaper.startsWith("#")) {
                 var lastCheck = monitorLastTimeChecks[screenName] || ""
 
                 if (currentTime === settings.time && currentTime !== lastCheck) {

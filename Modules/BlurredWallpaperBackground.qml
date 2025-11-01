@@ -76,11 +76,6 @@ Variants {
                 }
             }
 
-            WallpaperEngineProc {
-                id: weProc
-                monitor: modelData.name
-            }
-
             Component.onCompleted: {
                 if (source) {
                     const formattedSource = source.startsWith("file://") ? source : "file://" + source
@@ -89,34 +84,23 @@ Variants {
                 isInitialized = true
             }
 
-            Component.onDestruction: {
-                weProc.stop()
-            }
-
             property bool isInitialized: false
             property real transitionProgress: 0
             readonly property bool transitioning: transitionAnimation.running
 
             onSourceChanged: {
-                const isWE = source.startsWith("we:")
                 const isColor = source.startsWith("#")
 
-                if (isWE) {
+                if (!source) {
                     setWallpaperImmediate("")
-                    weProc.start(source.substring(3))
+                } else if (isColor) {
+                    setWallpaperImmediate("")
                 } else {
-                    weProc.stop()
-                    if (!source) {
-                        setWallpaperImmediate("")
-                    } else if (isColor) {
-                        setWallpaperImmediate("")
+                    if (!isInitialized || !currentWallpaper.source) {
+                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
+                        isInitialized = true
                     } else {
-                        if (!isInitialized || !currentWallpaper.source) {
-                            setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
-                            isInitialized = true
-                        } else {
-                            changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
-                        }
+                        changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
                     }
                 }
             }

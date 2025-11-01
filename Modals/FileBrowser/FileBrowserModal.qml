@@ -39,9 +39,6 @@ DankModal {
     property bool selectedFileIsDir: false
     property bool showOverwriteConfirmation: false
     property string pendingFilePath: ""
-    property bool weAvailable: false
-    property string wePath: ""
-    property bool weMode: false
     property var parentModal: null
     property bool showSidebar: true
     property string viewMode: "grid"
@@ -220,22 +217,6 @@ DankModal {
             StandardPaths.HomeLocation) + "/snap/steam/common/.local/share/Steam/steamapps/workshop/content/431960"]
     property int currentPathIndex: 0
 
-    function discoverWallpaperEngine() {
-        currentPathIndex = 0
-        checkNextPath()
-    }
-
-    function checkNextPath() {
-        if (currentPathIndex >= steamPaths.length) {
-            return
-        }
-
-        const wePath = steamPaths[currentPathIndex]
-        const cleanPath = wePath.replace(/^file:\/\//, '')
-        weDiscoveryProcess.command = ["test", "-d", cleanPath]
-        weDiscoveryProcess.wePath = wePath
-        weDiscoveryProcess.running = true
-    }
     width: 800
     height: 600
     enableShadow: true
@@ -266,9 +247,6 @@ DankModal {
             selectedIndex = -1
             keyboardNavigationActive = false
             backButtonFocused = false
-            if (browserType === "wallpaper" && !weAvailable) {
-                discoverWallpaperEngine()
-            }
         }
     }
     onCurrentPathChanged: {
@@ -572,23 +550,6 @@ DankModal {
         }
     }
 
-    Process {
-        id: weDiscoveryProcess
-
-        property string wePath: ""
-        running: false
-
-        onExited: exitCode => {
-                      if (exitCode === 0) {
-                          fileBrowserModal.weAvailable = true
-                          fileBrowserModal.wePath = wePath
-                      } else {
-                          currentPathIndex++
-                          checkNextPath()
-                      }
-                  }
-    }
-
     content: Component {
         Item {
             anchors.fill: parent
@@ -644,7 +605,6 @@ DankModal {
                             iconName: showHiddenFiles ? "visibility_off" : "visibility"
                             iconSize: Theme.iconSize - 4
                             iconColor: showHiddenFiles ? Theme.primary : Theme.surfaceText
-                            visible: !weMode
                             onClicked: showHiddenFiles = !showHiddenFiles
                         }
 
@@ -653,7 +613,6 @@ DankModal {
                             iconName: viewMode === "grid" ? "view_list" : "grid_view"
                             iconSize: Theme.iconSize - 4
                             iconColor: Theme.surfaceText
-                            visible: !weMode
                             onClicked: viewMode = viewMode === "grid" ? "list" : "grid"
                         }
 
@@ -662,24 +621,8 @@ DankModal {
                             iconName: iconSizeIndex === 0 ? "photo_size_select_small" : iconSizeIndex === 1 ? "photo_size_select_large" : iconSizeIndex === 2 ? "photo_size_select_actual" : "zoom_in"
                             iconSize: Theme.iconSize - 4
                             iconColor: Theme.surfaceText
-                            visible: !weMode && viewMode === "grid"
+                            visible: viewMode === "grid"
                             onClicked: iconSizeIndex = (iconSizeIndex + 1) % iconSizes.length
-                        }
-
-                        DankActionButton {
-                            circular: false
-                            iconName: "movie"
-                            iconSize: Theme.iconSize - 4
-                            iconColor: weMode ? Theme.primary : Theme.surfaceText
-                            visible: weAvailable && browserType === "wallpaper"
-                            onClicked: {
-                                weMode = !weMode
-                                if (weMode) {
-                                    navigateTo(wePath)
-                                } else {
-                                    navigateTo(getLastPath())
-                                }
-                            }
                         }
 
                         DankActionButton {
@@ -769,8 +712,8 @@ DankModal {
                                 height: parent.height - 41
                                 clip: true
 
-                                property real gridCellWidth: weMode ? 255 : iconSizes[iconSizeIndex] + 24
-                                property real gridCellHeight: weMode ? 215 : iconSizes[iconSizeIndex] + 56
+                                property real gridCellWidth: iconSizes[iconSizeIndex] + 24
+                                property real gridCellHeight: iconSizes[iconSizeIndex] + 56
                                 property real availableGridWidth: width - Theme.spacingM * 2
                                 property int gridColumns: Math.max(1, Math.floor(availableGridWidth / gridCellWidth))
                                 property real gridLeftMargin: Theme.spacingM + Math.max(0, (availableGridWidth - (gridColumns * gridCellWidth)) / 2)
@@ -809,7 +752,6 @@ DankModal {
                                     }
 
                                     delegate: FileBrowserGridDelegate {
-                                        weMode: fileBrowserModal.weMode
                                         iconSizes: fileBrowserModal.iconSizes
                                         iconSizeIndex: fileBrowserModal.iconSizeIndex
                                         selectedIndex: fileBrowserModal.selectedIndex
@@ -817,11 +759,7 @@ DankModal {
                                         onItemClicked: (index, path, name, isDir) => {
                                                            selectedIndex = index
                                                            setSelectedFileData(path, name, isDir)
-                                                           if (weMode && isDir) {
-                                                               var sceneId = path.split("/").pop()
-                                                               fileSelected("we:" + sceneId)
-                                                               fileBrowserModal.close()
-                                                           } else if (isDir) {
+                                                           if (isDir) {
                                                                navigateTo(path)
                                                            } else {
                                                                fileSelected(path)
@@ -838,11 +776,7 @@ DankModal {
                                                     fileBrowserModal.keyboardSelectionRequested = false
                                                     selectedIndex = index
                                                     setSelectedFileData(filePath, fileName, fileIsDir)
-                                                    if (weMode && fileIsDir) {
-                                                        var sceneId = filePath.split("/").pop()
-                                                        fileSelected("we:" + sceneId)
-                                                        fileBrowserModal.close()
-                                                    } else if (fileIsDir) {
+                                                    if (fileIsDir) {
                                                         navigateTo(filePath)
                                                     } else {
                                                         fileSelected(filePath)

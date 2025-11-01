@@ -202,7 +202,7 @@ Item {
     function loadWallpaperDirectory() {
         const currentWallpaper = getCurrentWallpaper()
 
-        if (!currentWallpaper || currentWallpaper.startsWith("#") || currentWallpaper.startsWith("we:")) {
+        if (!currentWallpaper || currentWallpaper.startsWith("#")) {
             if (CacheData.wallpaperLastPath && CacheData.wallpaperLastPath !== "") {
                 wallpaperDir = CacheData.wallpaperLastPath
             } else {
