@@ -43,23 +43,11 @@ Singleton {
             var screens = Quickshell.screens
             if (screens.length > 0) {
                 var firstMonitorWallpaper = SessionData.getMonitorWallpaper(screens[0].name)
-                var wallpaperPath = firstMonitorWallpaper || SessionData.wallpaperPath
-
-                if (wallpaperPath && wallpaperPath.startsWith("we:")) {
-                    return stateDir + "/we_screenshots/" + wallpaperPath.substring(3) + ".jpg"
-                }
-
-                return wallpaperPath
+                return firstMonitorWallpaper || SessionData.wallpaperPath
             }
         }
 
-        var wallpaperPath = SessionData.wallpaperPath
-        var screens = Quickshell.screens
-        if (screens.length > 0 && wallpaperPath && wallpaperPath.startsWith("we:")) {
-            return stateDir + "/we_screenshots/" + wallpaperPath.substring(3) + ".jpg"
-        }
-
-        return wallpaperPath
+        return SessionData.wallpaperPath
     }
     readonly property string rawWallpaperPath: {
         if (typeof SessionData === "undefined")
@@ -112,11 +100,10 @@ Singleton {
                                 const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode)
                                 const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default"
                                 const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
-                                const effectivePath = rawWallpaperPath.startsWith("we:") ? (stateDir + "/we_screenshots/" + rawWallpaperPath.substring(3) + ".jpg") : rawWallpaperPath
-                                if (effectivePath.startsWith("#")) {
-                                    setDesiredTheme("hex", effectivePath, isLight, iconTheme, selectedMatugenType)
+                                if (rawWallpaperPath.startsWith("#")) {
+                                    setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
                                 } else {
-                                    setDesiredTheme("image", effectivePath, isLight, iconTheme, selectedMatugenType)
+                                    setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
                                 }
                                 return
                             }
@@ -127,11 +114,10 @@ Singleton {
                             if (currentTheme === dynamic) {
                                 if (rawWallpaperPath) {
                                     const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
-                                    const effectivePath = rawWallpaperPath.startsWith("we:") ? (stateDir + "/we_screenshots/" + rawWallpaperPath.substring(3) + ".jpg") : rawWallpaperPath
-                                    if (effectivePath.startsWith("#")) {
-                                        setDesiredTheme("hex", effectivePath, isLight, iconTheme, selectedMatugenType)
+                                    if (rawWallpaperPath.startsWith("#")) {
+                                        setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
                                     } else {
-                                        setDesiredTheme("image", effectivePath, isLight, iconTheme, selectedMatugenType)
+                                        setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
                                     }
                                 }
                             } else {
@@ -813,13 +799,8 @@ Singleton {
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`])
         workerRunning = true
         const syncModeWithPortal = (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal) ? "true" : "false"
-        if (rawWallpaperPath.startsWith("we:")) {
-            console.log("Theme: Starting matugen worker (WE wallpaper, waiting for screenshot)")
-            systemThemeGenerator.command = ["sh", "-c", `sleep 3 && ${shellDir}/scripts/matugen-worker.sh '${stateDir}' '${shellDir}' '${configDir}' '${syncModeWithPortal}' --run`]
-        } else {
-            console.log("Theme: Starting matugen worker")
-            systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, "--run"]
-        }
+        console.log("Theme: Starting matugen worker")
+        systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, "--run"]
         systemThemeGenerator.running = true
     }
 
@@ -836,11 +817,10 @@ Singleton {
                 return
             }
             const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot"
-            const effectivePath = rawWallpaperPath.startsWith("we:") ? (stateDir + "/we_screenshots/" + rawWallpaperPath.substring(3) + ".jpg") : rawWallpaperPath
-            if (effectivePath.startsWith("#")) {
-                setDesiredTheme("hex", effectivePath, isLight, iconTheme, selectedMatugenType)
+            if (rawWallpaperPath.startsWith("#")) {
+                setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
             } else {
-                setDesiredTheme("image", effectivePath, isLight, iconTheme, selectedMatugenType)
+                setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType)
             }
         } else {
             let primaryColor
