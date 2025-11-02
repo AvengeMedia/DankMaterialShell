@@ -120,5 +120,7 @@ void main() {
     // Mix the textures (factor = 0 inside disc, 1 outside)
     fragColor = mix(color2, color1, factor);
     
+    if (ubuf.progress <= 0.0) fragColor = color1;
+
     fragColor *= ubuf.qt_Opacity;
 }
