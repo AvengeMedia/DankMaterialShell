@@ -83,7 +83,21 @@ Singleton {
             if (content && content.trim()) {
                 var settings = JSON.parse(content)
                 isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
-                wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : ""
+
+                if (settings.wallpaperPath && settings.wallpaperPath.startsWith("we:")) {
+                    console.warn("WallpaperEngine wallpaper detected, resetting wallpaper")
+                    wallpaperPath = ""
+                    Quickshell.execDetached([
+                        "notify-send",
+                        "-u", "critical",
+                        "-a", "DMS",
+                        "-i", "dialog-warning",
+                        "WallpaperEngine Support Moved",
+                        "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."
+                    ])
+                } else {
+                    wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : ""
+                }
                 perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false
                 monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {}
                 perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false
