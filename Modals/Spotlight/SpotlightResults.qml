@@ -84,59 +84,16 @@ Rectangle {
                 anchors.margins: Theme.spacingM
                 spacing: Theme.spacingL
 
-                Item {
+                AppIconRenderer {
                     width: resultsList.iconSize
                     height: resultsList.iconSize
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: model.icon !== undefined && model.icon !== ""
-
-                    property string iconValue: model.icon || ""
-                    property bool isMaterial: iconValue.indexOf("material:") === 0
-                    property bool isUnicode: iconValue.indexOf("unicode:") === 0
-                    property string materialName: isMaterial ? iconValue.substring(9) : ""
-                    property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: parent.materialName
-                        size: resultsList.iconSize
-                        color: Theme.surfaceText
-                        visible: parent.isMaterial
-                    }
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        text: parent.unicodeChar
-                        font.pixelSize: resultsList.iconSize * 0.8
-                        color: Theme.surfaceText
-                        visible: parent.isUnicode
-                    }
-
-                    IconImage {
-                        id: listIconImg
-
-                        anchors.fill: parent
-                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
-                        asynchronous: true
-                        visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        visible: !parent.isMaterial && !parent.isUnicode && !listIconImg.visible
-                        color: Theme.surfaceLight
-                        radius: Theme.cornerRadius
-                        border.width: 1
-                        border.color: Theme.primarySelected
-
-                        StyledText {
-                            anchors.centerIn: parent
-                            text: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
-                            font.pixelSize: resultsList.iconSize * 0.4
-                            color: Theme.primary
-                            font.weight: Font.Bold
-                        }
-                    }
+                    iconValue: model.icon || ""
+                    iconSize: resultsList.iconSize
+                    fallbackText: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
+                    materialIconSizeAdjustment: 0
+                    unicodeIconScale: 0.8
+                    iconMargins: 0
                 }
 
                 Column {
@@ -270,62 +227,19 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: Theme.spacingS
 
-                Item {
-                    property int iconSize: Math.min(resultsGrid.maxIconSize, Math.max(resultsGrid.minIconSize, resultsGrid.cellWidth * resultsGrid.iconSizeRatio))
+                AppIconRenderer {
+                    property int computedIconSize: Math.min(resultsGrid.maxIconSize, Math.max(resultsGrid.minIconSize, resultsGrid.cellWidth * resultsGrid.iconSizeRatio))
 
-                    width: iconSize
-                    height: iconSize
+                    width: computedIconSize
+                    height: computedIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: model.icon !== undefined && model.icon !== ""
-
-                    property string iconValue: model.icon || ""
-                    property bool isMaterial: iconValue.indexOf("material:") === 0
-                    property bool isUnicode: iconValue.indexOf("unicode:") === 0
-                    property string materialName: isMaterial ? iconValue.substring(9) : ""
-                    property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
-
-                    DankIcon {
-                        anchors.centerIn: parent
-                        name: parent.materialName
-                        size: parent.iconSize
-                        color: Theme.surfaceText
-                        visible: parent.isMaterial
-                    }
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        text: parent.unicodeChar
-                        font.pixelSize: parent.iconSize * 0.8
-                        color: Theme.surfaceText
-                        visible: parent.isUnicode
-                    }
-
-                    IconImage {
-                        id: gridIconImg
-
-                        anchors.fill: parent
-                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
-                        smooth: true
-                        asynchronous: true
-                        visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        visible: !parent.isMaterial && !parent.isUnicode && !gridIconImg.visible
-                        color: Theme.surfaceLight
-                        radius: Theme.cornerRadius
-                        border.width: 1
-                        border.color: Theme.primarySelected
-
-                        StyledText {
-                            anchors.centerIn: parent
-                            text: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
-                            font.pixelSize: Math.min(28, parent.width * 0.5)
-                            color: Theme.primary
-                            font.weight: Font.Bold
-                        }
-                    }
+                    iconValue: model.icon || ""
+                    iconSize: computedIconSize
+                    fallbackText: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
+                    materialIconSizeAdjustment: 0
+                    unicodeIconScale: 0.8
+                    fallbackTextScale: Math.min(28, computedIconSize * 0.5) / computedIconSize
+                    iconMargins: 0
                 }
 
                 StyledText {
