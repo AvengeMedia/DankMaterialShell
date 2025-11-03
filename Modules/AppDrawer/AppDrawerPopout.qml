@@ -389,86 +389,27 @@ DankPopout {
                                 appLauncher.keyboardNavigationActive = false
                             }
 
-                            delegate: Rectangle {
-                                width: ListView.view.width
-                                height: appList.itemHeight
-                                radius: Theme.cornerRadius
-                                color: ListView.isCurrentItem ? Theme.primaryPressed : listMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
-
-                                Row {
-                                    anchors.fill: parent
-                                    anchors.margins: Theme.spacingM
-                                    spacing: Theme.spacingL
-
-                                    AppIconRenderer {
-                                        width: appList.iconSize
-                                        height: appList.iconSize
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        iconValue: model.icon || ""
-                                        iconSize: appList.iconSize
-                                        fallbackText: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
-                                        iconMargins: Theme.spacingXS
-                                        fallbackLeftMargin: Theme.spacingS
-                                        fallbackRightMargin: Theme.spacingS
-                                        fallbackBottomMargin: Theme.spacingM
-                                    }
-
-                                    Column {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: (model.icon !== undefined && model.icon !== "") ? (parent.width - appList.iconSize - Theme.spacingL) : parent.width
-                                        spacing: Theme.spacingXS
-
-                                        StyledText {
-                                            width: parent.width
-                                            text: model.name || ""
-                                            font.pixelSize: Theme.fontSizeLarge
-                                            color: Theme.surfaceText
-                                            font.weight: Font.Medium
-                                            elide: Text.ElideRight
-                                            wrapMode: Text.NoWrap
-                                            maximumLineCount: 1
-                                        }
-
-                                        StyledText {
-                                            width: parent.width
-                                            text: model.comment || "Application"
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            color: Theme.surfaceVariantText
-                                            elide: Text.ElideRight
-                                            maximumLineCount: 1
-                                            visible: appList.showDescription && model.comment && model.comment.length > 0
-                                        }
-                                    }
+                            delegate: AppLauncherListDelegate {
+                                listView: appList
+                                itemHeight: appList.itemHeight
+                                iconSize: appList.iconSize
+                                showDescription: appList.showDescription
+                                hoverUpdatesSelection: appList.hoverUpdatesSelection
+                                keyboardNavigationActive: appList.keyboardNavigationActive
+                                isCurrentItem: ListView.isCurrentItem
+                                mouseAreaLeftMargin: Theme.spacingS
+                                mouseAreaRightMargin: Theme.spacingS
+                                mouseAreaBottomMargin: Theme.spacingM
+                                iconMargins: Theme.spacingXS
+                                iconFallbackLeftMargin: Theme.spacingS
+                                iconFallbackRightMargin: Theme.spacingS
+                                iconFallbackBottomMargin: Theme.spacingM
+                                onItemClicked: (idx, modelData) => appList.itemClicked(idx, modelData)
+                                onItemRightClicked: (idx, modelData, mouseX, mouseY) => {
+                                    const panelPos = contextMenu.parent.mapFromItem(null, mouseX, mouseY)
+                                    appList.itemRightClicked(idx, modelData, panelPos.x, panelPos.y)
                                 }
-
-                                MouseArea {
-                                    id: listMouseArea
-
-                                    anchors.fill: parent
-                                    anchors.leftMargin: Theme.spacingS
-                                    anchors.rightMargin: Theme.spacingS
-                                    anchors.bottomMargin: Theme.spacingM
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                    z: 10
-                                    onEntered: {
-                                        if (appList.hoverUpdatesSelection && !appList.keyboardNavigationActive)
-                                            appList.currentIndex = index
-                                    }
-                                    onPositionChanged: {
-                                        appList.keyboardNavigationReset()
-                                    }
-                                    onClicked: mouse => {
-                                                   if (mouse.button === Qt.LeftButton) {
-                                                       appList.itemClicked(index, model)
-                                                   } else if (mouse.button === Qt.RightButton) {
-                                                       var globalPos = mapToItem(null, mouse.x, mouse.y)
-                                                       var panelPos = contextMenu.parent.mapFromItem(null, globalPos.x, globalPos.y)
-                                                       appList.itemRightClicked(index, model, panelPos.x, panelPos.y)
-                                                   }
-                                               }
-                                }
+                                onKeyboardNavigationReset: appList.keyboardNavigationReset
                             }
                         }
 
@@ -539,76 +480,30 @@ DankPopout {
                                 appLauncher.keyboardNavigationActive = false
                             }
 
-                            delegate: Rectangle {
-                                width: appGrid.cellWidth - appGrid.cellPadding
-                                height: appGrid.cellHeight - appGrid.cellPadding
-                                radius: Theme.cornerRadius
-                                color: appGrid.currentIndex === index ? Theme.primaryPressed : gridMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
-
-                                Column {
-                                    anchors.centerIn: parent
-                                    spacing: Theme.spacingS
-
-                                    AppIconRenderer {
-                                        property int computedIconSize: Math.min(appGrid.maxIconSize, Math.max(appGrid.minIconSize, appGrid.cellWidth * appGrid.iconSizeRatio))
-
-                                        width: computedIconSize
-                                        height: computedIconSize
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        iconValue: model.icon || ""
-                                        iconSize: computedIconSize
-                                        fallbackText: (model.name && model.name.length > 0) ? model.name.charAt(0).toUpperCase() : "A"
-                                        materialIconSizeAdjustment: Theme.spacingL
-                                        unicodeIconScale: 0.8
-                                        fallbackTextScale: Math.min(28, computedIconSize * 0.5) / computedIconSize
-                                        iconMargins: 0
-                                        fallbackLeftMargin: Theme.spacingS
-                                        fallbackRightMargin: Theme.spacingS
-                                        fallbackBottomMargin: Theme.spacingS
-                                    }
-
-                                    StyledText {
-                                        anchors.horizontalCenter: parent.horizontalCenter
-                                        width: appGrid.cellWidth - 12
-                                        text: model.name || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        elide: Text.ElideRight
-                                        horizontalAlignment: Text.AlignHCenter
-                                        maximumLineCount: 1
-                                        wrapMode: Text.NoWrap
-                                    }
+                            delegate: AppLauncherGridDelegate {
+                                gridView: appGrid
+                                cellWidth: appGrid.cellWidth
+                                cellHeight: appGrid.cellHeight
+                                cellPadding: appGrid.cellPadding
+                                minIconSize: appGrid.minIconSize
+                                maxIconSize: appGrid.maxIconSize
+                                iconSizeRatio: appGrid.iconSizeRatio
+                                hoverUpdatesSelection: appGrid.hoverUpdatesSelection
+                                keyboardNavigationActive: appGrid.keyboardNavigationActive
+                                currentIndex: appGrid.currentIndex
+                                mouseAreaLeftMargin: Theme.spacingS
+                                mouseAreaRightMargin: Theme.spacingS
+                                mouseAreaBottomMargin: Theme.spacingS
+                                iconFallbackLeftMargin: Theme.spacingS
+                                iconFallbackRightMargin: Theme.spacingS
+                                iconFallbackBottomMargin: Theme.spacingS
+                                iconMaterialSizeAdjustment: Theme.spacingL
+                                onItemClicked: (idx, modelData) => appGrid.itemClicked(idx, modelData)
+                                onItemRightClicked: (idx, modelData, mouseX, mouseY) => {
+                                    const panelPos = contextMenu.parent.mapFromItem(null, mouseX, mouseY)
+                                    appGrid.itemRightClicked(idx, modelData, panelPos.x, panelPos.y)
                                 }
-
-                                MouseArea {
-                                    id: gridMouseArea
-
-                                    anchors.fill: parent
-                            anchors.leftMargin: Theme.spacingS
-                            anchors.rightMargin: Theme.spacingS
-                            anchors.bottomMargin: Theme.spacingS
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                    z: 10
-                                    onEntered: {
-                                        if (appGrid.hoverUpdatesSelection && !appGrid.keyboardNavigationActive)
-                                            appGrid.currentIndex = index
-                                    }
-                                    onPositionChanged: {
-                                        appGrid.keyboardNavigationReset()
-                                    }
-                                    onClicked: mouse => {
-                                                   if (mouse.button === Qt.LeftButton) {
-                                                       appGrid.itemClicked(index, model)
-                                                   } else if (mouse.button === Qt.RightButton) {
-                                                       var globalPos = mapToItem(null, mouse.x, mouse.y)
-                                                       var panelPos = contextMenu.parent.mapFromItem(null, globalPos.x, globalPos.y)
-                                                       appGrid.itemRightClicked(index, model, panelPos.x, panelPos.y)
-                                                   }
-                                               }
-                                }
+                                onKeyboardNavigationReset: appGrid.keyboardNavigationReset
                             }
                         }
                     }
