@@ -168,7 +168,7 @@ Item {
                          if (!byApp[key]) {
                              const moddedId = Paths.moddedAppId(keyBase)
                              const isSteamApp = moddedId.toLowerCase().includes("steam_app")
-                             const icon = isSteamApp ? "" : Quickshell.iconPath(DesktopEntries.heuristicLookup(moddedId)?.icon, true)
+                             const icon = isSteamApp ? "" : DesktopService.resolveIconPath(moddedId)
                              byApp[key] = {
                                  "type": "icon",
                                  "icon": icon,
