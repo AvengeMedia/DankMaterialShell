@@ -413,10 +413,6 @@ EOF
   set_system_color_scheme "$mode"
 }
 
-if command -v pywalfox >/dev/null 2>&1 && [[ -f "$HOME/.cache/wal/colors.json" ]]; then
-  pywalfox update >/dev/null 2>&1 || true
-fi
-
 while :; do
   DESIRED="$(read_desired)"
   WANT_KEY="$(key_of "$DESIRED")"
