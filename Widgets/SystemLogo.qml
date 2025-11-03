@@ -23,6 +23,11 @@ IconImage {
                 source = "file:///usr/share/icons/cachyos.svg"
                 return
             }
+	    else if (logo === "guix-icon")
+	    {
+		source = "file:///run/current-system/profile/share/icons/hicolor/scalable/apps/guix-icon.svg"
+		return
+	    }
             source = Quickshell.iconPath(logo, true)
         }, 0)
     }
