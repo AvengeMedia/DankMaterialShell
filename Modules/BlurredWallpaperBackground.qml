@@ -194,6 +194,7 @@ Variants {
                     blur: 0.8
                     blurMax: 75
                     opacity: 1 - root.transitionProgress
+                    autoPaddingEnabled: false
                 }
 
                 MultiEffect {
@@ -203,6 +204,7 @@ Variants {
                     blur: 0.8
                     blurMax: 75
                     opacity: root.transitionProgress
+                    autoPaddingEnabled: false
                 }
             }
 
