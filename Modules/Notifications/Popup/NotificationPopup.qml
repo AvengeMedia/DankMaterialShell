@@ -12,7 +12,7 @@ import qs.Widgets
 PanelWindow {
     id: win
 
-    WlrLayershell.namespace: "quickshell:notification"
+    WlrLayershell.namespace: "dms:notification-popup"
 
     required property var notificationData
     required property string notificationId

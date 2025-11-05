@@ -9,6 +9,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:hyprkeybinds"
+
     width: 1400
     height: 900
     onBackgroundClicked: close()

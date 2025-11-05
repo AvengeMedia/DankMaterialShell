@@ -11,6 +11,8 @@ import qs.Widgets
 DankPopout {
     id: root
 
+    layerNamespace: "dms:battery"
+
     property var triggerScreen: null
 
     function setTriggerPosition(x, y, width, section, screen) {

@@ -12,6 +12,8 @@ import qs.Widgets
 DankModal {
     id: clipboardHistoryModal
 
+    layerNamespace: "dms:clipboard"
+
     property int totalCount: 0
     property var clipboardEntries: []
     property string searchText: ""

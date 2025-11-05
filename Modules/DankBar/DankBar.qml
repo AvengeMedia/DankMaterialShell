@@ -146,7 +146,7 @@ Item {
             }
 
             WlrLayershell.layer: dBarLayer
-            WlrLayershell.namespace: "quickshell:bar"
+            WlrLayershell.namespace: "dms:bar"
 
             property var modelData: item
 

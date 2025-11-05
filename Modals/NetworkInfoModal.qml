@@ -8,6 +8,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:network-info"
+
     property bool networkInfoModalVisible: false
     property string networkSSID: ""
     property var networkData: null

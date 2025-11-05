@@ -7,6 +7,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:bluetooth-pairing"
+
     property string deviceName: ""
     property string deviceAddress: ""
     property string requestType: ""

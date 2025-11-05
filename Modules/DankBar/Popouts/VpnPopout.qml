@@ -13,6 +13,8 @@ import qs.Widgets
 DankPopout {
     id: root
 
+    layerNamespace: "dms:vpn"
+
     Ref {
         service: DMSNetworkService
     }

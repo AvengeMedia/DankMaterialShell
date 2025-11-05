@@ -7,6 +7,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:wifi-password"
+
     property string wifiPasswordSSID: ""
     property string wifiPasswordInput: ""
     property string wifiUsernameInput: ""

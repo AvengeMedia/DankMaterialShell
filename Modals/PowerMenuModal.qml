@@ -7,6 +7,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:power-menu"
+
     property int selectedIndex: 0
     property int optionCount: SessionService.hibernateSupported ? 5 : 4
     property rect parentBounds: Qt.rect(0, 0, 0, 0)

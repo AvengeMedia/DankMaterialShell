@@ -32,7 +32,7 @@ Scope {
                 visible: overviewScope.overviewOpen
                 color: "transparent"
 
-                WlrLayershell.namespace: "quickshell:overview"
+                WlrLayershell.namespace: "dms:workspace-overview"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive

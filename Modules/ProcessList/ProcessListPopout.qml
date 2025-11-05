@@ -14,6 +14,8 @@ import qs.Widgets
 DankPopout {
     id: processListPopout
 
+    layerNamespace: "dms:process-list-popout"
+
     property var parentWidget: null
     property var triggerScreen: null
 

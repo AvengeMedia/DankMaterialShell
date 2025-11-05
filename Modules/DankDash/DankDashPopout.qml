@@ -12,6 +12,8 @@ import qs.Modules.DankDash
 DankPopout {
     id: root
 
+    layerNamespace: "dms:dash"
+
     property bool dashVisible: false
     property var triggerScreen: null
     property int currentTabIndex: 0

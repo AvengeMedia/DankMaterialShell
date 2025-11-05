@@ -20,6 +20,8 @@ import "./utils/state.js" as StateUtils
 DankPopout {
     id: root
 
+    layerNamespace: "dms:control-center"
+
     property string expandedSection: ""
     property var triggerScreen: null
     property bool editMode: false

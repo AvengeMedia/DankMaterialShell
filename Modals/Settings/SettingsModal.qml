@@ -11,6 +11,8 @@ import qs.Widgets
 DankModal {
     id: settingsModal
 
+    layerNamespace: "dms:settings"
+
     property Component settingsContent
     property alias profileBrowser: profileBrowser
     property int currentTabIndex: 0

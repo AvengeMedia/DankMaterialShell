@@ -12,6 +12,8 @@ import qs.Widgets
 DankModal {
     id: spotlightModal
 
+    layerNamespace: "dms:spotlight"
+
     property bool spotlightOpen: false
     property alias spotlightContent: spotlightContentInstance
 

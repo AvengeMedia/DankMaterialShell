@@ -8,6 +8,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:network-info-wired"
+
     property bool networkWiredInfoModalVisible: false
     property string networkID: ""
     property var networkData: null

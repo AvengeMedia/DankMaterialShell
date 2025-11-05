@@ -9,6 +9,8 @@ import qs.Widgets
 DankModal {
     id: processListModal
 
+    layerNamespace: "dms:process-list-modal"
+
     property int currentTab: 0
     property var tabNames: ["Processes", "Performance", "System"]
 

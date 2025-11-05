@@ -13,6 +13,8 @@ import qs.Widgets
 DankPopout {
     id: appDrawerPopout
 
+    layerNamespace: "dms:app-launcher"
+
     property var triggerScreen: null
 
     // Setting to Exclusive, so virtual keyboards can send input to app drawer

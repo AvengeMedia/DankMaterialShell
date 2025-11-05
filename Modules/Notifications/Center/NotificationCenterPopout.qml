@@ -12,6 +12,8 @@ import qs.Modules.Notifications.Center
 DankPopout {
     id: root
 
+    layerNamespace: "dms:notification-center"
+
     property bool notificationHistoryVisible: false
     property var triggerScreen: null
 
