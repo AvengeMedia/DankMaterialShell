@@ -8,6 +8,7 @@ QtObject {
     id: root
 
     property var vpnBuiltinInstance: null
+    property var cupsBuiltinInstance: null
 
     property var vpnLoader: Loader {
         active: false
@@ -27,6 +28,29 @@ QtObject {
                 if (!hasVpnWidget && vpnLoader.active) {
                     console.log("VpnWidget: No VPN widget in control center, deactivating loader")
                     vpnLoader.active = false
+                }
+            }
+        }
+    }
+
+    property var cupsLoader: Loader {
+        active: false
+        sourceComponent: Component {
+            CupsWidget {}
+        }
+
+        onItemChanged: {
+            root.cupsBuiltinInstance = item
+        }
+
+        Connections {
+            target: SettingsData
+            function onControlCenterWidgetsChanged() {
+                const widgets = SettingsData.controlCenterWidgets || []
+                const hasCupsWidget = widgets.some(w => w.id === "builtin_cups")
+                if (!hasCupsWidget && cupsLoader.active) {
+                    console.log("CupsWidget: No CUPS widget in control center, deactivating loader")
+                    cupsLoader.active = false
                 }
             }
         }
@@ -145,6 +169,15 @@ QtObject {
             "type": "builtin_plugin",
             "enabled": DMSNetworkService.available,
             "warning": !DMSNetworkService.available ? "VPN not available" : undefined,
+            "isBuiltinPlugin": true
+        }, {
+            "id": "builtin_cups",
+            "text": "Printers",
+            "description": "Print Server Management",
+            "icon": "Print",
+            "type": "builtin_plugin",
+            "enabled": CupsService.available,
+            "warning": !CupsService.available ? "CUPS not available" : undefined,
             "isBuiltinPlugin": true
         }]
 

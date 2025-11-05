@@ -104,6 +104,12 @@ Item {
                 }
                 builtinInstance = widgetModel.vpnBuiltinInstance
             }
+            if (builtinId === "builtin_cups") {
+                if (widgetModel?.cupsLoader) {
+                    widgetModel.cupsLoader.active = true
+                }
+                builtinInstance = widgetModel.cupsBuiltinInstance
+            }
 
             if (!builtinInstance || !builtinInstance.ccDetailContent) {
                 return

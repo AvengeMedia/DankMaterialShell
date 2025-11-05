@@ -794,6 +794,12 @@ Column {
                     }
                     builtinInstance = Qt.binding(() => root.model?.vpnBuiltinInstance)
                 }
+                if (id === "builtin_cups") {
+                    if (root.model?.cupsLoader) {
+                        root.model.cupsLoader.active = true
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance)
+                }
             }
 
             sourceComponent: {
