@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Widgets
+import qs.Services
 
 Rectangle {
     id: resultsContainer
@@ -90,7 +91,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: model.icon !== undefined && model.icon !== ""
 
-                    property string iconValue: model.icon || ""
+                    property string iconValue: model.icon && model.icon !== "" ? model.icon : model.startupClass
                     property bool isMaterial: iconValue.indexOf("material:") === 0
                     property bool isUnicode: iconValue.indexOf("unicode:") === 0
                     property string materialName: isMaterial ? iconValue.substring(9) : ""
@@ -116,7 +117,7 @@ Rectangle {
                         id: listIconImg
 
                         anchors.fill: parent
-                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
+                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true) ||  DesktopService.resolveIconPath(parent.iconValue)
                         asynchronous: true
                         visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
                     }
@@ -278,7 +279,7 @@ Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: model.icon !== undefined && model.icon !== ""
 
-                    property string iconValue: model.icon || ""
+                    property string iconValue: model.icon && model.icon !== "" ? model.icon : model.startupClass
                     property bool isMaterial: iconValue.indexOf("material:") === 0
                     property bool isUnicode: iconValue.indexOf("unicode:") === 0
                     property string materialName: isMaterial ? iconValue.substring(9) : ""
@@ -304,7 +305,7 @@ Rectangle {
                         id: gridIconImg
 
                         anchors.fill: parent
-                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
+                        source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true) ||  DesktopService.resolveIconPath(parent.iconValue)
                         smooth: true
                         asynchronous: true
                         visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
