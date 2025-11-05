@@ -401,12 +401,13 @@ DankPopout {
                                     spacing: Theme.spacingL
 
                                     Item {
+				    	id: iconHolder 
                                         width: appList.iconSize
                                         height: appList.iconSize
                                         anchors.verticalCenter: parent.verticalCenter
                                         visible: model.icon !== undefined && model.icon !== ""
 
-                                        property string iconValue: model.icon || ""
+                                        property string iconValue: model.icon && model.icon !== "" ? model.icon : model.startupClass
                                         property bool isMaterial: iconValue.indexOf("material:") === 0
                                         property bool isUnicode: iconValue.indexOf("unicode:") === 0
                                         property string materialName: isMaterial ? iconValue.substring(9) : ""
@@ -433,7 +434,7 @@ DankPopout {
 
                                             anchors.fill: parent
                                             anchors.margins: Theme.spacingXS
-                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
+                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true) ||  DesktopService.resolveIconPath(parent.iconValue)
                                             smooth: true
                                             asynchronous: true
                                             visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready
@@ -463,7 +464,7 @@ DankPopout {
 
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        width: (model.icon !== undefined && model.icon !== "") ? (parent.width - appList.iconSize - Theme.spacingL) : parent.width
+                                        width: (iconHolder.iconValue !== "") ? (parent.width - appList.iconSize - Theme.spacingL) : parent.width
                                         spacing: Theme.spacingXS
 
                                         StyledText {
@@ -605,7 +606,7 @@ DankPopout {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         visible: model.icon !== undefined && model.icon !== ""
 
-                                        property string iconValue: model.icon || ""
+                                        property string iconValue: model.icon && model.icon !== "" ? model.icon : model.startupClass
                                         property bool isMaterial: iconValue.indexOf("material:") === 0
                                         property bool isUnicode: iconValue.indexOf("unicode:") === 0
                                         property string materialName: isMaterial ? iconValue.substring(9) : ""
@@ -634,7 +635,7 @@ DankPopout {
                             anchors.leftMargin: Theme.spacingS
                             anchors.rightMargin: Theme.spacingS
                             anchors.bottomMargin: Theme.spacingS
-                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true)
+                                            source: parent.isMaterial || parent.isUnicode ? "" : Quickshell.iconPath(parent.iconValue, true) ||  DesktopService.resolveIconPath(parent.iconValue)
                                             smooth: true
                                             asynchronous: true
                                             visible: !parent.isMaterial && !parent.isUnicode && status === Image.Ready

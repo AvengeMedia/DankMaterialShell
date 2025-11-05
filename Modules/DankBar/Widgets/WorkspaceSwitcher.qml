@@ -162,7 +162,7 @@ Item {
                              return
                          }
 
-                         const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown").toLowerCase()
+                         const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown")
                          const key = isActiveWs ? `${keyBase}_${i}` : keyBase
 
                          if (!byApp[key]) {

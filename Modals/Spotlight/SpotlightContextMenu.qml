@@ -177,7 +177,7 @@ Popup {
 
                         IconImage {
                             anchors.fill: parent
-                            source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
+                            source: DesktopService.resolveIconPath(modelData.name)
                             smooth: true
                             asynchronous: true
                             visible: status === Image.Ready
