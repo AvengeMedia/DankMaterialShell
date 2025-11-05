@@ -588,6 +588,18 @@
     "comment": ""
   },
   {
+    "term": "CUPS Insecure Filter Warning",
+    "context": "CUPS Insecure Filter Warning",
+    "reference": "Services/CupsService.qml:283",
+    "comment": ""
+  },
+  {
+    "term": "CUPS Missing Filter Warning",
+    "context": "CUPS Missing Filter Warning",
+    "reference": "Services/CupsService.qml:282",
+    "comment": ""
+  },
+  {
     "term": "Cancel",
     "context": "Cancel",
     "reference": "Modals/BluetoothPairingModal.qml:249, Modals/PolkitAuthModal.qml:289, Modals/DankColorPickerModal.qml:516, Modals/WifiPasswordModal.qml:492, Modules/Settings/PluginBrowser.qml:627, Modals/FileBrowser/FileBrowserOverwriteDialog.qml:83",
@@ -828,6 +840,12 @@
     "comment": ""
   },
   {
+    "term": "Connecting to Device",
+    "context": "Connecting to Device",
+    "reference": "Services/CupsService.qml:274",
+    "comment": ""
+  },
+  {
     "term": "Contrast",
     "context": "Contrast",
     "reference": "Modules/Settings/LauncherTab.qml:355",
@@ -897,6 +915,12 @@
     "term": "Corner Radius (0 = square corners)",
     "context": "Corner Radius (0 = square corners)",
     "reference": "Modules/Settings/ThemeColorsTab.qml:910",
+    "comment": ""
+  },
+  {
+    "term": "Cover Open",
+    "context": "Cover Open",
+    "reference": "Services/CupsService.qml:263",
     "comment": ""
   },
   {
@@ -1230,6 +1254,12 @@
     "comment": ""
   },
   {
+    "term": "Door Open",
+    "context": "Door Open",
+    "reference": "Services/CupsService.qml:264",
+    "comment": ""
+  },
+  {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "context": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "reference": "Modules/Settings/DankBarTab.qml:1772",
@@ -1380,6 +1410,12 @@
     "comment": ""
   },
   {
+    "term": "Error",
+    "context": "Error",
+    "reference": "Services/CupsService.qml:292",
+    "comment": ""
+  },
+  {
     "term": "Exclusive Zone Offset",
     "context": "Exclusive Zone Offset",
     "reference": "Modules/Settings/DankBarTab.qml:1077, Modules/Settings/DankBarTab.qml:1091",
@@ -1401,6 +1437,18 @@
     "term": "Failed to activate configuration",
     "context": "Failed to activate configuration",
     "reference": "Services/DMSNetworkService.qml:370",
+    "comment": ""
+  },
+  {
+    "term": "Failed to cancel all jobs",
+    "context": "Failed to cancel all jobs",
+    "reference": "Services/CupsService.qml:230",
+    "comment": ""
+  },
+  {
+    "term": "Failed to cancel selected job",
+    "context": "Failed to cancel selected job",
+    "reference": "Services/CupsService.qml:216",
     "comment": ""
   },
   {
@@ -1440,9 +1488,21 @@
     "comment": ""
   },
   {
+    "term": "Failed to pause printer",
+    "context": "Failed to pause printer",
+    "reference": "Services/CupsService.qml:188",
+    "comment": ""
+  },
+  {
     "term": "Failed to remove device",
     "context": "Failed to remove device",
     "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:548",
+    "comment": ""
+  },
+  {
+    "term": "Failed to resume printer",
+    "context": "Failed to resume printer",
+    "reference": "Services/CupsService.qml:202",
     "comment": ""
   },
   {
@@ -1722,6 +1782,12 @@
     "comment": ""
   },
   {
+    "term": "Idle",
+    "context": "Idle",
+    "reference": "Services/CupsService.qml:236",
+    "comment": ""
+  },
+  {
     "term": "Idle Inhibitor",
     "context": "Idle Inhibitor",
     "reference": "Modules/Settings/DankBarTab.qml:144",
@@ -1782,6 +1848,12 @@
     "comment": ""
   },
   {
+    "term": "Interlock Open",
+    "context": "Interlock Open",
+    "reference": "Services/CupsService.qml:265",
+    "comment": ""
+  },
+  {
     "term": "Internet",
     "context": "Internet",
     "reference": "Services/AppSearchService.qml:168, Services/AppSearchService.qml:169, Services/AppSearchService.qml:170",
@@ -1797,6 +1869,18 @@
     "term": "Invert on mode change",
     "context": "Invert on mode change",
     "reference": "Modules/Settings/LauncherTab.qml:384",
+    "comment": ""
+  },
+  {
+    "term": "Jobs",
+    "context": "Jobs",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:147",
+    "comment": ""
+  },
+  {
+    "term": "Jobs: ",
+    "context": "Jobs: ",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:20",
     "comment": ""
   },
   {
@@ -1986,6 +2070,30 @@
     "comment": ""
   },
   {
+    "term": "Marker Supply Empty",
+    "context": "Marker Supply Empty",
+    "reference": "Services/CupsService.qml:250",
+    "comment": ""
+  },
+  {
+    "term": "Marker Supply Low",
+    "context": "Marker Supply Low",
+    "reference": "Services/CupsService.qml:249",
+    "comment": ""
+  },
+  {
+    "term": "Marker Waste Almost Full",
+    "context": "Marker Waste Almost Full",
+    "reference": "Services/CupsService.qml:251",
+    "comment": ""
+  },
+  {
+    "term": "Marker Waste Full",
+    "context": "Marker Waste Full",
+    "reference": "Services/CupsService.qml:252",
+    "comment": ""
+  },
+  {
     "term": "Material Colors",
     "context": "Material Colors",
     "reference": "Modals/DankColorPickerModal.qml:311",
@@ -2025,6 +2133,30 @@
     "term": "Media Controls",
     "context": "Media Controls",
     "reference": "Modules/Settings/DankBarTab.qml:61",
+    "comment": ""
+  },
+  {
+    "term": "Media Empty",
+    "context": "Media Empty",
+    "reference": "Services/CupsService.qml:257",
+    "comment": ""
+  },
+  {
+    "term": "Media Jam",
+    "context": "Media Jam",
+    "reference": "Services/CupsService.qml:259",
+    "comment": ""
+  },
+  {
+    "term": "Media Low",
+    "context": "Media Low",
+    "reference": "Services/CupsService.qml:256",
+    "comment": ""
+  },
+  {
+    "term": "Media Needed",
+    "context": "Media Needed",
+    "reference": "Services/CupsService.qml:258",
     "comment": ""
   },
   {
@@ -2097,6 +2229,12 @@
     "term": "Mount",
     "context": "Mount",
     "reference": "Modules/ProcessList/SystemTab.qml:445",
+    "comment": ""
+  },
+  {
+    "term": "Moving to Paused",
+    "context": "Moving to Paused",
+    "reference": "Services/CupsService.qml:288",
     "comment": ""
   },
   {
@@ -2268,6 +2406,18 @@
     "comment": ""
   },
   {
+    "term": "No printer found",
+    "context": "No printer found",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:25",
+    "comment": ""
+  },
+  {
+    "term": "None",
+    "context": "None",
+    "reference": "Services/CupsService.qml:242",
+    "comment": ""
+  },
+  {
     "term": "Normal Priority",
     "context": "Normal Priority",
     "reference": "Modules/Notifications/Center/NotificationSettings.qml:175",
@@ -2358,6 +2508,12 @@
     "comment": ""
   },
   {
+    "term": "Offline Report",
+    "context": "Offline Report",
+    "reference": "Services/CupsService.qml:287",
+    "comment": ""
+  },
+  {
     "term": "On-Screen Displays",
     "context": "On-Screen Displays",
     "reference": "Modules/Settings/DisplaysTab.qml:34",
@@ -2391,6 +2547,30 @@
     "term": "Open search bar to find text",
     "context": "Open search bar to find text",
     "reference": "Modules/Notepad/NotepadSettings.qml:201",
+    "comment": ""
+  },
+  {
+    "term": "Other",
+    "context": "Other",
+    "reference": "Services/CupsService.qml:243",
+    "comment": ""
+  },
+  {
+    "term": "Output Area Almost Full",
+    "context": "Output Area Almost Full",
+    "reference": "Services/CupsService.qml:267",
+    "comment": ""
+  },
+  {
+    "term": "Output Area Full",
+    "context": "Output Area Full",
+    "reference": "Services/CupsService.qml:268",
+    "comment": ""
+  },
+  {
+    "term": "Output Tray Missing",
+    "context": "Output Tray Missing",
+    "reference": "Services/CupsService.qml:266",
     "comment": ""
   },
   {
@@ -2439,6 +2619,18 @@
     "term": "Password",
     "context": "Password",
     "reference": "Modals/WifiPasswordModal.qml:296",
+    "comment": ""
+  },
+  {
+    "term": "Pause",
+    "context": "Pause",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:102",
+    "comment": ""
+  },
+  {
+    "term": "Paused",
+    "context": "Paused",
+    "reference": "Services/CupsService.qml:272",
     "comment": ""
   },
   {
@@ -2622,6 +2814,24 @@
     "comment": ""
   },
   {
+    "term": "Print Server not available",
+    "context": "Print Server not available",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:23",
+    "comment": ""
+  },
+  {
+    "term": "Printers",
+    "context": "Printers",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:17",
+    "comment": ""
+  },
+  {
+    "term": "Printers: ",
+    "context": "Printers: ",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:20",
+    "comment": ""
+  },
+  {
     "term": "Privacy Indicator",
     "context": "Privacy Indicator",
     "reference": "Modules/Settings/DankBarTab.qml:114",
@@ -2631,6 +2841,12 @@
     "term": "Process",
     "context": "Process",
     "reference": "Modules/ProcessList/ProcessListView.qml:41",
+    "comment": ""
+  },
+  {
+    "term": "Processing",
+    "context": "Processing",
+    "reference": "Services/CupsService.qml:237",
     "comment": ""
   },
   {
@@ -2676,6 +2892,12 @@
     "comment": ""
   },
   {
+    "term": "Reason",
+    "context": "Reason",
+    "reference": "Services/CupsService.qml:156",
+    "comment": ""
+  },
+  {
     "term": "Reboot",
     "context": "Reboot",
     "reference": "Modals/PowerMenuModal.qml:47, Modals/PowerMenuModal.qml:365, Modules/Lock/LockPowerMenu.qml:372, Modules/ControlCenter/PowerMenu.qml:16",
@@ -2712,6 +2934,12 @@
     "comment": ""
   },
   {
+    "term": "Report",
+    "context": "Report",
+    "reference": "Services/CupsService.qml:294",
+    "comment": ""
+  },
+  {
     "term": "Request confirmation on power off, restart, suspend, hibernate and logout actions",
     "context": "Request confirmation on power off, restart, suspend, hibernate and logout actions",
     "reference": "Modals/Settings/PowerSettings.qml:359",
@@ -2727,6 +2955,12 @@
     "term": "Resources",
     "context": "Resources",
     "reference": "Modules/Settings/AboutTab.qml:421",
+    "comment": ""
+  },
+  {
+    "term": "Resume",
+    "context": "Resume",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:102",
     "comment": ""
   },
   {
@@ -3084,6 +3318,12 @@
     "comment": ""
   },
   {
+    "term": "Shutdown",
+    "context": "Shutdown",
+    "reference": "Services/CupsService.qml:273",
+    "comment": ""
+  },
+  {
     "term": "Size",
     "context": "Size",
     "reference": "Modules/ProcessList/SystemTab.qml:456, Modules/Settings/DankBarTab.qml:1149, Modules/Settings/DankBarTab.qml:1163",
@@ -3120,6 +3360,12 @@
     "comment": ""
   },
   {
+    "term": "Spool Area Full",
+    "context": "Spool Area Full",
+    "reference": "Services/CupsService.qml:281",
+    "comment": ""
+  },
+  {
     "term": "Square Corners",
     "context": "Square Corners",
     "reference": "Modules/Settings/DankBarTab.qml:1314",
@@ -3141,6 +3387,24 @@
     "term": "Status",
     "context": "Status",
     "reference": "Widgets/DankIconPicker.qml:49",
+    "comment": ""
+  },
+  {
+    "term": "Stopped",
+    "context": "Stopped",
+    "reference": "Services/CupsService.qml:238",
+    "comment": ""
+  },
+  {
+    "term": "Stopped Partly",
+    "context": "Stopped Partly",
+    "reference": "Services/CupsService.qml:277",
+    "comment": ""
+  },
+  {
+    "term": "Stopping",
+    "context": "Stopping",
+    "reference": "Services/CupsService.qml:276",
     "comment": ""
   },
   {
@@ -3318,6 +3582,12 @@
     "comment": ""
   },
   {
+    "term": "The job queue of this printer is empty",
+    "context": "The job queue of this printer is empty",
+    "reference": "Modules/ControlCenter/BuiltinPlugins/CupsWidget.qml:204",
+    "comment": ""
+  },
+  {
     "term": "Theme & Colors",
     "context": "Theme & Colors",
     "reference": "Modals/Settings/SettingsSidebar.qml:35",
@@ -3360,6 +3630,12 @@
     "comment": ""
   },
   {
+    "term": "Timed Out",
+    "context": "Timed Out",
+    "reference": "Services/CupsService.qml:275",
+    "comment": ""
+  },
+  {
     "term": "To Full",
     "context": "To Full",
     "reference": "Modules/DankBar/Popouts/BatteryPopout.qml:536",
@@ -3393,6 +3669,18 @@
     "term": "Tomorrow",
     "context": "Tomorrow",
     "reference": "Services/WeatherService.qml:170",
+    "comment": ""
+  },
+  {
+    "term": "Toner Empty",
+    "context": "Toner Empty",
+    "reference": "Services/CupsService.qml:248",
+    "comment": ""
+  },
+  {
+    "term": "Toner Low",
+    "context": "Toner Low",
+    "reference": "Services/CupsService.qml:247",
     "comment": ""
   },
   {
@@ -3645,6 +3933,12 @@
     "term": "Wallpapers",
     "context": "Wallpapers",
     "reference": "Modules/DankDash/DankDashPopout.qml:235",
+    "comment": ""
+  },
+  {
+    "term": "Warning",
+    "context": "Warning",
+    "reference": "Services/CupsService.qml:293",
     "comment": ""
   },
   {
