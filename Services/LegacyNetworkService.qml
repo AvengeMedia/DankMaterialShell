@@ -670,7 +670,7 @@ Singleton {
             wifiConnector.connectionSucceeded = false
             root.isConnecting = false
             root.connectingSSID = ""
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -693,7 +693,7 @@ Singleton {
                 root.currentWifiSSID = ""
                 root.connectionStatus = ""
             }
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -727,7 +727,7 @@ Singleton {
                 }
                 root.wifiNetworks = updated
                 root.networksUpdated()
-                refreshNetworkState()
+                doRefreshNetworkState()
             }
             root.forgetSSID = ""
         }
@@ -756,7 +756,7 @@ Singleton {
             if (exitCode === 0) {
                 ToastService.showInfo(targetState === "on" ? "WiFi enabled" : "WiFi disabled")
             }
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -802,7 +802,7 @@ Singleton {
         onExited: {
             root.changingPreference = false
             root.targetPreference = ""
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -930,7 +930,7 @@ Singleton {
             } else {
                 ToastService.showError("Failed to enable WiFi")
             }
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -955,7 +955,7 @@ Singleton {
         running: false
 
         onExited: function (exitCode) {
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
@@ -965,7 +965,7 @@ Singleton {
         running: false
 
         onExited: function (exitCode) {
-            refreshNetworkState()
+            doRefreshNetworkState()
         }
     }
 
