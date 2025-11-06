@@ -227,6 +227,8 @@ Singleton {
         DMSService.sendRequest("cups.pausePrinter", params, response => {
                                    if (response.error) {
                                        ToastService.showError(I18n.tr("Failed to pause printer") + " - " + response.error)
+                                   } else {
+                                       getState()
                                    }
                                })
     }
@@ -242,6 +244,8 @@ Singleton {
         DMSService.sendRequest("cups.resumePrinter", params, response => {
                                    if (response.error) {
                                        ToastService.showError(I18n.tr("Failed to resume printer") + " - " + response.error)
+                                   } else {
+                                       getState()
                                    }
                                })
     }
