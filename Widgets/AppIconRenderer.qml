@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Widgets
 import qs.Common
+import qs.Services
 
 Item {
     id: root
@@ -26,7 +27,7 @@ Item {
     readonly property bool isUnicode: iconValue.startsWith("unicode:")
     readonly property string materialName: isMaterial ? iconValue.substring(9) : ""
     readonly property string unicodeChar: isUnicode ? iconValue.substring(8) : ""
-    readonly property string iconPath: isMaterial || isUnicode ? "" : Quickshell.iconPath(iconValue, true)
+    readonly property string iconPath: isMaterial || isUnicode ? "" : Quickshell.iconPath(iconValue, true) || DesktopService.resolveIconPath(iconValue)
 
     visible: iconValue !== undefined && iconValue !== ""
 
