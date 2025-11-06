@@ -49,7 +49,7 @@ Rectangle {
         if (keyboardNavigationActive && expanded && selectedNotificationIndex >= 0) {
             return Theme.primaryHoverLight
         }
-        return Theme.surfaceContainerHigh
+        return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     }
     border.color: {
         if (isGroupSelected && keyboardNavigationActive) {
@@ -342,7 +342,7 @@ Rectangle {
                         return baseHeight
                     }
                     radius: Theme.cornerRadius
-                    color: isSelected ? Theme.primaryPressed : Theme.surfaceContainerHigh
+                    color: isSelected ? Theme.primaryPressed : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: isSelected ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.4) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
                     border.width: isSelected ? 1 : 1
 

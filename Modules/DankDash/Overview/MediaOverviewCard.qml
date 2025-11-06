@@ -131,7 +131,7 @@ Card {
                 height: 28
                 radius: 14
                 anchors.verticalCenter: playPauseButton.verticalCenter
-                color: prevArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                color: prevArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
 
                 DankIcon {
                     anchors.centerIn: parent
@@ -183,7 +183,7 @@ Card {
                 height: 28
                 radius: 14
                 anchors.verticalCenter: playPauseButton.verticalCenter
-                color: nextArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                color: nextArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
 
                 DankIcon {
                     anchors.centerIn: parent

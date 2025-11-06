@@ -138,13 +138,13 @@
     "Audio Output Devices (": "音訊輸出設備 ("
   },
   "Authenticate": {
-    "Authenticate": ""
+    "Authenticate": "驗證"
   },
   "Authentication Required": {
-    "Authentication Required": ""
+    "Authentication Required": "需要驗證"
   },
   "Authentication failed, please try again": {
-    "Authentication failed, please try again": ""
+    "Authentication failed, please try again": "驗證失敗，請重試"
   },
   "Authorize": {
     "Authorize": "授權"
@@ -172,6 +172,12 @@
   },
   "Auto-saving...": {
     "Auto-saving...": "自動保存..."
+  },
+  "Autoconnect disabled": {
+    "Autoconnect disabled": "自動連線關閉"
+  },
+  "Autoconnect enabled": {
+    "Autoconnect enabled": "自動連線啟用"
   },
   "Automatic Control": {
     "Automatic Control": "自動控制"
@@ -290,6 +296,12 @@
   "CPU usage indicator": {
     "CPU usage indicator": "CPU 使用率指示器"
   },
+  "CUPS Insecure Filter Warning": {
+    "CUPS Insecure Filter Warning": ""
+  },
+  "CUPS Missing Filter Warning": {
+    "CUPS Missing Filter Warning": ""
+  },
   "Cancel": {
     "Cancel": "取消"
   },
@@ -348,10 +360,10 @@
     "Color Picker": "顏色選擇器"
   },
   "Color temperature for day time": {
-    "Color temperature for day time": ""
+    "Color temperature for day time": "白天螢幕的顏色溫度"
   },
   "Color temperature for night mode": {
-    "Color temperature for night mode": "夜晚模式色溫"
+    "Color temperature for night mode": "夜晚螢幕的顏色溫度"
   },
   "Colorful mix of bright contrasting accents.": {
     "Colorful mix of bright contrasting accents.": "明亮對比點綴的繽紛組合。"
@@ -402,16 +414,19 @@
     "Confirm passkey for ": "確認密碼 "
   },
   "Connect": {
-    "Connect": "連接"
+    "Connect": "連線"
   },
   "Connect to VPN": {
-    "Connect to VPN": "連接到 VPN"
+    "Connect to VPN": "連線到 VPN"
   },
   "Connect to Wi-Fi": {
-    "Connect to Wi-Fi": "連接到 Wi-Fi"
+    "Connect to Wi-Fi": "連線到 Wi-Fi"
   },
   "Connected Displays": {
     "Connected Displays": "已連接的螢幕"
+  },
+  "Connecting to Device": {
+    "Connecting to Device": ""
   },
   "Connection failed. Check password and try again.": {
     "Connection failed. Check password and try again.": "連線失敗。請檢查密碼並重試。"
@@ -424,6 +439,15 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "控制目前播放器"
+  },
+  "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": {
+    "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": "控制所有彈出式介面、模態對話框及其內容層級的不透明度 (適用於 DankDash、設定、應用程式抽屜、控制中心等)"
+  },
+  "Controls opacity of individual widgets inside DankBar": {
+    "Controls opacity of individual widgets inside DankBar": "控制 DankBar 內部各別部件的不透明度"
+  },
+  "Controls opacity of the DankBar panel background": {
+    "Controls opacity of the DankBar panel background": "控制 DankBar 面板背景的不透明度"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "複製到剪貼簿"
@@ -442,6 +466,9 @@
   },
   "Corner Radius (0 = square corners)": {
     "Corner Radius (0 = square corners)": "圓角半徑 (0 = 方角)"
+  },
+  "Cover Open": {
+    "Cover Open": ""
   },
   "Create Dir": {
     "Create Dir": "新建資料夾"
@@ -515,11 +542,17 @@
   "DankSearch not available": {
     "DankSearch not available": "DankSearch 不可用"
   },
+  "Dark Mode": {
+    "Dark Mode": "深色主題"
+  },
+  "Darken Modal Background": {
+    "Darken Modal Background": "暗化模態背景"
+  },
   "Date Format": {
     "Date Format": "日期格式"
   },
   "Day Temperature": {
-    "Day Temperature": ""
+    "Day Temperature": "日間色溫"
   },
   "Default": {
     "Default": "預設"
@@ -545,11 +578,14 @@
   "Device paired": {
     "Device paired": "裝置已配對"
   },
+  "Disable Autoconnect": {
+    "Disable Autoconnect": "關閉自動連線"
+  },
   "Disconnect": {
-    "Disconnect": "斷開連接"
+    "Disconnect": "斷開連線"
   },
   "Disconnected from WiFi": {
-    "Disconnected from WiFi": "已中斷 WiFi 連接"
+    "Disconnected from WiFi": "已中斷 WiFi 連線"
   },
   "Disk": {
     "Disk": "硬碟"
@@ -602,6 +638,9 @@
   "Donate on Ko-fi": {
     "Donate on Ko-fi": "在 Ko-fi 上捐款"
   },
+  "Door Open": {
+    "Door Open": ""
+  },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "拖曳部件即可在版塊內重新排序。使用眼睛圖示隱藏/顯示部件 (會保持間距)，或使用 X 將其完全移除。"
   },
@@ -619,6 +658,9 @@
   },
   "Empty": {
     "Empty": "空白"
+  },
+  "Enable Autoconnect": {
+    "Enable Autoconnect": "啟用自動連線"
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "啟用 GPU 溫度"
@@ -674,6 +716,9 @@
   "Enter password for ": {
     "Enter password for ": "輸入密碼 "
   },
+  "Error": {
+    "Error": ""
+  },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "獨佔區域偏移"
   },
@@ -686,11 +731,17 @@
   "Failed to activate configuration": {
     "Failed to activate configuration": "無法啟動配置"
   },
+  "Failed to cancel all jobs": {
+    "Failed to cancel all jobs": ""
+  },
+  "Failed to cancel selected job": {
+    "Failed to cancel selected job": ""
+  },
   "Failed to connect VPN": {
     "Failed to connect VPN": "VPN 連線失敗"
   },
   "Failed to connect to ": {
-    "Failed to connect to ": "無法連接到 "
+    "Failed to connect to ": "無法連線到 "
   },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "無法斷開 VPN"
@@ -704,8 +755,14 @@
   "Failed to enable WiFi": {
     "Failed to enable WiFi": "無法啟用 WiFi"
   },
+  "Failed to pause printer": {
+    "Failed to pause printer": ""
+  },
   "Failed to remove device": {
     "Failed to remove device": "無法移除裝置"
+  },
+  "Failed to resume printer": {
+    "Failed to resume printer": ""
   },
   "Failed to set profile image": {
     "Failed to set profile image": "無法設定個人資料圖片"
@@ -715,6 +772,9 @@
   },
   "Failed to start connection to ": {
     "Failed to start connection to ": "無法啟動連線到 "
+  },
+  "Failed to update autoconnect": {
+    "Failed to update autoconnect": "自動連線更新失敗"
   },
   "Feels Like": {
     "Feels Like": "體感溫度"
@@ -851,6 +911,9 @@
   "Icon Theme": {
     "Icon Theme": "圖示主題"
   },
+  "Idle": {
+    "Idle": ""
+  },
   "Idle Inhibitor": {
     "Idle Inhibitor": "空閒抑制器"
   },
@@ -881,6 +944,9 @@
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "從 DMS 插件註冊表安裝插件"
   },
+  "Interlock Open": {
+    "Interlock Open": ""
+  },
   "Internet": {
     "Internet": "網際網路"
   },
@@ -889,6 +955,12 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "模式改變時反轉"
+  },
+  "Jobs": {
+    "Jobs": ""
+  },
+  "Jobs: ": {
+    "Jobs: ": ""
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "鍵盤布局名稱"
@@ -986,6 +1058,18 @@
   "Manual Show/Hide": {
     "Manual Show/Hide": "手動顯示/隱藏"
   },
+  "Marker Supply Empty": {
+    "Marker Supply Empty": ""
+  },
+  "Marker Supply Low": {
+    "Marker Supply Low": ""
+  },
+  "Marker Waste Almost Full": {
+    "Marker Waste Almost Full": ""
+  },
+  "Marker Waste Full": {
+    "Marker Waste Full": ""
+  },
   "Material Colors": {
     "Material Colors": "手動調整顏色"
   },
@@ -1006,6 +1090,18 @@
   },
   "Media Controls": {
     "Media Controls": "媒體控制台"
+  },
+  "Media Empty": {
+    "Media Empty": ""
+  },
+  "Media Jam": {
+    "Media Jam": ""
+  },
+  "Media Low": {
+    "Media Low": ""
+  },
+  "Media Needed": {
+    "Media Needed": ""
   },
   "Media Player Settings": {
     "Media Player Settings": "媒體播放設定"
@@ -1045,6 +1141,9 @@
   },
   "Mount": {
     "Mount": "掛載"
+  },
+  "Moving to Paused": {
+    "Moving to Paused": ""
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "柔和的調色板，柔和、平靜的色調。"
@@ -1092,7 +1191,7 @@
     "Night Mode": "夜晚模式"
   },
   "Night Temperature": {
-    "Night Temperature": ""
+    "Night Temperature": "夜間色溫"
   },
   "No Active Players": {
     "No Active Players": "無播放器"
@@ -1129,6 +1228,12 @@
   },
   "No plugins found.": {
     "No plugins found.": "找不到插件。"
+  },
+  "No printer found": {
+    "No printer found": ""
+  },
+  "None": {
+    "None": ""
   },
   "Normal Priority": {
     "Normal Priority": "普通優先級"
@@ -1175,6 +1280,9 @@
   "Office": {
     "Office": "辦公"
   },
+  "Offline Report": {
+    "Offline Report": ""
+  },
   "On-Screen Displays": {
     "On-Screen Displays": "螢幕顯示"
   },
@@ -1192,6 +1300,18 @@
   },
   "Open search bar to find text": {
     "Open search bar to find text": "打開搜尋欄尋找文本"
+  },
+  "Other": {
+    "Other": ""
+  },
+  "Output Area Almost Full": {
+    "Output Area Almost Full": ""
+  },
+  "Output Area Full": {
+    "Output Area Full": ""
+  },
+  "Output Tray Missing": {
+    "Output Tray Missing": ""
   },
   "Overview": {
     "Overview": "概覽"
@@ -1216,6 +1336,12 @@
   },
   "Password": {
     "Password": "密碼"
+  },
+  "Pause": {
+    "Pause": ""
+  },
+  "Paused": {
+    "Paused": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "以主題區分桌布"
@@ -1307,11 +1433,23 @@
   "Primary": {
     "Primary": "主要"
   },
+  "Print Server not available": {
+    "Print Server not available": ""
+  },
+  "Printers": {
+    "Printers": ""
+  },
+  "Printers: ": {
+    "Printers: ": ""
+  },
   "Privacy Indicator": {
     "Privacy Indicator": "隱私指示器"
   },
   "Process": {
     "Process": "程序"
+  },
+  "Processing": {
+    "Processing": ""
   },
   "Profile Image Error": {
     "Profile Image Error": "個人圖片錯誤"
@@ -1337,6 +1475,9 @@
   "Rain Chance": {
     "Rain Chance": "降雨機率"
   },
+  "Reason": {
+    "Reason": ""
+  },
   "Reboot": {
     "Reboot": "重新啟動"
   },
@@ -1355,6 +1496,9 @@
   "Remove": {
     "Remove": "刪除"
   },
+  "Report": {
+    "Report": ""
+  },
   "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "請求確認關機、重新啟動、暫停、休眠和登出操作"
   },
@@ -1363,6 +1507,9 @@
   },
   "Resources": {
     "Resources": "資源"
+  },
+  "Resume": {
+    "Resume": ""
   },
   "Right": {
     "Right": "右方"
@@ -1499,6 +1646,9 @@
   "Show all 9 tags instead of only occupied tags (DWL only)": {
     "Show all 9 tags instead of only occupied tags (DWL only)": "顯示所有 9 個標籤，而非僅顯示已佔用的標籤 (僅限 DWL)"
   },
+  "Show darkened overlay behind modal dialogs": {
+    "Show darkened overlay behind modal dialogs": "在模態對話框後顯示暗化覆蓋層"
+  },
   "Show on Last Display": {
     "Show on Last Display": "在最後顯示幕上顯示"
   },
@@ -1541,6 +1691,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "顯示麥克風、攝影機或螢幕共用處於活動狀態"
   },
+  "Shutdown": {
+    "Shutdown": ""
+  },
   "Size": {
     "Size": "大小"
   },
@@ -1559,6 +1712,9 @@
   "Spacing": {
     "Spacing": "間距"
   },
+  "Spool Area Full": {
+    "Spool Area Full": ""
+  },
   "Square Corners": {
     "Square Corners": "方角"
   },
@@ -1571,6 +1727,15 @@
   "Status": {
     "Status": "狀態"
   },
+  "Stopped": {
+    "Stopped": ""
+  },
+  "Stopped Partly": {
+    "Stopped Partly": ""
+  },
+  "Stopping": {
+    "Stopping": ""
+  },
   "Storage & Disks": {
     "Storage & Disks": "存儲與硬碟"
   },
@@ -1582,6 +1747,9 @@
   },
   "Suspend": {
     "Suspend": "系統暫停"
+  },
+  "Suspend behavior": {
+    "Suspend behavior": "暫停行為"
   },
   "Suspend system after": {
     "Suspend system after": "系統暫停後"
@@ -1661,6 +1829,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下設定將修改您的 GTK 和 Qt 設定。如果您希望保留目前配置，請備份 (qt5ct.conf|qt6ct.conf 和 ~/.config/gtk-3.0|gtk-4.0)。"
   },
+  "The job queue of this printer is empty": {
+    "The job queue of this printer is empty": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "主題和顏色"
   },
@@ -1682,6 +1853,9 @@
   "Time & Weather": {
     "Time & Weather": "時間與天氣"
   },
+  "Timed Out": {
+    "Timed Out": ""
+  },
   "To Full": {
     "To Full": "全部"
   },
@@ -1699,6 +1873,12 @@
   },
   "Tomorrow": {
     "Tomorrow": "明天"
+  },
+  "Toner Empty": {
+    "Toner Empty": ""
+  },
+  "Toner Low": {
+    "Toner Low": ""
   },
   "Top": {
     "Top": "上方"
@@ -1800,7 +1980,7 @@
     "VPN Connections": "VPN 連線"
   },
   "VPN status and quick connect": {
-    "VPN status and quick connect": "VPN 狀態和快速連接"
+    "VPN status and quick connect": "VPN 狀態和快速連線"
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "色彩鮮明且飽和度活潑的調色板。"
@@ -1828,6 +2008,9 @@
   },
   "Wallpapers": {
     "Wallpapers": "桌布"
+  },
+  "Warning": {
+    "Warning": ""
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "波浪進度條"

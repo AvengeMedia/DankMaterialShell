@@ -56,7 +56,7 @@ Row {
         StyledRect {
             anchors.fill: parent
             radius: Theme.cornerRadius
-            color: pathEditMode ? Theme.surfaceContainer : "transparent"
+            color: pathEditMode ? Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency) : "transparent"
             border.color: pathEditMode ? Theme.primary : "transparent"
             border.width: pathEditMode ? 1 : 0
             visible: !pathEditMode

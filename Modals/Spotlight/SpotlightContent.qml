@@ -160,7 +160,7 @@ Item {
                            parentModal.hide()
                        }
         onViewModeSelected: mode => {
-                                SettingsData.setSpotlightModalViewMode(mode)
+                                SettingsData.set("spotlightModalViewMode", mode)
                             }
     }
 
@@ -190,7 +190,7 @@ Item {
                 width: parent.width - 80 - Theme.spacingL
                 height: 56
                 cornerRadius: Theme.cornerRadius
-                backgroundColor: Theme.surfaceContainerHigh
+                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 normalBorderColor: Theme.outlineMedium
                 focusedBorderColor: Theme.primary
                 leftIconName: searchMode === "files" ? "folder" : "search"
@@ -201,7 +201,7 @@ Item {
                 textColor: Theme.surfaceText
                 font.pixelSize: Theme.fontSizeLarge
                 enabled: parentModal ? parentModal.spotlightOpen : true
-                placeholderText: searchMode === "files" ? "Search files..." : "Search apps..."
+                placeholderText: ""
                 ignoreLeftRightKeys: appLauncher.viewMode !== "list"
                 ignoreTabKeys: true
                 keyForwardTargets: [spotlightKeyHandler]

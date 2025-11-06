@@ -51,7 +51,7 @@ Singleton {
         }
         return Math.round((batteryEnergy * 100) / batteryCapacity)
     }
-    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging || b.state === UPowerDeviceState.FullyCharged)
+    readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging)
 
     // Is the system plugged in (none of the batteries are discharging or empty)
     readonly property bool isPluggedIn: batteryAvailable && batteries.every(b => b.state !== UPowerDeviceState.Discharging)

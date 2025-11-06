@@ -35,7 +35,7 @@ PluginComponent {
             id: detailRoot
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
             Column {
                 id: detailColumn

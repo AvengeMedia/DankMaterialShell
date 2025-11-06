@@ -26,7 +26,7 @@ Item {
                 width: parent.width
                 height: timeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -77,7 +77,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.use24HourClock
                             onToggled: checked => {
-                                           return SettingsData.setClockFormat(
+                                           return SettingsData.set("use24HourClock",
                                                checked)
                                        }
                         }
@@ -89,7 +89,7 @@ Item {
                 width: parent.width
                 height: timeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -140,7 +140,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.showSeconds
                             onToggled: checked => {
-                                           return SettingsData.setTimeFormat(
+                                           return SettingsData.set("showSeconds",
                                                checked)
                                        }
                         }
@@ -152,7 +152,7 @@ Item {
                 width: parent.width
                 height: dateSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -240,7 +240,7 @@ Item {
                                                 customFormatInput.visible = true
                                             } else {
                                                 customFormatInput.visible = false
-                                                SettingsData.setClockDateFormat(
+                                                SettingsData.set("clockDateFormat", 
                                                     formatMap[value])
                                             }
                                         }
@@ -302,7 +302,7 @@ Item {
                                                 customLockFormatInput.visible = true
                                             } else {
                                                 customLockFormatInput.visible = false
-                                                SettingsData.setLockDateFormat(
+                                                SettingsData.set("lockDateFormat", 
                                                     formatMap[value])
                                             }
                                         }
@@ -317,7 +317,7 @@ Item {
                         text: SettingsData.clockDateFormat
                         onTextChanged: {
                             if (visible && text)
-                                SettingsData.setClockDateFormat(text)
+                                SettingsData.set("clockDateFormat", text)
                         }
                     }
 
@@ -330,7 +330,7 @@ Item {
                         text: SettingsData.lockDateFormat
                         onTextChanged: {
                             if (visible && text)
-                                SettingsData.setLockDateFormat(text)
+                                SettingsData.set("lockDateFormat", text)
                         }
                     }
 
@@ -338,7 +338,7 @@ Item {
                         width: parent.width
                         height: formatHelp.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Theme.surfaceContainerHigh
+                        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                               Theme.outline.b, 0.1)
                         border.width: 0
@@ -440,7 +440,7 @@ Item {
                 width: parent.width
                 height: enableWeatherSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -491,7 +491,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.weatherEnabled
                             onToggled: checked => {
-                                           return SettingsData.setWeatherEnabled(
+                                           return SettingsData.set("weatherEnabled", 
                                                checked)
                                        }
                         }
@@ -503,7 +503,7 @@ Item {
                 width: parent.width
                 height: temperatureSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -556,7 +556,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.useFahrenheit
                             onToggled: checked => {
-                                           return SettingsData.setTemperatureUnit(
+                                           return SettingsData.set("temperatureUnit", 
                                                checked)
                                        }
                         }
@@ -575,7 +575,7 @@ Item {
                 width: parent.width
                 height: locationSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -628,7 +628,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.useAutoLocation
                             onToggled: checked => {
-                                           return SettingsData.setAutoLocation(
+                                           return SettingsData.set("autoLocation", 
                                                checked)
                                        }
                         }
@@ -804,7 +804,7 @@ Item {
                 width: parent.width
                 height: weatherDisplaySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -966,7 +966,7 @@ Item {
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
                                                     if (WeatherService.weather.available) {
-                                                        SettingsData.setTemperatureUnit(!SettingsData.useFahrenheit)
+                                                        SettingsData.set("temperatureUnit", !SettingsData.useFahrenheit)
                                                     }
                                                 }
                                                 enabled: WeatherService.weather.available
@@ -1058,7 +1058,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent
@@ -1105,7 +1105,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent
@@ -1152,7 +1152,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent
@@ -1199,7 +1199,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent
@@ -1246,7 +1246,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent
@@ -1293,7 +1293,7 @@ Item {
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                                 Column {
                                     anchors.centerIn: parent

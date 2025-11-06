@@ -11,6 +11,8 @@ import qs.Widgets
 DankModal {
     id: settingsModal
 
+    layerNamespace: "dms:settings"
+
     property Component settingsContent
     property alias profileBrowser: profileBrowser
     property int currentTabIndex: 0
@@ -36,6 +38,7 @@ DankModal {
     objectName: "settingsModal"
     width: Math.min(800, screenWidth * 0.9)
     height: Math.min(800, screenHeight * 0.85)
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     visible: false
     onBackgroundClicked: () => {
         return hide();

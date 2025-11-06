@@ -182,7 +182,7 @@ Column {
         height: 48
         visible: searchVisible
         opacity: searchVisible ? 1 : 0
-        color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.95)
+        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         border.color: searchField.activeFocus ? Theme.primary : Theme.outlineMedium
         border.width: searchField.activeFocus ? 2 : 1
         radius: Theme.cornerRadius

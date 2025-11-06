@@ -93,7 +93,6 @@ jobs:
           Requires:       dms-cli
           Requires:       dgop
 
-          Recommends:     brightnessctl
           Recommends:     cava
           Recommends:     cliphist
           Recommends:     danksearch
@@ -194,34 +193,7 @@ jobs:
 
           # Restart DMS for active users after upgrade
           if [ "$1" -ge 2 ]; then
-              # Find all quickshell DMS processes (PID and username)
-              while read pid cmd; do
-                  username=$(ps -o user= -p "$pid" 2>/dev/null)
-                  
-                  [ "$username" = "root" ] && continue
-                  [ -z "$username" ] && continue
-                  
-                  # Get user's UID and validate session
-                  user_uid=$(id -u "$username" 2>/dev/null)
-                  [ -z "$user_uid" ] && continue
-                  [ ! -d "/run/user/$user_uid" ] && continue
-                  
-                  wayland_display=$(tr '\0' '\n' < /proc/$pid/environ 2>/dev/null | grep '^WAYLAND_DISPLAY=' | cut -d= -f2)
-                  [ -z "$wayland_display" ] && continue
-                  
-                  echo "Restarting DMS for user: $username"
-                  
-                  # Run as user with full Wayland session environment
-                  runuser -u "$username" -- /bin/sh -c "
-                      export XDG_RUNTIME_DIR=/run/user/$user_uid
-                      export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$user_uid/bus
-                      export WAYLAND_DISPLAY=$wayland_display
-                      export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:\$PATH
-                      dms restart >/dev/null 2>&1
-                  " 2>/dev/null || true
-                  
-                  break
-              done < <(pgrep -a -f 'quickshell.*dms' 2>/dev/null)
+            pkill -HUP -x dms >/dev/null 2>&1 || true
           fi
 
           %files

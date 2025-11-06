@@ -25,7 +25,7 @@ Item {
                 width: parent.width
                 height: dockPositionSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -95,7 +95,7 @@ Item {
                 width: parent.width
                 height: dockVisibilitySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -146,7 +146,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockAutoHide
                             onToggled: checked => {
-                                           SettingsData.setDockAutoHide(checked)
+                                           SettingsData.set("dockAutoHide", checked)
                                        }
                         }
                     }
@@ -250,7 +250,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockOpenOnOverview
                             onToggled: checked => {
-                                           SettingsData.setDockOpenOnOverview(checked)
+                                           SettingsData.set("dockOpenOnOverview", checked)
                                        }
                         }
                     }
@@ -262,7 +262,7 @@ Item {
                 width: parent.width
                 height: groupByAppSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -315,7 +315,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockGroupByApp
                             onToggled: checked => {
-                                           SettingsData.setDockGroupByApp(checked)
+                                           SettingsData.set("dockGroupByApp", checked)
                                        }
                         }
                     }
@@ -334,7 +334,7 @@ Item {
                 width: parent.width
                 height: indicatorStyleSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -380,7 +380,7 @@ Item {
                             currentIndex: SettingsData.dockIndicatorStyle === "circle" ? 0 : 1
                             onSelectionChanged: (index, selected) => {
                                 if (selected) {
-                                    SettingsData.setDockIndicatorStyle(index === 0 ? "circle" : "line")
+                                    SettingsData.set("dockIndicatorStyle", index === 0 ? "circle" : "line")
                                 }
                             }
                         }
@@ -400,7 +400,7 @@ Item {
                 width: parent.width
                 height: iconSizeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -443,9 +443,9 @@ Item {
                         unit: ""
                         showValue: true
                         wheelEnabled: false
-                        thumbOutlineColor: Theme.surfaceContainerHigh
+                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         onSliderValueChanged: newValue => {
-                                                  SettingsData.setDockIconSize(newValue)
+                                                  SettingsData.set("dockIconSize", newValue)
                                               }
                     }
                 }
@@ -463,7 +463,7 @@ Item {
                 width: parent.width
                 height: dockSpacingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -517,9 +517,9 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDockSpacing(
+                                                      SettingsData.set("dockSpacing", 
                                                           newValue)
                                                   }
                         }
@@ -545,9 +545,9 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDockBottomGap(
+                                                      SettingsData.set("dockBottomGap", 
                                                           newValue)
                                                   }
                         }
@@ -567,7 +567,7 @@ Item {
                 width: parent.width
                 height: transparencySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -610,9 +610,9 @@ Item {
                         unit: "%"
                         showValue: true
                         wheelEnabled: false
-                        thumbOutlineColor: Theme.surfaceContainerHigh
+                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         onSliderValueChanged: newValue => {
-                                                  SettingsData.setDockTransparency(
+                                                  SettingsData.set("dockTransparency", 
                                                       newValue / 100)
                                               }
                     }

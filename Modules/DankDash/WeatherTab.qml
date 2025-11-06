@@ -139,7 +139,7 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     if (WeatherService.weather.available) {
-                                        SettingsData.setTemperatureUnit(!SettingsData.useFahrenheit)
+                                        SettingsData.set("temperatureUnit", !SettingsData.useFahrenheit)
                                     }
                                 }
                                 enabled: WeatherService.weather.available
@@ -231,7 +231,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -278,7 +278,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -325,7 +325,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -372,7 +372,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -419,7 +419,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -466,7 +466,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 Column {
                     anchors.centerIn: parent
@@ -554,7 +554,7 @@ Item {
                             return null
                         }
 
-                        color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : Theme.surfaceContainerHigh
+                        color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         border.color: isToday ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) : "transparent"
                         border.width: isToday ? 1 : 0
 

@@ -12,6 +12,8 @@ import qs.Widgets
 DankModal {
     id: spotlightModal
 
+    layerNamespace: "dms:spotlight"
+
     property bool spotlightOpen: false
     property alias spotlightContent: spotlightContentInstance
 
@@ -79,9 +81,9 @@ DankModal {
     }
 
     shouldBeVisible: spotlightOpen
-    width: 550
-    height: 700
-    backgroundColor: Theme.popupBackground()
+    width: 500
+    height: 600
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
     borderWidth: 1

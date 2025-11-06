@@ -10,8 +10,6 @@ import qs.Common
 Singleton {
     id: root
 
-    readonly property string shellDir: Paths.strip(Qt.resolvedUrl(".").toString()).replace("/Services/", "")
-    property string scriptPath: `${shellDir}/scripts/hyprland_keybinds.py`
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
     property string hyprConfigPath: `${_configDir}/hypr`
@@ -20,7 +18,7 @@ Singleton {
     Process {
         id: getKeybinds
         running: false
-        command: [root.scriptPath, "--path", root.hyprConfigPath]
+        command: ["dms", "hyprland", "keybinds", "--path", root.hyprConfigPath]
 
         stdout: SplitParser {
             onRead: data => {

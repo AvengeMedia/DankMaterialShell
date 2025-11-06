@@ -25,7 +25,7 @@ DankFlickable {
             width: parent.width
             height: systemInfoColumn.implicitHeight + 2 * Theme.spacingL
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             border.width: 0
 
             Column {
@@ -102,7 +102,7 @@ DankFlickable {
                         width: (parent.width - Theme.spacingXL) / 2
                         height: hardwareColumn.implicitHeight + Theme.spacingL
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.4)
+                        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         border.width: 1
                         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
 
@@ -191,8 +191,8 @@ DankFlickable {
                         height: gpuColumn.implicitHeight + Theme.spacingL
                         radius: Theme.cornerRadius
                         color: {
-                            const baseColor = Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.4);
-                            const hoverColor = Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, 0.6);
+                            const baseColor = Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
+                            const hoverColor = Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, Theme.popupTransparency * 1.5);
                             if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
                                 return gpuCardMouseArea.containsMouse && DgopService.availableGpus.length > 1 ? hoverColor : baseColor;
                             }
@@ -387,7 +387,7 @@ DankFlickable {
             width: parent.width
             height: storageColumn.implicitHeight + 2 * Theme.spacingL
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             border.width: 0
 
             Column {

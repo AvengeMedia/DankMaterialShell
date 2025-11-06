@@ -20,6 +20,8 @@ import "./utils/state.js" as StateUtils
 DankPopout {
     id: root
 
+    layerNamespace: "dms:control-center"
+
     property string expandedSection: ""
     property var triggerScreen: null
     property bool editMode: false
@@ -46,7 +48,7 @@ DankPopout {
         }
     }
 
-    readonly property color _containerBg: Theme.surfaceContainerHigh
+    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
     function setTriggerPosition(x, y, width, section, screen) {
         StateUtils.setTriggerPosition(root, x, y, width, section, screen)

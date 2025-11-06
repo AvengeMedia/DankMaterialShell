@@ -14,6 +14,8 @@ BasePill {
     property var popoutTarget: null
     property var widgetData: null
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
+    property bool showSwap: (widgetData && widgetData.showSwap !== undefined) ? widgetData.showSwap : false
+    readonly property real swapUsage: DgopService.totalSwapKB > 0 ? (DgopService.usedSwapKB / DgopService.totalSwapKB) * 100 : 0
 
     Component.onCompleted: {
         DgopService.addRef(["memory"]);
@@ -62,6 +64,14 @@ BasePill {
                     color: Theme.surfaceText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
+
+                StyledText {
+                    visible: root.showSwap && DgopService.totalSwapKB > 0
+                    text: root.swapUsage.toFixed(0)
+                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    color: Theme.surfaceVariantText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
             }
 
             Row {
@@ -93,18 +103,31 @@ BasePill {
                             return "--%";
                         }
 
-                        return DgopService.memoryUsage.toFixed(0) + "%";
+                        let ramText = DgopService.memoryUsage.toFixed(0) + "%";
+                        if (root.showSwap && DgopService.totalSwapKB > 0) {
+                            return ramText + " · " + root.swapUsage.toFixed(0) + "%";
+                        }
+                        return ramText;
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness)
                     color: Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
                     elide: Text.ElideNone
+                    wrapMode: Text.NoWrap
 
                     StyledTextMetrics {
                         id: ramBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness)
-                        text: "100%"
+                        text: {
+                            if (!root.showSwap) {
+                                return "100%";
+                            }
+                            if (root.swapUsage < 10) {
+                                return "100% · 0%";
+                            }
+                            return "100% · 100%";
+                        }
                     }
 
                     width: root.minimumWidth ? Math.max(ramBaseline.width, paintedWidth) : paintedWidth

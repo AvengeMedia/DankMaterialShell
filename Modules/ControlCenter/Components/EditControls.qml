@@ -76,7 +76,7 @@ Row {
                     width: 400 - Theme.spacingL * 2
                     height: 50
                     radius: Theme.cornerRadius
-                    color: widgetMouseArea.containsMouse ? Theme.primaryHover : Theme.surfaceContainerHigh
+                    color: widgetMouseArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                     border.width: 0
 

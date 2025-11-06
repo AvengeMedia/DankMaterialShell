@@ -9,6 +9,7 @@ import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.Common
 import qs.Services
+import qs.Modules.Greetd
 import "StockThemes.js" as StockThemes
 
 Singleton {
@@ -425,7 +426,12 @@ Singleton {
         }
     }
 
-    property real cornerRadius: typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12
+    property real cornerRadius: {
+        if (typeof SessionData !== "undefined" && SessionData.isGreeterMode && typeof GreetdSettings !== "undefined") {
+            return GreetdSettings.cornerRadius
+        }
+        return typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12
+    }
     property real spacingXS: 4
     property real spacingS: 8
     property real spacingM: 12
@@ -476,7 +482,7 @@ Singleton {
         }
         const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode)
         if (savePrefs && typeof SettingsData !== "undefined" && !isGreeterMode)
-            SettingsData.setTheme(currentTheme)
+            SettingsData.set("currentThemeName", currentTheme)
 
         if (!isGreeterMode) {
             generateSystemThemesFromCurrentTheme()
@@ -598,13 +604,6 @@ Singleton {
     readonly property var _availableThemeNames: StockThemes.getAllThemeNames()
     property string currentThemeName: currentTheme
 
-    function popupBackground() {
-        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, popupTransparency)
-    }
-
-    function contentBackground() {
-        return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, popupTransparency)
-    }
 
     function panelBackground() {
         return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, panelTransparency)
@@ -648,13 +647,6 @@ Singleton {
         }
     }
 
-    function getPopupBackgroundAlpha() {
-        return popupTransparency
-    }
-
-    function getContentBackgroundAlpha() {
-        return popupTransparency
-    }
 
     function isColorDark(c) {
         return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) < 0.5

@@ -60,7 +60,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.surfaceContainerHigh
+        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         radius: Theme.cornerRadius
         border.width: 1
         border.color: Theme.outlineMedium

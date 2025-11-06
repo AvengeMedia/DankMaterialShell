@@ -26,12 +26,11 @@ Singleton {
     readonly property int monitorTimeout: isOnBattery ? SettingsData.batteryMonitorTimeout : SettingsData.acMonitorTimeout
     readonly property int lockTimeout: isOnBattery ? SettingsData.batteryLockTimeout : SettingsData.acLockTimeout
     readonly property int suspendTimeout: isOnBattery ? SettingsData.batterySuspendTimeout : SettingsData.acSuspendTimeout
-    readonly property int hibernateTimeout: isOnBattery ? SettingsData.batteryHibernateTimeout : SettingsData.acHibernateTimeout
+    readonly property int suspendBehavior: isOnBattery ? SettingsData.batterySuspendBehavior : SettingsData.acSuspendBehavior
 
     onMonitorTimeoutChanged: _rearmIdleMonitors()
     onLockTimeoutChanged: _rearmIdleMonitors()
     onSuspendTimeoutChanged: _rearmIdleMonitors()
-    onHibernateTimeoutChanged: _rearmIdleMonitors()
 
     function _rearmIdleMonitors() {
         _enableGate = false
@@ -42,12 +41,10 @@ Singleton {
     signal requestMonitorOff()
     signal requestMonitorOn()
     signal requestSuspend()
-    signal requestHibernate()
 
     property var monitorOffMonitor: null
     property var lockMonitor: null
     property var suspendMonitor: null
-    property var hibernateMonitor: null
 
     function wake() {
         requestMonitorOn()
@@ -102,16 +99,6 @@ Singleton {
                     root.requestSuspend()
                 }
             })
-
-            hibernateMonitor = Qt.createQmlObject(qmlString, root, "IdleService.HibernateMonitor")
-            hibernateMonitor.enabled = Qt.binding(() => root._enableGate && root.enabled && root.idleMonitorAvailable && root.hibernateTimeout > 0)
-            hibernateMonitor.respectInhibitors = Qt.binding(() => root.respectInhibitors)
-            hibernateMonitor.timeout = Qt.binding(() => root.hibernateTimeout)
-            hibernateMonitor.isIdleChanged.connect(function() {
-                if (hibernateMonitor.isIdle) {
-                    root.requestHibernate()
-                }
-            })
         } catch (e) {
             console.warn("IdleService: Error creating IdleMonitors:", e)
         }
@@ -128,11 +115,7 @@ Singleton {
         }
 
         function onRequestSuspend() {
-            SessionService.suspend()
-        }
-
-        function onRequestHibernate() {
-            SessionService.hibernate()
+            SessionService.suspendWithBehavior(root.suspendBehavior)
         }
     }
 

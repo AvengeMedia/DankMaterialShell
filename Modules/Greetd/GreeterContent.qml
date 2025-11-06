@@ -149,7 +149,7 @@ Item {
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
             return (currentWallpaper && !currentWallpaper.startsWith("#")) ? currentWallpaper : ""
         }
-        fillMode: Theme.getFillMode(SettingsData.wallpaperFillMode)
+        fillMode: Theme.getFillMode(GreetdSettings.wallpaperFillMode)
         smooth: true
         asynchronous: false
         cache: true

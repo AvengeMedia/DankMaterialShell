@@ -69,7 +69,7 @@ Item {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         radius: Theme.cornerRadius
-        color: dropdownArea.containsMouse || dropdownMenu.visible ? Theme.surfaceContainerHigh : Theme.surfaceContainer
+        color: dropdownArea.containsMouse || dropdownMenu.visible ? Theme.surfaceContainerHigh : Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         border.color: dropdownMenu.visible ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
         border.width: dropdownMenu.visible ? 2 : 1
 
@@ -254,7 +254,7 @@ Item {
                     height: 42
                     visible: root.enableFuzzySearch
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                     DankTextField {
                         id: searchField

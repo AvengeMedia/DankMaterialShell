@@ -86,7 +86,7 @@ Rectangle {
             width: ListView.view.width
             height: filesList.itemHeight
             radius: Theme.cornerRadius
-            color: ListView.isCurrentItem ? Theme.primaryPressed : fileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
+            color: ListView.isCurrentItem ? Theme.primaryPressed : fileMouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
             Row {
                 anchors.fill: parent

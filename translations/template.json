@@ -399,6 +399,20 @@
     "comment": ""
   },
   {
+    "term": "Autoconnect disabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Autoconnect enabled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Automatic Control",
     "translation": "",
     "context": "",
@@ -666,6 +680,20 @@
   },
   {
     "term": "CPU usage indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "CUPS Insecure Filter Warning",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "CUPS Missing Filter Warning",
     "translation": "",
     "context": "",
     "reference": "",
@@ -952,6 +980,13 @@
     "comment": ""
   },
   {
+    "term": "Connecting to Device",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Contrast",
     "translation": "",
     "context": "",
@@ -967,6 +1002,27 @@
   },
   {
     "term": "Control currently playing media",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of individual widgets inside DankBar",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Controls opacity of the DankBar panel background",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1009,6 +1065,13 @@
   },
   {
     "term": "Corner Radius (0 = square corners)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Cover Open",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1176,6 +1239,20 @@
     "comment": ""
   },
   {
+    "term": "Dark Mode",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Darken Modal Background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Date Format",
     "translation": "",
     "context": "",
@@ -1240,6 +1317,13 @@
   },
   {
     "term": "Device paired",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disable Autoconnect",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1379,6 +1463,13 @@
     "comment": ""
   },
   {
+    "term": "Door Open",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "translation": "",
     "context": "",
@@ -1415,6 +1506,13 @@
   },
   {
     "term": "Empty",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable Autoconnect",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1547,6 +1645,13 @@
     "comment": ""
   },
   {
+    "term": "Error",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Exclusive Zone Offset",
     "translation": "",
     "context": "",
@@ -1569,6 +1674,20 @@
   },
   {
     "term": "Failed to activate configuration",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to cancel all jobs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to cancel selected job",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1617,7 +1736,21 @@
     "comment": ""
   },
   {
+    "term": "Failed to pause printer",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Failed to remove device",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to resume printer",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1639,6 +1772,13 @@
   },
   {
     "term": "Failed to start connection to ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to update autoconnect",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1876,13 +2016,6 @@
     "comment": ""
   },
   {
-    "term": "Hibernate system after",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Hide the dock when not in use and reveal it when hovering near the dock area",
     "translation": "",
     "context": "",
@@ -1940,6 +2073,13 @@
   },
   {
     "term": "Icon Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Idle",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2016,6 +2156,13 @@
     "comment": ""
   },
   {
+    "term": "Interlock Open",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Internet",
     "translation": "",
     "context": "",
@@ -2031,6 +2178,20 @@
   },
   {
     "term": "Invert on mode change",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Jobs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Jobs: ",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2254,6 +2415,34 @@
     "comment": ""
   },
   {
+    "term": "Marker Supply Empty",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Marker Supply Low",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Marker Waste Almost Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Marker Waste Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Material Colors",
     "translation": "",
     "context": "",
@@ -2297,6 +2486,34 @@
   },
   {
     "term": "Media Controls",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Media Empty",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Media Jam",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Media Low",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Media Needed",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2381,6 +2598,13 @@
   },
   {
     "term": "Mount",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Moving to Paused",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2583,6 +2807,20 @@
     "comment": ""
   },
   {
+    "term": "No printer found",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "None",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Normal Priority",
     "translation": "",
     "context": "",
@@ -2688,6 +2926,13 @@
     "comment": ""
   },
   {
+    "term": "Offline Report",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "On-Screen Displays",
     "translation": "",
     "context": "",
@@ -2724,6 +2969,34 @@
   },
   {
     "term": "Open search bar to find text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Other",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Output Area Almost Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Output Area Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Output Tray Missing",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2780,6 +3053,20 @@
   },
   {
     "term": "Password",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pause",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Paused",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2996,6 +3283,27 @@
     "comment": ""
   },
   {
+    "term": "Print Server not available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Printers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Printers: ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Privacy Indicator",
     "translation": "",
     "context": "",
@@ -3004,6 +3312,13 @@
   },
   {
     "term": "Process",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Processing",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3059,6 +3374,13 @@
     "comment": ""
   },
   {
+    "term": "Reason",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Reboot",
     "translation": "",
     "context": "",
@@ -3101,6 +3423,13 @@
     "comment": ""
   },
   {
+    "term": "Report",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Request confirmation on power off, restart, suspend, hibernate and logout actions",
     "translation": "",
     "context": "",
@@ -3116,6 +3445,13 @@
   },
   {
     "term": "Resources",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Resume",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3430,6 +3766,13 @@
     "comment": ""
   },
   {
+    "term": "Show darkened overlay behind modal dialogs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show on Last Display",
     "translation": "",
     "context": "",
@@ -3528,6 +3871,13 @@
     "comment": ""
   },
   {
+    "term": "Shutdown",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Size",
     "translation": "",
     "context": "",
@@ -3570,6 +3920,13 @@
     "comment": ""
   },
   {
+    "term": "Spool Area Full",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Square Corners",
     "translation": "",
     "context": "",
@@ -3598,6 +3955,27 @@
     "comment": ""
   },
   {
+    "term": "Stopped",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Stopped Partly",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Stopping",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Storage & Disks",
     "translation": "",
     "context": "",
@@ -3620,6 +3998,13 @@
   },
   {
     "term": "Suspend",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Suspend behavior",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3794,6 +4179,13 @@
     "comment": ""
   },
   {
+    "term": "The job queue of this printer is empty",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Theme & Colors",
     "translation": "",
     "context": "",
@@ -3843,6 +4235,13 @@
     "comment": ""
   },
   {
+    "term": "Timed Out",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "To Full",
     "translation": "",
     "context": "",
@@ -3879,6 +4278,20 @@
   },
   {
     "term": "Tomorrow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Toner Empty",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Toner Low",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4173,6 +4586,13 @@
   },
   {
     "term": "Wallpapers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Warning",
     "translation": "",
     "context": "",
     "reference": "",

@@ -138,13 +138,13 @@
     "Audio Output Devices (": "Ses Çıkış Aygıtları ("
   },
   "Authenticate": {
-    "Authenticate": ""
+    "Authenticate": "Kimlik Doğrula"
   },
   "Authentication Required": {
-    "Authentication Required": ""
+    "Authentication Required": "Kimlik Doğrulama Gerekli"
   },
   "Authentication failed, please try again": {
-    "Authentication failed, please try again": ""
+    "Authentication failed, please try again": "Kimlik doğrulama başarısız, lütfen tekrar deneyin"
   },
   "Authorize": {
     "Authorize": "Yetkilendir"
@@ -172,6 +172,12 @@
   },
   "Auto-saving...": {
     "Auto-saving...": "Otomatik kaydetme..."
+  },
+  "Autoconnect disabled": {
+    "Autoconnect disabled": "Otomatik bağlanma devre dışı"
+  },
+  "Autoconnect enabled": {
+    "Autoconnect enabled": "Otomatik bağlanma etkin"
   },
   "Automatic Control": {
     "Automatic Control": "Otomatik Kontrol"
@@ -290,6 +296,12 @@
   "CPU usage indicator": {
     "CPU usage indicator": "CPU kullanım göstergesi"
   },
+  "CUPS Insecure Filter Warning": {
+    "CUPS Insecure Filter Warning": "CUPS Güvenli Olmayan Filtre Uyarısı"
+  },
+  "CUPS Missing Filter Warning": {
+    "CUPS Missing Filter Warning": "CUPS Eksik Filtre Uyarısı"
+  },
   "Cancel": {
     "Cancel": "İptal"
   },
@@ -348,7 +360,7 @@
     "Color Picker": "Renk Seçici"
   },
   "Color temperature for day time": {
-    "Color temperature for day time": ""
+    "Color temperature for day time": "Gündüz için renk sıcaklığı"
   },
   "Color temperature for night mode": {
     "Color temperature for night mode": "Gece modu için renk sıcaklığı"
@@ -413,6 +425,9 @@
   "Connected Displays": {
     "Connected Displays": "Bağlı Ekranlar"
   },
+  "Connecting to Device": {
+    "Connecting to Device": "Cihaza Bağlanma"
+  },
   "Connection failed. Check password and try again.": {
     "Connection failed. Check password and try again.": "Bağlantı başarısız. Parolayı kontrol edin ve tekrar deneyin."
   },
@@ -424,6 +439,15 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "Şu anda oynatılan medyayı kontrol et"
+  },
+  "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": {
+    "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": "Tüm açılır pencerelerin, modal pencerelerin ve bunların içerik katmanlarının (DankDash, Ayarlar, Uygulama Çekmecesi, Kontrol Merkezi vb.) opaklığını kontrol eder"
+  },
+  "Controls opacity of individual widgets inside DankBar": {
+    "Controls opacity of individual widgets inside DankBar": "DankBar içindeki her widget için ayrı opaklığı kontrol eder"
+  },
+  "Controls opacity of the DankBar panel background": {
+    "Controls opacity of the DankBar panel background": "DankBar panelinin arka plan opaklığını kontrol eder"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "Panoya kopyalandı"
@@ -442,6 +466,9 @@
   },
   "Corner Radius (0 = square corners)": {
     "Corner Radius (0 = square corners)": "Köşe Yarıçapı (0 = kare köşeler)"
+  },
+  "Cover Open": {
+    "Cover Open": "Kapak Açık"
   },
   "Create Dir": {
     "Create Dir": "Dizin Oluştur"
@@ -495,7 +522,7 @@
     "Daily at:": "Her gün saat:"
   },
   "Dank": {
-    "Dank": ""
+    "Dank": "Dank"
   },
   "Dank Bar": {
     "Dank Bar": "Dank Bar"
@@ -515,11 +542,17 @@
   "DankSearch not available": {
     "DankSearch not available": "DankSearch kullanılamıyor"
   },
+  "Dark Mode": {
+    "Dark Mode": "Karanlık Mod"
+  },
+  "Darken Modal Background": {
+    "Darken Modal Background": "Koyu Modal Arkaplanı"
+  },
   "Date Format": {
     "Date Format": "Tarih Biçimi"
   },
   "Day Temperature": {
-    "Day Temperature": ""
+    "Day Temperature": "Gündüz Sıcaklığı"
   },
   "Default": {
     "Default": "Varsayılan"
@@ -544,6 +577,9 @@
   },
   "Device paired": {
     "Device paired": "Cihaz eşleştirildi"
+  },
+  "Disable Autoconnect": {
+    "Disable Autoconnect": "Otomatik Bağlanmayı Devre Dışı Bırak"
   },
   "Disconnect": {
     "Disconnect": "Bağlantıyı Kes"
@@ -602,6 +638,9 @@
   "Donate on Ko-fi": {
     "Donate on Ko-fi": "Ko-fi üzerinden bağış yap"
   },
+  "Door Open": {
+    "Door Open": "Kapı Açık"
+  },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Widget'ları sürükleyerek bölümler içinde yeniden sıralayın. Göz simgesini kullanarak widget'ları gizleyin/gösterin (aralıkları korur) veya X simgesini kullanarak tamamen kaldırın."
   },
@@ -619,6 +658,9 @@
   },
   "Empty": {
     "Empty": "Boş"
+  },
+  "Enable Autoconnect": {
+    "Enable Autoconnect": "Otomatik Bağlanmayı Etkinleştir"
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "GPU Sıcaklığını Etkinleştir"
@@ -674,6 +716,9 @@
   "Enter password for ": {
     "Enter password for ": "Parolayı girin "
   },
+  "Error": {
+    "Error": "Hata"
+  },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Özel Bölge Ofseti"
   },
@@ -685,6 +730,12 @@
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Yapılandırma etkinleştirilemedi"
+  },
+  "Failed to cancel all jobs": {
+    "Failed to cancel all jobs": "Tüm işler iptal edemedi"
+  },
+  "Failed to cancel selected job": {
+    "Failed to cancel selected job": "Seçilen işler iptal edemedi"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "VPN bağlantısı kurulamadı"
@@ -704,8 +755,14 @@
   "Failed to enable WiFi": {
     "Failed to enable WiFi": "WiFi etkinleştirilemedi"
   },
+  "Failed to pause printer": {
+    "Failed to pause printer": "Yazıcıyı duraklatma başarısız"
+  },
   "Failed to remove device": {
     "Failed to remove device": "Cihaz kaldırılamadı"
+  },
+  "Failed to resume printer": {
+    "Failed to resume printer": "Yazıcıyı devam ettirme başarısız"
   },
   "Failed to set profile image": {
     "Failed to set profile image": "Profil resmi ayarlanamadı"
@@ -715,6 +772,9 @@
   },
   "Failed to start connection to ": {
     "Failed to start connection to ": "Bağlantı başlatılamadı "
+  },
+  "Failed to update autoconnect": {
+    "Failed to update autoconnect": "Otomatik bağlanma güncellenemedi"
   },
   "Feels Like": {
     "Feels Like": "Hissedilen"
@@ -851,6 +911,9 @@
   "Icon Theme": {
     "Icon Theme": "Simge Teması"
   },
+  "Idle": {
+    "Idle": "Boşta"
+  },
   "Idle Inhibitor": {
     "Idle Inhibitor": "Boşta Kalma Engelleyici"
   },
@@ -881,6 +944,9 @@
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "DMS eklenti deposundan eklentiler yükle"
   },
+  "Interlock Open": {
+    "Interlock Open": "Kilit Açık"
+  },
   "Internet": {
     "Internet": "İnternet"
   },
@@ -889,6 +955,12 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "Mod değişikliğinde ters çevir"
+  },
+  "Jobs": {
+    "Jobs": "İşler"
+  },
+  "Jobs: ": {
+    "Jobs: ": "İşler:"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Klavye Düzeni Adı"
@@ -986,6 +1058,18 @@
   "Manual Show/Hide": {
     "Manual Show/Hide": "Manuel Göster/Gizle"
   },
+  "Marker Supply Empty": {
+    "Marker Supply Empty": "Sarf Malzemesi Boş"
+  },
+  "Marker Supply Low": {
+    "Marker Supply Low": "Sarf Malzemesi Az"
+  },
+  "Marker Waste Almost Full": {
+    "Marker Waste Almost Full": "Atık Haznesi Neredeyse Dolu"
+  },
+  "Marker Waste Full": {
+    "Marker Waste Full": "Atık Haznesi Dolu"
+  },
   "Material Colors": {
     "Material Colors": "Materyal Renkleri"
   },
@@ -1006,6 +1090,18 @@
   },
   "Media Controls": {
     "Media Controls": "Medya Kontrolleri"
+  },
+  "Media Empty": {
+    "Media Empty": "Kağıt Bitti"
+  },
+  "Media Jam": {
+    "Media Jam": "Kağıt Sıkışması"
+  },
+  "Media Low": {
+    "Media Low": "Kağıt Az"
+  },
+  "Media Needed": {
+    "Media Needed": "Kağıt Gerekli"
   },
   "Media Player Settings": {
     "Media Player Settings": "Medya Oynatıcı Ayarları"
@@ -1045,6 +1141,9 @@
   },
   "Mount": {
     "Mount": "Bağlı"
+  },
+  "Moving to Paused": {
+    "Moving to Paused": "Duraklatılıyor"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Sakin ve yatıştırıcı tonlara sahip, yumuşak renk paleti."
@@ -1092,7 +1191,7 @@
     "Night Mode": "Gece Modu"
   },
   "Night Temperature": {
-    "Night Temperature": ""
+    "Night Temperature": "Gece Sıcaklığı"
   },
   "No Active Players": {
     "No Active Players": "Aktif Oynatıcı Yok"
@@ -1129,6 +1228,12 @@
   },
   "No plugins found.": {
     "No plugins found.": "Eklenti bulunamadı."
+  },
+  "No printer found": {
+    "No printer found": "Yazıcı Bulunamadı"
+  },
+  "None": {
+    "None": "Hiçbiri"
   },
   "Normal Priority": {
     "Normal Priority": "Normal Öncelik"
@@ -1175,6 +1280,9 @@
   "Office": {
     "Office": "Ofis"
   },
+  "Offline Report": {
+    "Offline Report": "Çevrimdışı Rapor"
+  },
   "On-Screen Displays": {
     "On-Screen Displays": "Ekran Üstü Gösterimler"
   },
@@ -1192,6 +1300,18 @@
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Metin bulmak için arama çubuğunu aç"
+  },
+  "Other": {
+    "Other": "Diğer"
+  },
+  "Output Area Almost Full": {
+    "Output Area Almost Full": "Çıkış Alanı Neredeyse Dolu"
+  },
+  "Output Area Full": {
+    "Output Area Full": "Çıkış Alanı Dolu"
+  },
+  "Output Tray Missing": {
+    "Output Tray Missing": "Çıktı Tepsisi Yok"
   },
   "Overview": {
     "Overview": "Genel Görünüm"
@@ -1216,6 +1336,12 @@
   },
   "Password": {
     "Password": "Parola"
+  },
+  "Pause": {
+    "Pause": "Duraklat"
+  },
+  "Paused": {
+    "Paused": "Duraklatıldı"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Moda Özel Duvar Kağıtları"
@@ -1307,11 +1433,23 @@
   "Primary": {
     "Primary": "Birincil"
   },
+  "Print Server not available": {
+    "Print Server not available": "Yazıcı Sunucusu Kullanılamıyor"
+  },
+  "Printers": {
+    "Printers": "Yazıcılar"
+  },
+  "Printers: ": {
+    "Printers: ": "Yazıcılar:"
+  },
   "Privacy Indicator": {
     "Privacy Indicator": "Gizlilik Göstergesi"
   },
   "Process": {
     "Process": "Süreç"
+  },
+  "Processing": {
+    "Processing": "İşleniyor"
   },
   "Profile Image Error": {
     "Profile Image Error": "Profil Resmi Hatası"
@@ -1337,6 +1475,9 @@
   "Rain Chance": {
     "Rain Chance": "Yağış İhtimali"
   },
+  "Reason": {
+    "Reason": "Sebep"
+  },
   "Reboot": {
     "Reboot": "Yeniden Başlat"
   },
@@ -1355,6 +1496,9 @@
   "Remove": {
     "Remove": "Kaldır"
   },
+  "Report": {
+    "Report": "Rapor"
+  },
   "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "Kapatma, yeniden başlatma, askıya alma, hazırda bekletme ve oturumu kapatma işlemlerinde onay iste"
   },
@@ -1363,6 +1507,9 @@
   },
   "Resources": {
     "Resources": "Kaynaklar"
+  },
+  "Resume": {
+    "Resume": "Sürdür"
   },
   "Right": {
     "Right": "Sağ"
@@ -1479,7 +1626,7 @@
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: Tümünü Temizle • Esc: Kapat"
   },
   "Show All Tags": {
-    "Show All Tags": ""
+    "Show All Tags": "Tüm Etiketleri Göster"
   },
   "Show Confirmation on Power Actions": {
     "Show Confirmation on Power Actions": "Güç Eylemlerinde Onay Göster"
@@ -1497,7 +1644,10 @@
     "Show Workspace Apps": "Çalışma Alanı Uygulamalarını Göster"
   },
   "Show all 9 tags instead of only occupied tags (DWL only)": {
-    "Show all 9 tags instead of only occupied tags (DWL only)": ""
+    "Show all 9 tags instead of only occupied tags (DWL only)": "Sadece dolu etiketleri değil, tüm 9 etiketi göster (sadece DWL)"
+  },
+  "Show darkened overlay behind modal dialogs": {
+    "Show darkened overlay behind modal dialogs": "Modal diyalogların arkasında karartılmış kaplama göster"
   },
   "Show on Last Display": {
     "Show on Last Display": "Son Ekranda Göster"
@@ -1541,6 +1691,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mikrofon, kamera veya ekran paylaşımı aktif olduğunda gösterir"
   },
+  "Shutdown": {
+    "Shutdown": "Kapat"
+  },
   "Size": {
     "Size": "Boyut"
   },
@@ -1559,6 +1712,9 @@
   "Spacing": {
     "Spacing": "Boşluk"
   },
+  "Spool Area Full": {
+    "Spool Area Full": "Aktarım Alanı Dolu"
+  },
   "Square Corners": {
     "Square Corners": "Kare Köşeler"
   },
@@ -1571,6 +1727,15 @@
   "Status": {
     "Status": "Durum"
   },
+  "Stopped": {
+    "Stopped": "Durduruldu"
+  },
+  "Stopped Partly": {
+    "Stopped Partly": "Kısmen Durduruldu"
+  },
+  "Stopping": {
+    "Stopping": "Durduruluyor"
+  },
   "Storage & Disks": {
     "Storage & Disks": "Depolama & Diskler"
   },
@@ -1582,6 +1747,9 @@
   },
   "Suspend": {
     "Suspend": "Askıya Al"
+  },
+  "Suspend behavior": {
+    "Suspend behavior": "Askıya alma davranışı"
   },
   "Suspend system after": {
     "Suspend system after": "Şu zaman sonra askıya al"
@@ -1661,6 +1829,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Aşağıdaki ayarlar GTK ve Qt ayarlarınızı değiştirecektir. Mevcut yapılandırmalarınızı korumak istiyorsanız, lütfen yedekleyin (qt5ct.conf|qt6ct.conf ve ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The job queue of this printer is empty": {
+    "The job queue of this printer is empty": "Bu yazıcının iş kuyruğu boş"
+  },
   "Theme & Colors": {
     "Theme & Colors": "Tema & Renkler"
   },
@@ -1682,6 +1853,9 @@
   "Time & Weather": {
     "Time & Weather": "Zaman & Hava Durumu"
   },
+  "Timed Out": {
+    "Timed Out": "Zaman Aşımı"
+  },
   "To Full": {
     "To Full": "Dolmasına"
   },
@@ -1699,6 +1873,12 @@
   },
   "Tomorrow": {
     "Tomorrow": "Yarın"
+  },
+  "Toner Empty": {
+    "Toner Empty": "Toner Boş"
+  },
+  "Toner Low": {
+    "Toner Low": "Toner Az"
   },
   "Top": {
     "Top": "Üst"
@@ -1828,6 +2008,9 @@
   },
   "Wallpapers": {
     "Wallpapers": "Duvar Kağıtları"
+  },
+  "Warning": {
+    "Warning": "Uyarı"
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Dalga İlerleme Çubukları"

@@ -1,0 +1,13 @@
+[templates.dmscodiumdefault]
+input_path = './matugen/templates/vscode-color-theme.json'
+output_path = '~/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1/themes/dankshell-default-base.json'
+
+[templates.dmscodiumdark]
+input_path = './matugen/templates/vscode-color-theme.json'
+output_path = '~/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1/themes/dankshell-dark-base.json'
+mode = 'Dark'
+
+[templates.dmscodiumlight]
+input_path = './matugen/templates/vscode-color-theme.json'
+output_path = '~/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1/themes/dankshell-light-base.json'
+mode = 'Light'

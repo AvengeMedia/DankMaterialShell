@@ -206,7 +206,7 @@ Item {
                         radius: Theme.cornerRadius
                         color: {
                             if (modelData.name === currentCodec)
-                                return Theme.surfaceContainerHighest;
+                                return Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency);
                             else if (codecMouseArea.containsMouse)
                                 return Theme.surfaceHover;
                             else

@@ -85,7 +85,7 @@ Item {
             height: 28
             radius: Theme.cornerRadius
             visible: NotificationService.notifications.length > 0
-            color: clearArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
+            color: clearArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
             Row {
                 anchors.centerIn: parent

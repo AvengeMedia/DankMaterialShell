@@ -10,6 +10,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:color-picker"
+
     property string pickerTitle: "Choose Color"
     property color selectedColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary
     property var onColorSelectedCallback: null
@@ -382,7 +384,7 @@ DankModal {
                                             if (index < SessionData.recentColors.length) {
                                                 return SessionData.recentColors[index]
                                             }
-                                            return Theme.surfaceContainerHigh
+                                            return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         }
 
                                         opacity: index < SessionData.recentColors.length ? 1.0 : 0.3

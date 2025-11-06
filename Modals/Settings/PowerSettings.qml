@@ -64,7 +64,7 @@ Item {
                         text: I18n.tr("Show Power Actions")
                         description: I18n.tr("Show power, restart, and logout buttons on the lock screen")
                         checked: SettingsData.lockScreenShowPowerActions
-                        onToggled: checked => SettingsData.setLockScreenShowPowerActions(checked)
+                        onToggled: checked => SettingsData.set("lockScreenShowPowerActions", checked)
                     }
 
                     StyledText {
@@ -84,7 +84,7 @@ Item {
                         enabled: SessionService.loginctlAvailable
                         onToggled: checked => {
                             if (SessionService.loginctlAvailable) {
-                                SettingsData.setLoginctlLockIntegration(checked)
+                                SettingsData.set("loginctlLockIntegration", checked)
                             }
                         }
                     }
@@ -95,7 +95,7 @@ Item {
                         description: I18n.tr("Automatically lock the screen when the system prepares to suspend")
                         checked: SettingsData.lockBeforeSuspend
                         visible: SessionService.loginctlAvailable && SettingsData.loginctlLockIntegration
-                        onToggled: checked => SettingsData.setLockBeforeSuspend(checked)
+                        onToggled: checked => SettingsData.set("lockBeforeSuspend", checked)
                     }
 
                     DankToggle {
@@ -104,7 +104,7 @@ Item {
                         description: I18n.tr("Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)")
                         checked: SettingsData.enableFprint
                         visible: SettingsData.fprintdAvailable
-                        onToggled: checked => SettingsData.setEnableFprint(checked)
+                        onToggled: checked => SettingsData.set("enableFprint", checked)
                     }
                 }
             }
@@ -186,9 +186,9 @@ Item {
                             if (index >= 0) {
                                 const timeout = timeoutValues[index]
                                 if (powerCategory.currentIndex === 0) {
-                                    SettingsData.setAcLockTimeout(timeout)
+                                    SettingsData.set("acLockTimeout", timeout)
                                 } else {
-                                    SettingsData.setBatteryLockTimeout(timeout)
+                                    SettingsData.set("batteryLockTimeout", timeout)
                                 }
                             }
                         }
@@ -222,9 +222,9 @@ Item {
                             if (index >= 0) {
                                 const timeout = timeoutValues[index]
                                 if (powerCategory.currentIndex === 0) {
-                                    SettingsData.setAcMonitorTimeout(timeout)
+                                    SettingsData.set("acMonitorTimeout", timeout)
                                 } else {
-                                    SettingsData.setBatteryMonitorTimeout(timeout)
+                                    SettingsData.set("batteryMonitorTimeout", timeout)
                                 }
                             }
                         }
@@ -258,46 +258,52 @@ Item {
                             if (index >= 0) {
                                 const timeout = timeoutValues[index]
                                 if (powerCategory.currentIndex === 0) {
-                                    SettingsData.setAcSuspendTimeout(timeout)
+                                    SettingsData.set("acSuspendTimeout", timeout)
                                 } else {
-                                    SettingsData.setBatterySuspendTimeout(timeout)
+                                    SettingsData.set("batterySuspendTimeout", timeout)
                                 }
                             }
                         }
                     }
 
-                    DankDropdown {
-                        id: hibernateDropdown
-                        property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
-                        property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
-
-                        text: I18n.tr("Hibernate system after")
-                        options: timeoutOptions
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
                         visible: SessionService.hibernateSupported
 
-                        Connections {
-                            target: powerCategory
-                            function onCurrentIndexChanged() {
-                                const currentTimeout = powerCategory.currentIndex === 0 ? SettingsData.acHibernateTimeout : SettingsData.batteryHibernateTimeout
-                                const index = hibernateDropdown.timeoutValues.indexOf(currentTimeout)
-                                hibernateDropdown.currentValue = index >= 0 ? hibernateDropdown.timeoutOptions[index] : "Never"
+                        StyledText {
+                            text: I18n.tr("Suspend behavior")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                        }
+
+                        DankButtonGroup {
+                            id: suspendBehaviorSelector
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            model: ["Suspend", "Hibernate", "Suspend then Hibernate"]
+                            selectionMode: "single"
+                            checkEnabled: false
+
+                            Connections {
+                                target: powerCategory
+                                function onCurrentIndexChanged() {
+                                    const behavior = powerCategory.currentIndex === 0 ? SettingsData.acSuspendBehavior : SettingsData.batterySuspendBehavior
+                                    suspendBehaviorSelector.currentIndex = behavior
+                                }
                             }
-                        }
 
-                        Component.onCompleted: {
-                            const currentTimeout = powerCategory.currentIndex === 0 ? SettingsData.acHibernateTimeout : SettingsData.batteryHibernateTimeout
-                            const index = timeoutValues.indexOf(currentTimeout)
-                            currentValue = index >= 0 ? timeoutOptions[index] : "Never"
-                        }
+                            Component.onCompleted: {
+                                const behavior = powerCategory.currentIndex === 0 ? SettingsData.acSuspendBehavior : SettingsData.batterySuspendBehavior
+                                currentIndex = behavior
+                            }
 
-                        onValueChanged: value => {
-                            const index = timeoutOptions.indexOf(value)
-                            if (index >= 0) {
-                                const timeout = timeoutValues[index]
-                                if (powerCategory.currentIndex === 0) {
-                                    SettingsData.setAcHibernateTimeout(timeout)
-                                } else {
-                                    SettingsData.setBatteryHibernateTimeout(timeout)
+                            onSelectionChanged: (index, selected) => {
+                                if (selected) {
+                                    if (powerCategory.currentIndex === 0) {
+                                        SettingsData.set("acSuspendBehavior", index)
+                                    } else {
+                                        SettingsData.set("batterySuspendBehavior", index)
+                                    }
                                 }
                             }
                         }
@@ -352,7 +358,7 @@ Item {
                         text: I18n.tr("Show Confirmation on Power Actions")
                         description: I18n.tr("Request confirmation on power off, restart, suspend, hibernate and logout actions")
                         checked: SettingsData.powerActionConfirm
-                        onToggled: checked => SettingsData.setPowerActionConfirm(checked)
+                        onToggled: checked => SettingsData.set("powerActionConfirm", checked)
                     }
                 }
             }
@@ -418,7 +424,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionLock(text.trim());
+                                SettingsData.set("customPowerActionLock", text.trim());
                             }
                         }
                     }
@@ -450,7 +456,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionLogout(text.trim());
+                                SettingsData.set("customPowerActionLogout", text.trim());
                             }
                         }
                     }
@@ -482,7 +488,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionSuspend(text.trim());
+                                SettingsData.set("customPowerActionSuspend", text.trim());
                             }
                         }
                     }
@@ -514,7 +520,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionHibernate(text.trim());
+                                SettingsData.set("customPowerActionHibernate", text.trim());
                             }
                         }
                     }
@@ -546,7 +552,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionReboot(text.trim());
+                                SettingsData.set("customPowerActionReboot", text.trim());
                             }
                         }
                     }
@@ -578,7 +584,7 @@ Item {
                             }
 
                             onTextEdited: {
-                                SettingsData.setCustomPowerActionPowerOff(text.trim());
+                                SettingsData.set("customPowerActionPowerOff", text.trim());
                             }
                         }
                     }

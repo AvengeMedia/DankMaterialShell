@@ -7,6 +7,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:bluetooth-pairing"
+
     property string deviceName: ""
     property string deviceAddress: ""
     property string requestType: ""
@@ -201,7 +203,7 @@ DankModal {
                     width: parent.width
                     height: 56
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                     visible: requestType === "confirm"
 
                     Column {

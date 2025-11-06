@@ -14,6 +14,8 @@ import qs.Widgets
 DankPopout {
     id: processListPopout
 
+    layerNamespace: "dms:process-list-popout"
+
     property var parentWidget: null
     property var triggerScreen: null
 
@@ -59,7 +61,7 @@ DankPopout {
             id: processListContent
 
             radius: Theme.cornerRadius
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 0
             clip: true
@@ -99,7 +101,7 @@ DankPopout {
                     Layout.fillWidth: true
                     height: systemOverview.height + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                     border.width: 0
 
@@ -116,7 +118,7 @@ DankPopout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
                     border.width: 0
 

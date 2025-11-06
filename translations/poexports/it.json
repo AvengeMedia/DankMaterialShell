@@ -173,6 +173,12 @@
   "Auto-saving...": {
     "Auto-saving...": "Salvataggio automatico..."
   },
+  "Autoconnect disabled": {
+    "Autoconnect disabled": "Connessione automatica disabilitata"
+  },
+  "Autoconnect enabled": {
+    "Autoconnect enabled": "Connessione automatica abilitata"
+  },
   "Automatic Control": {
     "Automatic Control": "Controllo Automatico"
   },
@@ -289,6 +295,12 @@
   },
   "CPU usage indicator": {
     "CPU usage indicator": "Indicatore uso CPU"
+  },
+  "CUPS Insecure Filter Warning": {
+    "CUPS Insecure Filter Warning": ""
+  },
+  "CUPS Missing Filter Warning": {
+    "CUPS Missing Filter Warning": ""
   },
   "Cancel": {
     "Cancel": "Annulla"
@@ -413,6 +425,9 @@
   "Connected Displays": {
     "Connected Displays": "Display Connessi"
   },
+  "Connecting to Device": {
+    "Connecting to Device": ""
+  },
   "Connection failed. Check password and try again.": {
     "Connection failed. Check password and try again.": "Connessione fallita. Controlla la password e riprova"
   },
@@ -424,6 +439,15 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "Controllo media attualmente in riproduzione "
+  },
+  "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": {
+    "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": "Controlla l'opacità di tutti i popup, delle finestre modali e dei relativi livelli di contenuto (Dank Dash, Impostazioni, App Drawer, Centro di controllo, ecc.)"
+  },
+  "Controls opacity of individual widgets inside DankBar": {
+    "Controls opacity of individual widgets inside DankBar": "Controlla l'opacità di ogni widget nella DankBar"
+  },
+  "Controls opacity of the DankBar panel background": {
+    "Controls opacity of the DankBar panel background": "Controlla l'opacità dello sfondo del pannello della DankBar"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "Copiato nella clipboard"
@@ -442,6 +466,9 @@
   },
   "Corner Radius (0 = square corners)": {
     "Corner Radius (0 = square corners)": "Raggio Angoli (0 = angoli squadrati)"
+  },
+  "Cover Open": {
+    "Cover Open": ""
   },
   "Create Dir": {
     "Create Dir": "Crea Cartella"
@@ -515,6 +542,12 @@
   "DankSearch not available": {
     "DankSearch not available": "DankSearch non disponibile"
   },
+  "Dark Mode": {
+    "Dark Mode": "Modalità Scura"
+  },
+  "Darken Modal Background": {
+    "Darken Modal Background": "Scurisci lo sfondo modale"
+  },
   "Date Format": {
     "Date Format": "Formato Data"
   },
@@ -544,6 +577,9 @@
   },
   "Device paired": {
     "Device paired": "Dispositivo accoppiato"
+  },
+  "Disable Autoconnect": {
+    "Disable Autoconnect": "Disabilita connessione automatica"
   },
   "Disconnect": {
     "Disconnect": "Disconnetti"
@@ -602,6 +638,9 @@
   "Donate on Ko-fi": {
     "Donate on Ko-fi": "Dona su Ko-fi"
   },
+  "Door Open": {
+    "Door Open": ""
+  },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Trascina i widget per riordinarli nelle sezioni. Usa l'icona occhio per nascondere/mostrare i widget (mantenendo la spaziatura), o X per rimuoverli completamente."
   },
@@ -619,6 +658,9 @@
   },
   "Empty": {
     "Empty": "Vuoto"
+  },
+  "Enable Autoconnect": {
+    "Enable Autoconnect": "Abilita connessione automatica"
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "Abilita Temperatura GPU"
@@ -674,6 +716,9 @@
   "Enter password for ": {
     "Enter password for ": "Inserisci password per"
   },
+  "Error": {
+    "Error": ""
+  },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Offset Zona Esclusa"
   },
@@ -685,6 +730,12 @@
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Impossibile attivare configurazione"
+  },
+  "Failed to cancel all jobs": {
+    "Failed to cancel all jobs": ""
+  },
+  "Failed to cancel selected job": {
+    "Failed to cancel selected job": ""
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "Impossibile connettersi alla VPN"
@@ -704,8 +755,14 @@
   "Failed to enable WiFi": {
     "Failed to enable WiFi": "Impossibile abilitare WiFi"
   },
+  "Failed to pause printer": {
+    "Failed to pause printer": ""
+  },
   "Failed to remove device": {
     "Failed to remove device": "Impossibile rimuovere dispositivo"
+  },
+  "Failed to resume printer": {
+    "Failed to resume printer": ""
   },
   "Failed to set profile image": {
     "Failed to set profile image": "Impossibile impostare immagine profilo"
@@ -715,6 +772,9 @@
   },
   "Failed to start connection to ": {
     "Failed to start connection to ": "Impossibile avviare connessione a "
+  },
+  "Failed to update autoconnect": {
+    "Failed to update autoconnect": "Impossibile aggiornare connessione automatica"
   },
   "Feels Like": {
     "Feels Like": "Temperatura"
@@ -851,6 +911,9 @@
   "Icon Theme": {
     "Icon Theme": "Tema Icona"
   },
+  "Idle": {
+    "Idle": ""
+  },
   "Idle Inhibitor": {
     "Idle Inhibitor": "Inibitore Riposo"
   },
@@ -881,6 +944,9 @@
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "Installa plugins dal registro dei plugin DMS"
   },
+  "Interlock Open": {
+    "Interlock Open": ""
+  },
   "Internet": {
     "Internet": "Internet"
   },
@@ -889,6 +955,12 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "Invertire al cambio di modalità"
+  },
+  "Jobs": {
+    "Jobs": ""
+  },
+  "Jobs: ": {
+    "Jobs: ": ""
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Nome Layout Tastiera"
@@ -986,6 +1058,18 @@
   "Manual Show/Hide": {
     "Manual Show/Hide": "Mostra/Nascondi Manuale"
   },
+  "Marker Supply Empty": {
+    "Marker Supply Empty": ""
+  },
+  "Marker Supply Low": {
+    "Marker Supply Low": ""
+  },
+  "Marker Waste Almost Full": {
+    "Marker Waste Almost Full": ""
+  },
+  "Marker Waste Full": {
+    "Marker Waste Full": ""
+  },
   "Material Colors": {
     "Material Colors": "Colori Material"
   },
@@ -1006,6 +1090,18 @@
   },
   "Media Controls": {
     "Media Controls": "Controlli Media"
+  },
+  "Media Empty": {
+    "Media Empty": ""
+  },
+  "Media Jam": {
+    "Media Jam": ""
+  },
+  "Media Low": {
+    "Media Low": ""
+  },
+  "Media Needed": {
+    "Media Needed": ""
   },
   "Media Player Settings": {
     "Media Player Settings": "Impostazioni Media Player"
@@ -1045,6 +1141,9 @@
   },
   "Mount": {
     "Mount": "Monta"
+  },
+  "Moving to Paused": {
+    "Moving to Paused": ""
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Tavolozza sobria con toni sommessi e calmanti."
@@ -1130,6 +1229,12 @@
   "No plugins found.": {
     "No plugins found.": "Nessun plugin trovato."
   },
+  "No printer found": {
+    "No printer found": ""
+  },
+  "None": {
+    "None": ""
+  },
   "Normal Priority": {
     "Normal Priority": "Priorità Normale"
   },
@@ -1175,6 +1280,9 @@
   "Office": {
     "Office": "Ufficio"
   },
+  "Offline Report": {
+    "Offline Report": ""
+  },
   "On-Screen Displays": {
     "On-Screen Displays": "Visualizzazione A Schermo"
   },
@@ -1192,6 +1300,18 @@
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Apri barra di ricerca per cercare testo"
+  },
+  "Other": {
+    "Other": ""
+  },
+  "Output Area Almost Full": {
+    "Output Area Almost Full": ""
+  },
+  "Output Area Full": {
+    "Output Area Full": ""
+  },
+  "Output Tray Missing": {
+    "Output Tray Missing": ""
   },
   "Overview": {
     "Overview": "Panoramica"
@@ -1216,6 +1336,12 @@
   },
   "Password": {
     "Password": "Password"
+  },
+  "Pause": {
+    "Pause": ""
+  },
+  "Paused": {
+    "Paused": ""
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Sfondo Per Modalità"
@@ -1307,11 +1433,23 @@
   "Primary": {
     "Primary": "Primario"
   },
+  "Print Server not available": {
+    "Print Server not available": ""
+  },
+  "Printers": {
+    "Printers": ""
+  },
+  "Printers: ": {
+    "Printers: ": ""
+  },
   "Privacy Indicator": {
     "Privacy Indicator": "Indicatore Privacy"
   },
   "Process": {
     "Process": "Processo"
+  },
+  "Processing": {
+    "Processing": ""
   },
   "Profile Image Error": {
     "Profile Image Error": "Errore Immagine Profilo"
@@ -1337,6 +1475,9 @@
   "Rain Chance": {
     "Rain Chance": "Possibili Piogge"
   },
+  "Reason": {
+    "Reason": ""
+  },
   "Reboot": {
     "Reboot": "Riavvia"
   },
@@ -1355,6 +1496,9 @@
   "Remove": {
     "Remove": "Rimuovi"
   },
+  "Report": {
+    "Report": ""
+  },
   "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "Richiedi conferma alle azioni di spegnimento, riavvio, sospensione, hibernazione e logout"
   },
@@ -1363,6 +1507,9 @@
   },
   "Resources": {
     "Resources": "Risorse"
+  },
+  "Resume": {
+    "Resume": ""
   },
   "Right": {
     "Right": "Destra"
@@ -1392,7 +1539,7 @@
     "Saved": "Salvato"
   },
   "Scale DankBar font sizes independently": {
-    "Scale DankBar font sizes independently": "Scale le dimensioni font della DankBar indipendentemente"
+    "Scale DankBar font sizes independently": "Scala indipendentemente le dimensioni dei font della DankBar"
   },
   "Scale all font sizes": {
     "Scale all font sizes": "Scala tutte le dimensioni dei font"
@@ -1499,6 +1646,9 @@
   "Show all 9 tags instead of only occupied tags (DWL only)": {
     "Show all 9 tags instead of only occupied tags (DWL only)": "Mostra tutti i 9 tags invece dei soli tags occupati (solo DWL)"
   },
+  "Show darkened overlay behind modal dialogs": {
+    "Show darkened overlay behind modal dialogs": "Mostra la sovrapposizione scurita dietro le finestre di dialogo modali"
+  },
   "Show on Last Display": {
     "Show on Last Display": "Mostra sull'ultimo display"
   },
@@ -1541,6 +1691,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mostra quando microfono, videocamera, o condivisione schermo sono attivi"
   },
+  "Shutdown": {
+    "Shutdown": ""
+  },
   "Size": {
     "Size": "Dimensione"
   },
@@ -1559,6 +1712,9 @@
   "Spacing": {
     "Spacing": "Spaziatura"
   },
+  "Spool Area Full": {
+    "Spool Area Full": ""
+  },
   "Square Corners": {
     "Square Corners": "Angoli squadrati"
   },
@@ -1571,6 +1727,15 @@
   "Status": {
     "Status": "Stato"
   },
+  "Stopped": {
+    "Stopped": ""
+  },
+  "Stopped Partly": {
+    "Stopped Partly": ""
+  },
+  "Stopping": {
+    "Stopping": ""
+  },
   "Storage & Disks": {
     "Storage & Disks": "Archiviazione & Dischi"
   },
@@ -1582,6 +1747,9 @@
   },
   "Suspend": {
     "Suspend": "Sospendi"
+  },
+  "Suspend behavior": {
+    "Suspend behavior": "Sospendi funzionalità"
   },
   "Suspend system after": {
     "Suspend system after": "Sospendi sistema dopo"
@@ -1661,6 +1829,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "Le seguenti impostazioni modificheranno le tue impostazioni GTK e Qt. Se vuoi preservare la tua configurazione attuale, per favore fai il backup (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0)."
   },
+  "The job queue of this printer is empty": {
+    "The job queue of this printer is empty": ""
+  },
   "Theme & Colors": {
     "Theme & Colors": "Tema & Colori"
   },
@@ -1682,6 +1853,9 @@
   "Time & Weather": {
     "Time & Weather": "Orario & Meteo"
   },
+  "Timed Out": {
+    "Timed Out": ""
+  },
   "To Full": {
     "To Full": "A Pieno"
   },
@@ -1699,6 +1873,12 @@
   },
   "Tomorrow": {
     "Tomorrow": "Domani"
+  },
+  "Toner Empty": {
+    "Toner Empty": ""
+  },
+  "Toner Low": {
+    "Toner Low": ""
   },
   "Top": {
     "Top": "Superiore"
@@ -1828,6 +2008,9 @@
   },
   "Wallpapers": {
     "Wallpapers": "Sfondi"
+  },
+  "Warning": {
+    "Warning": ""
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "Progress Bar ad Onde"

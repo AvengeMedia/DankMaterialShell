@@ -71,7 +71,7 @@ That's it. One command installs dms and all dependencies on Arch, Fedora, Debian
 ## What You Get
 
 **Dynamic Theming**
-Wallpaper-based color schemes that automatically theme GTK, Qt, terminals, editors (like vscode), and more with [matugen](https://github.com/InioX/matugen) and [dank16](https://github.com/AvengeMedia/danklinux/blob/master/internal/dank16/dank16.go).
+Wallpaper-based color schemes that automatically theme GTK, Qt, terminals, editors (like vscode, vscodium), and more with [matugen](https://github.com/InioX/matugen) and [dank16](https://github.com/AvengeMedia/danklinux/blob/master/internal/dank16/dank16.go).
 
 **System Monitoring**
 Real-time CPU, RAM, GPU metrics and temps with [dgop](https://github.com/AvengeMedia/dgop). Full process list with search and management.
@@ -129,7 +129,7 @@ DankMaterialShell automatically generates color schemes from your wallpaper or t
 
 DMS is not opinionated or forcing these themes - they are created as optional themes you can enable. You can refer to the documentation if you want to use them:
 
-**Application theming:** [GTK, Qt, Firefox, terminals, vscode →](https://danklinux.com/docs/dankmaterialshell/application-themes)
+**Application theming:** [GTK, Qt, Firefox, terminals, vscode+vscodium →](https://danklinux.com/docs/dankmaterialshell/application-themes)
 
 **Custom themes:** [Create your own color schemes →](https://danklinux.com/docs/dankmaterialshell/custom-themes)
 

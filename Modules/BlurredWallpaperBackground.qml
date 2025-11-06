@@ -7,6 +7,7 @@ import Quickshell.Io
 import qs.Common
 import qs.Widgets
 import qs.Modules
+import qs.Services
 
 Variants {
     model: {
@@ -99,6 +100,8 @@ Variants {
                     if (!isInitialized || !currentWallpaper.source) {
                         setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
                         isInitialized = true
+                    } else if (CompositorService.isNiri && SessionData.isSwitchingMode) {
+                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
                     } else {
                         changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
                     }
@@ -157,7 +160,7 @@ Variants {
                 asynchronous: true
                 smooth: true
                 cache: true
-                fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
+                fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SettingsData.wallpaperFillMode)
             }
 
             Image {
@@ -168,7 +171,7 @@ Variants {
                 asynchronous: true
                 smooth: true
                 cache: true
-                fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
+                fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SettingsData.wallpaperFillMode)
 
                 onStatusChanged: {
                     if (status !== Image.Ready)
@@ -191,6 +194,7 @@ Variants {
                     blur: 0.8
                     blurMax: 75
                     opacity: 1 - root.transitionProgress
+                    autoPaddingEnabled: false
                 }
 
                 MultiEffect {
@@ -200,6 +204,7 @@ Variants {
                     blur: 0.8
                     blurMax: 75
                     opacity: root.transitionProgress
+                    autoPaddingEnabled: false
                 }
             }
 

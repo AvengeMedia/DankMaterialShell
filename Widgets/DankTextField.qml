@@ -30,7 +30,7 @@ StyledRect {
     property color leftIconColor: Theme.surfaceVariantText
     property color leftIconFocusedColor: Theme.primary
     property bool showClearButton: false
-    property color backgroundColor: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
+    property color backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     property color focusedBorderColor: Theme.primary
     property color normalBorderColor: Theme.outlineStrong
     property color placeholderColor: Theme.outlineButton

@@ -9,6 +9,8 @@ import qs.Widgets
 DankModal {
     id: notificationModal
 
+    layerNamespace: "dms:notification-modal"
+
     property bool notificationModalOpen: false
     property var notificationListRef: null
 

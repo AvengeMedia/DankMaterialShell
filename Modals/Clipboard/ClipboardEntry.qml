@@ -26,7 +26,7 @@ Rectangle {
         if (isSelected) {
             return Theme.primaryPressed
         }
-        return mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
+        return mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     }
 
     Row {

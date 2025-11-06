@@ -772,7 +772,7 @@ Item {
                 }
                 width: 100
                 height: 32
-                color: Theme.popupBackground()
+                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 radius: Theme.cornerRadius
                 border.width: 1
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)

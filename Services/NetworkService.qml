@@ -283,4 +283,10 @@ Singleton {
             activeService.cancelCredentials(token)
         }
     }
+
+    function setWifiAutoconnect(ssid, autoconnect) {
+        if (activeService && activeService.setWifiAutoconnect) {
+            activeService.setWifiAutoconnect(ssid, autoconnect)
+        }
+    }
 }

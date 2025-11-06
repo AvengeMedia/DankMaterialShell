@@ -40,7 +40,7 @@ Column {
         width: parent.width
         height: 200
         radius: Theme.cornerRadius
-        color: Theme.surfaceContainerHigh
+        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
         border.width: 1
 
@@ -180,7 +180,7 @@ Column {
         width: parent.width
         height: 80
         radius: Theme.cornerRadius
-        color: Theme.surfaceContainerHigh
+        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
         border.width: 1
 
@@ -350,7 +350,7 @@ Column {
             width: (parent.width - Theme.spacingM) / 2
             height: 80
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
             border.width: 1
 
@@ -416,7 +416,7 @@ Column {
             width: (parent.width - Theme.spacingM) / 2
             height: 80
             radius: Theme.cornerRadius
-            color: Theme.surfaceContainerHigh
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
             border.width: 1
 

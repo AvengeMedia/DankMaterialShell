@@ -42,7 +42,7 @@ Item {
                 height: root.itemHeight
                 width: root.getButtonWidth(itemCount, parent.width)
                 radius: Theme.cornerRadius
-                color: selectedCategory === modelData ? Theme.primary : Theme.surfaceContainerHigh
+                color: selectedCategory === modelData ? Theme.primary : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 StyledText {
                     anchors.centerIn: parent
@@ -81,7 +81,7 @@ Item {
                     height: root.itemHeight
                     width: root.getButtonWidth(itemCount, parent.width)
                     radius: Theme.cornerRadius
-                    color: selectedCategory === modelData ? Theme.primary : Theme.surfaceContainerHigh
+                    color: selectedCategory === modelData ? Theme.primary : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: selectedCategory === modelData ? selectedBorderColor : unselectedBorderColor
 
                     StyledText {
@@ -117,7 +117,7 @@ Item {
                     height: root.itemHeight
                     width: root.getButtonWidth(itemCount, parent.width)
                     radius: Theme.cornerRadius
-                    color: selectedCategory === modelData ? Theme.primary : Theme.surfaceContainerHigh
+                    color: selectedCategory === modelData ? Theme.primary : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: selectedCategory === modelData ? selectedBorderColor : unselectedBorderColor
 
                     StyledText {

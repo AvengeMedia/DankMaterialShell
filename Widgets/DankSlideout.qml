@@ -10,7 +10,8 @@ pragma ComponentBehavior: Bound
 PanelWindow {
     id: root
 
-    WlrLayershell.namespace: "quickshell:slideout"
+    property string layerNamespace: "dms:slideout"
+    WlrLayershell.namespace: layerNamespace
 
     property bool isVisible: false
     property var targetScreen: null

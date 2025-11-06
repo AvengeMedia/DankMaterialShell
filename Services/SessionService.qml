@@ -217,6 +217,20 @@ Singleton {
         }
     }
 
+    function suspendThenHibernate() {
+        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend-then-hibernate"])
+    }
+
+    function suspendWithBehavior(behavior) {
+        if (behavior === SettingsData.SuspendBehavior.Hibernate) {
+            hibernate()
+        } else if (behavior === SettingsData.SuspendBehavior.SuspendThenHibernate) {
+            suspendThenHibernate()
+        } else {
+            suspend()
+        }
+    }
+
     function reboot() {
         if (SettingsData.customPowerActionReboot.length === 0) {
             Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "reboot"])

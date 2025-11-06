@@ -146,7 +146,7 @@ Item {
             }
 
             WlrLayershell.layer: dBarLayer
-            WlrLayershell.namespace: "quickshell:bar"
+            WlrLayershell.namespace: "dms:bar"
 
             property var modelData: item
 
@@ -531,6 +531,61 @@ Item {
                                 axis: axis
                             }
 
+                            MouseArea {
+                                id: scrollArea
+                                anchors.fill: parent
+                                acceptedButtons: Qt.NoButton
+                                propagateComposedEvents: true
+                                z: -1
+
+                                property real scrollAccumulator: 0
+                                property real touchpadThreshold: 500
+                                property bool actionInProgress: false
+
+                                Timer {
+                                    id: cooldownTimer
+                                    interval: 100
+                                    onTriggered: parent.actionInProgress = false
+                                }
+
+                                onWheel: wheel => {
+                                    if (actionInProgress) {
+                                        wheel.accepted = false
+                                        return
+                                    }
+
+                                    const deltaY = wheel.angleDelta.y
+                                    const deltaX = wheel.angleDelta.x
+
+                                    if (CompositorService.isNiri && Math.abs(deltaX) > Math.abs(deltaY)) {
+                                        topBarContent.switchApp(deltaX)
+                                        wheel.accepted = false
+                                        return
+                                    }
+
+                                    const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0
+                                    const direction = deltaY < 0 ? 1 : -1
+
+                                    if (isMouseWheel) {
+                                        topBarContent.switchWorkspace(direction)
+                                        actionInProgress = true
+                                        cooldownTimer.restart()
+                                    } else {
+                                        scrollAccumulator += deltaY
+
+                                        if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
+                                            const touchDirection = scrollAccumulator < 0 ? 1 : -1
+                                            topBarContent.switchWorkspace(touchDirection)
+                                            scrollAccumulator = 0
+                                            actionInProgress = true
+                                            cooldownTimer.restart()
+                                        }
+                                    }
+
+                                    wheel.accepted = false
+                                }
+                            }
+
                             Item {
                                 id: topBarContent
                                 anchors.fill: parent
@@ -834,60 +889,6 @@ Item {
                                 Item {
                                     id: stackContainer
                                     anchors.fill: parent
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        acceptedButtons: Qt.NoButton
-                                        propagateComposedEvents: true
-                                        z: -1
-
-                                        property real scrollAccumulator: 0
-                                        property real touchpadThreshold: 500
-                                        property bool actionInProgress: false
-
-                                        Timer {
-                                            id: cooldownTimer
-                                            interval: 100
-                                            onTriggered: parent.actionInProgress = false
-                                        }
-
-                                        onWheel: wheel => {
-                                            if (actionInProgress) {
-                                                wheel.accepted = false
-                                                return
-                                            }
-
-                                            const deltaY = wheel.angleDelta.y
-                                            const deltaX = wheel.angleDelta.x
-
-                                            if (CompositorService.isNiri && Math.abs(deltaX) > Math.abs(deltaY)) {
-                                                topBarContent.switchApp(deltaX)
-                                                wheel.accepted = false
-                                                return
-                                            }
-
-                                            const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0
-                                            const direction = deltaY < 0 ? 1 : -1
-
-                                            if (isMouseWheel) {
-                                                topBarContent.switchWorkspace(direction)
-                                                actionInProgress = true
-                                                cooldownTimer.restart()
-                                            } else {
-                                                scrollAccumulator += deltaY
-
-                                                if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
-                                                    const touchDirection = scrollAccumulator < 0 ? 1 : -1
-                                                    topBarContent.switchWorkspace(touchDirection)
-                                                    scrollAccumulator = 0
-                                                    actionInProgress = true
-                                                    cooldownTimer.restart()
-                                                }
-                                            }
-
-                                            wheel.accepted = false
-                                        }
-                                    }
 
                                     Item {
                                         id: horizontalStack

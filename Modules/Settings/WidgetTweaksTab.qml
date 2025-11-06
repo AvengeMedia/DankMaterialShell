@@ -23,7 +23,7 @@ Item {
                 width: parent.width
                 height: workspaceSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -61,7 +61,7 @@ Item {
                         description: I18n.tr("Show workspace index numbers in the top bar workspace switcher")
                         checked: SettingsData.showWorkspaceIndex
                         onToggled: checked => {
-                                       return SettingsData.setShowWorkspaceIndex(
+                                       return SettingsData.set("showWorkspaceIndex", 
                                            checked)
                                    }
                     }
@@ -71,7 +71,7 @@ Item {
                         description: I18n.tr("Always show a minimum of 3 workspaces, even if fewer are available")
                         checked: SettingsData.showWorkspacePadding
                         onToggled: checked => {
-                                       return SettingsData.setShowWorkspacePadding(
+                                       return SettingsData.set("showWorkspacePadding", 
                                            checked)
                                    }
                     }
@@ -82,7 +82,7 @@ Item {
                         description: I18n.tr("Display application icons in workspace indicators")
                         checked: SettingsData.showWorkspaceApps
                         onToggled: checked => {
-                                       return SettingsData.setShowWorkspaceApps(
+                                       return SettingsData.set("showWorkspaceApps", 
                                            checked)
                                    }
                     }
@@ -116,7 +116,7 @@ Item {
                                 topPadding: Theme.spacingXS
                                 bottomPadding: Theme.spacingXS
                                 onEditingFinished: {
-                                    SettingsData.setMaxWorkspaceIcons(parseInt(text, 10))
+                                    SettingsData.set("maxWorkspaceIcons", parseInt(text, 10))
                                 }
                             }
                         }
@@ -135,7 +135,7 @@ Item {
                         description: I18n.tr("Show only workspaces belonging to each specific monitor.")
                         checked: SettingsData.workspacesPerMonitor
                         onToggled: checked => {
-                            return SettingsData.setWorkspacesPerMonitor(checked);
+                            return SettingsData.set("workspacesPerMonitor", checked);
                         }
                     }
 
@@ -146,7 +146,7 @@ Item {
                         checked: SettingsData.dwlShowAllTags
                         visible: CompositorService.isDwl
                         onToggled: checked => {
-                            return SettingsData.setDwlShowAllTags(checked);
+                            return SettingsData.set("dwlShowAllTags", checked);
                         }
                     }
                 }
@@ -156,7 +156,7 @@ Item {
                 width: parent.width
                 height: mediaSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -194,7 +194,7 @@ Item {
                         description: I18n.tr("Use animated wave progress bars for media playback")
                         checked: SettingsData.waveProgressEnabled
                         onToggled: checked => {
-                            return SettingsData.setWaveProgressEnabled(checked);
+                            return SettingsData.set("waveProgressEnabled", checked);
                         }
                     }
                 }
@@ -204,7 +204,7 @@ Item {
                 width: parent.width
                 height: updaterSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
@@ -244,10 +244,10 @@ Item {
                             if (!checked) {
                                 updaterCustomCommand.text = "";
                                 updaterTerminalCustomClass.text = "";
-                                SettingsData.setUpdaterCustomCommand("");
-                                SettingsData.setUpdaterTerminalAdditionalParams("");
+                                SettingsData.set("updaterCustomCommand", "");
+                                SettingsData.set("updaterTerminalAdditionalParams", "");
                             }
-                            return SettingsData.setUpdaterUseCustomCommandEnabled(checked);
+                            return SettingsData.set("updaterUseCustomCommandEnabled", checked);
                         }
                     }
 
@@ -284,7 +284,7 @@ Item {
                                 }
 
                                 onTextEdited: {
-                                    SettingsData.setUpdaterCustomCommand(text.trim());
+                                    SettingsData.set("updaterCustomCommand", text.trim());
                                 }
 
                                 MouseArea {
@@ -331,7 +331,7 @@ Item {
                                 }
 
                                 onTextEdited: {
-                                    SettingsData.setUpdaterTerminalAdditionalParams(text.trim());
+                                    SettingsData.set("updaterTerminalAdditionalParams", text.trim());
                                 }
 
                                 MouseArea {
@@ -351,7 +351,7 @@ Item {
                 width: parent.width
                 height: runningAppsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -389,7 +389,7 @@ Item {
                         description: I18n.tr("Show only apps running in current workspace")
                         checked: SettingsData.runningAppsCurrentWorkspace
                         onToggled: checked => {
-                                       return SettingsData.setRunningAppsCurrentWorkspace(
+                                       return SettingsData.set("runningAppsCurrentWorkspace", 
                                            checked)
                                    }
                     }
@@ -400,7 +400,7 @@ Item {
                 width: parent.width
                 height: workspaceIconsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -558,7 +558,7 @@ Item {
                 width: parent.width
                 height: notificationSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -621,19 +621,19 @@ Item {
                             onValueChanged: value => {
                                 switch (value) {
                                 case "Top Right":
-                                    SettingsData.setNotificationPopupPosition(SettingsData.Position.Top)
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Top)
                                     break
                                 case "Top Left":
-                                    SettingsData.setNotificationPopupPosition(SettingsData.Position.Left)
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Left)
                                     break
                                 case "Top Center":
-                                    SettingsData.setNotificationPopupPosition(-1)
+                                    SettingsData.set("notificationPopupPosition", -1)
                                     break
                                 case "Bottom Right":
-                                    SettingsData.setNotificationPopupPosition(SettingsData.Position.Right)
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Right)
                                     break
                                 case "Bottom Left":
-                                    SettingsData.setNotificationPopupPosition(SettingsData.Position.Bottom)
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom)
                                     break
                                 }
                                 SettingsData.sendTestNotifications()
@@ -647,7 +647,7 @@ Item {
                 width: parent.width
                 height: osdRow.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -693,7 +693,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         checked: SettingsData.osdAlwaysShowValue
                         onToggleCompleted: checked => {
-                                       SettingsData.setOsdAlwaysShowValue(checked)
+                                       SettingsData.set("osdAlwaysShowValue", checked)
                                    }
                     }
                 }

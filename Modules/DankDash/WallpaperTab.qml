@@ -412,7 +412,7 @@ Item {
                         id: wallpaperCard
                         anchors.fill: parent
                         anchors.margins: Theme.spacingXS
-                        color: Theme.surfaceContainerHighest
+                        color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                         radius: Theme.cornerRadius
                         clip: true
 

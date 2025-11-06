@@ -20,7 +20,7 @@ Rectangle {
     readonly property int iconSize: 40
 
     radius: Theme.cornerRadius
-    color: isSelected ? Theme.primaryPressed : mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.surfaceContainerHigh
+    color: isSelected ? Theme.primaryPressed : mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
     Row {
         anchors.fill: parent

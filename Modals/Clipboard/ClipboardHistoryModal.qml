@@ -12,6 +12,8 @@ import qs.Widgets
 DankModal {
     id: clipboardHistoryModal
 
+    layerNamespace: "dms:clipboard"
+
     property int totalCount: 0
     property var clipboardEntries: []
     property string searchText: ""
@@ -136,7 +138,7 @@ DankModal {
     visible: false
     width: ClipboardConstants.modalWidth
     height: ClipboardConstants.modalHeight
-    backgroundColor: Theme.popupBackground()
+    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
     borderWidth: 1

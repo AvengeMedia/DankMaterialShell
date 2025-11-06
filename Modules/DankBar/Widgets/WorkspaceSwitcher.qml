@@ -417,8 +417,12 @@ Item {
         acceptedButtons: Qt.RightButton
 
         onClicked: mouse => {
-            if (mouse.button === Qt.RightButton && CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
-                root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen
+            if (mouse.button === Qt.RightButton) {
+                if (CompositorService.isNiri) {
+                    NiriService.toggleOverview()
+                } else if (CompositorService.isHyprland && root.hyprlandOverviewLoader?.item) {
+                    root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen
+                }
             }
         }
     }
@@ -476,34 +480,27 @@ Item {
                 property bool loadedHasIcon: false
                 property var loadedIcons: []
 
-                readonly property real visualWidth: {
-                    if (root.isVertical) {
-                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5
-                    } else {
-                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
-                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
-                            const iconsWidth = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0)
-                            const baseWidth = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7
-                            return baseWidth + iconsWidth
-                        }
-                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7
+                readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5) : (isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7)
+                readonly property real baseHeight: root.isVertical ? (isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7) : (SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5)
+
+                readonly property real iconsExtraWidth: {
+                    if (!root.isVertical && SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
+                        const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
+                        return numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0) + (isActive ? Theme.spacingXS : 0)
                     }
+                    return 0
                 }
-                readonly property real visualHeight: {
-                    if (root.isVertical) {
-                        if (SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
-                            const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
-                            const iconsHeight = numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0)
-                            const baseHeight = isActive ? root.widgetHeight * 0.9 + Theme.spacingXS : root.widgetHeight * 0.7
-                            return baseHeight + iconsHeight
-                        }
-                        return isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7
-                    } else {
-                        return SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5
+                readonly property real iconsExtraHeight: {
+                    if (root.isVertical && SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
+                        const numIcons = Math.min(loadedIcons.length, SettingsData.maxWorkspaceIcons)
+                        return numIcons * 18 + (numIcons > 0 ? (numIcons - 1) * Theme.spacingXS : 0) + (isActive ? Theme.spacingXS : 0)
                     }
+                    return 0
                 }
-		
-		//DO NOT move this MouseArea. It should be on this level in order for the appMouseArea to work
+
+                readonly property real visualWidth: baseWidth + iconsExtraWidth
+                readonly property real visualHeight: baseHeight + iconsExtraHeight
+
 		MouseArea {
                     id: mouseArea
                     anchors.fill: parent
@@ -519,9 +516,17 @@ Item {
                         const isRightClick = mouse.button === Qt.RightButton
 
                         if (CompositorService.isNiri) {
-                            NiriService.switchToWorkspace(modelData - 1)
+                            if (isRightClick) {
+                                NiriService.toggleOverview()
+                            } else {
+                                NiriService.switchToWorkspace(modelData - 1)
+                            }
                         } else if (CompositorService.isHyprland && modelData?.id) {
-                            Hyprland.dispatch(`workspace ${modelData.id}`)
+                            if (isRightClick && root.hyprlandOverviewLoader?.item) {
+                                root.hyprlandOverviewLoader.item.overviewOpen = !root.hyprlandOverviewLoader.item.overviewOpen
+                            } else {
+                                Hyprland.dispatch(`workspace ${modelData.id}`)
+                            }
                         } else if (CompositorService.isDwl && modelData?.tag !== undefined) {
                             console.log("DWL click - tag:", modelData.tag, "rightClick:", isRightClick)
                             if (isRightClick) {
@@ -597,17 +602,10 @@ Item {
                     radius: Theme.cornerRadius
                     color: isActive ? Theme.primary : isUrgent ? Theme.error : isPlaceholder ? Theme.surfaceTextLight : isHovered ? Theme.outlineButton : Theme.surfaceTextAlpha
 
-                    border.width: {
-                        if (isUrgent && !isActive) return 2
-                        return 0
-                    }
-                    border.color: {
-                        if (isUrgent && !isActive) return Theme.error
-                        return Theme.withAlpha(Theme.error, 0)
-                    }
+                    border.width: isUrgent && !isActive ? 2 : 0
+                    border.color: isUrgent && !isActive ? Theme.error : Theme.withAlpha(Theme.error, 0)
 
                     Behavior on width {
-                        enabled: (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                         NumberAnimation {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
@@ -615,7 +613,6 @@ Item {
                     }
 
                     Behavior on height {
-                        enabled: root.isVertical && (!SettingsData.showWorkspaceApps || SettingsData.maxWorkspaceIcons <= 3)
                         NumberAnimation {
                             duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
@@ -631,14 +628,14 @@ Item {
 
                     Behavior on border.width {
                         NumberAnimation {
-                            duration: Theme.shortDuration
+                            duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
                         }
                     }
 
                     Behavior on border.color {
                         ColorAnimation {
-                            duration: Theme.shortDuration
+                            duration: Theme.mediumDuration
                             easing.type: Theme.emphasizedEasing
                         }
                     }

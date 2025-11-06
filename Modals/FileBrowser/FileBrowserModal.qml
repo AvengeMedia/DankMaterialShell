@@ -11,6 +11,8 @@ import qs.Widgets
 DankModal {
     id: fileBrowserModal
 
+    layerNamespace: "dms:file-browser"
+
     property string homeDir: StandardPaths.writableLocation(StandardPaths.HomeLocation)
     property string docsDir: StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
     property string musicDir: StandardPaths.writableLocation(StandardPaths.MusicLocation)

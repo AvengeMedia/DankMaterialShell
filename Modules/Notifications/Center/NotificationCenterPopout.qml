@@ -12,6 +12,8 @@ import qs.Modules.Notifications.Center
 DankPopout {
     id: root
 
+    layerNamespace: "dms:notification-center"
+
     property bool notificationHistoryVisible: false
     property var triggerScreen: null
 
@@ -113,7 +115,7 @@ DankPopout {
                 return Math.max(300, Math.min(baseHeight, maxHeight))
             }
 
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 0

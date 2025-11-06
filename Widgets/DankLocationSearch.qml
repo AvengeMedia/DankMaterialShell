@@ -178,7 +178,7 @@ Item {
         height: Math.min(Math.max(searchResultsModel.count * 38 + Theme.spacingS * 2, 50), 200)
         y: searchInputField.height
         radius: Theme.cornerRadius
-        color: Theme.popupBackground()
+        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         border.color: Theme.primarySelected
         border.width: 1
         visible: locationInput.getActiveFocus() && locationInput.text.length > 2 && (searchResultsModel.count > 0 || root.isLoading)

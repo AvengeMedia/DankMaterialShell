@@ -15,7 +15,7 @@ Rectangle {
 
     implicitHeight: diskContent.height + Theme.spacingM
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
 
@@ -78,7 +78,7 @@ Rectangle {
                     width: parent.width
                     height: 80
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHighest
+                    color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                     border.color: modelData.mount === currentMountPath ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: modelData.mount === currentMountPath ? 2 : 0
 

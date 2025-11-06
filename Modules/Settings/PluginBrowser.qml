@@ -241,7 +241,7 @@ DankModal {
                     anchors.topMargin: Theme.spacingM
                     height: 48
                     cornerRadius: Theme.cornerRadius
-                    backgroundColor: Theme.surfaceContainerHigh
+                    backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     normalBorderColor: Theme.outlineMedium
                     focusedBorderColor: Theme.primary
                     leftIconName: "search"

@@ -98,7 +98,7 @@ StyledRect {
     color: {
         if (keyboardNavigationActive && listDelegateRoot.index === selectedIndex)
             return Theme.surfacePressed
-        return listMouseArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+        return listMouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
     }
     border.color: keyboardNavigationActive && listDelegateRoot.index === selectedIndex ? Theme.primary : "transparent"
     border.width: (keyboardNavigationActive && listDelegateRoot.index === selectedIndex) ? 2 : 0

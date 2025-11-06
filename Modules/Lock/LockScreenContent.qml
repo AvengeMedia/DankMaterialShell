@@ -62,6 +62,7 @@ Item {
 
     function sendLockerReadyOnce() {
         if (lockerReadySent) return;
+        if (root.unlocking) return;
         lockerReadySent = true;
         if (SessionService.loginctlAvailable && DMSService.apiVersion >= 2) {
             DMSService.sendRequest("loginctl.lockerReady", null, resp => {
@@ -73,9 +74,10 @@ Item {
 
     function maybeSend() {
         if (!lockerReadyArmed) return;
+        if (root.unlocking) return;
         if (!root.visible || root.opacity <= 0) return;
         Qt.callLater(() => {
-            if (root.visible && root.opacity > 0)
+            if (root.visible && root.opacity > 0 && !root.unlocking)
                 sendLockerReadyOnce();
         });
     }
@@ -1241,6 +1243,7 @@ Item {
         lockSecured: !demoMode
         onUnlockRequested: {
             root.unlocking = true
+            lockerReadyArmed = false
             passwordField.text = ""
             root.passwordBuffer = ""
             root.unlockRequested()

@@ -11,23 +11,12 @@ DankOSD {
     autoHideInterval: 3000
     enableMouseInteraction: true
 
-    property var brightnessDebounceTimer: Timer {
-        property int pendingValue: 0
-
-        interval: {
-            const deviceInfo = DisplayService.getCurrentDeviceInfo()
-            return (deviceInfo && deviceInfo.class === "ddc") ? 200 : 50
-        }
-        repeat: false
-        onTriggered: {
-            DisplayService.setBrightnessInternal(pendingValue, DisplayService.lastIpcDevice)
-        }
-    }
-
     Connections {
         target: DisplayService
-        function onBrightnessChanged() {
-            root.show()
+        function onBrightnessChanged(showOsd) {
+            if (showOsd) {
+                root.show()
+            }
         }
     }
 
@@ -73,11 +62,35 @@ DankOSD {
                 height: 40
                 x: parent.gap * 2 + Theme.iconSize
                 anchors.verticalCenter: parent.verticalCenter
-                minimum: 1
-                maximum: 100
+                minimum: {
+                    const deviceInfo = DisplayService.getCurrentDeviceInfo()
+                    if (!deviceInfo) return 1
+                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id)
+                    if (isExponential) {
+                        return 1
+                    }
+                    return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0
+                }
+                maximum: {
+                    const deviceInfo = DisplayService.getCurrentDeviceInfo()
+                    if (!deviceInfo) return 100
+                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id)
+                    if (isExponential) {
+                        return 100
+                    }
+                    return deviceInfo.displayMax || 100
+                }
                 enabled: DisplayService.brightnessAvailable
                 showValue: true
-                unit: "%"
+                unit: {
+                    const deviceInfo = DisplayService.getCurrentDeviceInfo()
+                    if (!deviceInfo) return "%"
+                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id)
+                    if (isExponential) {
+                        return "%"
+                    }
+                    return deviceInfo.class === "ddc" ? "" : "%"
+                }
                 thumbOutlineColor: Theme.surfaceContainer
                 alwaysShowValue: SettingsData.osdAlwaysShowValue
 
@@ -89,8 +102,7 @@ DankOSD {
 
                 onSliderValueChanged: newValue => {
                                           if (DisplayService.brightnessAvailable) {
-                                              root.brightnessDebounceTimer.pendingValue = newValue
-                                              root.brightnessDebounceTimer.restart()
+                                              DisplayService.setBrightness(newValue, DisplayService.lastIpcDevice, true)
                                               resetHideTimer()
                                           }
                                       }
@@ -101,35 +113,25 @@ DankOSD {
 
                 onSliderDragFinished: finalValue => {
                                           if (DisplayService.brightnessAvailable) {
-                                              root.brightnessDebounceTimer.stop()
-                                              DisplayService.setBrightnessInternal(finalValue, DisplayService.lastIpcDevice)
+                                              DisplayService.setBrightness(finalValue, DisplayService.lastIpcDevice, true)
                                           }
                                       }
 
                 Connections {
                     target: DisplayService
 
-                    function onBrightnessChanged() {
-                        if (!brightnessSlider.pressed) {
+                    function onBrightnessChanged(showOsd) {
+                        if (!brightnessSlider.pressed && brightnessSlider.value !== DisplayService.brightnessLevel) {
                             brightnessSlider.value = DisplayService.brightnessLevel
                         }
                     }
 
                     function onDeviceSwitched() {
-                        if (!brightnessSlider.pressed) {
+                        if (!brightnessSlider.pressed && brightnessSlider.value !== DisplayService.brightnessLevel) {
                             brightnessSlider.value = DisplayService.brightnessLevel
                         }
                     }
                 }
-            }
-        }
-    }
-
-    onOsdShown: {
-        if (DisplayService.brightnessAvailable && contentLoader.item) {
-            const slider = contentLoader.item.children[0].children[1]
-            if (slider) {
-                slider.value = DisplayService.brightnessLevel
             }
         }
     }

@@ -485,7 +485,7 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.surfaceContainerHigh
+                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             }
         }
     }
@@ -507,7 +507,7 @@ Column {
                 instanceId: widgetData.instanceId || ""
                 screenName: root.screenName
                 parentScreen: root.parentScreen
-                property color sliderTrackColor: Theme.surfaceContainerHigh
+                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
                 onIconClicked: {
                     if (!root.editMode && DisplayService.devices && DisplayService.devices.length > 1) {
@@ -530,7 +530,7 @@ Column {
                 anchors.centerIn: parent
                 width: parent.width
                 height: 14
-                property color sliderTrackColor: Theme.surfaceContainerHigh
+                property color sliderTrackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
             }
         }
     }
@@ -794,6 +794,12 @@ Column {
                     }
                     builtinInstance = Qt.binding(() => root.model?.vpnBuiltinInstance)
                 }
+                if (id === "builtin_cups") {
+                    if (root.model?.cupsLoader) {
+                        root.model.cupsLoader.active = true
+                    }
+                    builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance)
+                }
             }
 
             sourceComponent: {
@@ -836,6 +842,9 @@ Column {
             onExpandClicked: {
                 if (root.editMode)
                     return
+                if (builtinInstance) {
+                    builtinInstance.ccWidgetExpanded()
+                }
                 root.expandClicked(widgetData, widgetIndex)
             }
         }
@@ -969,6 +978,9 @@ Column {
             onExpandClicked: {
                 if (root.editMode)
                     return
+                if (pluginInstance) {
+                    pluginInstance.ccWidgetExpanded()
+                }
                 root.expandClicked(widgetData, widgetIndex)
             }
         }

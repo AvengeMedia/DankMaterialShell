@@ -1,6 +1,6 @@
 pragma Singleton
 
-pragma ComponentBehavior: Bound
+pragma ComponentBehavior
 
 import QtCore
 import QtQuick
@@ -34,16 +34,20 @@ Singleton {
     signal searchResultsReceived(var plugins)
     signal operationSuccess(string message)
     signal operationError(string error)
-    signal connectionStateChanged()
+    signal connectionStateChanged
 
     signal networkStateUpdate(var data)
     signal cupsStateUpdate(var data)
     signal loginctlStateUpdate(var data)
     signal loginctlEvent(var event)
-    signal capabilitiesReceived()
+    signal capabilitiesReceived
     signal credentialsRequest(var data)
     signal bluetoothPairingRequest(var data)
     signal dwlStateUpdate(var data)
+    signal brightnessStateUpdate(var data)
+    signal brightnessDeviceUpdate(var device)
+
+    property var activeSubscriptions: ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -218,8 +222,72 @@ Singleton {
             "method": "subscribe"
         }
 
-        console.log("DMSService: Subscribing to all services")
+        if (activeSubscriptions.length > 0) {
+            request.params = {
+                "services": activeSubscriptions
+            }
+            console.log("DMSService: Subscribing to services:", JSON.stringify(activeSubscriptions))
+        } else {
+            console.log("DMSService: Subscribing to all services")
+        }
+
         subscribeSocket.send(request)
+    }
+
+    function subscribe(services) {
+        if (!Array.isArray(services)) {
+            services = [services]
+        }
+
+        activeSubscriptions = services
+
+        if (subscribeConnected) {
+            subscribeSocket.connected = false
+            Qt.callLater(() => {
+                subscribeSocket.connected = true
+            })
+        }
+    }
+
+    function addSubscription(service) {
+        if (activeSubscriptions.includes("all")) {
+            console.warn("DMSService: Cannot add specific subscription when subscribed to 'all'")
+            return
+        }
+
+        if (!activeSubscriptions.includes(service)) {
+            const newSubs = [...activeSubscriptions, service]
+            subscribe(newSubs)
+        }
+    }
+
+    function removeSubscription(service) {
+        if (activeSubscriptions.includes("all")) {
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness"]
+            const filtered = allServices.filter(s => s !== service)
+            subscribe(filtered)
+        } else {
+            const filtered = activeSubscriptions.filter(s => s !== service)
+            if (filtered.length === 0) {
+                console.warn("DMSService: Cannot remove last subscription")
+                return
+            }
+            subscribe(filtered)
+        }
+    }
+
+    function subscribeAll() {
+        subscribe(["all"])
+    }
+
+    function subscribeAllExcept(excludeServices) {
+        if (!Array.isArray(excludeServices)) {
+            excludeServices = [excludeServices]
+        }
+
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "cups", "dwl", "brightness"]
+        const filtered = allServices.filter(s => !excludeServices.includes(s))
+        subscribe(filtered)
     }
 
     function handleSubscriptionEvent(response) {
@@ -227,11 +295,7 @@ Singleton {
             if (response.error.includes("unknown method") && response.error.includes("subscribe")) {
                 if (!shownOutdatedError) {
                     console.error("DMSService: Server does not support subscribe method")
-                    ToastService.showError(
-                        I18n.tr("DMS out of date"),
-                        I18n.tr("To update, run the following command:"),
-                        updateCommand
-                    )
+                    ToastService.showError(I18n.tr("DMS out of date"), I18n.tr("To update, run the following command:"), updateCommand)
                     shownOutdatedError = true
                 }
             }
@@ -272,6 +336,12 @@ Singleton {
             cupsStateUpdate(data)
         } else if (service === "dwl") {
             dwlStateUpdate(data)
+        } else if (service === "brightness") {
+            brightnessStateUpdate(data)
+        } else if (service === "brightness.update") {
+            if (data.device) {
+                brightnessDeviceUpdate(data.device)
+            }
         }
     }
 
@@ -280,8 +350,8 @@ Singleton {
             console.warn("DMSService.sendRequest: Not connected, method:", method)
             if (callback) {
                 callback({
-                    "error": "not connected to DMS socket"
-                })
+                             "error": "not connected to DMS socket"
+                         })
             }
             return
         }

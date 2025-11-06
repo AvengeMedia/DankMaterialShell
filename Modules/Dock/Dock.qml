@@ -18,7 +18,7 @@ Variants {
     delegate: PanelWindow {
         id: dock
 
-        WlrLayershell.namespace: "quickshell:dock"
+        WlrLayershell.namespace: "dms:dock"
 
         readonly property bool isVertical: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
 

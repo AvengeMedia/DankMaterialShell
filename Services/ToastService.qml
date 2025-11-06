@@ -19,29 +19,92 @@ Singleton {
     property string currentCommand: ""
     property bool hasDetails: false
     property string wallpaperErrorStatus: ""
+    property int maxQueueSize: 3
+    property var lastErrorTime: ({})
+    property int errorThrottleMs: 1000
+    property string currentCategory: ""
 
-    function showToast(message, level = levelInfo, details = "", command = "") {
+    function showToast(message, level = levelInfo, details = "", command = "", category = "") {
+        const now = Date.now()
+        const messageKey = message + level
+
+        if (level === levelError) {
+            const lastTime = lastErrorTime[messageKey] || 0
+            if (now - lastTime < errorThrottleMs) {
+                return
+            }
+            lastErrorTime[messageKey] = now
+        }
+
+        if (category && level === levelError) {
+            if (currentCategory === category && toastVisible && currentLevel === levelError) {
+                currentMessage = message
+                currentDetails = details || ""
+                currentCommand = command || ""
+                hasDetails = currentDetails.length > 0 || currentCommand.length > 0
+                resetToastState()
+                if (hasDetails) {
+                    toastTimer.interval = 8000
+                } else {
+                    toastTimer.interval = 5000
+                }
+                toastTimer.restart()
+                return
+            }
+
+            toastQueue = toastQueue.filter(t => t.category !== category)
+        }
+
+        const isDuplicate = toastQueue.some(toast =>
+            toast.message === message && toast.level === level
+        )
+        if (isDuplicate) {
+            return
+        }
+
+        if (toastQueue.length >= maxQueueSize) {
+            if (level === levelError) {
+                toastQueue = toastQueue.filter(t => t.level !== levelError).slice(0, maxQueueSize - 1)
+            } else {
+                return
+            }
+        }
+
         toastQueue.push({
                             "message": message,
                             "level": level,
                             "details": details,
-                            "command": command
+                            "command": command,
+                            "category": category
                         })
         if (!toastVisible) {
             processQueue()
         }
     }
 
-    function showInfo(message, details = "", command = "") {
-        showToast(message, levelInfo, details, command)
+    function showInfo(message, details = "", command = "", category = "") {
+        showToast(message, levelInfo, details, command, category)
     }
 
-    function showWarning(message, details = "", command = "") {
-        showToast(message, levelWarn, details, command)
+    function showWarning(message, details = "", command = "", category = "") {
+        showToast(message, levelWarn, details, command, category)
     }
 
-    function showError(message, details = "", command = "") {
-        showToast(message, levelError, details, command)
+    function showError(message, details = "", command = "", category = "") {
+        showToast(message, levelError, details, command, category)
+    }
+
+    function dismissCategory(category) {
+        if (!category) {
+            return
+        }
+
+        if (currentCategory === category && toastVisible) {
+            hideToast()
+            return
+        }
+
+        toastQueue = toastQueue.filter(t => t.category !== category)
     }
 
     function hideToast() {
@@ -49,6 +112,7 @@ Singleton {
         currentMessage = ""
         currentDetails = ""
         currentCommand = ""
+        currentCategory = ""
         hasDetails = false
         currentLevel = levelInfo
         toastTimer.stop()
@@ -68,6 +132,7 @@ Singleton {
         currentLevel = toast.level
         currentDetails = toast.details || ""
         currentCommand = toast.command || ""
+        currentCategory = toast.category || ""
         hasDetails = currentDetails.length > 0 || currentCommand.length > 0
         toastVisible = true
         resetToastState()

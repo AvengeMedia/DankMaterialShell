@@ -20,7 +20,7 @@ Rectangle {
     width: parent ? parent.width : 200
     height: 60
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
     opacity: enabled ? 1.0 : 0.6

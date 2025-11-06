@@ -12,7 +12,7 @@ import qs.Widgets
 PanelWindow {
     id: win
 
-    WlrLayershell.namespace: "quickshell:notification"
+    WlrLayershell.namespace: "dms:notification-popup"
 
     required property var notificationData
     required property string notificationId
@@ -212,7 +212,7 @@ PanelWindow {
             anchors.fill: parent
             anchors.margins: 4
             radius: Theme.cornerRadius
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
             clip: true

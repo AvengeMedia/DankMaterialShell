@@ -13,6 +13,8 @@ import qs.Widgets
 DankPopout {
     id: root
 
+    layerNamespace: "dms:vpn"
+
     Ref {
         service: DMSNetworkService
     }
@@ -51,7 +53,7 @@ DankPopout {
             id: content
 
             implicitHeight: contentColumn.height + Theme.spacingL * 2
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.color: Theme.outlineMedium
             border.width: 0
@@ -152,7 +154,7 @@ DankPopout {
                     width: parent.width
                     implicitHeight: detailsColumn.implicitHeight + Theme.spacingM * 2
                     radius: Theme.cornerRadius
-                    color: Qt.rgba(Theme.surfaceContainerHigh.r, Theme.surfaceContainerHigh.g, Theme.surfaceContainerHigh.b, Theme.getContentBackgroundAlpha() * 0.6)
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Theme.outlineStrong
                     border.width: 0
                     clip: true

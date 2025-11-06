@@ -11,6 +11,8 @@ import qs.Widgets
 DankPopout {
     id: systemUpdatePopout
 
+    layerNamespace: "dms:system-update"
+
     property var parentWidget: null
     property var triggerScreen: null
 
@@ -48,7 +50,7 @@ DankPopout {
         Rectangle {
             id: updaterPanel
 
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             antialiasing: true
             smooth: true

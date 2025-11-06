@@ -110,7 +110,7 @@ Item {
         copy[i] = copy[j];
         copy[j] = tmp;
 
-        SettingsData.setControlCenterWidgets(copy);
+        SettingsData.set("controlCenterWidgets", copy);
     }
 
     function snapToGrid() {
@@ -244,7 +244,7 @@ Item {
             var widgets = SettingsData.controlCenterWidgets.slice()
             if (widgetIndex >= 0 && widgetIndex < widgets.length) {
                 widgets[widgetIndex].width = newSize
-                SettingsData.setControlCenterWidgets(widgets)
+                SettingsData.set("controlCenterWidgets", widgets)
             }
         }
     }

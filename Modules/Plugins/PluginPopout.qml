@@ -1,9 +1,12 @@
 import QtQuick
+import Quickshell.Wayland
 import qs.Common
 import qs.Widgets
 
 DankPopout {
     id: root
+
+    WlrLayershell.keyboardFocus: shouldBeVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None 
 
     property var triggerScreen: null
     property Component pluginContent: null
@@ -29,7 +32,7 @@ DankPopout {
             id: popoutContainer
 
             implicitHeight: popoutColumn.implicitHeight + Theme.spacingL * 2
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
             antialiasing: true

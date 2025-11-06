@@ -27,7 +27,7 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor)
     }
 
-    readonly property color _containerBg: Theme.surfaceContainerHigh
+    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
     color: {
         const baseColor = bodyMouse.containsMouse ? Theme.widgetBaseHoverColor : _containerBg

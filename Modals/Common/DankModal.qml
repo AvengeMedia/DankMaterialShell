@@ -8,7 +8,8 @@ import qs.Services
 PanelWindow {
     id: root
 
-    WlrLayershell.namespace: "quickshell:modal"
+    property string layerNamespace: "dms:modal"
+    WlrLayershell.namespace: layerNamespace
 
     property alias content: contentLoader.sourceComponent
     property alias contentLoader: contentLoader
@@ -110,24 +111,24 @@ PanelWindow {
         bottom: true
     }
 
+    MouseArea {
+        anchors.fill: parent
+        enabled: root.closeOnBackgroundClick && root.shouldBeVisible
+        onClicked: mouse => {
+                       const localPos = mapToItem(contentContainer, mouse.x, mouse.y)
+                       if (localPos.x < 0 || localPos.x > contentContainer.width || localPos.y < 0 || localPos.y > contentContainer.height) {
+                           root.backgroundClicked()
+                       }
+                   }
+    }
+
     Rectangle {
         id: background
 
         anchors.fill: parent
         color: "black"
-        opacity: root.showBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-        visible: root.showBackground
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.closeOnBackgroundClick
-            onClicked: mouse => {
-                           const localPos = mapToItem(contentContainer, mouse.x, mouse.y)
-                           if (localPos.x < 0 || localPos.x > contentContainer.width || localPos.y < 0 || localPos.y > contentContainer.height) {
-                               root.backgroundClicked()
-                           }
-                       }
-        }
+        opacity: root.showBackground && SettingsData.modalDarkenBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+        visible: root.showBackground && SettingsData.modalDarkenBackground
 
         Behavior on opacity {
             NumberAnimation {

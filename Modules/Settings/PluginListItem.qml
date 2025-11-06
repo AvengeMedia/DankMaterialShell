@@ -33,7 +33,7 @@ StyledRect {
     width: parent.width
     height: pluginItemColumn.implicitHeight + Theme.spacingM * 2 + settingsContainer.height
     radius: Theme.cornerRadius
-    color: (pluginMouseArea.containsMouse || updateArea.containsMouse || uninstallArea.containsMouse || reloadArea.containsMouse) ? Theme.surfacePressed : (isExpanded ? Theme.surfaceContainerHighest : Theme.surfaceContainerHigh)
+    color: (pluginMouseArea.containsMouse || updateArea.containsMouse || uninstallArea.containsMouse || reloadArea.containsMouse) ? Theme.surfacePressed : (isExpanded ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency))
     border.width: 0
 
     MouseArea {
@@ -111,7 +111,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: updateArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: updateArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
                     visible: DMSService.dmsAvailable && PluginService.isPluginLoaded(root.pluginId) && root.hasUpdate
 
                     DankIcon {
@@ -161,7 +161,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: uninstallArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: uninstallArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
                     visible: DMSService.dmsAvailable
 
                     DankIcon {
@@ -210,7 +210,7 @@ StyledRect {
                     width: 28
                     height: 28
                     radius: 14
-                    color: reloadArea.containsMouse ? Theme.surfaceContainerHighest : "transparent"
+                    color: reloadArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
                     visible: PluginService.isPluginLoaded(root.pluginId)
 
                     DankIcon {
@@ -335,7 +335,7 @@ StyledRect {
 
         Rectangle {
             anchors.fill: parent
-            color: Theme.surfaceContainerHighest
+            color: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
             radius: Theme.cornerRadius
             anchors.topMargin: Theme.spacingXS
             border.width: 0

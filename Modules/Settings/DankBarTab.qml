@@ -502,11 +502,11 @@ Item {
     function handleControlCenterSettingChanged(sectionId, widgetIndex, settingName, value) {
         // Control Center settings are global, not per-widget instance
         if (settingName === "showNetworkIcon") {
-            SettingsData.setControlCenterShowNetworkIcon(value)
+            SettingsData.set("controlCenterShowNetworkIcon", value)
         } else if (settingName === "showBluetoothIcon") {
-            SettingsData.setControlCenterShowBluetoothIcon(value)
+            SettingsData.set("controlCenterShowBluetoothIcon", value)
         } else if (settingName === "showAudioIcon") {
-            SettingsData.setControlCenterShowAudioIcon(value)
+            SettingsData.set("controlCenterShowAudioIcon", value)
         }
     }
 
@@ -541,6 +541,58 @@ Item {
                     newWidget.pciId = widget.pciId
                 if (widget.mountPath !== undefined)
                     newWidget.mountPath = widget.mountPath
+                if (widget.showSwap !== undefined)
+                    newWidget.showSwap = widget.showSwap
+                if (widget.id === "controlCenterButton") {
+                    newWidget.showNetworkIcon = widget.showNetworkIcon !== undefined ? widget.showNetworkIcon : true
+                    newWidget.showBluetoothIcon = widget.showBluetoothIcon !== undefined ? widget.showBluetoothIcon : true
+                    newWidget.showAudioIcon = widget.showAudioIcon !== undefined ? widget.showAudioIcon : true
+                }
+                widgets[widgetIndex] = newWidget
+            }
+        }
+
+        if (sectionId === "left")
+            SettingsData.setDankBarLeftWidgets(widgets)
+        else if (sectionId === "center")
+            SettingsData.setDankBarCenterWidgets(widgets)
+        else if (sectionId === "right")
+            SettingsData.setDankBarRightWidgets(widgets)
+    }
+
+    function handleShowSwapChanged(sectionId, widgetIndex, enabled) {
+        var widgets = []
+        if (sectionId === "left")
+            widgets = SettingsData.dankBarLeftWidgets.slice()
+        else if (sectionId === "center")
+            widgets = SettingsData.dankBarCenterWidgets.slice()
+        else if (sectionId === "right")
+            widgets = SettingsData.dankBarRightWidgets.slice()
+
+        if (widgetIndex >= 0 && widgetIndex < widgets.length) {
+            var widget = widgets[widgetIndex]
+            if (typeof widget === "string") {
+                widgets[widgetIndex] = {
+                    "id": widget,
+                    "enabled": true,
+                    "showSwap": enabled
+                }
+            } else {
+                var newWidget = {
+                    "id": widget.id,
+                    "enabled": widget.enabled,
+                    "showSwap": enabled
+                }
+                if (widget.size !== undefined)
+                    newWidget.size = widget.size
+                if (widget.selectedGpuIndex !== undefined)
+                    newWidget.selectedGpuIndex = widget.selectedGpuIndex
+                if (widget.pciId !== undefined)
+                    newWidget.pciId = widget.pciId
+                if (widget.mountPath !== undefined)
+                    newWidget.mountPath = widget.mountPath
+                if (widget.minimumWidth !== undefined)
+                    newWidget.minimumWidth = widget.minimumWidth
                 if (widget.id === "controlCenterButton") {
                     newWidget.showNetworkIcon = widget.showNetworkIcon !== undefined ? widget.showNetworkIcon : true
                     newWidget.showBluetoothIcon = widget.showBluetoothIcon !== undefined ? widget.showBluetoothIcon : true
@@ -582,6 +634,7 @@ Item {
                                var widgetShowBluetoothIcon = typeof widget === "string" ? undefined : widget.showBluetoothIcon
                                var widgetShowAudioIcon = typeof widget === "string" ? undefined : widget.showAudioIcon
                                var widgetMinimumWidth = typeof widget === "string" ? undefined : widget.minimumWidth
+                               var widgetShowSwap = typeof widget === "string" ? undefined : widget.showSwap
                                var widgetDef = baseWidgetDefinitions.find(w => {
                                                                               return w.id === widgetId
                                                                           })
@@ -604,6 +657,8 @@ Item {
                                    item.showAudioIcon = widgetShowAudioIcon
                                    if (widgetMinimumWidth !== undefined)
                                    item.minimumWidth = widgetMinimumWidth
+                                   if (widgetShowSwap !== undefined)
+                                   item.showSwap = widgetShowSwap
 
                                    widgets.push(item)
                                }
@@ -671,7 +726,7 @@ Item {
                 width: parent.width
                 height: positionSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -735,7 +790,7 @@ Item {
                 width: parent.width
                 height: dankBarAutoHideSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -786,7 +841,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dankBarAutoHide
                             onToggled: toggled => {
-                                           return SettingsData.setDankBarAutoHide(
+                                           return SettingsData.set("dankBarAutoHide", 
                                                toggled)
                                        }
                         }
@@ -838,7 +893,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dankBarVisible
                             onToggled: toggled => {
-                                           return SettingsData.setDankBarVisible(
+                                           return SettingsData.set("dankBarVisible", 
                                                toggled)
                                        }
                         }
@@ -892,7 +947,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dankBarOpenOnOverview
                             onToggled: toggled => {
-                                           return SettingsData.setDankBarOpenOnOverview(
+                                           return SettingsData.set("dankBarOpenOnOverview", 
                                                toggled)
                                        }
                         }
@@ -906,7 +961,7 @@ Item {
                 width: parent.width
                 height: dankBarSpacingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -971,7 +1026,7 @@ Item {
                                 buttonSize: 20
                                 iconName: "refresh"
                                 iconSize: 12
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
@@ -995,7 +1050,7 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
                                                       SettingsData.setDankBarSpacing(
                                                           newValue)
@@ -1043,11 +1098,11 @@ Item {
                                 buttonSize: 20
                                 iconName: "refresh"
                                 iconSize: 12
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
-                                    SettingsData.setDankBarBottomGap(0)
+                                    SettingsData.set("dankBarBottomGap", 0)
                                 }
                             }
 
@@ -1067,9 +1122,9 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDankBarBottomGap(
+                                                      SettingsData.set("dankBarBottomGap", 
                                                           newValue)
                                                   }
 
@@ -1115,11 +1170,11 @@ Item {
                                 buttonSize: 20
                                 iconName: "refresh"
                                 iconSize: 12
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
-                                    SettingsData.setDankBarInnerPadding(4)
+                                    SettingsData.set("dankBarInnerPadding", 4)
                                 }
                             }
 
@@ -1134,14 +1189,14 @@ Item {
                             width: parent.width
                             height: 24
                             value: SettingsData.dankBarInnerPadding
-                            minimum: 0
+                            minimum: -8
                             maximum: 24
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDankBarInnerPadding(
+                                                      SettingsData.set("dankBarInnerPadding",
                                                           newValue)
                                                   }
 
@@ -1164,7 +1219,7 @@ Item {
                             description: I18n.tr("Automatically calculate popup distance from bar edge.")
                             checked: SettingsData.popupGapsAuto
                             onToggled: checked => {
-                                SettingsData.setPopupGapsAuto(checked)
+                                SettingsData.set("popupGapsAuto", checked)
                             }
                         }
 
@@ -1214,11 +1269,11 @@ Item {
                                         buttonSize: 20
                                         iconName: "refresh"
                                         iconSize: 12
-                                        backgroundColor: Theme.surfaceContainerHigh
+                                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         iconColor: Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: {
-                                            SettingsData.setPopupGapsManual(4)
+                                            SettingsData.set("popupGapsManual", 4)
                                         }
                                     }
 
@@ -1238,9 +1293,9 @@ Item {
                                     unit: ""
                                     showValue: true
                                     wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
+                                    thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                     onSliderValueChanged: newValue => {
-                                        SettingsData.setPopupGapsManual(newValue)
+                                        SettingsData.set("popupGapsManual", newValue)
                                     }
 
                                     Binding {
@@ -1260,7 +1315,7 @@ Item {
                         description: "Removes rounded corners from bar container."
                         checked: SettingsData.dankBarSquareCorners
                         onToggled: checked => {
-                                       SettingsData.setDankBarSquareCorners(
+                                       SettingsData.set("dankBarSquareCorners", 
                                            checked)
                                    }
                     }
@@ -1271,7 +1326,7 @@ Item {
                         description: "Remove widget backgrounds for a minimal look with tighter spacing."
                         checked: SettingsData.dankBarNoBackground
                         onToggled: checked => {
-                                       SettingsData.setDankBarNoBackground(
+                                       SettingsData.set("dankBarNoBackground", 
                                            checked)
                                    }
                     }
@@ -1282,7 +1337,7 @@ Item {
                         description: "Add curved swooping tips at the bottom of the bar."
                         checked: SettingsData.dankBarGothCornersEnabled
                         onToggled: checked => {
-                                       SettingsData.setDankBarGothCornersEnabled(
+                                       SettingsData.set("dankBarGothCornersEnabled", 
                                            checked)
                                    }
                     }
@@ -1297,7 +1352,7 @@ Item {
                             description: "Add a 1px border to the bar. Smart edge detection only shows border on exposed sides."
                             checked: SettingsData.dankBarBorderEnabled
                             onToggled: checked => {
-                                           SettingsData.setDankBarBorderEnabled(checked)
+                                           SettingsData.set("dankBarBorderEnabled", checked)
                                        }
                         }
 
@@ -1399,7 +1454,7 @@ Item {
                                         buttonSize: 20
                                         iconName: "refresh"
                                         iconSize: 12
-                                        backgroundColor: Theme.surfaceContainerHigh
+                                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         iconColor: Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: {
@@ -1423,7 +1478,7 @@ Item {
                                     unit: "%"
                                     showValue: true
                                     wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
+                                    thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                     onSliderValueChanged: newValue => {
                                         SettingsData.dankBarBorderOpacity = newValue / 100
                                     }
@@ -1470,7 +1525,7 @@ Item {
                                         buttonSize: 20
                                         iconName: "refresh"
                                         iconSize: 12
-                                        backgroundColor: Theme.surfaceContainerHigh
+                                        backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         iconColor: Theme.surfaceText
                                         anchors.verticalCenter: parent.verticalCenter
                                         onClicked: {
@@ -1494,7 +1549,7 @@ Item {
                                     unit: "px"
                                     showValue: true
                                     wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
+                                    thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                     onSliderValueChanged: newValue => {
                                         SettingsData.dankBarBorderThickness = newValue
                                     }
@@ -1561,11 +1616,11 @@ Item {
                                 iconName: "remove"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.dankBarFontScale > 0.5
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newScale = Math.max(0.5, SettingsData.dankBarFontScale - 0.05)
-                                    SettingsData.setDankBarFontScale(newScale)
+                                    SettingsData.set("dankBarFontScale", newScale)
                                 }
                             }
 
@@ -1573,7 +1628,7 @@ Item {
                                 width: 60
                                 height: 32
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                 border.width: 0
 
@@ -1591,11 +1646,11 @@ Item {
                                 iconName: "add"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.dankBarFontScale < 2.0
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newScale = Math.min(2.0, SettingsData.dankBarFontScale + 0.05)
-                                    SettingsData.setDankBarFontScale(newScale)
+                                    SettingsData.set("dankBarFontScale", newScale)
                                 }
                             }
                         }
@@ -1608,7 +1663,7 @@ Item {
                 width: parent.width
                 height: widgetManagementSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -1731,7 +1786,7 @@ Item {
                     width: parent.width
                     height: leftSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                           Theme.outline.b, 0.2)
                     border.width: 0
@@ -1770,19 +1825,19 @@ Item {
                                              }
                         onCompactModeChanged: (widgetId, value) => {
                                                   if (widgetId === "clock") {
-                                                      SettingsData.setClockCompactMode(
+                                                      SettingsData.set("clockCompactMode", 
                                                           value)
                                                   } else if (widgetId === "music") {
-                                                      SettingsData.setMediaSize(
+                                                      SettingsData.set("mediaSize", 
                                                           value)
                                                   } else if (widgetId === "focusedWindow") {
-                                                      SettingsData.setFocusedWindowCompactMode(
+                                                      SettingsData.set("focusedWindowCompactMode", 
                                                           value)
                                                   } else if (widgetId === "runningApps") {
-                                                      SettingsData.setRunningAppsCompactMode(
+                                                      SettingsData.set("runningAppsCompactMode", 
                                                           value)
                                                   } else if (widgetId === "keyboard_layout_name") {
-                                                      SettingsData.setKeyboardLayoutNameCompactMode(
+                                                      SettingsData.set("keyboardLayoutNameCompactMode", 
                                                           value)
                                                   }
                                               }
@@ -1802,6 +1857,10 @@ Item {
                                                    dankBarTab.handleMinimumWidthChanged(
                                                        sectionId, widgetIndex, enabled)
                                                }
+                        onShowSwapChanged: (sectionId, widgetIndex, enabled) => {
+                                               dankBarTab.handleShowSwapChanged(
+                                                   sectionId, widgetIndex, enabled)
+                                           }
                     }
                 }
 
@@ -1810,7 +1869,7 @@ Item {
                     width: parent.width
                     height: centerSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                           Theme.outline.b, 0.2)
                     border.width: 0
@@ -1849,19 +1908,19 @@ Item {
                                              }
                         onCompactModeChanged: (widgetId, value) => {
                                                   if (widgetId === "clock") {
-                                                      SettingsData.setClockCompactMode(
+                                                      SettingsData.set("clockCompactMode", 
                                                           value)
                                                   } else if (widgetId === "music") {
-                                                      SettingsData.setMediaSize(
+                                                      SettingsData.set("mediaSize", 
                                                           value)
                                                   } else if (widgetId === "focusedWindow") {
-                                                      SettingsData.setFocusedWindowCompactMode(
+                                                      SettingsData.set("focusedWindowCompactMode", 
                                                           value)
                                                   } else if (widgetId === "runningApps") {
-                                                      SettingsData.setRunningAppsCompactMode(
+                                                      SettingsData.set("runningAppsCompactMode", 
                                                           value)
                                                   } else if (widgetId === "keyboard_layout_name") {
-                                                      SettingsData.setKeyboardLayoutNameCompactMode(
+                                                      SettingsData.set("keyboardLayoutNameCompactMode", 
                                                           value)
                                                   }
                                               }
@@ -1881,6 +1940,10 @@ Item {
                                                    dankBarTab.handleMinimumWidthChanged(
                                                        sectionId, widgetIndex, enabled)
                                                }
+                        onShowSwapChanged: (sectionId, widgetIndex, enabled) => {
+                                               dankBarTab.handleShowSwapChanged(
+                                                   sectionId, widgetIndex, enabled)
+                                           }
                     }
                 }
 
@@ -1889,7 +1952,7 @@ Item {
                     width: parent.width
                     height: rightSection.implicitHeight + Theme.spacingL * 2
                     radius: Theme.cornerRadius
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                           Theme.outline.b, 0.2)
                     border.width: 0
@@ -1928,19 +1991,19 @@ Item {
                                              }
                         onCompactModeChanged: (widgetId, value) => {
                                                   if (widgetId === "clock") {
-                                                      SettingsData.setClockCompactMode(
+                                                      SettingsData.set("clockCompactMode", 
                                                           value)
                                                   } else if (widgetId === "music") {
-                                                      SettingsData.setMediaSize(
+                                                      SettingsData.set("mediaSize", 
                                                           value)
                                                   } else if (widgetId === "focusedWindow") {
-                                                      SettingsData.setFocusedWindowCompactMode(
+                                                      SettingsData.set("focusedWindowCompactMode", 
                                                           value)
                                                   } else if (widgetId === "runningApps") {
-                                                      SettingsData.setRunningAppsCompactMode(
+                                                      SettingsData.set("runningAppsCompactMode", 
                                                           value)
                                                   } else if (widgetId === "keyboard_layout_name") {
-                                                      SettingsData.setKeyboardLayoutNameCompactMode(
+                                                      SettingsData.set("keyboardLayoutNameCompactMode", 
                                                           value)
                                                   }
                                               }
@@ -1960,6 +2023,10 @@ Item {
                                                    dankBarTab.handleMinimumWidthChanged(
                                                        sectionId, widgetIndex, enabled)
                                                }
+                        onShowSwapChanged: (sectionId, widgetIndex, enabled) => {
+                                               dankBarTab.handleShowSwapChanged(
+                                                   sectionId, widgetIndex, enabled)
+                                           }
                     }
                 }
             }

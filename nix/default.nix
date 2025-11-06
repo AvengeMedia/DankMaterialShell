@@ -10,11 +10,19 @@
 in {
     imports = [
         (lib.mkRemovedOptionModule ["programs" "dankMaterialShell" "enableNightMode"] "Night mode is now always available.")
+        (lib.mkRenamedOptionModule ["programs" "dankMaterialShell" "enableSystemd"] ["programs" "dankMaterialShell" "systemd" "enable"])
     ];
     options.programs.dankMaterialShell = with lib.types; {
         enable = lib.mkEnableOption "DankMaterialShell";
 
-        enableSystemd = lib.mkEnableOption "DankMaterialShell systemd startup";
+        systemd = {
+            enable = lib.mkEnableOption "DankMaterialShell systemd startup";
+            restartIfChanged = lib.mkOption {
+                type = bool;
+                default = true;
+                description = "Auto-restart dms.service when dankMaterialShell changes";
+            };
+        };
         enableSystemMonitoring = lib.mkOption {
             type = bool;
             default = true;
@@ -105,11 +113,12 @@ in {
             configs.dms = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
         };
 
-        systemd.user.services.dms = lib.mkIf cfg.enableSystemd {
+        systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
             Unit = {
                 Description = "DankMaterialShell";
                 PartOf = [ config.wayland.systemd.target ];
                 After = [ config.wayland.systemd.target ];
+                X-Restart-Triggers = lib.optional cfg.systemd.restartIfChanged config.programs.quickshell.configs.dms;
             };
 
             Service = {

@@ -164,7 +164,7 @@ Rectangle {
             onValueChanged: value => {
                                 for (let i = 0; i < timeoutOptions.length; i++) {
                                     if (timeoutOptions[i].text === value) {
-                                        SettingsData.setNotificationTimeoutLow(timeoutOptions[i].value)
+                                        SettingsData.set("notificationTimeoutLow", timeoutOptions[i].value)
                                         break
                                     }
                                 }
@@ -179,7 +179,7 @@ Rectangle {
             onValueChanged: value => {
                                 for (let i = 0; i < timeoutOptions.length; i++) {
                                     if (timeoutOptions[i].text === value) {
-                                        SettingsData.setNotificationTimeoutNormal(timeoutOptions[i].value)
+                                        SettingsData.set("notificationTimeoutNormal", timeoutOptions[i].value)
                                         break
                                     }
                                 }
@@ -194,7 +194,7 @@ Rectangle {
             onValueChanged: value => {
                                 for (let i = 0; i < timeoutOptions.length; i++) {
                                     if (timeoutOptions[i].text === value) {
-                                        SettingsData.setNotificationTimeoutCritical(timeoutOptions[i].value)
+                                        SettingsData.set("notificationTimeoutCritical", timeoutOptions[i].value)
                                         break
                                     }
                                 }
@@ -245,7 +245,7 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 checked: SettingsData.notificationOverlayEnabled
-                onToggled: toggled => SettingsData.setNotificationOverlayEnabled(toggled)
+                onToggled: toggled => SettingsData.set("notificationOverlayEnabled", toggled)
             }
         }
     }

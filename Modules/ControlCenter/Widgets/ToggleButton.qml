@@ -24,7 +24,7 @@ Rectangle {
     }
 
     readonly property color _tileBgActive: Theme.primary
-    readonly property color _tileBgInactive: Theme.surfaceContainerHigh
+    readonly property color _tileBgInactive: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     readonly property color _tileRingActive:
         Qt.rgba(Theme.primaryText.r, Theme.primaryText.g, Theme.primaryText.b, 0.22)
 
@@ -42,7 +42,7 @@ Rectangle {
         return Theme.isLightMode ? Qt.darker(base, factor) : Qt.lighter(base, factor)
     }
 
-    readonly property color _containerBg: Theme.surfaceContainerHigh
+    readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
     Rectangle {
         anchors.fill: parent

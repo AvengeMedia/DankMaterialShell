@@ -50,7 +50,7 @@ Item {
                     }
                     return w
                 })
-                SettingsData.setControlCenterWidgets(newWidgets)
+                SettingsData.set("controlCenterWidgets", newWidgets)
                 if (root.collapseCallback) {
                     root.collapseCallback()
                 }
@@ -74,7 +74,7 @@ Item {
                     }
                     return w
                 })
-                SettingsData.setControlCenterWidgets(newWidgets)
+                SettingsData.set("controlCenterWidgets", newWidgets)
                 if (root.collapseCallback) {
                     root.collapseCallback()
                 }
@@ -103,6 +103,12 @@ Item {
                     widgetModel.vpnLoader.active = true
                 }
                 builtinInstance = widgetModel.vpnBuiltinInstance
+            }
+            if (builtinId === "builtin_cups") {
+                if (widgetModel?.cupsLoader) {
+                    widgetModel.cupsLoader.active = true
+                }
+                builtinInstance = widgetModel.cupsBuiltinInstance
             }
 
             if (!builtinInstance || !builtinInstance.ccDetailContent) {

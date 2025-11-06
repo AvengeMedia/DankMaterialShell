@@ -7,6 +7,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:polkit"
+
     property string passwordInput: ""
     property var currentFlow: PolkitService.agent?.flow
     property bool isLoading: false

@@ -23,6 +23,7 @@ Column {
     signal diskMountSelectionChanged(string sectionId, int widgetIndex, string mountPath)
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
+    signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
 
     width: parent.width
     height: implicitHeight
@@ -315,6 +316,34 @@ Column {
                             }
                         }
 
+                        DankActionButton {
+                            id: showSwapButton
+                            buttonSize: 28
+                            visible: modelData.id === "memUsage"
+                            iconName: "swap_horiz"
+                            iconSize: 16
+                            iconColor: (modelData.showSwap !== undefined ? modelData.showSwap : false) ? Theme.primary : Theme.outline
+                            onClicked: {
+                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false
+                                root.showSwapChanged(root.sectionId, index, !currentEnabled)
+                            }
+                            onEntered: {
+                                showSwapTooltipLoader.active = true
+                                if (showSwapTooltipLoader.item) {
+                                    var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false
+                                    const tooltipText = currentEnabled ? "Hide Swap" : "Show Swap"
+                                    const p = showSwapButton.mapToItem(null, showSwapButton.width / 2, 0)
+                                    showSwapTooltipLoader.item.show(tooltipText, p.x, p.y - 40, null)
+                                }
+                            }
+                            onExited: {
+                                if (showSwapTooltipLoader.item) {
+                                    showSwapTooltipLoader.item.hide()
+                                }
+                                showSwapTooltipLoader.active = false
+                            }
+                        }
+
                         Row {
                             spacing: Theme.spacingXS
                             visible: modelData.id === "clock"
@@ -483,7 +512,7 @@ Column {
                                 iconSize: 16
                                 iconColor: SettingsData.runningAppsGroupByApp ? Theme.primary : Theme.outline
                                 onClicked: {
-                                    SettingsData.setRunningAppsGroupByApp(!SettingsData.runningAppsGroupByApp)
+                                    SettingsData.set("runningAppsGroupByApp", !SettingsData.runningAppsGroupByApp)
                                 }
                                 onEntered: {
                                     groupByAppTooltipLoader.active = true
@@ -756,7 +785,7 @@ Column {
         }
 
         background: Rectangle {
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
             border.width: 0
@@ -971,6 +1000,12 @@ Column {
 
     Loader {
         id: groupByAppTooltipLoader
+        active: false
+        sourceComponent: DankTooltip {}
+    }
+
+    Loader {
+        id: showSwapTooltipLoader
         active: false
         sourceComponent: DankTooltip {}
     }

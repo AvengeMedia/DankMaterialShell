@@ -67,7 +67,7 @@ PanelWindow {
             }
         }
 
-        width: shouldBeVisible ? Math.min(900, messageText.implicitWidth + statusIcon.width + Theme.spacingM + (ToastService.hasDetails ? (expandButton.width + closeButton.width + 4) : 0) + Theme.spacingL * 2 + Theme.spacingM * 2) : frozenWidth
+        width: shouldBeVisible ? Math.min(900, messageText.implicitWidth + statusIcon.width + Theme.spacingM + (ToastService.hasDetails ? (expandButton.width + closeButton.width + 4) : (ToastService.currentLevel === ToastService.levelError ? closeButton.width + Theme.spacingS : 0)) + Theme.spacingL * 2 + Theme.spacingM * 2) : frozenWidth
         height: toastContent.height + Theme.spacingL * 2
         anchors.horizontalCenter: parent.horizontalCenter
         y: Theme.barHeight - 4 + SettingsData.dankBarSpacing + 2
@@ -146,8 +146,10 @@ PanelWindow {
                     font.weight: Font.Medium
                     anchors.left: statusIcon.right
                     anchors.leftMargin: Theme.spacingM
+                    anchors.right: ToastService.hasDetails ? expandButton.left : parent.right
+                    anchors.rightMargin: ToastService.hasDetails ? Theme.spacingS : 0
                     anchors.verticalCenter: parent.verticalCenter
-                    width: implicitWidth
+                    elide: Text.ElideRight
                     wrapMode: Text.NoWrap
                 }
 
@@ -196,7 +198,7 @@ PanelWindow {
                     buttonSize: Theme.iconSize + 8
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: ToastService.hasDetails
+                    visible: ToastService.hasDetails || ToastService.currentLevel === ToastService.levelError
 
                     onClicked: {
                         ToastService.hideToast()

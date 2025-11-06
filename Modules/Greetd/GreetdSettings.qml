@@ -43,6 +43,7 @@ Singleton {
     property bool lockScreenShowPowerActions: true
     property var screenPreferences: ({})
     property int animationSpeed: 2
+    property string wallpaperFillMode: "Fill"
 
     readonly property string defaultFontFamily: "Inter Variable"
     readonly property string defaultMonoFontFamily: "Fira Code"
@@ -78,6 +79,7 @@ Singleton {
                 lockScreenShowPowerActions = settings.lockScreenShowPowerActions !== undefined ? settings.lockScreenShowPowerActions : true
                 screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({})
                 animationSpeed = settings.animationSpeed !== undefined ? settings.animationSpeed : 2
+                wallpaperFillMode = settings.wallpaperFillMode !== undefined ? settings.wallpaperFillMode : "Fill"
                 settingsLoaded = true
 
                 if (typeof Theme !== "undefined") {

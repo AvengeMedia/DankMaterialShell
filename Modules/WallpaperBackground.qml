@@ -123,6 +123,8 @@ Variants {
                     if (!isInitialized || !currentWallpaper.source) {
                         setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
                         isInitialized = true
+                    } else if (CompositorService.isNiri && SessionData.isSwitchingMode) {
+                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
                     } else {
                         changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
                     }

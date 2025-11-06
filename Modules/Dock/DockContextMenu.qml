@@ -161,7 +161,7 @@ PanelWindow {
 
         width: Math.min(400, Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2))
         height: Math.max(60, menuColumn.implicitHeight + Theme.spacingS * 2)
-        color: Theme.popupBackground()
+        color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
         radius: Theme.cornerRadius
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
         border.width: 1

@@ -83,7 +83,7 @@ Item {
                         }
                         return w
                     })
-                    SettingsData.setControlCenterWidgets(newWidgets)
+                    SettingsData.set("controlCenterWidgets", newWidgets)
                 }
             }
         }

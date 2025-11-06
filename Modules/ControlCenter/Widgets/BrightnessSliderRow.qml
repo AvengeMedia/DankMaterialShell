@@ -13,7 +13,7 @@ Row {
     property string screenName: ""
     property var parentScreen: null
 
-    signal iconClicked()
+    signal iconClicked
 
     height: 40
     spacing: 0
@@ -36,13 +36,27 @@ Row {
 
         if (deviceName && deviceName.length > 0) {
             const found = DisplayService.devices.find(dev => dev.name === deviceName)
-            return found ? found.name : ""
+            if (found) {
+                return found.name
+            }
         }
 
         const currentDeviceName = DisplayService.currentDevice
         if (currentDeviceName) {
             const found = DisplayService.devices.find(dev => dev.name === currentDeviceName)
-            return found ? found.name : ""
+            if (found) {
+                return found.name
+            }
+        }
+
+        const backlight = DisplayService.devices.find(d => d.class === "backlight")
+        if (backlight) {
+            return backlight.name
+        }
+
+        const ddc = DisplayService.devices.find(d => d.class === "ddc")
+        if (ddc) {
+            return ddc.name
         }
 
         return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : ""
@@ -57,6 +71,7 @@ Row {
     }
 
     property real targetBrightness: {
+        DisplayService.brightnessVersion
         if (!targetDeviceName) {
             return 0
         }
@@ -69,9 +84,7 @@ Row {
         height: Theme.iconSize + Theme.spacingS * 2
         anchors.verticalCenter: parent.verticalCenter
         radius: (Theme.iconSize + Theme.spacingS * 2) / 2
-        color: iconArea.containsMouse
-               ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
-               : Theme.withAlpha(Theme.primary, 0)
+        color: iconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.primary, 0)
 
         MouseArea {
             id: iconArea
@@ -112,8 +125,10 @@ Row {
 
                     if (targetDevice.class === "backlight" || targetDevice.class === "ddc") {
                         const brightness = targetBrightness
-                        if (brightness <= 33) return "brightness_low"
-                        if (brightness <= 66) return "brightness_medium"
+                        if (brightness <= 33)
+                            return "brightness_low"
+                        if (brightness <= 66)
+                            return "brightness_medium"
                         return "brightness_high"
                     } else if (targetDevice.name.includes("kbd")) {
                         return "keyboard"
@@ -131,16 +146,39 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
         enabled: DisplayService.brightnessAvailable && targetDeviceName.length > 0
-        minimum: 1
-        maximum: 100
+        minimum: {
+            if (!targetDevice) return 1
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (isExponential) {
+                return 1
+            }
+            return (targetDevice.class === "backlight" || targetDevice.class === "ddc") ? 1 : 0
+        }
+        maximum: {
+            if (!targetDevice) return 100
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (isExponential) {
+                return 100
+            }
+            return targetDevice.displayMax || 100
+        }
         value: targetBrightness
-        onSliderValueChanged: function(newValue) {
+        showValue: true
+        unit: {
+            if (!targetDevice) return "%"
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (isExponential) {
+                return "%"
+            }
+            return targetDevice.class === "ddc" ? "" : "%"
+        }
+        onSliderValueChanged: function (newValue) {
             if (DisplayService.brightnessAvailable && targetDeviceName) {
                 DisplayService.setBrightness(newValue, targetDeviceName, true)
             }
         }
         thumbOutlineColor: Theme.surfaceContainer
-        trackColor: Theme.surfaceContainerHigh
+        trackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     }
 
     Loader {

@@ -12,15 +12,14 @@ Singleton {
 
     property bool brightnessAvailable: devices.length > 0
     property var devices: []
-    property var ddcDevices: []
     property var deviceBrightness: ({})
-    property var ddcPendingInit: ({})
+    property var deviceBrightnessUserSet: ({})
+    property var deviceMaxCache: ({})
+    property int brightnessVersion: 0
     property string currentDevice: ""
     property string lastIpcDevice: ""
-    property bool ddcAvailable: false
-    property var ddcInitQueue: []
-    property bool skipDdcRead: false
     property int brightnessLevel: {
+        brightnessVersion
         const deviceToUse = lastIpcDevice === "" ? getDefaultDevice() : (lastIpcDevice || currentDevice)
         if (!deviceToUse) {
             return 50
@@ -31,7 +30,7 @@ Singleton {
     property int maxBrightness: 100
     property bool brightnessInitialized: false
 
-    signal brightnessChanged
+    signal brightnessChanged(bool showOsd)
     signal deviceSwitched
 
     property bool nightModeActive: nightModeEnabled
@@ -40,36 +39,181 @@ Singleton {
     property bool automationAvailable: false
     property bool gammaControlAvailable: false
 
-    function setBrightnessInternal(percentage, device) {
-        const clampedValue = Math.max(1, Math.min(100, percentage))
-        const actualDevice = device === "" ? getDefaultDevice() : (device || currentDevice || getDefaultDevice())
+    function updateSingleDevice(device) {
+        const deviceIndex = devices.findIndex(d => d.id === device.id)
+        if (deviceIndex !== -1) {
+            const newDevices = [...devices]
+            const existingDevice = devices[deviceIndex]
+            const cachedMax = deviceMaxCache[device.id]
 
-        if (actualDevice) {
-            const newBrightness = Object.assign({}, deviceBrightness)
-            newBrightness[actualDevice] = clampedValue
-            deviceBrightness = newBrightness
+            let displayMax = cachedMax || (device.class === "ddc" ? device.max : 100)
+            if (displayMax > 0 && !cachedMax) {
+                const newCache = Object.assign({}, deviceMaxCache)
+                newCache[device.id] = displayMax
+                deviceMaxCache = newCache
+            }
+
+            newDevices[deviceIndex] = {
+                "id": device.id,
+                "name": device.id,
+                "class": device.class,
+                "current": device.current,
+                "percentage": device.currentPercent,
+                "max": device.max,
+                "backend": device.backend,
+                "displayMax": displayMax
+            }
+            devices = newDevices
         }
 
-        const deviceInfo = getCurrentDeviceInfoByName(actualDevice)
+        const isExponential = SessionData.getBrightnessExponential(device.id)
+        const userSetValue = deviceBrightnessUserSet[device.id]
 
-        if (deviceInfo && deviceInfo.class === "ddc") {
-            ddcBrightnessSetProcess.command = ["ddcutil", "setvcp", "-d", String(deviceInfo.ddcDisplay), "10", String(clampedValue)]
-            ddcBrightnessSetProcess.running = true
-        } else {
-            if (device) {
-                brightnessSetProcess.command = ["brightnessctl", "-d", device, "set", `${clampedValue}%`]
+        let displayValue = device.currentPercent
+        if (isExponential) {
+            if (userSetValue !== undefined) {
+                displayValue = userSetValue
             } else {
-                brightnessSetProcess.command = ["brightnessctl", "set", `${clampedValue}%`]
+                displayValue = linearToExponential(device.currentPercent, device.id)
             }
-            brightnessSetProcess.running = true
+        }
+
+        const newBrightness = Object.assign({}, deviceBrightness)
+        newBrightness[device.id] = displayValue
+        deviceBrightness = newBrightness
+        brightnessVersion++
+    }
+
+    function updateFromBrightnessState(state) {
+        if (!state || !state.devices) {
+            return
+        }
+
+        const newMaxCache = Object.assign({}, deviceMaxCache)
+        devices = state.devices.map(d => {
+                                              const cachedMax = deviceMaxCache[d.id]
+                                              let displayMax = cachedMax || (d.class === "ddc" ? d.max : 100)
+                                              if (displayMax > 0 && !cachedMax) {
+                                                  newMaxCache[d.id] = displayMax
+                                              }
+                                              return {
+                                                  "id": d.id,
+                                                  "name": d.id,
+                                                  "class": d.class,
+                                                  "current": d.current,
+                                                  "percentage": d.currentPercent,
+                                                  "max": d.max,
+                                                  "backend": d.backend,
+                                                  "displayMax": displayMax
+                                              }
+                                          })
+        deviceMaxCache = newMaxCache
+
+        const newBrightness = {}
+        for (const device of state.devices) {
+            const isExponential = SessionData.getBrightnessExponential(device.id)
+            const userSetValue = deviceBrightnessUserSet[device.id]
+
+            if (isExponential) {
+                if (userSetValue !== undefined) {
+                    newBrightness[device.id] = userSetValue
+                } else {
+                    newBrightness[device.id] = linearToExponential(device.currentPercent, device.id)
+                }
+            } else {
+                newBrightness[device.id] = device.currentPercent
+            }
+        }
+        deviceBrightness = newBrightness
+        brightnessVersion++
+
+        brightnessAvailable = devices.length > 0
+
+        if (devices.length > 0 && !currentDevice) {
+            const lastDevice = SessionData.lastBrightnessDevice || ""
+            const deviceExists = devices.some(d => d.id === lastDevice)
+            if (deviceExists) {
+                setCurrentDevice(lastDevice, false)
+            } else {
+                const backlight = devices.find(d => d.class === "backlight")
+                const nonKbdDevice = devices.find(d => !d.id.includes("kbd"))
+                const defaultDevice = backlight || nonKbdDevice || devices[0]
+                setCurrentDevice(defaultDevice.id, false)
+            }
+        }
+
+        if (!brightnessInitialized) {
+            brightnessInitialized = true
         }
     }
 
     function setBrightness(percentage, device, suppressOsd) {
-        setBrightnessInternal(percentage, device)
-        if (!suppressOsd) {
-            brightnessChanged()
+        const actualDevice = device === "" ? getDefaultDevice() : (device || currentDevice || getDefaultDevice())
+
+        if (!actualDevice) {
+            console.warn("DisplayService: No device selected for brightness change")
+            return
         }
+
+        const deviceInfo = getCurrentDeviceInfoByName(actualDevice)
+        const isExponential = SessionData.getBrightnessExponential(actualDevice)
+
+        let minValue = 0
+        let maxValue = 100
+
+        if (isExponential) {
+            minValue = 1
+            maxValue = 100
+        } else {
+            minValue = (deviceInfo && (deviceInfo.class === "backlight" || deviceInfo.class === "ddc")) ? 1 : 0
+            maxValue = deviceInfo?.displayMax || 100
+        }
+
+        if (maxValue <= 0) {
+            console.warn("DisplayService: Invalid max value for device", actualDevice, "- skipping brightness change")
+            return
+        }
+
+        const clampedValue = Math.max(minValue, Math.min(maxValue, percentage))
+
+        if (!DMSService.isConnected) {
+            console.warn("DisplayService: Not connected to DMS")
+            return
+        }
+
+        const newBrightness = Object.assign({}, deviceBrightness)
+        newBrightness[actualDevice] = clampedValue
+        deviceBrightness = newBrightness
+        brightnessVersion++
+
+        if (isExponential) {
+            const newUserSet = Object.assign({}, deviceBrightnessUserSet)
+            newUserSet[actualDevice] = clampedValue
+            deviceBrightnessUserSet = newUserSet
+            SessionData.setBrightnessUserSetValue(actualDevice, clampedValue)
+        }
+
+        if (!suppressOsd) {
+            brightnessChanged(true)
+        }
+
+        const params = {
+            "device": actualDevice,
+            "percent": clampedValue
+        }
+        if (isExponential) {
+            params.exponential = true
+            params.exponent = SessionData.getBrightnessExponent(actualDevice)
+        }
+
+        DMSService.sendRequest("brightness.setBrightness", params, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to set brightness:", response.error)
+                                       ToastService.showError("Failed to set brightness: " + response.error, "", "", "brightness")
+                                   } else {
+                                       ToastService.dismissCategory("brightness")
+                                   }
+                               })
     }
 
     function setCurrentDevice(deviceName, saveToSession = false) {
@@ -85,79 +229,34 @@ Singleton {
         }
 
         deviceSwitched()
-
-        const deviceInfo = getCurrentDeviceInfoByName(deviceName)
-        if (deviceInfo && deviceInfo.class === "ddc") {
-            return
-        } else {
-            brightnessGetProcess.command = ["brightnessctl", "-m", "-d", deviceName, "get"]
-            brightnessGetProcess.running = true
-        }
-    }
-
-    function refreshDevices() {
-        deviceListProcess.running = true
-    }
-
-    function refreshDevicesInternal() {
-        const allDevices = [...devices, ...ddcDevices]
-
-        allDevices.sort((a, b) => {
-                            if (a.class === "backlight" && b.class !== "backlight") {
-                                return -1
-                            }
-                            if (a.class !== "backlight" && b.class === "backlight") {
-                                return 1
-                            }
-
-                            if (a.class === "ddc" && b.class !== "ddc" && b.class !== "backlight") {
-                                return -1
-                            }
-                            if (a.class !== "ddc" && b.class === "ddc" && a.class !== "backlight") {
-                                return 1
-                            }
-
-                            return a.name.localeCompare(b.name)
-                        })
-
-        devices = allDevices
-
-        if (devices.length > 0 && !currentDevice) {
-            const lastDevice = SessionData.lastBrightnessDevice || ""
-            const deviceExists = devices.some(d => d.name === lastDevice)
-            if (deviceExists) {
-                setCurrentDevice(lastDevice, false)
-            } else {
-                const nonKbdDevice = devices.find(d => !d.name.includes("kbd")) || devices[0]
-                setCurrentDevice(nonKbdDevice.name, false)
-            }
-        }
     }
 
     function getDeviceBrightness(deviceName) {
         if (!deviceName) {
-            return
-        } 50
-
-        const deviceInfo = getCurrentDeviceInfoByName(deviceName)
-        if (!deviceInfo) {
             return 50
         }
 
-        if (deviceInfo.class === "ddc") {
-            return deviceBrightness[deviceName] || 50
+        if (deviceName in deviceBrightness) {
+            return deviceBrightness[deviceName]
         }
 
-        return deviceBrightness[deviceName] || deviceInfo.percentage || 50
+        return 50
+    }
+
+    function linearToExponential(linearPercent, deviceName) {
+        const exponent = SessionData.getBrightnessExponent(deviceName)
+        const hardwarePercent = linearPercent / 100.0
+        const normalizedPercent = Math.pow(hardwarePercent, 1.0 / exponent)
+        return Math.round(normalizedPercent * 100.0)
     }
 
     function getDefaultDevice() {
         for (const device of devices) {
             if (device.class === "backlight") {
-                return device.name
+                return device.id
             }
         }
-        return devices.length > 0 ? devices[0].name : ""
+        return devices.length > 0 ? devices[0].id : ""
     }
 
     function getCurrentDeviceInfo() {
@@ -167,7 +266,7 @@ Singleton {
         }
 
         for (const device of devices) {
-            if (device.name === deviceToUse) {
+            if (device.id === deviceToUse) {
                 return device
             }
         }
@@ -176,15 +275,7 @@ Singleton {
 
     function isCurrentDeviceReady() {
         const deviceToUse = lastIpcDevice === "" ? getDefaultDevice() : (lastIpcDevice || currentDevice)
-        if (!deviceToUse) {
-            return false
-        }
-
-        if (ddcPendingInit[deviceToUse]) {
-            return false
-        }
-
-        return true
+        return deviceToUse !== ""
     }
 
     function getCurrentDeviceInfoByName(deviceName) {
@@ -193,21 +284,19 @@ Singleton {
         }
 
         for (const device of devices) {
-            if (device.name === deviceName) {
+            if (device.id === deviceName) {
                 return device
             }
         }
         return null
     }
 
-    function processNextDdcInit() {
-        if (ddcInitQueue.length === 0 || ddcInitialBrightnessProcess.running) {
-            return
+    function getDeviceMax(deviceName) {
+        const deviceInfo = getCurrentDeviceInfoByName(deviceName)
+        if (!deviceInfo) {
+            return 100
         }
-
-        const displayId = ddcInitQueue.shift()
-        ddcInitialBrightnessProcess.command = ["ddcutil", "getvcp", "-d", String(displayId), "10", "--brief"]
-        ddcInitialBrightnessProcess.running = true
+        return deviceInfo.displayMax || 100
     }
 
     // Night Mode Functions - Simplified
@@ -221,22 +310,23 @@ Singleton {
         SessionData.setNightModeEnabled(true)
 
         DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": true
-        }, response => {
-            if (response.error) {
-                console.error("DisplayService: Failed to enable gamma control:", response.error)
-                ToastService.showError("Failed to enable night mode: " + response.error)
-                nightModeEnabled = false
-                SessionData.setNightModeEnabled(false)
-                return
-            }
+                                   "enabled": true
+                               }, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to enable gamma control:", response.error)
+                                       ToastService.showError("Failed to enable night mode: " + response.error, "", "", "night-mode")
+                                       nightModeEnabled = false
+                                       SessionData.setNightModeEnabled(false)
+                                       return
+                                   }
+                                   ToastService.dismissCategory("night-mode")
 
-            if (SessionData.nightModeAutoEnabled) {
-                startAutomation()
-            } else {
-                applyNightModeDirectly()
-            }
-        })
+                                   if (SessionData.nightModeAutoEnabled) {
+                                       startAutomation()
+                                   } else {
+                                       applyNightModeDirectly()
+                                   }
+                               })
     }
 
     function disableNightMode() {
@@ -248,13 +338,15 @@ Singleton {
         }
 
         DMSService.sendRequest("wayland.gamma.setEnabled", {
-            "enabled": false
-        }, response => {
-            if (response.error) {
-                console.error("DisplayService: Failed to disable gamma control:", response.error)
-                ToastService.showError("Failed to disable night mode: " + response.error)
-            }
-        })
+                                   "enabled": false
+                               }, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to disable gamma control:", response.error)
+                                       ToastService.showError("Failed to disable night mode: " + response.error, "", "", "night-mode")
+                                   } else {
+                                       ToastService.dismissCategory("night-mode")
+                                   }
+                               })
     }
 
     function toggleNightMode() {
@@ -269,32 +361,35 @@ Singleton {
         const temperature = SessionData.nightModeTemperature || 4000
 
         DMSService.sendRequest("wayland.gamma.setManualTimes", {
-            "sunrise": null,
-            "sunset": null
-        }, response => {
-            if (response.error) {
-                console.error("DisplayService: Failed to clear manual times:", response.error)
-                return
-            }
+                                   "sunrise": null,
+                                   "sunset": null
+                               }, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to clear manual times:", response.error)
+                                       return
+                                   }
 
-            DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
-                "use": false
-            }, response => {
-                if (response.error) {
-                    console.error("DisplayService: Failed to disable IP location:", response.error)
-                    return
-                }
+                                   DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                                                              "use": false
+                                                          }, response => {
+                                                              if (response.error) {
+                                                                  console.error("DisplayService: Failed to disable IP location:", response.error)
+                                                                  return
+                                                              }
 
-                DMSService.sendRequest("wayland.gamma.setTemperature", {
-                    "temp": temperature
-                }, response => {
-                    if (response.error) {
-                        console.error("DisplayService: Failed to set temperature:", response.error)
-                        ToastService.showError("Failed to set night mode temperature: " + response.error)
-                    }
-                })
-            })
-        })
+                                                              DMSService.sendRequest("wayland.gamma.setTemperature", {
+                                                                                         "low": temperature,
+                                                                                         "high": 6500
+                                                                                     }, response => {
+                                                                                         if (response.error) {
+                                                                                             console.error("DisplayService: Failed to set temperature:", response.error)
+                                                                                             ToastService.showError("Failed to set night mode temperature: " + response.error, "", "", "night-mode")
+                                                                                         } else {
+                                                                                             ToastService.dismissCategory("night-mode")
+                                                                                         }
+                                                                                     })
+                                                          })
+                               })
     }
 
     function startAutomation() {
@@ -326,34 +421,36 @@ Singleton {
         const sunset = `${String(sunsetHour).padStart(2, '0')}:${String(sunsetMinute).padStart(2, '0')}`
 
         DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
-            "use": false
-        }, response => {
-            if (response.error) {
-                console.error("DisplayService: Failed to disable IP location:", response.error)
-                return
-            }
+                                   "use": false
+                               }, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to disable IP location:", response.error)
+                                       return
+                                   }
 
-            DMSService.sendRequest("wayland.gamma.setTemperature", {
-                "low": temperature,
-                "high": highTemp
-            }, response => {
-                if (response.error) {
-                    console.error("DisplayService: Failed to set temperature:", response.error)
-                    ToastService.showError("Failed to set night mode temperature: " + response.error)
-                    return
-                }
+                                   DMSService.sendRequest("wayland.gamma.setTemperature", {
+                                                              "low": temperature,
+                                                              "high": highTemp
+                                                          }, response => {
+                                                              if (response.error) {
+                                                                  console.error("DisplayService: Failed to set temperature:", response.error)
+                                                                  ToastService.showError("Failed to set night mode temperature: " + response.error, "", "", "night-mode")
+                                                                  return
+                                                              }
 
-                DMSService.sendRequest("wayland.gamma.setManualTimes", {
-                    "sunrise": sunrise,
-                    "sunset": sunset
-                }, response => {
-                    if (response.error) {
-                        console.error("DisplayService: Failed to set manual times:", response.error)
-                        ToastService.showError("Failed to set night mode schedule: " + response.error)
-                    }
-                })
-            })
-        })
+                                                              DMSService.sendRequest("wayland.gamma.setManualTimes", {
+                                                                                         "sunrise": sunrise,
+                                                                                         "sunset": sunset
+                                                                                     }, response => {
+                                                                                         if (response.error) {
+                                                                                             console.error("DisplayService: Failed to set manual times:", response.error)
+                                                                                             ToastService.showError("Failed to set night mode schedule: " + response.error, "", "", "night-mode")
+                                                                                         } else {
+                                                                                             ToastService.dismissCategory("night-mode")
+                                                                                         }
+                                                                                     })
+                                                          })
+                               })
     }
 
     function startLocationBasedMode() {
@@ -361,57 +458,61 @@ Singleton {
         const highTemp = SessionData.nightModeHighTemperature || 6500
 
         DMSService.sendRequest("wayland.gamma.setManualTimes", {
-            "sunrise": null,
-            "sunset": null
-        }, response => {
-            if (response.error) {
-                console.error("DisplayService: Failed to clear manual times:", response.error)
-                return
-            }
+                                   "sunrise": null,
+                                   "sunset": null
+                               }, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to clear manual times:", response.error)
+                                       return
+                                   }
 
-            DMSService.sendRequest("wayland.gamma.setTemperature", {
-                "low": temperature,
-                "high": highTemp
-            }, response => {
-                if (response.error) {
-                    console.error("DisplayService: Failed to set temperature:", response.error)
-                    ToastService.showError("Failed to set night mode temperature: " + response.error)
-                    return
-                }
+                                   DMSService.sendRequest("wayland.gamma.setTemperature", {
+                                                              "low": temperature,
+                                                              "high": highTemp
+                                                          }, response => {
+                                                              if (response.error) {
+                                                                  console.error("DisplayService: Failed to set temperature:", response.error)
+                                                                  ToastService.showError("Failed to set night mode temperature: " + response.error, "", "", "night-mode")
+                                                                  return
+                                                              }
 
-                if (SessionData.nightModeUseIPLocation) {
-                    DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
-                        "use": true
-                    }, response => {
-                        if (response.error) {
-                            console.error("DisplayService: Failed to enable IP location:", response.error)
-                            ToastService.showError("Failed to enable IP location: " + response.error)
-                        }
-                    })
-                } else if (SessionData.latitude !== 0.0 && SessionData.longitude !== 0.0) {
-                    DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
-                        "use": false
-                    }, response => {
-                        if (response.error) {
-                            console.error("DisplayService: Failed to disable IP location:", response.error)
-                            return
-                        }
+                                                              if (SessionData.nightModeUseIPLocation) {
+                                                                  DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                                                                                             "use": true
+                                                                                         }, response => {
+                                                                                             if (response.error) {
+                                                                                                 console.error("DisplayService: Failed to enable IP location:", response.error)
+                                                                                                 ToastService.showError("Failed to enable IP location: " + response.error, "", "", "night-mode")
+                                                                                             } else {
+                                                                                                 ToastService.dismissCategory("night-mode")
+                                                                                             }
+                                                                                         })
+                                                              } else if (SessionData.latitude !== 0.0 && SessionData.longitude !== 0.0) {
+                                                                  DMSService.sendRequest("wayland.gamma.setUseIPLocation", {
+                                                                                             "use": false
+                                                                                         }, response => {
+                                                                                             if (response.error) {
+                                                                                                 console.error("DisplayService: Failed to disable IP location:", response.error)
+                                                                                                 return
+                                                                                             }
 
-                        DMSService.sendRequest("wayland.gamma.setLocation", {
-                            "latitude": SessionData.latitude,
-                            "longitude": SessionData.longitude
-                        }, response => {
-                            if (response.error) {
-                                console.error("DisplayService: Failed to set location:", response.error)
-                                ToastService.showError("Failed to set night mode location: " + response.error)
-                            }
-                        })
-                    })
-                } else {
-                    console.warn("DisplayService: Location mode selected but no coordinates set and IP location disabled")
-                }
-            })
-        })
+                                                                                             DMSService.sendRequest("wayland.gamma.setLocation", {
+                                                                                                                        "latitude": SessionData.latitude,
+                                                                                                                        "longitude": SessionData.longitude
+                                                                                                                    }, response => {
+                                                                                                                        if (response.error) {
+                                                                                                                            console.error("DisplayService: Failed to set location:", response.error)
+                                                                                                                            ToastService.showError("Failed to set night mode location: " + response.error, "", "", "night-mode")
+                                                                                                                        } else {
+                                                                                                                            ToastService.dismissCategory("night-mode")
+                                                                                                                        }
+                                                                                                                    })
+                                                                                         })
+                                                              } else {
+                                                                  console.warn("DisplayService: Location mode selected but no coordinates set and IP location disabled")
+                                                              }
+                                                          })
+                               })
     }
 
     function setNightModeAutomationMode(mode) {
@@ -450,32 +551,32 @@ Singleton {
         }
 
         DMSService.sendRequest("wayland.gamma.getState", null, response => {
-            if (response.error) {
-                gammaControlAvailable = false
-                automationAvailable = false
-                console.error("DisplayService: Gamma control not available:", response.error)
-            } else {
-                gammaControlAvailable = true
-                automationAvailable = true
+                                   if (response.error) {
+                                       gammaControlAvailable = false
+                                       automationAvailable = false
+                                       console.error("DisplayService: Gamma control not available:", response.error)
+                                   } else {
+                                       gammaControlAvailable = true
+                                       automationAvailable = true
 
-                if (nightModeEnabled) {
-                    DMSService.sendRequest("wayland.gamma.setEnabled", {
-                        "enabled": true
-                    }, enableResponse => {
-                        if (enableResponse.error) {
-                            console.error("DisplayService: Failed to enable gamma control on startup:", enableResponse.error)
-                            return
-                        }
+                                       if (nightModeEnabled) {
+                                           DMSService.sendRequest("wayland.gamma.setEnabled", {
+                                                                      "enabled": true
+                                                                  }, enableResponse => {
+                                                                      if (enableResponse.error) {
+                                                                          console.error("DisplayService: Failed to enable gamma control on startup:", enableResponse.error)
+                                                                          return
+                                                                      }
 
-                        if (SessionData.nightModeAutoEnabled) {
-                            startAutomation()
-                        } else {
-                            applyNightModeDirectly()
-                        }
-                    })
-                }
-            }
-        })
+                                                                      if (SessionData.nightModeAutoEnabled) {
+                                                                          startAutomation()
+                                                                      } else {
+                                                                          applyNightModeDirectly()
+                                                                      }
+                                                                  })
+                                       }
+                                   }
+                               })
     }
 
     Timer {
@@ -494,275 +595,36 @@ Singleton {
         }
     }
 
+    function rescanDevices() {
+        if (!DMSService.isConnected) {
+            return
+        }
+
+        DMSService.sendRequest("brightness.rescan", null, response => {
+                                   if (response.error) {
+                                       console.error("DisplayService: Failed to rescan brightness devices:", response.error)
+                                   }
+                               })
+    }
+
+    function updateDeviceBrightnessDisplay(deviceName) {
+        brightnessVersion++
+        brightnessChanged()
+    }
+
     Component.onCompleted: {
-        ddcDetectionProcess.running = true
-        refreshDevices()
         nightModeEnabled = SessionData.nightModeEnabled
-    }
-
-    Process {
-        id: ddcDetectionProcess
-
-        command: ["which", "ddcutil"]
-        running: false
-
-        onExited: function (exitCode) {
-            ddcAvailable = (exitCode === 0)
-            if (ddcAvailable) {
-                ddcDisplayDetectionProcess.running = true
-            } else {
-                console.info("DisplayService: ddcutil not available")
-            }
+        deviceBrightnessUserSet = Object.assign({}, SessionData.brightnessUserSetValues)
+        if (DMSService.isConnected) {
+            checkGammaControlAvailability()
         }
     }
 
-    Process {
-        id: ddcDisplayDetectionProcess
+    Connections {
+        target: Quickshell
 
-        command: ["bash", "-c", "ddcutil detect --brief 2>/dev/null | grep '^Display [0-9]' | awk '{print \"{\\\"display\\\":\" $2 \",\\\"name\\\":\\\"ddc-\" $2 \"\\\",\\\"class\\\":\\\"ddc\\\"}\"}' | tr '\\n' ',' | sed 's/,$//' | sed 's/^/[/' | sed 's/$/]/' || echo '[]'"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim()) {
-                    ddcDevices = []
-                    return
-                }
-
-                try {
-                    const parsedDevices = JSON.parse(text.trim())
-                    const newDdcDevices = []
-
-                    for (const device of parsedDevices) {
-                        if (device.display && device.class === "ddc") {
-                            newDdcDevices.push({
-                                                   "name": device.name,
-                                                   "class": "ddc",
-                                                   "current": 50,
-                                                   "percentage": 50,
-                                                   "max": 100,
-                                                   "ddcDisplay": device.display
-                                               })
-                        }
-                    }
-
-                    ddcDevices = newDdcDevices
-                    console.info("DisplayService: Found", ddcDevices.length, "DDC displays")
-
-                    // Queue initial brightness readings for DDC devices
-                    ddcInitQueue = []
-                    for (const device of ddcDevices) {
-                        ddcInitQueue.push(device.ddcDisplay)
-                        // Mark DDC device as pending initialization
-                        ddcPendingInit[device.name] = true
-                    }
-
-                    // Start processing the queue
-                    processNextDdcInit()
-
-                    // Refresh device list to include DDC devices
-                    refreshDevicesInternal()
-
-                    // Retry setting last device now that DDC devices are available
-                    const lastDevice = SessionData.lastBrightnessDevice || ""
-                    if (lastDevice) {
-                        const deviceExists = devices.some(d => d.name === lastDevice)
-                        if (deviceExists && (!currentDevice || currentDevice !== lastDevice)) {
-                            setCurrentDevice(lastDevice, false)
-                        }
-                    }
-                } catch (error) {
-                    console.warn("DisplayService: Failed to parse DDC devices:", error)
-                    ddcDevices = []
-                }
-            }
-        }
-
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to detect DDC displays:", exitCode)
-                ddcDevices = []
-            }
-        }
-    }
-
-    Process {
-        id: deviceListProcess
-
-        command: ["brightnessctl", "-m", "-l"]
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to list devices:", exitCode)
-                brightnessAvailable = false
-            }
-        }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim()) {
-                    console.warn("DisplayService: No devices found")
-                    return
-                }
-                const lines = text.trim().split("\n")
-                const newDevices = []
-                for (const line of lines) {
-                    const parts = line.split(",")
-                    if (parts.length >= 5) {
-                        newDevices.push({
-                                            "name": parts[0],
-                                            "class": parts[1],
-                                            "current": parseInt(parts[2]),
-                                            "percentage": parseInt(parts[3]),
-                                            "max": parseInt(parts[4])
-                                        })
-                    }
-                }
-                // Store brightnessctl devices separately
-                devices = newDevices
-
-                // Always refresh to combine with DDC devices and set up device selection
-                refreshDevicesInternal()
-            }
-        }
-    }
-
-    Process {
-        id: brightnessSetProcess
-
-        running: false
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to set brightness:", exitCode)
-            }
-        }
-    }
-
-    Process {
-        id: ddcBrightnessSetProcess
-
-        running: false
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to set DDC brightness:", exitCode)
-            }
-        }
-    }
-
-    Process {
-        id: ddcInitialBrightnessProcess
-
-        running: false
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to get initial DDC brightness:", exitCode)
-            }
-
-            processNextDdcInit()
-        }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim())
-                return
-
-                const parts = text.trim().split(" ")
-                if (parts.length >= 5) {
-                    const current = parseInt(parts[3]) || 50
-                    const max = parseInt(parts[4]) || 100
-                    const brightness = Math.round((current / max) * 100)
-
-                    const commandParts = ddcInitialBrightnessProcess.command
-                    if (commandParts && commandParts.length >= 4) {
-                        const displayId = commandParts[3]
-                        const deviceName = "ddc-" + displayId
-
-                        var newBrightness = Object.assign({}, deviceBrightness)
-                        newBrightness[deviceName] = brightness
-                        deviceBrightness = newBrightness
-
-                        var newPending = Object.assign({}, ddcPendingInit)
-                        delete newPending[deviceName]
-                        ddcPendingInit = newPending
-
-                        console.log("DisplayService: Initial DDC Device", deviceName, "brightness:", brightness + "%")
-                    }
-                }
-            }
-        }
-    }
-
-    Process {
-        id: brightnessGetProcess
-
-        running: false
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to get brightness:", exitCode)
-            }
-        }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim())
-                return
-
-                const parts = text.trim().split(",")
-                if (parts.length >= 5) {
-                    const current = parseInt(parts[2])
-                    const max = parseInt(parts[4])
-                    maxBrightness = max
-                    const brightness = Math.round((current / max) * 100)
-
-                    // Update the device brightness cache
-                    if (currentDevice) {
-                        var newBrightness = Object.assign({}, deviceBrightness)
-                        newBrightness[currentDevice] = brightness
-                        deviceBrightness = newBrightness
-                    }
-
-                    brightnessInitialized = true
-                    console.log("DisplayService: Device", currentDevice, "brightness:", brightness + "%")
-                    brightnessChanged()
-                }
-            }
-        }
-    }
-
-    Process {
-        id: ddcBrightnessGetProcess
-
-        running: false
-        onExited: function (exitCode) {
-            if (exitCode !== 0) {
-                console.warn("DisplayService: Failed to get DDC brightness:", exitCode)
-            }
-        }
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                if (!text.trim())
-                return
-
-                // Parse ddcutil getvcp output format: "VCP 10 C 50 100"
-                const parts = text.trim().split(" ")
-                if (parts.length >= 5) {
-                    const current = parseInt(parts[3]) || 50
-                    const max = parseInt(parts[4]) || 100
-                    maxBrightness = max
-                    const brightness = Math.round((current / max) * 100)
-
-                    // Update the device brightness cache
-                    if (currentDevice) {
-                        var newBrightness = Object.assign({}, deviceBrightness)
-                        newBrightness[currentDevice] = brightness
-                        deviceBrightness = newBrightness
-                    }
-
-                    brightnessInitialized = true
-                    console.log("DisplayService: DDC Device", currentDevice, "brightness:", brightness + "%")
-                    brightnessChanged()
-                }
-            }
+        function onScreensChanged() {
+            rescanDevices()
         }
     }
 
@@ -773,6 +635,7 @@ Singleton {
             if (DMSService.isConnected) {
                 checkGammaControlAvailability()
             } else {
+                brightnessAvailable = false
                 gammaControlAvailable = false
                 automationAvailable = false
             }
@@ -780,6 +643,14 @@ Singleton {
 
         function onCapabilitiesReceived() {
             checkGammaControlAvailability()
+        }
+
+        function onBrightnessStateUpdate(data) {
+            updateFromBrightnessState(data)
+        }
+
+        function onBrightnessDeviceUpdate(device) {
+            updateSingleDevice(device)
         }
     }
 
@@ -839,19 +710,21 @@ Singleton {
                 return "Invalid brightness value: " + percentage
             }
 
-            const clampedValue = Math.max(1, Math.min(100, value))
             const targetDevice = device || ""
 
-            // Ensure device exists if specified
-            if (targetDevice && !root.devices.some(d => d.name === targetDevice)) {
+            if (targetDevice && !root.devices.some(d => d.id === targetDevice)) {
                 return "Device not found: " + targetDevice
             }
+
+            const deviceInfo = targetDevice ? root.getCurrentDeviceInfoByName(targetDevice) : null
+            const minValue = (deviceInfo && (deviceInfo.class === "backlight" || deviceInfo.class === "ddc")) ? 1 : 0
+            const clampedValue = Math.max(minValue, Math.min(100, value))
 
             root.lastIpcDevice = targetDevice
             if (targetDevice && targetDevice !== root.currentDevice) {
                 root.setCurrentDevice(targetDevice, false)
             }
-            root.setBrightness(clampedValue, targetDevice)
+            root.setBrightness(clampedValue, targetDevice, false)
 
             if (targetDevice) {
                 return "Brightness set to " + clampedValue + "% on " + targetDevice
@@ -868,26 +741,33 @@ Singleton {
             const targetDevice = device || ""
             const actualDevice = targetDevice === "" ? root.getDefaultDevice() : targetDevice
 
-            // Ensure device exists
-            if (actualDevice && !root.devices.some(d => d.name === actualDevice)) {
+            if (actualDevice && !root.devices.some(d => d.id === actualDevice)) {
                 return "Device not found: " + actualDevice
             }
 
-            const currentLevel = actualDevice ? root.getDeviceBrightness(actualDevice) : root.brightnessLevel
-            const stepValue = parseInt(step || "10")
-            const newLevel = Math.max(1, Math.min(100, currentLevel + stepValue))
+            const stepValue = parseInt(step || "5")
 
-            root.lastIpcDevice = targetDevice
-            if (targetDevice && targetDevice !== root.currentDevice) {
-                root.setCurrentDevice(targetDevice, false)
+            root.lastIpcDevice = actualDevice
+            if (actualDevice && actualDevice !== root.currentDevice) {
+                root.setCurrentDevice(actualDevice, false)
             }
-            root.setBrightness(newLevel, targetDevice)
 
-            if (targetDevice) {
-                return "Brightness increased to " + newLevel + "% on " + targetDevice
+            const isExponential = SessionData.getBrightnessExponential(actualDevice)
+            const currentBrightness = root.getDeviceBrightness(actualDevice)
+            const deviceInfo = root.getCurrentDeviceInfoByName(actualDevice)
+
+            let maxValue = 100
+            if (isExponential) {
+                maxValue = 100
             } else {
-                return "Brightness increased to " + newLevel + "%"
+                maxValue = deviceInfo?.displayMax || 100
             }
+
+            const newBrightness = Math.min(maxValue, currentBrightness + stepValue)
+
+            root.setBrightness(newBrightness, actualDevice, false)
+
+            return "Brightness increased by " + stepValue + "%" + (targetDevice ? " on " + targetDevice : "")
         }
 
         function decrement(step: string, device: string): string {
@@ -898,26 +778,33 @@ Singleton {
             const targetDevice = device || ""
             const actualDevice = targetDevice === "" ? root.getDefaultDevice() : targetDevice
 
-            // Ensure device exists
-            if (actualDevice && !root.devices.some(d => d.name === actualDevice)) {
+            if (actualDevice && !root.devices.some(d => d.id === actualDevice)) {
                 return "Device not found: " + actualDevice
             }
 
-            const currentLevel = actualDevice ? root.getDeviceBrightness(actualDevice) : root.brightnessLevel
-            const stepValue = parseInt(step || "10")
-            const newLevel = Math.max(1, Math.min(100, currentLevel - stepValue))
+            const stepValue = parseInt(step || "5")
 
-            root.lastIpcDevice = targetDevice
-            if (targetDevice && targetDevice !== root.currentDevice) {
-                root.setCurrentDevice(targetDevice, false)
+            root.lastIpcDevice = actualDevice
+            if (actualDevice && actualDevice !== root.currentDevice) {
+                root.setCurrentDevice(actualDevice, false)
             }
-            root.setBrightness(newLevel, targetDevice)
 
-            if (targetDevice) {
-                return "Brightness decreased to " + newLevel + "% on " + targetDevice
+            const isExponential = SessionData.getBrightnessExponential(actualDevice)
+            const currentBrightness = root.getDeviceBrightness(actualDevice)
+            const deviceInfo = root.getCurrentDeviceInfoByName(actualDevice)
+
+            let minValue = 0
+            if (isExponential) {
+                minValue = 1
             } else {
-                return "Brightness decreased to " + newLevel + "%"
+                minValue = (deviceInfo && (deviceInfo.class === "backlight" || deviceInfo.class === "ddc")) ? 1 : 0
             }
+
+            const newBrightness = Math.max(minValue, currentBrightness - stepValue)
+
+            root.setBrightness(newBrightness, actualDevice, false)
+
+            return "Brightness decreased by " + stepValue + "%" + (targetDevice ? " on " + targetDevice : "")
         }
 
         function status(): string {
@@ -933,11 +820,55 @@ Singleton {
                 return "No brightness devices available"
             }
 
-            let result = "Available devices:\\n"
+            let result = "Available devices:\n"
             for (const device of root.devices) {
-                result += device.name + " (" + device.class + ")\\n"
+                const isExp = SessionData.getBrightnessExponential(device.id)
+                result += device.id + " (" + device.class + ")" + (isExp ? " [exponential]" : "") + "\n"
             }
             return result
+        }
+
+        function enableExponential(device: string): string {
+            const targetDevice = device || root.currentDevice
+            if (!targetDevice) {
+                return "No device specified"
+            }
+
+            if (!root.devices.some(d => d.id === targetDevice)) {
+                return "Device not found: " + targetDevice
+            }
+
+            SessionData.setBrightnessExponential(targetDevice, true)
+            return "Exponential mode enabled for " + targetDevice
+        }
+
+        function disableExponential(device: string): string {
+            const targetDevice = device || root.currentDevice
+            if (!targetDevice) {
+                return "No device specified"
+            }
+
+            if (!root.devices.some(d => d.id === targetDevice)) {
+                return "Device not found: " + targetDevice
+            }
+
+            SessionData.setBrightnessExponential(targetDevice, false)
+            return "Exponential mode disabled for " + targetDevice
+        }
+
+        function toggleExponential(device: string): string {
+            const targetDevice = device || root.currentDevice
+            if (!targetDevice) {
+                return "No device specified"
+            }
+
+            if (!root.devices.some(d => d.id === targetDevice)) {
+                return "Device not found: " + targetDevice
+            }
+
+            const currentState = SessionData.getBrightnessExponential(targetDevice)
+            SessionData.setBrightnessExponential(targetDevice, !currentState)
+            return "Exponential mode " + (!currentState ? "enabled" : "disabled") + " for " + targetDevice
         }
 
         target: "brightness"

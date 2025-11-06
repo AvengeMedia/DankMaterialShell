@@ -12,6 +12,8 @@ import qs.Modules.DankDash
 DankPopout {
     id: root
 
+    layerNamespace: "dms:dash"
+
     property bool dashVisible: false
     property var triggerScreen: null
     property int currentTabIndex: 0
@@ -105,7 +107,7 @@ DankPopout {
             id: mainContainer
 
             implicitHeight: contentColumn.height + Theme.spacingM * 2
-            color: Theme.surfaceContainer
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             focus: true
 

@@ -513,7 +513,7 @@ Singleton {
                         "sunset": formatTime(daily.sunset?.[0]) || "18:00",
                         "uv": 0,
                         "pressure": Math.round(current.surface_pressure || 0),
-                        "precipitationProbability": Math.round(current.precipitation || 0),
+                        "precipitationProbability": Math.round(daily.precipitation_probability_max?.[0] || 0),
                         "isDay": Boolean(current.is_day),
                         "forecast": forecast
                     }

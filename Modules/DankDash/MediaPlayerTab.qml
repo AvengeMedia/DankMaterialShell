@@ -435,7 +435,7 @@ Item {
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: deviceMouseAreaLeft.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.surfaceContainerHigh
+                                color: deviceMouseAreaLeft.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 border.color: modelData === AudioService.sink ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                 border.width: modelData === AudioService.sink ? 2 : 1
 
@@ -592,7 +592,7 @@ Item {
                                 width: parent.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.surfaceContainerHigh
+                                color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                 border.width: modelData === activePlayer ? 2 : 1
 
@@ -862,7 +862,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: prevBtnArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                                color: prevBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -940,7 +940,7 @@ Item {
                                 height: 40
                                 radius: 20
                                 anchors.centerIn: parent
-                                color: nextBtnArea.containsMouse ? Theme.surfaceContainerHigh : "transparent"
+                                color: nextBtnArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency) : "transparent"
 
                                 DankIcon {
                                     anchors.centerIn: parent
@@ -1249,7 +1249,7 @@ Item {
                     width: parent.width
                     height: parent.height
                     anchors.centerIn: parent
-                    color: Theme.surfaceContainerHigh
+                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                     radius: Theme.cornerRadius
                 }
 

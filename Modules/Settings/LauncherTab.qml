@@ -18,7 +18,7 @@ Item {
         browserType: "generic"
         filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
         onFileSelected: path => {
-            SettingsData.setLauncherLogoCustomPath(path.replace("file://", ""))
+            SettingsData.set("launcherLogoCustomPath", path.replace("file://", ""))
         }
     }
 
@@ -38,7 +38,7 @@ Item {
                 width: parent.width
                 height: launcherLogoSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -112,15 +112,15 @@ Item {
                             onSelectionChanged: (index, selected) => {
                                 if (!selected) return
                                 if (index === 0) {
-                                    SettingsData.setLauncherLogoMode("apps")
+                                    SettingsData.set("launcherLogoMode", "apps")
                                 } else if (index === 1) {
-                                    SettingsData.setLauncherLogoMode("os")
+                                    SettingsData.set("launcherLogoMode", "os")
                                 } else if (index === 2) {
-                                    SettingsData.setLauncherLogoMode("dank")
+                                    SettingsData.set("launcherLogoMode", "dank")
                                 } else if (index === 3) {
-                                    SettingsData.setLauncherLogoMode("compositor")
+                                    SettingsData.set("launcherLogoMode", "compositor")
                                 } else if (index === 4) {
-                                    SettingsData.setLauncherLogoMode("custom")
+                                    SettingsData.set("launcherLogoMode", "custom")
                                 }
                             }
                         }
@@ -210,16 +210,16 @@ Item {
                                     onSelectionChanged: (index, selected) => {
                                         if (!selected) return
                                         if (index === 0) {
-                                            SettingsData.setLauncherLogoColorOverride("")
+                                            SettingsData.set("launcherLogoColorOverride", "")
                                         } else if (index === 1) {
-                                            SettingsData.setLauncherLogoColorOverride("primary")
+                                            SettingsData.set("launcherLogoColorOverride", "primary")
                                         } else if (index === 2) {
-                                            SettingsData.setLauncherLogoColorOverride("surface")
+                                            SettingsData.set("launcherLogoColorOverride", "surface")
                                         } else if (index === 3) {
                                             const currentOverride = SettingsData.launcherLogoColorOverride
                                             const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface"
                                             if (isPreset) {
-                                                SettingsData.setLauncherLogoColorOverride("#ffffff")
+                                                SettingsData.set("launcherLogoColorOverride", "#ffffff")
                                             }
                                         }
                                     }
@@ -252,7 +252,7 @@ Item {
                                                 PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride
                                                 PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color")
                                                 PopoutService.colorPickerModal.onColorSelectedCallback = function(selectedColor) {
-                                                    SettingsData.setLauncherLogoColorOverride(selectedColor)
+                                                    SettingsData.set("launcherLogoColorOverride", selectedColor)
                                                 }
                                                 PopoutService.colorPickerModal.show()
                                             }
@@ -288,10 +288,10 @@ Item {
                                     unit: ""
                                     showValue: true
                                     wheelEnabled: false
-                                    thumbOutlineColor: Theme.surfaceContainerHigh
+                                    thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     onSliderValueChanged: newValue => {
-                                        SettingsData.setLauncherLogoSizeOffset(newValue)
+                                        SettingsData.set("launcherLogoSizeOffset", newValue)
                                     }
                                 }
                             }
@@ -339,10 +339,10 @@ Item {
                                         unit: "%"
                                         showValue: true
                                         wheelEnabled: false
-                                        thumbOutlineColor: Theme.surfaceContainerHigh
+                                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onSliderValueChanged: newValue => {
-                                            SettingsData.setLauncherLogoBrightness(newValue / 100)
+                                            SettingsData.set("launcherLogoBrightness", newValue / 100)
                                         }
                                     }
                                 }
@@ -368,10 +368,10 @@ Item {
                                         unit: "%"
                                         showValue: true
                                         wheelEnabled: false
-                                        thumbOutlineColor: Theme.surfaceContainerHigh
+                                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onSliderValueChanged: newValue => {
-                                            SettingsData.setLauncherLogoContrast(newValue / 100)
+                                            SettingsData.set("launcherLogoContrast", newValue / 100)
                                         }
                                     }
                                 }
@@ -394,7 +394,7 @@ Item {
                                         checked: SettingsData.launcherLogoColorInvertOnMode
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onToggled: checked => {
-                                            SettingsData.setLauncherLogoColorInvertOnMode(checked)
+                                            SettingsData.set("launcherLogoColorInvertOnMode", checked)
                                         }
                                     }
                                 }
@@ -408,7 +408,7 @@ Item {
                 width: parent.width
                 height: launchPrefixSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -453,7 +453,7 @@ Item {
                         text: SettingsData.launchPrefix
                         placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
                         onTextEdited: {
-                            SettingsData.setLaunchPrefix(text)
+                            SettingsData.set("launchPrefix", text)
                         }
                     }
                 }
@@ -463,7 +463,7 @@ Item {
                 width: parent.width
                 height: sortingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -509,7 +509,7 @@ Item {
                             checked: SettingsData.sortAppsAlphabetically
                             anchors.verticalCenter: parent.verticalCenter
                             onToggled: checked => {
-                                SettingsData.setSortAppsAlphabetically(checked)
+                                SettingsData.set("sortAppsAlphabetically", checked)
                             }
                         }
                     }
@@ -528,7 +528,7 @@ Item {
                 width: parent.width
                 height: recentlyUsedSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0

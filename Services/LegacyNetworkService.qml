@@ -764,7 +764,7 @@ Singleton {
         root.userPreference = preference
         root.changingPreference = true
         root.targetPreference = preference
-        SettingsData.setNetworkPreference(preference)
+        SettingsData.set("networkPreference", preference)
 
         if (preference === "wifi") {
             setConnectionPriority("wifi")

@@ -173,6 +173,12 @@
   "Auto-saving...": {
     "Auto-saving...": "自動保存中..."
   },
+  "Autoconnect disabled": {
+    "Autoconnect disabled": "自動接続が無効"
+  },
+  "Autoconnect enabled": {
+    "Autoconnect enabled": "自動接続が有効"
+  },
   "Automatic Control": {
     "Automatic Control": "自動制御"
   },
@@ -290,6 +296,12 @@
   "CPU usage indicator": {
     "CPU usage indicator": "CPU使用率インジケーター"
   },
+  "CUPS Insecure Filter Warning": {
+    "CUPS Insecure Filter Warning": "CUPS の安全でないフィルターの警告"
+  },
+  "CUPS Missing Filter Warning": {
+    "CUPS Missing Filter Warning": "CUPS の欠落フィルターの警告"
+  },
   "Cancel": {
     "Cancel": "キャンセル"
   },
@@ -348,7 +360,7 @@
     "Color Picker": "カラーピッカー"
   },
   "Color temperature for day time": {
-    "Color temperature for day time": ""
+    "Color temperature for day time": "昼間の色温度"
   },
   "Color temperature for night mode": {
     "Color temperature for night mode": "ナイトモードの色温度"
@@ -413,6 +425,9 @@
   "Connected Displays": {
     "Connected Displays": "接続されたディスプレイ"
   },
+  "Connecting to Device": {
+    "Connecting to Device": "デバイスに接続中"
+  },
   "Connection failed. Check password and try again.": {
     "Connection failed. Check password and try again.": "接続に失敗しました。パスワードを確認して、もう一度やり直してください。"
   },
@@ -424,6 +439,15 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "現在再生中のメディアを制御"
+  },
+  "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": {
+    "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": "すべてのポップアウト、モーダル、およびそれらのコンテンツレイヤー(DankDash、設定、アプリドロワー、コントロールセンターなど)の不透明度を制御"
+  },
+  "Controls opacity of individual widgets inside DankBar": {
+    "Controls opacity of individual widgets inside DankBar": "DankBar内の個々のウィジェットの不透明度を制御"
+  },
+  "Controls opacity of the DankBar panel background": {
+    "Controls opacity of the DankBar panel background": "DankBarパネルの背景の不透明度を制御"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "クリップボードにコピーしました"
@@ -442,6 +466,9 @@
   },
   "Corner Radius (0 = square corners)": {
     "Corner Radius (0 = square corners)": "コーナー半径（0 = 角丸なし）"
+  },
+  "Cover Open": {
+    "Cover Open": "カバーオープン"
   },
   "Create Dir": {
     "Create Dir": "ディレクトリを作成"
@@ -515,11 +542,17 @@
   "DankSearch not available": {
     "DankSearch not available": "DankSearchが利用できません"
   },
+  "Dark Mode": {
+    "Dark Mode": "ダークモード"
+  },
+  "Darken Modal Background": {
+    "Darken Modal Background": "モーダル背景を暗くする"
+  },
   "Date Format": {
     "Date Format": "日付形式"
   },
   "Day Temperature": {
-    "Day Temperature": ""
+    "Day Temperature": "昼間の温度"
   },
   "Default": {
     "Default": "デフォルト"
@@ -544,6 +577,9 @@
   },
   "Device paired": {
     "Device paired": "デバイスがペアリングされました"
+  },
+  "Disable Autoconnect": {
+    "Disable Autoconnect": "自動接続を無効"
   },
   "Disconnect": {
     "Disconnect": "切断"
@@ -602,6 +638,9 @@
   "Donate on Ko-fi": {
     "Donate on Ko-fi": "Ko-fiで寄付"
   },
+  "Door Open": {
+    "Door Open": "ドアオープン"
+  },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "ウィジェットをドラッグしてセクション内で順序を変更できます。目のアイコンでウィジェットを表示/非表示に（スペースは維持）、Xで完全に削除できます。"
   },
@@ -619,6 +658,9 @@
   },
   "Empty": {
     "Empty": "空白"
+  },
+  "Enable Autoconnect": {
+    "Enable Autoconnect": "自動接続を有効"
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "GPU温度を有効にする"
@@ -674,6 +716,9 @@
   "Enter password for ": {
     "Enter password for ": "パスワードを入力"
   },
+  "Error": {
+    "Error": "エラー"
+  },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "排他ゾーンオフセット"
   },
@@ -685,6 +730,12 @@
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "設定が適用できませんでした"
+  },
+  "Failed to cancel all jobs": {
+    "Failed to cancel all jobs": "すべてのジョブの取り消しに失敗しました"
+  },
+  "Failed to cancel selected job": {
+    "Failed to cancel selected job": "選ばれたジョブの取り消しに失敗しました"
   },
   "Failed to connect VPN": {
     "Failed to connect VPN": "VPNへの接続が失敗しました"
@@ -704,8 +755,14 @@
   "Failed to enable WiFi": {
     "Failed to enable WiFi": "WiFiを有効化にできませんでした"
   },
+  "Failed to pause printer": {
+    "Failed to pause printer": "プリンターの一時中断に失敗しました"
+  },
   "Failed to remove device": {
     "Failed to remove device": "デバイスの削除に失敗しました"
+  },
+  "Failed to resume printer": {
+    "Failed to resume printer": "プリンタの再開に失敗しました"
   },
   "Failed to set profile image": {
     "Failed to set profile image": "プロフィール画像の設定に失敗しました"
@@ -715,6 +772,9 @@
   },
   "Failed to start connection to ": {
     "Failed to start connection to ": "接続ができませんでした "
+  },
+  "Failed to update autoconnect": {
+    "Failed to update autoconnect": "自動接続の更新が失敗しました"
   },
   "Feels Like": {
     "Feels Like": "どうやら"
@@ -851,6 +911,9 @@
   "Icon Theme": {
     "Icon Theme": "アイコンテーマ"
   },
+  "Idle": {
+    "Idle": "アイドル"
+  },
   "Idle Inhibitor": {
     "Idle Inhibitor": "アイドルインヒビター"
   },
@@ -881,6 +944,9 @@
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "DMSプラグインレジストリからプラグインをインストールする"
   },
+  "Interlock Open": {
+    "Interlock Open": "インターロックオープン"
+  },
   "Internet": {
     "Internet": "インターネット"
   },
@@ -889,6 +955,12 @@
   },
   "Invert on mode change": {
     "Invert on mode change": "モード変更時に反転"
+  },
+  "Jobs": {
+    "Jobs": "ジョブ"
+  },
+  "Jobs: ": {
+    "Jobs: ": "ジョブ: "
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "キーボードレイアウト名"
@@ -960,7 +1032,7 @@
     "Lock Screen Format": "ロック画面のフォーマット"
   },
   "Lock before suspend": {
-    "Lock before suspend": "サスペンド前にロック"
+    "Lock before suspend": "一時停止前にロック"
   },
   "Log Out": {
     "Log Out": "ログアウト"
@@ -986,6 +1058,18 @@
   "Manual Show/Hide": {
     "Manual Show/Hide": "手動で表示/非表示"
   },
+  "Marker Supply Empty": {
+    "Marker Supply Empty": "マーカー供給量がない"
+  },
+  "Marker Supply Low": {
+    "Marker Supply Low": "マーカー供給量が少ない"
+  },
+  "Marker Waste Almost Full": {
+    "Marker Waste Almost Full": "マーカー廃棄物がほぼ満杯"
+  },
+  "Marker Waste Full": {
+    "Marker Waste Full": "マーカー廃棄物がいっぱい"
+  },
   "Material Colors": {
     "Material Colors": "Material Colors"
   },
@@ -1006,6 +1090,18 @@
   },
   "Media Controls": {
     "Media Controls": "メディアコントロール"
+  },
+  "Media Empty": {
+    "Media Empty": "メディアがない"
+  },
+  "Media Jam": {
+    "Media Jam": "メディアジャム"
+  },
+  "Media Low": {
+    "Media Low": "メディアロー"
+  },
+  "Media Needed": {
+    "Media Needed": "メディアが必要"
   },
   "Media Player Settings": {
     "Media Player Settings": "メディアプレーヤーの設定"
@@ -1045,6 +1141,9 @@
   },
   "Mount": {
     "Mount": "マウント"
+  },
+  "Moving to Paused": {
+    "Moving to Paused": "一時停止への移行"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "落ち着いた色調のパレット。"
@@ -1092,7 +1191,7 @@
     "Night Mode": "ナイトモード"
   },
   "Night Temperature": {
-    "Night Temperature": ""
+    "Night Temperature": "夜間の温度"
   },
   "No Active Players": {
     "No Active Players": "アクティブプレイヤーなし"
@@ -1129,6 +1228,12 @@
   },
   "No plugins found.": {
     "No plugins found.": "プラグインが見つかりませんでした。"
+  },
+  "No printer found": {
+    "No printer found": "プリンターが見つかりませんでした"
+  },
+  "None": {
+    "None": "ない"
   },
   "Normal Priority": {
     "Normal Priority": "通常の優先度"
@@ -1175,6 +1280,9 @@
   "Office": {
     "Office": "オフィス"
   },
+  "Offline Report": {
+    "Offline Report": "オフライン報告"
+  },
   "On-Screen Displays": {
     "On-Screen Displays": "オンスクリーンディスプレイ"
   },
@@ -1192,6 +1300,18 @@
   },
   "Open search bar to find text": {
     "Open search bar to find text": "検索バーを開いてテキストを検索"
+  },
+  "Other": {
+    "Other": "他"
+  },
+  "Output Area Almost Full": {
+    "Output Area Almost Full": "アウトプットエリアがほぼ満杯"
+  },
+  "Output Area Full": {
+    "Output Area Full": "アウトプットエリアがいっぱい"
+  },
+  "Output Tray Missing": {
+    "Output Tray Missing": "アウトプットトレイが見つかりませんでした"
   },
   "Overview": {
     "Overview": "概要"
@@ -1216,6 +1336,12 @@
   },
   "Password": {
     "Password": "パスワード"
+  },
+  "Pause": {
+    "Pause": "一時停止"
+  },
+  "Paused": {
+    "Paused": "一時停止"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "モードごとの壁紙"
@@ -1307,11 +1433,23 @@
   "Primary": {
     "Primary": "プライマリー"
   },
+  "Print Server not available": {
+    "Print Server not available": "プリントサーバーが利用できません"
+  },
+  "Printers": {
+    "Printers": "プリンター"
+  },
+  "Printers: ": {
+    "Printers: ": "プリンター: "
+  },
   "Privacy Indicator": {
     "Privacy Indicator": "プライバシーインジケーター"
   },
   "Process": {
     "Process": "プロセス"
+  },
+  "Processing": {
+    "Processing": "進行中"
   },
   "Profile Image Error": {
     "Profile Image Error": "プロフィール画像エラー"
@@ -1337,6 +1475,9 @@
   "Rain Chance": {
     "Rain Chance": "降水確率"
   },
+  "Reason": {
+    "Reason": "原因"
+  },
   "Reboot": {
     "Reboot": "再起動"
   },
@@ -1355,6 +1496,9 @@
   "Remove": {
     "Remove": "削除"
   },
+  "Report": {
+    "Report": "報告"
+  },
   "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "電源オフ、再起動、一時停止、休止状態、ログアウトアクションの確認を要求"
   },
@@ -1363,6 +1507,9 @@
   },
   "Resources": {
     "Resources": "リソース"
+  },
+  "Resume": {
+    "Resume": "レジュメ"
   },
   "Right": {
     "Right": "右"
@@ -1499,6 +1646,9 @@
   "Show all 9 tags instead of only occupied tags (DWL only)": {
     "Show all 9 tags instead of only occupied tags (DWL only)": "占有タグのみではなく、9 つのタグをすべて表示 (DWL のみ)"
   },
+  "Show darkened overlay behind modal dialogs": {
+    "Show darkened overlay behind modal dialogs": "モーダルダイアログの背後に暗いオーバーレイを表示"
+  },
   "Show on Last Display": {
     "Show on Last Display": "最後のディスプレイに表示"
   },
@@ -1541,6 +1691,9 @@
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "マイク、カメラ、または画面共有がアクティブなときに表示"
   },
+  "Shutdown": {
+    "Shutdown": "シャットダウン"
+  },
   "Size": {
     "Size": "サイズ"
   },
@@ -1559,6 +1712,9 @@
   "Spacing": {
     "Spacing": "間隔"
   },
+  "Spool Area Full": {
+    "Spool Area Full": "スプールエリアがいっぱい"
+  },
   "Square Corners": {
     "Square Corners": "四角コーナー"
   },
@@ -1571,6 +1727,15 @@
   "Status": {
     "Status": "状態"
   },
+  "Stopped": {
+    "Stopped": "停止"
+  },
+  "Stopped Partly": {
+    "Stopped Partly": "一部停止"
+  },
+  "Stopping": {
+    "Stopping": "停止中"
+  },
   "Storage & Disks": {
     "Storage & Disks": "ストレージとディスク"
   },
@@ -1582,6 +1747,9 @@
   },
   "Suspend": {
     "Suspend": "一時停止"
+  },
+  "Suspend behavior": {
+    "Suspend behavior": "一時停止の行為"
   },
   "Suspend system after": {
     "Suspend system after": "後にシステムを一時停止"
@@ -1661,6 +1829,9 @@
   "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
     "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "以下の設定は、GTKとQtの設定を変更します。現在の設定を維持したい場合は、バックアップを作成してください（qt5ct.conf|qt6ct.conf および ~/.config/gtk-3.0|gtk-4.0）。"
   },
+  "The job queue of this printer is empty": {
+    "The job queue of this printer is empty": "このプリンタのジョブ待ち行列は空です"
+  },
   "Theme & Colors": {
     "Theme & Colors": "テーマおよびカラー"
   },
@@ -1682,6 +1853,9 @@
   "Time & Weather": {
     "Time & Weather": "時間および天気"
   },
+  "Timed Out": {
+    "Timed Out": "タイムアウト"
+  },
   "To Full": {
     "To Full": "フルへ"
   },
@@ -1699,6 +1873,12 @@
   },
   "Tomorrow": {
     "Tomorrow": "明日"
+  },
+  "Toner Empty": {
+    "Toner Empty": "トナーが空です"
+  },
+  "Toner Low": {
+    "Toner Low": "トナーが低い"
   },
   "Top": {
     "Top": "トップ"
@@ -1828,6 +2008,9 @@
   },
   "Wallpapers": {
     "Wallpapers": "壁紙"
+  },
+  "Warning": {
+    "Warning": "警告"
   },
   "Wave Progress Bars": {
     "Wave Progress Bars": "ウェーブプログレスバー"

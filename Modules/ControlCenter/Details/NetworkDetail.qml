@@ -17,7 +17,7 @@ Rectangle {
         return headerRow.height + wifiOffContent.height + Theme.spacingM
     }
     radius: Theme.cornerRadius
-    color: Theme.surfaceContainerHigh
+    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
 
@@ -230,7 +230,7 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: wiredNetworkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
+                    color: wiredNetworkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                     border.color: Theme.primary
                     border.width: 0
 
@@ -310,7 +310,7 @@ Rectangle {
         property bool currentConnected: false
 
         background: Rectangle {
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
@@ -376,6 +376,9 @@ Rectangle {
         contentHeight: wifiColumn.height
         clip: true
 
+        property var frozenNetworks: []
+        property bool menuOpen: false
+
         Column {
             id: wifiColumn
             width: parent.width
@@ -403,7 +406,7 @@ Rectangle {
             }
 
             Repeater {
-                model: sortedNetworks
+                model: wifiContent.menuOpen ? wifiContent.frozenNetworks : sortedNetworks
 
                 property var sortedNetworks: {
                     const ssid = NetworkService.currentWifiSSID
@@ -414,6 +417,9 @@ Rectangle {
                         if (b.ssid === ssid) return 1
                         return b.signal - a.signal
                     })
+                    if (!wifiContent.menuOpen) {
+                        wifiContent.frozenNetworks = sorted
+                    }
                     return sorted
                 }
                 delegate: Rectangle {
@@ -423,7 +429,7 @@ Rectangle {
                     width: parent.width
                     height: 50
                     radius: Theme.cornerRadius
-                    color: networkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.surfaceContainerHighest
+                    color: networkMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                     border.color: modelData.ssid === NetworkService.currentWifiSSID ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
                     border.width: 0
 
@@ -494,11 +500,13 @@ Rectangle {
                             if (networkContextMenu.visible) {
                                 networkContextMenu.close()
                             } else {
+                                wifiContent.menuOpen = true
                                 networkContextMenu.currentSSID = modelData.ssid
                                 networkContextMenu.currentSecured = modelData.secured
                                 networkContextMenu.currentConnected = modelData.ssid === NetworkService.currentWifiSSID
                                 networkContextMenu.currentSaved = modelData.saved
                                 networkContextMenu.currentSignal = modelData.signal
+                                networkContextMenu.currentAutoconnect = modelData.autoconnect || false
                                 networkContextMenu.popup(optionsButton, -networkContextMenu.width + optionsButton.width, optionsButton.height + Theme.spacingXS)
                             }
                         }
@@ -541,9 +549,14 @@ Rectangle {
         property bool currentConnected: false
         property bool currentSaved: false
         property int currentSignal: 0
+        property bool currentAutoconnect: false
+
+        onClosed: {
+            wifiContent.menuOpen = false
+        }
 
         background: Rectangle {
-            color: Theme.popupBackground()
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
@@ -603,6 +616,29 @@ Rectangle {
             onTriggered: {
                 let networkData = NetworkService.getNetworkInfo(networkContextMenu.currentSSID)
                 networkInfoModal.showNetworkInfo(networkContextMenu.currentSSID, networkData)
+            }
+        }
+
+        MenuItem {
+            text: networkContextMenu.currentAutoconnect ? I18n.tr("Disable Autoconnect") : I18n.tr("Enable Autoconnect")
+            height: (networkContextMenu.currentSaved || networkContextMenu.currentConnected) && DMSService.apiVersion > 13 ? 32 : 0
+            visible: (networkContextMenu.currentSaved || networkContextMenu.currentConnected) && DMSService.apiVersion > 13
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                NetworkService.setWifiAutoconnect(networkContextMenu.currentSSID, !networkContextMenu.currentAutoconnect)
             }
         }
 

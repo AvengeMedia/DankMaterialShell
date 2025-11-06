@@ -81,7 +81,7 @@ Item {
                 width: parent.width
                 height: themeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -707,7 +707,7 @@ Item {
                 width: parent.width
                 height: transparencySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -750,6 +750,14 @@ Item {
                             font.weight: Font.Medium
                         }
 
+                        StyledText {
+                            text: I18n.tr("Controls opacity of the DankBar panel background")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                        }
+
                         DankSlider {
                             width: parent.width
                             height: 24
@@ -760,9 +768,9 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDankBarTransparency(
+                                                      SettingsData.set("dankBarTransparency", 
                                                           newValue / 100)
                                                   }
                         }
@@ -776,14 +784,27 @@ Item {
                             width: parent.width
                             height: Math.max(transparencyLabel.height, widgetColorGroup.height)
 
-                            StyledText {
-                                id: transparencyLabel
-                                text: I18n.tr("Dank Bar Widget Transparency")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
+                            Column {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
+                                width: parent.width - widgetColorGroup.width - Theme.spacingM
+                                spacing: 2
+
+                                StyledText {
+                                    id: transparencyLabel
+                                    text: I18n.tr("Dank Bar Widget Transparency")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceText
+                                    font.weight: Font.Medium
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Controls opacity of individual widgets inside DankBar")
+                                    font.pixelSize: Theme.fontSizeSmall - 2
+                                    color: Theme.surfaceVariantText
+                                    width: parent.width
+                                    wrapMode: Text.WordWrap
+                                }
                             }
 
                             DankButtonGroup {
@@ -814,7 +835,7 @@ Item {
                                 onSelectionChanged: (index, selected) => {
                                     if (!selected) return
                                     const colorOptions = ["sth", "s", "sc", "sch"]
-                                    SettingsData.setWidgetBackgroundColor(colorOptions[index])
+                                    SettingsData.set("widgetBackgroundColor", colorOptions[index])
                                 }
                             }
                         }
@@ -829,9 +850,9 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setDankBarWidgetTransparency(
+                                                      SettingsData.set("dankBarWidgetTransparency", 
                                                           newValue / 100)
                                                   }
                         }
@@ -848,6 +869,14 @@ Item {
                             font.weight: Font.Medium
                         }
 
+                        StyledText {
+                            text: I18n.tr("Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.surfaceVariantText
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                        }
+
                         DankSlider {
                             width: parent.width
                             height: 24
@@ -858,14 +887,13 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setPopupTransparency(
+                                                      SettingsData.set("popupTransparency", 
                                                           newValue / 100)
                                                   }
                         }
                     }
-
 
                     Rectangle {
                         width: parent.width
@@ -894,11 +922,54 @@ Item {
                             unit: ""
                             showValue: true
                             wheelEnabled: false
-                            thumbOutlineColor: Theme.surfaceContainerHigh
+                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
                                                       SettingsData.setCornerRadius(
                                                           newValue)
                                                   }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: 1
+                        color: Theme.outline
+                        opacity: 0.2
+                    }
+
+                    Row {
+                        width: parent.width
+                        height: 40
+                        spacing: Theme.spacingM
+
+                        Column {
+                            width: parent.width - modalBackgroundToggle.width - parent.spacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("Darken Modal Background")
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceText
+                                font.weight: Font.Medium
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Show darkened overlay behind modal dialogs")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                            }
+                        }
+
+                        DankToggle {
+                            id: modalBackgroundToggle
+                            width: 48
+                            height: 24
+                            anchors.verticalCenter: parent.verticalCenter
+                            checked: SettingsData.modalDarkenBackground
+                            onToggled: checked => {
+                                SettingsData.set("modalDarkenBackground", checked)
+                            }
                         }
                     }
                 }
@@ -908,7 +979,7 @@ Item {
                 width: parent.width
                 height: fontSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -955,9 +1026,9 @@ Item {
                         options: cachedFontFamilies
                         onValueChanged: value => {
                                             if (value.startsWith("Default"))
-                                            SettingsData.setFontFamily(SettingsData.defaultFontFamily)
+                                            SettingsData.set("fontFamily", SettingsData.defaultFontFamily)
                                             else
-                                            SettingsData.setFontFamily(value)
+                                            SettingsData.set("fontFamily", value)
                                         }
                     }
 
@@ -1023,7 +1094,7 @@ Item {
                                                 weight = Font.Normal
                                                 break
                                             }
-                                            SettingsData.setFontWeight(weight)
+                                            SettingsData.set("fontWeight", weight)
                                         }
                     }
 
@@ -1042,9 +1113,9 @@ Item {
                         options: cachedMonoFamilies
                         onValueChanged: value => {
                                             if (value === "Default")
-                                            SettingsData.setMonoFontFamily(SettingsData.defaultMonoFontFamily)
+                                            SettingsData.set("monoFontFamily", SettingsData.defaultMonoFontFamily)
                                             else
-                                            SettingsData.setMonoFontFamily(value)
+                                            SettingsData.set("monoFontFamily", value)
                                         }
                     }
 
@@ -1090,11 +1161,11 @@ Item {
                                 iconName: "remove"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.fontScale > 1.0
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newScale = Math.max(1.0, SettingsData.fontScale - 0.05)
-                                    SettingsData.setFontScale(newScale)
+                                    SettingsData.set("fontScale", newScale)
                                 }
                             }
 
@@ -1102,7 +1173,7 @@ Item {
                                 width: 60
                                 height: 32
                                 radius: Theme.cornerRadius
-                                color: Theme.surfaceContainerHigh
+                                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 border.color: Qt.rgba(Theme.outline.r,
                                                       Theme.outline.g,
                                                       Theme.outline.b, 0.2)
@@ -1123,12 +1194,12 @@ Item {
                                 iconName: "add"
                                 iconSize: Theme.iconSizeSmall
                                 enabled: SettingsData.fontScale < 2.0
-                                backgroundColor: Theme.surfaceContainerHigh
+                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
                                     var newScale = Math.min(2.0,
                                                             SettingsData.fontScale + 0.05)
-                                    SettingsData.setFontScale(newScale)
+                                    SettingsData.set("fontScale", newScale)
                                 }
                             }
                         }
@@ -1140,7 +1211,7 @@ Item {
                 width: parent.width
                 height: portalSyncSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -1187,7 +1258,7 @@ Item {
                         height: 32
                         checked: SettingsData.syncModeWithPortal
                         anchors.verticalCenter: parent.verticalCenter
-                        onToggled: checked => SettingsData.setSyncModeWithPortal(checked)
+                        onToggled: checked => SettingsData.set("syncModeWithPortal", checked)
                     }
                 }
             }
@@ -1231,7 +1302,7 @@ Item {
                 width: parent.width
                 height: iconThemeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -1282,7 +1353,7 @@ Item {
                 width: parent.width
                 height: systemThemingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
@@ -1428,7 +1499,7 @@ Item {
         onFileSelected: function(filePath) {
             // Save the custom theme file path and switch to custom theme
             if (filePath.endsWith(".json")) {
-                SettingsData.setCustomThemeFile(filePath)
+                SettingsData.set("customThemeFile", filePath)
                 Theme.switchTheme("custom")
                 close()
             }
