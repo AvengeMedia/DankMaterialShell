@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Widgets
 import qs.Common
 import qs.Widgets
-import qs.Services
 
 Rectangle {
     id: resultsContainer
