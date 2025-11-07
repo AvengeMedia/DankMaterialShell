@@ -122,7 +122,8 @@ build_once() {
     echo "" >> "$TMP_CFG"
   fi
 
-  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" >> "$TMP_CFG"
+  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" | \
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" >> "$TMP_CFG"
   echo "" >> "$TMP_CFG"
 
   cat >> "$TMP_CFG" << EOF
@@ -134,40 +135,48 @@ EOF
 
   # If light mode, use gtk3 light config
   if [[ "$mode" == "light" ]]; then
-    cat "$SHELL_DIR/matugen/configs/gtk3-light.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/gtk3-light.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   else
-    cat "$SHELL_DIR/matugen/configs/gtk3-dark.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/gtk3-dark.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v niri >/dev/null 2>&1; then
-    cat "$SHELL_DIR/matugen/configs/niri.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/niri.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v qt5ct >/dev/null 2>&1; then
-    cat "$SHELL_DIR/matugen/configs/qt5ct.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/qt5ct.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v qt6ct >/dev/null 2>&1; then
-    cat "$SHELL_DIR/matugen/configs/qt6ct.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/qt6ct.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v firefox >/dev/null 2>&1; then
-    cat "$SHELL_DIR/matugen/configs/firefox.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/firefox.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v pywalfox >/dev/null 2>&1; then
-    cat "$SHELL_DIR/matugen/configs/pywalfox.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/pywalfox.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
   if command -v vesktop >/dev/null 2>&1 && [[ -d "$CONFIG_DIR/vesktop" ]]; then
-    cat "$SHELL_DIR/matugen/configs/vesktop.toml" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$SHELL_DIR/matugen/configs/vesktop.toml" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   fi
 
@@ -178,7 +187,8 @@ EOF
 
   for config in "$USER_MATUGEN_DIR/configs"/*.toml; do
     [[ -f "$config" ]] || continue
-    cat "$config" >> "$TMP_CFG"
+    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
+      "$config" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   done
   
