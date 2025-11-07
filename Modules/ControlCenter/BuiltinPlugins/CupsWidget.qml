@@ -40,6 +40,26 @@ PluginComponent {
             color: Theme.surfaceContainerHigh
 
             Column {
+                visible: !CupsService.cupsAvailable || CupsService.getPrintersNum() == 0
+                anchors.centerIn: parent
+                spacing: Theme.spacingS
+
+                DankIcon {
+                    name: "print_disabled"
+                    size: 36
+                    color: Theme.surfaceVariantText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                StyledText {
+                    text: !CupsService.cupsAvailable ? I18n.tr("Print Server not available") : I18n.tr("No printer found")
+                    font.pixelSize: Theme.fontSizeMedium
+                    color: Theme.surfaceVariantText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+            }
+            
+            Column {
                 id: detailColumn
                 anchors.fill: parent
                 anchors.margins: Theme.spacingM
