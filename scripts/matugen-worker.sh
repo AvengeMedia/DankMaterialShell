@@ -187,8 +187,7 @@ EOF
 
   for config in "$USER_MATUGEN_DIR/configs"/*.toml; do
     [[ -f "$config" ]] || continue
-    sed "s|input_path = '\./matugen/templates/|input_path = '$SHELL_DIR/matugen/templates/|g" \
-      "$config" >> "$TMP_CFG"
+    cat "$config" >> "$TMP_CFG"
     echo "" >> "$TMP_CFG"
   done
   
