@@ -20,6 +20,7 @@ Item {
     property real popoutWidth: 400
     property real popoutHeight: 0
     property var pillClickAction: null
+    property var pillRightClickAction: null
 
     property Component controlCenterWidget: null
     property string ccWidgetIcon: ""
@@ -120,6 +121,18 @@ Item {
                 pluginPopout.toggle()
             }
         }
+        onRightClicked: {
+            if (pillRightClickAction) {
+                if (pillRightClickAction.length === 0) {
+                    pillRightClickAction()
+                } else {
+                    const globalPos = mapToGlobal(0, 0)
+                    const currentScreen = parentScreen || Screen
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
+                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                }
+            }
+        }
     }
 
     BasePill {
@@ -145,6 +158,18 @@ Item {
                 }
             } else if (hasPopout) {
                 pluginPopout.toggle()
+            }
+        }
+        onRightClicked: {
+            if (pillRightClickAction) {
+                if (pillRightClickAction.length === 0) {
+                    pillRightClickAction()
+                } else {
+                    const globalPos = mapToGlobal(0, 0)
+                    const currentScreen = parentScreen || Screen
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
+                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                }
             }
         }
     }
