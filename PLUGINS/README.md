@@ -177,6 +177,7 @@ PluginComponent {
 - `popoutWidth`: Popout window width
 - `popoutHeight`: Popout window height
 - `pillClickAction`: Custom click handler function (overrides popout)
+- `pillRightClickAction`: Custom right click handler function
 
 ### Control Center Integration
 
@@ -227,7 +228,7 @@ PluginComponent {
 
 **Custom Click Actions:**
 
-Override default popout with `pillClickAction`:
+Override default popout with `pillClickAction` and `pillRightClickAction`:
 
 ```qml
 pillClickAction: () => {
@@ -236,6 +237,14 @@ pillClickAction: () => {
 
 // Or with position params: (x, y, width, section, screen)
 pillClickAction: (x, y, width, section, screen) => {
+    popoutService?.toggleControlCenter(x, y, width, section, screen)
+}
+
+pillRightClickAction: () => {
+    Process.exec("bash", ["-c", "notify-send 'Right clicked!'"])
+}
+
+pillRightClickAction: (x, y, width, section, screen) => {
     popoutService?.toggleControlCenter(x, y, width, section, screen)
 }
 ```
