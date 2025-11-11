@@ -340,6 +340,9 @@ Item {
             color: "transparent"
 
             PanelWindow {
+
+                WlrLayershell.namespace: "dms:tray-menu-window"
+
                 id: menuWindow
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Overlay

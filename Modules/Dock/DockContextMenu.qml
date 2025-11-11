@@ -10,6 +10,8 @@ import qs.Widgets
 PanelWindow {
     id: root
 
+    WlrLayershell.namespace: "dms:dock-context-menu"
+
     property var appData: null
     property var anchorItem: null
     property real dockVisibleHeight: 40

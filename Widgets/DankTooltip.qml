@@ -6,6 +6,8 @@ import qs.Common
 PanelWindow {
     id: root
 
+    WlrLayershell.namespace: "dms:tooltip"
+
     property string text: ""
     property real targetX: 0
     property real targetY: 0

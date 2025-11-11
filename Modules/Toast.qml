@@ -11,6 +11,8 @@ import qs.Widgets
 PanelWindow {
     id: root
 
+    WlrLayershell.namespace: "dms:toast"
+
     property var modelData
     property bool shouldBeVisible: false
     property real frozenWidth: 0
