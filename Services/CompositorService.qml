@@ -15,11 +15,13 @@ Singleton {
     property bool isDwl: false
     property bool isSway: false
     property bool isLabwc: false
+    property bool isScroll: false
     property string compositor: "unknown"
 
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     readonly property string niriSocket: Quickshell.env("NIRI_SOCKET")
     readonly property string swaySocket: Quickshell.env("SWAYSOCK")
+    readonly property string scrollSocket: Quickshell.env("SCROLLSOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
 
@@ -111,6 +113,10 @@ Singleton {
         target: NiriService
         function onWindowsChanged() { root.scheduleSort() }
     }
+    Connections {
+        target: ScrollService
+        function onAllWorkspacesChanged() { root.scheduleSort() }
+    }
 
     Component.onCompleted: {
         detectCompositor()
@@ -121,7 +127,7 @@ Singleton {
     Connections {
         target: DwlService
         function onStateChanged() {
-            if (isDwl && !isHyprland && !isNiri) {
+            if (isDwl && !isHyprland && !isNiri && !isScroll) {
                 scheduleSort()
             }
         }
@@ -353,6 +359,7 @@ Singleton {
             isDwl = false
             isSway = false
             isLabwc = false
+            isScroll = false
             compositor = "hyprland"
             console.info("CompositorService: Detected Hyprland")
             return
@@ -366,10 +373,27 @@ Singleton {
                     isDwl = false
                     isSway = false
                     isLabwc = false
+                    isScroll = false
                     compositor = "niri"
                     console.info("CompositorService: Detected Niri with socket:", niriSocket)
                     NiriService.generateNiriBinds()
                     NiriService.generateNiriBlurrule()
+                }
+            }, 0)
+            return
+        }
+
+        if (scrollSocket && scrollSocket.length > 0) {
+            Proc.runCommand("scrollSocketCheck", ["test", "-S", scrollSocket], (output, exitCode) => {
+                if (exitCode === 0) {
+                    isNiri = false
+                    isHyprland = false
+                    isDwl = false
+                    isSway = false
+                    isLabwc = false
+                    isScroll = true
+                    compositor = "scroll"
+                    console.info("CompositorService: Detected Scroll with socket:", scrollSocket)
                 }
             }, 0)
             return
@@ -383,6 +407,7 @@ Singleton {
                     isDwl = false
                     isSway = true
                     isLabwc = false
+                    isScroll = false
                     compositor = "sway"
                     console.info("CompositorService: Detected Sway with socket:", swaySocket)
                 }
@@ -396,6 +421,7 @@ Singleton {
             isDwl = false
             isSway = false
             isLabwc = true
+            isScroll = false
             compositor = "labwc"
             console.info("CompositorService: Detected LabWC with PID:", labwcPid)
             return
@@ -409,6 +435,7 @@ Singleton {
             isDwl = false
             isSway = false
             isLabwc = false
+            isScroll = false
             compositor = "unknown"
             console.warn("CompositorService: No compositor detected")
         }
@@ -417,7 +444,7 @@ Singleton {
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc) {
+            if (!isHyprland && !isNiri && !isDwl && !isLabwc && !isScroll) {
                 checkForDwl()
             }
         }
@@ -430,6 +457,7 @@ Singleton {
             isDwl = true
             isSway = false
             isLabwc = false
+            isScroll = false
             compositor = "dwl"
             console.info("CompositorService: Detected DWL via DMS capability")
         }
@@ -440,6 +468,7 @@ Singleton {
         if (isHyprland) return Hyprland.dispatch("dpms off")
         if (isDwl) return _dwlPowerOffMonitors()
         if (isSway) { try { I3.dispatch("output * dpms off") } catch(_){} return }
+        if (isScroll) return ScrollService.send(ScrollService.IPC_COMMAND, "output * dpms off")
         console.warn("CompositorService: Cannot power off monitors, unknown compositor")
     }
 
@@ -448,6 +477,7 @@ Singleton {
         if (isHyprland) return Hyprland.dispatch("dpms on")
         if (isDwl) return _dwlPowerOnMonitors()
         if (isSway) { try { I3.dispatch("output * dpms on") } catch(_){} return }
+        if (isScroll) return ScrollService.send(ScrollService.IPC_COMMAND, "output * dpms on")
         console.warn("CompositorService: Cannot power on monitors, unknown compositor")
     }
 
