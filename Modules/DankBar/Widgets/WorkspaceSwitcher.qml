@@ -23,7 +23,7 @@ Item {
         return CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
     }
 
-    readonly property bool useExtWorkspace: DMSService.forceExtWorkspace || (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isDwl && !CompositorService.isSway && ExtWorkspaceService.extWorkspaceAvailable)
+    readonly property bool useExtWorkspace: DMSService.forceExtWorkspace || (!CompositorService.isNiri && !CompositorService.isHyprland && !CompositorService.isDwl && !CompositorService.isSway && !CompositorService.isScroll && ExtWorkspaceService.extWorkspaceAvailable)
 
     Connections {
         target: DesktopEntries
@@ -44,6 +44,8 @@ Item {
             return activeTags.length > 0 ? activeTags[0] : -1
         } else if (CompositorService.isSway) {
             return getSwayActiveWorkspace()
+        } else if (CompositorService.isScroll) {
+            return getScrollActiveWorkspace()
         }
         return 1
     }
@@ -75,6 +77,10 @@ Item {
             const baseList = getSwayWorkspaces()
             return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
         }
+        if (CompositorService.isScroll) {
+            const baseList = getScrollWorkspaces()
+            return SettingsData.showWorkspacePadding ? padWorkspaces(baseList) : baseList
+        }
         return [1]
     }
 
@@ -97,6 +103,27 @@ Item {
         }
 
         const focusedWs = I3.workspaces?.values?.find(ws => ws.monitor?.name === root.screenName && ws.focused === true)
+        return focusedWs ? focusedWs.num : 1
+    }
+
+    function getScrollWorkspaces() {
+        const workspaces = ScrollService.allWorkspaces || []
+        if (workspaces.length === 0) return [{"num": 1}]
+
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
+            return workspaces.slice().sort((a, b) => a.num - b.num)
+        }
+
+        const monitorWorkspaces = workspaces.filter(ws => ws.output === root.screenName)
+        return monitorWorkspaces.length > 0 ? monitorWorkspaces.sort((a, b) => a.num - b.num) : [{"num": 1}]
+    }
+
+    function getScrollActiveWorkspace() {
+        if (!root.screenName || !SettingsData.workspacesPerMonitor) {
+            return ScrollService.focusedWorkspaceNum
+        }
+
+        const focusedWs = ScrollService.allWorkspaces.find(ws => ws.output === root.screenName && ws.focused === true)
         return focusedWs ? focusedWs.num : 1
     }
 
@@ -126,6 +153,8 @@ Item {
             targetWorkspaceId = ws.tag
         } else if (CompositorService.isSway) {
             targetWorkspaceId = ws.num !== undefined ? ws.num : ws
+        } else if (CompositorService.isScroll) {
+            targetWorkspaceId = ws.num !== undefined ? ws.num : ws
         } else {
             return []
         }
@@ -138,6 +167,9 @@ Item {
             isActiveWs = NiriService.allWorkspaces.some(ws => ws.id === targetWorkspaceId && ws.is_active)
         } else if (CompositorService.isSway) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true)
+            isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false
+        } else if (CompositorService.isScroll) {
+            const focusedWs = ScrollService.allWorkspaces.find(ws => ws.focused === true)
             isActiveWs = focusedWs ? (focusedWs.num === targetWorkspaceId) : false
         } else if (CompositorService.isDwl) {
             const output = DwlService.getOutputState(root.screenName)
@@ -158,6 +190,8 @@ Item {
                          if (CompositorService.isNiri) {
                              winWs = w.workspace_id
                          } else if (CompositorService.isSway) {
+                             winWs = w.workspace?.num
+                         } else if (CompositorService.isScroll) {
                              winWs = w.workspace?.num
                          } else {
                              const hyprlandToplevels = Array.from(Hyprland.toplevels?.values || [])
@@ -207,6 +241,8 @@ Item {
         } else if (CompositorService.isDwl) {
             placeholder = {"tag": -1}
         } else if (CompositorService.isSway) {
+            placeholder = {"num": -1}
+        } else if (CompositorService.isScroll) {
             placeholder = {"num": -1}
         } else {
             placeholder = -1
@@ -372,6 +408,7 @@ Item {
                                              if (CompositorService.isHyprland) return ws && ws.id !== -1
                                              if (CompositorService.isDwl) return ws && ws.tag !== -1
                                              if (CompositorService.isSway) return ws && ws.num !== -1
+                                             if (CompositorService.isScroll) return ws && ws.num !== -1
                                              return ws !== -1
                                          })
     }
@@ -453,12 +490,27 @@ Item {
             }
 
             try { I3.dispatch(`workspace number ${realWorkspaces[nextIndex].num}`) } catch(_){}
+        } else if (CompositorService.isScroll) {
+            const realWorkspaces = getRealWorkspaces()
+            if (realWorkspaces.length < 2) {
+                return
+            }
+
+            const currentIndex = realWorkspaces.findIndex(ws => ws.num === root.currentWorkspace)
+            const validIndex = currentIndex === -1 ? 0 : currentIndex
+            const nextIndex = direction > 0 ? Math.min(validIndex + 1, realWorkspaces.length - 1) : Math.max(validIndex - 1, 0)
+
+            if (nextIndex === validIndex) {
+                return
+            }
+
+            ScrollService.switchToWorkspace(realWorkspaces[nextIndex].num)
         }
     }
 
     width: isVertical ? barThickness : visualWidth
     height: isVertical ? visualHeight : barThickness
-    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || useExtWorkspace
+    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || useExtWorkspace
 
     Rectangle {
         id: visualBackground
@@ -509,6 +561,7 @@ Item {
                     if (CompositorService.isHyprland) return !!(modelData && modelData.id === root.currentWorkspace)
                     if (CompositorService.isDwl) return !!(modelData && root.dwlActiveTags.includes(modelData.tag))
                     if (CompositorService.isSway) return !!(modelData && modelData.num === root.currentWorkspace)
+                    if (CompositorService.isScroll) return !!(modelData && modelData.num === root.currentWorkspace)
                     return modelData === root.currentWorkspace
                 }
                 property bool isPlaceholder: {
@@ -516,6 +569,7 @@ Item {
                     if (CompositorService.isHyprland) return !!(modelData && modelData.id === -1)
                     if (CompositorService.isDwl) return !!(modelData && modelData.tag === -1)
                     if (CompositorService.isSway) return !!(modelData && modelData.num === -1)
+                    if (CompositorService.isScroll) return !!(modelData && modelData.num === -1)
                     return modelData === -1
                 }
                 property bool isHovered: mouseArea.containsMouse
@@ -528,6 +582,7 @@ Item {
                     if (CompositorService.isNiri) return loadedIsUrgent
                     if (CompositorService.isDwl) return modelData?.state === 2
                     if (CompositorService.isSway) return loadedIsUrgent
+                    if (CompositorService.isScroll) return loadedIsUrgent
                     return false
                 }
                 property var loadedIconData: null
@@ -592,6 +647,8 @@ Item {
                             }
                         } else if (CompositorService.isSway && modelData?.num) {
                             try { I3.dispatch(`workspace number ${modelData.num}`) } catch(_){}
+                        } else if (CompositorService.isScroll && modelData?.num) {
+                            ScrollService.switchToWorkspace(modelData.num)
                         }
                     }
                 }
@@ -620,6 +677,8 @@ Item {
                             wsData = modelData;
                         } else if (CompositorService.isSway) {
                             wsData = modelData;
+                        } else if (CompositorService.isScroll) {
+                            wsData = modelData;
                         }
                         delegateRoot.loadedWorkspaceData = wsData;
                         delegateRoot.loadedIsUrgent = wsData?.urgent ?? false;
@@ -632,7 +691,7 @@ Item {
                         delegateRoot.loadedHasIcon = icData !== null;
 
                         if (SettingsData.showWorkspaceApps) {
-                            if (CompositorService.isDwl || CompositorService.isSway) {
+                            if (CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll) {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(modelData);
                             } else {
                                 delegateRoot.loadedIcons = root.getWorkspaceIcons(CompositorService.isHyprland ? modelData : (modelData === -1 ? null : modelData));
@@ -911,6 +970,7 @@ Item {
                                 if (CompositorService.isHyprland) return modelData?.id || ""
                                 if (CompositorService.isDwl) return (modelData?.tag !== undefined) ? (modelData.tag + 1) : ""
                                 if (CompositorService.isSway) return modelData?.num || ""
+                                if (CompositorService.isScroll) return modelData?.num || ""
                                 return modelData - 1
                             }
                             color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
@@ -948,6 +1008,11 @@ Item {
                     target: I3.workspaces
                     enabled: CompositorService.isSway
                     function onValuesChanged() { delegateRoot.updateAllData() }
+                }
+                Connections {
+                    target: ScrollService
+                    enabled: CompositorService.isScroll
+                    function onAllWorkspacesChanged() { delegateRoot.updateAllData() }
                 }
                 Connections {
                     target: ExtWorkspaceService
