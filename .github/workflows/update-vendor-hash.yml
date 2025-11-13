@@ -6,7 +6,7 @@ on:
       - "core/go.mod"
       - "core/go.sum"
     branches:
-      - NOOP
+      - master
 
 jobs:
   update-vendor-hash:
@@ -20,14 +20,14 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@v31
 
-      - name: Update vendorHash in core/flake.nix
+      - name: Update vendorHash in flake.nix
         run: |
           set -euo pipefail
 
           # Try to build and capture the expected hash from error message
           echo "Attempting nix build to get new vendorHash..."
-          cd core
-          if output=$(nix build .#dms-cli 2>&1); then
+
+          if output=$(nix build .#dmsCli 2>&1); then
             echo "Build succeeded, no hash update needed"
             exit 0
           fi
@@ -58,7 +58,7 @@ jobs:
 
           # Verify the build works with the new hash
           echo "Verifying build with new vendorHash..."
-          nix build .#dms-cli
+          nix build .#dmsCli
 
           echo "vendorHash updated successfully!"
 
@@ -66,12 +66,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          if ! git diff --quiet core/flake.nix; then
+          if ! git diff --quiet flake.nix; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 
-            git add core/flake.nix
-            git commit -m "flake: update vendorHash for go.mod changes"
+            git add flake.nix
+            git commit -m "nix: update vendorHash for go.mod changes"
 
             for attempt in 1 2 3; do
               if git push; then
@@ -86,5 +86,5 @@ jobs:
             echo "Failed to push after retries" >&2
             exit 1
           else
-            echo "No changes to core/flake.nix"
+            echo "No changes to flake.nix"
           fi
