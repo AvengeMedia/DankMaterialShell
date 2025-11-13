@@ -122,7 +122,7 @@ in {
             };
 
             Service = {
-                ExecStart = lib.getExe dmsPkgs.dmsCli + " run";
+                ExecStart = lib.getExe dmsPkgs.dmsCli + " run --session";
                 Restart = "on-failure";
             };
 
