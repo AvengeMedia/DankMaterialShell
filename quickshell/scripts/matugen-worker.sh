@@ -327,7 +327,7 @@ EOF
   fi
 
   if command -v wezterm >/dev/null 2>&1; then
-    WEZTERM_CONFIG="$CONFIG_DIR/wezterm/dank-theme.toml"
+    WEZTERM_CONFIG="$CONFIG_DIR/wezterm/colors/dank-theme.toml"
 
     if [[ ! -f "$WEZTERM_CONFIG" ]]; then
       mkdir -p "$(dirname "$WEZTERM_CONFIG")"
