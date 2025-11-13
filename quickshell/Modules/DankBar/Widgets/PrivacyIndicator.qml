@@ -15,9 +15,9 @@ Item {
     property real widgetThickness: 30
     property real barThickness: 48
 
-    property bool showMicIcon: SettingsData.controlCenterShowMicIcon
-    property bool showCameraIcon: SettingsData.controlCenterShowCameraIcon
-    property bool showScreenSharingIcon: SettingsData.controlCenterShowScreenShareIcon
+    property bool showMicIcon: SettingsData.privacyCenterShowMicIcon
+    property bool showCameraIcon: SettingsData.privacyCenterShowCameraIcon
+    property bool showScreenSharingIcon: SettingsData.privacyShowScreenShareIcon
 
     readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property bool hasActivePrivacy: showMicIcon || showCameraIcon || showScreenSharingIcon || PrivacyService.anyPrivacyActive

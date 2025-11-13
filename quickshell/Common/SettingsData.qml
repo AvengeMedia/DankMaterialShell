@@ -100,9 +100,9 @@ Singleton {
     property bool controlCenterShowBluetoothIcon: true
     property bool controlCenterShowAudioIcon: true
 
-    property bool controlCenterShowMicIcon: true
-    property bool controlCenterShowCameraIcon: false
-    property bool controlCenterShowScreenShareIcon: false
+    property bool privacyShowMicIcon: true
+    property bool privacyShowCameraIcon: false
+    property bool privacyShowScreenShareIcon: false
 
     property var controlCenterWidgets: [{
             "id": "volumeSlider",
