@@ -122,7 +122,7 @@ Item {
             Item {
                 width: 18
                 height: 18
-                visible: PrivacyService.microphoneActive
+                visible: showMicIcon || PrivacyService.microphoneActive
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
@@ -133,7 +133,7 @@ Item {
                         return "mic"
                     }
                     size: Theme.iconSizeSmall
-                    color: Theme.error
+                    color: PrivacyService.microphoneActive ? Theme.error : Theme.surfaceText
                     filled: true
                     anchors.centerIn: parent
                 }
@@ -142,13 +142,13 @@ Item {
             Item {
                 width: 18
                 height: 18
-                visible: PrivacyService.cameraActive
+                visible: showCameraIcon || PrivacyService.cameraActive
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
                     name: "camera_video"
                     size: Theme.iconSizeSmall
-                    color: Theme.surfaceText
+                    color: PrivacyService.cameraActive ? Theme.error : Theme.surfaceText
                     filled: true
                     anchors.centerIn: parent
                 }
@@ -162,19 +162,20 @@ Item {
                     anchors.top: parent.top
                     anchors.rightMargin: -2
                     anchors.topMargin: -1
+                    visible: PrivacyService.cameraActive
                 }
             }
 
             Item {
                 width: 18
                 height: 18
-                visible: PrivacyService.screensharingActive
+                visible: showScreenSharingIcon || PrivacyService.screensharingActive
                 anchors.verticalCenter: parent.verticalCenter
 
                 DankIcon {
                     name: "screen_share"
                     size: Theme.iconSizeSmall
-                    color: Theme.warning
+                    color: PrivacyService.cameraActive ? Theme.warning : Theme.surfaceText
                     filled: true
                     anchors.centerIn: parent
                 }
