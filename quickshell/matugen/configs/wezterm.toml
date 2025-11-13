@@ -1,0 +1,3 @@
+[templates.dmswezterm]
+input_path = 'SHELL_DIR/matugen/templates/wezterm.toml'
+output_path = '~/.config/wezterm/dank-theme.toml'

@@ -222,6 +222,11 @@ EOF
     echo "" >> "$TMP_CONTENT_CFG"
   fi
 
+  if command -v wezterm >/dev/null 2>&1; then
+    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/wezterm.toml" >>"$TMP_CONTENT_CFG"
+    echo "" >>"$TMP_CONTENT_CFG"
+  fi
+
   if command -v dgop >/dev/null 2>&1; then
     sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/dgop.toml" >> "$TMP_CONTENT_CFG"
     echo "" >> "$TMP_CONTENT_CFG"
@@ -318,6 +323,20 @@ EOF
     OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --foot 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >> "$FOOT_CONFIG"
+    fi
+  fi
+
+  if command -v wezterm >/dev/null 2>&1; then
+    WEZTERM_CONFIG="$CONFIG_DIR/wezterm/dank-theme.toml"
+
+    if [[ ! -f "$WEZTERM_CONFIG" ]]; then
+      mkdir -p "$(dirname "$WEZTERM_CONFIG")"
+      touch "$WEZTERM_CONFIG"
+    fi
+
+    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --wezterm 2>/dev/null || true)
+    if [[ -n "${OUT:-}" ]]; then
+      printf "\n%s\n" "$OUT" >>"$WEZTERM_CONFIG"
     fi
   fi
 

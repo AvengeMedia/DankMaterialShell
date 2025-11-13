@@ -116,7 +116,7 @@ Theme singleton provides Material Design 3 color system, spacing, fonts, and ele
 Templates in `scripts/templates/` generate themes for:
 - GTK 3/4
 - Qt5/Qt6
-- Alacritty, Kitty, Foot terminals
+- Alacritty, Kitty, Ghostty, Foot, Wezterm terminals
 - VSCode/VSCodium
 - Firefox
 

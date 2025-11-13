@@ -1,0 +1,10 @@
+[colors]
+background = '{{colors.background.default.hex}}'
+foreground = '{{colors.on_surface.default.hex}}'
+
+cursor_bg = '{{colors.primary.default.hex}}'
+cursor_fg = '{{colors.background.default.hex}}'
+cursor_border = '{{colors.primary.default.hex}}'
+
+selection_bg = '{{colors.primary_container.default.hex}}'
+selection_fg = '{{colors.on_surface.default.hex}}'

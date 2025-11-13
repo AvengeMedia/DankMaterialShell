@@ -124,3 +124,17 @@ func GenerateGhosttyTheme(colors []string) string {
 	}
 	return result.String()
 }
+
+func GenerateWeztermTheme(colors []string) string {
+	var result strings.Builder
+	labels := []string{"ansi", "brights"}
+	for j, label := range labels {
+		start := j * 8
+		colorSlice := make([]string, 8)
+		for i, color := range colors[start : start+8] {
+			colorSlice[i] = fmt.Sprintf("'%s'", color)
+		}
+		fmt.Fprintf(&result, "%s = [%s]\n", label, strings.Join(colorSlice, ", "))
+	}
+	return result.String()
+}

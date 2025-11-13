@@ -25,6 +25,7 @@ func init() {
 	dank16Cmd.Flags().Bool("foot", false, "Output in Foot terminal format")
 	dank16Cmd.Flags().Bool("alacritty", false, "Output in Alacritty terminal format")
 	dank16Cmd.Flags().Bool("ghostty", false, "Output in Ghostty terminal format")
+	dank16Cmd.Flags().Bool("wezterm", false, "Output in Wezterm terminal format")
 	dank16Cmd.Flags().String("vscode-enrich", "", "Enrich existing VSCode theme file with terminal colors")
 	dank16Cmd.Flags().String("background", "", "Custom background color")
 	dank16Cmd.Flags().String("contrast", "dps", "Contrast algorithm: dps (Delta Phi Star, default) or wcag")
@@ -42,6 +43,7 @@ func runDank16(cmd *cobra.Command, args []string) {
 	isFoot, _ := cmd.Flags().GetBool("foot")
 	isAlacritty, _ := cmd.Flags().GetBool("alacritty")
 	isGhostty, _ := cmd.Flags().GetBool("ghostty")
+	isWezterm, _ := cmd.Flags().GetBool("wezterm")
 	vscodeEnrich, _ := cmd.Flags().GetString("vscode-enrich")
 	background, _ := cmd.Flags().GetString("background")
 	contrastAlgo, _ := cmd.Flags().GetString("contrast")
@@ -84,6 +86,8 @@ func runDank16(cmd *cobra.Command, args []string) {
 		fmt.Print(dank16.GenerateAlacrittyTheme(colors))
 	} else if isGhostty {
 		fmt.Print(dank16.GenerateGhosttyTheme(colors))
+	} else if isWezterm {
+		fmt.Print(dank16.GenerateWeztermTheme(colors))
 	} else {
 		fmt.Print(dank16.GenerateGhosttyTheme(colors))
 	}
