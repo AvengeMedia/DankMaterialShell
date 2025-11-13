@@ -21,7 +21,6 @@ Item {
 
     readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
     readonly property bool hasActivePrivacy: showMicIcon || showCameraIcon || showScreenSharingIcon || PrivacyService.anyPrivacyActive
-    // readonly property int activeCount: PrivacyService.microphoneActive + PrivacyService.cameraActive + PrivacyService.screensharingActive
     readonly property int activeCount: (showMicIcon ? 1 : PrivacyService.microphoneActive) + (showCameraIcon ? 1 : PrivacyService.cameraActive) + (showScreenSharingIcon ? 1 : PrivacyService.screensharingActive)
     readonly property real contentWidth: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
     readonly property real contentHeight: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
