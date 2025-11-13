@@ -518,6 +518,13 @@ Item {
         } else if (settingName === "showAudioIcon") {
             SettingsData.set("controlCenterShowAudioIcon", value)
         }
+        if (settingName === "showMicIcon") {
+            SettingsData.set("controlCenterShowMicIcon", value)
+        } else if (settingName === "showCameraIcon") {
+            SettingsData.set("controlCenterShowCameraIcon", value)
+        } else if (settingName === "showAudioIcon") {
+            SettingsData.set("controlCenterShowScreenShareIcon", value)
+        }
     }
 
     function handleMinimumWidthChanged(sectionId, widgetIndex, enabled) {
