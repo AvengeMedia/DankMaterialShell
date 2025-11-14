@@ -95,14 +95,13 @@ Singleton {
     property bool showNotificationButton: true
     property bool showBattery: true
     property bool showControlCenterButton: true
-
     property bool controlCenterShowNetworkIcon: true
     property bool controlCenterShowBluetoothIcon: true
     property bool controlCenterShowAudioIcon: true
-
+    property bool showPrivacyButton: true
     property bool privacyShowMicIcon: true
-    property bool privacyShowCameraIcon: false
-    property bool privacyShowScreenShareIcon: false
+    property bool privacyShowCameraIcon: true
+    property bool privacyShowScreenShareIcon: true
 
     property var controlCenterWidgets: [{
             "id": "volumeSlider",

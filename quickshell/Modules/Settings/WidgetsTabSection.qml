@@ -22,6 +22,7 @@ Column {
     signal gpuSelectionChanged(string sectionId, int widgetIndex, int selectedIndex)
     signal diskMountSelectionChanged(string sectionId, int widgetIndex, string mountPath)
     signal controlCenterSettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
+    signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
 
@@ -581,6 +582,25 @@ Column {
                         }
 
                         DankActionButton {
+                            visible: modelData.id === "privacyIndicator"
+                            buttonSize: 32
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
+                            onClicked: {
+                                console.log("Privacy three-dot button clicked for widget:", modelData.id)
+                                privacyContextMenu.widgetData = modelData
+                                privacyContextMenu.sectionId = root.sectionId
+                                privacyContextMenu.widgetIndex = index
+                                // Position relative to the action buttons row, not the specific button
+                                var parentPos = parent.mapToItem(root, 0, 0)
+                                privacyContextMenu.x = parentPos.x - 210 // Position to the left with margin
+                                privacyContextMenu.y = parentPos.y - 10 // Slightly above
+                                privacyContextMenu.open()
+                            }
+                        }
+
+                        DankActionButton {
                             id: visibilityButton
                             visible: modelData.id !== "spacer"
                             buttonSize: 32
@@ -954,6 +974,227 @@ Column {
                         onPressed: {
                             audioToggle.checked = !audioToggle.checked
                             root.controlCenterSettingChanged(controlCenterContextMenu.sectionId, controlCenterContextMenu.widgetIndex, "showAudioIcon", audioToggle.checked)
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    Popup {
+        id: privacyContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+
+
+        width: 200
+        height: 120
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        onOpened: {
+            console.log("Privacy context menu opened")
+        }
+
+        onClosed: {
+            console.log("Privacy Center context menu closed")
+        }
+
+        background: Rectangle {
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+
+            Column {
+                id: menuPrivacyColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: networkToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        StyledText {
+                            text: I18n.tr("Always on icons")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: networkToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "mic"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Microphone")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: micToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: SettingsData.privacyShowMicIcon
+                        onToggled: toggled => {
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showMicIcon", toggled)
+                        }
+                    }
+
+                    MouseArea {
+                        id: micToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            micToggle.checked = !micToggle.checked
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showMicIcon", micToggle.checked)
+                        }
+                    }
+                }
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: networkToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "camera_video"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Camera")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: cameraToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: SettingsData.privacyShowCameraIcon
+                        onToggled: toggled => {
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showCameraIcon", toggled)
+                        }
+                    }
+
+                    MouseArea {
+                        id: cameraToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            cameraToggle.checked = !cameraToggle.checked
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showCameraIcon", cameraToggle.checked)
+                        }
+                    }
+                }
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: networkToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "screen_share"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Screen sharing")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: screenshareToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: SettingsData.privacyShowScreenShareIcon
+                        onToggled: toggled => {
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showScreenSharingIcon", toggled)
+                        }
+                    }
+
+                    MouseArea {
+                        id: screenshareToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            screenshareToggle.checked = !screenshareToggle.checked
+                            root.privacySettingChanged(privacyContextMenu.sectionId, privacyContextMenu.widgetIndex, "showScreenSharingIcon", screenshareToggle.checked)
                         }
                     }
                 }

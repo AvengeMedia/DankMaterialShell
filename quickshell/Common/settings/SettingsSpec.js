@@ -52,6 +52,7 @@ var SPEC = {
     controlCenterShowBluetoothIcon: { def: true },
     controlCenterShowAudioIcon: { def: true },
 
+    showPrivacyButton: { def: true },
     privacyShowMicIcon: { def: true },
     privacyShowCameraIcon: { def: true },
     privacyShowScreenShareIcon: { def: true },
