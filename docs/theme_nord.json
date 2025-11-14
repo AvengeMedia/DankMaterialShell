@@ -1,0 +1,42 @@
+{
+  "dark": {
+    "name": "Nord dark",
+    "primary": "#81a1c1",
+    "primaryText": "#2e3440",
+    "primaryContainer": "#88c0d0",
+    "secondary": "#b48ead",
+    "surface": "#3b4252",
+    "surfaceText": "#5e81ac",
+    "surfaceVariant": "#434c5e",
+    "surfaceVariantText": "#eceff4",
+    "surfaceTint": "#81a1c1",
+    "background": "#2e3440",
+    "backgroundText": "#8fbcbb",
+    "outline": "#d8dee9",
+    "surfaceContainer": "#434c5e",
+    "surfaceContainerHigh": "#4c566a",
+    "error": "#bf616a",
+    "warning": "#d08770",
+    "info": "#88c0d0"
+},
+  "light": {
+    "name": "Nord light",
+    "primary": "#3b6ea8",
+    "primaryText": "#e5e9f0",
+    "primaryContainer": "#398eac",
+    "secondary": "#97365b",
+    "surface": "#c2d0e7",
+    "surfaceText": "#5272af",
+    "surfaceVariant": "#b8c5db",
+    "surfaceVariantText": "#3b4252",
+    "surfaceTint": "#3b6ea8",
+    "background": "#e5e9f0",
+    "backgroundText": "#29838d",
+    "outline": "#60728c",
+    "surfaceContainer": "#b8c5db",
+    "surfaceContainerHigh": "#aebacf",
+    "error": "#99324b",
+    "warning": "#ac4426",
+    "info": "#398eac"
+  }
+}

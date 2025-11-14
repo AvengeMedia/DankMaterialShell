@@ -1,0 +1,42 @@
+{
+  "dark": {
+    "name": "Rosé Pine",
+    "primary": "#c4a7e7",
+    "primaryText": "#191724",
+    "primaryContainer": "#9ccfd8",
+    "secondary": "#f6c177",
+    "surface": "#1f1d2e",
+    "surfaceText": "#524f67",
+    "surfaceVariant": "#26233a",
+    "surfaceVariantText": "#e0def4",
+    "surfaceTint": "#c4a7e7",
+    "background": "#191724",
+    "backgroundText": "#524f67",
+    "outline": "#908caa",
+    "surfaceContainer": "#26233a",
+    "surfaceContainerHigh": "#6e6a86",
+    "error": "#eb6f92",
+    "warning": "#f6c177",
+    "info": "#9ccfd8"
+},
+  "light": {
+    "name": "Rosé Pine dawn",
+    "primary": "#907aa9",
+    "primaryText": "#faf4ed",
+    "primaryContainer": "#56949f",
+    "secondary": "#ea9d34",
+    "surface": "#fffaf3",
+    "surfaceText": "#cecacd",
+    "surfaceVariant": "#f2e9de",
+    "surfaceVariantText": "#575279",
+    "surfaceTint": "#907aa9",
+    "background": "#faf4ed",
+    "backgroundText": "#cecacd",
+    "outline": "#797593",
+    "surfaceContainer": "#f2e9de",
+    "surfaceContainerHigh": "#9893a5",
+    "error": "#b4637a",
+    "warning": "#ea9d34",
+    "info": "#56949f"
+  }
+}

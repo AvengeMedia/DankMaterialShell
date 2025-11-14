@@ -1,0 +1,42 @@
+{
+  "dark": {
+    "name": "Tokyo Night night",
+    "primary": "#7aa2f7",
+    "primaryText": "#16161e",
+    "primaryContainer": "#7dcfff",
+    "secondary": "#bb9af7",
+    "surface": "#1a1b26",
+    "surfaceText": "#73daca",
+    "surfaceVariant": "#2f3549",
+    "surfaceVariantText": "#cbccd1",
+    "surfaceTint": "#7aa2f7",
+    "background": "#16161e",
+    "backgroundText": "#d5d6db",
+    "outline": "#787c99",
+    "surfaceContainer": "#2f3549",
+    "surfaceContainerHigh": "#444b6a",
+    "error": "#f7768e",
+    "warning": "#ff9e64",
+    "info": "#7dcfff"
+},
+  "light": {
+    "name": "Tokyo Night day",
+    "primary": "#2e7de9",
+    "primaryText": "#d0d5e3",
+    "primaryContainer": "#007197",
+    "secondary": "#9854f1",
+    "surface": "#e1e2e7",
+    "surfaceText": "#387068",
+    "surfaceVariant": "#c4c8da",
+    "surfaceVariantText": "#1a1b26",
+    "surfaceTint": "#2e7de9",
+    "background": "#cbccd1",
+    "backgroundText": "#1a1b26",
+    "outline": "#4c505e",
+    "surfaceContainer": "#dfe0e5",
+    "surfaceContainerHigh": "#9699a3",
+    "error": "#f52a65",
+    "warning": "#b15c00",
+    "info": "#007197"
+  }
+}
