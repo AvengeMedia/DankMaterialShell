@@ -207,7 +207,7 @@
     "Available": "Kullanılabilir"
   },
   "Available Layouts": {
-    "Available Layouts": ""
+    "Available Layouts": "Mevcut Düzenler"
   },
   "Available Plugins": {
     "Available Plugins": "Kullanılabilir Eklentiler"
@@ -302,11 +302,14 @@
   "Capacity": {
     "Capacity": "Kapasite"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "Orta Bölüm"
   },
   "Center Tiling": {
-    "Center Tiling": ""
+    "Center Tiling": "Merkez Döşeme"
   },
   "Changes:": {
     "Changes:": "Değişiklikler:"
@@ -504,7 +507,7 @@
     "Customizable empty space": "Özelleştirilebilir boş alan"
   },
   "Customize which actions appear in the power menu": {
-    "Customize which actions appear in the power menu": ""
+    "Customize which actions appear in the power menu": "Güç menüsünde hangi eylemlerin görüneceğini özelleştirin"
   },
   "DEMO MODE - Click anywhere to exit": {
     "DEMO MODE - Click anywhere to exit": "DEMO MODU - Çıkmak için herhangi bir yere tıklayın"
@@ -519,7 +522,7 @@
     "DMS_SOCKET not available": "DMS_SOCKET kullanılamıyor"
   },
   "DWL service not available": {
-    "DWL service not available": ""
+    "DWL service not available": "DWL hizmeti kullanılamıyor"
   },
   "Daily at:": {
     "Daily at:": "Her gün saat:"
@@ -555,13 +558,13 @@
     "Day Temperature": "Gündüz Sıcaklığı"
   },
   "Deck": {
-    "Deck": ""
+    "Deck": "Deck"
   },
   "Default": {
     "Default": "Varsayılan"
   },
   "Default selected action": {
-    "Default selected action": ""
+    "Default selected action": "Ön tanımlı seçili eylem"
   },
   "Defaults": {
     "Defaults": "Varsayılanlar"
@@ -612,7 +615,7 @@
     "Display all priorities over fullscreen apps": "Tam ekran uygulamaların üzerinde tüm öncelikleri göster"
   },
   "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": ""
+    "Display and switch DWL layouts": "DWL düzenlerini görüntüle ve değiştir"
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "Çalışma alanı göstergesinde uygulama simgelerini göster"
@@ -830,6 +833,9 @@
   "Force Kill Process": {
     "Force Kill Process": "Süreci Zorla Kapat"
   },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": ""
+  },
   "Forget Device": {
     "Forget Device": "Aygıtı Unut"
   },
@@ -879,7 +885,7 @@
     "Graphics": "Grafik"
   },
   "Grid": {
-    "Grid": ""
+    "Grid": "Izgara"
   },
   "Group by App": {
     "Group by App": "Uygulamaya Göre Gruplandır"
@@ -1026,7 +1032,7 @@
     "Launcher Button Logo": "Başlatıcı Buton Logosu"
   },
   "Layout": {
-    "Layout": ""
+    "Layout": "Düzen"
   },
   "Left": {
     "Left": "Sol"
@@ -1167,7 +1173,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Duvar kağıdı dinamik tema renklerini yönlendiren monitör"
   },
   "Monocle": {
-    "Monocle": ""
+    "Monocle": "Monocle"
   },
   "Monospace Font": {
     "Monospace Font": "Sabit Aralıklı Yazı Tipi"
@@ -1323,7 +1329,7 @@
     "Only adjust gamma based on time or location rules.": "Gamayı yalnızca zaman veya konum kurallarına göre ayarlayın."
   },
   "Only visible if hibernate is supported by your system": {
-    "Only visible if hibernate is supported by your system": ""
+    "Only visible if hibernate is supported by your system": "Sisteminizde hazırda bekletme özelliği destekleniyorsa görünür"
   },
   "Opacity": {
     "Opacity": "Opaklık"
@@ -1455,7 +1461,7 @@
     "Power Action Confirmation": "Güç Eylemi Onayı"
   },
   "Power Menu Customization": {
-    "Power Menu Customization": ""
+    "Power Menu Customization": "Güç Menüsü Özelleştirme"
   },
   "Power Off": {
     "Power Off": "Kapat"
@@ -1548,7 +1554,7 @@
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "Kapatma, yeniden başlatma, askıya alma, hazırda bekletme ve oturumu kapatma işlemlerinde onay iste"
   },
   "Requires DWL compositor": {
-    "Requires DWL compositor": ""
+    "Requires DWL compositor": "DWL kompozitör gerektirir"
   },
   "Reset": {
     "Reset": "Sıfırla"
@@ -1560,10 +1566,10 @@
     "Restart": "Yeniden Başlat"
   },
   "Restart DMS": {
-    "Restart DMS": ""
+    "Restart DMS": "DMS'yi Yeniden Başlat"
   },
   "Restart the DankMaterialShell": {
-    "Restart the DankMaterialShell": ""
+    "Restart the DankMaterialShell": "DankMaterialShell'i yeniden başlatın"
   },
   "Resume": {
     "Resume": "Sürdür"
@@ -1581,10 +1587,10 @@
     "Right Section": "Sağ Bölüm"
   },
   "Right Tiling": {
-    "Right Tiling": ""
+    "Right Tiling": "Sağ Döşeme"
   },
   "Right-click bar widget to cycle": {
-    "Right-click bar widget to cycle": ""
+    "Right-click bar widget to cycle": "Çubuk widget'ını sağ tıklayarak döngüye değiştir"
   },
   "Run User Templates": {
     "Run User Templates": "Kullanıcı Şablonlarını Çalıştır"
@@ -1620,7 +1626,7 @@
     "Science": "Bilim"
   },
   "Scrolling": {
-    "Scrolling": ""
+    "Scrolling": "Kaydırma"
   },
   "Search file contents": {
     "Search file contents": "Dosya içeriklerini ara"
@@ -1704,31 +1710,31 @@
     "Show Dock": "Dock'u Göster"
   },
   "Show Hibernate": {
-    "Show Hibernate": ""
+    "Show Hibernate": "Hazırda Bekleti Göster"
   },
   "Show Line Numbers": {
     "Show Line Numbers": "Satır Numaralarını Göster"
   },
   "Show Lock": {
-    "Show Lock": ""
+    "Show Lock": "Kilitleyi Göster"
   },
   "Show Log Out": {
-    "Show Log Out": ""
+    "Show Log Out": "Çıkışı Göster"
   },
   "Show Power Actions": {
     "Show Power Actions": "Güç Eylemlerini Göster"
   },
   "Show Power Off": {
-    "Show Power Off": ""
+    "Show Power Off": "Kapatı Göster"
   },
   "Show Reboot": {
-    "Show Reboot": ""
+    "Show Reboot": "Yeniden Başlatı Göster"
   },
   "Show Restart DMS": {
-    "Show Restart DMS": ""
+    "Show Restart DMS": "DMS'yi Yeniden Başlatı Göster"
   },
   "Show Suspend": {
-    "Show Suspend": ""
+    "Show Suspend": "Askıya Alı Göster"
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "Çalışma Alanı Uygulamalarını Göster"
@@ -1777,6 +1783,9 @@
   },
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "Mevcut çalışma alanı gösterir ve değiştirmeye izin verir"
+  },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
   },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mikrofon, kamera veya ekran paylaşımı aktif olduğunda gösterir"
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Terminal özel ek parametreleri"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": ""
+  },
   "Text": {
     "Text": "Metin"
   },
@@ -1935,7 +1947,7 @@
     "This will permanently delete all clipboard history.": "Bu, tüm pano geçmişini kalıcı olarak siler."
   },
   "Tiling": {
-    "Tiling": ""
+    "Tiling": "Döşeme"
   },
   "Time & Weather": {
     "Time & Weather": "Zaman & Hava Durumu"
@@ -2021,6 +2033,12 @@
   "Use IP Location": {
     "Use IP Location": "IP Konumunu Kullan"
   },
+  "Use Imperial Units": {
+    "Use Imperial Units": ""
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": ""
+  },
   "Use Monospace Font": {
     "Use Monospace Font": "Sabit Aralıklı Yazı Tipi Kullan"
   },
@@ -2070,16 +2088,16 @@
     "VRR: ": "VRR: "
   },
   "Vertical Deck": {
-    "Vertical Deck": ""
+    "Vertical Deck": "Dikey Deck"
   },
   "Vertical Grid": {
-    "Vertical Grid": ""
+    "Vertical Grid": "Dikey Izgara"
   },
   "Vertical Scrolling": {
-    "Vertical Scrolling": ""
+    "Vertical Scrolling": "Dikey Kaydırma"
   },
   "Vertical Tiling": {
-    "Vertical Tiling": ""
+    "Vertical Tiling": "Dikey Döşeme"
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Oynak doygunluğa sahip canlı palet"

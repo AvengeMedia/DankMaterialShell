@@ -263,9 +263,9 @@ func (g *GentooDistribution) setGlobalUseFlags(ctx context.Context, sudoPassword
 
 	var cmd *exec.Cmd
 	if hasUse {
-		cmd = ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("sed -i 's/^USE=\"\\(.*\\)\"/USE=\"\\1 %s\"/' /etc/portage/make.conf; exit_code=$?; exit $exit_code", useFlags))
+		cmd = ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("sed -i 's/^USE=\"\\(.*\\)\"/USE=\"\\1 %s\"/' /etc/portage/make.conf", useFlags))
 	} else {
-		cmd = ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("bash -c \"echo 'USE=\\\"%s\\\"' >> /etc/portage/make.conf\"; exit_code=$?; exit $exit_code", useFlags))
+		cmd = ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("bash -c \"echo 'USE=\\\"%s\\\"' >> /etc/portage/make.conf\"", useFlags))
 	}
 
 	output, err := cmd.CombinedOutput()
@@ -343,8 +343,7 @@ func (g *GentooDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 		LogOutput:   "Syncing Portage tree with emerge --sync",
 	}
 
-	syncCmd := ExecSudoCommand(ctx, sudoPassword,
-		"emerge --sync --quiet; exit_code=$?; exit $exit_code")
+	syncCmd := ExecSudoCommand(ctx, sudoPassword, "emerge --sync --quiet")
 	syncOutput, syncErr := syncCmd.CombinedOutput()
 	if syncErr != nil {
 		g.log(fmt.Sprintf("emerge --sync output: %s", string(syncOutput)))
@@ -365,7 +364,7 @@ func (g *GentooDistribution) InstallPrerequisites(ctx context.Context, sudoPassw
 
 	args := []string{"emerge", "--ask=n", "--quiet"}
 	args = append(args, missingPkgs...)
-	cmd := ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("%s; exit_code=$?; exit $exit_code", strings.Join(args, " ")))
+	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		g.logError("failed to install prerequisites", err)
@@ -392,7 +391,7 @@ func (g *GentooDistribution) InstallPackages(ctx context.Context, dependencies [
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, guruPkgs, manualPkgs := g.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, guruPkgs, manualPkgs, variantMap := g.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	g.log(fmt.Sprintf("CATEGORIZED PACKAGES: system=%d, guru=%d, manual=%d", len(systemPkgs), len(guruPkgs), len(manualPkgs)))
 
@@ -448,7 +447,7 @@ func (g *GentooDistribution) InstallPackages(ctx context.Context, dependencies [
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := g.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := g.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -472,7 +471,7 @@ func (g *GentooDistribution) InstallPackages(ctx context.Context, dependencies [
 	return nil
 }
 
-func (g *GentooDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]PackageMapping, []PackageMapping, []string) {
+func (g *GentooDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]PackageMapping, []PackageMapping, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []PackageMapping{}
 	guruPkgs := []PackageMapping{}
 	manualPkgs := []string{}
@@ -509,7 +508,7 @@ func (g *GentooDistribution) categorizePackages(dependencies []deps.Dependency, 
 		}
 	}
 
-	return systemPkgs, guruPkgs, manualPkgs
+	return systemPkgs, guruPkgs, manualPkgs, variantMap
 }
 
 func (g *GentooDistribution) extractPackageNames(packages []PackageMapping) []string {
@@ -553,7 +552,7 @@ func (g *GentooDistribution) installPortagePackages(ctx context.Context, package
 		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("%s || exit $?", strings.Join(args, " ")))
+	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
 	return g.runWithProgressTimeout(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60, 0)
 }
 
@@ -745,6 +744,6 @@ func (g *GentooDistribution) installGURUPackages(ctx context.Context, packages [
 		CommandInfo: fmt.Sprintf("sudo %s", strings.Join(args, " ")),
 	}
 
-	cmd := ExecSudoCommand(ctx, sudoPassword, fmt.Sprintf("%s || exit $?", strings.Join(args, " ")))
+	cmd := ExecSudoCommand(ctx, sudoPassword, strings.Join(args, " "))
 	return g.runWithProgressTimeout(cmd, progressChan, PhaseAURPackages, 0.70, 0.85, 0)
 }

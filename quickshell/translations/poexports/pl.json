@@ -207,7 +207,7 @@
     "Available": "Dostępny"
   },
   "Available Layouts": {
-    "Available Layouts": ""
+    "Available Layouts": "Dostępne układy"
   },
   "Available Plugins": {
     "Available Plugins": "Dostępne wtyczki"
@@ -302,14 +302,17 @@
   "Capacity": {
     "Capacity": "Pojemność"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "Sekcja środkowa"
   },
   "Center Tiling": {
-    "Center Tiling": ""
+    "Center Tiling": "Płytki środkowe"
   },
   "Changes:": {
-    "Changes:": ""
+    "Changes:": "Zmiany:"
   },
   "Check for system updates": {
     "Check for system updates": "Sprawdź aktualizacje systemu"
@@ -408,7 +411,7 @@
     "Confirm": "Potwierdź"
   },
   "Confirm Display Changes": {
-    "Confirm Display Changes": ""
+    "Confirm Display Changes": "Potwierdź zmiany wyświetlania"
   },
   "Confirm passkey for ": {
     "Confirm passkey for ": "Potwierdź klucz dostępu dla "
@@ -504,7 +507,7 @@
     "Customizable empty space": "Dostosowywalna pusta przestrzeń"
   },
   "Customize which actions appear in the power menu": {
-    "Customize which actions appear in the power menu": ""
+    "Customize which actions appear in the power menu": "Dostosuj, które akcje będą wyświetlane w menu zasilania"
   },
   "DEMO MODE - Click anywhere to exit": {
     "DEMO MODE - Click anywhere to exit": "TRYB DEMO - Kliknij gdziekolwiek aby wyjść"
@@ -519,7 +522,7 @@
     "DMS_SOCKET not available": "DMS_SOCKET niedostępny"
   },
   "DWL service not available": {
-    "DWL service not available": ""
+    "DWL service not available": "Usługa DWL niedostępna"
   },
   "Daily at:": {
     "Daily at:": "Codziennie o:"
@@ -555,13 +558,13 @@
     "Day Temperature": "Temperatura w dzień"
   },
   "Deck": {
-    "Deck": ""
+    "Deck": "Pokład"
   },
   "Default": {
     "Default": "Domyślne"
   },
   "Default selected action": {
-    "Default selected action": ""
+    "Default selected action": "Domyślnie wybrana akcja"
   },
   "Defaults": {
     "Defaults": "Domyślne"
@@ -588,7 +591,7 @@
     "Disable Autoconnect": "Wyłącz automatyczne łączenie"
   },
   "Disabled": {
-    "Disabled": ""
+    "Disabled": "Wyłączony"
   },
   "Disconnect": {
     "Disconnect": "Rozłącz"
@@ -612,7 +615,7 @@
     "Display all priorities over fullscreen apps": "Wyświetlaj wszystkie priorytety nad aplikacjami pełnoekranowymi"
   },
   "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": ""
+    "Display and switch DWL layouts": "Wyświetlanie i przełączanie układów DWL"
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "Wyświetlaj ikony aplikacji we wskaźnikach obszaru roboczego"
@@ -621,7 +624,7 @@
     "Display currently focused application title": "Wyświetlaj tytuł aktywnej aplikacji"
   },
   "Display settings for ": {
-    "Display settings for ": ""
+    "Display settings for ": "Ustawienia wyświetlania dla "
   },
   "Display volume and brightness percentage values by default in OSD popups": {
     "Display volume and brightness percentage values by default in OSD popups": "Domyślnie wyświetlaj wartości procentowe głośności i jasności w wyskakujących okienkach OSD"
@@ -699,7 +702,7 @@
     "Enable loginctl lock integration": "Włącz integrację blokady loginctl"
   },
   "Enabled": {
-    "Enabled": ""
+    "Enabled": "Włączony"
   },
   "End": {
     "End": "Koniec"
@@ -830,6 +833,9 @@
   "Force Kill Process": {
     "Force Kill Process": "Wymuś zamknięcie procesu"
   },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": ""
+  },
   "Forget Device": {
     "Forget Device": "Zapomnij urządzenie"
   },
@@ -879,7 +885,7 @@
     "Graphics": "Grafika"
   },
   "Grid": {
-    "Grid": ""
+    "Grid": "Siatka"
   },
   "Group by App": {
     "Group by App": "Grupuj według aplikacji"
@@ -888,7 +894,7 @@
     "Group multiple windows of the same app together with a window count indicator": "Grupuj wiele okien tej samej aplikacji ze wskaźnikiem liczby okien"
   },
   "HSV": {
-    "HSV": ""
+    "HSV": "HSV"
   },
   "Health": {
     "Health": "Zdrowie"
@@ -897,7 +903,7 @@
     "Height to Edge Gap (Exclusive Zone)": "Odstęp od krawędzi (strefa wyłączności)"
   },
   "Hex": {
-    "Hex": ""
+    "Hex": "Klątwa"
   },
   "Hibernate": {
     "Hibernate": "Hibernacja"
@@ -957,7 +963,7 @@
     "Individual Batteries": "Pojedyncze akumulatory"
   },
   "Inhibit idle timeout when audio or video is playing": {
-    "Inhibit idle timeout when audio or video is playing": ""
+    "Inhibit idle timeout when audio or video is playing": "Blokuj limit czasu bezczynności podczas odtwarzania dźwięku lub obrazu"
   },
   "Input Devices": {
     "Input Devices": "Urządzenia wejściowe"
@@ -984,7 +990,7 @@
     "Jobs: ": "Zadania: "
   },
   "Keep Changes": {
-    "Keep Changes": ""
+    "Keep Changes": "Zachowaj zmiany"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Nazwa układu klawiatury"
@@ -1026,7 +1032,7 @@
     "Launcher Button Logo": "Logo przycisku programu uruchamiającego"
   },
   "Layout": {
-    "Layout": ""
+    "Layout": "Układ"
   },
   "Left": {
     "Left": "Lewa"
@@ -1050,7 +1056,7 @@
     "Location Search": "Wyszukiwanie lokalizacji"
   },
   "Lock": {
-    "Lock": ""
+    "Lock": "Zamek"
   },
   "Lock Screen": {
     "Lock Screen": "Ekran blokady"
@@ -1086,7 +1092,7 @@
     "Manual Show/Hide": "Ręczne pokazywanie/ukrywanie"
   },
   "Margin": {
-    "Margin": ""
+    "Margin": "Margines"
   },
   "Marker Supply Empty": {
     "Marker Supply Empty": "Brak materiału eksploatacyjnego"
@@ -1158,7 +1164,7 @@
     "Mode:": "Tryb:"
   },
   "Mode: ": {
-    "Mode: ": ""
+    "Mode: ": "Tryb: "
   },
   "Monitor Selection:": {
     "Monitor Selection:": "Wybór monitora:"
@@ -1167,7 +1173,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "Monitor, którego tapeta steruje dynamicznymi kolorami motywu"
   },
   "Monocle": {
-    "Monocle": ""
+    "Monocle": "Monokl"
   },
   "Monospace Font": {
     "Monospace Font": "Czcionka o stałej szerokości"
@@ -1323,7 +1329,7 @@
     "Only adjust gamma based on time or location rules.": "Dostosuj gamma tylko na podstawie reguł czasu lub lokalizacji."
   },
   "Only visible if hibernate is supported by your system": {
-    "Only visible if hibernate is supported by your system": ""
+    "Only visible if hibernate is supported by your system": "Widoczne tylko wtedy, gdy system obsługuje hibernację"
   },
   "Opacity": {
     "Opacity": "Przezroczystość"
@@ -1446,7 +1452,7 @@
     "Position": "Pozycja"
   },
   "Position: ": {
-    "Position: ": ""
+    "Position: ": "Stanowisko: "
   },
   "Power & Security": {
     "Power & Security": "Zasilanie i bezpieczeństwo"
@@ -1455,7 +1461,7 @@
     "Power Action Confirmation": "Potwierdzenie działania zasilania"
   },
   "Power Menu Customization": {
-    "Power Menu Customization": ""
+    "Power Menu Customization": "Dostosowywanie menu zasilania"
   },
   "Power Off": {
     "Power Off": "Wyłącz komputer"
@@ -1470,7 +1476,7 @@
     "Pressure": "Ciśnienie"
   },
   "Prevent idle for media": {
-    "Prevent idle for media": ""
+    "Prevent idle for media": "Zapobiegaj bezczynności nośników"
   },
   "Prevent screen timeout": {
     "Prevent screen timeout": "Zapobiegaj wygaszaniu ekranu"
@@ -1515,7 +1521,7 @@
     "Quick note-taking slideout panel": "Wysuwany panel szybkiego sporządzania notatek"
   },
   "RGB": {
-    "RGB": ""
+    "RGB": "RGB"
   },
   "Rain Chance": {
     "Rain Chance": "Szansa na deszcz"
@@ -1548,7 +1554,7 @@
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "Poproś o potwierdzenie czynności wyłączenia, ponownego uruchomienia, zawieszenia, hibernacji i wylogowania."
   },
   "Requires DWL compositor": {
-    "Requires DWL compositor": ""
+    "Requires DWL compositor": "Wymaga kompozytora DWL"
   },
   "Reset": {
     "Reset": "Resetuj"
@@ -1557,22 +1563,22 @@
     "Resources": "Źródła"
   },
   "Restart": {
-    "Restart": ""
+    "Restart": "Uruchom ponownie"
   },
   "Restart DMS": {
-    "Restart DMS": ""
+    "Restart DMS": "Uruchom ponownie DMS"
   },
   "Restart the DankMaterialShell": {
-    "Restart the DankMaterialShell": ""
+    "Restart the DankMaterialShell": "Uruchom ponownie DankMaterialShell"
   },
   "Resume": {
     "Resume": "Wznów"
   },
   "Revert": {
-    "Revert": ""
+    "Revert": "Odwracać"
   },
   "Reverting in:": {
-    "Reverting in:": ""
+    "Reverting in:": "Przywracanie w:"
   },
   "Right": {
     "Right": "Prawo"
@@ -1581,10 +1587,10 @@
     "Right Section": "Sekcja prawa"
   },
   "Right Tiling": {
-    "Right Tiling": ""
+    "Right Tiling": "Prawe kafelkowanie"
   },
   "Right-click bar widget to cycle": {
-    "Right-click bar widget to cycle": ""
+    "Right-click bar widget to cycle": "Kliknij prawym przyciskiem myszy pasek widżetu, aby przejść do następnego"
   },
   "Run User Templates": {
     "Run User Templates": "Uruchom szablony użytkownika"
@@ -1620,7 +1626,7 @@
     "Science": "Nauka"
   },
   "Scrolling": {
-    "Scrolling": ""
+    "Scrolling": "Przewijanie"
   },
   "Search file contents": {
     "Search file contents": "Przeszukaj zawartość plików"
@@ -1704,31 +1710,31 @@
     "Show Dock": "Pokaż dok"
   },
   "Show Hibernate": {
-    "Show Hibernate": ""
+    "Show Hibernate": "Pokaż hibernację"
   },
   "Show Line Numbers": {
     "Show Line Numbers": "Pokaż numery wierszy"
   },
   "Show Lock": {
-    "Show Lock": ""
+    "Show Lock": "Pokaż blokadę"
   },
   "Show Log Out": {
-    "Show Log Out": ""
+    "Show Log Out": "Pokaż wylogowanie"
   },
   "Show Power Actions": {
     "Show Power Actions": "Pokaż akcje zasilania"
   },
   "Show Power Off": {
-    "Show Power Off": ""
+    "Show Power Off": "Pokaż wyłączone zasilanie"
   },
   "Show Reboot": {
-    "Show Reboot": ""
+    "Show Reboot": "Pokaż ponowne uruchomienie"
   },
   "Show Restart DMS": {
-    "Show Restart DMS": ""
+    "Show Restart DMS": "Pokaż ponowne uruchomienie DMS"
   },
   "Show Suspend": {
-    "Show Suspend": ""
+    "Show Suspend": "Pokaż zawieszenie"
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "Pokaż aplikacje z obszaru roboczego"
@@ -1777,6 +1783,9 @@
   },
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "Pokazuje bieżący obszar roboczy i pozwala na przełączanie"
+  },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
   },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Pokazuje, gdy mikrofon, kamera lub udostępnianie ekranu są aktywne"
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Niestandardowe dodatkowe parametry terminala"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": ""
+  },
   "Text": {
     "Text": "Tekst"
   },
@@ -1935,7 +1947,7 @@
     "This will permanently delete all clipboard history.": "To trwale usunie całą historię schowka."
   },
   "Tiling": {
-    "Tiling": ""
+    "Tiling": "Dekarstwo"
   },
   "Time & Weather": {
     "Time & Weather": "Czas i pogoda"
@@ -2021,6 +2033,12 @@
   "Use IP Location": {
     "Use IP Location": "Użyj lokalizacji IP"
   },
+  "Use Imperial Units": {
+    "Use Imperial Units": ""
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": ""
+  },
   "Use Monospace Font": {
     "Use Monospace Font": "Użyj czcionki o stałej szerokości"
   },
@@ -2067,19 +2085,19 @@
     "VPN status and quick connect": "Status VPN i szybkie połączenie"
   },
   "VRR: ": {
-    "VRR: ": ""
+    "VRR: ": "VRR: "
   },
   "Vertical Deck": {
-    "Vertical Deck": ""
+    "Vertical Deck": "Pionowy pokład"
   },
   "Vertical Grid": {
-    "Vertical Grid": ""
+    "Vertical Grid": "Siatka pionowa"
   },
   "Vertical Scrolling": {
-    "Vertical Scrolling": ""
+    "Vertical Scrolling": "Przewijanie pionowe"
   },
   "Vertical Tiling": {
-    "Vertical Tiling": ""
+    "Vertical Tiling": "Płytki pionowe"
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Wibrująca paleta z zabawnym nasyceniem."

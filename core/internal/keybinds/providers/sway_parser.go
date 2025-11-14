@@ -1,4 +1,4 @@
-package sway
+package providers
 
 import (
 	"os"
@@ -8,40 +8,40 @@ import (
 )
 
 const (
-	TitleRegex  = "#+!"
-	HideComment = "[hidden]"
+	SwayTitleRegex  = "#+!"
+	SwayHideComment = "[hidden]"
 )
 
-var ModSeparators = []rune{'+', ' '}
+var SwayModSeparators = []rune{'+', ' '}
 
-type KeyBinding struct {
+type SwayKeyBinding struct {
 	Mods    []string `json:"mods"`
 	Key     string   `json:"key"`
 	Command string   `json:"command"`
 	Comment string   `json:"comment"`
 }
 
-type Section struct {
-	Children []Section    `json:"children"`
-	Keybinds []KeyBinding `json:"keybinds"`
-	Name     string       `json:"name"`
+type SwaySection struct {
+	Children []SwaySection    `json:"children"`
+	Keybinds []SwayKeyBinding `json:"keybinds"`
+	Name     string           `json:"name"`
 }
 
-type Parser struct {
+type SwayParser struct {
 	contentLines []string
 	readingLine  int
 	variables    map[string]string
 }
 
-func NewParser() *Parser {
-	return &Parser{
+func NewSwayParser() *SwayParser {
+	return &SwayParser{
 		contentLines: []string{},
 		readingLine:  0,
 		variables:    make(map[string]string),
 	}
 }
 
-func (p *Parser) ReadContent(path string) error {
+func (p *SwayParser) ReadContent(path string) error {
 	expandedPath := os.ExpandEnv(path)
 	expandedPath = filepath.Clean(expandedPath)
 	if strings.HasPrefix(expandedPath, "~") {
@@ -88,7 +88,7 @@ func (p *Parser) ReadContent(path string) error {
 	return nil
 }
 
-func (p *Parser) parseVariables() {
+func (p *SwayParser) parseVariables() {
 	setRegex := regexp.MustCompile(`^\s*set\s+\$(\w+)\s+(.+)$`)
 	for _, line := range p.contentLines {
 		matches := setRegex.FindStringSubmatch(line)
@@ -100,7 +100,7 @@ func (p *Parser) parseVariables() {
 	}
 }
 
-func (p *Parser) expandVariables(text string) string {
+func (p *SwayParser) expandVariables(text string) string {
 	result := text
 	for varName, varValue := range p.variables {
 		result = strings.ReplaceAll(result, "$"+varName, varValue)
@@ -108,7 +108,7 @@ func (p *Parser) expandVariables(text string) string {
 	return result
 }
 
-func autogenerateComment(command string) string {
+func swayAutogenerateComment(command string) string {
 	command = strings.TrimSpace(command)
 
 	if strings.HasPrefix(command, "exec ") {
@@ -200,7 +200,7 @@ func autogenerateComment(command string) string {
 	}
 }
 
-func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
+func (p *SwayParser) getKeybindAtLine(lineNumber int) *SwayKeyBinding {
 	if lineNumber >= len(p.contentLines) {
 		return nil
 	}
@@ -223,7 +223,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 		comment = strings.TrimSpace(parts[1])
 	}
 
-	if strings.HasPrefix(comment, HideComment) {
+	if strings.HasPrefix(comment, SwayHideComment) {
 		return nil
 	}
 
@@ -249,11 +249,11 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	var modList []string
 	var key string
 
-	modstring := keyCombo + string(ModSeparators[0])
+	modstring := keyCombo + string(SwayModSeparators[0])
 	pos := 0
 	for index, char := range modstring {
 		isModSep := false
-		for _, sep := range ModSeparators {
+		for _, sep := range SwayModSeparators {
 			if char == sep {
 				isModSep = true
 				break
@@ -262,7 +262,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 		if isModSep {
 			if index-pos > 0 {
 				part := modstring[pos:index]
-				if isMod(part) {
+				if swayIsMod(part) {
 					modList = append(modList, part)
 				} else {
 					key = part
@@ -273,12 +273,12 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	}
 
 	if comment == "" {
-		comment = autogenerateComment(command)
+		comment = swayAutogenerateComment(command)
 	}
 
 	_ = flags
 
-	return &KeyBinding{
+	return &SwayKeyBinding{
 		Mods:    modList,
 		Key:     key,
 		Command: command,
@@ -286,7 +286,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	}
 }
 
-func isMod(s string) bool {
+func swayIsMod(s string) bool {
 	s = strings.ToLower(s)
 	if s == "mod1" || s == "mod2" || s == "mod3" || s == "mod4" || s == "mod5" ||
 		s == "shift" || s == "control" || s == "ctrl" || s == "alt" || s == "super" ||
@@ -307,8 +307,8 @@ func isMod(s string) bool {
 	return false
 }
 
-func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section {
-	titleRegex := regexp.MustCompile(TitleRegex)
+func (p *SwayParser) getBindsRecursive(currentContent *SwaySection, scope int) *SwaySection {
+	titleRegex := regexp.MustCompile(SwayTitleRegex)
 
 	for p.readingLine < len(p.contentLines) {
 		line := p.contentLines[p.readingLine]
@@ -325,9 +325,9 @@ func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section 
 			sectionName := strings.TrimSpace(line[headingScope+1:])
 			p.readingLine++
 
-			childSection := &Section{
-				Children: []Section{},
-				Keybinds: []KeyBinding{},
+			childSection := &SwaySection{
+				Children: []SwaySection{},
+				Keybinds: []SwayKeyBinding{},
 				Name:     sectionName,
 			}
 			result := p.getBindsRecursive(childSection, headingScope)
@@ -348,18 +348,18 @@ func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section 
 	return currentContent
 }
 
-func (p *Parser) ParseKeys() *Section {
+func (p *SwayParser) ParseKeys() *SwaySection {
 	p.readingLine = 0
-	rootSection := &Section{
-		Children: []Section{},
-		Keybinds: []KeyBinding{},
+	rootSection := &SwaySection{
+		Children: []SwaySection{},
+		Keybinds: []SwayKeyBinding{},
 		Name:     "",
 	}
 	return p.getBindsRecursive(rootSection, 0)
 }
 
-func ParseKeys(path string) (*Section, error) {
-	parser := NewParser()
+func ParseSwayKeys(path string) (*SwaySection, error) {
+	parser := NewSwayParser()
 	if err := parser.ReadContent(path); err != nil {
 		return nil, err
 	}

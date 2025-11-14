@@ -302,6 +302,9 @@
   "Capacity": {
     "Capacity": "电池容量"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "中间区域"
   },
@@ -829,6 +832,9 @@
   },
   "Force Kill Process": {
     "Force Kill Process": "强制结束进程"
+  },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": ""
   },
   "Forget Device": {
     "Forget Device": "取消配对"
@@ -1778,6 +1784,9 @@
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "显示当前工作区并支持快速切换"
   },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
+  },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "显示麦克风、摄像头或屏幕共享的使用状态"
   },
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "终端自定义附加参数"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": ""
+  },
   "Text": {
     "Text": "文本"
   },
@@ -2020,6 +2032,12 @@
   },
   "Use IP Location": {
     "Use IP Location": "使用 IP 定位"
+  },
+  "Use Imperial Units": {
+    "Use Imperial Units": ""
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "使用等宽字体"

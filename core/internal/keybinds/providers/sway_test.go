@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/sway"
 )
 
 func TestSwayProviderName(t *testing.T) {
@@ -76,12 +74,12 @@ func TestSwayCategorizeByCommand(t *testing.T) {
 func TestSwayFormatKey(t *testing.T) {
 	tests := []struct {
 		name     string
-		keybind  *sway.KeyBinding
+		keybind  *SwayKeyBinding
 		expected string
 	}{
 		{
 			name: "single_mod",
-			keybind: &sway.KeyBinding{
+			keybind: &SwayKeyBinding{
 				Mods: []string{"Mod4"},
 				Key:  "q",
 			},
@@ -89,7 +87,7 @@ func TestSwayFormatKey(t *testing.T) {
 		},
 		{
 			name: "multiple_mods",
-			keybind: &sway.KeyBinding{
+			keybind: &SwayKeyBinding{
 				Mods: []string{"Mod4", "Shift"},
 				Key:  "e",
 			},
@@ -97,7 +95,7 @@ func TestSwayFormatKey(t *testing.T) {
 		},
 		{
 			name: "no_mods",
-			keybind: &sway.KeyBinding{
+			keybind: &SwayKeyBinding{
 				Mods: []string{},
 				Key:  "Print",
 			},
@@ -119,13 +117,13 @@ func TestSwayFormatKey(t *testing.T) {
 func TestSwayConvertKeybind(t *testing.T) {
 	tests := []struct {
 		name     string
-		keybind  *sway.KeyBinding
+		keybind  *SwayKeyBinding
 		wantKey  string
 		wantDesc string
 	}{
 		{
 			name: "with_comment",
-			keybind: &sway.KeyBinding{
+			keybind: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "t",
 				Command: "exec kitty",
@@ -136,7 +134,7 @@ func TestSwayConvertKeybind(t *testing.T) {
 		},
 		{
 			name: "without_comment",
-			keybind: &sway.KeyBinding{
+			keybind: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "r",
 				Command: "reload",

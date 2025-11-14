@@ -143,7 +143,10 @@ PanelWindow {
                 property int blurMax: 64
                 shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / blurMax))
                 shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: Qt.rgba(0, 0, 0, osdContainer.effectiveShadowAlpha)
+                shadowColor: {
+                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
+                    return Theme.withAlpha(baseColor, osdContainer.effectiveShadowAlpha)
+                }
             }
 
             DankRectangle {

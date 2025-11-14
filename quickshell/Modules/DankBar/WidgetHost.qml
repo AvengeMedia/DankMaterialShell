@@ -192,6 +192,7 @@ Loader {
             "notificationButton": components.notificationButtonComponent,
             "battery": components.batteryComponent,
             "controlCenterButton": components.controlCenterButtonComponent,
+            "capsLockIndicator": components.capsLockIndicatorComponent,
             "idleInhibitor": components.idleInhibitorComponent,
             "spacer": components.spacerComponent,
             "separator": components.separatorComponent,

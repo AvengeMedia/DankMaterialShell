@@ -1175,61 +1175,62 @@ Item {
 
             StyledRect {
                 width: parent.width
-                height: portalSyncSection.implicitHeight + Theme.spacingL * 2
+                height: applicationsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
                                       Theme.outline.b, 0.2)
                 border.width: 0
 
-                Row {
-                    id: portalSyncSection
+                Column {
+                    id: applicationsSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
                     spacing: Theme.spacingM
 
-                    DankIcon {
-                        name: "sync"
-                        size: Theme.iconSize
-                        color: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
 
-                    Column {
-                        width: parent.width - Theme.iconSize - Theme.spacingM - syncToggle.width - Theme.spacingM
-                        spacing: Theme.spacingXS
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        StyledText {
-                            text: I18n.tr("Sync Mode with Portal")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
+                        DankIcon {
+                            name: "terminal"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StyledText {
-                            text: I18n.tr("Sync dark mode with settings portals for system-wide theme hints")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                            wrapMode: Text.WordWrap
-                            width: parent.width
+                            text: I18n.tr("Applications")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
 
                     DankToggle {
-                        id: syncToggle
-
-                        width: 48
-                        height: 32
+                        width: parent.width
+                        text: I18n.tr("Sync Mode with Portal")
+                        description: I18n.tr("Sync dark mode with settings portals for system-wide theme hints")
                         checked: SettingsData.syncModeWithPortal
-                        anchors.verticalCenter: parent.verticalCenter
-                        onToggled: checked => SettingsData.set("syncModeWithPortal", checked)
+                        onToggled: checked => {
+                            return SettingsData.set("syncModeWithPortal", checked)
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Terminals - Always use Dark Theme")
+                        description: I18n.tr("Force terminal applications to always use dark color schemes")
+                        checked: SettingsData.terminalsAlwaysDark
+                        onToggled: checked => {
+                            return SettingsData.set("terminalsAlwaysDark", checked)
+                        }
                     }
                 }
             }
 
-            // System Configuration Warning
             Rectangle {
                 width: parent.width
                 height: warningText.implicitHeight + Theme.spacingM * 2
@@ -1449,6 +1450,7 @@ Item {
                     }
                 }
             }
+
         }
     }
 
@@ -1463,7 +1465,6 @@ Item {
         }
 
         onFileSelected: function(filePath) {
-            // Save the custom theme file path and switch to custom theme
             if (filePath.endsWith(".json")) {
                 SettingsData.set("customThemeFile", filePath)
                 Theme.switchTheme("custom")

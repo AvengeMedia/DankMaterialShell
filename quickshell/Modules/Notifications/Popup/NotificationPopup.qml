@@ -250,7 +250,10 @@ PanelWindow {
                 property int blurMax: 64
                 shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / blurMax))
                 shadowScale: 1 + (2 * content.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: Qt.rgba(0, 0, 0, content.effectiveShadowAlpha)
+                shadowColor: {
+                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
+                    return Theme.withAlpha(baseColor, content.effectiveShadowAlpha)
+                }
             }
 
             Shape {

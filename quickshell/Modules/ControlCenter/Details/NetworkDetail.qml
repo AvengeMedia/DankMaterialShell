@@ -7,6 +7,8 @@ import qs.Widgets
 import qs.Modals
 
 Rectangle {
+    id: root
+
     implicitHeight: {
         if (NetworkService.wifiToggling) {
             return headerRow.height + wifiToggleContent.height + Theme.spacingM
@@ -92,6 +94,8 @@ Rectangle {
             }
         }
     }
+
+
 
     Item {
         id: wifiToggleContent
@@ -411,10 +415,18 @@ Rectangle {
                     values: {
                         const ssid = NetworkService.currentWifiSSID
                         const networks = NetworkService.wifiNetworks
+                        const pins = SettingsData.wifiNetworkPins || {}
+                        const pinnedSSID = pins["preferredWifi"]
+                        
                         let sorted = [...networks]
                         sorted.sort((a, b) => {
+                            // Pinned network first
+                            if (a.ssid === pinnedSSID && b.ssid !== pinnedSSID) return -1
+                            if (b.ssid === pinnedSSID && a.ssid !== pinnedSSID) return 1
+                            // Then currently connected
                             if (a.ssid === ssid) return -1
                             if (b.ssid === ssid) return 1
+                            // Then by signal strength
                             return b.signal - a.signal
                         })
                         if (!wifiContent.menuOpen) {
@@ -514,10 +526,69 @@ Rectangle {
                         }
                     }
 
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: pinWifiRow.width + Theme.spacingS * 2
+                        height: 28
+                        radius: height / 2
+                        color: {
+                            const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
+                            return isThisNetworkPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                        }
+
+                        Row {
+                            id: pinWifiRow
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            DankIcon {
+                                name: "push_pin"
+                                size: 16
+                                color: {
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
+                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: {
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
+                                    return isThisNetworkPinned ? "Pinned" : "Pin"
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: {
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
+                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}))
+                                const isCurrentlyPinned = pins["preferredWifi"] === modelData.ssid
+                                
+                                if (isCurrentlyPinned) {
+                                    delete pins["preferredWifi"]
+                                } else {
+                                    pins["preferredWifi"] = modelData.ssid
+                                }
+                                
+                                SettingsData.set("wifiNetworkPins", pins)
+                            }
+                        }
+                    }
+
                     MouseArea {
                         id: networkMouseArea
                         anchors.fill: parent
-                        anchors.rightMargin: optionsButton.width + Theme.spacingS
+                        anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS + pinWifiRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: function(event) {

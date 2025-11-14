@@ -4,8 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangowc"
 )
 
 func TestMangoWCProviderName(t *testing.T) {
@@ -88,12 +86,12 @@ func TestMangoWCCategorizeByCommand(t *testing.T) {
 func TestMangoWCFormatKey(t *testing.T) {
 	tests := []struct {
 		name     string
-		keybind  *mangowc.KeyBinding
+		keybind  *MangoWCKeyBinding
 		expected string
 	}{
 		{
 			name: "single_mod",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods: []string{"ALT"},
 				Key:  "q",
 			},
@@ -101,7 +99,7 @@ func TestMangoWCFormatKey(t *testing.T) {
 		},
 		{
 			name: "multiple_mods",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods: []string{"SUPER", "SHIFT"},
 				Key:  "Up",
 			},
@@ -109,7 +107,7 @@ func TestMangoWCFormatKey(t *testing.T) {
 		},
 		{
 			name: "no_mods",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods: []string{},
 				Key:  "Print",
 			},
@@ -131,13 +129,13 @@ func TestMangoWCFormatKey(t *testing.T) {
 func TestMangoWCConvertKeybind(t *testing.T) {
 	tests := []struct {
 		name     string
-		keybind  *mangowc.KeyBinding
+		keybind  *MangoWCKeyBinding
 		wantKey  string
 		wantDesc string
 	}{
 		{
 			name: "with_comment",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods:    []string{"ALT"},
 				Key:     "t",
 				Command: "spawn",
@@ -149,7 +147,7 @@ func TestMangoWCConvertKeybind(t *testing.T) {
 		},
 		{
 			name: "without_comment",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods:    []string{"SUPER"},
 				Key:     "r",
 				Command: "reload_config",
@@ -161,7 +159,7 @@ func TestMangoWCConvertKeybind(t *testing.T) {
 		},
 		{
 			name: "with_params_no_comment",
-			keybind: &mangowc.KeyBinding{
+			keybind: &MangoWCKeyBinding{
 				Mods:    []string{"CTRL"},
 				Key:     "1",
 				Command: "view",

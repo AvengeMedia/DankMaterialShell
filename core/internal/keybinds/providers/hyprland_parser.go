@@ -1,4 +1,4 @@
-package hyprland
+package providers
 
 import (
 	"os"
@@ -15,7 +15,7 @@ const (
 
 var ModSeparators = []rune{'+', ' '}
 
-type KeyBinding struct {
+type HyprlandKeyBinding struct {
 	Mods       []string `json:"mods"`
 	Key        string   `json:"key"`
 	Dispatcher string   `json:"dispatcher"`
@@ -23,25 +23,25 @@ type KeyBinding struct {
 	Comment    string   `json:"comment"`
 }
 
-type Section struct {
-	Children []Section    `json:"children"`
-	Keybinds []KeyBinding `json:"keybinds"`
-	Name     string       `json:"name"`
+type HyprlandSection struct {
+	Children []HyprlandSection    `json:"children"`
+	Keybinds []HyprlandKeyBinding `json:"keybinds"`
+	Name     string               `json:"name"`
 }
 
-type Parser struct {
+type HyprlandParser struct {
 	contentLines []string
 	readingLine  int
 }
 
-func NewParser() *Parser {
-	return &Parser{
+func NewHyprlandParser() *HyprlandParser {
+	return &HyprlandParser{
 		contentLines: []string{},
 		readingLine:  0,
 	}
 }
 
-func (p *Parser) ReadContent(directory string) error {
+func (p *HyprlandParser) ReadContent(directory string) error {
 	expandedDir := os.ExpandEnv(directory)
 	expandedDir = filepath.Clean(expandedDir)
 	if strings.HasPrefix(expandedDir, "~") {
@@ -87,7 +87,7 @@ func (p *Parser) ReadContent(directory string) error {
 	return nil
 }
 
-func autogenerateComment(dispatcher, params string) string {
+func hyprlandAutogenerateComment(dispatcher, params string) string {
 	switch dispatcher {
 	case "resizewindow":
 		return "Resize window"
@@ -196,7 +196,7 @@ func autogenerateComment(dispatcher, params string) string {
 	}
 }
 
-func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
+func (p *HyprlandParser) getKeybindAtLine(lineNumber int) *HyprlandKeyBinding {
 	line := p.contentLines[lineNumber]
 	parts := strings.SplitN(line, "=", 2)
 	if len(parts) < 2 {
@@ -232,7 +232,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 			return nil
 		}
 	} else {
-		comment = autogenerateComment(dispatcher, params)
+		comment = hyprlandAutogenerateComment(dispatcher, params)
 	}
 
 	var modList []string
@@ -256,7 +256,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 		}
 	}
 
-	return &KeyBinding{
+	return &HyprlandKeyBinding{
 		Mods:       modList,
 		Key:        key,
 		Dispatcher: dispatcher,
@@ -265,7 +265,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	}
 }
 
-func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section {
+func (p *HyprlandParser) getBindsRecursive(currentContent *HyprlandSection, scope int) *HyprlandSection {
 	titleRegex := regexp.MustCompile(TitleRegex)
 
 	for p.readingLine < len(p.contentLines) {
@@ -283,9 +283,9 @@ func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section 
 			sectionName := strings.TrimSpace(line[headingScope+1:])
 			p.readingLine++
 
-			childSection := &Section{
-				Children: []Section{},
-				Keybinds: []KeyBinding{},
+			childSection := &HyprlandSection{
+				Children: []HyprlandSection{},
+				Keybinds: []HyprlandKeyBinding{},
 				Name:     sectionName,
 			}
 			result := p.getBindsRecursive(childSection, headingScope)
@@ -312,18 +312,18 @@ func (p *Parser) getBindsRecursive(currentContent *Section, scope int) *Section 
 	return currentContent
 }
 
-func (p *Parser) ParseKeys() *Section {
+func (p *HyprlandParser) ParseKeys() *HyprlandSection {
 	p.readingLine = 0
-	rootSection := &Section{
-		Children: []Section{},
-		Keybinds: []KeyBinding{},
+	rootSection := &HyprlandSection{
+		Children: []HyprlandSection{},
+		Keybinds: []HyprlandKeyBinding{},
 		Name:     "",
 	}
 	return p.getBindsRecursive(rootSection, 0)
 }
 
-func ParseKeys(path string) (*Section, error) {
-	parser := NewParser()
+func ParseHyprlandKeys(path string) (*HyprlandSection, error) {
+	parser := NewHyprlandParser()
 	if err := parser.ReadContent(path); err != nil {
 		return nil, err
 	}

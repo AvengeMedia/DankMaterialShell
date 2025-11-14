@@ -47,6 +47,7 @@ var SPEC = {
     showNotificationButton: { def: true },
     showBattery: { def: true },
     showControlCenterButton: { def: true },
+    showCapsLockIndicator: { def: true },
 
     controlCenterShowNetworkIcon: { def: true },
     controlCenterShowBluetoothIcon: { def: true },
@@ -151,10 +152,15 @@ var SPEC = {
     loginctlLockIntegration: { def: true },
     launchPrefix: { def: "" },
     brightnessDevicePins: { def: {} },
+    wifiNetworkPins: { def: {} },
+    bluetoothDevicePins: { def: {} },
+    audioInputDevicePins: { def: {} },
+    audioOutputDevicePins: { def: {} },
 
     gtkThemingEnabled: { def: false, onChange: "regenSystemThemes" },
     qtThemingEnabled: { def: false, onChange: "regenSystemThemes" },
     syncModeWithPortal: { def: true },
+    terminalsAlwaysDark: { def: false, onChange: "regenSystemThemes" },
 
     showDock: { def: false },
     dockAutoHide: { def: false },

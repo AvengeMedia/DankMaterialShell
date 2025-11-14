@@ -1,4 +1,4 @@
-package sway
+package providers
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAutogenerateComment(t *testing.T) {
+func TestSwayAutogenerateComment(t *testing.T) {
 	tests := []struct {
 		command  string
 		expected string
@@ -46,25 +46,25 @@ func TestAutogenerateComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.command, func(t *testing.T) {
-			result := autogenerateComment(tt.command)
+			result := swayAutogenerateComment(tt.command)
 			if result != tt.expected {
-				t.Errorf("autogenerateComment(%q) = %q, want %q",
+				t.Errorf("swayAutogenerateComment(%q) = %q, want %q",
 					tt.command, result, tt.expected)
 			}
 		})
 	}
 }
 
-func TestGetKeybindAtLine(t *testing.T) {
+func TestSwayGetKeybindAtLine(t *testing.T) {
 	tests := []struct {
 		name     string
 		line     string
-		expected *KeyBinding
+		expected *SwayKeyBinding
 	}{
 		{
 			name: "basic_keybind",
 			line: "bindsym Mod4+q kill",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "q",
 				Command: "kill",
@@ -74,7 +74,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_exec",
 			line: "bindsym Mod4+t exec kitty",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "t",
 				Command: "exec kitty",
@@ -84,7 +84,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_comment",
 			line: "bindsym Mod4+Space exec dms ipc call spotlight toggle # Open launcher",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "Space",
 				Command: "exec dms ipc call spotlight toggle",
@@ -99,7 +99,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_multiple_mods",
 			line: "bindsym Mod4+Shift+e exit",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4", "Shift"},
 				Key:     "e",
 				Command: "exit",
@@ -109,7 +109,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_no_mods",
 			line: "bindsym Print exec grim screenshot.png",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{},
 				Key:     "Print",
 				Command: "exec grim screenshot.png",
@@ -119,7 +119,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_flags",
 			line: "bindsym --release Mod4+x exec notify-send released",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "x",
 				Command: "exec notify-send released",
@@ -129,7 +129,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_focus_direction",
 			line: "bindsym Mod4+Left focus left",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "Left",
 				Command: "focus left",
@@ -139,7 +139,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_workspace",
 			line: "bindsym Mod4+1 workspace number 1",
-			expected: &KeyBinding{
+			expected: &SwayKeyBinding{
 				Mods:    []string{"Mod4"},
 				Key:     "1",
 				Command: "workspace number 1",
@@ -150,7 +150,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewParser()
+			parser := NewSwayParser()
 			parser.contentLines = []string{tt.line}
 			result := parser.getKeybindAtLine(0)
 
@@ -188,7 +188,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 	}
 }
 
-func TestVariableExpansion(t *testing.T) {
+func TestSwayVariableExpansion(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config")
 
@@ -204,9 +204,9 @@ bindsym $mod+d exec $menu
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(configFile)
+	section, err := ParseSwayKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseSwayKeys failed: %v", err)
 	}
 
 	if len(section.Keybinds) != 2 {
@@ -229,7 +229,7 @@ bindsym $mod+d exec $menu
 	}
 }
 
-func TestParseKeysWithSections(t *testing.T) {
+func TestSwayParseKeysWithSections(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config")
 
@@ -251,9 +251,9 @@ bindsym $mod+t exec kitty # Terminal
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(tmpDir)
+	section, err := ParseSwayKeys(tmpDir)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseSwayKeys failed: %v", err)
 	}
 
 	if len(section.Children) != 2 {
@@ -296,7 +296,7 @@ bindsym $mod+t exec kitty # Terminal
 	}
 }
 
-func TestReadContentErrors(t *testing.T) {
+func TestSwayReadContentErrors(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
@@ -313,7 +313,7 @@ func TestReadContentErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ParseKeys(tt.path)
+			_, err := ParseSwayKeys(tt.path)
 			if err == nil {
 				t.Error("Expected error, got nil")
 			}
@@ -321,7 +321,7 @@ func TestReadContentErrors(t *testing.T) {
 	}
 }
 
-func TestReadContentWithTildeExpansion(t *testing.T) {
+func TestSwayReadContentWithTildeExpansion(t *testing.T) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		t.Skip("Cannot get home directory")
@@ -343,7 +343,7 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 		t.Skip("Cannot create relative path")
 	}
 
-	parser := NewParser()
+	parser := NewSwayParser()
 	tildePathMatch := "~/" + relPath
 	err = parser.ReadContent(tildePathMatch)
 
@@ -352,7 +352,7 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 	}
 }
 
-func TestEmptyAndCommentLines(t *testing.T) {
+func TestSwayEmptyAndCommentLines(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config")
 
@@ -369,9 +369,9 @@ bindsym Mod4+t exec kitty
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(configFile)
+	section, err := ParseSwayKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseSwayKeys failed: %v", err)
 	}
 
 	if len(section.Keybinds) != 2 {
@@ -379,7 +379,7 @@ bindsym Mod4+t exec kitty
 	}
 }
 
-func TestRealWorldConfig(t *testing.T) {
+func TestSwayRealWorldConfig(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config")
 
@@ -408,9 +408,9 @@ bindsym $mod+Shift+1 move container to workspace number 1
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(configFile)
+	section, err := ParseSwayKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseSwayKeys failed: %v", err)
 	}
 
 	if len(section.Keybinds) < 9 {
@@ -444,7 +444,7 @@ bindsym $mod+Shift+1 move container to workspace number 1
 	}
 }
 
-func TestIsMod(t *testing.T) {
+func TestSwayIsMod(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected bool
@@ -462,9 +462,9 @@ func TestIsMod(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			result := isMod(tt.input)
+			result := swayIsMod(tt.input)
 			if result != tt.expected {
-				t.Errorf("isMod(%q) = %v, want %v", tt.input, result, tt.expected)
+				t.Errorf("swayIsMod(%q) = %v, want %v", tt.input, result, tt.expected)
 			}
 		})
 	}

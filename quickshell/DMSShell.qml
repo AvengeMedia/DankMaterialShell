@@ -600,6 +600,14 @@ Item {
         }
     }
 
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: CapsLockOSD {
+            modelData: item
+        }
+    }
+
     LazyLoader {
         id: hyprlandOverviewLoader
         active: CompositorService.isHyprland

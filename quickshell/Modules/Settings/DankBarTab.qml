@@ -156,6 +156,12 @@ Item {
             "icon": "motion_sensor_active",
             "enabled": true
         }, {
+            "id": "capsLockIndicator",
+            "text": I18n.tr("Caps Lock Indicator"),
+            "description": I18n.tr("Shows when caps lock is active"),
+            "icon": "shift_lock",
+            "enabled": true
+        }, {
             "id": "spacer",
             "text": I18n.tr("Spacer"),
             "description": I18n.tr("Customizable empty space"),

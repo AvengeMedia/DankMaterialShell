@@ -1,4 +1,4 @@
-package hyprland
+package providers
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAutogenerateComment(t *testing.T) {
+func TestHyprlandAutogenerateComment(t *testing.T) {
 	tests := []struct {
 		dispatcher string
 		params     string
@@ -51,25 +51,25 @@ func TestAutogenerateComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.dispatcher+"_"+tt.params, func(t *testing.T) {
-			result := autogenerateComment(tt.dispatcher, tt.params)
+			result := hyprlandAutogenerateComment(tt.dispatcher, tt.params)
 			if result != tt.expected {
-				t.Errorf("autogenerateComment(%q, %q) = %q, want %q",
+				t.Errorf("hyprlandAutogenerateComment(%q, %q) = %q, want %q",
 					tt.dispatcher, tt.params, result, tt.expected)
 			}
 		})
 	}
 }
 
-func TestGetKeybindAtLine(t *testing.T) {
+func TestHyprlandGetKeybindAtLine(t *testing.T) {
 	tests := []struct {
 		name     string
 		line     string
-		expected *KeyBinding
+		expected *HyprlandKeyBinding
 	}{
 		{
 			name: "basic_keybind",
 			line: "bind = SUPER, Q, killactive",
-			expected: &KeyBinding{
+			expected: &HyprlandKeyBinding{
 				Mods:       []string{"SUPER"},
 				Key:        "Q",
 				Dispatcher: "killactive",
@@ -80,7 +80,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_params",
 			line: "bind = SUPER, left, movefocus, l",
-			expected: &KeyBinding{
+			expected: &HyprlandKeyBinding{
 				Mods:       []string{"SUPER"},
 				Key:        "left",
 				Dispatcher: "movefocus",
@@ -91,7 +91,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_comment",
 			line: "bind = SUPER, T, exec, kitty # Open terminal",
-			expected: &KeyBinding{
+			expected: &HyprlandKeyBinding{
 				Mods:       []string{"SUPER"},
 				Key:        "T",
 				Dispatcher: "exec",
@@ -107,7 +107,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_multiple_mods",
 			line: "bind = SUPER+SHIFT, F, fullscreen, 0",
-			expected: &KeyBinding{
+			expected: &HyprlandKeyBinding{
 				Mods:       []string{"SUPER", "SHIFT"},
 				Key:        "F",
 				Dispatcher: "fullscreen",
@@ -118,7 +118,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_no_mods",
 			line: "bind = , Print, exec, screenshot",
-			expected: &KeyBinding{
+			expected: &HyprlandKeyBinding{
 				Mods:       []string{},
 				Key:        "Print",
 				Dispatcher: "exec",
@@ -130,7 +130,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewParser()
+			parser := NewHyprlandParser()
 			parser.contentLines = []string{tt.line}
 			result := parser.getKeybindAtLine(0)
 
@@ -171,7 +171,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 	}
 }
 
-func TestParseKeysWithSections(t *testing.T) {
+func TestHyprlandParseKeysWithSections(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "hyprland.conf")
 
@@ -191,9 +191,9 @@ bind = SUPER, T, exec, kitty # Terminal
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(tmpDir)
+	section, err := ParseHyprlandKeys(tmpDir)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseHyprlandKeys failed: %v", err)
 	}
 
 	if len(section.Children) != 2 {
@@ -236,7 +236,7 @@ bind = SUPER, T, exec, kitty # Terminal
 	}
 }
 
-func TestParseKeysWithCommentBinds(t *testing.T) {
+func TestHyprlandParseKeysWithCommentBinds(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "test.conf")
 
@@ -249,9 +249,9 @@ bind = SUPER, B, exec, app2
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(tmpDir)
+	section, err := ParseHyprlandKeys(tmpDir)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseHyprlandKeys failed: %v", err)
 	}
 
 	if len(section.Keybinds) != 3 {
@@ -269,7 +269,7 @@ bind = SUPER, B, exec, app2
 	}
 }
 
-func TestReadContentMultipleFiles(t *testing.T) {
+func TestHyprlandReadContentMultipleFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	file1 := filepath.Join(tmpDir, "a.conf")
@@ -285,7 +285,7 @@ func TestReadContentMultipleFiles(t *testing.T) {
 		t.Fatalf("Failed to write file2: %v", err)
 	}
 
-	parser := NewParser()
+	parser := NewHyprlandParser()
 	if err := parser.ReadContent(tmpDir); err != nil {
 		t.Fatalf("ReadContent failed: %v", err)
 	}
@@ -296,7 +296,7 @@ func TestReadContentMultipleFiles(t *testing.T) {
 	}
 }
 
-func TestReadContentErrors(t *testing.T) {
+func TestHyprlandReadContentErrors(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
@@ -313,7 +313,7 @@ func TestReadContentErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ParseKeys(tt.path)
+			_, err := ParseHyprlandKeys(tt.path)
 			if err == nil {
 				t.Error("Expected error, got nil")
 			}
@@ -321,7 +321,7 @@ func TestReadContentErrors(t *testing.T) {
 	}
 }
 
-func TestReadContentWithTildeExpansion(t *testing.T) {
+func TestHyprlandReadContentWithTildeExpansion(t *testing.T) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		t.Skip("Cannot get home directory")
@@ -343,7 +343,7 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 		t.Skip("Cannot create relative path")
 	}
 
-	parser := NewParser()
+	parser := NewHyprlandParser()
 	tildePathMatch := "~/" + relPath
 	err = parser.ReadContent(tildePathMatch)
 
@@ -352,8 +352,8 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 	}
 }
 
-func TestKeybindWithParamsContainingCommas(t *testing.T) {
-	parser := NewParser()
+func TestHyprlandKeybindWithParamsContainingCommas(t *testing.T) {
+	parser := NewHyprlandParser()
 	parser.contentLines = []string{"bind = SUPER, R, exec, notify-send 'Title' 'Message, with comma'"}
 
 	result := parser.getKeybindAtLine(0)
@@ -368,7 +368,7 @@ func TestKeybindWithParamsContainingCommas(t *testing.T) {
 	}
 }
 
-func TestEmptyAndCommentLines(t *testing.T) {
+func TestHyprlandEmptyAndCommentLines(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "test.conf")
 
@@ -385,9 +385,9 @@ bind = SUPER, T, exec, kitty
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	section, err := ParseKeys(tmpDir)
+	section, err := ParseHyprlandKeys(tmpDir)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseHyprlandKeys failed: %v", err)
 	}
 
 	if len(section.Keybinds) != 2 {

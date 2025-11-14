@@ -31,6 +31,7 @@ Distribution-aware installer with TUI for deploying DMS and compositor configura
 - DDC/CI protocol - External monitor brightness control (like `ddcutil`)
 - Backlight control - Internal display brightness via `login1` or sysfs
 - LED control - Keyboard/device LED management
+- evdev input monitoring - Keyboard state tracking (caps lock, etc.)
 
 **Plugin System**
 - Plugin registry integration

@@ -294,7 +294,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, manualPkgs := o.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, manualPkgs, variantMap := o.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	// Phase 2: System Packages (Zypper)
 	if len(systemPkgs) > 0 {
@@ -320,7 +320,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := o.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := o.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -346,7 +346,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 	return nil
 }
 
-func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string) {
+func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []string{}
 	manualPkgs := []string{}
 
@@ -380,7 +380,7 @@ func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency
 		}
 	}
 
-	return systemPkgs, manualPkgs
+	return systemPkgs, manualPkgs, variantMap
 }
 
 func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -406,8 +406,7 @@ func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packag
 	return o.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.40, 0.60)
 }
 
-// installQuickshell overrides the base implementation to set openSUSE-specific CFLAGS
-func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	o.log("Installing quickshell from source (with openSUSE-specific build flags)...")
 
 	homeDir := os.Getenv("HOME")
@@ -435,10 +434,9 @@ func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, sudoPasswo
 	}
 
 	var cloneCmd *exec.Cmd
-	if forceQuickshellGit {
+	if forceQuickshellGit || variant == deps.VariantGit {
 		cloneCmd = exec.CommandContext(ctx, "git", "clone", "https://github.com/quickshell-mirror/quickshell.git", tmpDir)
 	} else {
-		// Get latest tag from repository
 		latestTag := o.getLatestQuickshellTag(ctx)
 		if latestTag != "" {
 			o.log(fmt.Sprintf("Using latest quickshell tag: %s", latestTag))
@@ -524,8 +522,8 @@ func (o *OpenSUSEDistribution) installQuickshell(ctx context.Context, sudoPasswo
 		CommandInfo: "sudo cmake --install build",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword,
-		fmt.Sprintf("cd %s && cmake --install build", tmpDir))
+	installCmd := ExecSudoCommand(ctx, sudoPassword, "cmake --install build")
+	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install quickshell: %w", err)
 	}
@@ -573,15 +571,13 @@ func (o *OpenSUSEDistribution) installRust(ctx context.Context, sudoPassword str
 	return nil
 }
 
-// InstallManualPackages overrides the base implementation to use openSUSE-specific builds
-func (o *OpenSUSEDistribution) InstallManualPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (o *OpenSUSEDistribution) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	if len(packages) == 0 {
 		return nil
 	}
 
 	o.log(fmt.Sprintf("Installing manual packages: %s", strings.Join(packages, ", ")))
 
-	// Install Rust if needed for matugen
 	for _, pkg := range packages {
 		if pkg == "matugen" {
 			if err := o.installRust(ctx, sudoPassword, progressChan); err != nil {
@@ -592,13 +588,13 @@ func (o *OpenSUSEDistribution) InstallManualPackages(ctx context.Context, packag
 	}
 
 	for _, pkg := range packages {
+		variant := variantMap[pkg]
 		if pkg == "quickshell" {
-			if err := o.installQuickshell(ctx, sudoPassword, progressChan); err != nil {
+			if err := o.installQuickshell(ctx, variant, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install quickshell: %w", err)
 			}
 		} else {
-			// Use the base ManualPackageInstaller for other packages
-			if err := o.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, sudoPassword, progressChan); err != nil {
+			if err := o.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, variantMap, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install %s: %w", pkg, err)
 			}
 		}

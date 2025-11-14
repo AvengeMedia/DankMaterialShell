@@ -308,7 +308,7 @@ func (n *NixOSDistribution) InstallPackages(ctx context.Context, dependencies []
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	nixpkgsPkgs, flakePkgs := n.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	nixpkgsPkgs, flakePkgs, _ := n.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	// Phase 2: Nixpkgs Packages
 	if len(nixpkgsPkgs) > 0 {
@@ -362,9 +362,14 @@ func (n *NixOSDistribution) InstallPackages(ctx context.Context, dependencies []
 	return nil
 }
 
-func (n *NixOSDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string) {
+func (n *NixOSDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, map[string]deps.PackageVariant) {
 	nixpkgsPkgs := []string{}
 	flakePkgs := []string{}
+
+	variantMap := make(map[string]deps.PackageVariant)
+	for _, dep := range dependencies {
+		variantMap[dep.Name] = dep.Variant
+	}
 
 	packageMap := n.GetPackageMapping(wm)
 
@@ -391,7 +396,7 @@ func (n *NixOSDistribution) categorizePackages(dependencies []deps.Dependency, w
 		}
 	}
 
-	return nixpkgsPkgs, flakePkgs
+	return nixpkgsPkgs, flakePkgs, variantMap
 }
 
 func (n *NixOSDistribution) installNixpkgsPackages(ctx context.Context, packages []string, progressChan chan<- InstallProgressMsg) error {

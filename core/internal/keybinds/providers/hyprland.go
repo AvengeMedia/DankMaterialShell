@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/hyprland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
 )
 
@@ -26,7 +25,7 @@ func (h *HyprlandProvider) Name() string {
 }
 
 func (h *HyprlandProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
-	section, err := hyprland.ParseKeys(h.configPath)
+	section, err := ParseHyprlandKeys(h.configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse hyprland config: %w", err)
 	}
@@ -41,7 +40,7 @@ func (h *HyprlandProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	}, nil
 }
 
-func (h *HyprlandProvider) convertSection(section *hyprland.Section, subcategory string, categorizedBinds map[string][]keybinds.Keybind) {
+func (h *HyprlandProvider) convertSection(section *HyprlandSection, subcategory string, categorizedBinds map[string][]keybinds.Keybind) {
 	currentSubcat := subcategory
 	if section.Name != "" {
 		currentSubcat = section.Name
@@ -86,7 +85,7 @@ func (h *HyprlandProvider) categorizeByDispatcher(dispatcher string) string {
 	}
 }
 
-func (h *HyprlandProvider) convertKeybind(kb *hyprland.KeyBinding, subcategory string) keybinds.Keybind {
+func (h *HyprlandProvider) convertKeybind(kb *HyprlandKeyBinding, subcategory string) keybinds.Keybind {
 	key := h.formatKey(kb)
 	desc := kb.Comment
 
@@ -108,7 +107,7 @@ func (h *HyprlandProvider) generateDescription(dispatcher, params string) string
 	return dispatcher
 }
 
-func (h *HyprlandProvider) formatKey(kb *hyprland.KeyBinding) string {
+func (h *HyprlandProvider) formatKey(kb *HyprlandKeyBinding) string {
 	parts := make([]string, 0, len(kb.Mods)+1)
 	parts = append(parts, kb.Mods...)
 	parts = append(parts, kb.Key)

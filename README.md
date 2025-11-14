@@ -36,8 +36,10 @@ DankMaterialShell/
 │   ├── cmd/            # dms CLI and dankinstall binaries
 │   ├── internal/       # System integration, IPC, distro support
 │   └── pkg/            # Shared packages
-├── distro/             # Distribution packaging (Fedora RPM specs)
-├── nix/                # NixOS/home-manager modules
+├── distro/             # Distribution packaging
+│   ├── fedora/         # Fedora RPM specs
+│   ├── debian/         # Debian packaging
+│   └── nix/            # NixOS/home-manager modules
 └── flake.nix           # Nix flake for declarative installation
 ```
 
@@ -136,8 +138,7 @@ See component-specific documentation:
 
 - **[quickshell/](quickshell/)** - QML shell development, widgets, and modules
 - **[core/](core/)** - Go backend, CLI tools, and system integration
-- **[distro/](distro/)** - Distribution packaging
-- **[nix/](nix/)** - NixOS and home-manager modules
+- **[distro/](distro/)** - Distribution packaging (Fedora, Debian, NixOS)
 
 ### Building from Source
 

@@ -302,6 +302,9 @@
   "Capacity": {
     "Capacity": "容量"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "センターセクション"
   },
@@ -829,6 +832,9 @@
   },
   "Force Kill Process": {
     "Force Kill Process": "プロセスを強制終了"
+  },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": ""
   },
   "Forget Device": {
     "Forget Device": "デバイスを忘れる"
@@ -1778,6 +1784,9 @@
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "現在のワークスペースを表示、切り替えを可能に"
   },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
+  },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "マイク、カメラ、または画面共有がアクティブなときに表示"
   },
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "端末のカスタム追加パラメーター"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": ""
+  },
   "Text": {
     "Text": "テキスト"
   },
@@ -2020,6 +2032,12 @@
   },
   "Use IP Location": {
     "Use IP Location": "IP ロケーションの使用"
+  },
+  "Use Imperial Units": {
+    "Use Imperial Units": ""
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "等幅フォントを使用"

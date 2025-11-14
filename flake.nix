@@ -47,7 +47,7 @@
 
                     pname = "dmsCli";
                     src = ./core;
-                    vendorHash = "sha256-XbCg6qQwD4g4R/hBReLGE4NOq9uv0LBqogmfpBs//Ic=";
+                    vendorHash = "sha256-HfLUsxNPtgv9sr5sXf8CpUVveYcaqA5lNYG9qfTaGRw=";
 
                     subPackages = ["cmd/dms"];
 
@@ -84,16 +84,16 @@
         homeModules.dankMaterialShell.default = {pkgs, ...}: let
             dmsPkgs = buildDmsPkgs pkgs;
         in {
-            imports = [./nix/default.nix];
+            imports = [./distro/nix/default.nix];
             _module.args.dmsPkgs = dmsPkgs;
         };
 
-        homeModules.dankMaterialShell.niri = import ./nix/niri.nix;
+        homeModules.dankMaterialShell.niri = import ./distro/nix/niri.nix;
 
         nixosModules.greeter = {pkgs, ...}: let
             dmsPkgs = buildDmsPkgs pkgs;
         in {
-            imports = [./nix/greeter.nix];
+            imports = [./distro/nix/greeter.nix];
             _module.args.dmsPkgs = dmsPkgs;
         };
     };

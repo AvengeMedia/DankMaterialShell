@@ -707,6 +707,13 @@
     "comment": ""
   },
   {
+    "term": "Caps Lock Indicator",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "translation": "",
     "context": "",
@@ -1933,6 +1940,13 @@
   },
   {
     "term": "Force Kill Process",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Force terminal applications to always use dark color schemes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4144,6 +4158,13 @@
     "comment": ""
   },
   {
+    "term": "Shows when caps lock is active",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Shows when microphone, camera, or screen sharing is active",
     "translation": "",
     "context": "",
@@ -4438,6 +4459,13 @@
     "comment": ""
   },
   {
+    "term": "Terminals - Always use Dark Theme",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Text",
     "translation": "",
     "context": "",
@@ -4690,21 +4718,21 @@
     "comment": ""
   },
   {
-    "term": "Use Fahrenheit",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Use Fahrenheit instead of Celsius for temperature",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Use IP Location",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use Imperial Units",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
     "translation": "",
     "context": "",
     "reference": "",

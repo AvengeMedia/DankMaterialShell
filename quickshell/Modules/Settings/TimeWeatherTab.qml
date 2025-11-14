@@ -535,14 +535,14 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             StyledText {
-                                text: I18n.tr("Use Fahrenheit")
+                                text: I18n.tr("Use Imperial Units")
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.weight: Font.Medium
                                 color: Theme.surfaceText
                             }
 
                             StyledText {
-                                text: I18n.tr("Use Fahrenheit instead of Celsius for temperature")
+                                text: I18n.tr("Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)")
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 wrapMode: Text.WordWrap
@@ -841,7 +841,7 @@ Item {
                     Column {
                         width: parent.width
                         spacing: Theme.spacingL
-                        visible: !WeatherService.weather.available || WeatherService.weather.temp === 0
+                        visible: !WeatherService.weather.available
 
                         DankIcon {
                             name: "cloud_off"
@@ -861,7 +861,7 @@ Item {
                     Column {
                         width: parent.width
                         spacing: Theme.spacingM
-                        visible: WeatherService.weather.available && WeatherService.weather.temp !== 0
+                        visible: WeatherService.weather.available
 
                         Item {
                             width: parent.width
@@ -1185,7 +1185,16 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: WeatherService.weather.wind || "--"
+                                            text: {
+                                                if (!WeatherService.weather.wind) return "--"
+                                                const windKmh = parseFloat(WeatherService.weather.wind)
+                                                if (isNaN(windKmh)) return WeatherService.weather.wind
+                                                if (SettingsData.useFahrenheit) {
+                                                    const windMph = Math.round(windKmh * 0.621371)
+                                                    return windMph + " mph"
+                                                }
+                                                return WeatherService.weather.wind
+                                            }
                                             font.pixelSize: Theme.fontSizeSmall + 1
                                             color: Theme.surfaceText
                                             font.weight: Font.Medium
@@ -1232,7 +1241,15 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: WeatherService.weather.pressure ? WeatherService.weather.pressure + " hPa" : "--"
+                                            text: {
+                                                if (!WeatherService.weather.pressure) return "--"
+                                                const pressureHpa = WeatherService.weather.pressure
+                                                if (SettingsData.useFahrenheit) {
+                                                    const pressureInHg = (pressureHpa * 0.02953).toFixed(2)
+                                                    return pressureInHg + " inHg"
+                                                }
+                                                return pressureHpa + " hPa"
+                                            }
                                             font.pixelSize: Theme.fontSizeSmall + 1
                                             color: Theme.surfaceText
                                             font.weight: Font.Medium

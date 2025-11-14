@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/sway"
 )
 
 type SwayProvider struct {
@@ -26,7 +25,7 @@ func (s *SwayProvider) Name() string {
 }
 
 func (s *SwayProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
-	section, err := sway.ParseKeys(s.configPath)
+	section, err := ParseSwayKeys(s.configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse sway config: %w", err)
 	}
@@ -41,7 +40,7 @@ func (s *SwayProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	}, nil
 }
 
-func (s *SwayProvider) convertSection(section *sway.Section, subcategory string, categorizedBinds map[string][]keybinds.Keybind) {
+func (s *SwayProvider) convertSection(section *SwaySection, subcategory string, categorizedBinds map[string][]keybinds.Keybind) {
 	currentSubcat := subcategory
 	if section.Name != "" {
 		currentSubcat = section.Name
@@ -89,7 +88,7 @@ func (s *SwayProvider) categorizeByCommand(command string) string {
 	}
 }
 
-func (s *SwayProvider) convertKeybind(kb *sway.KeyBinding, subcategory string) keybinds.Keybind {
+func (s *SwayProvider) convertKeybind(kb *SwayKeyBinding, subcategory string) keybinds.Keybind {
 	key := s.formatKey(kb)
 	desc := kb.Comment
 
@@ -104,7 +103,7 @@ func (s *SwayProvider) convertKeybind(kb *sway.KeyBinding, subcategory string) k
 	}
 }
 
-func (s *SwayProvider) formatKey(kb *sway.KeyBinding) string {
+func (s *SwayProvider) formatKey(kb *SwayKeyBinding) string {
 	parts := make([]string, 0, len(kb.Mods)+1)
 	parts = append(parts, kb.Mods...)
 	parts = append(parts, kb.Key)

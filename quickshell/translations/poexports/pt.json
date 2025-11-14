@@ -302,6 +302,9 @@
   "Capacity": {
     "Capacity": "Capacidade"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "Seção Central"
   },
@@ -829,6 +832,9 @@
   },
   "Force Kill Process": {
     "Force Kill Process": "Forçar Fechamento do Processo"
+  },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": ""
   },
   "Forget Device": {
     "Forget Device": "Esquecer Dispositivo"
@@ -1778,6 +1784,9 @@
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "Mostra a área de trabalho atual e permite alternar entre elas"
   },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
+  },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "Mostra quando microfone, câmera, ou compartilhamento de tela está ativado"
   },
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "Parâmetros adicionais para o terminal"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": ""
+  },
   "Text": {
     "Text": "Texto"
   },
@@ -2020,6 +2032,12 @@
   },
   "Use IP Location": {
     "Use IP Location": "Usar Localização do Endereço IP"
+  },
+  "Use Imperial Units": {
+    "Use Imperial Units": ""
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": ""
   },
   "Use Monospace Font": {
     "Use Monospace Font": "Usar Fonte Monoespaçada"

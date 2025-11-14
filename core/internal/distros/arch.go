@@ -321,7 +321,7 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, aurPkgs, manualPkgs := a.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, aurPkgs, manualPkgs, variantMap := a.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	// Phase 3: System Packages
 	if len(systemPkgs) > 0 {
@@ -361,7 +361,7 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := a.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := a.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -387,7 +387,7 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 	return nil
 }
 
-func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, []string) {
+func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []string{}
 	aurPkgs := []string{}
 	manualPkgs := []string{}
@@ -410,7 +410,6 @@ func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm
 
 		pkgInfo, exists := packageMap[dep.Name]
 		if !exists {
-			// If no mapping exists, treat as manual build
 			manualPkgs = append(manualPkgs, dep.Name)
 			continue
 		}
@@ -425,7 +424,7 @@ func (a *ArchDistribution) categorizePackages(dependencies []deps.Dependency, wm
 		}
 	}
 
-	return systemPkgs, aurPkgs, manualPkgs
+	return systemPkgs, aurPkgs, manualPkgs, variantMap
 }
 
 func (a *ArchDistribution) installSystemPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
