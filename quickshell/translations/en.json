@@ -50,7 +50,7 @@
   {
     "term": "7-Day Forecast",
     "context": "7-Day Forecast",
-    "reference": "Modules/DankDash/WeatherTab.qml:525",
+    "reference": "Modules/DankDash/WeatherTab.qml:542",
     "comment": ""
   },
   {
@@ -68,19 +68,19 @@
   {
     "term": "Access clipboard history",
     "context": "Access clipboard history",
-    "reference": "Modules/Settings/DankBarTab.qml:75",
+    "reference": "Modules/Settings/DankBarTab.qml:78",
     "comment": ""
   },
   {
     "term": "Access to notifications and do not disturb",
     "context": "Access to notifications and do not disturb",
-    "reference": "Modules/Settings/DankBarTab.qml:134",
+    "reference": "Modules/Settings/DankBarTab.qml:137",
     "comment": ""
   },
   {
     "term": "Access to system controls and settings",
     "context": "Access to system controls and settings",
-    "reference": "Modules/Settings/DankBarTab.qml:128",
+    "reference": "Modules/Settings/DankBarTab.qml:131",
     "comment": ""
   },
   {
@@ -164,7 +164,7 @@
   {
     "term": "App Launcher",
     "context": "App Launcher",
-    "reference": "Modules/Settings/DankBarTab.qml:32",
+    "reference": "Modules/Settings/DankBarTab.qml:35",
     "comment": ""
   },
   {
@@ -176,19 +176,19 @@
   {
     "term": "Applications",
     "context": "Applications",
-    "reference": "Modules/AppDrawer/AppDrawerPopout.qml:190",
+    "reference": "Modules/AppDrawer/AppDrawerPopout.qml:190, Modules/Settings/ThemeColorsTab.qml:1204",
     "comment": ""
   },
   {
     "term": "Apply GTK Colors",
     "context": "Apply GTK Colors",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1379",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1380",
     "comment": ""
   },
   {
     "term": "Apply Qt Colors",
     "context": "Apply Qt Colors",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1415",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1416",
     "comment": ""
   },
   {
@@ -242,7 +242,7 @@
   {
     "term": "Audio Codec",
     "context": "Audio Codec",
-    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:501",
+    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:570",
     "comment": ""
   },
   {
@@ -254,7 +254,7 @@
   {
     "term": "Audio Devices",
     "context": "Audio Devices",
-    "reference": "Modules/ControlCenter/Details/AudioOutputDetail.qml:33",
+    "reference": "Modules/ControlCenter/Details/AudioOutputDetail.qml:35",
     "comment": ""
   },
   {
@@ -314,13 +314,13 @@
   {
     "term": "Auto Popup Gaps",
     "context": "Auto Popup Gaps",
-    "reference": "Modules/Settings/DankBarTab.qml:1225",
+    "reference": "Modules/Settings/DankBarTab.qml:1234",
     "comment": ""
   },
   {
     "term": "Auto-hide",
     "context": "Auto-hide",
-    "reference": "Modules/Settings/DankBarTab.qml:830",
+    "reference": "Modules/Settings/DankBarTab.qml:839",
     "comment": ""
   },
   {
@@ -362,7 +362,7 @@
   {
     "term": "Automatically calculate popup distance from bar edge.",
     "context": "Automatically calculate popup distance from bar edge.",
-    "reference": "Modules/Settings/DankBarTab.qml:1226",
+    "reference": "Modules/Settings/DankBarTab.qml:1235",
     "comment": ""
   },
   {
@@ -392,7 +392,7 @@
   {
     "term": "Automatically hide the top bar to expand screen real estate",
     "context": "Automatically hide the top bar to expand screen real estate",
-    "reference": "Modules/Settings/DankBarTab.qml:837",
+    "reference": "Modules/Settings/DankBarTab.qml:846",
     "comment": ""
   },
   {
@@ -434,7 +434,7 @@
   {
     "term": "Back",
     "context": "Back",
-    "reference": "Modules/DankBar/Widgets/SystemTrayBar.qml:856",
+    "reference": "Modules/DankBar/Widgets/SystemTrayBar.qml:991",
     "comment": ""
   },
   {
@@ -446,13 +446,13 @@
   {
     "term": "Battery",
     "context": "Battery",
-    "reference": "Modules/Settings/DankBarTab.qml:139",
+    "reference": "Modules/Settings/DankBarTab.qml:142",
     "comment": ""
   },
   {
     "term": "Battery level and power management",
     "context": "Battery level and power management",
-    "reference": "Modules/Settings/DankBarTab.qml:140",
+    "reference": "Modules/Settings/DankBarTab.qml:143",
     "comment": ""
   },
   {
@@ -470,7 +470,7 @@
   {
     "term": "Bluetooth Settings",
     "context": "Bluetooth Settings",
-    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:69",
+    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:71",
     "comment": ""
   },
   {
@@ -494,37 +494,37 @@
   {
     "term": "Border",
     "context": "Border",
-    "reference": "Modules/Settings/DankBarTab.qml:1446",
+    "reference": "Modules/Settings/DankBarTab.qml:1455",
     "comment": ""
   },
   {
     "term": "Border Color",
     "context": "Border Color",
-    "reference": "Modules/Settings/DankBarTab.qml:1476",
+    "reference": "Modules/Settings/DankBarTab.qml:1485",
     "comment": ""
   },
   {
     "term": "Border Opacity",
     "context": "Border Opacity",
-    "reference": "Modules/Settings/DankBarTab.qml:1528, Modules/Settings/DankBarTab.qml:1542",
+    "reference": "Modules/Settings/DankBarTab.qml:1537, Modules/Settings/DankBarTab.qml:1551",
     "comment": ""
   },
   {
     "term": "Border Thickness",
     "context": "Border Thickness",
-    "reference": "Modules/Settings/DankBarTab.qml:1599, Modules/Settings/DankBarTab.qml:1613",
+    "reference": "Modules/Settings/DankBarTab.qml:1608, Modules/Settings/DankBarTab.qml:1622",
     "comment": ""
   },
   {
     "term": "Bottom",
     "context": "Bottom",
-    "reference": "Modules/Settings/DankBarTab.qml:770",
+    "reference": "Modules/Settings/DankBarTab.qml:779",
     "comment": ""
   },
   {
     "term": "Bottom Section",
     "context": "Bottom Section",
-    "reference": "Modules/Settings/DankBarTab.qml:2059",
+    "reference": "Modules/Settings/DankBarTab.qml:2068",
     "comment": ""
   },
   {
@@ -560,25 +560,25 @@
   {
     "term": "CPU Temperature",
     "context": "CPU Temperature",
-    "reference": "Modules/Settings/DankBarTab.qml:101",
+    "reference": "Modules/Settings/DankBarTab.qml:104",
     "comment": ""
   },
   {
     "term": "CPU Usage",
     "context": "CPU Usage",
-    "reference": "Modules/Settings/DankBarTab.qml:80",
+    "reference": "Modules/Settings/DankBarTab.qml:83",
     "comment": ""
   },
   {
     "term": "CPU temperature display",
     "context": "CPU temperature display",
-    "reference": "Modules/Settings/DankBarTab.qml:102",
+    "reference": "Modules/Settings/DankBarTab.qml:105",
     "comment": ""
   },
   {
     "term": "CPU usage indicator",
     "context": "CPU usage indicator",
-    "reference": "Modules/Settings/DankBarTab.qml:81",
+    "reference": "Modules/Settings/DankBarTab.qml:84",
     "comment": ""
   },
   {
@@ -606,9 +606,15 @@
     "comment": ""
   },
   {
+    "term": "Caps Lock Indicator",
+    "context": "Caps Lock Indicator",
+    "reference": "Modules/Settings/DankBarTab.qml:160",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "context": "Center Section",
-    "reference": "Modules/Settings/DankBarTab.qml:1976",
+    "reference": "Modules/Settings/DankBarTab.qml:1985",
     "comment": ""
   },
   {
@@ -626,7 +632,7 @@
   {
     "term": "Check for system updates",
     "context": "Check for system updates",
-    "reference": "Modules/Settings/DankBarTab.qml:195",
+    "reference": "Modules/Settings/DankBarTab.qml:204",
     "comment": ""
   },
   {
@@ -644,7 +650,7 @@
   {
     "term": "Choose the border accent color",
     "context": "Choose the border accent color",
-    "reference": "Modules/Settings/DankBarTab.qml:1483",
+    "reference": "Modules/Settings/DankBarTab.qml:1492",
     "comment": ""
   },
   {
@@ -686,13 +692,13 @@
   {
     "term": "Clipboard Manager",
     "context": "Clipboard Manager",
-    "reference": "Modules/Settings/DankBarTab.qml:74",
+    "reference": "Modules/Settings/DankBarTab.qml:77",
     "comment": ""
   },
   {
     "term": "Clock",
     "context": "Clock",
-    "reference": "Modules/Settings/DankBarTab.qml:56",
+    "reference": "Modules/Settings/DankBarTab.qml:59",
     "comment": ""
   },
   {
@@ -716,7 +722,7 @@
   {
     "term": "Color Picker",
     "context": "Color Picker",
-    "reference": "Modules/Settings/DankBarTab.qml:188",
+    "reference": "Modules/Settings/DankBarTab.qml:197",
     "comment": ""
   },
   {
@@ -866,13 +872,13 @@
   {
     "term": "Control Center",
     "context": "Control Center",
-    "reference": "Modules/Settings/DankBarTab.qml:127",
+    "reference": "Modules/Settings/DankBarTab.qml:130",
     "comment": ""
   },
   {
     "term": "Control currently playing media",
     "context": "Control currently playing media",
-    "reference": "Modules/Settings/DankBarTab.qml:69",
+    "reference": "Modules/Settings/DankBarTab.qml:72",
     "comment": ""
   },
   {
@@ -926,7 +932,7 @@
   {
     "term": "Corner Radius Override",
     "context": "Corner Radius Override",
-    "reference": "Modules/Settings/DankBarTab.qml:1358",
+    "reference": "Modules/Settings/DankBarTab.qml:1367",
     "comment": ""
   },
   {
@@ -962,13 +968,13 @@
   {
     "term": "Current time and date display",
     "context": "Current time and date display",
-    "reference": "Modules/Settings/DankBarTab.qml:57",
+    "reference": "Modules/Settings/DankBarTab.qml:60",
     "comment": ""
   },
   {
     "term": "Current weather conditions and temperature",
     "context": "Current weather conditions and temperature",
-    "reference": "Modules/Settings/DankBarTab.qml:63",
+    "reference": "Modules/Settings/DankBarTab.qml:66",
     "comment": ""
   },
   {
@@ -1004,7 +1010,7 @@
   {
     "term": "Customizable empty space",
     "context": "Customizable empty space",
-    "reference": "Modules/Settings/DankBarTab.qml:158",
+    "reference": "Modules/Settings/DankBarTab.qml:167",
     "comment": ""
   },
   {
@@ -1016,7 +1022,7 @@
   {
     "term": "DEMO MODE - Click anywhere to exit",
     "context": "DEMO MODE - Click anywhere to exit",
-    "reference": "Modules/Lock/LockScreenContent.qml:747",
+    "reference": "Modules/Lock/LockScreenContent.qml:777",
     "comment": ""
   },
   {
@@ -1028,7 +1034,7 @@
   {
     "term": "DMS out of date",
     "context": "DMS out of date",
-    "reference": "Services/DMSService.qml:301",
+    "reference": "Services/DMSService.qml:304",
     "comment": ""
   },
   {
@@ -1040,7 +1046,7 @@
   {
     "term": "DWL service not available",
     "context": "DWL service not available",
-    "reference": "Modules/Settings/DankBarTab.qml:29",
+    "reference": "Modules/Settings/DankBarTab.qml:32",
     "comment": ""
   },
   {
@@ -1076,7 +1082,7 @@
   {
     "term": "DankBar Font Scale",
     "context": "DankBar Font Scale",
-    "reference": "Modules/Settings/DankBarTab.qml:1685",
+    "reference": "Modules/Settings/DankBarTab.qml:1694",
     "comment": ""
   },
   {
@@ -1172,7 +1178,7 @@
   {
     "term": "Disable Autoconnect",
     "context": "Disable Autoconnect",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:625",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:696",
     "comment": ""
   },
   {
@@ -1202,7 +1208,7 @@
   {
     "term": "Disk Usage",
     "context": "Disk Usage",
-    "reference": "Modules/Settings/DankBarTab.qml:94",
+    "reference": "Modules/Settings/DankBarTab.qml:97",
     "comment": ""
   },
   {
@@ -1226,7 +1232,7 @@
   {
     "term": "Display and switch DWL layouts",
     "context": "Display and switch DWL layouts",
-    "reference": "Modules/Settings/DankBarTab.qml:26",
+    "reference": "Modules/Settings/DankBarTab.qml:29",
     "comment": ""
   },
   {
@@ -1238,7 +1244,7 @@
   {
     "term": "Display currently focused application title",
     "context": "Display currently focused application title",
-    "reference": "Modules/Settings/DankBarTab.qml:45",
+    "reference": "Modules/Settings/DankBarTab.qml:48",
     "comment": ""
   },
   {
@@ -1262,7 +1268,7 @@
   {
     "term": "Displays the active keyboard layout and allows switching",
     "context": "Displays the active keyboard layout and allows switching",
-    "reference": "Modules/Settings/DankBarTab.qml:178",
+    "reference": "Modules/Settings/DankBarTab.qml:187",
     "comment": ""
   },
   {
@@ -1316,7 +1322,7 @@
   {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "context": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
-    "reference": "Modules/Settings/DankBarTab.qml:1867",
+    "reference": "Modules/Settings/DankBarTab.qml:1876",
     "comment": ""
   },
   {
@@ -1334,7 +1340,7 @@
   {
     "term": "Edge Spacing (0 = edge-to-edge)",
     "context": "Edge Spacing (0 = edge-to-edge)",
-    "reference": "Modules/Settings/DankBarTab.qml:1012, Modules/Settings/DankBarTab.qml:1026",
+    "reference": "Modules/Settings/DankBarTab.qml:1021, Modules/Settings/DankBarTab.qml:1035",
     "comment": ""
   },
   {
@@ -1352,7 +1358,7 @@
   {
     "term": "Enable Autoconnect",
     "context": "Enable Autoconnect",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:625",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:696",
     "comment": ""
   },
   {
@@ -1376,7 +1382,7 @@
   {
     "term": "Enable WiFi",
     "context": "Enable WiFi",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:177",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:181",
     "comment": ""
   },
   {
@@ -1478,7 +1484,7 @@
   {
     "term": "Exclusive Zone Offset",
     "context": "Exclusive Zone Offset",
-    "reference": "Modules/Settings/DankBarTab.qml:1084, Modules/Settings/DankBarTab.qml:1098",
+    "reference": "Modules/Settings/DankBarTab.qml:1093, Modules/Settings/DankBarTab.qml:1107",
     "comment": ""
   },
   {
@@ -1556,7 +1562,7 @@
   {
     "term": "Failed to remove device",
     "context": "Failed to remove device",
-    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:548",
+    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:617",
     "comment": ""
   },
   {
@@ -1622,7 +1628,7 @@
   {
     "term": "Focused Window",
     "context": "Focused Window",
-    "reference": "Modules/Settings/DankBarTab.qml:44",
+    "reference": "Modules/Settings/DankBarTab.qml:47",
     "comment": ""
   },
   {
@@ -1662,15 +1668,21 @@
     "comment": ""
   },
   {
+    "term": "Force terminal applications to always use dark color schemes",
+    "context": "Force terminal applications to always use dark color schemes",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1225",
+    "comment": ""
+  },
+  {
     "term": "Forget Device",
     "context": "Forget Device",
-    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:526",
+    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:595",
     "comment": ""
   },
   {
     "term": "Forget Network",
     "context": "Forget Network",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:648",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:719",
     "comment": ""
   },
   {
@@ -1700,13 +1712,13 @@
   {
     "term": "GPU Temperature",
     "context": "GPU Temperature",
-    "reference": "Modules/Settings/DankBarTab.qml:108",
+    "reference": "Modules/Settings/DankBarTab.qml:111",
     "comment": ""
   },
   {
     "term": "GPU temperature display",
     "context": "GPU temperature display",
-    "reference": "Modules/Settings/DankBarTab.qml:109",
+    "reference": "Modules/Settings/DankBarTab.qml:112",
     "comment": ""
   },
   {
@@ -1736,19 +1748,19 @@
   {
     "term": "Good",
     "context": "Good",
-    "reference": "Modules/DankDash/WeatherTab.qml:502, Modules/Settings/TimeWeatherTab.qml:1329",
+    "reference": "Modules/DankDash/WeatherTab.qml:519, Modules/Settings/TimeWeatherTab.qml:1346",
     "comment": ""
   },
   {
     "term": "Goth Corner Radius",
     "context": "Goth Corner Radius",
-    "reference": "Modules/Settings/DankBarTab.qml:1377, Modules/Settings/DankBarTab.qml:1391",
+    "reference": "Modules/Settings/DankBarTab.qml:1386, Modules/Settings/DankBarTab.qml:1400",
     "comment": ""
   },
   {
     "term": "Goth Corners",
     "context": "Goth Corners",
-    "reference": "Modules/Settings/DankBarTab.qml:1347",
+    "reference": "Modules/Settings/DankBarTab.qml:1356",
     "comment": ""
   },
   {
@@ -1856,7 +1868,7 @@
   {
     "term": "Icon Theme",
     "context": "Icon Theme",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1297",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1298",
     "comment": ""
   },
   {
@@ -1868,7 +1880,7 @@
   {
     "term": "Idle Inhibitor",
     "context": "Idle Inhibitor",
-    "reference": "Modules/Settings/DankBarTab.qml:151",
+    "reference": "Modules/Settings/DankBarTab.qml:154",
     "comment": ""
   },
   {
@@ -1922,7 +1934,7 @@
   {
     "term": "Input Devices",
     "context": "Input Devices",
-    "reference": "Modules/ControlCenter/Details/AudioInputDetail.qml:33",
+    "reference": "Modules/ControlCenter/Details/AudioInputDetail.qml:35",
     "comment": ""
   },
   {
@@ -1976,7 +1988,7 @@
   {
     "term": "Keyboard Layout Name",
     "context": "Keyboard Layout Name",
-    "reference": "Modules/Settings/DankBarTab.qml:177",
+    "reference": "Modules/Settings/DankBarTab.qml:186",
     "comment": ""
   },
   {
@@ -2054,19 +2066,19 @@
   {
     "term": "Layout",
     "context": "Layout",
-    "reference": "Modules/Settings/DankBarTab.qml:25, Modules/DankBar/Popouts/DWLLayoutPopout.qml:173",
+    "reference": "Modules/Settings/DankBarTab.qml:28, Modules/DankBar/Popouts/DWLLayoutPopout.qml:173",
     "comment": ""
   },
   {
     "term": "Left",
     "context": "Left",
-    "reference": "Modules/Settings/DankBarTab.qml:770, Modules/DankBar/Popouts/BatteryPopout.qml:542",
+    "reference": "Modules/Settings/DankBarTab.qml:779, Modules/DankBar/Popouts/BatteryPopout.qml:542",
     "comment": ""
   },
   {
     "term": "Left Section",
     "context": "Left Section",
-    "reference": "Modules/Settings/DankBarTab.qml:1893",
+    "reference": "Modules/Settings/DankBarTab.qml:1902",
     "comment": ""
   },
   {
@@ -2162,13 +2174,13 @@
   {
     "term": "Manual Gap Size",
     "context": "Manual Gap Size",
-    "reference": "Modules/Settings/DankBarTab.qml:1255, Modules/Settings/DankBarTab.qml:1269",
+    "reference": "Modules/Settings/DankBarTab.qml:1264, Modules/Settings/DankBarTab.qml:1278",
     "comment": ""
   },
   {
     "term": "Manual Show/Hide",
     "context": "Manual Show/Hide",
-    "reference": "Modules/Settings/DankBarTab.qml:882",
+    "reference": "Modules/Settings/DankBarTab.qml:891",
     "comment": ""
   },
   {
@@ -2240,7 +2252,7 @@
   {
     "term": "Media Controls",
     "context": "Media Controls",
-    "reference": "Modules/Settings/DankBarTab.qml:68",
+    "reference": "Modules/Settings/DankBarTab.qml:71",
     "comment": ""
   },
   {
@@ -2288,13 +2300,13 @@
   {
     "term": "Memory Usage",
     "context": "Memory Usage",
-    "reference": "Modules/Settings/DankBarTab.qml:87",
+    "reference": "Modules/Settings/DankBarTab.qml:90",
     "comment": ""
   },
   {
     "term": "Memory usage indicator",
     "context": "Memory usage indicator",
-    "reference": "Modules/Settings/DankBarTab.qml:88",
+    "reference": "Modules/Settings/DankBarTab.qml:91",
     "comment": ""
   },
   {
@@ -2396,7 +2408,7 @@
   {
     "term": "Network Info",
     "context": "Network Info",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:345, Modules/ControlCenter/Details/NetworkDetail.qml:602",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:349, Modules/ControlCenter/Details/NetworkDetail.qml:673",
     "comment": ""
   },
   {
@@ -2408,19 +2420,19 @@
   {
     "term": "Network Settings",
     "context": "Network Settings",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:68",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:70",
     "comment": ""
   },
   {
     "term": "Network Speed Monitor",
     "context": "Network Speed Monitor",
-    "reference": "Modules/Settings/DankBarTab.qml:170",
+    "reference": "Modules/Settings/DankBarTab.qml:179",
     "comment": ""
   },
   {
     "term": "Network download and upload speed display",
     "context": "Network download and upload speed display",
-    "reference": "Modules/Settings/DankBarTab.qml:171",
+    "reference": "Modules/Settings/DankBarTab.qml:180",
     "comment": ""
   },
   {
@@ -2462,13 +2474,13 @@
   {
     "term": "No Background",
     "context": "No Background",
-    "reference": "Modules/Settings/DankBarTab.qml:1332",
+    "reference": "Modules/Settings/DankBarTab.qml:1341",
     "comment": ""
   },
   {
     "term": "No Bluetooth adapter found",
     "context": "No Bluetooth adapter found",
-    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:450",
+    "reference": "Modules/ControlCenter/Details/BluetoothDetail.qml:519",
     "comment": ""
   },
   {
@@ -2546,7 +2558,7 @@
   {
     "term": "Notepad",
     "context": "Notepad",
-    "reference": "DMSShell.qml:455, Modules/Settings/DankBarTab.qml:182",
+    "reference": "DMSShell.qml:455, Modules/Settings/DankBarTab.qml:191",
     "comment": ""
   },
   {
@@ -2570,7 +2582,7 @@
   {
     "term": "Notification Center",
     "context": "Notification Center",
-    "reference": "Modules/Settings/DankBarTab.qml:133",
+    "reference": "Modules/Settings/DankBarTab.qml:136",
     "comment": ""
   },
   {
@@ -2780,7 +2792,7 @@
   {
     "term": "Percentage",
     "context": "Percentage",
-    "reference": "Modules/Settings/DankBarTab.qml:95",
+    "reference": "Modules/Settings/DankBarTab.qml:98",
     "comment": ""
   },
   {
@@ -2858,7 +2870,7 @@
   {
     "term": "Plugin is disabled - enable in Plugins settings to use",
     "context": "Plugin is disabled - enable in Plugins settings to use",
-    "reference": "Modules/Settings/DankBarTab.qml:209",
+    "reference": "Modules/Settings/DankBarTab.qml:218",
     "comment": ""
   },
   {
@@ -2888,7 +2900,7 @@
   {
     "term": "Position",
     "context": "Position",
-    "reference": "Modules/Settings/DankBarTab.qml:760",
+    "reference": "Modules/Settings/DankBarTab.qml:769",
     "comment": ""
   },
   {
@@ -2936,7 +2948,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "Modules/DankDash/WeatherTab.qml:401, Modules/Settings/TimeWeatherTab.qml:1228",
+    "reference": "Modules/DankDash/WeatherTab.qml:410, Modules/Settings/TimeWeatherTab.qml:1237",
     "comment": ""
   },
   {
@@ -2948,7 +2960,7 @@
   {
     "term": "Prevent screen timeout",
     "context": "Prevent screen timeout",
-    "reference": "Modules/Settings/DankBarTab.qml:152",
+    "reference": "Modules/Settings/DankBarTab.qml:155",
     "comment": ""
   },
   {
@@ -2978,7 +2990,7 @@
   {
     "term": "Privacy Indicator",
     "context": "Privacy Indicator",
-    "reference": "Modules/Settings/DankBarTab.qml:121",
+    "reference": "Modules/Settings/DankBarTab.qml:124",
     "comment": ""
   },
   {
@@ -3008,19 +3020,19 @@
   {
     "term": "Quick access to application launcher",
     "context": "Quick access to application launcher",
-    "reference": "Modules/Settings/DankBarTab.qml:33",
+    "reference": "Modules/Settings/DankBarTab.qml:36",
     "comment": ""
   },
   {
     "term": "Quick access to color picker",
     "context": "Quick access to color picker",
-    "reference": "Modules/Settings/DankBarTab.qml:189",
+    "reference": "Modules/Settings/DankBarTab.qml:198",
     "comment": ""
   },
   {
     "term": "Quick access to notepad",
     "context": "Quick access to notepad",
-    "reference": "Modules/Settings/DankBarTab.qml:183",
+    "reference": "Modules/Settings/DankBarTab.qml:192",
     "comment": ""
   },
   {
@@ -3038,7 +3050,7 @@
   {
     "term": "Rain Chance",
     "context": "Rain Chance",
-    "reference": "Modules/DankDash/WeatherTab.qml:448, Modules/Settings/TimeWeatherTab.qml:1275",
+    "reference": "Modules/DankDash/WeatherTab.qml:465, Modules/Settings/TimeWeatherTab.qml:1292",
     "comment": ""
   },
   {
@@ -3098,13 +3110,13 @@
   {
     "term": "Requires DWL compositor",
     "context": "Requires DWL compositor",
-    "reference": "Modules/Settings/DankBarTab.qml:29",
+    "reference": "Modules/Settings/DankBarTab.qml:32",
     "comment": ""
   },
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modules/Settings/DankBarTab.qml:1825, Modules/ControlCenter/Components/EditControls.qml:227",
+    "reference": "Modules/Settings/DankBarTab.qml:1834, Modules/ControlCenter/Components/EditControls.qml:227",
     "comment": ""
   },
   {
@@ -3146,13 +3158,13 @@
   {
     "term": "Right",
     "context": "Right",
-    "reference": "Modules/Settings/DankBarTab.qml:770",
+    "reference": "Modules/Settings/DankBarTab.qml:779",
     "comment": ""
   },
   {
     "term": "Right Section",
     "context": "Right Section",
-    "reference": "Modules/Settings/DankBarTab.qml:2059",
+    "reference": "Modules/Settings/DankBarTab.qml:2068",
     "comment": ""
   },
   {
@@ -3176,7 +3188,7 @@
   {
     "term": "Running Apps",
     "context": "Running Apps",
-    "reference": "Modules/Settings/DankBarTab.qml:50",
+    "reference": "Modules/Settings/DankBarTab.qml:53",
     "comment": ""
   },
   {
@@ -3212,7 +3224,7 @@
   {
     "term": "Scale DankBar font sizes independently",
     "context": "Scale DankBar font sizes independently",
-    "reference": "Modules/Settings/DankBarTab.qml:1692",
+    "reference": "Modules/Settings/DankBarTab.qml:1701",
     "comment": ""
   },
   {
@@ -3356,7 +3368,7 @@
   {
     "term": "Separator",
     "context": "Separator",
-    "reference": "Modules/Settings/DankBarTab.qml:163",
+    "reference": "Modules/Settings/DankBarTab.qml:172",
     "comment": ""
   },
   {
@@ -3482,7 +3494,7 @@
   {
     "term": "Show on Overview",
     "context": "Show on Overview",
-    "reference": "Modules/Settings/DockTab.qml:242, Modules/Settings/DankBarTab.qml:936",
+    "reference": "Modules/Settings/DockTab.qml:242, Modules/Settings/DankBarTab.qml:945",
     "comment": ""
   },
   {
@@ -3542,19 +3554,25 @@
   {
     "term": "Shows all running applications with focus indication",
     "context": "Shows all running applications with focus indication",
-    "reference": "Modules/Settings/DankBarTab.qml:51",
+    "reference": "Modules/Settings/DankBarTab.qml:54",
     "comment": ""
   },
   {
     "term": "Shows current workspace and allows switching",
     "context": "Shows current workspace and allows switching",
-    "reference": "Modules/Settings/DankBarTab.qml:39",
+    "reference": "Modules/Settings/DankBarTab.qml:42",
+    "comment": ""
+  },
+  {
+    "term": "Shows when caps lock is active",
+    "context": "Shows when caps lock is active",
+    "reference": "Modules/Settings/DankBarTab.qml:161",
     "comment": ""
   },
   {
     "term": "Shows when microphone, camera, or screen sharing is active",
     "context": "Shows when microphone, camera, or screen sharing is active",
-    "reference": "Modules/Settings/DankBarTab.qml:122",
+    "reference": "Modules/Settings/DankBarTab.qml:125",
     "comment": ""
   },
   {
@@ -3566,7 +3584,7 @@
   {
     "term": "Size",
     "context": "Size",
-    "reference": "Modules/ProcessList/SystemTab.qml:456, Modules/Settings/DankBarTab.qml:1156, Modules/Settings/DankBarTab.qml:1170",
+    "reference": "Modules/ProcessList/SystemTab.qml:456, Modules/Settings/DankBarTab.qml:1165, Modules/Settings/DankBarTab.qml:1179",
     "comment": ""
   },
   {
@@ -3590,13 +3608,13 @@
   {
     "term": "Spacer",
     "context": "Spacer",
-    "reference": "Modules/Settings/DankBarTab.qml:157",
+    "reference": "Modules/Settings/DankBarTab.qml:166",
     "comment": ""
   },
   {
     "term": "Spacing",
     "context": "Spacing",
-    "reference": "Modules/Settings/DockTab.qml:473, Modules/Settings/DankBarTab.qml:995",
+    "reference": "Modules/Settings/DockTab.qml:473, Modules/Settings/DankBarTab.qml:1004",
     "comment": ""
   },
   {
@@ -3608,7 +3626,7 @@
   {
     "term": "Square Corners",
     "context": "Square Corners",
-    "reference": "Modules/Settings/DankBarTab.qml:1321",
+    "reference": "Modules/Settings/DankBarTab.qml:1330",
     "comment": ""
   },
   {
@@ -3698,13 +3716,13 @@
   {
     "term": "Sync Mode with Portal",
     "context": "Sync Mode with Portal",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1205",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1214",
     "comment": ""
   },
   {
     "term": "Sync dark mode with settings portals for system-wide theme hints",
     "context": "Sync dark mode with settings portals for system-wide theme hints",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1212",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1215",
     "comment": ""
   },
   {
@@ -3716,7 +3734,7 @@
   {
     "term": "System App Theming",
     "context": "System App Theming",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1347",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1348",
     "comment": ""
   },
   {
@@ -3740,13 +3758,13 @@
   {
     "term": "System Tray",
     "context": "System Tray",
-    "reference": "Modules/Settings/DisplaysTab.qml:49, Modules/Settings/DankBarTab.qml:115",
+    "reference": "Modules/Settings/DisplaysTab.qml:49, Modules/Settings/DankBarTab.qml:118",
     "comment": ""
   },
   {
     "term": "System Update",
     "context": "System Update",
-    "reference": "Modules/Settings/DankBarTab.qml:194",
+    "reference": "Modules/Settings/DankBarTab.qml:203",
     "comment": ""
   },
   {
@@ -3770,7 +3788,7 @@
   {
     "term": "System notification area icons",
     "context": "System notification area icons",
-    "reference": "Modules/Settings/DankBarTab.qml:116",
+    "reference": "Modules/Settings/DankBarTab.qml:119",
     "comment": ""
   },
   {
@@ -3804,6 +3822,12 @@
     "comment": ""
   },
   {
+    "term": "Terminals - Always use Dark Theme",
+    "context": "Terminals - Always use Dark Theme",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1224",
+    "comment": ""
+  },
+  {
     "term": "Text",
     "context": "Text",
     "reference": "Modals/Clipboard/ClipboardEntry.qml:87",
@@ -3818,7 +3842,7 @@
   {
     "term": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
     "context": "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).",
-    "reference": "Modules/Settings/ThemeColorsTab.qml:1258",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:1259",
     "comment": ""
   },
   {
@@ -3854,7 +3878,7 @@
   {
     "term": "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.",
     "context": "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.",
-    "reference": "Modules/Settings/DankBarTab.qml:111",
+    "reference": "Modules/Settings/DankBarTab.qml:114",
     "comment": ""
   },
   {
@@ -3890,7 +3914,7 @@
   {
     "term": "To update, run the following command:",
     "context": "To update, run the following command:",
-    "reference": "Services/DMSService.qml:301",
+    "reference": "Services/DMSService.qml:304",
     "comment": ""
   },
   {
@@ -3908,7 +3932,7 @@
   {
     "term": "Toggle top bar visibility manually (can be controlled via IPC)",
     "context": "Toggle top bar visibility manually (can be controlled via IPC)",
-    "reference": "Modules/Settings/DankBarTab.qml:889",
+    "reference": "Modules/Settings/DankBarTab.qml:898",
     "comment": ""
   },
   {
@@ -3932,7 +3956,7 @@
   {
     "term": "Top",
     "context": "Top",
-    "reference": "Modules/Settings/DankBarTab.qml:770",
+    "reference": "Modules/Settings/DankBarTab.qml:779",
     "comment": ""
   },
   {
@@ -3944,7 +3968,7 @@
   {
     "term": "Top Section",
     "context": "Top Section",
-    "reference": "Modules/Settings/DankBarTab.qml:1893",
+    "reference": "Modules/Settings/DankBarTab.qml:1902",
     "comment": ""
   },
   {
@@ -4020,21 +4044,21 @@
     "comment": ""
   },
   {
-    "term": "Use Fahrenheit",
-    "context": "Use Fahrenheit",
+    "term": "Use IP Location",
+    "context": "Use IP Location",
+    "reference": "Modules/Settings/DisplaysTab.qml:403",
+    "comment": ""
+  },
+  {
+    "term": "Use Imperial Units",
+    "context": "Use Imperial Units",
     "reference": "Modules/Settings/TimeWeatherTab.qml:538",
     "comment": ""
   },
   {
-    "term": "Use Fahrenheit instead of Celsius for temperature",
-    "context": "Use Fahrenheit instead of Celsius for temperature",
+    "term": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
+    "context": "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)",
     "reference": "Modules/Settings/TimeWeatherTab.qml:545",
-    "comment": ""
-  },
-  {
-    "term": "Use IP Location",
-    "context": "Use IP Location",
-    "reference": "Modules/Settings/DisplaysTab.qml:403",
     "comment": ""
   },
   {
@@ -4112,7 +4136,7 @@
   {
     "term": "VPN",
     "context": "VPN",
-    "reference": "Modules/Settings/DankBarTab.qml:145",
+    "reference": "Modules/Settings/DankBarTab.qml:148",
     "comment": ""
   },
   {
@@ -4124,7 +4148,7 @@
   {
     "term": "VPN status and quick connect",
     "context": "VPN status and quick connect",
-    "reference": "Modules/Settings/DankBarTab.qml:146",
+    "reference": "Modules/Settings/DankBarTab.qml:149",
     "comment": ""
   },
   {
@@ -4166,13 +4190,13 @@
   {
     "term": "Visibility",
     "context": "Visibility",
-    "reference": "Modules/DankDash/WeatherTab.qml:495, Modules/Settings/TimeWeatherTab.qml:1322",
+    "reference": "Modules/DankDash/WeatherTab.qml:512, Modules/Settings/TimeWeatherTab.qml:1339",
     "comment": ""
   },
   {
     "term": "Visual divider between widgets",
     "context": "Visual divider between widgets",
-    "reference": "Modules/Settings/DankBarTab.qml:164",
+    "reference": "Modules/Settings/DankBarTab.qml:173",
     "comment": ""
   },
   {
@@ -4232,7 +4256,7 @@
   {
     "term": "Weather Widget",
     "context": "Weather Widget",
-    "reference": "Modules/Settings/DankBarTab.qml:62",
+    "reference": "Modules/Settings/DankBarTab.qml:65",
     "comment": ""
   },
   {
@@ -4262,13 +4286,13 @@
   {
     "term": "WiFi is off",
     "context": "WiFi is off",
-    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:159",
+    "reference": "Modules/ControlCenter/Details/NetworkDetail.qml:163",
     "comment": ""
   },
   {
     "term": "Widget Management",
     "context": "Widget Management",
-    "reference": "Modules/Settings/DankBarTab.qml:1787",
+    "reference": "Modules/Settings/DankBarTab.qml:1796",
     "comment": ""
   },
   {
@@ -4316,7 +4340,7 @@
   {
     "term": "Workspace Switcher",
     "context": "Workspace Switcher",
-    "reference": "Modules/Settings/DankBarTab.qml:38",
+    "reference": "Modules/Settings/DankBarTab.qml:41",
     "comment": ""
   },
   {

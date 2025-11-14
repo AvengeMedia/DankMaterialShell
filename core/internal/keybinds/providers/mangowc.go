@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/mangowc"
 )
 
 type MangoWCProvider struct {
@@ -26,7 +25,7 @@ func (m *MangoWCProvider) Name() string {
 }
 
 func (m *MangoWCProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
-	keybinds_list, err := mangowc.ParseKeys(m.configPath)
+	keybinds_list, err := ParseMangoWCKeys(m.configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse mangowc config: %w", err)
 	}
@@ -83,7 +82,7 @@ func (m *MangoWCProvider) categorizeByCommand(command string) string {
 	}
 }
 
-func (m *MangoWCProvider) convertKeybind(kb *mangowc.KeyBinding) keybinds.Keybind {
+func (m *MangoWCProvider) convertKeybind(kb *MangoWCKeyBinding) keybinds.Keybind {
 	key := m.formatKey(kb)
 	desc := kb.Comment
 
@@ -104,7 +103,7 @@ func (m *MangoWCProvider) generateDescription(command, params string) string {
 	return command
 }
 
-func (m *MangoWCProvider) formatKey(kb *mangowc.KeyBinding) string {
+func (m *MangoWCProvider) formatKey(kb *MangoWCKeyBinding) string {
 	parts := make([]string, 0, len(kb.Mods)+1)
 	parts = append(parts, kb.Mods...)
 	parts = append(parts, kb.Key)

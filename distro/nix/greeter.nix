@@ -14,7 +14,7 @@
         export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package config.programs.${cfg.compositor.name}.package ]}
         ${lib.escapeShellArgs ([
             "sh"
-            "${../quickshell/Modules/Greetd/assets/dms-greeter}"
+            "${../../quickshell/Modules/Greetd/assets/dms-greeter}"
             "--cache-dir"
             "/var/lib/dmsgreeter"
             "--command"

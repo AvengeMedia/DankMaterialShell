@@ -21,33 +21,26 @@ func TestNetworkManagerBackend_GetWiFiEnabled(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_SetWiFiEnabled(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
 
-	originalState, err := backend.GetWiFiEnabled()
-	if err != nil {
-		t.Skipf("Cannot get WiFi state: %v", err)
-	}
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
-	defer func() {
-		backend.SetWiFiEnabled(originalState)
-	}()
+	mockNM.EXPECT().SetPropertyWirelessEnabled(true).Return(nil)
 
-	err = backend.SetWiFiEnabled(!originalState)
+	err = backend.SetWiFiEnabled(true)
 	assert.NoError(t, err)
 
 	backend.stateMutex.RLock()
-	assert.Equal(t, !originalState, backend.state.WiFiEnabled)
+	assert.True(t, backend.state.WiFiEnabled)
 	backend.stateMutex.RUnlock()
 }
 
 func TestNetworkManagerBackend_ScanWiFi_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	err = backend.ScanWiFi()
@@ -56,14 +49,14 @@ func TestNetworkManagerBackend_ScanWiFi_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_ScanWiFi_Disabled(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockDeviceWireless := mock_gonetworkmanager.NewMockDeviceWireless(t)
 
-	if backend.wifiDevice == nil {
-		t.Skip("No WiFi device available")
-	}
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+
+	backend.wifiDevice = mockDeviceWireless
+	backend.wifiDev = mockDeviceWireless
 
 	backend.stateMutex.Lock()
 	backend.state.WiFiEnabled = false
@@ -75,10 +68,10 @@ func TestNetworkManagerBackend_ScanWiFi_Disabled(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_GetWiFiNetworkDetails_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	_, err = backend.GetWiFiNetworkDetails("TestNetwork")
@@ -87,10 +80,10 @@ func TestNetworkManagerBackend_GetWiFiNetworkDetails_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_ConnectWiFi_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	req := ConnectionRequest{SSID: "TestNetwork", Password: "password"}
@@ -100,14 +93,14 @@ func TestNetworkManagerBackend_ConnectWiFi_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_ConnectWiFi_AlreadyConnected(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+	mockDeviceWireless := mock_gonetworkmanager.NewMockDeviceWireless(t)
 
-	if backend.wifiDevice == nil {
-		t.Skip("No WiFi device available")
-	}
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
+
+	backend.wifiDevice = mockDeviceWireless
+	backend.wifiDev = mockDeviceWireless
 
 	backend.stateMutex.Lock()
 	backend.state.WiFiConnected = true
@@ -120,10 +113,10 @@ func TestNetworkManagerBackend_ConnectWiFi_AlreadyConnected(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_DisconnectWiFi_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	err = backend.DisconnectWiFi()
@@ -132,10 +125,10 @@ func TestNetworkManagerBackend_DisconnectWiFi_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_IsConnectingTo(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.stateMutex.Lock()
 	backend.state.IsConnecting = true
@@ -147,10 +140,10 @@ func TestNetworkManagerBackend_IsConnectingTo(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_IsConnectingTo_NotConnecting(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.stateMutex.Lock()
 	backend.state.IsConnecting = false
@@ -161,10 +154,10 @@ func TestNetworkManagerBackend_IsConnectingTo_NotConnecting(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_UpdateWiFiNetworks_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	_, err = backend.updateWiFiNetworks()
@@ -173,10 +166,10 @@ func TestNetworkManagerBackend_UpdateWiFiNetworks_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_FindConnection_NoSettings(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.settings = nil
 	_, err = backend.findConnection("NonExistentNetwork")
@@ -184,10 +177,10 @@ func TestNetworkManagerBackend_FindConnection_NoSettings(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_CreateAndConnectWiFi_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	backend.wifiDev = nil

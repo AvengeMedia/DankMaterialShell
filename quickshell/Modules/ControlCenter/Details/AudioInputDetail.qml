@@ -7,6 +7,8 @@ import qs.Services
 import qs.Widgets
 
 Rectangle {
+    id: root
+
     property bool hasInputVolumeSliderInCC: {
         const widgets = SettingsData.controlCenterWidgets || []
         return widgets.some(widget => widget.id === "inputVolumeSlider")
@@ -124,9 +126,25 @@ Rectangle {
 
             Repeater {
                 model: ScriptModel {
-                    values: Pipewire.nodes.values.filter(node => {
-                        return node.audio && !node.isSink && !node.isStream
-                    })
+                    values: {
+                        const nodes = Pipewire.nodes.values.filter(node => {
+                            return node.audio && !node.isSink && !node.isStream
+                        })
+                        const pins = SettingsData.audioInputDevicePins || {}
+                        const pinnedName = pins["preferredInput"]
+                        
+                        let sorted = [...nodes]
+                        sorted.sort((a, b) => {
+                            // Pinned device first
+                            if (a.name === pinnedName && b.name !== pinnedName) return -1
+                            if (b.name === pinnedName && a.name !== pinnedName) return 1
+                            // Then active device
+                            if (a === AudioService.source && b !== AudioService.source) return -1
+                            if (b === AudioService.source && a !== AudioService.source) return 1
+                            return 0
+                        })
+                        return sorted
+                    }
                 }
 
                 delegate: Rectangle {
@@ -185,9 +203,69 @@ Rectangle {
                         }
                     }
 
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: pinInputRow.width + Theme.spacingS * 2
+                        height: 28
+                        radius: height / 2
+                        color: {
+                            const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
+                            return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                        }
+
+                        Row {
+                            id: pinInputRow
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            DankIcon {
+                                name: "push_pin"
+                                size: 16
+                                color: {
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: {
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
+                                    return isThisDevicePinned ? "Pinned" : "Pin"
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: {
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}))
+                                const isCurrentlyPinned = pins["preferredInput"] === modelData.name
+                                
+                                if (isCurrentlyPinned) {
+                                    delete pins["preferredInput"]
+                                } else {
+                                    pins["preferredInput"] = modelData.name
+                                }
+                                
+                                SettingsData.set("audioInputDevicePins", pins)
+                            }
+                        }
+                    }
+
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent
+                        anchors.rightMargin: pinInputRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {

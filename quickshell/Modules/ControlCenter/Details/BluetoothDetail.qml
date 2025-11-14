@@ -54,6 +54,8 @@ Rectangle {
         }
     }
 
+
+
     Row {
         id: headerRow
         anchors.left: parent.left
@@ -150,10 +152,18 @@ Rectangle {
                     if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
                         return []
 
+                    const pins = SettingsData.bluetoothDevicePins || {}
+                    const pinnedAddr = pins["preferredDevice"]
+                    
                     let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
                     devices.sort((a, b) => {
+                        // Pinned device first
+                        if (a.address === pinnedAddr && b.address !== pinnedAddr) return -1
+                        if (b.address === pinnedAddr && a.address !== pinnedAddr) return 1
+                        // Then connected devices
                         if (a.connected && !b.connected) return -1
                         if (!a.connected && b.connected) return 1
+                        // Then by signal strength
                         return (b.signalStrength || 0) - (a.signalStrength || 0)
                     })
                     return devices
@@ -273,6 +283,65 @@ Rectangle {
                         }
                     }
 
+                    Rectangle {
+                        anchors.right: pairedOptionsButton.left
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: pinBluetoothRow.width + Theme.spacingS * 2
+                        height: 28
+                        radius: height / 2
+                        color: {
+                            const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                            return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                        }
+
+                        Row {
+                            id: pinBluetoothRow
+                            anchors.centerIn: parent
+                            spacing: 4
+
+                            DankIcon {
+                                name: "push_pin"
+                                size: 16
+                                color: {
+                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: {
+                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    return isThisDevicePinned ? "Pinned" : "Pin"
+                                }
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: {
+                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                }
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                const pins = JSON.parse(JSON.stringify(SettingsData.bluetoothDevicePins || {}))
+                                const isCurrentlyPinned = pins["preferredDevice"] === modelData.address
+                                
+                                if (isCurrentlyPinned) {
+                                    delete pins["preferredDevice"]
+                                } else {
+                                    pins["preferredDevice"] = modelData.address
+                                }
+                                
+                                SettingsData.set("bluetoothDevicePins", pins)
+                            }
+                        }
+                    }
+
                     DankActionButton {
                         id: pairedOptionsButton
                         anchors.right: parent.right
@@ -293,7 +362,7 @@ Rectangle {
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent
-                        anchors.rightMargin: pairedOptionsButton.width + Theme.spacingS
+                        anchors.rightMargin: pairedOptionsButton.width + Theme.spacingM + pinBluetoothRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {

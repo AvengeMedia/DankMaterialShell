@@ -7,6 +7,10 @@ on:
         description: 'Versioning (e.g., 0.1.14, leave empty for latest release)'
         required: false
         default: ''
+      release:
+        description: 'Release number (e.g., 1, 2, 3 for hotfixes)'
+        required: false
+        default: '1'
 
 jobs:
   build-and-upload:
@@ -19,6 +23,7 @@ jobs:
       - name: Determine version
         id: version
         run: |
+          # Get version from manual input or latest release
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION="${{ github.event.inputs.version }}"
             echo "Using manual version: $VERSION"
@@ -27,8 +32,14 @@ jobs:
             echo "Using latest release version: $VERSION"
           fi
 
+          RELEASE="${{ github.event.inputs.release }}"
+          if [ -z "$RELEASE" ]; then
+            RELEASE="1"
+          fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "✅ Building DMS stable version: $VERSION"
+          echo "release=$RELEASE" >> $GITHUB_OUTPUT
+          echo "✅ Building DMS hotfix version: $VERSION-$RELEASE"
       
       - name: Setup build environment
         run: |
@@ -57,6 +68,7 @@ jobs:
       - name: Generate stable spec file
         run: |
           VERSION="${{ steps.version.outputs.version }}"
+          RELEASE="${{ steps.version.outputs.release }}"
           CHANGELOG_DATE="$(date '+%a %b %d %Y')"
 
           cat > ~/rpmbuild/SPECS/dms.spec <<'SPECEOF'
@@ -68,7 +80,7 @@ jobs:
 
           Name:           dms
           Version:        %{version}
-          Release:        1%{?dist}
+          Release:        RELEASE_PLACEHOLDER%{?dist}
           Summary:        %{pkg_summary}
 
           License:        MIT
@@ -212,16 +224,17 @@ jobs:
           %{_bindir}/dgop
 
           %changelog
-          * CHANGELOG_DATE_PLACEHOLDER AvengeMedia <contact@avengemedia.com> - VERSION_PLACEHOLDER-1
+          * CHANGELOG_DATE_PLACEHOLDER AvengeMedia <contact@avengemedia.com> - VERSION_PLACEHOLDER-RELEASE_PLACEHOLDER
           - Stable release VERSION_PLACEHOLDER
           - Built from GitHub release
           - Includes latest dms-cli and dgop binaries
           SPECEOF
 
           sed -i "s/VERSION_PLACEHOLDER/${VERSION}/g" ~/rpmbuild/SPECS/dms.spec
+          sed -i "s/RELEASE_PLACEHOLDER/${RELEASE}/g" ~/rpmbuild/SPECS/dms.spec
           sed -i "s/CHANGELOG_DATE_PLACEHOLDER/${CHANGELOG_DATE}/g" ~/rpmbuild/SPECS/dms.spec
-          
-          echo "✅ Spec file generated for v${VERSION}"
+
+          echo "✅ Spec file generated for v${VERSION}-${RELEASE}"
           echo ""
           echo "=== Spec file preview ==="
           head -40 ~/rpmbuild/SPECS/dms.spec
@@ -295,7 +308,7 @@ jobs:
         run: |
           echo "### 🎉 DMS Stable Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version:** ${{ steps.version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.version }}-${{ steps.version.outputs.release }}" >> $GITHUB_STEP_SUMMARY
           echo "- **SRPM:** ${{ steps.build.outputs.srpm_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Project:** https://copr.fedorainfracloud.org/coprs/avengemedia/dms/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

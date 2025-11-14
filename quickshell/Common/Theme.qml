@@ -779,8 +779,9 @@ Singleton {
         Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`])
         workerRunning = true
         const syncModeWithPortal = (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal) ? "true" : "false"
+        const terminalsAlwaysDark = (typeof SettingsData !== "undefined" && SettingsData.terminalsAlwaysDark) ? "true" : "false"
         console.log("Theme: Starting matugen worker")
-        systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, "--run"]
+        systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, terminalsAlwaysDark, "--run"]
         systemThemeGenerator.running = true
     }
 

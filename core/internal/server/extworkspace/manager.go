@@ -151,9 +151,8 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		outputID := e.Output.ID()
 		log.Debugf("ExtWorkspace: Group %d output enter (output=%d)", groupID, outputID)
 
-		group.outputIDs[outputID] = true
-
 		m.post(func() {
+			group.outputIDs[outputID] = true
 			m.updateState()
 		})
 	})
@@ -161,8 +160,8 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 	handle.SetOutputLeaveHandler(func(e ext_workspace.ExtWorkspaceGroupHandleV1OutputLeaveEvent) {
 		outputID := e.Output.ID()
 		log.Debugf("ExtWorkspace: Group %d output leave (output=%d)", groupID, outputID)
-		delete(group.outputIDs, outputID)
 		m.post(func() {
+			delete(group.outputIDs, outputID)
 			m.updateState()
 		})
 	})
@@ -171,14 +170,14 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		workspaceID := e.Workspace.ID()
 		log.Debugf("ExtWorkspace: Group %d workspace enter (workspace=%d)", groupID, workspaceID)
 
-		m.workspacesMutex.Lock()
-		if ws, exists := m.workspaces[workspaceID]; exists {
-			ws.groupID = groupID
-		}
-		m.workspacesMutex.Unlock()
-
-		group.workspaceIDs = append(group.workspaceIDs, workspaceID)
 		m.post(func() {
+			m.workspacesMutex.Lock()
+			if ws, exists := m.workspaces[workspaceID]; exists {
+				ws.groupID = groupID
+			}
+			m.workspacesMutex.Unlock()
+
+			group.workspaceIDs = append(group.workspaceIDs, workspaceID)
 			m.updateState()
 		})
 	})
@@ -187,32 +186,33 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		workspaceID := e.Workspace.ID()
 		log.Debugf("ExtWorkspace: Group %d workspace leave (workspace=%d)", groupID, workspaceID)
 
-		m.workspacesMutex.Lock()
-		if ws, exists := m.workspaces[workspaceID]; exists {
-			ws.groupID = 0
-		}
-		m.workspacesMutex.Unlock()
-
-		for i, id := range group.workspaceIDs {
-			if id == workspaceID {
-				group.workspaceIDs = append(group.workspaceIDs[:i], group.workspaceIDs[i+1:]...)
-				break
-			}
-		}
 		m.post(func() {
+			m.workspacesMutex.Lock()
+			if ws, exists := m.workspaces[workspaceID]; exists {
+				ws.groupID = 0
+			}
+			m.workspacesMutex.Unlock()
+
+			for i, id := range group.workspaceIDs {
+				if id == workspaceID {
+					group.workspaceIDs = append(group.workspaceIDs[:i], group.workspaceIDs[i+1:]...)
+					break
+				}
+			}
 			m.updateState()
 		})
 	})
 
 	handle.SetRemovedHandler(func(e ext_workspace.ExtWorkspaceGroupHandleV1RemovedEvent) {
 		log.Debugf("ExtWorkspace: Group %d removed", groupID)
-		group.removed = true
-
-		m.groupsMutex.Lock()
-		delete(m.groups, groupID)
-		m.groupsMutex.Unlock()
 
 		m.post(func() {
+			group.removed = true
+
+			m.groupsMutex.Lock()
+			delete(m.groups, groupID)
+			m.groupsMutex.Unlock()
+
 			m.wlMutex.Lock()
 			handle.Destroy()
 			m.wlMutex.Unlock()
@@ -240,16 +240,16 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 
 	handle.SetIdHandler(func(e ext_workspace.ExtWorkspaceHandleV1IdEvent) {
 		log.Debugf("ExtWorkspace: Workspace %d id: %s", workspaceID, e.Id)
-		ws.workspaceID = e.Id
 		m.post(func() {
+			ws.workspaceID = e.Id
 			m.updateState()
 		})
 	})
 
 	handle.SetNameHandler(func(e ext_workspace.ExtWorkspaceHandleV1NameEvent) {
 		log.Debugf("ExtWorkspace: Workspace %d name: %s", workspaceID, e.Name)
-		ws.name = e.Name
 		m.post(func() {
+			ws.name = e.Name
 			m.updateState()
 		})
 	})
@@ -266,16 +266,16 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 			}
 		}
 		log.Debugf("ExtWorkspace: Workspace %d coordinates: %v", workspaceID, coords)
-		ws.coordinates = coords
 		m.post(func() {
+			ws.coordinates = coords
 			m.updateState()
 		})
 	})
 
 	handle.SetStateHandler(func(e ext_workspace.ExtWorkspaceHandleV1StateEvent) {
 		log.Debugf("ExtWorkspace: Workspace %d state: %d", workspaceID, e.State)
-		ws.state = e.State
 		m.post(func() {
+			ws.state = e.State
 			m.updateState()
 		})
 	})
@@ -286,13 +286,14 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 
 	handle.SetRemovedHandler(func(e ext_workspace.ExtWorkspaceHandleV1RemovedEvent) {
 		log.Debugf("ExtWorkspace: Workspace %d removed", workspaceID)
-		ws.removed = true
-
-		m.workspacesMutex.Lock()
-		delete(m.workspaces, workspaceID)
-		m.workspacesMutex.Unlock()
 
 		m.post(func() {
+			ws.removed = true
+
+			m.workspacesMutex.Lock()
+			delete(m.workspaces, workspaceID)
+			m.workspacesMutex.Unlock()
+
 			m.wlMutex.Lock()
 			handle.Destroy()
 			m.wlMutex.Unlock()
@@ -422,112 +423,140 @@ func (m *Manager) notifier() {
 }
 
 func (m *Manager) ActivateWorkspace(groupID, workspaceID string) error {
-	m.workspacesMutex.RLock()
-	defer m.workspacesMutex.RUnlock()
+	errChan := make(chan error, 1)
 
-	var targetGroupID uint32
-	if groupID != "" {
-		var parsedID uint32
-		if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
-			targetGroupID = parsedID
-		}
-	}
+	m.post(func() {
+		m.workspacesMutex.RLock()
+		defer m.workspacesMutex.RUnlock()
 
-	for _, ws := range m.workspaces {
-		if targetGroupID != 0 && ws.groupID != targetGroupID {
-			continue
-		}
-		if ws.workspaceID == workspaceID || ws.name == workspaceID {
-			m.wlMutex.Lock()
-			err := ws.handle.Activate()
-			if err == nil {
-				err = m.manager.Commit()
+		var targetGroupID uint32
+		if groupID != "" {
+			var parsedID uint32
+			if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
+				targetGroupID = parsedID
 			}
-			m.wlMutex.Unlock()
-			return err
 		}
-	}
 
-	return fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		for _, ws := range m.workspaces {
+			if targetGroupID != 0 && ws.groupID != targetGroupID {
+				continue
+			}
+			if ws.workspaceID == workspaceID || ws.name == workspaceID {
+				m.wlMutex.Lock()
+				err := ws.handle.Activate()
+				if err == nil {
+					err = m.manager.Commit()
+				}
+				m.wlMutex.Unlock()
+				errChan <- err
+				return
+			}
+		}
+
+		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+	})
+
+	return <-errChan
 }
 
 func (m *Manager) DeactivateWorkspace(groupID, workspaceID string) error {
-	m.workspacesMutex.RLock()
-	defer m.workspacesMutex.RUnlock()
+	errChan := make(chan error, 1)
 
-	var targetGroupID uint32
-	if groupID != "" {
-		var parsedID uint32
-		if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
-			targetGroupID = parsedID
-		}
-	}
+	m.post(func() {
+		m.workspacesMutex.RLock()
+		defer m.workspacesMutex.RUnlock()
 
-	for _, ws := range m.workspaces {
-		if targetGroupID != 0 && ws.groupID != targetGroupID {
-			continue
-		}
-		if ws.workspaceID == workspaceID || ws.name == workspaceID {
-			m.wlMutex.Lock()
-			err := ws.handle.Deactivate()
-			if err == nil {
-				err = m.manager.Commit()
+		var targetGroupID uint32
+		if groupID != "" {
+			var parsedID uint32
+			if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
+				targetGroupID = parsedID
 			}
-			m.wlMutex.Unlock()
-			return err
 		}
-	}
 
-	return fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		for _, ws := range m.workspaces {
+			if targetGroupID != 0 && ws.groupID != targetGroupID {
+				continue
+			}
+			if ws.workspaceID == workspaceID || ws.name == workspaceID {
+				m.wlMutex.Lock()
+				err := ws.handle.Deactivate()
+				if err == nil {
+					err = m.manager.Commit()
+				}
+				m.wlMutex.Unlock()
+				errChan <- err
+				return
+			}
+		}
+
+		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+	})
+
+	return <-errChan
 }
 
 func (m *Manager) RemoveWorkspace(groupID, workspaceID string) error {
-	m.workspacesMutex.RLock()
-	defer m.workspacesMutex.RUnlock()
+	errChan := make(chan error, 1)
 
-	var targetGroupID uint32
-	if groupID != "" {
-		var parsedID uint32
-		if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
-			targetGroupID = parsedID
-		}
-	}
+	m.post(func() {
+		m.workspacesMutex.RLock()
+		defer m.workspacesMutex.RUnlock()
 
-	for _, ws := range m.workspaces {
-		if targetGroupID != 0 && ws.groupID != targetGroupID {
-			continue
-		}
-		if ws.workspaceID == workspaceID || ws.name == workspaceID {
-			m.wlMutex.Lock()
-			err := ws.handle.Remove()
-			if err == nil {
-				err = m.manager.Commit()
+		var targetGroupID uint32
+		if groupID != "" {
+			var parsedID uint32
+			if _, err := fmt.Sscanf(groupID, "group-%d", &parsedID); err == nil {
+				targetGroupID = parsedID
 			}
-			m.wlMutex.Unlock()
-			return err
 		}
-	}
 
-	return fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		for _, ws := range m.workspaces {
+			if targetGroupID != 0 && ws.groupID != targetGroupID {
+				continue
+			}
+			if ws.workspaceID == workspaceID || ws.name == workspaceID {
+				m.wlMutex.Lock()
+				err := ws.handle.Remove()
+				if err == nil {
+					err = m.manager.Commit()
+				}
+				m.wlMutex.Unlock()
+				errChan <- err
+				return
+			}
+		}
+
+		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+	})
+
+	return <-errChan
 }
 
 func (m *Manager) CreateWorkspace(groupID, workspaceName string) error {
-	m.groupsMutex.RLock()
-	defer m.groupsMutex.RUnlock()
+	errChan := make(chan error, 1)
 
-	for _, group := range m.groups {
-		if fmt.Sprintf("group-%d", group.id) == groupID {
-			m.wlMutex.Lock()
-			err := group.handle.CreateWorkspace(workspaceName)
-			if err == nil {
-				err = m.manager.Commit()
+	m.post(func() {
+		m.groupsMutex.RLock()
+		defer m.groupsMutex.RUnlock()
+
+		for _, group := range m.groups {
+			if fmt.Sprintf("group-%d", group.id) == groupID {
+				m.wlMutex.Lock()
+				err := group.handle.CreateWorkspace(workspaceName)
+				if err == nil {
+					err = m.manager.Commit()
+				}
+				m.wlMutex.Unlock()
+				errChan <- err
+				return
 			}
-			m.wlMutex.Unlock()
-			return err
 		}
-	}
 
-	return fmt.Errorf("workspace group not found: %s", groupID)
+		errChan <- fmt.Errorf("workspace group not found: %s", groupID)
+	})
+
+	return <-errChan
 }
 
 func (m *Manager) Close() {

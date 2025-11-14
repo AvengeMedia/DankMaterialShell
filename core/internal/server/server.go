@@ -18,6 +18,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
@@ -28,7 +29,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
 )
 
-const APIVersion = 17
+const APIVersion = 18
 
 type Capabilities struct {
 	Capabilities []string `json:"capabilities"`
@@ -54,6 +55,7 @@ var dwlManager *dwl.Manager
 var extWorkspaceManager *extworkspace.Manager
 var brightnessManager *brightness.Manager
 var wlrOutputManager *wlroutput.Manager
+var evdevManager *evdev.Manager
 var wlContext *wlcontext.SharedContext
 
 var capabilitySubscribers = make(map[string]chan ServerInfo)
@@ -292,6 +294,19 @@ func InitializeWlrOutputManager() error {
 	return nil
 }
 
+func InitializeEvdevManager() error {
+	manager, err := evdev.InitializeManager()
+	if err != nil {
+		log.Warnf("Failed to initialize evdev manager: %v", err)
+		return err
+	}
+
+	evdevManager = manager
+
+	log.Info("Evdev manager initialized")
+	return nil
+}
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
@@ -358,6 +373,10 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "wlroutput")
 	}
 
+	if evdevManager != nil {
+		caps = append(caps, "evdev")
+	}
+
 	return Capabilities{Capabilities: caps}
 }
 
@@ -402,6 +421,10 @@ func getServerInfo() ServerInfo {
 
 	if wlrOutputManager != nil {
 		caps = append(caps, "wlroutput")
+	}
+
+	if evdevManager != nil {
+		caps = append(caps, "evdev")
 	}
 
 	return ServerInfo{
@@ -918,6 +941,38 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("evdev") && evdevManager != nil {
+		wg.Add(1)
+		evdevChan := evdevManager.Subscribe(clientID + "-evdev")
+		go func() {
+			defer wg.Done()
+			defer evdevManager.Unsubscribe(clientID + "-evdev")
+
+			initialState := evdevManager.GetState()
+			select {
+			case eventChan <- ServiceEvent{Service: "evdev", Data: initialState}:
+			case <-stopChan:
+				return
+			}
+
+			for {
+				select {
+				case state, ok := <-evdevChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "evdev", Data: state}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	go func() {
 		wg.Wait()
 		close(eventChan)
@@ -973,6 +1028,9 @@ func cleanupManagers() {
 	}
 	if wlrOutputManager != nil {
 		wlrOutputManager.Close()
+	}
+	if evdevManager != nil {
+		evdevManager.Close()
 	}
 	if wlContext != nil {
 		wlContext.Close()
@@ -1122,6 +1180,9 @@ func Start(printDocs bool) error {
 		log.Info("     - transform    : Transform value (optional)")
 		log.Info("     - scale        : Scale value (optional)")
 		log.Info("     - adaptiveSync : Adaptive sync state (optional)")
+		log.Info("Evdev:")
+		log.Info(" evdev.getState                        - Get current evdev state (caps lock)")
+		log.Info(" evdev.subscribe                       - Subscribe to evdev state changes (streaming)")
 		log.Info("")
 	}
 	log.Info("Initializing managers...")
@@ -1194,16 +1255,22 @@ func Start(printDocs bool) error {
 	fatalErrChan := make(chan error, 1)
 	if wlrOutputManager != nil {
 		go func() {
-			select {
-			case err := <-wlrOutputManager.FatalError():
-				fatalErrChan <- fmt.Errorf("WlrOutput fatal error: %w", err)
-			}
+			err := <-wlrOutputManager.FatalError()
+			fatalErrChan <- fmt.Errorf("WlrOutput fatal error: %w", err)
 		}()
 	}
 
 	go func() {
 		if err := InitializeBrightnessManager(); err != nil {
 			log.Warnf("Brightness manager unavailable: %v", err)
+		} else {
+			notifyCapabilityChange()
+		}
+	}()
+
+	go func() {
+		if err := InitializeEvdevManager(); err != nil {
+			log.Debugf("Evdev manager unavailable: %v", err)
 		} else {
 			notifyCapabilityChange()
 		}

@@ -263,7 +263,7 @@ func (u *UbuntuDistribution) InstallPackages(ctx context.Context, dependencies [
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, ppaPkgs, manualPkgs := u.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, ppaPkgs, manualPkgs, variantMap := u.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	// Phase 2: Enable PPA repositories
 	if len(ppaPkgs) > 0 {
@@ -329,7 +329,7 @@ func (u *UbuntuDistribution) InstallPackages(ctx context.Context, dependencies [
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := u.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := u.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -355,10 +355,15 @@ func (u *UbuntuDistribution) InstallPackages(ctx context.Context, dependencies [
 	return nil
 }
 
-func (u *UbuntuDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []PackageMapping, []string) {
+func (u *UbuntuDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []PackageMapping, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []string{}
 	ppaPkgs := []PackageMapping{}
 	manualPkgs := []string{}
+
+	variantMap := make(map[string]deps.PackageVariant)
+	for _, dep := range dependencies {
+		variantMap[dep.Name] = dep.Variant
+	}
 
 	packageMap := u.GetPackageMapping(wm)
 
@@ -387,7 +392,7 @@ func (u *UbuntuDistribution) categorizePackages(dependencies []deps.Dependency, 
 		}
 	}
 
-	return systemPkgs, ppaPkgs, manualPkgs
+	return systemPkgs, ppaPkgs, manualPkgs, variantMap
 }
 
 func (u *UbuntuDistribution) extractPackageNames(packages []PackageMapping) []string {
@@ -729,8 +734,7 @@ func (u *UbuntuDistribution) installGhosttyUbuntu(ctx context.Context, sudoPassw
 	return nil
 }
 
-// Override InstallManualPackages for Ubuntu to handle Ubuntu-specific installations
-func (u *UbuntuDistribution) InstallManualPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (u *UbuntuDistribution) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	if len(packages) == 0 {
 		return nil
 	}
@@ -744,8 +748,7 @@ func (u *UbuntuDistribution) InstallManualPackages(ctx context.Context, packages
 				return fmt.Errorf("failed to install ghostty: %w", err)
 			}
 		default:
-			// Use the base ManualPackageInstaller for other packages
-			if err := u.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, sudoPassword, progressChan); err != nil {
+			if err := u.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, variantMap, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install %s: %w", pkg, err)
 			}
 		}

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The network manager API provides methods for managing WiFi connections, monitoring network state, and handling credential prompts through NetworkManager. Communication occurs over a message-based protocol (websocket, IPC, etc.) with event subscriptions for state updates.
+The network manager API provides methods for managing WiFi connections, monitoring network state, and handling credential prompts through NetworkManager or iwd (and systemd-networkd for ethernet only). Communication occurs over a message-based protocol (websocket, IPC, etc.) with event subscriptions for state updates.
 
 ## API Methods
 

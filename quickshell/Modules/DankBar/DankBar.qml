@@ -844,6 +844,7 @@ Item {
                                         "battery": batteryComponent,
                                         "layout": layoutComponent,
                                         "controlCenterButton": controlCenterButtonComponent,
+                                        "capsLockIndicator": capsLockIndicatorComponent,
                                         "idleInhibitor": idleInhibitorComponent,
                                         "spacer": spacerComponent,
                                         "separator": separatorComponent,
@@ -884,6 +885,7 @@ Item {
                                                                           "batteryComponent": batteryComponent,
                                                                           "layoutComponent": layoutComponent,
                                                                           "controlCenterButtonComponent": controlCenterButtonComponent,
+                                                                          "capsLockIndicatorComponent": capsLockIndicatorComponent,
                                                                           "idleInhibitorComponent": idleInhibitorComponent,
                                                                           "spacerComponent": spacerComponent,
                                                                           "separatorComponent": separatorComponent,
@@ -1425,6 +1427,16 @@ Item {
                                                 NetworkService.scanWifi()
                                             }
                                         }
+                                    }
+                                }
+
+                                Component {
+                                    id: capsLockIndicatorComponent
+
+                                    CapsLockIndicator {
+                                        widgetThickness: barWindow.widgetThickness
+                                        section: topBarContent.getWidgetSection(parent) || "right"
+                                        parentScreen: barWindow.screen
                                     }
                                 }
 

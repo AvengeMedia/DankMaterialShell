@@ -314,7 +314,7 @@ func (f *FedoraDistribution) InstallPackages(ctx context.Context, dependencies [
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	dnfPkgs, coprPkgs, manualPkgs := f.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	dnfPkgs, coprPkgs, manualPkgs, variantMap := f.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	// Phase 2: Enable COPR repositories
 	if len(coprPkgs) > 0 {
@@ -369,7 +369,7 @@ func (f *FedoraDistribution) InstallPackages(ctx context.Context, dependencies [
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := f.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := f.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -395,7 +395,7 @@ func (f *FedoraDistribution) InstallPackages(ctx context.Context, dependencies [
 	return nil
 }
 
-func (f *FedoraDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []PackageMapping, []string) {
+func (f *FedoraDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []PackageMapping, []string, map[string]deps.PackageVariant) {
 	dnfPkgs := []string{}
 	coprPkgs := []PackageMapping{}
 	manualPkgs := []string{}
@@ -432,7 +432,7 @@ func (f *FedoraDistribution) categorizePackages(dependencies []deps.Dependency, 
 		}
 	}
 
-	return dnfPkgs, coprPkgs, manualPkgs
+	return dnfPkgs, coprPkgs, manualPkgs, variantMap
 }
 
 func (f *FedoraDistribution) extractPackageNames(packages []PackageMapping) []string {
@@ -483,7 +483,7 @@ func (f *FedoraDistribution) enableCOPRRepos(ctx context.Context, coprPkgs []Pac
 				}
 
 				priorityCmd := ExecSudoCommand(ctx, sudoPassword,
-					fmt.Sprintf("bash -c 'echo \"priority=1\" | tee -a %s' 2>&1", repoFile))
+					fmt.Sprintf("bash -c 'echo \"priority=1\" | tee -a %s'", repoFile))
 				priorityOutput, err := priorityCmd.CombinedOutput()
 				if err != nil {
 					f.logError("failed to set niri COPR repo priority", err)

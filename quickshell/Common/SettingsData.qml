@@ -95,6 +95,7 @@ Singleton {
     property bool showNotificationButton: true
     property bool showBattery: true
     property bool showControlCenterButton: true
+    property bool showCapsLockIndicator: true
 
     property bool controlCenterShowNetworkIcon: true
     property bool controlCenterShowBluetoothIcon: true
@@ -233,10 +234,15 @@ Singleton {
     property bool loginctlLockIntegration: true
     property string launchPrefix: ""
     property var brightnessDevicePins: ({})
+    property var wifiNetworkPins: ({})
+    property var bluetoothDevicePins: ({})
+    property var audioInputDevicePins: ({})
+    property var audioOutputDevicePins: ({})
 
     property bool gtkThemingEnabled: false
     property bool qtThemingEnabled: false
     property bool syncModeWithPortal: true
+    property bool terminalsAlwaysDark: false
 
     property bool showDock: false
     property bool dockAutoHide: false
@@ -775,6 +781,7 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         showNotificationButton = true
         showBattery = true
         showControlCenterButton = true
+        showCapsLockIndicator = true
         saveSettings()
     }
 

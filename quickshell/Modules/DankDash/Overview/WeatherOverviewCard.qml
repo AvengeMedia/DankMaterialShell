@@ -16,7 +16,7 @@ Card {
     Column {
         anchors.centerIn: parent
         spacing: Theme.spacingS
-        visible: !WeatherService.weather.available || WeatherService.weather.temp === 0
+        visible: !WeatherService.weather.available
 
         DankIcon {
             name: "cloud_off"
@@ -46,7 +46,7 @@ Card {
         anchors.leftMargin: Theme.spacingL
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingL
-        visible: WeatherService.weather.available && WeatherService.weather.temp !== 0
+        visible: WeatherService.weather.available
 
         DankIcon {
             name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
@@ -61,11 +61,9 @@ Card {
 
             StyledText {
                 text: {
-                    const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
-                    if (temp === undefined || temp === null || temp === 0) {
-                        return "--°" + (SettingsData.useFahrenheit ? "F" : "C");
-                    }
-                    return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C");
+                    const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp
+                    if (temp === undefined || temp === null) return "--°" + (SettingsData.useFahrenheit ? "F" : "C")
+                    return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C")
                 }
                 font.pixelSize: Theme.fontSizeXLarge + 4
                 color: Theme.surfaceText

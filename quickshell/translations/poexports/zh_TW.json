@@ -207,7 +207,7 @@
     "Available": "可用"
   },
   "Available Layouts": {
-    "Available Layouts": ""
+    "Available Layouts": "可用佈局"
   },
   "Available Plugins": {
     "Available Plugins": "可用的插件"
@@ -302,11 +302,14 @@
   "Capacity": {
     "Capacity": "容量"
   },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": ""
+  },
   "Center Section": {
     "Center Section": "中間區塊"
   },
   "Center Tiling": {
-    "Center Tiling": ""
+    "Center Tiling": "居中平鋪"
   },
   "Changes:": {
     "Changes:": "變更："
@@ -519,7 +522,7 @@
     "DMS_SOCKET not available": "DMS_SOCKET 不可用"
   },
   "DWL service not available": {
-    "DWL service not available": ""
+    "DWL service not available": "DWL 服務不可用"
   },
   "Daily at:": {
     "Daily at:": "每日:"
@@ -555,7 +558,7 @@
     "Day Temperature": "日間色溫"
   },
   "Deck": {
-    "Deck": ""
+    "Deck": "Deck"
   },
   "Default": {
     "Default": "預設"
@@ -612,7 +615,7 @@
     "Display all priorities over fullscreen apps": "顯示全螢幕應用程式上的所有優先級"
   },
   "Display and switch DWL layouts": {
-    "Display and switch DWL layouts": ""
+    "Display and switch DWL layouts": "顯示並切換 DWL 佈局"
   },
   "Display application icons in workspace indicators": {
     "Display application icons in workspace indicators": "在工作區標籤中顯示應用程式圖標"
@@ -830,6 +833,9 @@
   "Force Kill Process": {
     "Force Kill Process": "強制結束程序"
   },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": "強制終端應用程式始終使用深色配色方案"
+  },
   "Forget Device": {
     "Forget Device": "忘記設備"
   },
@@ -879,7 +885,7 @@
     "Graphics": "圖形"
   },
   "Grid": {
-    "Grid": ""
+    "Grid": "網格"
   },
   "Group by App": {
     "Group by App": "App 分組"
@@ -1026,7 +1032,7 @@
     "Launcher Button Logo": "啟動器按鈕 Logo"
   },
   "Layout": {
-    "Layout": ""
+    "Layout": "佈局"
   },
   "Left": {
     "Left": "左"
@@ -1167,7 +1173,7 @@
     "Monitor whose wallpaper drives dynamic theming colors": "系統介面顏色依據哪一個螢幕上的桌布來決定"
   },
   "Monocle": {
-    "Monocle": ""
+    "Monocle": "單片"
   },
   "Monospace Font": {
     "Monospace Font": "等寬字體"
@@ -1548,7 +1554,7 @@
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "請求確認關機、重新啟動、暫停、休眠和登出操作"
   },
   "Requires DWL compositor": {
-    "Requires DWL compositor": ""
+    "Requires DWL compositor": "需要 DWL 混成器"
   },
   "Reset": {
     "Reset": "重設"
@@ -1581,10 +1587,10 @@
     "Right Section": "右方區塊"
   },
   "Right Tiling": {
-    "Right Tiling": ""
+    "Right Tiling": "右側平鋪"
   },
   "Right-click bar widget to cycle": {
-    "Right-click bar widget to cycle": ""
+    "Right-click bar widget to cycle": "右鍵點擊條形部件以循環"
   },
   "Run User Templates": {
     "Run User Templates": "執行使用者模板"
@@ -1620,7 +1626,7 @@
     "Science": "科學"
   },
   "Scrolling": {
-    "Scrolling": ""
+    "Scrolling": "滾動"
   },
   "Search file contents": {
     "Search file contents": "搜尋檔案內容"
@@ -1778,6 +1784,9 @@
   "Shows current workspace and allows switching": {
     "Shows current workspace and allows switching": "顯示目前工作區並允許切換"
   },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": ""
+  },
   "Shows when microphone, camera, or screen sharing is active": {
     "Shows when microphone, camera, or screen sharing is active": "顯示麥克風、攝影機或螢幕共用處於活動狀態"
   },
@@ -1803,7 +1812,7 @@
     "Spacing": "間距"
   },
   "Spool Area Full": {
-    "Spool Area Full": "緩衝區域已滿"
+    "Spool Area Full": "緩衝區已滿"
   },
   "Square Corners": {
     "Square Corners": "方角"
@@ -1904,6 +1913,9 @@
   "Terminal custom additional parameters": {
     "Terminal custom additional parameters": "自訂終端附加參數"
   },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": "終端 - 始終使用深色主題"
+  },
   "Text": {
     "Text": "文字"
   },
@@ -1935,7 +1947,7 @@
     "This will permanently delete all clipboard history.": "這將永久刪除所有剪貼簿歷史記錄。"
   },
   "Tiling": {
-    "Tiling": ""
+    "Tiling": "平鋪"
   },
   "Time & Weather": {
     "Time & Weather": "時間與天氣"
@@ -2021,6 +2033,12 @@
   "Use IP Location": {
     "Use IP Location": "使用 IP 位置"
   },
+  "Use Imperial Units": {
+    "Use Imperial Units": "使用英制單位"
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "使用英制單位（°F, mph, inHg）而非公制單位（°C, km/h, hPa）"
+  },
   "Use Monospace Font": {
     "Use Monospace Font": "使用等寬字體"
   },
@@ -2070,16 +2088,16 @@
     "VRR: ": "VRR："
   },
   "Vertical Deck": {
-    "Vertical Deck": ""
+    "Vertical Deck": "垂直甲板"
   },
   "Vertical Grid": {
-    "Vertical Grid": ""
+    "Vertical Grid": "垂直網格"
   },
   "Vertical Scrolling": {
-    "Vertical Scrolling": ""
+    "Vertical Scrolling": "垂直滾動"
   },
   "Vertical Tiling": {
-    "Vertical Tiling": ""
+    "Vertical Tiling": "垂直平鋪"
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "色彩鮮明且飽和度活潑的調色板。"

@@ -332,6 +332,7 @@ Item {
         }
 
         ColumnLayout {
+            id: passwordLayout
             anchors.centerIn: parent
             anchors.verticalCenterOffset: 50
             spacing: Theme.spacingM
@@ -736,6 +737,35 @@ Item {
                         duration: Theme.shortDuration
                         easing.type: Theme.standardEasing
                     }
+                }
+            }
+        }
+
+        Row {
+            anchors.top: passwordLayout.bottom
+            anchors.topMargin: Theme.spacingS
+            anchors.horizontalCenter: passwordLayout.horizontalCenter
+            spacing: 4
+            opacity: DMSService.capsLockState ? 1 : 0
+
+            DankIcon {
+                name: "shift_lock"
+                size: 14
+                color: Theme.error
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            StyledText {
+                text: "Caps Lock is on"
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.error
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.shortDuration
+                    easing.type: Theme.standardEasing
                 }
             }
         }

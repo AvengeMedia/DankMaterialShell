@@ -1,4 +1,4 @@
-package mangowc
+package providers
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAutogenerateComment(t *testing.T) {
+func TestMangoWCAutogenerateComment(t *testing.T) {
 	tests := []struct {
 		command  string
 		params   string
@@ -60,25 +60,25 @@ func TestAutogenerateComment(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.command+"_"+tt.params, func(t *testing.T) {
-			result := autogenerateComment(tt.command, tt.params)
+			result := mangowcAutogenerateComment(tt.command, tt.params)
 			if result != tt.expected {
-				t.Errorf("autogenerateComment(%q, %q) = %q, want %q",
+				t.Errorf("mangowcAutogenerateComment(%q, %q) = %q, want %q",
 					tt.command, tt.params, result, tt.expected)
 			}
 		})
 	}
 }
 
-func TestGetKeybindAtLine(t *testing.T) {
+func TestMangoWCGetKeybindAtLine(t *testing.T) {
 	tests := []struct {
 		name     string
 		line     string
-		expected *KeyBinding
+		expected *MangoWCKeyBinding
 	}{
 		{
 			name: "basic_keybind",
 			line: "bind=ALT,q,killclient,",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"ALT"},
 				Key:     "q",
 				Command: "killclient",
@@ -89,7 +89,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_params",
 			line: "bind=ALT,Left,focusdir,left",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"ALT"},
 				Key:     "Left",
 				Command: "focusdir",
@@ -100,7 +100,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_comment",
 			line: "bind=Alt,t,spawn,kitty # Open terminal",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"Alt"},
 				Key:     "t",
 				Command: "spawn",
@@ -116,7 +116,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_multiple_mods",
 			line: "bind=SUPER+SHIFT,Up,exchange_client,up",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"SUPER", "SHIFT"},
 				Key:     "Up",
 				Command: "exchange_client",
@@ -127,7 +127,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_no_mods",
 			line: "bind=NONE,Print,spawn,screenshot",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{},
 				Key:     "Print",
 				Command: "spawn",
@@ -138,7 +138,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_multiple_params",
 			line: "bind=Ctrl,1,view,1,0",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"Ctrl"},
 				Key:     "1",
 				Command: "view",
@@ -149,7 +149,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "bindl_flag",
 			line: "bindl=SUPER+ALT,l,spawn,dms ipc call lock lock",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"SUPER", "ALT"},
 				Key:     "l",
 				Command: "spawn",
@@ -160,7 +160,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 		{
 			name: "keybind_with_spaces",
 			line: "bind = SUPER, r, reload_config",
-			expected: &KeyBinding{
+			expected: &MangoWCKeyBinding{
 				Mods:    []string{"SUPER"},
 				Key:     "r",
 				Command: "reload_config",
@@ -172,7 +172,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewParser()
+			parser := NewMangoWCParser()
 			parser.contentLines = []string{tt.line}
 			result := parser.getKeybindAtLine(0)
 
@@ -213,7 +213,7 @@ func TestGetKeybindAtLine(t *testing.T) {
 	}
 }
 
-func TestParseKeys(t *testing.T) {
+func TestMangoWCParseKeys(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.conf")
 
@@ -242,9 +242,9 @@ bind=Ctrl,2,view,2,0
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	keybinds, err := ParseKeys(configFile)
+	keybinds, err := ParseMangoWCKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseMangoWCKeys failed: %v", err)
 	}
 
 	expectedCount := 7
@@ -267,7 +267,7 @@ bind=Ctrl,2,view,2,0
 	}
 }
 
-func TestReadContentMultipleFiles(t *testing.T) {
+func TestMangoWCReadContentMultipleFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	file1 := filepath.Join(tmpDir, "a.conf")
@@ -283,7 +283,7 @@ func TestReadContentMultipleFiles(t *testing.T) {
 		t.Fatalf("Failed to write file2: %v", err)
 	}
 
-	parser := NewParser()
+	parser := NewMangoWCParser()
 	if err := parser.ReadContent(tmpDir); err != nil {
 		t.Fatalf("ReadContent failed: %v", err)
 	}
@@ -294,7 +294,7 @@ func TestReadContentMultipleFiles(t *testing.T) {
 	}
 }
 
-func TestReadContentSingleFile(t *testing.T) {
+func TestMangoWCReadContentSingleFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.conf")
 
@@ -304,7 +304,7 @@ func TestReadContentSingleFile(t *testing.T) {
 		t.Fatalf("Failed to write config: %v", err)
 	}
 
-	parser := NewParser()
+	parser := NewMangoWCParser()
 	if err := parser.ReadContent(configFile); err != nil {
 		t.Fatalf("ReadContent failed: %v", err)
 	}
@@ -315,7 +315,7 @@ func TestReadContentSingleFile(t *testing.T) {
 	}
 }
 
-func TestReadContentErrors(t *testing.T) {
+func TestMangoWCReadContentErrors(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
@@ -332,7 +332,7 @@ func TestReadContentErrors(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := ParseKeys(tt.path)
+			_, err := ParseMangoWCKeys(tt.path)
 			if err == nil {
 				t.Error("Expected error, got nil")
 			}
@@ -340,7 +340,7 @@ func TestReadContentErrors(t *testing.T) {
 	}
 }
 
-func TestReadContentWithTildeExpansion(t *testing.T) {
+func TestMangoWCReadContentWithTildeExpansion(t *testing.T) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		t.Skip("Cannot get home directory")
@@ -362,7 +362,7 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 		t.Skip("Cannot create relative path")
 	}
 
-	parser := NewParser()
+	parser := NewMangoWCParser()
 	tildePathMatch := "~/" + relPath
 	err = parser.ReadContent(tildePathMatch)
 
@@ -371,7 +371,7 @@ func TestReadContentWithTildeExpansion(t *testing.T) {
 	}
 }
 
-func TestEmptyAndCommentLines(t *testing.T) {
+func TestMangoWCEmptyAndCommentLines(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.conf")
 
@@ -388,9 +388,9 @@ bind=Alt,t,spawn,kitty
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	keybinds, err := ParseKeys(configFile)
+	keybinds, err := ParseMangoWCKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseMangoWCKeys failed: %v", err)
 	}
 
 	if len(keybinds) != 2 {
@@ -398,7 +398,7 @@ bind=Alt,t,spawn,kitty
 	}
 }
 
-func TestInvalidBindLines(t *testing.T) {
+func TestMangoWCInvalidBindLines(t *testing.T) {
 	tests := []struct {
 		name string
 		line string
@@ -419,7 +419,7 @@ func TestInvalidBindLines(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			parser := NewParser()
+			parser := NewMangoWCParser()
 			parser.contentLines = []string{tt.line}
 			result := parser.getKeybindAtLine(0)
 
@@ -430,7 +430,7 @@ func TestInvalidBindLines(t *testing.T) {
 	}
 }
 
-func TestRealWorldConfig(t *testing.T) {
+func TestMangoWCRealWorldConfig(t *testing.T) {
 	tmpDir := t.TempDir()
 	configFile := filepath.Join(tmpDir, "config.conf")
 
@@ -462,9 +462,9 @@ bind=Ctrl,3,view,3,0
 		t.Fatalf("Failed to write test config: %v", err)
 	}
 
-	keybinds, err := ParseKeys(configFile)
+	keybinds, err := ParseMangoWCKeys(configFile)
 	if err != nil {
-		t.Fatalf("ParseKeys failed: %v", err)
+		t.Fatalf("ParseMangoWCKeys failed: %v", err)
 	}
 
 	if len(keybinds) < 14 {

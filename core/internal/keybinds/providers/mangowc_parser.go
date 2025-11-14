@@ -1,4 +1,4 @@
-package mangowc
+package providers
 
 import (
 	"os"
@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	HideComment = "[hidden]"
+	MangoWCHideComment = "[hidden]"
 )
 
-var ModSeparators = []rune{'+', ' '}
+var MangoWCModSeparators = []rune{'+', ' '}
 
-type KeyBinding struct {
+type MangoWCKeyBinding struct {
 	Mods    []string `json:"mods"`
 	Key     string   `json:"key"`
 	Command string   `json:"command"`
@@ -21,19 +21,19 @@ type KeyBinding struct {
 	Comment string   `json:"comment"`
 }
 
-type Parser struct {
+type MangoWCParser struct {
 	contentLines []string
 	readingLine  int
 }
 
-func NewParser() *Parser {
-	return &Parser{
+func NewMangoWCParser() *MangoWCParser {
+	return &MangoWCParser{
 		contentLines: []string{},
 		readingLine:  0,
 	}
 }
 
-func (p *Parser) ReadContent(path string) error {
+func (p *MangoWCParser) ReadContent(path string) error {
 	expandedPath := os.ExpandEnv(path)
 	expandedPath = filepath.Clean(expandedPath)
 	if strings.HasPrefix(expandedPath, "~") {
@@ -82,7 +82,7 @@ func (p *Parser) ReadContent(path string) error {
 	return nil
 }
 
-func autogenerateComment(command, params string) string {
+func mangowcAutogenerateComment(command, params string) string {
 	switch command {
 	case "spawn", "spawn_shell":
 		return params
@@ -196,7 +196,7 @@ func autogenerateComment(command, params string) string {
 	}
 }
 
-func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
+func (p *MangoWCParser) getKeybindAtLine(lineNumber int) *MangoWCKeyBinding {
 	if lineNumber >= len(p.contentLines) {
 		return nil
 	}
@@ -220,7 +220,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 		comment = strings.TrimSpace(parts[1])
 	}
 
-	if strings.HasPrefix(comment, HideComment) {
+	if strings.HasPrefix(comment, MangoWCHideComment) {
 		return nil
 	}
 
@@ -239,16 +239,16 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	}
 
 	if comment == "" {
-		comment = autogenerateComment(command, params)
+		comment = mangowcAutogenerateComment(command, params)
 	}
 
 	var modList []string
 	if mods != "" && !strings.EqualFold(mods, "none") {
-		modstring := mods + string(ModSeparators[0])
+		modstring := mods + string(MangoWCModSeparators[0])
 		p := 0
 		for index, char := range modstring {
 			isModSep := false
-			for _, sep := range ModSeparators {
+			for _, sep := range MangoWCModSeparators {
 				if char == sep {
 					isModSep = true
 					break
@@ -265,7 +265,7 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 
 	_ = bindType
 
-	return &KeyBinding{
+	return &MangoWCKeyBinding{
 		Mods:    modList,
 		Key:     key,
 		Command: command,
@@ -274,8 +274,8 @@ func (p *Parser) getKeybindAtLine(lineNumber int) *KeyBinding {
 	}
 }
 
-func (p *Parser) ParseKeys() []KeyBinding {
-	var keybinds []KeyBinding
+func (p *MangoWCParser) ParseKeys() []MangoWCKeyBinding {
+	var keybinds []MangoWCKeyBinding
 
 	for lineNumber := 0; lineNumber < len(p.contentLines); lineNumber++ {
 		line := p.contentLines[lineNumber]
@@ -296,8 +296,8 @@ func (p *Parser) ParseKeys() []KeyBinding {
 	return keybinds
 }
 
-func ParseKeys(path string) ([]KeyBinding, error) {
-	parser := NewParser()
+func ParseMangoWCKeys(path string) ([]MangoWCKeyBinding, error) {
+	parser := NewMangoWCParser()
 	if err := parser.ReadContent(path); err != nil {
 		return nil, err
 	}

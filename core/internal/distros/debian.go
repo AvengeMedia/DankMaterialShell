@@ -238,7 +238,7 @@ func (d *DebianDistribution) InstallPackages(ctx context.Context, dependencies [
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, manualPkgs := d.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, manualPkgs, variantMap := d.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
 	if len(systemPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
@@ -273,7 +273,7 @@ func (d *DebianDistribution) InstallPackages(ctx context.Context, dependencies [
 			IsComplete: false,
 			LogOutput:  fmt.Sprintf("Building from source: %s", strings.Join(manualPkgs, ", ")),
 		}
-		if err := d.InstallManualPackages(ctx, manualPkgs, sudoPassword, progressChan); err != nil {
+		if err := d.InstallManualPackages(ctx, manualPkgs, variantMap, sudoPassword, progressChan); err != nil {
 			return fmt.Errorf("failed to install manual packages: %w", err)
 		}
 	}
@@ -297,9 +297,14 @@ func (d *DebianDistribution) InstallPackages(ctx context.Context, dependencies [
 	return nil
 }
 
-func (d *DebianDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string) {
+func (d *DebianDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []string{}
 	manualPkgs := []string{}
+
+	variantMap := make(map[string]deps.PackageVariant)
+	for _, dep := range dependencies {
+		variantMap[dep.Name] = dep.Variant
+	}
 
 	packageMap := d.GetPackageMapping(wm)
 
@@ -326,7 +331,7 @@ func (d *DebianDistribution) categorizePackages(dependencies []deps.Dependency, 
 		}
 	}
 
-	return systemPkgs, manualPkgs
+	return systemPkgs, manualPkgs, variantMap
 }
 
 func (d *DebianDistribution) installAPTPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -513,7 +518,7 @@ func (d *DebianDistribution) installGhosttyDebian(ctx context.Context, sudoPassw
 	return nil
 }
 
-func (d *DebianDistribution) InstallManualPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (d *DebianDistribution) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	if len(packages) == 0 {
 		return nil
 	}
@@ -527,7 +532,7 @@ func (d *DebianDistribution) InstallManualPackages(ctx context.Context, packages
 				return fmt.Errorf("failed to install ghostty: %w", err)
 			}
 		default:
-			if err := d.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, sudoPassword, progressChan); err != nil {
+			if err := d.ManualPackageInstaller.InstallManualPackages(ctx, []string{pkg}, variantMap, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install %s: %w", pkg, err)
 			}
 		}

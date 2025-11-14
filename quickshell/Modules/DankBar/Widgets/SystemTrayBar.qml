@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Item {
@@ -32,9 +34,11 @@ Item {
         })
     }
     readonly property var mainBarItems: allTrayItems.filter(item => !SessionData.isHiddenTrayId(item?.id || ""))
+    readonly property var hiddenBarItems: allTrayItems.filter(item => SessionData.isHiddenTrayId(item?.id || ""))
+    readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
     readonly property int calculatedSize: {
         if (allTrayItems.length === 0) return 0
-        const itemCount = mainBarItems.length + 1
+        const itemCount = mainBarItems.length + (hasHiddenItems ? 1 : 0)
         return itemCount * 24 + horizontalPadding * 2
     }
     readonly property real visualWidth: isVertical ? widgetThickness : calculatedSize
@@ -45,6 +49,7 @@ Item {
     visible: allTrayItems.length > 0
 
     property bool menuOpen: false
+    property bool overflowWasOpenBeforeTrayMenu: false
 
     Rectangle {
         id: visualBackground
@@ -157,17 +162,17 @@ Item {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: Qt.PointingHandCursor
                         onClicked: (mouse) => {
-                            if (!delegateRoot.trayItem) {
-                                return;
-                            }
+                            if (!delegateRoot.trayItem) return
 
                             if (mouse.button === Qt.LeftButton && !delegateRoot.trayItem.onlyMenu) {
-                                delegateRoot.trayItem.activate();
-                                return ;
+                                delegateRoot.trayItem.activate()
+                                return
                             }
-                            if (delegateRoot.trayItem.hasMenu) {
-                                root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis);
-                            }
+
+                            if (!delegateRoot.trayItem.hasMenu) return
+
+                            root.overflowWasOpenBeforeTrayMenu = root.menuOpen
+                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                         }
                     }
                 }
@@ -176,6 +181,7 @@ Item {
             Item {
                 width: 24
                 height: root.barThickness
+                visible: root.hasHiddenItems
 
                 Rectangle {
                     id: caretButton
@@ -289,17 +295,17 @@ Item {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: Qt.PointingHandCursor
                         onClicked: (mouse) => {
-                            if (!delegateRoot.trayItem) {
-                                return;
-                            }
+                            if (!delegateRoot.trayItem) return
 
                             if (mouse.button === Qt.LeftButton && !delegateRoot.trayItem.onlyMenu) {
-                                delegateRoot.trayItem.activate();
-                                return ;
+                                delegateRoot.trayItem.activate()
+                                return
                             }
-                            if (delegateRoot.trayItem.hasMenu) {
-                                root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis);
-                            }
+
+                            if (!delegateRoot.trayItem.hasMenu) return
+
+                            root.overflowWasOpenBeforeTrayMenu = root.menuOpen
+                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                         }
                     }
                 }
@@ -308,6 +314,7 @@ Item {
             Item {
                 width: root.barThickness
                 height: 24
+                visible: root.hasHiddenItems
 
                 Rectangle {
                     id: caretButtonVert
@@ -349,7 +356,7 @@ Item {
         screen: root.parentScreen
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
 
@@ -360,10 +367,26 @@ Item {
             bottom: true
         }
 
+        readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale)
+            ? CompositorService.getScreenScale(overflowMenu.screen)
+            : (screen?.devicePixelRatio || 1)
         property point anchorPos: Qt.point(screen.width / 2, screen.height / 2)
 
         onVisibleChanged: {
-            if (visible) updatePosition()
+            if (visible) {
+                updatePosition()
+                Qt.callLater(() => overflowFocusScope.forceActiveFocus())
+            }
+        }
+
+        FocusScope {
+            id: overflowFocusScope
+            anchors.fill: parent
+            focus: true
+
+            Keys.onEscapePressed: {
+                root.menuOpen = false
+            }
         }
 
         function updatePosition() {
@@ -395,50 +418,71 @@ Item {
             }
         }
 
-        Rectangle {
+        Item {
             id: menuContainer
-            width: 250
-            height: Math.min(screen.height - 100, menuColumn.implicitHeight + Theme.spacingS * 2)
 
-            x: {
+            readonly property real rawWidth: {
+                const itemCount = root.hiddenBarItems.length
+                const cols = Math.min(5, itemCount)
+                const itemSize = 28
+                const spacing = 2
+                return cols * itemSize + (cols - 1) * spacing + Theme.spacingS * 2
+            }
+            readonly property real rawHeight: {
+                const itemCount = root.hiddenBarItems.length
+                const cols = Math.min(5, itemCount)
+                const rows = Math.ceil(itemCount / cols)
+                const itemSize = 28
+                const spacing = 2
+                return rows * itemSize + (rows - 1) * spacing + Theme.spacingS * 2
+            }
+
+            readonly property real alignedWidth: Theme.px(rawWidth, overflowMenu.dpr)
+            readonly property real alignedHeight: Theme.px(rawHeight, overflowMenu.dpr)
+
+            width: alignedWidth
+            height: alignedHeight
+
+            x: Theme.snap((() => {
                 if (root.isVertical) {
                     const edge = root.axis?.edge
                     if (edge === "left") {
                         const targetX = overflowMenu.anchorPos.x
-                        return Math.min(overflowMenu.screen.width - width - 10, targetX)
+                        return Math.min(overflowMenu.screen.width - alignedWidth - 10, targetX)
                     } else {
-                        const targetX = overflowMenu.anchorPos.x - width
+                        const targetX = overflowMenu.anchorPos.x - alignedWidth
                         return Math.max(10, targetX)
                     }
                 } else {
                     const left = 10
-                    const right = overflowMenu.width - width - 10
-                    const want = overflowMenu.anchorPos.x - width / 2
+                    const right = overflowMenu.width - alignedWidth - 10
+                    const want = overflowMenu.anchorPos.x - alignedWidth / 2
                     return Math.max(left, Math.min(right, want))
                 }
-            }
+            })(), overflowMenu.dpr)
 
-            y: {
+            y: Theme.snap((() => {
                 if (root.isVertical) {
                     const top = 10
-                    const bottom = overflowMenu.height - height - 10
-                    const want = overflowMenu.anchorPos.y - height / 2
+                    const bottom = overflowMenu.height - alignedHeight - 10
+                    const want = overflowMenu.anchorPos.y - alignedHeight / 2
                     return Math.max(top, Math.min(bottom, want))
                 } else {
                     if (root.isAtBottom) {
-                        const targetY = overflowMenu.anchorPos.y - height
+                        const targetY = overflowMenu.anchorPos.y - alignedHeight
                         return Math.max(10, targetY)
                     } else {
                         const targetY = overflowMenu.anchorPos.y
-                        return Math.min(overflowMenu.screen.height - height - 10, targetY)
+                        return Math.min(overflowMenu.screen.height - alignedHeight - 10, targetY)
                     }
                 }
-            }
+            })(), overflowMenu.dpr)
 
-            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-            radius: Theme.cornerRadius
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-            border.width: 1
+            property real shadowBlurPx: 10
+            property real shadowSpreadPx: 0
+            property real shadowBaseAlpha: 0.60
+            readonly property real popupSurfaceAlpha: Theme.popupTransparency
+            readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
 
             opacity: root.menuOpen ? 1 : 0
             scale: root.menuOpen ? 1 : 0.85
@@ -457,156 +501,122 @@ Item {
                 }
             }
 
-            Rectangle {
+            Item {
+                id: bgShadowLayer
                 anchors.fill: parent
-                anchors.topMargin: 4
-                anchors.leftMargin: 2
-                anchors.rightMargin: -2
-                anchors.bottomMargin: -4
-                radius: parent.radius
-                color: Qt.rgba(0, 0, 0, 0.15)
-                z: parent.z - 1
+                layer.enabled: true
+                layer.smooth: true
+                layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
+                layer.textureMirroring: ShaderEffectSource.MirrorVertically
+                layer.samples: 4
+
+                layer.effect: MultiEffect {
+                    autoPaddingEnabled: true
+                    shadowEnabled: true
+                    blurEnabled: false
+                    maskEnabled: false
+                    property int blurMax: 64
+                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                    shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
+                    shadowColor: {
+                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
+                        return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha)
+                    }
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                    radius: Theme.cornerRadius
+                    antialiasing: true
+                    smooth: true
+                }
             }
 
-            DankFlickable {
-                id: scrollView
-                anchors.fill: parent
-                anchors.margins: Theme.spacingS
-                contentWidth: width
-                contentHeight: menuColumn.implicitHeight
-                clip: true
+            Grid {
+                id: menuGrid
+                anchors.centerIn: parent
+                columns: Math.min(5, root.hiddenBarItems.length)
+                spacing: 2
+                rowSpacing: 2
 
-                Column {
-                    id: menuColumn
-                    width: parent.width
-                    spacing: 2
+                Repeater {
+                    model: root.hiddenBarItems
 
-                    Repeater {
-                        model: root.allTrayItems
-
-                        delegate: Rectangle {
-                            property var trayItem: modelData
-                            property string iconSource: {
-                                let icon = trayItem?.icon
-                                if (typeof icon === 'string' || icon instanceof String) {
-                                    if (icon === "") return ""
-                                    if (icon.includes("?path=")) {
-                                        const split = icon.split("?path=")
-                                        if (split.length !== 2) return icon
-                                        const name = split[0]
-                                        const path = split[1]
-                                        let fileName = name.substring(name.lastIndexOf("/") + 1)
-                                        if (fileName.startsWith("dropboxstatus")) {
-                                            fileName = `hicolor/16x16/status/${fileName}`
-                                        }
-                                        return `file://${path}/${fileName}`
+                    delegate: Rectangle {
+                        property var trayItem: modelData
+                        property string iconSource: {
+                            let icon = trayItem?.icon
+                            if (typeof icon === 'string' || icon instanceof String) {
+                                if (icon === "") return ""
+                                if (icon.includes("?path=")) {
+                                    const split = icon.split("?path=")
+                                    if (split.length !== 2) return icon
+                                    const name = split[0]
+                                    const path = split[1]
+                                    let fileName = name.substring(name.lastIndexOf("/") + 1)
+                                    if (fileName.startsWith("dropboxstatus")) {
+                                        fileName = `hicolor/16x16/status/${fileName}`
                                     }
-                                    if (icon.startsWith("/") && !icon.startsWith("file://")) {
-                                        return `file://${icon}`
-                                    }
-                                    return icon
+                                    return `file://${path}/${fileName}`
                                 }
-                                return ""
+                                if (icon.startsWith("/") && !icon.startsWith("file://")) {
+                                    return `file://${icon}`
+                                }
+                                return icon
                             }
+                            return ""
+                        }
 
-                            width: menuColumn.width
-                            height: 32
-                            radius: Theme.cornerRadius
-                            color: itemArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                        width: 28
+                        height: 28
+                        radius: Theme.cornerRadius
+                        color: itemArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0)
 
-                            Row {
-                                anchors.left: parent.left
-                                anchors.leftMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.spacingS
+                        IconImage {
+                            id: menuIconImg
+                            anchors.centerIn: parent
+                            width: Theme.barIconSize(root.barThickness)
+                            height: Theme.barIconSize(root.barThickness)
+                            source: parent.iconSource
+                            asynchronous: true
+                            smooth: true
+                            mipmap: true
+                            visible: status === Image.Ready
+                        }
 
-                                IconImage {
-                                    id: menuIconImg
-                                    width: 20
-                                    height: 20
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    source: parent.parent.iconSource
-                                    asynchronous: true
-                                    smooth: true
-                                    mipmap: true
-                                    visible: status === Image.Ready
-                                }
-
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    visible: !menuIconImg.visible
-                                    text: {
-                                        const itemId = trayItem?.id || ""
-                                        if (!itemId) return "?"
-                                        return itemId.charAt(0).toUpperCase()
-                                    }
-                                    font.pixelSize: 10
-                                    color: Theme.surfaceText
-                                }
-
-                                StyledText {
-                                    text: trayItem?.tooltip?.title || trayItem?.id || "Unknown"
-                                    font.pixelSize: Theme.fontSizeSmall
-                                    color: Theme.surfaceText
-                                    elide: Text.ElideRight
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: Math.min(implicitWidth, menuColumn.width - 80)
-                                }
+                        Text {
+                            anchors.centerIn: parent
+                            visible: !menuIconImg.visible
+                            text: {
+                                const itemId = trayItem?.id || ""
+                                if (!itemId) return "?"
+                                return itemId.charAt(0).toUpperCase()
                             }
+                            font.pixelSize: 10
+                            color: Theme.surfaceText
+                        }
 
-                            Rectangle {
-                                anchors.right: parent.right
-                                anchors.rightMargin: Theme.spacingS
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: 24
-                                height: 24
-                                radius: Theme.cornerRadius
-                                color: visibilityArea.containsMouse ? Theme.primaryHover : "transparent"
+                        MouseArea {
+                            id: itemArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: (mouse) => {
+                                if (!trayItem) return
 
-                                DankIcon {
-                                    anchors.centerIn: parent
-                                    name: SessionData.isHiddenTrayId(trayItem?.id || "") ? "visibility_off" : "visibility"
-                                    size: 16
-                                    color: Theme.surfaceText
+                                if (mouse.button === Qt.LeftButton && !trayItem.onlyMenu) {
+                                    trayItem.activate()
+                                    root.menuOpen = false
+                                    return
                                 }
 
-                                MouseArea {
-                                    id: visibilityArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    onClicked: {
-                                        const itemId = trayItem?.id || ""
-                                        if (!itemId) return
-                                        if (SessionData.isHiddenTrayId(itemId)) {
-                                            SessionData.showTrayId(itemId)
-                                        } else {
-                                            SessionData.hideTrayId(itemId)
-                                        }
-                                    }
-                                }
-                            }
+                                if (!trayItem.hasMenu) return
 
-                            MouseArea {
-                                id: itemArea
-                                anchors.fill: parent
-                                anchors.rightMargin: 32
-                                hoverEnabled: true
-                                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: (mouse) => {
-                                    if (!trayItem) return
-
-                                    if (mouse.button === Qt.LeftButton && !trayItem.onlyMenu) {
-                                        trayItem.activate()
-                                        root.menuOpen = false
-                                        return
-                                    }
-                                    if (trayItem.hasMenu) {
-                                        root.menuOpen = false
-                                        root.showForTrayItem(trayItem, parent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
-                                    }
-                                }
+                                root.overflowWasOpenBeforeTrayMenu = true
+                                root.menuOpen = false
+                                root.showForTrayItem(trayItem, parent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                             }
                         }
                     }
@@ -665,6 +675,20 @@ Item {
 
             function close() {
                 showMenu = false
+                if (root.overflowWasOpenBeforeTrayMenu) {
+                    root.menuOpen = true
+                    Qt.callLater(() => {
+                        if (overflowMenu.visible && overflowFocusScope) {
+                            overflowFocusScope.forceActiveFocus()
+                        }
+                    })
+                }
+                root.overflowWasOpenBeforeTrayMenu = false
+            }
+
+            function closeWithAction() {
+                root.overflowWasOpenBeforeTrayMenu = false
+                close()
             }
 
             function showSubMenu(entry) {
@@ -697,7 +721,7 @@ Item {
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 color: "transparent"
 
                 anchors {
@@ -707,11 +731,29 @@ Item {
                     bottom: true
                 }
 
+                readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale)
+                    ? CompositorService.getScreenScale(menuWindow.screen)
+                    : (screen?.devicePixelRatio || 1)
                 property point anchorPos: Qt.point(screen.width / 2, screen.height / 2)
 
                 onVisibleChanged: {
                     if (visible) {
                         updatePosition()
+                        Qt.callLater(() => menuFocusScope.forceActiveFocus())
+                    }
+                }
+
+                FocusScope {
+                    id: menuFocusScope
+                    anchors.fill: parent
+                    focus: true
+
+                    Keys.onEscapePressed: {
+                        if (entryStack.count > 0) {
+                            menuRoot.goBack()
+                        } else {
+                            menuRoot.close()
+                        }
                     }
                 }
 
@@ -744,64 +786,104 @@ Item {
                     }
                 }
 
-                Rectangle {
+                Item {
                     id: menuContainer
 
-                    width: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
-                    height: Math.max(40, menuColumn.implicitHeight + Theme.spacingS * 2)
+                    readonly property real rawWidth: Math.min(500, Math.max(250, menuColumn.implicitWidth + Theme.spacingS * 2))
+                    readonly property real rawHeight: Math.max(40, menuColumn.implicitHeight + Theme.spacingS * 2)
 
-                    x: {
+                    readonly property real alignedWidth: Theme.px(rawWidth, menuWindow.dpr)
+                    readonly property real alignedHeight: Theme.px(rawHeight, menuWindow.dpr)
+
+                    width: alignedWidth
+                    height: alignedHeight
+
+                    x: Theme.snap((() => {
                         if (menuRoot.isVertical) {
                             const edge = menuRoot.axis?.edge
                             if (edge === "left") {
                                 const targetX = menuWindow.anchorPos.x
-                                return Math.min(menuWindow.screen.width - width - 10, targetX)
+                                return Math.min(menuWindow.screen.width - alignedWidth - 10, targetX)
                             } else {
-                                const targetX = menuWindow.anchorPos.x - width
+                                const targetX = menuWindow.anchorPos.x - alignedWidth
                                 return Math.max(10, targetX)
                             }
                         } else {
                             const left = 10
-                            const right = menuWindow.width - width - 10
-                            const want = menuWindow.anchorPos.x - width / 2
+                            const right = menuWindow.width - alignedWidth - 10
+                            const want = menuWindow.anchorPos.x - alignedWidth / 2
                             return Math.max(left, Math.min(right, want))
                         }
-                    }
+                    })(), menuWindow.dpr)
 
-                    y: {
+                    y: Theme.snap((() => {
                         if (menuRoot.isVertical) {
                             const top = 10
-                            const bottom = menuWindow.height - height - 10
-                            const want = menuWindow.anchorPos.y - height / 2
+                            const bottom = menuWindow.height - alignedHeight - 10
+                            const want = menuWindow.anchorPos.y - alignedHeight / 2
                             return Math.max(top, Math.min(bottom, want))
                         } else {
                             if (menuRoot.isAtBottom) {
-                                const targetY = menuWindow.anchorPos.y - height
+                                const targetY = menuWindow.anchorPos.y - alignedHeight
                                 return Math.max(10, targetY)
                             } else {
                                 const targetY = menuWindow.anchorPos.y
-                                return Math.min(menuWindow.screen.height - height - 10, targetY)
+                                return Math.min(menuWindow.screen.height - alignedHeight - 10, targetY)
                             }
                         }
-                    }
+                    })(), menuWindow.dpr)
 
-                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    radius: Theme.cornerRadius
-                    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
-                    border.width: 1
+                    property real shadowBlurPx: 10
+                    property real shadowSpreadPx: 0
+                    property real shadowBaseAlpha: 0.60
+                    readonly property real popupSurfaceAlpha: Theme.popupTransparency
+                    readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
 
                     opacity: menuRoot.showMenu ? 1 : 0
                     scale: menuRoot.showMenu ? 1 : 0.85
 
-                    Rectangle {
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+
+                    Behavior on scale {
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.type: Theme.emphasizedEasing
+                        }
+                    }
+
+                    Item {
+                        id: menuBgShadowLayer
                         anchors.fill: parent
-                        anchors.topMargin: 4
-                        anchors.leftMargin: 2
-                        anchors.rightMargin: -2
-                        anchors.bottomMargin: -4
-                        radius: parent.radius
-                        color: Qt.rgba(0, 0, 0, 0.15)
-                        z: parent.z - 1
+                        layer.enabled: true
+                        layer.smooth: true
+                        layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
+                        layer.textureMirroring: ShaderEffectSource.MirrorVertically
+
+                        layer.effect: MultiEffect {
+                            autoPaddingEnabled: true
+                            shadowEnabled: true
+                            blurEnabled: false
+                            maskEnabled: false
+                            property int blurMax: 64
+                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                            shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(menuBgShadowLayer.width, menuBgShadowLayer.height))
+                            shadowColor: {
+                                const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
+                                return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha)
+                            }
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                            radius: Theme.cornerRadius
+                            antialiasing: true
+                        }
                     }
 
                     QsMenuAnchor {
@@ -833,11 +915,64 @@ Item {
                         spacing: 1
 
                         Rectangle {
+                            visible: entryStack.count === 0
+                            width: parent.width
+                            height: 28
+                            radius: 0
+                            color: visibilityToggleArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0)
+
+                            StyledText {
+                                anchors.left: parent.left
+                                anchors.leftMargin: Theme.spacingS
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: menuRoot.trayItem?.id || "Unknown"
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceTextMedium
+                                elide: Text.ElideMiddle
+                                width: parent.width - Theme.spacingS * 2 - 24
+                            }
+
+                            DankIcon {
+                                anchors.right: parent.right
+                                anchors.rightMargin: Theme.spacingS
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: SessionData.isHiddenTrayId(menuRoot.trayItem?.id || "") ? "visibility" : "visibility_off"
+                                size: 16
+                                color: Theme.surfaceText
+                            }
+
+                            MouseArea {
+                                id: visibilityToggleArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    const itemId = menuRoot.trayItem?.id || ""
+                                    if (!itemId) return
+
+                                    if (SessionData.isHiddenTrayId(itemId)) {
+                                        SessionData.showTrayId(itemId)
+                                    } else {
+                                        SessionData.hideTrayId(itemId)
+                                    }
+                                    menuRoot.closeWithAction()
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            visible: entryStack.count === 0
+                            width: parent.width
+                            height: 1
+                            color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                        }
+
+                        Rectangle {
                             visible: entryStack.count > 0
                             width: parent.width
                             height: 28
-                            radius: Theme.cornerRadius
-                            color: backArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                            radius: 0
+                            color: backArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0)
 
                             Row {
                                 anchors.left: parent.left
@@ -863,6 +998,7 @@ Item {
                             MouseArea {
                                 id: backArea
                                 anchors.fill: parent
+                                hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: menuRoot.goBack()
                             }
@@ -886,33 +1022,35 @@ Item {
 
                                 width: menuColumn.width
                                 height: menuEntry?.isSeparator ? 1 : 28
-                                radius: menuEntry?.isSeparator ? 0 : Theme.cornerRadius
+                                radius: 0
                                 color: {
                                     if (menuEntry?.isSeparator) {
                                         return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                     }
-                                    return itemArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                                    return itemArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0)
                                 }
 
                                 MouseArea {
                                     id: itemArea
                                     anchors.fill: parent
+                                    hoverEnabled: true
                                     enabled: !menuEntry?.isSeparator && (menuEntry?.enabled !== false)
                                     cursorShape: Qt.PointingHandCursor
 
                                     onClicked: {
-                                        if (!menuEntry || menuEntry.isSeparator) return;
+                                        if (!menuEntry || menuEntry.isSeparator) return
 
                                         if (menuEntry.hasChildren) {
-                                            menuRoot.showSubMenu(menuEntry);
-                                        } else {
-                                            if (typeof menuEntry.activate === "function") {
-                                                menuEntry.activate();
-                                            } else if (typeof menuEntry.triggered === "function") {
-                                                menuEntry.triggered();
-                                            }
-                                            Qt.createQmlObject('import QtQuick; Timer { interval: 80; running: true; repeat: false; onTriggered: menuRoot.close() }', menuRoot);
+                                            menuRoot.showSubMenu(menuEntry)
+                                            return
                                         }
+
+                                        if (typeof menuEntry.activate === "function") {
+                                            menuEntry.activate()
+                                        } else if (typeof menuEntry.triggered === "function") {
+                                            menuEntry.triggered()
+                                        }
+                                        Qt.createQmlObject('import QtQuick; Timer { interval: 80; running: true; repeat: false; onTriggered: menuRoot.closeWithAction() }', menuRoot)
                                     }
                                 }
 
@@ -994,20 +1132,6 @@ Item {
                                     }
                                 }
                             }
-                        }
-                    }
-
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
-                        }
-                    }
-
-                    Behavior on scale {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
                         }
                     }
                 }

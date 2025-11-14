@@ -3,15 +3,15 @@ package network
 import (
 	"testing"
 
+	mock_gonetworkmanager "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/github.com/Wifx/gonetworkmanager/v2"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNetworkManagerBackend_New(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
 
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 	assert.NotNil(t, backend)
 	assert.Equal(t, "networkmanager", backend.state.Backend)
 	assert.NotNil(t, backend.stopChan)
@@ -19,10 +19,10 @@ func TestNetworkManagerBackend_New(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_GetCurrentState(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.state.NetworkStatus = StatusWiFi
 	backend.state.WiFiConnected = true
@@ -49,10 +49,10 @@ func TestNetworkManagerBackend_GetCurrentState(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_SetPromptBroker_Nil(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	err = backend.SetPromptBroker(nil)
 	assert.Error(t, err)
@@ -60,10 +60,10 @@ func TestNetworkManagerBackend_SetPromptBroker_Nil(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_SubmitCredentials_NoBroker(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.promptBroker = nil
 	err = backend.SubmitCredentials("token", map[string]string{"password": "test"}, false)
@@ -72,10 +72,10 @@ func TestNetworkManagerBackend_SubmitCredentials_NoBroker(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_CancelCredentials_NoBroker(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.promptBroker = nil
 	err = backend.CancelCredentials("token")
@@ -84,10 +84,10 @@ func TestNetworkManagerBackend_CancelCredentials_NoBroker(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_EnsureWiFiDevice_NoDevice(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDevice = nil
 	backend.wifiDev = nil
@@ -98,10 +98,10 @@ func TestNetworkManagerBackend_EnsureWiFiDevice_NoDevice(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_EnsureWiFiDevice_AlreadySet(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.wifiDev = "dummy-device"
 
@@ -110,10 +110,10 @@ func TestNetworkManagerBackend_EnsureWiFiDevice_AlreadySet(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_StartSecretAgent_NoBroker(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	backend.promptBroker = nil
 	err = backend.startSecretAgent()
@@ -122,10 +122,10 @@ func TestNetworkManagerBackend_StartSecretAgent_NoBroker(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_Close(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	assert.NotPanics(t, func() {
 		backend.Close()
@@ -133,20 +133,20 @@ func TestNetworkManagerBackend_Close(t *testing.T) {
 }
 
 func TestNetworkManagerBackend_GetPromptBroker(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	broker := backend.GetPromptBroker()
 	assert.Nil(t, broker)
 }
 
 func TestNetworkManagerBackend_StopMonitoring_NoSignals(t *testing.T) {
-	backend, err := NewNetworkManagerBackend()
-	if err != nil {
-		t.Skipf("NetworkManager not available: %v", err)
-	}
+	mockNM := mock_gonetworkmanager.NewMockNetworkManager(t)
+
+	backend, err := NewNetworkManagerBackend(mockNM)
+	assert.NoError(t, err)
 
 	assert.NotPanics(t, func() {
 		backend.StopMonitoring()

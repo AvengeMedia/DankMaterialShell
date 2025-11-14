@@ -1,0 +1,48 @@
+with-expecter: true
+dir: "internal/mocks/{{.InterfaceDirRelative}}"
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "{{.PackageName}}"
+packages:
+  github.com/Wifx/gonetworkmanager/v2:
+    interfaces:
+      NetworkManager:
+      Device:
+      DeviceWireless:
+      AccessPoint:
+      Connection:
+      Settings:
+      ActiveConnection:
+      IP4Config:
+  net:
+    interfaces:
+      Conn:
+  github.com/AvengeMedia/danklinux/internal/plugins:
+    interfaces:
+      GitClient:
+  github.com/godbus/dbus/v5:
+    interfaces:
+      BusObject:
+  github.com/AvengeMedia/danklinux/internal/server/brightness:
+    config:
+      dir: "internal/mocks/brightness"
+      outpkg: mocks_brightness
+    interfaces:
+      DBusConn:
+  github.com/AvengeMedia/danklinux/internal/server/network:
+    config:
+      dir: "internal/mocks/network"
+      outpkg: mocks_network
+    interfaces:
+      Backend:
+  github.com/AvengeMedia/danklinux/internal/server/cups:
+    config:
+      dir: "internal/mocks/cups"
+      outpkg: mocks_cups
+    interfaces:
+      CUPSClientInterface:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev:
+    config:
+      dir: "internal/mocks/evdev"
+      outpkg: mocks_evdev
+    interfaces:
+      EvdevDevice:

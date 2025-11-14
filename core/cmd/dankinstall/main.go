@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/logger"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -12,7 +12,7 @@ import (
 var Version = "dev"
 
 func main() {
-	fileLogger, err := logger.NewFileLogger()
+	fileLogger, err := log.NewFileLogger()
 	if err != nil {
 		fmt.Printf("Warning: Failed to create log file: %v\n", err)
 		fmt.Println("Continuing without file logging...")

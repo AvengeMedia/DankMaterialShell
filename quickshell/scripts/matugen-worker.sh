@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [ $# -lt 4 ]; then
-    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL --run" >&2
+if [ $# -lt 5 ]; then
+    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
     exit 1
 fi
 
@@ -10,6 +10,7 @@ STATE_DIR="$1"
 SHELL_DIR="$2"
 CONFIG_DIR="$3"
 SYNC_MODE_WITH_PORTAL="$4"
+TERMINALS_ALWAYS_DARK="$5"
 
 if [ ! -d "$STATE_DIR" ]; then
     echo "Error: STATE_DIR '$STATE_DIR' does not exist" >&2
@@ -26,10 +27,10 @@ if [ ! -d "$CONFIG_DIR" ]; then
     exit 1
 fi
 
-shift 4
+shift 5
 
 if [[ "${1:-}" != "--run" ]]; then
-  echo "usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL --run" >&2
+  echo "usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
   exit 1
 fi
 
@@ -202,6 +203,11 @@ EOF
   echo "[config]" > "$TMP_CONTENT_CFG"
   echo "" >> "$TMP_CONTENT_CFG"
 
+  TERMINAL_MODE="$mode"
+  if [[ "$TERMINALS_ALWAYS_DARK" == "true" ]]; then
+    TERMINAL_MODE="dark"
+  fi
+
   if command -v ghostty >/dev/null 2>&1; then
     sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/ghostty.toml" >> "$TMP_CONTENT_CFG"
     echo "" >> "$TMP_CONTENT_CFG"
@@ -243,12 +249,13 @@ EOF
   fi
 
   if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
+    MAT_TERMINAL_MODE=(-m "$TERMINAL_MODE")
     case "$kind" in
       image)
-        matugen -c "$TMP_CONTENT_CFG" image "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
+        matugen -c "$TMP_CONTENT_CFG" image "$value" "${MAT_TERMINAL_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
         ;;
       hex)
-        matugen -c "$TMP_CONTENT_CFG" color hex "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
+        matugen -c "$TMP_CONTENT_CFG" color hex "$value" "${MAT_TERMINAL_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
         ;;
     esac
   fi
@@ -292,8 +299,13 @@ EOF
     return 2
   fi
 
+  TERMINAL_LIGHT_FLAG=""
+  if [[ "$TERMINALS_ALWAYS_DARK" != "true" ]] && [[ "$mode" == "light" ]]; then
+    TERMINAL_LIGHT_FLAG="--light"
+  fi
+
   if command -v ghostty >/dev/null 2>&1 && [[ -f "$CONFIG_DIR/ghostty/config-dankcolors" ]]; then
-    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --ghostty 2>/dev/null || true)
+    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --ghostty 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >> "$CONFIG_DIR/ghostty/config-dankcolors"
       if [[ -f "$CONFIG_DIR/ghostty/config" ]] && grep -q "^[^#]*config-dankcolors" "$CONFIG_DIR/ghostty/config" 2>/dev/null; then
@@ -303,7 +315,7 @@ EOF
   fi
 
   if command -v kitty >/dev/null 2>&1 && [[ -f "$CONFIG_DIR/kitty/dank-theme.conf" ]]; then
-    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --kitty 2>/dev/null || true)
+    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --kitty 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >> "$CONFIG_DIR/kitty/dank-theme.conf"
       if [[ -f "$CONFIG_DIR/kitty/kitty.conf" ]] && grep -q "^[^#]*dank-theme.conf" "$CONFIG_DIR/kitty/kitty.conf" 2>/dev/null; then
@@ -320,7 +332,7 @@ EOF
       echo "[colors]" > "$FOOT_CONFIG"
     fi
 
-    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --foot 2>/dev/null || true)
+    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --foot 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >> "$FOOT_CONFIG"
     fi
@@ -334,7 +346,7 @@ EOF
       touch "$WEZTERM_CONFIG"
     fi
 
-    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --wezterm 2>/dev/null || true)
+    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --wezterm 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >>"$WEZTERM_CONFIG"
     fi
@@ -348,7 +360,7 @@ EOF
       touch "$ALACRITTY_CONFIG"
     fi
 
-    OUT=$(dms dank16 "$PRIMARY" $([[ "$mode" == "light" ]] && echo --light) ${SURFACE:+--background "$SURFACE"} --alacritty 2>/dev/null || true)
+    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --alacritty 2>/dev/null || true)
     if [[ -n "${OUT:-}" ]]; then
       printf "\n%s\n" "$OUT" >> "$ALACRITTY_CONFIG"
     fi

@@ -9,6 +9,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/dwl"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
@@ -162,6 +163,20 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			Params: req.Params,
 		}
 		wlroutput.HandleRequest(conn, wlrOutputReq, wlrOutputManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "evdev.") {
+		if evdevManager == nil {
+			models.RespondError(conn, req.ID, "evdev manager not initialized")
+			return
+		}
+		evdevReq := evdev.Request{
+			ID:     req.ID,
+			Method: req.Method,
+			Params: req.Params,
+		}
+		evdev.HandleRequest(conn, evdevReq, evdevManager)
 		return
 	}
 

@@ -105,14 +105,17 @@ Item {
 
     function getHyprlandWorkspaces() {
         const workspaces = Hyprland.workspaces?.values || []
-        if (workspaces.length === 0) return [{id: 1}]
+        if (workspaces.length === 0) return [{id: 1, name: "1"}]
+
+        const filtered = workspaces.filter(ws => ws.id > -1)
+        if (filtered.length === 0) return [{id: 1, name: "1"}]
 
         if (!root.screenName || !SettingsData.workspacesPerMonitor) {
-            return workspaces.slice().sort((a, b) => a.id - b.id)
+            return filtered.slice().sort((a, b) => a.id - b.id)
         }
 
-        const monitorWorkspaces = workspaces.filter(ws => ws.monitor?.name === root.screenName)
-        return monitorWorkspaces.length > 0 ? monitorWorkspaces.sort((a, b) => a.id - b.id) : [{id: 1}]
+        const monitorWorkspaces = filtered.filter(ws => ws.monitor?.name === root.screenName)
+        return monitorWorkspaces.length > 0 ? monitorWorkspaces.sort((a, b) => a.id - b.id) : [{id: 1, name: "1"}]
     }
 
     function getHyprlandActiveWorkspace() {

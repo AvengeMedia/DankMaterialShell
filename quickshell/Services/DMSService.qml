@@ -49,8 +49,11 @@ Singleton {
     signal brightnessDeviceUpdate(var device)
     signal extWorkspaceStateUpdate(var data)
     signal wlrOutputStateUpdate(var data)
+    signal evdevStateUpdate(var data)
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "gamma", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput"]
+    property bool capsLockState: false
+
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "gamma", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -349,6 +352,11 @@ Singleton {
             extWorkspaceStateUpdate(data)
         } else if (service === "wlroutput") {
             wlrOutputStateUpdate(data)
+        } else if (service === "evdev") {
+            if (data.capsLock !== undefined) {
+                capsLockState = data.capsLock
+            }
+            evdevStateUpdate(data)
         }
     }
 

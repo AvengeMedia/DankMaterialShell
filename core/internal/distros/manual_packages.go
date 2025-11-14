@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 )
 
 // ManualPackageInstaller provides methods for installing packages from source
@@ -42,8 +44,7 @@ func (m *ManualPackageInstaller) getLatestQuickshellTag(ctx context.Context) str
 	return m.parseLatestTagFromGitOutput(string(tagOutput))
 }
 
-// InstallManualPackages handles packages that need manual building
-func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, packages []string, variantMap map[string]deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	if len(packages) == 0 {
 		return nil
 	}
@@ -51,9 +52,10 @@ func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, pack
 	m.log(fmt.Sprintf("Installing manual packages: %s", strings.Join(packages, ", ")))
 
 	for _, pkg := range packages {
+		variant := variantMap[pkg]
 		switch pkg {
 		case "dms (DankMaterialShell)", "dms":
-			if err := m.installDankMaterialShell(ctx, sudoPassword, progressChan); err != nil {
+			if err := m.installDankMaterialShell(ctx, variant, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install DankMaterialShell: %w", err)
 			}
 		case "dgop":
@@ -69,7 +71,7 @@ func (m *ManualPackageInstaller) InstallManualPackages(ctx context.Context, pack
 				return fmt.Errorf("failed to install niri: %w", err)
 			}
 		case "quickshell":
-			if err := m.installQuickshell(ctx, sudoPassword, progressChan); err != nil {
+			if err := m.installQuickshell(ctx, variant, sudoPassword, progressChan); err != nil {
 				return fmt.Errorf("failed to install quickshell: %w", err)
 			}
 		case "hyprland":
@@ -294,7 +296,7 @@ func (m *ManualPackageInstaller) installNiri(ctx context.Context, sudoPassword s
 	return nil
 }
 
-func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	m.log("Installing quickshell from source...")
 
 	homeDir := os.Getenv("HOME")
@@ -322,10 +324,9 @@ func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, sudoPass
 	}
 
 	var cloneCmd *exec.Cmd
-	if forceQuickshellGit {
+	if forceQuickshellGit || variant == deps.VariantGit {
 		cloneCmd = exec.CommandContext(ctx, "git", "clone", "https://github.com/quickshell-mirror/quickshell.git", tmpDir)
 	} else {
-		// Get latest tag from repository
 		latestTag := m.getLatestQuickshellTag(ctx)
 		if latestTag != "" {
 			m.log(fmt.Sprintf("Using latest quickshell tag: %s", latestTag))
@@ -391,8 +392,8 @@ func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, sudoPass
 		CommandInfo: "sudo cmake --install build",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword,
-		fmt.Sprintf("cd %s && cmake --install build", tmpDir))
+	installCmd := ExecSudoCommand(ctx, sudoPassword, "cmake --install build")
+	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install quickshell: %w", err)
 	}
@@ -454,8 +455,8 @@ func (m *ManualPackageInstaller) installHyprland(ctx context.Context, sudoPasswo
 		CommandInfo: "sudo make install",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword,
-		fmt.Sprintf("cd %s && make install", tmpDir))
+	installCmd := ExecSudoCommand(ctx, sudoPassword, "make install")
+	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install Hyprland: %w", err)
 	}
@@ -520,8 +521,8 @@ func (m *ManualPackageInstaller) installHyprpicker(ctx context.Context, sudoPass
 		CommandInfo: "sudo make install",
 	}
 
-	installCmd := ExecSudoCommand(ctx, sudoPassword,
-		fmt.Sprintf("cd %s && make install", tmpDir))
+	installCmd := ExecSudoCommand(ctx, sudoPassword, "make install")
+	installCmd.Dir = tmpDir
 	if err := installCmd.Run(); err != nil {
 		return fmt.Errorf("failed to install hyprpicker: %w", err)
 	}
@@ -642,7 +643,7 @@ func (m *ManualPackageInstaller) installMatugen(ctx context.Context, sudoPasswor
 	return nil
 }
 
-func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, variant deps.PackageVariant, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
 	m.log("Installing DankMaterialShell (DMS)...")
 
 	if err := m.installDMSBinary(ctx, sudoPassword, progressChan); err != nil {
@@ -671,24 +672,26 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, s
 			return fmt.Errorf("failed to clone DankMaterialShell: %w", err)
 		}
 
-		if !forceDMSGit {
-			tagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
-			tagOutput, err := tagCmd.Output()
-			if err != nil {
-				m.log("Using default branch (no tags found)")
-				return nil
-			}
-
-			latestTag := strings.TrimSpace(string(tagOutput))
-			checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
-			if err := checkoutCmd.Run(); err != nil {
-				m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
-				return nil
-			}
-
-			m.log(fmt.Sprintf("Checked out latest tag: %s", latestTag))
+		if forceDMSGit || variant == deps.VariantGit {
+			m.log("Using git variant (master branch)")
+			return nil
 		}
 
+		tagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
+		tagOutput, err := tagCmd.Output()
+		if err != nil {
+			m.log("Using default branch (no tags found)")
+			return nil
+		}
+
+		latestTag := strings.TrimSpace(string(tagOutput))
+		checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
+		if err := checkoutCmd.Run(); err != nil {
+			m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
+			return nil
+		}
+
+		m.log(fmt.Sprintf("Checked out latest tag: %s", latestTag))
 		m.log("DankMaterialShell cloned successfully")
 		return nil
 	}
@@ -707,47 +710,44 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, s
 		return nil
 	}
 
-	tagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--exact-match", "--tags", "HEAD")
-	onTag := tagCmd.Run() == nil
-
-	if onTag && !forceDMSGit {
-		latestTagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
-		tagOutput, err := latestTagCmd.Output()
+	if forceDMSGit || variant == deps.VariantGit {
+		branchCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "rev-parse", "--abbrev-ref", "HEAD")
+		branchOutput, err := branchCmd.Output()
 		if err != nil {
-			m.logError("Failed to get latest tag", err)
+			m.logError("Failed to get current branch", err)
 			return nil
 		}
 
-		latestTag := strings.TrimSpace(string(tagOutput))
-		checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
-		if err := checkoutCmd.Run(); err != nil {
-			m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
+		branch := strings.TrimSpace(string(branchOutput))
+		if branch == "" {
+			branch = "master"
+		}
+
+		pullCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "pull", "origin", branch)
+		if err := pullCmd.Run(); err != nil {
+			m.logError("Failed to pull updates", err)
 			return nil
 		}
 
-		m.log(fmt.Sprintf("Updated to tag: %s", latestTag))
+		m.log("DankMaterialShell updated successfully (git variant)")
 		return nil
 	}
 
-	branchCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "rev-parse", "--abbrev-ref", "HEAD")
-	branchOutput, err := branchCmd.Output()
+	latestTagCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "describe", "--tags", "--abbrev=0", "origin/master")
+	tagOutput, err := latestTagCmd.Output()
 	if err != nil {
-		m.logError("Failed to get current branch", err)
+		m.logError("Failed to get latest tag", err)
 		return nil
 	}
 
-	branch := strings.TrimSpace(string(branchOutput))
-	if branch == "" {
-		branch = "master"
-	}
-
-	pullCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "pull", "origin", branch)
-	if err := pullCmd.Run(); err != nil {
-		m.logError("Failed to pull updates", err)
+	latestTag := strings.TrimSpace(string(tagOutput))
+	checkoutCmd := exec.CommandContext(ctx, "git", "-C", dmsPath, "checkout", latestTag)
+	if err := checkoutCmd.Run(); err != nil {
+		m.logError(fmt.Sprintf("Failed to checkout tag %s", latestTag), err)
 		return nil
 	}
 
-	m.log("DankMaterialShell updated successfully")
+	m.log(fmt.Sprintf("Updated to tag: %s", latestTag))
 	return nil
 }
 

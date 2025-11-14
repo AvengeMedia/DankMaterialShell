@@ -73,7 +73,8 @@ Item {
                 if (root.groupByApp) {
                     const appGroups = new Map()
 
-                    pinnedApps.forEach(appId => {
+                    pinnedApps.forEach(rawAppId => {
+                        const appId = Paths.moddedAppId(rawAppId)
                         appGroups.set(appId, {
                             appId: appId,
                             isPinned: true,
@@ -82,7 +83,8 @@ Item {
                     })
 
                     sortedToplevels.forEach((toplevel, index) => {
-                        const appId = toplevel.appId || "unknown"
+                        const rawAppId = toplevel.appId || "unknown"
+                        const appId = Paths.moddedAppId(rawAppId)
                         if (!appGroups.has(appId)) {
                             appGroups.set(appId, {
                                 appId: appId,
@@ -137,7 +139,8 @@ Item {
                     unpinnedGroups.forEach(item => items.push(item))
                     root.pinnedAppCount = pinnedGroups.length
                 } else {
-                    pinnedApps.forEach(appId => {
+                    pinnedApps.forEach(rawAppId => {
+                        const appId = Paths.moddedAppId(rawAppId)
                         items.push({
                             uniqueKey: "pinned_" + appId,
                             type: "pinned",
@@ -176,7 +179,7 @@ Item {
                         items.push({
                             uniqueKey: uniqueKey,
                             type: "window",
-                            appId: toplevel.appId,
+                            appId: Paths.moddedAppId(toplevel.appId),
                             toplevel: toplevel,
                             isPinned: false,
                             isRunning: true
