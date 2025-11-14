@@ -54,9 +54,9 @@ var SPEC = {
     controlCenterShowAudioIcon: { def: true },
 
     showPrivacyButton: { def: true },
-    privacyShowMicIcon: { def: true },
-    privacyShowCameraIcon: { def: true },
-    privacyShowScreenShareIcon: { def: true },
+    privacyShowMicIcon: { def: false },
+    privacyShowCameraIcon: { def: false },
+    privacyShowScreenShareIcon: { def: false },
 
     controlCenterWidgets: { def: [
         { id: "volumeSlider", enabled: true, width: 50 },
