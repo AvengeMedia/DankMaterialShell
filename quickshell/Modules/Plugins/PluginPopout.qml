@@ -6,6 +6,8 @@ import qs.Widgets
 DankPopout {
     id: root
 
+    layerNamespace: "dms-plugin:" + layerNamespacePlugin
+
     WlrLayershell.keyboardFocus: shouldBeVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None 
 
     property var triggerScreen: null

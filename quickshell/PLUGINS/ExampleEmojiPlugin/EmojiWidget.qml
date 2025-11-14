@@ -8,6 +8,8 @@ import qs.Modules.Plugins
 PluginComponent {
     id: root
 
+    layerNamespacePlugin: "emoji-cycler"
+
     property var enabledEmojis: pluginData.emojis || ["😊", "😢", "❤️"]
     property int cycleInterval: pluginData.cycleInterval || 3000
     property int maxBarEmojis: pluginData.maxBarEmojis || 3

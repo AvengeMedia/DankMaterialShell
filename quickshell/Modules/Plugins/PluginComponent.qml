@@ -6,6 +6,8 @@ import qs.Widgets
 Item {
     id: root
 
+    property string layerNamespacePlugin: "plugin"
+
     property var axis: null
     property string section: "center"
     property var parentScreen: null
