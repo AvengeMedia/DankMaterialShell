@@ -31,7 +31,7 @@ func LocateDMSConfig() (string, error) {
 
 	for _, dir := range strings.Split(configDirs, ":") {
 		if dir != "" {
-			primaryPaths = append(primaryPaths, filepath.Join(dir, "quickshell", "dms"))
+			primaryPaths = append(primaryPaths, filepath.Join(dir, "quickshell", "dms", "quickshell"))
 		}
 	}
 
