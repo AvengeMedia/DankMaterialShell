@@ -127,10 +127,7 @@ Item {
                     dankDashPopoutLoader.item.triggerScreen = barWindow.screen
                 }
 
-                if (!dankDashPopoutLoader.item.dashVisible) {
-                    dankDashPopoutLoader.item.currentTabIndex = 2
-                }
-                dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
+                PopoutManager.requestPopout(dankDashPopoutLoader.item, 2)
             }
 
             readonly property var dBarLayer: {
@@ -1130,8 +1127,7 @@ Item {
                                         onClockClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
-                                                dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
-                                                dankDashPopoutLoader.item.currentTabIndex = 0
+                                                PopoutManager.requestPopout(dankDashPopoutLoader.item, 0)
                                             }
                                         }
                                     }
@@ -1154,8 +1150,7 @@ Item {
                                         onClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
-                                                dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
-                                                dankDashPopoutLoader.item.currentTabIndex = 1
+                                                PopoutManager.requestPopout(dankDashPopoutLoader.item, 1)
                                             }
                                         }
                                     }
@@ -1177,8 +1172,7 @@ Item {
                                         onClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
-                                                dankDashPopoutLoader.item.dashVisible = !dankDashPopoutLoader.item.dashVisible
-                                                dankDashPopoutLoader.item.currentTabIndex = 3
+                                                PopoutManager.requestPopout(dankDashPopoutLoader.item, 3)
                                             }
                                         }
                                     }

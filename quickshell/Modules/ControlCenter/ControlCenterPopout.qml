@@ -71,7 +71,8 @@ DankPopout {
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: false
-    visible: shouldBeVisible
+
+    onBackgroundClicked: close()
 
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {

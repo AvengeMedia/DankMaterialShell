@@ -590,6 +590,53 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         }
     }
 
+    function getBarBounds(screen, barThickness) {
+        if (!screen) {
+            return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+        }
+
+        const wingRadius = dankBarGothCornerRadiusOverride ? dankBarGothCornerRadiusValue : Theme.cornerRadius
+        const wingSize = dankBarGothCornersEnabled ? Math.max(0, wingRadius) : 0
+        const screenWidth = screen.width
+        const screenHeight = screen.height
+
+        if (dankBarPosition === SettingsData.Position.Top) {
+            return {
+                "x": 0,
+                "y": 0,
+                "width": screenWidth,
+                "height": barThickness + dankBarSpacing + wingSize,
+                "wingSize": wingSize
+            }
+        } else if (dankBarPosition === SettingsData.Position.Bottom) {
+            return {
+                "x": 0,
+                "y": screenHeight - barThickness - dankBarSpacing - wingSize,
+                "width": screenWidth,
+                "height": barThickness + dankBarSpacing + wingSize,
+                "wingSize": wingSize
+            }
+        } else if (dankBarPosition === SettingsData.Position.Left) {
+            return {
+                "x": 0,
+                "y": 0,
+                "width": barThickness + dankBarSpacing + wingSize,
+                "height": screenHeight,
+                "wingSize": wingSize
+            }
+        } else if (dankBarPosition === SettingsData.Position.Right) {
+            return {
+                "x": screenWidth - barThickness - dankBarSpacing - wingSize,
+                "y": 0,
+                "width": barThickness + dankBarSpacing + wingSize,
+                "height": screenHeight,
+                "wingSize": wingSize
+            }
+        }
+
+        return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+    }
+
     function getFilteredScreens(componentId) {
         var prefs = screenPreferences && screenPreferences[componentId] || ["all"]
         if (prefs.includes("all")) {

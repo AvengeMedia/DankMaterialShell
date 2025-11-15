@@ -28,7 +28,24 @@ PanelWindow {
     property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property bool shouldBeVisible: false
-    property int keyboardFocusMode: WlrKeyboardFocus.OnDemand
+    property int keyboardFocusMode: WlrKeyboardFocus.Exclusive
+
+    visible: false
+
+    readonly property real effectiveBarThickness: Math.max(26 + SettingsData.dankBarInnerPadding * 0.6, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing
+
+    readonly property var barBounds: {
+        if (!root.screen) {
+            return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+        }
+        return SettingsData.getBarBounds(root.screen, effectiveBarThickness)
+    }
+
+    readonly property real barX: barBounds.x
+    readonly property real barY: barBounds.y
+    readonly property real barWidth: barBounds.width
+    readonly property real barHeight: barBounds.height
+    readonly property real barWingSize: barBounds.wingSize
 
     signal opened
     signal popoutClosed
@@ -38,6 +55,7 @@ PanelWindow {
         closeTimer.stop()
         shouldBeVisible = true
         visible = true
+        PopoutManager.showPopout(root)
         opened()
     }
 
@@ -59,6 +77,7 @@ PanelWindow {
         onTriggered: {
             if (!shouldBeVisible) {
                 visible = false
+                PopoutManager.hidePopout(root)
                 popoutClosed()
             }
         }
@@ -114,16 +133,82 @@ PanelWindow {
         }
     })(), dpr)
 
+    readonly property real maskX: {
+        switch (SettingsData.dankBarPosition) {
+        case SettingsData.Position.Left:
+            return root.barWidth > 0 ? root.barWidth : 0
+        case SettingsData.Position.Right:
+        case SettingsData.Position.Top:
+        case SettingsData.Position.Bottom:
+        default:
+            return 0
+        }
+    }
+
+    readonly property real maskY: {
+        switch (SettingsData.dankBarPosition) {
+        case SettingsData.Position.Top:
+            return root.barHeight > 0 ? root.barHeight : 0
+        case SettingsData.Position.Bottom:
+        case SettingsData.Position.Left:
+        case SettingsData.Position.Right:
+        default:
+            return 0
+        }
+    }
+
+    readonly property real maskWidth: {
+        switch (SettingsData.dankBarPosition) {
+        case SettingsData.Position.Left:
+            return root.barWidth > 0 ? root.width - root.barWidth : root.width
+        case SettingsData.Position.Right:
+            return root.barWidth > 0 ? root.width - root.barWidth : root.width
+        case SettingsData.Position.Top:
+        case SettingsData.Position.Bottom:
+        default:
+            return root.width
+        }
+    }
+
+    readonly property real maskHeight: {
+        switch (SettingsData.dankBarPosition) {
+        case SettingsData.Position.Top:
+            return root.barHeight > 0 ? root.height - root.barHeight : root.height
+        case SettingsData.Position.Bottom:
+            return root.barHeight > 0 ? root.height - root.barHeight : root.height
+        case SettingsData.Position.Left:
+        case SettingsData.Position.Right:
+        default:
+            return root.height
+        }
+    }
+
+    mask: Region {
+        item: Rectangle {
+            x: root.maskX
+            y: root.maskY
+            width: root.maskWidth
+            height: root.maskHeight
+        }
+    }
+
     MouseArea {
-        anchors.fill: parent
-        enabled: shouldBeVisible && contentLoader.opacity > 0.1
+        x: maskX
+        y: maskY
+        width: maskWidth
+        height: maskHeight
+        z: -1
+        enabled: shouldBeVisible
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onClicked: mouse => {
-            if (mouse.x < alignedX || mouse.x > alignedX + alignedWidth ||
-                mouse.y < alignedY || mouse.y > alignedY + alignedHeight) {
-                backgroundClicked()
-                close()
-            }
+            const clickX = mouse.x + maskX
+            const clickY = mouse.y + maskY
+            const outsideContent = clickX < alignedX || clickX > alignedX + alignedWidth ||
+                                   clickY < alignedY || clickY > alignedY + alignedHeight
+
+            if (!outsideContent) return
+
+            backgroundClicked()
         }
     }
 

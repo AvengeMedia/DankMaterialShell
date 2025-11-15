@@ -42,7 +42,14 @@ DankPopout {
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: notificationHistoryVisible
-    visible: shouldBeVisible
+
+    function toggle() {
+        notificationHistoryVisible = !notificationHistoryVisible
+    }
+
+    onBackgroundClicked: {
+        notificationHistoryVisible = false
+    }
 
     onNotificationHistoryVisibleChanged: {
         if (notificationHistoryVisible) {

@@ -27,7 +27,6 @@ DankPopout {
     popupHeight: contentHeight
     screen: triggerScreen
     shouldBeVisible: false
-    visible: shouldBeVisible
 
     content: Component {
         Rectangle {
