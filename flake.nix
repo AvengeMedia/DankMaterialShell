@@ -90,6 +90,9 @@
 
         homeModules.dankMaterialShell.niri = import ./distro/nix/niri.nix;
 
+        nixosModules.dankMaterialShell = {
+            imports = [./distro/nix/nixos.nix];
+        };
         nixosModules.greeter = {pkgs, ...}: let
             dmsPkgs = buildDmsPkgs pkgs;
         in {
