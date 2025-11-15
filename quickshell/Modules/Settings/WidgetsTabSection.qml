@@ -991,7 +991,7 @@ Column {
 
 
         width: 200
-        height: 120
+        height: 160
         padding: 0
         modal: true
         focus: true
