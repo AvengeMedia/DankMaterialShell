@@ -45,7 +45,6 @@ DankPopout {
     triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 80
     shouldBeVisible: dashVisible
-    visible: shouldBeVisible
 
     property bool __focusArmed: false
     property bool __contentReady: false

@@ -40,6 +40,8 @@ DankPopout {
     positioning: ""
     screen: triggerScreen
 
+    onBackgroundClicked: close()
+
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
             appLauncher.searchQuery = ""

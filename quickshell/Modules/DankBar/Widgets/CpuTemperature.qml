@@ -132,8 +132,8 @@ BasePill {
                 popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
             }
             DgopService.setSortBy("cpu");
-            if (root.toggleProcessList) {
-                root.toggleProcessList();
+            if (popoutTarget) {
+                PopoutManager.requestPopout(popoutTarget, undefined, "cpu_temp");
             }
         }
     }

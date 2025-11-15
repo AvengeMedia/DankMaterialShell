@@ -24,6 +24,25 @@ Item {
         debounceTimer.restart()
     }
 
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+        z: -999
+        onClicked: {
+            const activePopout = PopoutManager.getActivePopout(barWindow.screen)
+            if (activePopout) {
+                if (activePopout.dashVisible !== undefined) {
+                    activePopout.dashVisible = false
+                } else if (activePopout.notificationHistoryVisible !== undefined) {
+                    activePopout.notificationHistoryVisible = false
+                } else {
+                    activePopout.close()
+                }
+            }
+            TrayMenuManager.closeAllMenus()
+        }
+    }
+
     Timer {
         id: debounceTimer
         interval: 50

@@ -50,8 +50,8 @@ DankPopout {
     triggerWidth: 70
     positioning: ""
     screen: triggerScreen
-    shouldBeVisible: false
-    visible: shouldBeVisible
+
+    onBackgroundClicked: close()
 
     content: Component {
         Rectangle {
