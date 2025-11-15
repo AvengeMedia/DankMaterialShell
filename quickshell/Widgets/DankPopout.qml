@@ -99,7 +99,12 @@ PanelWindow {
     WlrLayershell.keyboardFocus: {
         if (!shouldBeVisible) return WlrKeyboardFocus.None
         return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
-    } 
+    }
+
+    HyprlandFocusGrab {
+        windows: [root]
+        active: CompositorService.isHyprland && shouldBeVisible
+    }
 
     anchors {
         top: true

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Services.SystemTray
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -366,9 +367,17 @@ Item {
         screen: root.parentScreen
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+        WlrLayershell.keyboardFocus: {
+            if (!root.menuOpen) return WlrKeyboardFocus.None
+            return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+        }
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
+
+        HyprlandFocusGrab {
+            windows: [overflowMenu]
+            active: CompositorService.isHyprland && root.menuOpen
+        }
 
         anchors {
             top: true
@@ -811,8 +820,16 @@ Item {
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                WlrLayershell.keyboardFocus: {
+                    if (!menuRoot.showMenu) return WlrKeyboardFocus.None
+                    return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+                }
                 color: "transparent"
+
+                HyprlandFocusGrab {
+                    windows: [menuWindow]
+                    active: CompositorService.isHyprland && menuRoot.showMenu
+                }
 
                 anchors {
                     top: true

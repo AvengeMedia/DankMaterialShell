@@ -92,6 +92,12 @@ PanelWindow {
         if (!shouldHaveFocus) return WlrKeyboardFocus.None
         return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
     }
+
+    HyprlandFocusGrab {
+        windows: [root]
+        active: CompositorService.isHyprland && shouldHaveFocus
+    }
+
     onVisibleChanged: {
         if (root.visible) {
             opened()
