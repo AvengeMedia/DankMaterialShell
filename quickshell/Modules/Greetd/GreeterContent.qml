@@ -1086,9 +1086,9 @@ Item {
                 })
             }
             // 1. Explicit system/user paths 
-            var explicitFind = "find " + paths.join(" ") + " -maxdepth 1 -name '*.desktop' -type f 2>/dev/null"
+            var explicitFind = "find " + paths.join(" ") + " -maxdepth 1 -name '*.desktop' -type f -follow 2>/dev/null"
             // 2. Scan all /home user directories for local session files
-            var homeScan = "find /home -maxdepth 5 \\( -path '*/wayland-sessions/*.desktop' -o -path '*/xsessions/*.desktop' \\) -type f 2>/dev/null"
+            var homeScan = "find /home -maxdepth 5 \\( -path '*/wayland-sessions/*.desktop' -o -path '*/xsessions/*.desktop' \\) -type f -follow 2>/dev/null"
             var findCmd = "(" + explicitFind + "; " + homeScan + ") | sort -u"
             return ["sh", "-c", findCmd]
         }
