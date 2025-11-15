@@ -88,7 +88,10 @@ PanelWindow {
         }
     }
     WlrLayershell.exclusiveZone: -1
-    WlrLayershell.keyboardFocus: shouldHaveFocus ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: {
+        if (!shouldHaveFocus) return WlrKeyboardFocus.None
+        return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+    }
     onVisibleChanged: {
         if (root.visible) {
             opened()

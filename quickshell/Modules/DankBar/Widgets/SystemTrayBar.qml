@@ -49,21 +49,16 @@ Item {
     visible: allTrayItems.length > 0
 
     property bool menuOpen: false
-    property bool overflowWasOpenBeforeTrayMenu: false
+    property var currentTrayMenu: null
 
     Component.onCompleted: {
-        if (parentScreen) {
-            TrayMenuManager.registerOverflowMenu(parentScreen.name, {
-                close: () => { root.menuOpen = false }
-            })
-        }
+        if (!parentScreen) return
+        TrayMenuManager.register(parentScreen.name, root)
     }
 
     Component.onDestruction: {
-        if (parentScreen) {
-            TrayMenuManager.unregisterOverflowMenu(parentScreen.name)
-            TrayMenuManager.unregisterTrayMenu(parentScreen.name)
-        }
+        if (!parentScreen) return
+        TrayMenuManager.unregister(parentScreen.name)
     }
 
     Rectangle {
@@ -186,7 +181,7 @@ Item {
 
                             if (!delegateRoot.trayItem.hasMenu) return
 
-                            root.overflowWasOpenBeforeTrayMenu = root.menuOpen
+                            root.menuOpen = false
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                         }
                     }
@@ -319,7 +314,7 @@ Item {
 
                             if (!delegateRoot.trayItem.hasMenu) return
 
-                            root.overflowWasOpenBeforeTrayMenu = root.menuOpen
+                            root.menuOpen = false
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                         }
                     }
@@ -722,7 +717,6 @@ Item {
 
                                 if (!trayItem.hasMenu) return
 
-                                root.overflowWasOpenBeforeTrayMenu = true
                                 root.menuOpen = false
                                 root.showForTrayItem(trayItem, parent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
                             }
@@ -784,7 +778,6 @@ Item {
             }
 
             function closeWithAction() {
-                root.overflowWasOpenBeforeTrayMenu = false
                 close()
             }
 
@@ -1329,39 +1322,19 @@ Item {
         }
     }
 
-    property var currentTrayMenu: null
-
-    Connections {
-        target: currentTrayMenu
-        enabled: currentTrayMenu !== null
-        function onShowMenuChanged() {
-            if (parentWindow && typeof parentWindow.systemTrayMenuOpen !== "undefined") {
-                parentWindow.systemTrayMenuOpen = currentTrayMenu.showMenu
-            }
-        }
-    }
-
     function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj) {
-        if (parentWindow && typeof parentWindow.systemTrayMenuOpen !== "undefined") {
-            parentWindow.systemTrayMenuOpen = true
-        }
+        if (!screen) return
 
         if (currentTrayMenu) {
-            root.overflowWasOpenBeforeTrayMenu = false
             currentTrayMenu.showMenu = false
             currentTrayMenu.destroy()
             currentTrayMenu = null
         }
 
         currentTrayMenu = trayMenuComponent.createObject(null)
-        if (currentTrayMenu && screen) {
-            currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj)
-            TrayMenuManager.registerTrayMenu(screen.name, () => {
-                if (currentTrayMenu) {
-                    currentTrayMenu.close()
-                }
-            })
-        }
+        if (!currentTrayMenu) return
+
+        currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj)
     }
 
 }

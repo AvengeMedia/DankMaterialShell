@@ -6,49 +6,27 @@ import QtQuick
 Singleton {
     id: root
 
-    property var activeOverflowMenus: ({})
-    property var activeTrayMenus: ({})
+    property var activeTrayBars: ({})
 
-    function registerOverflowMenu(screenName, menuOpenBinding) {
+    function register(screenName, trayBar) {
+        if (!screenName || !trayBar) return
+        activeTrayBars[screenName] = trayBar
+    }
+
+    function unregister(screenName) {
         if (!screenName) return
-        activeOverflowMenus[screenName] = menuOpenBinding
-    }
-
-    function unregisterOverflowMenu(screenName) {
-        if (!screenName) return
-        delete activeOverflowMenus[screenName]
-    }
-
-    function registerTrayMenu(screenName, closeCallback) {
-        if (!screenName) return
-        activeTrayMenus[screenName] = closeCallback
-    }
-
-    function unregisterTrayMenu(screenName) {
-        if (!screenName) return
-        delete activeTrayMenus[screenName]
-    }
-
-    function closeOverflowMenus() {
-        for (const screenName in activeOverflowMenus) {
-            const menuBinding = activeOverflowMenus[screenName]
-            if (menuBinding && menuBinding.close) {
-                menuBinding.close()
-            }
-        }
-    }
-
-    function closeTrayMenus() {
-        for (const screenName in activeTrayMenus) {
-            const closeCallback = activeTrayMenus[screenName]
-            if (closeCallback) {
-                closeCallback()
-            }
-        }
+        delete activeTrayBars[screenName]
     }
 
     function closeAllMenus() {
-        closeOverflowMenus()
-        closeTrayMenus()
+        for (const screenName in activeTrayBars) {
+            const trayBar = activeTrayBars[screenName]
+            if (!trayBar) continue
+
+            trayBar.menuOpen = false
+            if (trayBar.currentTrayMenu) {
+                trayBar.currentTrayMenu.showMenu = false
+            }
+        }
     }
 }

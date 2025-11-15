@@ -28,7 +28,6 @@ PanelWindow {
     property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property bool shouldBeVisible: false
-    property int keyboardFocusMode: WlrKeyboardFocus.Exclusive
 
     visible: false
 
@@ -97,7 +96,10 @@ PanelWindow {
         }
     }
     WlrLayershell.exclusiveZone: -1
-    WlrLayershell.keyboardFocus: shouldBeVisible ? keyboardFocusMode : WlrKeyboardFocus.None 
+    WlrLayershell.keyboardFocus: {
+        if (!shouldBeVisible) return WlrKeyboardFocus.None
+        return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+    } 
 
     anchors {
         top: true

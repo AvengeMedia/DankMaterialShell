@@ -18,7 +18,6 @@ DankPopout {
     property var triggerScreen: null
     property int currentTabIndex: 0
 
-    keyboardFocusMode: WlrKeyboardFocus.Exclusive
 
     function setTriggerPosition(x, y, width, section, screen) {
         triggerSection = section

@@ -35,7 +35,7 @@ Scope {
                 WlrLayershell.namespace: "dms:workspace-overview"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.exclusiveZone: -1
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+                WlrLayershell.keyboardFocus: overviewScope.overviewOpen ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
                 anchors {
                     top: true
