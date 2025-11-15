@@ -56,7 +56,7 @@ in {
         enableAudioWavelength = lib.mkOption {
             type = bool;
             default = true;
-            description = "Add needed dependencies to have audio waveleng support";
+            description = "Add needed dependencies to have audio wavelength support";
         };
         enableCalendarEvents = lib.mkOption {
             type = bool;
