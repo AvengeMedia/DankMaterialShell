@@ -6,6 +6,8 @@ import qs.Widgets
 DankModal {
     id: root
 
+    layerNamespace: "dms:confirm-modal"
+
     property string confirmTitle: ""
     property string confirmMessage: ""
     property string confirmButtonText: "Confirm"
