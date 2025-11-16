@@ -240,19 +240,25 @@ func TestHandleSubscribe(t *testing.T) {
 
 func TestManager_Subscribe_Unsubscribe(t *testing.T) {
 	manager := &Manager{
-		state:       &NetworkState{},
-		subscribers: make(map[string]chan NetworkState),
+		state: &NetworkState{},
 	}
 
 	t.Run("subscribe creates channel", func(t *testing.T) {
 		ch := manager.Subscribe("client1")
 		assert.NotNil(t, ch)
-		assert.Len(t, manager.subscribers, 1)
+		count := 0
+		manager.subscribers.Range(func(key string, ch chan NetworkState) bool {
+			count++
+			return true
+		})
+		assert.Equal(t, 1, count)
 	})
 
 	t.Run("unsubscribe removes channel", func(t *testing.T) {
 		manager.Unsubscribe("client1")
-		assert.Len(t, manager.subscribers, 0)
+		count := 0
+		manager.subscribers.Range(func(key string, ch chan NetworkState) bool { count++; return true })
+		assert.Equal(t, 0, count)
 	})
 
 	t.Run("unsubscribe non-existent client is safe", func(t *testing.T) {

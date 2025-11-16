@@ -4,7 +4,8 @@ import (
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_workspace"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
 type Workspace struct {
@@ -37,23 +38,18 @@ type Manager struct {
 	registry *wlclient.Registry
 	manager  *ext_workspace.ExtWorkspaceManagerV1
 
-	outputsMutex sync.RWMutex
-	outputs      map[uint32]*wlclient.Output
-	outputNames  map[uint32]string
+	outputNames syncmap.Map[uint32, string]
 
-	groupsMutex sync.RWMutex
-	groups      map[uint32]*workspaceGroupState
+	groups syncmap.Map[uint32, *workspaceGroupState]
 
-	workspacesMutex sync.RWMutex
-	workspaces      map[uint32]*workspaceState
+	workspaces syncmap.Map[uint32, *workspaceState]
 
 	wlMutex  sync.Mutex
 	cmdq     chan cmd
 	stopChan chan struct{}
 	wg       sync.WaitGroup
 
-	subscribers  map[string]chan State
-	subMutex     sync.RWMutex
+	subscribers  syncmap.Map[string, chan State]
 	dirty        chan struct{}
 	notifierWg   sync.WaitGroup
 	lastNotified *State
@@ -95,19 +91,16 @@ func (m *Manager) GetState() State {
 
 func (m *Manager) Subscribe(id string) chan State {
 	ch := make(chan State, 64)
-	m.subMutex.Lock()
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+
+	m.subscribers.Store(id, ch)
+
 	return ch
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
+	if ch, ok := m.subscribers.LoadAndDelete(id); ok {
 		close(ch)
-		delete(m.subscribers, id)
 	}
-	m.subMutex.Unlock()
 }
 
 func (m *Manager) notifySubscribers() {

@@ -139,7 +139,7 @@ Rectangle {
             }
 
             StyledText {
-                text: DgopService.distribution || "Linux"
+                text: UserInfoService.hostname || "Linux"
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceVariantText
                 elide: Text.ElideRight

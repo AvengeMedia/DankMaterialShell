@@ -3,7 +3,8 @@ package dwl
 import (
 	"sync"
 
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
 type TagState struct {
@@ -40,8 +41,7 @@ type Manager struct {
 	registry *wlclient.Registry
 	manager  interface{}
 
-	outputs      map[uint32]*outputState
-	outputsMutex sync.RWMutex
+	outputs syncmap.Map[uint32, *outputState]
 
 	tagCount uint32
 	layouts  []string
@@ -52,8 +52,7 @@ type Manager struct {
 	stopChan       chan struct{}
 	wg             sync.WaitGroup
 
-	subscribers  map[string]chan State
-	subMutex     sync.RWMutex
+	subscribers  syncmap.Map[string, chan State]
 	dirty        chan struct{}
 	notifierWg   sync.WaitGroup
 	lastNotified *State
@@ -92,19 +91,16 @@ func (m *Manager) GetState() State {
 
 func (m *Manager) Subscribe(id string) chan State {
 	ch := make(chan State, 64)
-	m.subMutex.Lock()
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+
+	m.subscribers.Store(id, ch)
+
 	return ch
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
-		close(ch)
-		delete(m.subscribers, id)
+	if val, ok := m.subscribers.LoadAndDelete(id); ok {
+		close(val)
 	}
-	m.subMutex.Unlock()
 }
 
 func (m *Manager) notifySubscribers() {

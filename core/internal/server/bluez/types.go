@@ -3,6 +3,7 @@ package bluez
 import (
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -59,22 +60,19 @@ type PairingPrompt struct {
 type Manager struct {
 	state              *BluetoothState
 	stateMutex         sync.RWMutex
-	subscribers        map[string]chan BluetoothState
-	subMutex           sync.RWMutex
+	subscribers        syncmap.Map[string, chan BluetoothState]
 	stopChan           chan struct{}
 	dbusConn           *dbus.Conn
 	signals            chan *dbus.Signal
 	sigWG              sync.WaitGroup
 	agent              *BluezAgent
 	promptBroker       PromptBroker
-	pairingSubscribers map[string]chan PairingPrompt
-	pairingSubMutex    sync.RWMutex
+	pairingSubscribers syncmap.Map[string, chan PairingPrompt]
 	dirty              chan struct{}
 	notifierWg         sync.WaitGroup
 	lastNotifiedState  *BluetoothState
 	adapterPath        dbus.ObjectPath
-	pendingPairings    map[string]bool
-	pendingPairingsMux sync.Mutex
+	pendingPairings    syncmap.Map[string, bool]
 	eventQueue         chan func()
 	eventWg            sync.WaitGroup
 }

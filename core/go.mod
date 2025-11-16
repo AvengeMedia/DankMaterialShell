@@ -13,7 +13,6 @@ require (
 	github.com/holoplot/go-evdev v0.0.0-20250804134636-ab1d56a1fe83
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
-	github.com/yaslama/go-wayland/wayland v0.0.0-20250907155644-2874f32d9c34
 	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6
 )
 

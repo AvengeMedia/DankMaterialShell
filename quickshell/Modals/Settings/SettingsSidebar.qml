@@ -66,7 +66,7 @@ Rectangle {
         Column {
             id: sidebarColumn
 
-            width: parent.width
+            anchors.fill: parent
             anchors.leftMargin: Theme.spacingS
             anchors.rightMargin: Theme.spacingS
             anchors.bottomMargin: Theme.spacingS
@@ -100,7 +100,7 @@ Rectangle {
 
                     property bool isActive: sidebarContainer.currentIndex === index
 
-                    width: sidebarColumn.width - Theme.spacingS * 2
+                    width: parent.width
                     height: 44
                     radius: Theme.cornerRadius
                     color: isActive ? Theme.primary : tabMouseArea.containsMouse ? Theme.surfaceHover : "transparent"

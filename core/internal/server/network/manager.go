@@ -66,13 +66,10 @@ func NewManager() (*Manager, error) {
 			Preference:    PreferenceAuto,
 			WiFiNetworks:  []WiFiNetwork{},
 		},
-		stateMutex:            sync.RWMutex{},
-		subscribers:           make(map[string]chan NetworkState),
-		subMutex:              sync.RWMutex{},
-		stopChan:              make(chan struct{}),
-		dirty:                 make(chan struct{}, 1),
-		credentialSubscribers: make(map[string]chan CredentialPrompt),
-		credSubMutex:          sync.RWMutex{},
+		stateMutex: sync.RWMutex{},
+
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 
 	broker := NewSubscriptionBroker(m.broadcastCredentialPrompt)
@@ -270,48 +267,36 @@ func (m *Manager) GetState() NetworkState {
 
 func (m *Manager) Subscribe(id string) chan NetworkState {
 	ch := make(chan NetworkState, 64)
-	m.subMutex.Lock()
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+	m.subscribers.Store(id, ch)
 	return ch
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
-		close(ch)
-		delete(m.subscribers, id)
+	if val, ok := m.subscribers.LoadAndDelete(id); ok {
+		close(val)
 	}
-	m.subMutex.Unlock()
 }
 
 func (m *Manager) SubscribeCredentials(id string) chan CredentialPrompt {
 	ch := make(chan CredentialPrompt, 16)
-	m.credSubMutex.Lock()
-	m.credentialSubscribers[id] = ch
-	m.credSubMutex.Unlock()
+	m.credentialSubscribers.Store(id, ch)
 	return ch
 }
 
 func (m *Manager) UnsubscribeCredentials(id string) {
-	m.credSubMutex.Lock()
-	if ch, ok := m.credentialSubscribers[id]; ok {
+	if ch, ok := m.credentialSubscribers.LoadAndDelete(id); ok {
 		close(ch)
-		delete(m.credentialSubscribers, id)
 	}
-	m.credSubMutex.Unlock()
 }
 
 func (m *Manager) broadcastCredentialPrompt(prompt CredentialPrompt) {
-	m.credSubMutex.RLock()
-	defer m.credSubMutex.RUnlock()
-
-	for _, ch := range m.credentialSubscribers {
+	m.credentialSubscribers.Range(func(key string, ch chan CredentialPrompt) bool {
 		select {
 		case ch <- prompt:
 		default:
 		}
-	}
+		return true
+	})
 }
 
 func (m *Manager) notifier() {
@@ -335,28 +320,21 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			if len(m.subscribers) == 0 {
-				m.subMutex.RUnlock()
-				pending = false
-				continue
-			}
 
 			currentState := m.snapshotState()
 
 			if m.lastNotifiedState != nil && !stateChangedMeaningfully(m.lastNotifiedState, &currentState) {
-				m.subMutex.RUnlock()
 				pending = false
 				continue
 			}
 
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan NetworkState) bool {
 				select {
 				case ch <- currentState:
 				default:
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotifiedState = &stateCopy
@@ -396,12 +374,11 @@ func (m *Manager) Close() {
 		m.backend.Close()
 	}
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan NetworkState) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan NetworkState)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 }
 
 func (m *Manager) ScanWiFi() error {

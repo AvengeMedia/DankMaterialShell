@@ -228,8 +228,13 @@ Singleton {
     function initializeGpuMetadata() {
         if (!dgopAvailable)
             return
-        // Load GPU metadata once at startup for basic info
         gpuInitProcess.running = true
+    }
+
+    function initializeSystemMetadata() {
+        if (!dgopAvailable)
+            return
+        systemInitProcess.running = true
     }
 
     function buildDgopCommand() {
@@ -450,14 +455,14 @@ Singleton {
             bootTime = sys.boottime || ""
         }
 
-        if (data.hardware) {
-            const hw = data.hardware
-            hostname = hw.hostname || ""
-            kernelVersion = hw.kernel || ""
-            distribution = hw.distro || ""
-            architecture = hw.arch || ""
-            motherboard = (hw.bios && hw.bios.motherboard) || ""
-            biosVersion = (hw.bios && hw.bios.version) || ""
+        const hwData = data.hardware || (data.hostname || data.kernel || data.distro || data.arch) ? data : null
+        if (hwData) {
+            hostname = hwData.hostname || ""
+            kernelVersion = hwData.kernel || ""
+            distribution = hwData.distro || ""
+            architecture = hwData.arch || ""
+            motherboard = (hwData.bios && hwData.bios.motherboard) || ""
+            biosVersion = (hwData.bios && hwData.bios.version) || ""
         }
 
         isUpdating = false
@@ -630,6 +635,29 @@ Singleton {
     }
 
     Process {
+        id: systemInitProcess
+        command: ["dgop", "hardware", "--json"]
+        running: false
+        onExited: exitCode => {
+            if (exitCode !== 0) {
+                console.warn("System init process failed with exit code:", exitCode)
+            }
+        }
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim()) {
+                    try {
+                        const data = JSON.parse(text.trim())
+                        parseData(data)
+                    } catch (e) {
+                        console.warn("Failed to parse system init JSON:", e)
+                    }
+                }
+            }
+        }
+    }
+
+    Process {
         id: dgopCheckProcess
         command: ["which", "dgop"]
         running: false
@@ -637,12 +665,11 @@ Singleton {
             dgopAvailable = (exitCode === 0)
             if (dgopAvailable) {
                 initializeGpuMetadata()
-                // Load persisted GPU PCI IDs from session state
+                initializeSystemMetadata()
                 if (SessionData.enabledGpuPciIds && SessionData.enabledGpuPciIds.length > 0) {
                     for (const pciId of SessionData.enabledGpuPciIds) {
                         addGpuPciId(pciId)
                     }
-                    // Trigger update if we already have active modules
                     if (refCount > 0 && enabledModules.length > 0) {
                         updateAllStats()
                     }

@@ -6,10 +6,9 @@ func NewTestManager(backend Backend, state *NetworkState) *Manager {
 		state = &NetworkState{}
 	}
 	return &Manager{
-		backend:     backend,
-		state:       state,
-		subscribers: make(map[string]chan NetworkState),
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
+		backend:  backend,
+		state:    state,
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 }

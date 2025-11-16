@@ -13,9 +13,8 @@ import (
 
 func NewSysfsBackend() (*SysfsBackend, error) {
 	b := &SysfsBackend{
-		basePath:    "/sys/class",
-		classes:     []string{"backlight", "leds"},
-		deviceCache: make(map[string]*sysfsDevice),
+		basePath: "/sys/class",
+		classes:  []string{"backlight", "leds"},
 	}
 
 	if err := b.scanDevices(); err != nil {
@@ -26,9 +25,6 @@ func NewSysfsBackend() (*SysfsBackend, error) {
 }
 
 func (b *SysfsBackend) scanDevices() error {
-	b.deviceCacheMutex.Lock()
-	defer b.deviceCacheMutex.Unlock()
-
 	for _, class := range b.classes {
 		classPath := filepath.Join(b.basePath, class)
 		entries, err := os.ReadDir(classPath)
@@ -68,13 +64,13 @@ func (b *SysfsBackend) scanDevices() error {
 			}
 
 			deviceID := fmt.Sprintf("%s:%s", class, entry.Name())
-			b.deviceCache[deviceID] = &sysfsDevice{
+			b.deviceCache.Store(deviceID, &sysfsDevice{
 				class:         deviceClass,
 				id:            deviceID,
 				name:          entry.Name(),
 				maxBrightness: maxBrightness,
 				minValue:      minValue,
-			}
+			})
 
 			log.Debugf("found %s device: %s (max=%d)", class, entry.Name(), maxBrightness)
 		}
@@ -106,19 +102,16 @@ func shouldSuppressDevice(name string) bool {
 }
 
 func (b *SysfsBackend) GetDevices() ([]Device, error) {
-	b.deviceCacheMutex.RLock()
-	defer b.deviceCacheMutex.RUnlock()
+	devices := make([]Device, 0)
 
-	devices := make([]Device, 0, len(b.deviceCache))
-
-	for _, dev := range b.deviceCache {
+	b.deviceCache.Range(func(key string, dev *sysfsDevice) bool {
 		if shouldSuppressDevice(dev.name) {
-			continue
+			return true
 		}
 
 		parts := strings.SplitN(dev.id, ":", 2)
 		if len(parts) != 2 {
-			continue
+			return true
 		}
 
 		class := parts[0]
@@ -130,13 +123,13 @@ func (b *SysfsBackend) GetDevices() ([]Device, error) {
 		brightnessData, err := os.ReadFile(brightnessPath)
 		if err != nil {
 			log.Debugf("failed to read brightness for %s: %v", dev.id, err)
-			continue
+			return true
 		}
 
 		current, err := strconv.Atoi(strings.TrimSpace(string(brightnessData)))
 		if err != nil {
 			log.Debugf("failed to parse brightness for %s: %v", dev.id, err)
-			continue
+			return true
 		}
 
 		percent := b.ValueToPercent(current, dev, false)
@@ -150,16 +143,14 @@ func (b *SysfsBackend) GetDevices() ([]Device, error) {
 			CurrentPercent: percent,
 			Backend:        "sysfs",
 		})
-	}
+		return true
+	})
 
 	return devices, nil
 }
 
 func (b *SysfsBackend) GetDevice(id string) (*sysfsDevice, error) {
-	b.deviceCacheMutex.RLock()
-	defer b.deviceCacheMutex.RUnlock()
-
-	dev, ok := b.deviceCache[id]
+	dev, ok := b.deviceCache.Load(id)
 	if !ok {
 		return nil, fmt.Errorf("device not found: %s", id)
 	}

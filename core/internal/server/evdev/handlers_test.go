@@ -47,10 +47,9 @@ func TestHandleRequest(t *testing.T) {
 		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
 
 		m := &Manager{
-			devices:     []EvdevDevice{mockDevice},
-			state:       State{Available: true, CapsLock: true},
-			subscribers: make(map[string]chan State),
-			closeChan:   make(chan struct{}),
+			devices:   []EvdevDevice{mockDevice},
+			state:     State{Available: true, CapsLock: true},
+			closeChan: make(chan struct{}),
 		}
 
 		conn := newMockNetConn()
@@ -77,10 +76,9 @@ func TestHandleRequest(t *testing.T) {
 		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
 
 		m := &Manager{
-			devices:     []EvdevDevice{mockDevice},
-			state:       State{Available: true, CapsLock: false},
-			subscribers: make(map[string]chan State),
-			closeChan:   make(chan struct{}),
+			devices:   []EvdevDevice{mockDevice},
+			state:     State{Available: true, CapsLock: false},
+			closeChan: make(chan struct{}),
 		}
 
 		conn := newMockNetConn()
@@ -107,10 +105,9 @@ func TestHandleGetState(t *testing.T) {
 	mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
 
 	m := &Manager{
-		devices:     []EvdevDevice{mockDevice},
-		state:       State{Available: true, CapsLock: false},
-		subscribers: make(map[string]chan State),
-		closeChan:   make(chan struct{}),
+		devices:   []EvdevDevice{mockDevice},
+		state:     State{Available: true, CapsLock: false},
+		closeChan: make(chan struct{}),
 	}
 
 	conn := newMockNetConn()

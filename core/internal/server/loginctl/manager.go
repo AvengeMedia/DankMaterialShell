@@ -25,13 +25,12 @@ func NewManager() (*Manager, error) {
 		state: &SessionState{
 			SessionID: sessionID,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan SessionState),
-		subMutex:    sync.RWMutex{},
-		stopChan:    make(chan struct{}),
-		conn:        conn,
-		dirty:       make(chan struct{}, 1),
-		signals:     make(chan *dbus.Signal, 256),
+		stateMutex: sync.RWMutex{},
+
+		stopChan: make(chan struct{}),
+		conn:     conn,
+		dirty:    make(chan struct{}, 1),
+		signals:  make(chan *dbus.Signal, 256),
 	}
 	m.sleepInhibitorEnabled.Store(true)
 
@@ -351,19 +350,14 @@ func (m *Manager) GetState() SessionState {
 
 func (m *Manager) Subscribe(id string) chan SessionState {
 	ch := make(chan SessionState, 64)
-	m.subMutex.Lock()
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+	m.subscribers.Store(id, ch)
 	return ch
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
-		close(ch)
-		delete(m.subscribers, id)
+	if val, ok := m.subscribers.LoadAndDelete(id); ok {
+		close(val)
 	}
-	m.subMutex.Unlock()
 }
 
 func (m *Manager) notifier() {
@@ -387,28 +381,21 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			if len(m.subscribers) == 0 {
-				m.subMutex.RUnlock()
-				pending = false
-				continue
-			}
 
 			currentState := m.snapshotState()
 
 			if m.lastNotifiedState != nil && !stateChangedMeaningfully(m.lastNotifiedState, &currentState) {
-				m.subMutex.RUnlock()
 				pending = false
 				continue
 			}
 
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan SessionState) bool {
 				select {
 				case ch <- currentState:
 				default:
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotifiedState = &stateCopy
@@ -584,12 +571,11 @@ func (m *Manager) Close() {
 
 	m.releaseSleepInhibitor()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan SessionState) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan SessionState)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 
 	if m.conn != nil {
 		m.conn.Close()

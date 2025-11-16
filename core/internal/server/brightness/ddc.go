@@ -24,7 +24,6 @@ const (
 
 func NewDDCBackend() (*DDCBackend, error) {
 	b := &DDCBackend{
-		devices:         make(map[string]*ddcDevice),
 		scanInterval:    30 * time.Second,
 		debounceTimers:  make(map[string]*time.Timer),
 		debouncePending: make(map[string]ddcPendingSet),
@@ -53,10 +52,10 @@ func (b *DDCBackend) scanI2CDevices() error {
 		return nil
 	}
 
-	b.devicesMutex.Lock()
-	defer b.devicesMutex.Unlock()
-
-	b.devices = make(map[string]*ddcDevice)
+	b.devices.Range(func(key string, value *ddcDevice) bool {
+		b.devices.Delete(key)
+		return true
+	})
 
 	for i := 0; i < 32; i++ {
 		busPath := fmt.Sprintf("/dev/i2c-%d", i)
@@ -64,7 +63,6 @@ func (b *DDCBackend) scanI2CDevices() error {
 			continue
 		}
 
-		// Skip SMBus, GPU internal buses (e.g. AMDGPU SMU) to prevent GPU hangs
 		if isIgnorableI2CBus(i) {
 			log.Debugf("Skipping ignorable i2c-%d", i)
 			continue
@@ -77,7 +75,7 @@ func (b *DDCBackend) scanI2CDevices() error {
 
 		id := fmt.Sprintf("ddc:i2c-%d", i)
 		dev.id = id
-		b.devices[id] = dev
+		b.devices.Store(id, dev)
 		log.Debugf("found DDC device on i2c-%d", i)
 	}
 
@@ -164,12 +162,9 @@ func (b *DDCBackend) GetDevices() ([]Device, error) {
 		log.Debugf("DDC scan error: %v", err)
 	}
 
-	b.devicesMutex.Lock()
-	defer b.devicesMutex.Unlock()
+	devices := make([]Device, 0)
 
-	devices := make([]Device, 0, len(b.devices))
-
-	for id, dev := range b.devices {
+	b.devices.Range(func(id string, dev *ddcDevice) bool {
 		devices = append(devices, Device{
 			Class:          ClassDDC,
 			ID:             id,
@@ -179,7 +174,8 @@ func (b *DDCBackend) GetDevices() ([]Device, error) {
 			CurrentPercent: dev.lastBrightness,
 			Backend:        "ddc",
 		})
-	}
+		return true
+	})
 
 	return devices, nil
 }
@@ -189,9 +185,7 @@ func (b *DDCBackend) SetBrightness(id string, value int, exponential bool, callb
 }
 
 func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential bool, exponent float64, callback func()) error {
-	b.devicesMutex.RLock()
-	_, ok := b.devices[id]
-	b.devicesMutex.RUnlock()
+	_, ok := b.devices.Load(id)
 
 	if !ok {
 		return fmt.Errorf("device not found: %s", id)
@@ -202,8 +196,6 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 	}
 
 	b.debounceMutex.Lock()
-	defer b.debounceMutex.Unlock()
-
 	b.debouncePending[id] = ddcPendingSet{
 		percent:  value,
 		callback: callback,
@@ -234,14 +226,13 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 			}
 		})
 	}
+	b.debounceMutex.Unlock()
 
 	return nil
 }
 
 func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) error {
-	b.devicesMutex.RLock()
-	dev, ok := b.devices[id]
-	b.devicesMutex.RUnlock()
+	dev, ok := b.devices.Load(id)
 
 	if !ok {
 		return fmt.Errorf("device not found: %s", id)
@@ -266,9 +257,8 @@ func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) er
 			return fmt.Errorf("get current capability: %w", err)
 		}
 		max = cap.max
-		b.devicesMutex.Lock()
 		dev.max = max
-		b.devicesMutex.Unlock()
+		b.devices.Store(id, dev)
 	}
 
 	if err := b.setVCPFeature(fd, VCP_BRIGHTNESS, value); err != nil {
@@ -277,10 +267,9 @@ func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) er
 
 	log.Debugf("set %s to %d/%d", id, value, max)
 
-	b.devicesMutex.Lock()
 	dev.max = max
 	dev.lastBrightness = value
-	b.devicesMutex.Unlock()
+	b.devices.Store(id, dev)
 
 	return nil
 }

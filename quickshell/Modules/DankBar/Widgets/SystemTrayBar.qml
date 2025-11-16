@@ -356,7 +356,7 @@ Item {
         screen: root.parentScreen
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
 
@@ -375,7 +375,6 @@ Item {
         onVisibleChanged: {
             if (visible) {
                 updatePosition()
-                Qt.callLater(() => overflowFocusScope.forceActiveFocus())
             }
         }
 
@@ -677,11 +676,6 @@ Item {
                 showMenu = false
                 if (root.overflowWasOpenBeforeTrayMenu) {
                     root.menuOpen = true
-                    Qt.callLater(() => {
-                        if (overflowMenu.visible && overflowFocusScope) {
-                            overflowFocusScope.forceActiveFocus()
-                        }
-                    })
                 }
                 root.overflowWasOpenBeforeTrayMenu = false
             }
@@ -721,7 +715,7 @@ Item {
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
-                WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
                 color: "transparent"
 
                 anchors {
@@ -739,7 +733,6 @@ Item {
                 onVisibleChanged: {
                     if (visible) {
                         updatePosition()
-                        Qt.callLater(() => menuFocusScope.forceActiveFocus())
                     }
                 }
 
@@ -1095,7 +1088,7 @@ Item {
                                         width: 16
                                         height: 16
                                         anchors.verticalCenter: parent.verticalCenter
-                                        visible: menuEntry?.icon && menuEntry.icon !== ""
+                                        visible: (menuEntry?.icon ?? "") !== ""
 
                                         Image {
                                             anchors.fill: parent

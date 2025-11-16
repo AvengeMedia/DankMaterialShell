@@ -15,10 +15,8 @@ func NewManager() (*Manager, error) {
 
 func NewManagerWithOptions(exponential bool) (*Manager, error) {
 	m := &Manager{
-		subscribers:       make(map[string]chan State),
-		updateSubscribers: make(map[string]chan DeviceUpdate),
-		stopChan:          make(chan struct{}),
-		exponential:       exponential,
+		stopChan:    make(chan struct{}),
+		exponential: exponential,
 	}
 
 	go m.initLogind()
@@ -360,20 +358,13 @@ func (m *Manager) broadcastDeviceUpdate(deviceID string) {
 
 	update := DeviceUpdate{Device: *targetDevice}
 
-	m.subMutex.RLock()
-	defer m.subMutex.RUnlock()
-
-	if len(m.updateSubscribers) == 0 {
-		log.Debugf("No update subscribers for device: %s", deviceID)
-		return
-	}
-
 	log.Debugf("Broadcasting device update: %s at %d%%", deviceID, targetDevice.CurrentPercent)
 
-	for _, ch := range m.updateSubscribers {
+	m.updateSubscribers.Range(func(key string, ch chan DeviceUpdate) bool {
 		select {
 		case ch <- update:
 		default:
 		}
-	}
+		return true
+	})
 }

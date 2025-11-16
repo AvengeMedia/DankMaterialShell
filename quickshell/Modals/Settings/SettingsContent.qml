@@ -12,9 +12,9 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        anchors.leftMargin: 0
-        anchors.rightMargin: Theme.spacingS
-        anchors.bottomMargin: Theme.spacingM
+        anchors.leftMargin: Theme.spacingS
+        anchors.rightMargin: 0
+        anchors.bottomMargin: 0
         anchors.topMargin: 0
         color: "transparent"
 

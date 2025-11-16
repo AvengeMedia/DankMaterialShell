@@ -160,26 +160,21 @@ func TestSysfsBackend_ScanDevices(t *testing.T) {
 	}
 
 	b := &SysfsBackend{
-		basePath:    tmpDir,
-		classes:     []string{"backlight", "leds"},
-		deviceCache: make(map[string]*sysfsDevice),
+		basePath: tmpDir,
+		classes:  []string{"backlight", "leds"},
 	}
 
 	if err := b.scanDevices(); err != nil {
 		t.Fatalf("scanDevices() error = %v", err)
 	}
 
-	if len(b.deviceCache) != 2 {
-		t.Errorf("expected 2 devices, got %d", len(b.deviceCache))
-	}
-
 	backlightID := "backlight:test_backlight"
-	if _, ok := b.deviceCache[backlightID]; !ok {
+	if _, ok := b.deviceCache.Load(backlightID); !ok {
 		t.Errorf("backlight device not found")
 	}
 
 	ledID := "leds:test_led"
-	if _, ok := b.deviceCache[ledID]; !ok {
+	if _, ok := b.deviceCache.Load(ledID); !ok {
 		t.Errorf("LED device not found")
 	}
 }

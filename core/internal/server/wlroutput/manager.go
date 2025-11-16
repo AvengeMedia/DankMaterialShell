@@ -6,20 +6,17 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_output_management"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
 
 func NewManager(display *wlclient.Display) (*Manager, error) {
 	m := &Manager{
-		display:     display,
-		ctx:         display.Context(),
-		heads:       make(map[uint32]*headState),
-		modes:       make(map[uint32]*modeState),
-		cmdq:        make(chan cmd, 128),
-		stopChan:    make(chan struct{}),
-		subscribers: make(map[string]chan State),
-		dirty:       make(chan struct{}, 1),
-		fatalError:  make(chan error, 1),
+		display:    display,
+		ctx:        display.Context(),
+		cmdq:       make(chan cmd, 128),
+		stopChan:   make(chan struct{}),
+		dirty:      make(chan struct{}, 1),
+		fatalError: make(chan error, 1),
 	}
 
 	m.wg.Add(1)
@@ -143,9 +140,7 @@ func (m *Manager) handleHead(e wlr_output_management.ZwlrOutputManagerV1HeadEven
 		modeIDs: make([]uint32, 0),
 	}
 
-	m.headsMutex.Lock()
-	m.heads[headID] = head
-	m.headsMutex.Unlock()
+	m.heads.Store(headID, head)
 
 	handle.SetNameHandler(func(e wlr_output_management.ZwlrOutputHeadV1NameEvent) {
 		log.Debugf("WlrOutput: Head %d name: %s", headID, e.Name)
@@ -254,9 +249,7 @@ func (m *Manager) handleHead(e wlr_output_management.ZwlrOutputManagerV1HeadEven
 		log.Debugf("WlrOutput: Head %d finished", headID)
 		head.finished = true
 
-		m.headsMutex.Lock()
-		delete(m.heads, headID)
-		m.headsMutex.Unlock()
+		m.heads.Delete(headID)
 
 		m.post(func() {
 			m.wlMutex.Lock()
@@ -279,15 +272,12 @@ func (m *Manager) handleMode(headID uint32, e wlr_output_management.ZwlrOutputHe
 		handle: handle,
 	}
 
-	m.modesMutex.Lock()
-	m.modes[modeID] = mode
-	m.modesMutex.Unlock()
+	m.modes.Store(modeID, mode)
 
-	m.headsMutex.Lock()
-	if head, ok := m.heads[headID]; ok {
+	if head, ok := m.heads.Load(headID); ok {
 		head.modeIDs = append(head.modeIDs, modeID)
+		m.heads.Store(headID, head)
 	}
-	m.headsMutex.Unlock()
 
 	handle.SetSizeHandler(func(e wlr_output_management.ZwlrOutputModeV1SizeEvent) {
 		log.Debugf("WlrOutput: Mode %d size: %dx%d", modeID, e.Width, e.Height)
@@ -318,9 +308,7 @@ func (m *Manager) handleMode(headID uint32, e wlr_output_management.ZwlrOutputHe
 		log.Debugf("WlrOutput: Mode %d finished", modeID)
 		mode.finished = true
 
-		m.modesMutex.Lock()
-		delete(m.modes, modeID)
-		m.modesMutex.Unlock()
+		m.modes.Delete(modeID)
 
 		m.post(func() {
 			m.wlMutex.Lock()
@@ -333,22 +321,22 @@ func (m *Manager) handleMode(headID uint32, e wlr_output_management.ZwlrOutputHe
 }
 
 func (m *Manager) updateState() {
-	m.headsMutex.RLock()
-	m.modesMutex.RLock()
-
 	outputs := make([]Output, 0)
 
-	for _, head := range m.heads {
+	m.heads.Range(func(key uint32, head *headState) bool {
 		if head.finished {
-			continue
+			return true
 		}
 
 		modes := make([]OutputMode, 0)
 		var currentMode *OutputMode
 
 		for _, modeID := range head.modeIDs {
-			mode, exists := m.modes[modeID]
-			if !exists || mode.finished {
+			mode, exists := m.modes.Load(modeID)
+			if !exists {
+				continue
+			}
+			if mode.finished {
 				continue
 			}
 
@@ -385,10 +373,8 @@ func (m *Manager) updateState() {
 			ID:             head.id,
 		}
 		outputs = append(outputs, output)
-	}
-
-	m.modesMutex.RUnlock()
-	m.headsMutex.RUnlock()
+		return true
+	})
 
 	newState := State{
 		Outputs: outputs,
@@ -442,14 +428,6 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			subCount := len(m.subscribers)
-			m.subMutex.RUnlock()
-
-			if subCount == 0 {
-				pending = false
-				continue
-			}
 
 			currentState := m.GetState()
 
@@ -458,15 +436,14 @@ func (m *Manager) notifier() {
 				continue
 			}
 
-			m.subMutex.RLock()
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan State) bool {
 				select {
 				case ch <- currentState:
 				default:
 					log.Warn("WlrOutput: subscriber channel full, dropping update")
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotified = &stateCopy
@@ -480,30 +457,27 @@ func (m *Manager) Close() {
 	m.wg.Wait()
 	m.notifierWg.Wait()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan State) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan State)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 
-	m.modesMutex.Lock()
-	for _, mode := range m.modes {
+	m.modes.Range(func(key uint32, mode *modeState) bool {
 		if mode.handle != nil {
 			mode.handle.Release()
 		}
-	}
-	m.modes = make(map[uint32]*modeState)
-	m.modesMutex.Unlock()
+		m.modes.Delete(key)
+		return true
+	})
 
-	m.headsMutex.Lock()
-	for _, head := range m.heads {
+	m.heads.Range(func(key uint32, head *headState) bool {
 		if head.handle != nil {
 			head.handle.Release()
 		}
-	}
-	m.heads = make(map[uint32]*headState)
-	m.headsMutex.Unlock()
+		m.heads.Delete(key)
+		return true
+	})
 
 	if m.manager != nil {
 		m.manager.Stop()

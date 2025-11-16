@@ -14,10 +14,8 @@ func TestManager_HandleDBusSignal_Lock(t *testing.T) {
 			Locked:     false,
 			LockedHint: false,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan SessionState),
-		subMutex:    sync.RWMutex{},
-		dirty:       make(chan struct{}, 1),
+		stateMutex: sync.RWMutex{},
+		dirty:      make(chan struct{}, 1),
 	}
 
 	sig := &dbus.Signal{
@@ -38,10 +36,8 @@ func TestManager_HandleDBusSignal_Unlock(t *testing.T) {
 			Locked:     true,
 			LockedHint: true,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan SessionState),
-		subMutex:    sync.RWMutex{},
-		dirty:       make(chan struct{}, 1),
+		stateMutex: sync.RWMutex{},
+		dirty:      make(chan struct{}, 1),
 	}
 
 	sig := &dbus.Signal{
@@ -62,10 +58,8 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 			state: &SessionState{
 				PreparingForSleep: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -85,10 +79,8 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 			state: &SessionState{
 				PreparingForSleep: true,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -108,10 +100,8 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 			state: &SessionState{
 				PreparingForSleep: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -133,10 +123,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 			state: &SessionState{
 				Active: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -161,10 +149,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 			state: &SessionState{
 				IdleHint: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -189,10 +175,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 			state: &SessionState{
 				IdleSinceHint: 0,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -218,10 +202,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 				LockedHint: false,
 				Locked:     false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -247,10 +229,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 			state: &SessionState{
 				Active: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -272,11 +252,9 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 	t.Run("empty body", func(t *testing.T) {
 		manager := &Manager{
-			state:       &SessionState{},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			state:      &SessionState{},
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{
@@ -295,10 +273,8 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 				Active:   false,
 				IdleHint: false,
 			},
-			stateMutex:  sync.RWMutex{},
-			subscribers: make(map[string]chan SessionState),
-			subMutex:    sync.RWMutex{},
-			dirty:       make(chan struct{}, 1),
+			stateMutex: sync.RWMutex{},
+			dirty:      make(chan struct{}, 1),
 		}
 
 		sig := &dbus.Signal{

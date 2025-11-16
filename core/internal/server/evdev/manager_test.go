@@ -16,10 +16,9 @@ func TestManager_Creation(t *testing.T) {
 		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
 
 		m := &Manager{
-			devices:     []EvdevDevice{mockDevice},
-			state:       State{Available: true, CapsLock: false},
-			subscribers: make(map[string]chan State),
-			closeChan:   make(chan struct{}),
+			devices:   []EvdevDevice{mockDevice},
+			state:     State{Available: true, CapsLock: false},
+			closeChan: make(chan struct{}),
 		}
 
 		assert.NotNil(t, m)
@@ -32,10 +31,9 @@ func TestManager_Creation(t *testing.T) {
 		mockDevice.EXPECT().ReadOne().Return(nil, errors.New("test")).Maybe()
 
 		m := &Manager{
-			devices:     []EvdevDevice{mockDevice},
-			state:       State{Available: true, CapsLock: true},
-			subscribers: make(map[string]chan State),
-			closeChan:   make(chan struct{}),
+			devices:   []EvdevDevice{mockDevice},
+			state:     State{Available: true, CapsLock: true},
+			closeChan: make(chan struct{}),
 		}
 
 		assert.NotNil(t, m)
@@ -52,7 +50,6 @@ func TestManager_GetState(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 
@@ -69,13 +66,17 @@ func TestManager_Subscribe(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 
 	ch := m.Subscribe("test-client")
 	assert.NotNil(t, ch)
-	assert.Len(t, m.subscribers, 1)
+	count := 0
+	m.subscribers.Range(func(key string, ch chan State) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 1, count)
 }
 
 func TestManager_Unsubscribe(t *testing.T) {
@@ -86,15 +87,24 @@ func TestManager_Unsubscribe(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 
 	ch := m.Subscribe("test-client")
-	assert.Len(t, m.subscribers, 1)
+	count := 0
+	m.subscribers.Range(func(key string, ch chan State) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 1, count)
 
 	m.Unsubscribe("test-client")
-	assert.Len(t, m.subscribers, 0)
+	count = 0
+	m.subscribers.Range(func(key string, ch chan State) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 0, count)
 
 	select {
 	case _, ok := <-ch:
@@ -112,7 +122,6 @@ func TestManager_UpdateCapsLock(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 
@@ -148,7 +157,6 @@ func TestManager_Close(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 
@@ -171,7 +179,12 @@ func TestManager_Close(t *testing.T) {
 		t.Error("channel 2 should be closed")
 	}
 
-	assert.Len(t, m.subscribers, 0)
+	count := 0
+	m.subscribers.Range(func(key string, ch chan State) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 0, count)
 
 	m.Close()
 }
@@ -230,10 +243,9 @@ func TestManager_MonitorDevice(t *testing.T) {
 		mockDevice.EXPECT().Close().Return(nil).Maybe()
 
 		m := &Manager{
-			devices:     []EvdevDevice{mockDevice},
-			state:       State{Available: true, CapsLock: false},
-			subscribers: make(map[string]chan State),
-			closeChan:   make(chan struct{}),
+			devices:   []EvdevDevice{mockDevice},
+			state:     State{Available: true, CapsLock: false},
+			closeChan: make(chan struct{}),
 		}
 
 		ch := m.Subscribe("test")
@@ -276,7 +288,6 @@ func TestNotifySubscribers(t *testing.T) {
 		devices:        []EvdevDevice{mockDevice},
 		monitoredPaths: make(map[string]bool),
 		state:          State{Available: true, CapsLock: false},
-		subscribers:    make(map[string]chan State),
 		closeChan:      make(chan struct{}),
 	}
 

@@ -466,9 +466,7 @@ func TestHandleSubscribe(t *testing.T) {
 			SessionID: "1",
 			Locked:    false,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan SessionState),
-		subMutex:    sync.RWMutex{},
+		stateMutex: sync.RWMutex{},
 	}
 
 	conn := newMockNetConn()

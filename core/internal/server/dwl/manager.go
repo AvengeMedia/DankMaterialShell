@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/dwl_ipc"
@@ -14,13 +14,12 @@ func NewManager(display *wlclient.Display) (*Manager, error) {
 	m := &Manager{
 		display:        display,
 		ctx:            display.Context(),
-		outputs:        make(map[uint32]*outputState),
 		cmdq:           make(chan cmd, 128),
 		outputSetupReq: make(chan uint32, 16),
 		stopChan:       make(chan struct{}),
-		subscribers:    make(map[string]chan State),
-		dirty:          make(chan struct{}, 1),
-		layouts:        make([]string, 0),
+
+		dirty:   make(chan struct{}, 1),
+		layouts: make([]string, 0),
 	}
 
 	if err := m.setupRegistry(); err != nil {
@@ -56,10 +55,7 @@ func (m *Manager) waylandActor() {
 		case c := <-m.cmdq:
 			c.fn()
 		case outputID := <-m.outputSetupReq:
-			m.outputsMutex.RLock()
-			out, exists := m.outputs[outputID]
-			m.outputsMutex.RUnlock()
-
+			out, exists := m.outputs.Load(outputID)
 			if !exists {
 				log.Warnf("DWL: Output %d no longer exists, skipping setup", outputID)
 				continue
@@ -156,9 +152,7 @@ func (m *Manager) setupRegistry() error {
 				outputs = append(outputs, output)
 				outputRegNames[outputID] = e.Name
 
-				m.outputsMutex.Lock()
-				m.outputs[outputID] = outState
-				m.outputsMutex.Unlock()
+				m.outputs.Store(outputID, outState)
 
 				if m.manager != nil {
 					select {
@@ -176,17 +170,16 @@ func (m *Manager) setupRegistry() error {
 
 	registry.SetGlobalRemoveHandler(func(e wlclient.RegistryGlobalRemoveEvent) {
 		m.post(func() {
-			m.outputsMutex.Lock()
 			var outToRelease *outputState
-			for id, out := range m.outputs {
+			m.outputs.Range(func(id uint32, out *outputState) bool {
 				if out.registryName == e.Name {
 					log.Infof("DWL: Output %d removed", id)
 					outToRelease = out
-					delete(m.outputs, id)
-					break
+					m.outputs.Delete(id)
+					return false
 				}
-			}
-			m.outputsMutex.Unlock()
+				return true
+			})
 
 			if outToRelease != nil {
 				if ipcOut, ok := outToRelease.ipcOutput.(*dwl_ipc.ZdwlIpcOutputV2); ok && ipcOut != nil {
@@ -236,14 +229,11 @@ func (m *Manager) setupOutput(manager *dwl_ipc.ZdwlIpcManagerV2, output *wlclien
 		return fmt.Errorf("failed to get dwl output: %w", err)
 	}
 
-	m.outputsMutex.Lock()
-	outState, exists := m.outputs[output.ID()]
+	outState, exists := m.outputs.Load(output.ID())
 	if !exists {
-		m.outputsMutex.Unlock()
 		return fmt.Errorf("output state not found for id %d", output.ID())
 	}
 	outState.ipcOutput = ipcOutput
-	m.outputsMutex.Unlock()
 
 	ipcOutput.SetActiveHandler(func(e dwl_ipc.ZdwlIpcOutputV2ActiveEvent) {
 		outState.active = e.Active
@@ -300,11 +290,10 @@ func (m *Manager) setupOutput(manager *dwl_ipc.ZdwlIpcManagerV2, output *wlclien
 }
 
 func (m *Manager) updateState() {
-	m.outputsMutex.RLock()
 	outputs := make(map[string]*OutputState)
 	activeOutput := ""
 
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		name := out.name
 		if name == "" {
 			name = fmt.Sprintf("output-%d", out.id)
@@ -326,8 +315,8 @@ func (m *Manager) updateState() {
 		if out.active != 0 {
 			activeOutput = name
 		}
-	}
-	m.outputsMutex.RUnlock()
+		return true
+	})
 
 	newState := State{
 		Outputs:      outputs,
@@ -365,14 +354,6 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			subCount := len(m.subscribers)
-			m.subMutex.RUnlock()
-
-			if subCount == 0 {
-				pending = false
-				continue
-			}
 
 			currentState := m.GetState()
 
@@ -381,15 +362,14 @@ func (m *Manager) notifier() {
 				continue
 			}
 
-			m.subMutex.RLock()
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan State) bool {
 				select {
 				case ch <- currentState:
 				default:
 					log.Warn("DWL: subscriber channel full, dropping update")
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotified = &stateCopy
@@ -407,11 +387,9 @@ func (m *Manager) ensureOutputSetup(out *outputState) error {
 }
 
 func (m *Manager) SetTags(outputName string, tagmask uint32, toggleTagset uint32) error {
-	m.outputsMutex.RLock()
-
-	availableOutputs := make([]string, 0, len(m.outputs))
+	availableOutputs := make([]string, 0)
 	var targetOut *outputState
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		name := out.name
 		if name == "" {
 			name = fmt.Sprintf("output-%d", out.id)
@@ -419,10 +397,10 @@ func (m *Manager) SetTags(outputName string, tagmask uint32, toggleTagset uint32
 		availableOutputs = append(availableOutputs, name)
 		if name == outputName {
 			targetOut = out
-			break
+			return false
 		}
-	}
-	m.outputsMutex.RUnlock()
+		return true
+	})
 
 	if targetOut == nil {
 		return fmt.Errorf("output not found: %s (available: %v)", outputName, availableOutputs)
@@ -444,20 +422,18 @@ func (m *Manager) SetTags(outputName string, tagmask uint32, toggleTagset uint32
 }
 
 func (m *Manager) SetClientTags(outputName string, andTags uint32, xorTags uint32) error {
-	m.outputsMutex.RLock()
-
 	var targetOut *outputState
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		name := out.name
 		if name == "" {
 			name = fmt.Sprintf("output-%d", out.id)
 		}
 		if name == outputName {
 			targetOut = out
-			break
+			return false
 		}
-	}
-	m.outputsMutex.RUnlock()
+		return true
+	})
 
 	if targetOut == nil {
 		return fmt.Errorf("output not found: %s", outputName)
@@ -479,20 +455,18 @@ func (m *Manager) SetClientTags(outputName string, andTags uint32, xorTags uint3
 }
 
 func (m *Manager) SetLayout(outputName string, index uint32) error {
-	m.outputsMutex.RLock()
-
 	var targetOut *outputState
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		name := out.name
 		if name == "" {
 			name = fmt.Sprintf("output-%d", out.id)
 		}
 		if name == outputName {
 			targetOut = out
-			break
+			return false
 		}
-	}
-	m.outputsMutex.RUnlock()
+		return true
+	})
 
 	if targetOut == nil {
 		return fmt.Errorf("output not found: %s", outputName)
@@ -518,21 +492,19 @@ func (m *Manager) Close() {
 	m.wg.Wait()
 	m.notifierWg.Wait()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan State) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan State)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 
-	m.outputsMutex.Lock()
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		if ipcOut, ok := out.ipcOutput.(*dwl_ipc.ZdwlIpcOutputV2); ok {
 			ipcOut.Release()
 		}
-	}
-	m.outputs = make(map[uint32]*outputState)
-	m.outputsMutex.Unlock()
+		m.outputs.Delete(key)
+		return true
+	})
 
 	if mgr, ok := m.manager.(*dwl_ipc.ZdwlIpcManagerV2); ok {
 		mgr.Release()

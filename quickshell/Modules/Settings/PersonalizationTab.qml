@@ -68,7 +68,6 @@ Item {
 
     DankFlickable {
         anchors.fill: parent
-        anchors.topMargin: Theme.spacingL
         clip: true
         contentHeight: mainColumn.height
         contentWidth: width

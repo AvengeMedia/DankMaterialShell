@@ -13,10 +13,9 @@ func TestNewManager(t *testing.T) {
 		state: &CUPSState{
 			Printers: make(map[string]*Printer),
 		},
-		client:      nil,
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
-		subscribers: make(map[string]chan CUPSState),
+		client:   nil,
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 
 	assert.NotNil(t, m)
@@ -35,10 +34,9 @@ func TestManager_GetState(t *testing.T) {
 				},
 			},
 		},
-		client:      mockClient,
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
-		subscribers: make(map[string]chan CUPSState),
+		client:   mockClient,
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 
 	state := m.GetState()
@@ -53,18 +51,28 @@ func TestManager_Subscribe(t *testing.T) {
 		state: &CUPSState{
 			Printers: make(map[string]*Printer),
 		},
-		client:      mockClient,
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
-		subscribers: make(map[string]chan CUPSState),
+		client:   mockClient,
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 
 	ch := m.Subscribe("test-client")
 	assert.NotNil(t, ch)
-	assert.Equal(t, 1, len(m.subscribers))
+
+	count := 0
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 1, count)
 
 	m.Unsubscribe("test-client")
-	assert.Equal(t, 0, len(m.subscribers))
+	count = 0
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 0, count)
 }
 
 func TestManager_Close(t *testing.T) {
@@ -74,10 +82,9 @@ func TestManager_Close(t *testing.T) {
 		state: &CUPSState{
 			Printers: make(map[string]*Printer),
 		},
-		client:      mockClient,
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
-		subscribers: make(map[string]chan CUPSState),
+		client:   mockClient,
+		stopChan: make(chan struct{}),
+		dirty:    make(chan struct{}, 1),
 	}
 
 	m.eventWG.Add(1)
@@ -93,7 +100,12 @@ func TestManager_Close(t *testing.T) {
 	}()
 
 	m.Close()
-	assert.Equal(t, 0, len(m.subscribers))
+	count := 0
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
+		count++
+		return true
+	})
+	assert.Equal(t, 0, count)
 }
 
 func TestStateChanged(t *testing.T) {

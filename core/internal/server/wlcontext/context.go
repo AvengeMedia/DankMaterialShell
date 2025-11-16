@@ -6,7 +6,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
 
 type SharedContext struct {

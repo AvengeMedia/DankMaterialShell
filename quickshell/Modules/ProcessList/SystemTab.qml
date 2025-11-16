@@ -9,10 +9,10 @@ DankFlickable {
     contentHeight: systemColumn.implicitHeight
     clip: true
     Component.onCompleted: {
-        DgopService.addRef(["system", "hardware", "diskmounts"]);
+        DgopService.addRef(["system", "diskmounts"]);
     }
     Component.onDestruction: {
-        DgopService.removeRef(["system", "hardware", "diskmounts"]);
+        DgopService.removeRef(["system", "diskmounts"]);
     }
 
     Column {

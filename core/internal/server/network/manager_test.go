@@ -31,19 +31,15 @@ func TestManager_NotifySubscribers(t *testing.T) {
 		state: &NetworkState{
 			NetworkStatus: StatusWiFi,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan NetworkState),
-		subMutex:    sync.RWMutex{},
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
+		stateMutex: sync.RWMutex{},
+		stopChan:   make(chan struct{}),
+		dirty:      make(chan struct{}, 1),
 	}
 	manager.notifierWg.Add(1)
 	go manager.notifier()
 
 	ch := make(chan NetworkState, 10)
-	manager.subMutex.Lock()
-	manager.subscribers["test-client"] = ch
-	manager.subMutex.Unlock()
+	manager.subscribers.Store("test-client", ch)
 
 	manager.notifySubscribers()
 
@@ -63,19 +59,15 @@ func TestManager_NotifySubscribers_Debounce(t *testing.T) {
 		state: &NetworkState{
 			NetworkStatus: StatusWiFi,
 		},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan NetworkState),
-		subMutex:    sync.RWMutex{},
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
+		stateMutex: sync.RWMutex{},
+		stopChan:   make(chan struct{}),
+		dirty:      make(chan struct{}, 1),
 	}
 	manager.notifierWg.Add(1)
 	go manager.notifier()
 
 	ch := make(chan NetworkState, 10)
-	manager.subMutex.Lock()
-	manager.subscribers["test-client"] = ch
-	manager.subMutex.Unlock()
+	manager.subscribers.Store("test-client", ch)
 
 	manager.notifySubscribers()
 	manager.notifySubscribers()
@@ -98,19 +90,15 @@ func TestManager_NotifySubscribers_Debounce(t *testing.T) {
 
 func TestManager_Close(t *testing.T) {
 	manager := &Manager{
-		state:       &NetworkState{},
-		stateMutex:  sync.RWMutex{},
-		subscribers: make(map[string]chan NetworkState),
-		subMutex:    sync.RWMutex{},
-		stopChan:    make(chan struct{}),
+		state:      &NetworkState{},
+		stateMutex: sync.RWMutex{},
+		stopChan:   make(chan struct{}),
 	}
 
 	ch1 := make(chan NetworkState, 1)
 	ch2 := make(chan NetworkState, 1)
-	manager.subMutex.Lock()
-	manager.subscribers["client1"] = ch1
-	manager.subscribers["client2"] = ch2
-	manager.subMutex.Unlock()
+	manager.subscribers.Store("client1", ch1)
+	manager.subscribers.Store("client2", ch2)
 
 	manager.Close()
 
@@ -125,31 +113,27 @@ func TestManager_Close(t *testing.T) {
 	assert.False(t, ok1, "ch1 should be closed")
 	assert.False(t, ok2, "ch2 should be closed")
 
-	assert.Len(t, manager.subscribers, 0)
+	count := 0
+	manager.subscribers.Range(func(key string, ch chan NetworkState) bool { count++; return true })
+	assert.Equal(t, 0, count)
 }
 
 func TestManager_Subscribe(t *testing.T) {
 	manager := &Manager{
-		state:       &NetworkState{},
-		subscribers: make(map[string]chan NetworkState),
-		subMutex:    sync.RWMutex{},
+		state: &NetworkState{},
 	}
 
 	ch := manager.Subscribe("test-client")
 	assert.NotNil(t, ch)
 	assert.Equal(t, 64, cap(ch))
 
-	manager.subMutex.RLock()
-	_, exists := manager.subscribers["test-client"]
-	manager.subMutex.RUnlock()
+	_, exists := manager.subscribers.Load("test-client")
 	assert.True(t, exists)
 }
 
 func TestManager_Unsubscribe(t *testing.T) {
 	manager := &Manager{
-		state:       &NetworkState{},
-		subscribers: make(map[string]chan NetworkState),
-		subMutex:    sync.RWMutex{},
+		state: &NetworkState{},
 	}
 
 	ch := manager.Subscribe("test-client")
@@ -159,9 +143,7 @@ func TestManager_Unsubscribe(t *testing.T) {
 	_, ok := <-ch
 	assert.False(t, ok)
 
-	manager.subMutex.RLock()
-	_, exists := manager.subscribers["test-client"]
-	manager.subMutex.RUnlock()
+	_, exists := manager.subscribers.Load("test-client")
 	assert.False(t, exists)
 }
 

@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 	"github.com/godbus/dbus/v5"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
 	"golang.org/x/sys/unix"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
@@ -23,14 +23,13 @@ func NewManager(display *wlclient.Display, config Config) (*Manager, error) {
 	}
 
 	m := &Manager{
-		config:         config,
-		display:        display,
-		ctx:            display.Context(),
-		outputs:        make(map[uint32]*outputState),
-		cmdq:           make(chan cmd, 128),
-		stopChan:       make(chan struct{}),
-		updateTrigger:  make(chan struct{}, 1),
-		subscribers:    make(map[string]chan State),
+		config:        config,
+		display:       display,
+		ctx:           display.Context(),
+		cmdq:          make(chan cmd, 128),
+		stopChan:      make(chan struct{}),
+		updateTrigger: make(chan struct{}, 1),
+
 		dirty:          make(chan struct{}, 1),
 		dbusSignal:     make(chan *dbus.Signal, 16),
 		transitionChan: make(chan int, 1),
@@ -114,17 +113,17 @@ func (m *Manager) waylandActor() {
 }
 
 func (m *Manager) allOutputsReady() bool {
-	m.outputsMutex.RLock()
-	defer m.outputsMutex.RUnlock()
-	if len(m.outputs) == 0 {
-		return false
-	}
-	for _, o := range m.outputs {
-		if o.rampSize == 0 || o.failed {
+	hasOutputs := false
+	allReady := true
+	m.outputs.Range(func(key uint32, value *outputState) bool {
+		hasOutputs = true
+		if value.rampSize == 0 || value.failed {
+			allReady = false
 			return false
 		}
-	}
-	return true
+		return true
+	})
+	return hasOutputs && allReady
 }
 
 func (m *Manager) setupDBusMonitor() error {
@@ -157,7 +156,6 @@ func (m *Manager) setupRegistry() error {
 	m.registry = registry
 
 	outputs := make([]*wlclient.Output, 0)
-	outputRegNames := make(map[uint32]uint32)
 	outputNames := make(map[uint32]string)
 	var gammaMgr *wlr_gamma_control.ZwlrGammaControlManagerV1
 
@@ -198,14 +196,9 @@ func (m *Manager) setupRegistry() error {
 
 				if gammaMgr != nil {
 					outputs = append(outputs, output)
-					outputRegNames[outputID] = e.Name
 				}
 
-				m.outputsMutex.Lock()
-				if m.outputRegNames != nil {
-					m.outputRegNames[outputID] = e.Name
-				}
-				m.outputsMutex.Unlock()
+				m.outputRegNames.Store(outputID, e.Name)
 
 				m.configMutex.RLock()
 				enabled := m.config.Enabled
@@ -236,23 +229,33 @@ func (m *Manager) setupRegistry() error {
 
 	registry.SetGlobalRemoveHandler(func(e wlclient.RegistryGlobalRemoveEvent) {
 		m.post(func() {
-			m.outputsMutex.Lock()
-			defer m.outputsMutex.Unlock()
-
-			for id, out := range m.outputs {
+			var foundID uint32
+			var foundOut *outputState
+			m.outputs.Range(func(id uint32, out *outputState) bool {
 				if out.registryName == e.Name {
-					log.Infof("Output %d (registry name %d) removed, destroying gamma control", id, e.Name)
-					if out.gammaControl != nil {
-						control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
-						control.Destroy()
-					}
-					delete(m.outputs, id)
+					foundID = id
+					foundOut = out
+					return false
+				}
+				return true
+			})
 
-					if len(m.outputs) == 0 {
-						m.controlsInitialized = false
-						log.Info("All outputs removed, controls no longer initialized")
-					}
-					return
+			if foundOut != nil {
+				log.Infof("Output %d (registry name %d) removed, destroying gamma control", foundID, e.Name)
+				if foundOut.gammaControl != nil {
+					control := foundOut.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
+					control.Destroy()
+				}
+				m.outputs.Delete(foundID)
+
+				hasOutputs := false
+				m.outputs.Range(func(key uint32, value *outputState) bool {
+					hasOutputs = true
+					return false
+				})
+				if !hasOutputs {
+					m.controlsInitialized = false
+					log.Info("All outputs removed, controls no longer initialized")
 				}
 			}
 		})
@@ -292,7 +295,6 @@ func (m *Manager) setupRegistry() error {
 
 	m.gammaControl = gammaMgr
 	m.availableOutputs = physicalOutputs
-	m.outputRegNames = outputRegNames
 
 	log.Info("setupRegistry: completed successfully (gamma controls will be initialized when enabled)")
 	return nil
@@ -308,9 +310,12 @@ func (m *Manager) setupOutputControls(outputs []*wlclient.Output, manager *wlr_g
 			continue
 		}
 
+		outputID := output.ID()
+		registryName, _ := m.outputRegNames.Load(outputID)
+
 		outState := &outputState{
-			id:           output.ID(),
-			registryName: m.outputRegNames[output.ID()],
+			id:           outputID,
+			registryName: registryName,
 			output:       output,
 			gammaControl: control,
 			isVirtual:    false,
@@ -318,14 +323,12 @@ func (m *Manager) setupOutputControls(outputs []*wlclient.Output, manager *wlr_g
 
 		func(state *outputState) {
 			control.SetGammaSizeHandler(func(e wlr_gamma_control.ZwlrGammaControlV1GammaSizeEvent) {
-				m.outputsMutex.Lock()
-				if outState, exists := m.outputs[state.id]; exists {
+				if outState, exists := m.outputs.Load(state.id); exists {
 					outState.rampSize = e.Size
 					outState.failed = false
 					outState.retryCount = 0
 					log.Infof("Output %d gamma_size=%d", state.id, e.Size)
 				}
-				m.outputsMutex.Unlock()
 
 				m.transitionMutex.RLock()
 				currentTemp := m.currentTemp
@@ -337,8 +340,7 @@ func (m *Manager) setupOutputControls(outputs []*wlclient.Output, manager *wlr_g
 			})
 
 			control.SetFailedHandler(func(e wlr_gamma_control.ZwlrGammaControlV1FailedEvent) {
-				m.outputsMutex.Lock()
-				if outState, exists := m.outputs[state.id]; exists {
+				if outState, exists := m.outputs.Load(state.id); exists {
 					outState.failed = true
 					outState.rampSize = 0
 					outState.retryCount++
@@ -357,13 +359,10 @@ func (m *Manager) setupOutputControls(outputs []*wlclient.Output, manager *wlr_g
 						})
 					})
 				}
-				m.outputsMutex.Unlock()
 			})
 		}(outState)
 
-		m.outputsMutex.Lock()
-		m.outputs[output.ID()] = outState
-		m.outputsMutex.Unlock()
+		m.outputs.Store(outputID, outState)
 	}
 
 	return nil
@@ -375,8 +374,7 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 	var outputName string
 	output.SetNameHandler(func(ev wlclient.OutputNameEvent) {
 		outputName = ev.Name
-		m.outputsMutex.Lock()
-		if outState, exists := m.outputs[outputID]; exists {
+		if outState, exists := m.outputs.Load(outputID); exists {
 			outState.name = ev.Name
 			if len(ev.Name) >= 9 && ev.Name[:9] == "HEADLESS-" {
 				log.Infof("Detected virtual output %d (name=%s), marking for gamma control skip", outputID, ev.Name)
@@ -384,7 +382,6 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 				outState.failed = true
 			}
 		}
-		m.outputsMutex.Unlock()
 	})
 
 	gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
@@ -394,24 +391,24 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 		return fmt.Errorf("failed to get gamma control: %w", err)
 	}
 
+	registryName, _ := m.outputRegNames.Load(outputID)
+
 	outState := &outputState{
 		id:           outputID,
 		name:         outputName,
-		registryName: m.outputRegNames[outputID],
+		registryName: registryName,
 		output:       output,
 		gammaControl: control,
 		isVirtual:    false,
 	}
 
 	control.SetGammaSizeHandler(func(e wlr_gamma_control.ZwlrGammaControlV1GammaSizeEvent) {
-		m.outputsMutex.Lock()
-		if out, exists := m.outputs[outState.id]; exists {
+		if out, exists := m.outputs.Load(outState.id); exists {
 			out.rampSize = e.Size
 			out.failed = false
 			out.retryCount = 0
 			log.Infof("Output %d gamma_size=%d", outState.id, e.Size)
 		}
-		m.outputsMutex.Unlock()
 
 		m.transitionMutex.RLock()
 		currentTemp := m.currentTemp
@@ -423,8 +420,7 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 	})
 
 	control.SetFailedHandler(func(e wlr_gamma_control.ZwlrGammaControlV1FailedEvent) {
-		m.outputsMutex.Lock()
-		if out, exists := m.outputs[outState.id]; exists {
+		if out, exists := m.outputs.Load(outState.id); exists {
 			out.failed = true
 			out.rampSize = 0
 			out.retryCount++
@@ -443,12 +439,9 @@ func (m *Manager) addOutputControl(output *wlclient.Output) error {
 				})
 			})
 		}
-		m.outputsMutex.Unlock()
 	})
 
-	m.outputsMutex.Lock()
-	m.outputs[output.ID()] = outState
-	m.outputsMutex.Unlock()
+	m.outputs.Store(outputID, outState)
 
 	log.Infof("Added gamma control for output %d", output.ID())
 	return nil
@@ -623,17 +616,19 @@ func (m *Manager) transitionWorker() {
 				if !enabled && targetTemp == identityTemp && m.controlsInitialized {
 					m.post(func() {
 						log.Info("Destroying gamma controls after transition to identity")
-						m.outputsMutex.Lock()
-						for id, out := range m.outputs {
+						m.outputs.Range(func(id uint32, out *outputState) bool {
 							if out.gammaControl != nil {
 								control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
 								control.Destroy()
 								log.Debugf("Destroyed gamma control for output %d", id)
 							}
-						}
-						m.outputs = make(map[uint32]*outputState)
+							return true
+						})
+						m.outputs.Range(func(key uint32, value *outputState) bool {
+							m.outputs.Delete(key)
+							return true
+						})
 						m.controlsInitialized = false
-						m.outputsMutex.Unlock()
 
 						m.transitionMutex.Lock()
 						m.currentTemp = identityTemp
@@ -661,9 +656,7 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 		return nil
 	}
 
-	m.outputsMutex.RLock()
-	_, exists := m.outputs[out.id]
-	m.outputsMutex.RUnlock()
+	_, exists := m.outputs.Load(out.id)
 
 	if !exists {
 		return nil
@@ -689,14 +682,12 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 
 	state := out
 	control.SetGammaSizeHandler(func(e wlr_gamma_control.ZwlrGammaControlV1GammaSizeEvent) {
-		m.outputsMutex.Lock()
-		if outState, exists := m.outputs[state.id]; exists {
+		if outState, exists := m.outputs.Load(state.id); exists {
 			outState.rampSize = e.Size
 			outState.failed = false
 			outState.retryCount = 0
 			log.Infof("Output %d gamma_size=%d (recreated)", state.id, e.Size)
 		}
-		m.outputsMutex.Unlock()
 
 		m.transitionMutex.RLock()
 		currentTemp := m.currentTemp
@@ -708,8 +699,7 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 	})
 
 	control.SetFailedHandler(func(e wlr_gamma_control.ZwlrGammaControlV1FailedEvent) {
-		m.outputsMutex.Lock()
-		if outState, exists := m.outputs[state.id]; exists {
+		if outState, exists := m.outputs.Load(state.id); exists {
 			outState.failed = true
 			outState.rampSize = 0
 			outState.retryCount++
@@ -728,7 +718,6 @@ func (m *Manager) recreateOutputControl(out *outputState) error {
 				})
 			})
 		}
-		m.outputsMutex.Unlock()
 	})
 
 	out.gammaControl = control
@@ -750,13 +739,11 @@ func (m *Manager) applyNowOnActor(temp int) {
 		return
 	}
 
-	// Lock while snapshotting outputs to prevent races with recreateOutputControl
-	m.outputsMutex.RLock()
 	var outs []*outputState
-	for _, out := range m.outputs {
-		outs = append(outs, out)
-	}
-	m.outputsMutex.RUnlock()
+	m.outputs.Range(func(key uint32, value *outputState) bool {
+		outs = append(outs, value)
+		return true
+	})
 
 	if len(outs) == 0 {
 		return
@@ -796,20 +783,17 @@ func (m *Manager) applyNowOnActor(temp int) {
 		if err := m.setGammaBytesActor(j.out, j.data); err != nil {
 			log.Warnf("Failed to set gamma for output %d: %v", j.out.id, err)
 			outID := j.out.id
-			m.outputsMutex.Lock()
-			if out, exists := m.outputs[outID]; exists {
+			if out, exists := m.outputs.Load(outID); exists {
 				out.failed = true
 				out.rampSize = 0
 			}
-			m.outputsMutex.Unlock()
 
 			time.AfterFunc(300*time.Millisecond, func() {
 				m.post(func() {
-					m.outputsMutex.RLock()
-					out, exists := m.outputs[outID]
-					m.outputsMutex.RUnlock()
-					if exists && out.failed {
-						m.recreateOutputControl(out)
+					if out, exists := m.outputs.Load(outID); exists {
+						if out.failed {
+							m.recreateOutputControl(out)
+						}
 					}
 				})
 			})
@@ -935,28 +919,21 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			if len(m.subscribers) == 0 {
-				m.subMutex.RUnlock()
-				pending = false
-				continue
-			}
 
 			currentState := m.GetState()
 
 			if m.lastNotified != nil && !stateChanged(m.lastNotified, &currentState) {
-				m.subMutex.RUnlock()
 				pending = false
 				continue
 			}
 
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan State) bool {
 				select {
 				case ch <- currentState:
 				default:
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotified = &stateCopy
@@ -1296,17 +1273,19 @@ func (m *Manager) SetEnabled(enabled bool) {
 			if currentTemp == identityTemp {
 				m.post(func() {
 					log.Infof("Already at %dK, destroying gamma controls immediately", identityTemp)
-					m.outputsMutex.Lock()
-					for id, out := range m.outputs {
+					m.outputs.Range(func(id uint32, out *outputState) bool {
 						if out.gammaControl != nil {
 							control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
 							control.Destroy()
 							log.Debugf("Destroyed gamma control for output %d", id)
 						}
-					}
-					m.outputs = make(map[uint32]*outputState)
+						return true
+					})
+					m.outputs.Range(func(key uint32, value *outputState) bool {
+						m.outputs.Delete(key)
+						return true
+					})
 					m.controlsInitialized = false
-					m.outputsMutex.Unlock()
 
 					m.transitionMutex.Lock()
 					m.currentTemp = identityTemp
@@ -1332,21 +1311,22 @@ func (m *Manager) Close() {
 	m.wg.Wait()
 	m.notifierWg.Wait()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan State) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan State)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 
-	m.outputsMutex.Lock()
-	for _, out := range m.outputs {
+	m.outputs.Range(func(key uint32, out *outputState) bool {
 		if control, ok := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1); ok {
 			control.Destroy()
 		}
-	}
-	m.outputs = make(map[uint32]*outputState)
-	m.outputsMutex.Unlock()
+		return true
+	})
+	m.outputs.Range(func(key uint32, value *outputState) bool {
+		m.outputs.Delete(key)
+		return true
+	})
 
 	if manager, ok := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1); ok {
 		manager.Destroy()

@@ -154,14 +154,13 @@ func (m *Manager) ApplyConfiguration(heads []HeadConfig, test bool) error {
 			statusChan <- fmt.Errorf("configuration cancelled (outdated serial)")
 		})
 
-		m.headsMutex.RLock()
 		headsByName := make(map[string]*headState)
-		for _, head := range m.heads {
+		m.heads.Range(func(key uint32, head *headState) bool {
 			if !head.finished {
 				headsByName[head.name] = head
 			}
-		}
-		m.headsMutex.RUnlock()
+			return true
+		})
 
 		for _, headCfg := range heads {
 			head, exists := headsByName[headCfg.Name]
@@ -188,9 +187,7 @@ func (m *Manager) ApplyConfiguration(heads []HeadConfig, test bool) error {
 			}
 
 			if headCfg.ModeID != nil {
-				m.modesMutex.RLock()
-				mode, exists := m.modes[*headCfg.ModeID]
-				m.modesMutex.RUnlock()
+				mode, exists := m.modes.Load(*headCfg.ModeID)
 
 				if !exists {
 					config.Destroy()

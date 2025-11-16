@@ -6,21 +6,17 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/ext_workspace"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
 
 func NewManager(display *wlclient.Display) (*Manager, error) {
 	m := &Manager{
-		display:     display,
-		ctx:         display.Context(),
-		outputs:     make(map[uint32]*wlclient.Output),
-		outputNames: make(map[uint32]string),
-		groups:      make(map[uint32]*workspaceGroupState),
-		workspaces:  make(map[uint32]*workspaceState),
-		cmdq:        make(chan cmd, 128),
-		stopChan:    make(chan struct{}),
-		subscribers: make(map[string]chan State),
-		dirty:       make(chan struct{}, 1),
+		display:  display,
+		ctx:      display.Context(),
+		cmdq:     make(chan cmd, 128),
+		stopChan: make(chan struct{}),
+
+		dirty: make(chan struct{}, 1),
 	}
 
 	m.wg.Add(1)
@@ -77,9 +73,7 @@ func (m *Manager) setupRegistry() error {
 				outputID := output.ID()
 
 				output.SetNameHandler(func(ev wlclient.OutputNameEvent) {
-					m.outputsMutex.Lock()
-					m.outputNames[outputID] = ev.Name
-					m.outputsMutex.Unlock()
+					m.outputNames.Store(outputID, ev.Name)
 					log.Debugf("ExtWorkspace: Output %d (%s) name received", outputID, ev.Name)
 				})
 			}
@@ -139,9 +133,7 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		workspaceIDs: make([]uint32, 0),
 	}
 
-	m.groupsMutex.Lock()
-	m.groups[groupID] = group
-	m.groupsMutex.Unlock()
+	m.groups.Store(groupID, group)
 
 	handle.SetCapabilitiesHandler(func(e ext_workspace.ExtWorkspaceGroupHandleV1CapabilitiesEvent) {
 		log.Debugf("ExtWorkspace: Group %d capabilities: %d", groupID, e.Capabilities)
@@ -171,11 +163,9 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		log.Debugf("ExtWorkspace: Group %d workspace enter (workspace=%d)", groupID, workspaceID)
 
 		m.post(func() {
-			m.workspacesMutex.Lock()
-			if ws, exists := m.workspaces[workspaceID]; exists {
+			if ws, ok := m.workspaces.Load(workspaceID); ok {
 				ws.groupID = groupID
 			}
-			m.workspacesMutex.Unlock()
 
 			group.workspaceIDs = append(group.workspaceIDs, workspaceID)
 			m.updateState()
@@ -187,11 +177,9 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		log.Debugf("ExtWorkspace: Group %d workspace leave (workspace=%d)", groupID, workspaceID)
 
 		m.post(func() {
-			m.workspacesMutex.Lock()
-			if ws, exists := m.workspaces[workspaceID]; exists {
+			if ws, ok := m.workspaces.Load(workspaceID); ok {
 				ws.groupID = 0
 			}
-			m.workspacesMutex.Unlock()
 
 			for i, id := range group.workspaceIDs {
 				if id == workspaceID {
@@ -209,9 +197,7 @@ func (m *Manager) handleWorkspaceGroup(e ext_workspace.ExtWorkspaceManagerV1Work
 		m.post(func() {
 			group.removed = true
 
-			m.groupsMutex.Lock()
-			delete(m.groups, groupID)
-			m.groupsMutex.Unlock()
+			m.groups.Delete(groupID)
 
 			m.wlMutex.Lock()
 			handle.Destroy()
@@ -234,9 +220,7 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 		coordinates: make([]uint32, 0),
 	}
 
-	m.workspacesMutex.Lock()
-	m.workspaces[workspaceID] = ws
-	m.workspacesMutex.Unlock()
+	m.workspaces.Store(workspaceID, ws)
 
 	handle.SetIdHandler(func(e ext_workspace.ExtWorkspaceHandleV1IdEvent) {
 		log.Debugf("ExtWorkspace: Workspace %d id: %s", workspaceID, e.Id)
@@ -290,9 +274,7 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 		m.post(func() {
 			ws.removed = true
 
-			m.workspacesMutex.Lock()
-			delete(m.workspaces, workspaceID)
-			m.workspacesMutex.Unlock()
+			m.workspaces.Delete(workspaceID)
 
 			m.wlMutex.Lock()
 			handle.Destroy()
@@ -304,23 +286,21 @@ func (m *Manager) handleWorkspace(e ext_workspace.ExtWorkspaceManagerV1Workspace
 }
 
 func (m *Manager) updateState() {
-	m.groupsMutex.RLock()
-	m.workspacesMutex.RLock()
-
 	groups := make([]*WorkspaceGroup, 0)
 
-	for _, group := range m.groups {
+	m.groups.Range(func(key uint32, group *workspaceGroupState) bool {
 		if group.removed {
-			continue
+			return true
 		}
 
 		outputs := make([]string, 0)
 		for outputID := range group.outputIDs {
-			m.outputsMutex.RLock()
-			name := m.outputNames[outputID]
-			m.outputsMutex.RUnlock()
-			if name != "" {
-				outputs = append(outputs, name)
+			if name, ok := m.outputNames.Load(outputID); ok {
+				if name != "" {
+					outputs = append(outputs, name)
+				} else {
+					outputs = append(outputs, fmt.Sprintf("output-%d", outputID))
+				}
 			} else {
 				outputs = append(outputs, fmt.Sprintf("output-%d", outputID))
 			}
@@ -328,8 +308,11 @@ func (m *Manager) updateState() {
 
 		workspaces := make([]*Workspace, 0)
 		for _, wsID := range group.workspaceIDs {
-			ws, exists := m.workspaces[wsID]
-			if !exists || ws.removed {
+			ws, exists := m.workspaces.Load(wsID)
+			if !exists {
+				continue
+			}
+			if ws.removed {
 				continue
 			}
 
@@ -351,10 +334,8 @@ func (m *Manager) updateState() {
 			Workspaces: workspaces,
 		}
 		groups = append(groups, groupState)
-	}
-
-	m.workspacesMutex.RUnlock()
-	m.groupsMutex.RUnlock()
+		return true
+	})
 
 	newState := State{
 		Groups: groups,
@@ -389,14 +370,6 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			subCount := len(m.subscribers)
-			m.subMutex.RUnlock()
-
-			if subCount == 0 {
-				pending = false
-				continue
-			}
 
 			currentState := m.GetState()
 
@@ -405,15 +378,14 @@ func (m *Manager) notifier() {
 				continue
 			}
 
-			m.subMutex.RLock()
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan State) bool {
 				select {
 				case ch <- currentState:
 				default:
 					log.Warn("ExtWorkspace: subscriber channel full, dropping update")
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotified = &stateCopy
@@ -426,9 +398,6 @@ func (m *Manager) ActivateWorkspace(groupID, workspaceID string) error {
 	errChan := make(chan error, 1)
 
 	m.post(func() {
-		m.workspacesMutex.RLock()
-		defer m.workspacesMutex.RUnlock()
-
 		var targetGroupID uint32
 		if groupID != "" {
 			var parsedID uint32
@@ -437,9 +406,10 @@ func (m *Manager) ActivateWorkspace(groupID, workspaceID string) error {
 			}
 		}
 
-		for _, ws := range m.workspaces {
+		var found bool
+		m.workspaces.Range(func(key uint32, ws *workspaceState) bool {
 			if targetGroupID != 0 && ws.groupID != targetGroupID {
-				continue
+				return true
 			}
 			if ws.workspaceID == workspaceID || ws.name == workspaceID {
 				m.wlMutex.Lock()
@@ -449,11 +419,15 @@ func (m *Manager) ActivateWorkspace(groupID, workspaceID string) error {
 				}
 				m.wlMutex.Unlock()
 				errChan <- err
-				return
+				found = true
+				return false
 			}
-		}
+			return true
+		})
 
-		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		if !found {
+			errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		}
 	})
 
 	return <-errChan
@@ -463,9 +437,6 @@ func (m *Manager) DeactivateWorkspace(groupID, workspaceID string) error {
 	errChan := make(chan error, 1)
 
 	m.post(func() {
-		m.workspacesMutex.RLock()
-		defer m.workspacesMutex.RUnlock()
-
 		var targetGroupID uint32
 		if groupID != "" {
 			var parsedID uint32
@@ -474,9 +445,10 @@ func (m *Manager) DeactivateWorkspace(groupID, workspaceID string) error {
 			}
 		}
 
-		for _, ws := range m.workspaces {
+		var found bool
+		m.workspaces.Range(func(key uint32, ws *workspaceState) bool {
 			if targetGroupID != 0 && ws.groupID != targetGroupID {
-				continue
+				return true
 			}
 			if ws.workspaceID == workspaceID || ws.name == workspaceID {
 				m.wlMutex.Lock()
@@ -486,11 +458,15 @@ func (m *Manager) DeactivateWorkspace(groupID, workspaceID string) error {
 				}
 				m.wlMutex.Unlock()
 				errChan <- err
-				return
+				found = true
+				return false
 			}
-		}
+			return true
+		})
 
-		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		if !found {
+			errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		}
 	})
 
 	return <-errChan
@@ -500,9 +476,6 @@ func (m *Manager) RemoveWorkspace(groupID, workspaceID string) error {
 	errChan := make(chan error, 1)
 
 	m.post(func() {
-		m.workspacesMutex.RLock()
-		defer m.workspacesMutex.RUnlock()
-
 		var targetGroupID uint32
 		if groupID != "" {
 			var parsedID uint32
@@ -511,9 +484,10 @@ func (m *Manager) RemoveWorkspace(groupID, workspaceID string) error {
 			}
 		}
 
-		for _, ws := range m.workspaces {
+		var found bool
+		m.workspaces.Range(func(key uint32, ws *workspaceState) bool {
 			if targetGroupID != 0 && ws.groupID != targetGroupID {
-				continue
+				return true
 			}
 			if ws.workspaceID == workspaceID || ws.name == workspaceID {
 				m.wlMutex.Lock()
@@ -523,11 +497,15 @@ func (m *Manager) RemoveWorkspace(groupID, workspaceID string) error {
 				}
 				m.wlMutex.Unlock()
 				errChan <- err
-				return
+				found = true
+				return false
 			}
-		}
+			return true
+		})
 
-		errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		if !found {
+			errChan <- fmt.Errorf("workspace not found: %s in group %s", workspaceID, groupID)
+		}
 	})
 
 	return <-errChan
@@ -537,10 +515,8 @@ func (m *Manager) CreateWorkspace(groupID, workspaceName string) error {
 	errChan := make(chan error, 1)
 
 	m.post(func() {
-		m.groupsMutex.RLock()
-		defer m.groupsMutex.RUnlock()
-
-		for _, group := range m.groups {
+		var found bool
+		m.groups.Range(func(key uint32, group *workspaceGroupState) bool {
 			if fmt.Sprintf("group-%d", group.id) == groupID {
 				m.wlMutex.Lock()
 				err := group.handle.CreateWorkspace(workspaceName)
@@ -549,11 +525,15 @@ func (m *Manager) CreateWorkspace(groupID, workspaceName string) error {
 				}
 				m.wlMutex.Unlock()
 				errChan <- err
-				return
+				found = true
+				return false
 			}
-		}
+			return true
+		})
 
-		errChan <- fmt.Errorf("workspace group not found: %s", groupID)
+		if !found {
+			errChan <- fmt.Errorf("workspace group not found: %s", groupID)
+		}
 	})
 
 	return <-errChan
@@ -564,30 +544,27 @@ func (m *Manager) Close() {
 	m.wg.Wait()
 	m.notifierWg.Wait()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan State) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan State)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 
-	m.workspacesMutex.Lock()
-	for _, ws := range m.workspaces {
+	m.workspaces.Range(func(key uint32, ws *workspaceState) bool {
 		if ws.handle != nil {
 			ws.handle.Destroy()
 		}
-	}
-	m.workspaces = make(map[uint32]*workspaceState)
-	m.workspacesMutex.Unlock()
+		m.workspaces.Delete(key)
+		return true
+	})
 
-	m.groupsMutex.Lock()
-	for _, group := range m.groups {
+	m.groups.Range(func(key uint32, group *workspaceGroupState) bool {
 		if group.handle != nil {
 			group.handle.Destroy()
 		}
-	}
-	m.groups = make(map[uint32]*workspaceGroupState)
-	m.groupsMutex.Unlock()
+		m.groups.Delete(key)
+		return true
+	})
 
 	if m.manager != nil {
 		m.manager.Stop()

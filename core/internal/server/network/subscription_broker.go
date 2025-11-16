@@ -3,37 +3,29 @@ package network
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
 type SubscriptionBroker struct {
-	mu                 sync.RWMutex
-	pending            map[string]chan PromptReply
-	requests           map[string]PromptRequest
-	pathSettingToToken map[string]string
+	pending            syncmap.Map[string, chan PromptReply]
+	requests           syncmap.Map[string, PromptRequest]
+	pathSettingToToken syncmap.Map[string, string]
 	broadcastPrompt    func(CredentialPrompt)
 }
 
 func NewSubscriptionBroker(broadcastPrompt func(CredentialPrompt)) PromptBroker {
 	return &SubscriptionBroker{
-		pending:            make(map[string]chan PromptReply),
-		requests:           make(map[string]PromptRequest),
-		pathSettingToToken: make(map[string]string),
-		broadcastPrompt:    broadcastPrompt,
+		broadcastPrompt: broadcastPrompt,
 	}
 }
 
 func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string, error) {
 	pathSettingKey := fmt.Sprintf("%s:%s", req.ConnectionPath, req.SettingName)
 
-	b.mu.Lock()
-	existingToken, alreadyPending := b.pathSettingToToken[pathSettingKey]
-	b.mu.Unlock()
-
-	if alreadyPending {
+	if existingToken, alreadyPending := b.pathSettingToToken.Load(pathSettingKey); alreadyPending {
 		log.Infof("[SubscriptionBroker] Duplicate prompt for %s, returning existing token", pathSettingKey)
 		return existingToken, nil
 	}
@@ -44,11 +36,9 @@ func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string
 	}
 
 	replyChan := make(chan PromptReply, 1)
-	b.mu.Lock()
-	b.pending[token] = replyChan
-	b.requests[token] = req
-	b.pathSettingToToken[pathSettingKey] = token
-	b.mu.Unlock()
+	b.pending.Store(token, replyChan)
+	b.requests.Store(token, req)
+	b.pathSettingToToken.Store(pathSettingKey, token)
 
 	if b.broadcastPrompt != nil {
 		prompt := CredentialPrompt{
@@ -71,10 +61,7 @@ func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string
 }
 
 func (b *SubscriptionBroker) Wait(ctx context.Context, token string) (PromptReply, error) {
-	b.mu.RLock()
-	replyChan, exists := b.pending[token]
-	b.mu.RUnlock()
-
+	replyChan, exists := b.pending.Load(token)
 	if !exists {
 		return PromptReply{}, fmt.Errorf("unknown token: %s", token)
 	}
@@ -93,10 +80,7 @@ func (b *SubscriptionBroker) Wait(ctx context.Context, token string) (PromptRepl
 }
 
 func (b *SubscriptionBroker) Resolve(token string, reply PromptReply) error {
-	b.mu.RLock()
-	replyChan, exists := b.pending[token]
-	b.mu.RUnlock()
-
+	replyChan, exists := b.pending.Load(token)
 	if !exists {
 		log.Warnf("[SubscriptionBroker] Resolve: unknown or expired token: %s", token)
 		return fmt.Errorf("unknown or expired token: %s", token)
@@ -112,25 +96,19 @@ func (b *SubscriptionBroker) Resolve(token string, reply PromptReply) error {
 }
 
 func (b *SubscriptionBroker) cleanup(token string) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	if req, exists := b.requests[token]; exists {
+	if req, exists := b.requests.Load(token); exists {
 		pathSettingKey := fmt.Sprintf("%s:%s", req.ConnectionPath, req.SettingName)
-		delete(b.pathSettingToToken, pathSettingKey)
+		b.pathSettingToToken.Delete(pathSettingKey)
 	}
 
-	delete(b.pending, token)
-	delete(b.requests, token)
+	b.pending.Delete(token)
+	b.requests.Delete(token)
 }
 
 func (b *SubscriptionBroker) Cancel(path string, setting string) error {
 	pathSettingKey := fmt.Sprintf("%s:%s", path, setting)
 
-	b.mu.Lock()
-	token, exists := b.pathSettingToToken[pathSettingKey]
-	b.mu.Unlock()
-
+	token, exists := b.pathSettingToToken.Load(pathSettingKey)
 	if !exists {
 		log.Infof("[SubscriptionBroker] Cancel: no pending prompt for %s", pathSettingKey)
 		return nil

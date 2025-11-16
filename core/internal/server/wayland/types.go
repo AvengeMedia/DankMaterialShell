@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
+	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 	"github.com/godbus/dbus/v5"
-	wlclient "github.com/yaslama/go-wayland/wayland/client"
 )
 
 type Config struct {
@@ -48,9 +49,8 @@ type Manager struct {
 	registry            *wlclient.Registry
 	gammaControl        interface{}
 	availableOutputs    []*wlclient.Output
-	outputRegNames      map[uint32]uint32
-	outputs             map[uint32]*outputState
-	outputsMutex        sync.RWMutex
+	outputRegNames      syncmap.Map[uint32, uint32]
+	outputs             syncmap.Map[uint32, *outputState]
 	controlsInitialized bool
 
 	cmdq  chan cmd
@@ -69,8 +69,7 @@ type Manager struct {
 	cachedIPLon   *float64
 	locationMutex sync.RWMutex
 
-	subscribers  map[string]chan State
-	subMutex     sync.RWMutex
+	subscribers  syncmap.Map[string, chan State]
 	dirty        chan struct{}
 	notifierWg   sync.WaitGroup
 	lastNotified *State
@@ -147,19 +146,14 @@ func (m *Manager) GetState() State {
 
 func (m *Manager) Subscribe(id string) chan State {
 	ch := make(chan State, 64)
-	m.subMutex.Lock()
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+	m.subscribers.Store(id, ch)
 	return ch
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
-		close(ch)
-		delete(m.subscribers, id)
+	if val, ok := m.subscribers.LoadAndDelete(id); ok {
+		close(val)
 	}
-	m.subMutex.Unlock()
 }
 
 func (m *Manager) notifySubscribers() {

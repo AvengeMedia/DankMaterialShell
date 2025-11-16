@@ -3,22 +3,19 @@ package bluez
 import (
 	"context"
 	"fmt"
-	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
 type SubscriptionBroker struct {
-	mu              sync.RWMutex
-	pending         map[string]chan PromptReply
-	requests        map[string]PromptRequest
+	pending         syncmap.Map[string, chan PromptReply]
+	requests        syncmap.Map[string, PromptRequest]
 	broadcastPrompt func(PairingPrompt)
 }
 
 func NewSubscriptionBroker(broadcastPrompt func(PairingPrompt)) PromptBroker {
 	return &SubscriptionBroker{
-		pending:         make(map[string]chan PromptReply),
-		requests:        make(map[string]PromptRequest),
 		broadcastPrompt: broadcastPrompt,
 	}
 }
@@ -30,10 +27,8 @@ func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string
 	}
 
 	replyChan := make(chan PromptReply, 1)
-	b.mu.Lock()
-	b.pending[token] = replyChan
-	b.requests[token] = req
-	b.mu.Unlock()
+	b.pending.Store(token, replyChan)
+	b.requests.Store(token, req)
 
 	if b.broadcastPrompt != nil {
 		prompt := PairingPrompt{
@@ -53,10 +48,7 @@ func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string
 }
 
 func (b *SubscriptionBroker) Wait(ctx context.Context, token string) (PromptReply, error) {
-	b.mu.RLock()
-	replyChan, exists := b.pending[token]
-	b.mu.RUnlock()
-
+	replyChan, exists := b.pending.Load(token)
 	if !exists {
 		return PromptReply{}, fmt.Errorf("unknown token: %s", token)
 	}
@@ -75,10 +67,7 @@ func (b *SubscriptionBroker) Wait(ctx context.Context, token string) (PromptRepl
 }
 
 func (b *SubscriptionBroker) Resolve(token string, reply PromptReply) error {
-	b.mu.RLock()
-	replyChan, exists := b.pending[token]
-	b.mu.RUnlock()
-
+	replyChan, exists := b.pending.Load(token)
 	if !exists {
 		return fmt.Errorf("unknown or expired token: %s", token)
 	}
@@ -92,8 +81,6 @@ func (b *SubscriptionBroker) Resolve(token string, reply PromptReply) error {
 }
 
 func (b *SubscriptionBroker) cleanup(token string) {
-	b.mu.Lock()
-	delete(b.pending, token)
-	delete(b.requests, token)
-	b.mu.Unlock()
+	b.pending.Delete(token)
+	b.requests.Delete(token)
 }

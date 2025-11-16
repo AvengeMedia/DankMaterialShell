@@ -35,13 +35,11 @@ func NewManager() (*Manager, error) {
 		state: &CUPSState{
 			Printers: make(map[string]*Printer),
 		},
-		client:      client,
-		baseURL:     baseURL,
-		stateMutex:  sync.RWMutex{},
-		stopChan:    make(chan struct{}),
-		dirty:       make(chan struct{}, 1),
-		subscribers: make(map[string]chan CUPSState),
-		subMutex:    sync.RWMutex{},
+		client:     client,
+		baseURL:    baseURL,
+		stateMutex: sync.RWMutex{},
+		stopChan:   make(chan struct{}),
+		dirty:      make(chan struct{}, 1),
 	}
 
 	if err := m.updateState(); err != nil {
@@ -142,28 +140,21 @@ func (m *Manager) notifier() {
 			if !pending {
 				continue
 			}
-			m.subMutex.RLock()
-			if len(m.subscribers) == 0 {
-				m.subMutex.RUnlock()
-				pending = false
-				continue
-			}
 
 			currentState := m.snapshotState()
 
 			if m.lastNotifiedState != nil && !stateChanged(m.lastNotifiedState, &currentState) {
-				m.subMutex.RUnlock()
 				pending = false
 				continue
 			}
 
-			for _, ch := range m.subscribers {
+			m.subscribers.Range(func(key string, ch chan CUPSState) bool {
 				select {
 				case ch <- currentState:
 				default:
 				}
-			}
-			m.subMutex.RUnlock()
+				return true
+			})
 
 			stateCopy := currentState
 			m.lastNotifiedState = &stateCopy
@@ -199,10 +190,14 @@ func (m *Manager) snapshotState() CUPSState {
 
 func (m *Manager) Subscribe(id string) chan CUPSState {
 	ch := make(chan CUPSState, 64)
-	m.subMutex.Lock()
-	wasEmpty := len(m.subscribers) == 0
-	m.subscribers[id] = ch
-	m.subMutex.Unlock()
+
+	wasEmpty := true
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
+		wasEmpty = false
+		return false
+	})
+
+	m.subscribers.Store(id, ch)
 
 	if wasEmpty && m.subscription != nil {
 		if err := m.subscription.Start(); err != nil {
@@ -217,13 +212,15 @@ func (m *Manager) Subscribe(id string) chan CUPSState {
 }
 
 func (m *Manager) Unsubscribe(id string) {
-	m.subMutex.Lock()
-	if ch, ok := m.subscribers[id]; ok {
-		close(ch)
-		delete(m.subscribers, id)
+	if val, ok := m.subscribers.LoadAndDelete(id); ok {
+		close(val)
 	}
-	isEmpty := len(m.subscribers) == 0
-	m.subMutex.Unlock()
+
+	isEmpty := true
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
+		isEmpty = false
+		return false
+	})
 
 	if isEmpty && m.subscription != nil {
 		m.subscription.Stop()
@@ -241,12 +238,11 @@ func (m *Manager) Close() {
 	m.eventWG.Wait()
 	m.notifierWg.Wait()
 
-	m.subMutex.Lock()
-	for _, ch := range m.subscribers {
+	m.subscribers.Range(func(key string, ch chan CUPSState) bool {
 		close(ch)
-	}
-	m.subscribers = make(map[string]chan CUPSState)
-	m.subMutex.Unlock()
+		m.subscribers.Delete(key)
+		return true
+	})
 }
 
 func stateChanged(old, new *CUPSState) bool {

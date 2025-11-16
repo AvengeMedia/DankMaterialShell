@@ -6,6 +6,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -50,8 +51,7 @@ type SessionEvent struct {
 type Manager struct {
 	state                 *SessionState
 	stateMutex            sync.RWMutex
-	subscribers           map[string]chan SessionState
-	subMutex              sync.RWMutex
+	subscribers           syncmap.Map[string, chan SessionState]
 	stopChan              chan struct{}
 	conn                  *dbus.Conn
 	sessionPath           dbus.ObjectPath

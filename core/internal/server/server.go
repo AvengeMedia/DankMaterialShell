@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -27,6 +28,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlroutput"
+	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
 const APIVersion = 18
@@ -58,11 +60,9 @@ var wlrOutputManager *wlroutput.Manager
 var evdevManager *evdev.Manager
 var wlContext *wlcontext.SharedContext
 
-var capabilitySubscribers = make(map[string]chan ServerInfo)
-var capabilityMutex sync.RWMutex
-
-var cupsSubscribers = make(map[string]bool)
-var cupsSubscribersMutex sync.Mutex
+var capabilitySubscribers syncmap.Map[string, chan ServerInfo]
+var cupsSubscribers syncmap.Map[string, bool]
+var cupsSubscriberCount atomic.Int32
 
 func getSocketDir() string {
 	if runtime := os.Getenv("XDG_RUNTIME_DIR"); runtime != "" {
@@ -434,16 +434,14 @@ func getServerInfo() ServerInfo {
 }
 
 func notifyCapabilityChange() {
-	capabilityMutex.RLock()
-	defer capabilityMutex.RUnlock()
-
 	info := getServerInfo()
-	for _, ch := range capabilitySubscribers {
+	capabilitySubscribers.Range(func(key string, ch chan ServerInfo) bool {
 		select {
 		case ch <- info:
 		default:
 		}
-	}
+		return true
+	})
 }
 
 func handleSubscribe(conn net.Conn, req models.Request) {
@@ -475,18 +473,12 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 	stopChan := make(chan struct{})
 
 	capChan := make(chan ServerInfo, 64)
-	capabilityMutex.Lock()
-	capabilitySubscribers[clientID+"-capabilities"] = capChan
-	capabilityMutex.Unlock()
+	capabilitySubscribers.Store(clientID+"-capabilities", capChan)
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		defer func() {
-			capabilityMutex.Lock()
-			delete(capabilitySubscribers, clientID+"-capabilities")
-			capabilityMutex.Unlock()
-		}()
+		defer capabilitySubscribers.Delete(clientID + "-capabilities")
 
 		for {
 			select {
@@ -728,12 +720,10 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 	}
 
 	if shouldSubscribe("cups") {
-		cupsSubscribersMutex.Lock()
-		wasEmpty := len(cupsSubscribers) == 0
-		cupsSubscribers[clientID+"-cups"] = true
-		cupsSubscribersMutex.Unlock()
+		cupsSubscribers.Store(clientID+"-cups", true)
+		count := cupsSubscriberCount.Add(1)
 
-		if wasEmpty {
+		if count == 1 {
 			if err := InitializeCupsManager(); err != nil {
 				log.Warnf("Failed to initialize CUPS manager for subscription: %v", err)
 			} else {
@@ -748,13 +738,10 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 				defer wg.Done()
 				defer func() {
 					cupsManager.Unsubscribe(clientID + "-cups")
+					cupsSubscribers.Delete(clientID + "-cups")
+					count := cupsSubscriberCount.Add(-1)
 
-					cupsSubscribersMutex.Lock()
-					delete(cupsSubscribers, clientID+"-cups")
-					isEmpty := len(cupsSubscribers) == 0
-					cupsSubscribersMutex.Unlock()
-
-					if isEmpty {
+					if count == 0 {
 						log.Info("Last CUPS subscriber disconnected, shutting down CUPS manager")
 						if cupsManager != nil {
 							cupsManager.Close()
@@ -822,36 +809,46 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
-	if shouldSubscribe("extworkspace") && extWorkspaceManager != nil {
-		wg.Add(1)
-		extWorkspaceChan := extWorkspaceManager.Subscribe(clientID + "-extworkspace")
-		go func() {
-			defer wg.Done()
-			defer extWorkspaceManager.Unsubscribe(clientID + "-extworkspace")
-
-			initialState := extWorkspaceManager.GetState()
-			select {
-			case eventChan <- ServiceEvent{Service: "extworkspace", Data: initialState}:
-			case <-stopChan:
-				return
+	if shouldSubscribe("extworkspace") {
+		if extWorkspaceManager == nil {
+			if err := InitializeExtWorkspaceManager(); err != nil {
+				log.Warnf("Failed to initialize ExtWorkspace manager for subscription: %v", err)
+			} else {
+				notifyCapabilityChange()
 			}
+		}
 
-			for {
+		if extWorkspaceManager != nil {
+			wg.Add(1)
+			extWorkspaceChan := extWorkspaceManager.Subscribe(clientID + "-extworkspace")
+			go func() {
+				defer wg.Done()
+				defer extWorkspaceManager.Unsubscribe(clientID + "-extworkspace")
+
+				initialState := extWorkspaceManager.GetState()
 				select {
-				case state, ok := <-extWorkspaceChan:
-					if !ok {
-						return
-					}
-					select {
-					case eventChan <- ServiceEvent{Service: "extworkspace", Data: state}:
-					case <-stopChan:
-						return
-					}
+				case eventChan <- ServiceEvent{Service: "extworkspace", Data: initialState}:
 				case <-stopChan:
 					return
 				}
-			}
-		}()
+
+				for {
+					select {
+					case state, ok := <-extWorkspaceChan:
+						if !ok {
+							return
+						}
+						select {
+						case eventChan <- ServiceEvent{Service: "extworkspace", Data: state}:
+						case <-stopChan:
+							return
+						}
+					case <-stopChan:
+						return
+					}
+				}
+			}()
+		}
 	}
 
 	if shouldSubscribe("brightness") && brightnessManager != nil {
@@ -1242,10 +1239,6 @@ func Start(printDocs bool) error {
 
 	if err := InitializeDwlManager(); err != nil {
 		log.Debugf("DWL manager unavailable: %v", err)
-	}
-
-	if err := InitializeExtWorkspaceManager(); err != nil {
-		log.Debugf("ExtWorkspace manager unavailable: %v", err)
 	}
 
 	if err := InitializeWlrOutputManager(); err != nil {
