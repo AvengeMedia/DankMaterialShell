@@ -1058,7 +1058,9 @@ Item {
                                                 const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, launcherButton.visualWidth)
                                                 appDrawerLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen)
                                             }
-                                            appDrawerLoader.item?.toggle()
+                                            if (appDrawerLoader.item) {
+                                                PopoutManager.requestPopout(appDrawerLoader.item, undefined, "appDrawer")
+                                            }
                                         }
                                     }
                                 }
@@ -1127,6 +1129,13 @@ Item {
                                         onClockClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
+                                                if (dankDashPopoutLoader.item.setTriggerPosition) {
+                                                    const globalPos = visualContent.mapToGlobal(0, 0)
+                                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, visualWidth)
+                                                    dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen)
+                                                } else {
+                                                    dankDashPopoutLoader.item.triggerScreen = barWindow.screen
+                                                }
                                                 PopoutManager.requestPopout(dankDashPopoutLoader.item, 0)
                                             }
                                         }
@@ -1150,6 +1159,13 @@ Item {
                                         onClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
+                                                if (dankDashPopoutLoader.item.setTriggerPosition) {
+                                                    const globalPos = visualContent.mapToGlobal(0, 0)
+                                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, visualWidth)
+                                                    dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen)
+                                                } else {
+                                                    dankDashPopoutLoader.item.triggerScreen = barWindow.screen
+                                                }
                                                 PopoutManager.requestPopout(dankDashPopoutLoader.item, 1)
                                             }
                                         }
@@ -1172,6 +1188,13 @@ Item {
                                         onClicked: {
                                             dankDashPopoutLoader.active = true
                                             if (dankDashPopoutLoader.item) {
+                                                if (dankDashPopoutLoader.item.setTriggerPosition) {
+                                                    const globalPos = visualContent.mapToGlobal(0, 0)
+                                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, visualWidth)
+                                                    dankDashPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, section, barWindow.screen)
+                                                } else {
+                                                    dankDashPopoutLoader.item.triggerScreen = barWindow.screen
+                                                }
                                                 PopoutManager.requestPopout(dankDashPopoutLoader.item, 3)
                                             }
                                         }
@@ -1317,7 +1340,9 @@ Item {
                                         parentScreen: barWindow.screen
                                         onClicked: {
                                             notificationCenterLoader.active = true
-                                            notificationCenterLoader.item?.toggle()
+                                            if (notificationCenterLoader.item) {
+                                                PopoutManager.requestPopout(notificationCenterLoader.item, undefined, "notifications")
+                                            }
                                         }
                                     }
                                 }
@@ -1338,7 +1363,9 @@ Item {
                                         parentScreen: barWindow.screen
                                         onToggleBatteryPopup: {
                                             batteryPopoutLoader.active = true
-                                            batteryPopoutLoader.item?.toggle()
+                                            if (batteryPopoutLoader.item) {
+                                                PopoutManager.requestPopout(batteryPopoutLoader.item, undefined, "battery")
+                                            }
                                         }
                                     }
                                 }
@@ -1359,7 +1386,9 @@ Item {
                                         parentScreen: barWindow.screen
                                         onToggleLayoutPopup: {
                                             layoutPopoutLoader.active = true
-                                            layoutPopoutLoader.item?.toggle()
+                                            if (layoutPopoutLoader.item) {
+                                                PopoutManager.requestPopout(layoutPopoutLoader.item, undefined, "layout")
+                                            }
                                         }
                                     }
                                 }
@@ -1379,7 +1408,9 @@ Item {
                                         parentScreen: barWindow.screen
                                         onToggleVpnPopup: {
                                             vpnPopoutLoader.active = true
-                                            vpnPopoutLoader.item?.toggle()
+                                            if (vpnPopoutLoader.item) {
+                                                PopoutManager.requestPopout(vpnPopoutLoader.item, undefined, "vpn")
+                                            }
                                         }
                                     }
                                 }
@@ -1416,7 +1447,7 @@ Item {
                                                 return
                                             }
                                             controlCenterLoader.item.triggerScreen = barWindow.screen
-                                            controlCenterLoader.item.toggle()
+                                            PopoutManager.requestPopout(controlCenterLoader.item, undefined, "controlCenter")
                                             if (controlCenterLoader.item.shouldBeVisible && NetworkService.wifiEnabled) {
                                                 NetworkService.scanWifi()
                                             }

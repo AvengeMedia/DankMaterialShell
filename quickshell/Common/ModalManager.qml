@@ -12,7 +12,9 @@ Singleton {
         if (!modal.allowStacking) {
             closeAllModalsExcept(modal)
         }
-        PopoutManager.closeAllPopouts()
+        if (!modal.keepPopoutsOpen) {
+            PopoutManager.closeAllPopouts()
+        }
         TrayMenuManager.closeAllMenus()
     }
 }

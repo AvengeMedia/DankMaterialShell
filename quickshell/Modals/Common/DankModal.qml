@@ -43,6 +43,7 @@ PanelWindow {
     property bool allowFocusOverride: false
     property bool allowStacking: false
     property bool keepContentLoaded: false
+    property bool keepPopoutsOpen: false
 
     signal opened
     signal dialogClosed
@@ -90,7 +91,8 @@ PanelWindow {
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: {
         if (!shouldHaveFocus) return WlrKeyboardFocus.None
-        return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+        if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
+        return WlrKeyboardFocus.Exclusive
     }
 
     HyprlandFocusGrab {

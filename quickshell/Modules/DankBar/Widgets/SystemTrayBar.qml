@@ -369,7 +369,8 @@ Item {
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
             if (!root.menuOpen) return WlrKeyboardFocus.None
-            return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+            if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
+            return WlrKeyboardFocus.Exclusive
         }
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
@@ -822,7 +823,8 @@ Item {
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
                     if (!menuRoot.showMenu) return WlrKeyboardFocus.None
-                    return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+                    if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
+                    return WlrKeyboardFocus.Exclusive
                 }
                 color: "transparent"
 

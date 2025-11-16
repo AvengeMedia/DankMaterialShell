@@ -98,7 +98,8 @@ PanelWindow {
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: {
         if (!shouldBeVisible) return WlrKeyboardFocus.None
-        return CompositorService.isHyprland ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.Exclusive
+        if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
+        return WlrKeyboardFocus.Exclusive
     }
 
     HyprlandFocusGrab {
@@ -345,6 +346,7 @@ PanelWindow {
     }
 
     Item {
+        id: focusHelper
         parent: contentContainer
         anchors.fill: parent
         focus: true
@@ -354,7 +356,5 @@ PanelWindow {
                 event.accepted = true
             }
         }
-        Component.onCompleted: forceActiveFocus()
-        onVisibleChanged: if (visible) forceActiveFocus()
     }
 }

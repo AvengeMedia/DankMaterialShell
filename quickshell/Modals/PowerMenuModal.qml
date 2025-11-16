@@ -33,7 +33,9 @@ DankModal {
         parentBounds = bounds
         parentScreen = targetScreen
         backgroundOpacity = 0
+        keepPopoutsOpen = true
         open()
+        keepPopoutsOpen = false
     }
 
     function updateVisibleActions() {
