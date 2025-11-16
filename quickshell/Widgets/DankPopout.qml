@@ -102,11 +102,6 @@ PanelWindow {
         return WlrKeyboardFocus.Exclusive
     }
 
-    HyprlandFocusGrab {
-        windows: [root]
-        active: CompositorService.isHyprland && shouldBeVisible
-    }
-
     anchors {
         top: true
         left: true
