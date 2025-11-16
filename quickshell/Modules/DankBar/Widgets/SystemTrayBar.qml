@@ -465,9 +465,11 @@ Item {
 
         onVisibleChanged: {
             if (visible) {
+                if (currentTrayMenu) {
+                    currentTrayMenu.showMenu = false
+                }
                 PopoutManager.closeAllPopouts()
                 ModalManager.closeAllModalsExcept(null)
-                TrayMenuManager.closeTrayMenus()
                 updatePosition()
             }
         }
@@ -781,10 +783,6 @@ Item {
 
             function close() {
                 showMenu = false
-                if (root.overflowWasOpenBeforeTrayMenu) {
-                    root.menuOpen = true
-                }
-                root.overflowWasOpenBeforeTrayMenu = false
             }
 
             function closeWithAction() {
@@ -918,9 +916,9 @@ Item {
 
                 onVisibleChanged: {
                     if (visible) {
+                        root.menuOpen = false
                         PopoutManager.closeAllPopouts()
                         ModalManager.closeAllModalsExcept(null)
-                        TrayMenuManager.closeOverflowMenus()
                         updatePosition()
                     }
                 }
