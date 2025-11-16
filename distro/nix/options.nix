@@ -1,4 +1,4 @@
-{lib, ...}: let
+{pkgs, lib, ...}: let
     inherit (lib) types;
 in {
     options.programs.dankMaterialShell = {
@@ -58,7 +58,7 @@ in {
             description = "Add needed dependencies to have system sound support";
         };
         quickshell = {
-            package = lib.mkPackageOption {} "quickshell" {};
+            package = lib.mkPackageOption pkgs "quickshell" {};
         };
     };
 }
