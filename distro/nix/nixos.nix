@@ -6,7 +6,7 @@
     ...
 }: let
     cfg = config.programs.dankMaterialShell;
-    common = import ./common.nix { inherit config pkgs lib dmsPkgs; };
+    common = import ./common.nix {inherit config pkgs lib dmsPkgs;};
 in {
     imports = [
         ./options.nix
@@ -18,8 +18,8 @@ in {
 
         systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
             description = "DankMaterialShell";
-            path = [ cfg.quickshell.package ];
-            
+            path = [cfg.quickshell.package];
+
             partOf = ["graphical-session.target"];
             after = ["graphical-session.target"];
             wantedBy = ["graphical-session.target"];

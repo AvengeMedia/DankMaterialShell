@@ -8,7 +8,7 @@
     cfg = config.programs.dankMaterialShell;
 in {
     qmlPath = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
-    
+
     packages =
         [
             pkgs.material-symbols

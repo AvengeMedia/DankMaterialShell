@@ -7,7 +7,7 @@
 }: let
     cfg = config.programs.dankMaterialShell;
     jsonFormat = pkgs.formats.json {};
-    common = import ./common.nix { inherit config pkgs lib dmsPkgs; };
+    common = import ./common.nix {inherit config pkgs lib dmsPkgs;};
 in {
     imports = [
         ./options.nix
