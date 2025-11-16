@@ -84,7 +84,7 @@
         homeModules.dankMaterialShell.default = {pkgs, ...}: let
             dmsPkgs = buildDmsPkgs pkgs;
         in {
-            imports = [./distro/nix/default.nix];
+            imports = [./distro/nix/home.nix];
             _module.args.dmsPkgs = dmsPkgs;
         };
 

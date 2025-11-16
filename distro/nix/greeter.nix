@@ -11,7 +11,7 @@
     user = config.services.greetd.settings.default_session.user;
 
     greeterScript = pkgs.writeShellScriptBin "dms-greeter" ''
-        export PATH=$PATH:${lib.makeBinPath [ cfg.quickshell.package config.programs.${cfg.compositor.name}.package ]}
+        export PATH=$PATH:${lib.makeBinPath [cfg.quickshell.package config.programs.${cfg.compositor.name}.package]}
         ${lib.escapeShellArgs ([
             "sh"
             "${../../quickshell/Modules/Greetd/assets/dms-greeter}"
@@ -28,11 +28,9 @@
         ])} ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
     '';
 in {
-    imports =
-        let
-            msg = "The option 'programs.dankMaterialShell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dankMaterialShell.greeter.compositor.customConfig' instead.";
-        in
-        [ (lib.mkRemovedOptionModule [ "programs" "dankMaterialShell" "greeter" "compositor" "extraConfig" ] msg) ];
+    imports = let
+        msg = "The option 'programs.dankMaterialShell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dankMaterialShell.greeter.compositor.customConfig' instead.";
+    in [(lib.mkRemovedOptionModule ["programs" "dankMaterialShell" "greeter" "compositor" "extraConfig"] msg)];
 
     options.programs.dankMaterialShell.greeter = {
         enable = lib.mkEnableOption "DankMaterialShell greeter";
@@ -77,7 +75,7 @@ in {
     config = lib.mkIf cfg.enable {
         assertions = [
             {
-                assertion = (config.users.users.${user} or { }) != { };
+                assertion = (config.users.users.${user} or {}) != {};
                 message = ''
                     dmsgreeter: user set for greetd default_session ${user} does not exist. Please create it before referencing it.
                 '';
@@ -95,8 +93,10 @@ in {
         systemd.tmpfiles.settings."10-dmsgreeter" = {
             "/var/lib/dmsgreeter".d = {
                 user = user;
-                group = if config.users.users.${user}.group != ""
-                    then config.users.users.${user}.group else "greeter";
+                group =
+                    if config.users.users.${user}.group != ""
+                    then config.users.users.${user}.group
+                    else "greeter";
                 mode = "0755";
             };
         };
@@ -106,7 +106,8 @@ in {
                 if [ -f "${f}" ]; then
                     cp "${f}" .
                 fi
-            '') cfg.configFiles)}
+            '')
+            cfg.configFiles)}
 
             if [ -f session.json ]; then
                 if cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg; then
