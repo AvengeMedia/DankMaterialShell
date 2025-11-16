@@ -24,6 +24,11 @@
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
             dankMaterialShell = self.packages.${pkgs.stdenv.hostPlatform.system}.dankMaterialShell;
         };
+        mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
+            imports = [
+                (import path (args // {dmsPkgs = buildDmsPkgs pkgs;}))
+            ];
+        };
     in {
         formatter = forEachSystem (_: pkgs: pkgs.alejandra);
 
@@ -81,26 +86,12 @@
             }
         );
 
-        homeModules.dankMaterialShell.default = {pkgs, ...}: let
-            dmsPkgs = buildDmsPkgs pkgs;
-        in {
-            imports = [./distro/nix/home.nix];
-            _module.args.dmsPkgs = dmsPkgs;
-        };
+        homeModules.dankMaterialShell.default = mkModuleWithDmsPkgs ./distro/nix/home.nix;
 
         homeModules.dankMaterialShell.niri = import ./distro/nix/niri.nix;
 
-        nixosModules.dankMaterialShell = {pkgs, ...}: let
-            dmsPkgs = buildDmsPkgs pkgs;
-        in {
-            imports = [./distro/nix/nixos.nix];
-            _module.args.dmsPkgs = dmsPkgs;
-        };
-        nixosModules.greeter = {pkgs, ...}: let
-            dmsPkgs = buildDmsPkgs pkgs;
-        in {
-            imports = [./distro/nix/greeter.nix];
-            _module.args.dmsPkgs = dmsPkgs;
-        };
+        nixosModules.dankMaterialShell = mkModuleWithDmsPkgs ./distro/nix/nixos.nix;
+
+        nixosModules.greeter = mkModuleWithDmsPkgs ./distro/nix/greeter.nix;
     };
 }
