@@ -113,11 +113,6 @@ Singleton {
         target: NiriService
         function onWindowsChanged() { root.scheduleSort() }
     }
-    Connections {
-        target: ScrollService
-        function onAllWorkspacesChanged() { root.scheduleSort() }
-    }
-
     Component.onCompleted: {
         detectCompositor()
         scheduleSort()
@@ -127,7 +122,7 @@ Singleton {
     Connections {
         target: DwlService
         function onStateChanged() {
-            if (isDwl && !isHyprland && !isNiri && !isScroll) {
+            if (isDwl && !isHyprland && !isNiri && !isSway) {
                 scheduleSort()
             }
         }
@@ -383,33 +378,21 @@ Singleton {
             return
         }
 
-        if (scrollSocket && scrollSocket.length > 0) {
-            Proc.runCommand("scrollSocketCheck", ["test", "-S", scrollSocket], (output, exitCode) => {
-                if (exitCode === 0) {
-                    isNiri = false
-                    isHyprland = false
-                    isDwl = false
-                    isSway = false
-                    isLabwc = false
-                    isScroll = true
-                    compositor = "scroll"
-                    console.info("CompositorService: Detected Scroll with socket:", scrollSocket)
-                }
-            }, 0)
-            return
-        }
+        const scrollSock = scrollSocket && scrollSocket.length > 0
+        const swaySock = swaySocket && swaySocket.length > 0
 
-        if (swaySocket && swaySocket.length > 0) {
-            Proc.runCommand("swaySocketCheck", ["test", "-S", swaySocket], (output, exitCode) => {
+        if (scrollSock || swaySock) {
+            const socketToCheck = scrollSock ? scrollSocket : swaySocket
+            Proc.runCommand("swaySocketCheck", ["test", "-S", socketToCheck], (output, exitCode) => {
                 if (exitCode === 0) {
-                    isNiri = false
-                    isHyprland = false
-                    isDwl = false
+                    isScroll = scrollSock
                     isSway = true
+                    isHyprland = false
+                    isNiri = false
+                    isDwl = false
                     isLabwc = false
-                    isScroll = false
-                    compositor = "sway"
-                    console.info("CompositorService: Detected Sway with socket:", swaySocket)
+                    compositor = scrollSock ? "scroll" : "sway"
+                    console.info("CompositorService: Detected", compositor, "with socket:", socketToCheck)
                 }
             }, 0)
             return
@@ -444,7 +427,7 @@ Singleton {
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            if (!isHyprland && !isNiri && !isDwl && !isLabwc && !isScroll) {
+            if (!isHyprland && !isNiri && !isDwl && !isLabwc && !isSway) {
                 checkForDwl()
             }
         }
@@ -467,8 +450,7 @@ Singleton {
         if (isNiri) return NiriService.powerOffMonitors()
         if (isHyprland) return Hyprland.dispatch("dpms off")
         if (isDwl) return _dwlPowerOffMonitors()
-        if (isSway) { try { I3.dispatch("output * dpms off") } catch(_){} return }
-        if (isScroll) return ScrollService.send(ScrollService.IPC_COMMAND, "output * dpms off")
+        if (isSway || isScroll) { try { I3.dispatch("output * dpms off") } catch(_){} return }
         console.warn("CompositorService: Cannot power off monitors, unknown compositor")
     }
 
@@ -476,8 +458,7 @@ Singleton {
         if (isNiri) return NiriService.powerOnMonitors()
         if (isHyprland) return Hyprland.dispatch("dpms on")
         if (isDwl) return _dwlPowerOnMonitors()
-        if (isSway) { try { I3.dispatch("output * dpms on") } catch(_){} return }
-        if (isScroll) return ScrollService.send(ScrollService.IPC_COMMAND, "output * dpms on")
+        if (isSway || isScroll) { try { I3.dispatch("output * dpms on") } catch(_){} return }
         console.warn("CompositorService: Cannot power on monitors, unknown compositor")
     }
 
