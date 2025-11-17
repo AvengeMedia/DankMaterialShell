@@ -100,7 +100,7 @@ Endless customization with the [plugin registry](https://plugins.danklinux.com).
 
 ## Supported Compositors
 
-DankMaterialShell works best with **[niri](https://github.com/YaLTeR/niri)**, **[Hyprland](https://hyprland.org/)**, **[sway](https://swaywm.org/)**, **[dwl/MangoWC](https://github.com/DreamMaoMao/mangowc)**, and **[labwc](https://labwc.github.io/)** - with full workspace switching, overview integration, and monitor management.
+DankMaterialShell works best with **[niri](https://github.com/YaLTeR/niri)**, **[Hyprland](https://hyprland.org/)**, **[sway](https://swaywm.org/)**/**[scroll](https://github.com/dawsers/scroll)**, **[dwl/MangoWC](https://github.com/DreamMaoMao/mangowc)**, and **[labwc](https://labwc.github.io/)** - with full workspace switching, overview integration, and monitor management.
 
 Other Wayland compositors work too, just with a reduced feature set.
 
