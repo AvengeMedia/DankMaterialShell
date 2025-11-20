@@ -152,7 +152,7 @@ get_matugen_dank_json() {
     return 2
   fi
 
-  dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json
+  echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
 }
 
 build_once() {
@@ -246,7 +246,7 @@ EOF
 
   DANK_JSON=$(get_matugen_dank_json "$mode" "$TMP_CFG")
 
-  run_matugen "$value" "$kind" --import-json-from-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null 2>&1
+  run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null 2>&1
 
   pushd "$SHELL_DIR" >/dev/null
   TMP_CONTENT_CFG="$(mktemp)"
@@ -300,7 +300,7 @@ EOF
   fi
 
   # if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
-  run_matugen "$kind" "$value" -c "$TMP_CONTENT_CFG" --import-json-from-string "$DANK_JSON" >/dev/null
+  run_matugen "$value" "$kind" -c "$TMP_CONTENT_CFG" --import-json-string "$DANK_JSON" >/dev/null
   # fi
   #
   # rm -f "$TMP_CONTENT_CFG"
