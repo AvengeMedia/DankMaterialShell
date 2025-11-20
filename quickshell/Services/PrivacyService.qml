@@ -44,6 +44,10 @@ Singleton {
 
         for (let i = 0; i < Pipewire.nodes.values.length; i++) {
             const node = Pipewire.nodes.values[i]
+            if (!node || !node.ready) {
+                continue
+            }
+            
             if (node.properties && node.properties["media.class"] === "Stream/Input/Video") {
                 if (node.properties["stream.is-live"] === "true") {
                     return true
