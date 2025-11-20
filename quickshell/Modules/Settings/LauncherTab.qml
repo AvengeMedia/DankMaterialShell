@@ -593,6 +593,72 @@ Item {
 
             StyledRect {
                 width: parent.width
+                height: niriOverviewSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
+                                      Theme.outline.b, 0.2)
+                border.width: 0
+                visible: CompositorService.isNiri
+
+                Column {
+                    id: niriOverviewSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "open_in_new"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Close Overview on Launch")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item {
+                            width: parent.width - parent.children[0].width
+                                   - parent.children[1].width
+                                   - niriOverviewToggle.width - Theme.spacingM * 3
+                            height: 1
+                        }
+
+                        DankToggle {
+                            id: niriOverviewToggle
+
+                            width: 32
+                            height: 18
+                            checked: SettingsData.spotlightCloseNiriOverview
+                            anchors.verticalCenter: parent.verticalCenter
+                            onToggled: checked => {
+                                SettingsData.set("spotlightCloseNiriOverview", checked)
+                            }
+                        }
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("When enabled, launching an app from the launcher will automatically close the Niri overview if it's open.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
                 height: recentlyUsedSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)

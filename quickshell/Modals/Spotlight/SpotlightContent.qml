@@ -158,6 +158,10 @@ Item {
         onAppLaunched: () => {
                            if (parentModal)
                            parentModal.hide()
+                           
+                           if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
+                               NiriService.toggleOverview()
+                           }
                        }
         onViewModeSelected: mode => {
                                 SettingsData.set("spotlightModalViewMode", mode)
@@ -170,6 +174,10 @@ Item {
         onFileOpened: () => {
                           if (parentModal)
                           parentModal.hide()
+                          
+                          if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
+                              NiriService.toggleOverview()
+                          }
                       }
     }
 

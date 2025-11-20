@@ -606,6 +606,38 @@ Singleton {
                     })
     }
 
+    function moveColumnLeft() {
+        return send({
+                        "Action": {
+                            "FocusColumnLeft": {}
+                        }
+                    })
+    }
+
+    function moveColumnRight() {
+        return send({
+                        "Action": {
+                            "FocusColumnRight": {}
+                        }
+                    })
+    }
+
+    function moveWorkspaceDown() {
+        return send({
+                        "Action": {
+                            "FocusWorkspaceDown": {}
+                        }
+                    })
+    }
+
+    function moveWorkspaceUp() {
+        return send({
+                        "Action": {
+                            "FocusWorkspaceUp": {}
+                        }
+                    })
+    }
+
     function switchToWorkspace(workspaceIndex) {
         return send({
                         "Action": {
