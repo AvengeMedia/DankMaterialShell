@@ -2,8 +2,8 @@
 set -euo pipefail
 
 if [ $# -lt 5 ]; then
-  echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
-  exit 1
+    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
+    exit 1
 fi
 
 STATE_DIR="$1"
@@ -13,18 +13,18 @@ SYNC_MODE_WITH_PORTAL="$4"
 TERMINALS_ALWAYS_DARK="$5"
 
 if [ ! -d "$STATE_DIR" ]; then
-  echo "Error: STATE_DIR '$STATE_DIR' does not exist" >&2
-  exit 1
+    echo "Error: STATE_DIR '$STATE_DIR' does not exist" >&2
+    exit 1
 fi
 
 if [ ! -d "$SHELL_DIR" ]; then
-  echo "Error: SHELL_DIR '$SHELL_DIR' does not exist" >&2
-  exit 1
+    echo "Error: SHELL_DIR '$SHELL_DIR' does not exist" >&2
+    exit 1
 fi
 
 if [ ! -d "$CONFIG_DIR" ]; then
-  echo "Error: CONFIG_DIR '$CONFIG_DIR' does not exist" >&2
-  exit 1
+    echo "Error: CONFIG_DIR '$CONFIG_DIR' does not exist" >&2
+    exit 1
 fi
 
 shift 5
@@ -54,10 +54,7 @@ get_matugen_major_version() {
 MATUGEN_VERSION=$(get_matugen_major_version)
 
 read_desired() {
-  [[ ! -f "$DESIRED_JSON" ]] && {
-    echo "no desired state" >&2
-    exit 0
-  }
+  [[ ! -f "$DESIRED_JSON" ]] && { echo "no desired state" >&2; exit 0; }
   cat "$DESIRED_JSON"
 }
 
@@ -104,19 +101,11 @@ run_matugen() {
 
   case "$kind" in
   image)
-    [[ -f "$value" ]] || {
-      echo "wallpaper not found: $value" >&2
-      popd >/dev/null
-      return 2
-    }
+    [[ -f "$value" ]] || { echo "wallpaper not found: $value" >&2; popd >/dev/null; return 2; }
     matugen image "$value" "${MAT_ARGS[@]}"
     ;;
   hex)
-    [[ "$value" =~ ^#[0-9A-Fa-f]{6}$ ]] || {
-      echo "invalid hex: $value" >&2
-      popd >/dev/null
-      return 2
-    }
+    [[ "$value" =~ ^#[0-9A-Fa-f]{6}$ ]] || { echo "invalid hex: $value" >&2; popd >/dev/null; return 2; }
     matugen color hex "$value" "${MAT_ARGS[@]}"
     ;;
   *)
@@ -138,8 +127,8 @@ append_matugen_config() {
   if [[ "$check_cmd" == "skip" ]] || command -v "$check_cmd" >/dev/null 2>&1; then
     if [[ -f "$target_config" ]]; then
       # The sed command
-      sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target_config" >>"$cfg_file"
-      echo "" >>"$cfg_file"
+      sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target_config" >> "$cfg_file"
+      echo "" >> "$cfg_file"
     fi
   fi
 }
@@ -167,7 +156,7 @@ get_dank_json() {
     return 2
   fi
 
-  echo "$MAT_JSON" >LAST_JSON
+  echo "$MAT_JSON" > LAST_JSON
 
   echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
 }
@@ -191,18 +180,18 @@ build_once() {
   trap 'rm -f "$TMP_CFG"' RETURN
 
   if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
-    awk '/^\[config/{p=1} /^\[templates/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    awk '/^\[config/{p=1} /^\[templates/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
   else
-    echo "[config]" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    echo "[config]" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
   fi
 
-  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" |
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" >>"$TMP_CFG"
-  echo "" >>"$TMP_CFG"
+  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" | \
+    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" >> "$TMP_CFG"
+  echo "" >> "$TMP_CFG"
 
-  cat >>"$TMP_CFG" <<EOF
+  cat >> "$TMP_CFG" << EOF
 [templates.dank]
 input_path = '$SHELL_DIR/matugen/templates/dank.json'
 output_path = '$STATE_DIR/dms-colors.json'
@@ -225,27 +214,26 @@ EOF
   append_matugen_config "vesktop" "vesktop.toml" "$TMP_CFG"
 
   if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
-    awk '/^\[templates/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    awk '/^\[templates/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
   fi
-  sed -i "s|$SHELL_DIR/matugen/templates|$SHELL_DIR/matugen/templates3|g" "$TMP_CFG"
 
   for config in "$USER_MATUGEN_DIR/configs"/*.toml; do
     [[ -f "$config" ]] || continue
-    cat "$config" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    cat "$config" >> "$TMP_CFG"
+    echo "" >> "$TMP_CFG"
   done
 
   DANK_JSON=$(get_dank_json "$mode" "$TMP_CFG")
 
   if [[ -s "$TMP_CFG" ]] && grep -q '\[templates\.' "$TMP_CFG"; then
-    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null 2>&1
+    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >dev/null 2>&1
   fi
 
   pushd "$SHELL_DIR" >/dev/null
   TMP_CONTENT_CFG="$(mktemp)"
-  echo "[config]" >"$TMP_CONTENT_CFG"
-  echo "" >>"$TMP_CONTENT_CFG"
+  echo "[config]" > "$TMP_CONTENT_CFG"
+  echo "" >> "$TMP_CONTENT_CFG"
 
   append_matugen_config "ghostty" "ghostty.toml" "$TMP_CONTENT_CFG"
   append_matugen_config "kitty" "kitty.toml" "$TMP_CONTENT_CFG"
@@ -255,8 +243,6 @@ EOF
   append_matugen_config "dgop" "dgop.toml" "$TMP_CONTENT_CFG"
   append_matugen_config "code" "vscode.toml" "$TMP_CONTENT_CFG"
   append_matugen_config "codium" "codium.toml" "$TMP_CONTENT_CFG"
-
-  sed -i "s|$SHELL_DIR/matugen/templates|$SHELL_DIR/matugen/templates3|g" "$TMP_CONTENT_CFG"
 
   if [[ $TERMINALS_ALWAYS_DARK == "true" ]] && [[ "$mode" == "light" ]]; then
     DANK_JSON=$(get_dank_json "dark" "$TMP_CONTENT_CFG")
@@ -373,7 +359,7 @@ while :; do
   fi
 
   if build_once "$DESIRED"; then
-    echo "$WANT_KEY" >"$BUILT_KEY"
+    echo "$WANT_KEY" > "$BUILT_KEY"
   else
     exit 2
   fi
