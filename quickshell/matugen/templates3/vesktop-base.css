@@ -1,0 +1,217 @@
+/**
+ * @name DMS Discord Base CSS
+ * @author DMS Team
+ * @version 3.0.0
+ * @description Minimal Discord color theme - stock layout with DMS colors
+ * @source https://github.com/yourusername/dankdots
+*/
+
+body {
+    --font-primary: var(--font), 'gg sans';
+    --font-display: var(--font), 'gg sans';
+    --font-code: var(--code-font), 'gg mono';
+}
+
+@property --colors {
+    syntax: 'off | on';
+    inherits: false;
+    initial-value: on;
+}
+
+@container root style(--colors: on) {
+    .visual-refresh body,
+    .visual-refresh .theme-dark:not(.custom-user-profile-theme),
+    .visual-refresh .theme-light:not(.custom-user-profile-theme) {
+        --activity-card-background: var(--bg-3);
+        --autocomplete-bg: var(--bg-3);
+        --background-accent: var(--bg-4);
+        --background-floating: var(--bg-3);
+        --background-nested-floating: var(--bg-2);
+        --background-mentioned: color-mix(in srgb, var(--accent-2), transparent 90%);
+        --background-mentioned-hover: color-mix(in srgb, var(--accent-2), transparent 85%);
+        --background-message-highlight: color-mix(in srgb, var(--text-3), transparent 95%);
+        --background-message-highlight-hover: color-mix(in srgb, var(--text-3), transparent 92%);
+        --background-message-hover: var(--message-hover);
+        --background-primary: var(--bg-2);
+        --background-secondary: var(--bg-3);
+        --background-secondary-alt: var(--bg-3);
+        --background-tertiary: var(--bg-2);
+        --bg-base-primary: var(--bg-2);
+        --bg-base-secondary: var(--bg-2);
+        --bg-base-tertiary: var(--bg-3);
+        --background-mod-subtle: var(--hover);
+        --background-mod-normal: var(--active);
+        --background-mod-strong: var(--active-2);
+        --background-base-low: var(--bg-2);
+        --background-base-lower: var(--bg-2);
+        --background-base-lowest: var(--bg-2);
+        --background-surface-high: var(--bg-3);
+        --background-surface-higher: var(--bg-4);
+        --background-surface-highest: var(--bg-4);
+        --bg-surface-overlay: var(--bg-2);
+        --bg-surface-raised: var(--bg-3);
+        --chat-background-default: var(--bg-3);
+        --chat-text-muted: var(--text-5);
+        --input-background: var(--bg-3);
+        --modal-background: var(--bg-2);
+        --modal-footer-background: var(--bg-2);
+        --background-modifier-accent: var(--hover);
+        --background-modifier-active: var(--active);
+        --background-modifier-hover: var(--hover);
+        --background-modifier-selected: var(--active);
+        --bg-mod-faint: var(--hover);
+        --bg-mod-subtle: var(--bg-3);
+        --bg-mod-strong: var(--bg-3);
+        --bg-brand: var(--accent-2);
+        --border-faint: transparent;
+        --border-subtle: transparent;
+        --border-normal: transparent;
+        --border-strong: transparent;
+        --input-border: transparent;
+        --button-danger-background: var(--red-3);
+        --button-danger-background-active: var(--red-5);
+        --button-danger-background-hover: var(--red-4);
+        --button-danger-background-disabled: var(--red-5);
+        --button-danger-border: transparent;
+        --button-filled-brand-text: var(--text-0);
+        --button-filled-brand-background: var(--accent-3);
+        --button-filled-brand-background-active: var(--accent-5);
+        --button-filled-brand-background-hover: var(--accent-4);
+        --button-filled-brand-border: transparent;
+        --button-filled-brand-inverted-background: var(--text-1);
+        --button-filled-brand-inverted-background-active: var(--text-3);
+        --button-filled-brand-inverted-background-hover: var(--text-2);
+        --button-filled-brand-inverted-text: var(--bg-1);
+        --button-filled-white-background: var(--text-1);
+        --button-filled-white-background-active: var(--text-3);
+        --button-filled-white-background-hover: var(--text-2);
+        --button-filled-white-text: var(--bg-1);
+        --button-outline-danger-background: var(--bg-3);
+        --button-outline-danger-background-active: var(--text-5);
+        --button-outline-danger-background-hover: var(--bg-2);
+        --button-outline-danger-border: transparent;
+        --button-outline-danger-border-active: transparent;
+        --button-outline-danger-border-hover: transparent;
+        --button-outline-danger-text: var(--red-1);
+        --button-outline-danger-text-active: var(--red-1);
+        --button-outline-danger-text-hover: var(--red-1);
+        --button-outline-primary-background: transparent;
+        --button-outline-primary-background-active: var(--active);
+        --button-outline-primary-background-hover: var(--hover);
+        --button-outline-primary-border: transparent;
+        --button-outline-primary-border-active: transparent;
+        --button-outline-primary-border-hover: transparent;
+        --button-outline-primary-text: var(--text-3);
+        --button-outline-primary-text-active: var(--text-3);
+        --button-outline-primary-text-hover: var(--text-3);
+        --button-positive-background: var(--green-2);
+        --button-positive-background-active: var(--green-4);
+        --button-positive-background-hover: var(--green-3);
+        --button-positive-background-disabled: var(--green-4);
+        --button-positive-border: transparent;
+        --button-secondary-background: var(--bg-4);
+        --button-secondary-background-active: var(--text-5);
+        --button-secondary-background-hover: var(--bg-3);
+        --button-secondary-background-disabled: var(--bg-3);
+        --button-secondary-text: var(--text-3);
+        --button-transparent-background: var(--hover);
+        --button-transparent-background-active: var(--active-2);
+        --button-transparent-background-hover: var(--active);
+        --button-transparent-text: var(--text-3);
+        --redesign-button-secondary-text: var(--text-3);
+        --card-primary-bg: var(--bg-3);
+        --card-secondary-bg: var(--bg-4);
+        --channel-icon: var(--text-4);
+        --channels-default: var(--text-4);
+        --embed-title: var(--text-2);
+        --header-primary: var(--text-2);
+        --header-secondary: var(--text-4);
+        --header-muted: var(--text-4);
+        --icon-muted: var(--text-5);
+        --icon-primary: var(--text-3);
+        --icon-secondary: var(--text-4);
+        --icon-tertiary: var(--text-4);
+        --text-brand: var(--accent-1);
+        --text-danger: var(--red-1);
+        --text-link: var(--accent-1);
+        --text-low-contrast: var(--text-4);
+        --text-muted: var(--text-5);
+        --text-muted-on-default: var(--text-4);
+        --text-normal: var(--text-3);
+        --text-positive: var(--green-1);
+        --text-primary: var(--text-3);
+        --text-secondary: var(--text-4);
+        --text-warning: var(--yellow-1);
+        --text-default: var(--text-3);
+        --text-tertiary: var(--text-4);
+        --user-profile-overlay-background: var(--bg-2);
+        --user-profile-overlay-background-hover: var(--bg-4);
+        --status-danger: var(--red-2);
+        --status-danger-background: var(--red-3);
+        --status-danger-text: var(--white);
+        --status-dnd: var(--dnd);
+        --status-idle: var(--idle);
+        --status-offline: var(--offline);
+        --status-online: var(--online);
+        --status-positive: var(--green-2);
+        --status-positive-background: var(--green-2);
+        --status-positive-text: var(--white);
+        --status-speaking: var(--green-2);
+        --status-warning: var(--yellow-2);
+        --interactive-normal: var(--text-4);
+        --interactive-hover: var(--text-3);
+        --interactive-active: var(--text-3);
+        --interactive-muted: var(--text-5);
+        --mention-foreground: var(--accent-1);
+        --mention-background: color-mix(in srgb, var(--accent-2), transparent 90%);
+        --channel-text-area-placeholder: var(--text-5);
+        --message-reacted-text: var(--text-2);
+        --message-reacted-background: color-mix(in srgb, var(--accent-2), transparent 90%);
+        --custom-channel-members-bg: var(--bg-2);
+        --redesign-input-control-selected: var(--accent-2);
+        --scrollbar-auto-thumb: var(--bg-4);
+        --scrollbar-auto-track: transparent;
+        --scrollbar-thin-thumb: var(--bg-4);
+        --scrollbar-thin-track: transparent;
+        --white: var(--text-0);
+        --white-500: var(--text-0);
+        --redesign-button-overlay-alpha-text: var(--text-2);
+        --brand-360: var(--accent-2);
+        --brand-500: var(--accent-2);
+        --blurple-50: var(--accent-2);
+        --red-400: var(--red-2);
+        --red-500: var(--red-3);
+        --green-360: var(--green-2);
+        --primary-400: var(--text-4);
+        --deprecated-text-input-bg: var(--bg-3);
+        --deprecated-text-input-border: transparent;
+        --background-code: var(--bg-3);
+    }
+
+    .visual-refresh {
+        .bg__960e4 { background: var(--bg-1); }
+        .base_c48ade { background: var(--bg-1); }
+        .colorPickerSwatch__459fb[style*="rgb(88, 101, 242)"],
+        .newBadge_faa96b,
+        .mentioned__5126c:before { background-color: var(--accent-2) !important; }
+        .botTagRegular__82f07 { background-color: var(--accent-2); }
+        .container__87bf1.checked__87bf1 { background-color: var(--accent-2) !important; }
+        .container__87bf1.checked__87bf1 .slider__87bf1 > svg > path { fill: var(--accent-2) !important; }
+        .newMessagesBar__0f481 { background-color: var(--accent-3); }
+        .barFill_a562c8 { background-color: var(--accent-2) !important; }
+        ::selection,
+        .highlight { background: var(--accent-3); color: var(--text-0); }
+        rect[fill='#82838b'] { fill: var(--offline); }
+        .status_a423bd[style='background-color: rgb(130, 131, 139);'] { background-color: var(--offline) !important; }
+        rect[fill='#43a25a'],
+        path[fill='#43a25a'],
+        path[fill='var(--status-positive)'] { fill: var(--online); }
+        .status_a423bd[style='background-color: rgb(67, 162, 90);'] { background-color: var(--online) !important; }
+        rect[fill='#ca9654'] { fill: var(--idle); }
+        .status_a423bd[style='background-color: rgb(202, 150, 84);'] { background-color: var(--idle) !important; }
+        rect[fill='#d83a42'] { fill: var(--dnd); }
+        .status_a423bd[style='background-color: rgb(216, 58, 66);'] { background-color: var(--dnd) !important; }
+        rect[fill='#9147ff'] { fill: var(--streaming); }
+        div[style*='background-color: rgb(67, 162, 90)'] { background-color: var(--online) !important; }
+    }
+}
