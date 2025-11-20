@@ -1,0 +1,132 @@
+@media -moz-pref("userChrome.theme-material") {
+  :root {
+    --md-sys-color-primary: {{colors.primary.light.hex}};
+    --md-sys-color-surface-tint: {{colors.primary.light.hex}};
+    --md-sys-color-on-primary: {{colors.on_primary.light.hex}};
+    --md-sys-color-primary-container: {{colors.primary_container.light.hex}};
+    --md-sys-color-on-primary-container: {{colors.on_primary_container.light.hex}};
+    --md-sys-color-secondary: {{colors.secondary.light.hex}};
+    --md-sys-color-on-secondary: {{colors.on_secondary.light.hex}};
+    --md-sys-color-secondary-container: {{colors.secondary_container.light.hex}};
+    --md-sys-color-on-secondary-container: {{colors.on_secondary_container.light.hex}};
+    --md-sys-color-tertiary: {{colors.tertiary.light.hex}};
+    --md-sys-color-on-tertiary: {{colors.on_tertiary.light.hex}};
+    --md-sys-color-tertiary-container: {{colors.tertiary_container.light.hex}};
+    --md-sys-color-on-tertiary-container: {{colors.on_tertiary_container.light.hex}};
+    --md-sys-color-error: {{colors.error.light.hex}};
+    --md-sys-color-on-error: {{colors.on_error.light.hex}};
+    --md-sys-color-error-container: {{colors.error_container.light.hex}};
+    --md-sys-color-on-error-container: {{colors.on_error_container.light.hex}};
+    --md-sys-color-background: {{colors.background.light.hex}};
+    --md-sys-color-on-background: {{colors.on_background.light.hex}};
+    --md-sys-color-surface: {{colors.background.light.hex}};
+    --md-sys-color-on-surface: {{colors.on_surface.light.hex}};
+    --md-sys-color-surface-variant: {{colors.surface_variant.light.hex}};
+    --md-sys-color-on-surface-variant: {{colors.on_surface_variant.light.hex}};
+    --md-sys-color-outline: {{colors.outline.light.hex}};
+    --md-sys-color-outline-variant: {{colors.outline_variant.light.hex}};
+    --md-sys-color-shadow: {{colors.shadow.light.hex}};
+    --md-sys-color-scrim: {{colors.scrim.light.hex}};
+    --md-sys-color-inverse-surface: {{colors.inverse_surface.light.hex}};
+    --md-sys-color-inverse-on-surface: {{colors.inverse_on_surface.light.hex}};
+    --md-sys-color-inverse-primary: {{colors.inverse_primary.light.hex}};
+    --md-sys-color-primary-fixed: {{colors.primary_fixed.light.hex}};
+    --md-sys-color-on-primary-fixed: {{colors.on_primary_fixed.light.hex}};
+    --md-sys-color-primary-fixed-dim: {{colors.primary_fixed_dim.light.hex}};
+    --md-sys-color-on-primary-fixed-variant: {{colors.on_primary_fixed_variant.light.hex}};
+    --md-sys-color-secondary-fixed: {{colors.secondary_fixed.light.hex}};
+    --md-sys-color-on-secondary-fixed: {{colors.on_secondary_fixed.light.hex}};
+    --md-sys-color-secondary-fixed-dim: {{colors.secondary_fixed_dim.light.hex}};
+    --md-sys-color-on-secondary-fixed-variant: {{colors.on_secondary_fixed_variant.light.hex}};
+    --md-sys-color-tertiary-fixed: {{colors.tertiary_fixed.light.hex}};
+    --md-sys-color-on-tertiary-fixed: {{colors.on_tertiary_fixed.light.hex}};
+    --md-sys-color-tertiary-fixed-dim: {{colors.tertiary_fixed_dim.light.hex}};
+    --md-sys-color-on-tertiary-fixed-variant: {{colors.on_tertiary_fixed_variant.light.hex}};
+    --md-sys-color-surface-dim: {{colors.surface_dim.light.hex}};
+    --md-sys-color-surface-bright: {{colors.surface_bright.light.hex}};
+    --md-sys-color-surface-container-lowest: {{colors.surface_container_lowest.light.hex}};
+    --md-sys-color-surface-container-low: {{colors.surface_container_low.light.hex}};
+    --md-sys-color-surface-container: {{colors.background.light.hex}};
+    --md-sys-color-surface-container-high: {{colors.background.light.hex}};
+    --md-sys-color-surface-container-highest: {{colors.background.light.hex}};
+
+    --m3-radius: 12px;
+    --m3-radius-sm: 10px;
+    --m3-elev-0: none;
+    --m3-elev-1: 0 1px 2px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06);
+    --m3-elev-2: 0 2px 6px rgba(0,0,0,.10), 0 1px 3px rgba(0,0,0,.06);
+
+    --tab-height: 34px;
+    --urlbar-height: 38px;
+
+    --state-hover: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);
+    --state-press: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+
+    --focus-ring: 0 0 0 2px color-mix(in srgb, var(--md-sys-color-primary) 70%, transparent);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-sys-color-primary: {{colors.primary.dark.hex}};
+    --md-sys-color-surface-tint: {{colors.primary.dark.hex}};
+    --md-sys-color-on-primary: {{colors.on_primary.dark.hex}};
+    --md-sys-color-primary-container: {{colors.primary_container.dark.hex}};
+    --md-sys-color-on-primary-container: {{colors.on_primary_container.dark.hex}};
+    --md-sys-color-secondary: {{colors.secondary.dark.hex}};
+    --md-sys-color-on-secondary: {{colors.on_secondary.dark.hex}};
+    --md-sys-color-secondary-container: {{colors.secondary_container.dark.hex}};
+    --md-sys-color-on-secondary-container: {{colors.on_secondary_container.dark.hex}};
+    --md-sys-color-tertiary: {{colors.tertiary.dark.hex}};
+    --md-sys-color-on-tertiary: {{colors.on_tertiary.dark.hex}};
+    --md-sys-color-tertiary-container: {{colors.tertiary_container.dark.hex}};
+    --md-sys-color-on-tertiary-container: {{colors.on_tertiary_container.dark.hex}};
+    --md-sys-color-error: {{colors.error.dark.hex}};
+    --md-sys-color-on-error: {{colors.on_error.dark.hex}};
+    --md-sys-color-error-container: {{colors.error_container.dark.hex}};
+    --md-sys-color-on-error-container: {{colors.on_error_container.dark.hex}};
+    --md-sys-color-background: {{colors.background.dark.hex}};
+    --md-sys-color-on-background: {{colors.on_background.dark.hex}};
+    --md-sys-color-surface: {{colors.surface.dark.hex}};
+    --md-sys-color-on-surface: {{colors.on_surface.dark.hex}};
+    --md-sys-color-surface-variant: {{colors.surface_variant.dark.hex}};
+    --md-sys-color-on-surface-variant: {{colors.on_surface_variant.dark.hex}};
+    --md-sys-color-outline: {{colors.outline.dark.hex}};
+    --md-sys-color-outline-variant: {{colors.outline_variant.dark.hex}};
+    --md-sys-color-shadow: {{colors.shadow.dark.hex}};
+    --md-sys-color-scrim: {{colors.scrim.dark.hex}};
+    --md-sys-color-inverse-surface: {{colors.inverse_surface.dark.hex}};
+    --md-sys-color-inverse-on-surface: {{colors.inverse_on_surface.dark.hex}};
+    --md-sys-color-inverse-primary: {{colors.inverse_primary.dark.hex}};
+    --md-sys-color-primary-fixed: {{colors.primary_fixed.dark.hex}};
+    --md-sys-color-on-primary-fixed: {{colors.on_primary_fixed.dark.hex}};
+    --md-sys-color-primary-fixed-dim: {{colors.primary_fixed_dim.dark.hex}};
+    --md-sys-color-on-primary-fixed-variant: {{colors.on_primary_fixed_variant.dark.hex}};
+    --md-sys-color-secondary-fixed: {{colors.secondary_fixed.dark.hex}};
+    --md-sys-color-on-secondary-fixed: {{colors.on_secondary_fixed.dark.hex}};
+    --md-sys-color-secondary-fixed-dim: {{colors.secondary_fixed_dim.dark.hex}};
+    --md-sys-color-on-secondary-fixed-variant: {{colors.on_secondary_fixed_variant.dark.hex}};
+    --md-sys-color-tertiary-fixed: {{colors.tertiary_fixed.dark.hex}};
+    --md-sys-color-on-tertiary-fixed: {{colors.on_tertiary_fixed.dark.hex}};
+    --md-sys-color-tertiary-fixed-dim: {{colors.tertiary_fixed_dim.dark.hex}};
+    --md-sys-color-on-tertiary-fixed-variant: {{colors.on_tertiary_fixed_variant.dark.hex}};
+    --md-sys-color-surface-dim: {{colors.surface_dim.dark.hex}};
+    --md-sys-color-surface-bright: {{colors.surface_bright.dark.hex}};
+    --md-sys-color-surface-container-lowest: {{colors.surface_container_lowest.dark.hex}};
+    --md-sys-color-surface-container-low: {{colors.surface_container_low.dark.hex}};
+    --md-sys-color-surface-container: {{colors.surface_container.dark.hex}};
+    --md-sys-color-surface-container-high: {{colors.surface_container_high.dark.hex}};
+    --md-sys-color-surface-container-highest: {{colors.surface_container_highest.dark.hex}};
+
+    --m3-elev-1: 0 1px 2px rgba(0,0,0,.50), 0 1px 3px rgba(0,0,0,.35);
+    --m3-elev-2: 0 4px 10px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.35);
+
+    --state-hover: color-mix(in srgb, var(--md-sys-color-on-surface) 6%, transparent);
+    --state-press: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent);
+  }
+}
+
+/* idk if this even works, but the suggestion in the material updated readme bricks symbols no matter how many fallbacks I add */
+:root {
+  font-family: system-ui, "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+}

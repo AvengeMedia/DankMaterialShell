@@ -1,0 +1,31 @@
+{
+  "name": "dynamic-base16-dankshell",
+  "displayName": "Dynamic Base16 DankShell",
+  "publisher": "local",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Dynamic Base16 DankShell",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dankshell-default.json"
+      },
+      {
+        "label": "Dynamic Base16 DankShell (Dark)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dankshell-dark.json"
+      },
+      {
+        "label": "Dynamic Base16 DankShell (Light)",
+        "uiTheme": "vs",
+        "path": "./themes/dankshell-light.json"
+      }
+    ]
+  }
+}
