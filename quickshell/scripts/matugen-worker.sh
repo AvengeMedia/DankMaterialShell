@@ -128,7 +128,23 @@ run_matugen() {
 
 }
 
-get_matugen_dank_json() {
+append_matugen_config() {
+  local check_cmd="$1"
+  local file_name="$2"
+  local cfg_file="$3"
+  local target_config="$SHELL_DIR/matugen/configs/$file_name"
+
+  # Check if command exists AND if the config file exists
+  if [[ "$check_cmd" == "skip" ]] || command -v "$check_cmd" >/dev/null 2>&1; then
+    if [[ -f "$target_config" ]]; then
+      # The sed command
+      sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target_config" >>"$cfg_file"
+      echo "" >>"$cfg_file"
+    fi
+  fi
+}
+
+get_dank_json() {
   local theme_mode="$1"
   local cfg=$2
   local MODE_ARG=(-m "$theme_mode")
@@ -148,9 +164,10 @@ get_matugen_dank_json() {
   if [[ -z "$primary" ]]; then
     echo "Error: Failed to extract PRIMARY color from matugen JSON (mode: $mode)" >&2
     echo "This may indicate an incompatible matugen JSON format" >&2
-    set_system_color_scheme "$mode"
     return 2
   fi
+
+  echo "$MAT_JSON" >LAST_JSON
 
   echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
 }
@@ -171,7 +188,7 @@ build_once() {
   USER_MATUGEN_DIR="$CONFIG_DIR/matugen/dms"
 
   TMP_CFG="$(mktemp)"
-  # trap 'rm -f "$TMP_CFG"' RETURN
+  trap 'rm -f "$TMP_CFG"' RETURN
 
   if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
     awk '/^\[config/{p=1} /^\[templates/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >>"$TMP_CFG"
@@ -195,42 +212,17 @@ EOF
 
   # If light mode, use gtk3 light config
   if [[ "$mode" == "light" ]]; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/gtk3-light.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    append_matugen_config "skip" "gtk3-light.toml" "$TMP_CFG"
   else
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/gtk3-dark.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
+    append_matugen_config "skip" "gtk3-dark.toml" "$TMP_CFG"
   fi
 
-  if command -v niri >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/niri.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
-
-  if command -v qt5ct >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/qt5ct.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
-
-  if command -v qt6ct >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/qt6ct.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
-
-  if command -v firefox >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/firefox.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
-
-  if command -v pywalfox >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/pywalfox.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
-
-  if command -v vesktop >/dev/null 2>&1 && [[ -d "$CONFIG_DIR/vesktop" ]]; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/vesktop.toml" >>"$TMP_CFG"
-    echo "" >>"$TMP_CFG"
-  fi
+  append_matugen_config "niri" "niri.toml" "$TMP_CFG"
+  append_matugen_config "qt5ct" "qt5ct.toml" "$TMP_CFG"
+  append_matugen_config "qt6ct" "qt6ct.toml" "$TMP_CFG"
+  append_matugen_config "firefox" "firefox.toml" "$TMP_CFG"
+  append_matugen_config "pywalfox" "pywalfox.toml" "$TMP_CFG"
+  append_matugen_config "vesktop" "vesktop.toml" "$TMP_CFG"
 
   if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
     awk '/^\[templates/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >>"$TMP_CFG"
@@ -244,67 +236,38 @@ EOF
     echo "" >>"$TMP_CFG"
   done
 
-  DANK_JSON=$(get_matugen_dank_json "$mode" "$TMP_CFG")
+  DANK_JSON=$(get_dank_json "$mode" "$TMP_CFG")
 
-  run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null 2>&1
+  if [[ -s "$TMP_CFG" ]] && grep -q '\[templates\.' "$TMP_CFG"; then
+    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null 2>&1
+  fi
 
   pushd "$SHELL_DIR" >/dev/null
   TMP_CONTENT_CFG="$(mktemp)"
   echo "[config]" >"$TMP_CONTENT_CFG"
   echo "" >>"$TMP_CONTENT_CFG"
 
-  if command -v ghostty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/ghostty.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v kitty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/kitty.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v foot >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/foot.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v alacritty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/alacritty.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v wezterm >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/wezterm.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v dgop >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/dgop.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v code >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/vscode.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v codium >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/codium.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
+  append_matugen_config "ghostty" "ghostty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "kitty" "kitty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "foot" "foot.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "alacritty" "alacritty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "wezterm" "wezterm.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "dgop" "dgop.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "code" "vscode.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "codium" "codium.toml" "$TMP_CONTENT_CFG"
 
   sed -i "s|$SHELL_DIR/matugen/templates|$SHELL_DIR/matugen/templates3|g" "$TMP_CONTENT_CFG"
 
   if [[ $TERMINALS_ALWAYS_DARK == "true" ]] && [[ "$mode" == "light" ]]; then
-    DANK_JSON=$(get_matugen_dank_json "dark" "$TMP_CONTENT_CFG")
+    DANK_JSON=$(get_dank_json "dark" "$TMP_CONTENT_CFG")
   fi
 
-  # if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
-  run_matugen "$value" "$kind" -c "$TMP_CONTENT_CFG" --import-json-string "$DANK_JSON" >/dev/null
-  # fi
-  #
-  # rm -f "$TMP_CONTENT_CFG"
-  # popd >/dev/null
+  if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
+    run_matugen "$value" "$kind" -c "$TMP_CONTENT_CFG" --import-json-string "$DANK_JSON" >/dev/null
+  fi
+
+  rm -f "$TMP_CONTENT_CFG"
+  popd >/dev/null
 
   GTK_CSS="$CONFIG_DIR/gtk-3.0/gtk.css"
   SHOULD_RUN_HOOK=false
@@ -322,7 +285,7 @@ EOF
     gsettings set org.gnome.desktop.interface gtk-theme "" >/dev/null 2>&1 || true
     gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-${mode}" >/dev/null 2>&1 || true
   fi
-  #
+
   # if command -v code >/dev/null 2>&1; then
   #   VSCODE_EXT_DIR="$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1"
   #   VSCODE_THEME_DIR="$VSCODE_EXT_DIR/themes"
