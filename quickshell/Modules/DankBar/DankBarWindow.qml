@@ -430,9 +430,9 @@ PanelWindow {
                 bottom: barWindow.isVertical ? parent.bottom : undefined
             }
             readonly property bool inOverview: CompositorService.isNiri && NiriService.inOverview && SettingsData.dankBarOpenOnOverview
-            hoverEnabled: SettingsData.dankBarAutoHide && !topBarCore.reveal && !inOverview
+            hoverEnabled: SettingsData.dankBarAutoHide && !inOverview
             acceptedButtons: Qt.NoButton
-            enabled: SettingsData.dankBarAutoHide && !topBarCore.reveal && !inOverview
+            enabled: SettingsData.dankBarAutoHide && !inOverview
 
             Item {
                 id: topBarContainer

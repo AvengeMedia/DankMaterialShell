@@ -257,7 +257,8 @@ Variants {
 
             height: {
                 if (dock.isVertical) {
-                    return dock.reveal ? Math.min(dockBackground.implicitHeight + 4, maxDockHeight) : Math.min(Math.max(dockBackground.implicitHeight + 64, 200), screenHeight * 0.5)
+                    const hiddenHeight = Math.min(Math.max(dockBackground.implicitHeight + 64, 200), screenHeight * 0.5)
+                    return dock.reveal ? Math.max(Math.min(dockBackground.implicitHeight + 4, maxDockHeight), hiddenHeight) : hiddenHeight
                 } else {
                     return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1
                 }
@@ -266,7 +267,8 @@ Variants {
                 if (dock.isVertical) {
                     return dock.reveal ? px(dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin) : 1
                 } else {
-                    return dock.reveal ? Math.min(dockBackground.implicitWidth + 4, maxDockWidth) : Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
+                    const hiddenWidth = Math.min(Math.max(dockBackground.implicitWidth + 64, 200), screenWidth * 0.5)
+                    return dock.reveal ? Math.max(Math.min(dockBackground.implicitWidth + 4, maxDockWidth), hiddenWidth) : hiddenWidth
                 }
             }
             anchors {
