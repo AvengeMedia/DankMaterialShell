@@ -156,7 +156,7 @@ get_dank_json() {
     return 2
   fi
 
-  echo "$MAT_JSON" > LAST_JSON
+  echo "$MAT_JSON" > "$LAST_JSON"
 
   echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
 }
