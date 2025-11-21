@@ -1029,7 +1029,57 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     property bool pluginSettingsFileExists: false
 
     IpcHandler {
-        function reveal(): string {
+        function get(arg: string): string {
+            return root[arg]
+        }
+
+        function set(arg: string, value: string): string {
+
+            if (!(arg in root)) {
+                console.warn("Cannot set property, not found:", arg)
+                return "SETTINGS_SET_FAILURE"
+            }
+
+            const typeName = typeof root[arg]
+
+            try {
+                switch (typeName) {
+                case "boolean":
+                    if (value === "true" || value === "false") value = Boolean(value)
+                    else throw `${value} is not a Boolean`
+                    break
+                case "number":
+                    value = Number(value)
+                    if (isNaN(value)) throw `${value} is not a Number`
+                    break
+                case "string":
+                    value = String(value)
+                    break
+                case "object":
+                    // NOTE: Parsing lists is messed up upstream and not sure if we want
+                    // to make sure objects are well structured or just let people set
+                    // whatever they want
+                    // objects/arrays are disabled for now
+                    // https://github.com/quickshell-mirror/quickshell/pull/22
+                    throw "Setting Objects and Arrays not supported"
+                default:
+                    throw "Unsupported type"
+                }
+
+                root[arg] = value
+                root.saveSettings()
+                return "SETTINGS_SET_SUCCESS"
+            } catch (e) {
+                console.warn("Failed to set property:", arg, "error:", e)
+                return "SETTINGS_SET_FAILURE"
+            }
+        }
+
+        target: "settings"
+    }
+
+    IpcHandler {
+        function show(): string {
             root.dankBarVisible = true
             root.saveSettings()
             return "BAR_SHOW_SUCCESS"
