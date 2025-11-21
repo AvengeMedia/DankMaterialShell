@@ -1050,6 +1050,24 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
             return root.dankBarVisible ? "visible" : "hidden"
         }
 
+        function autoHide(): string {
+            root.dankBarAutoHide = true
+            root.saveSettings()
+            return "BAR_AUTO_HIDE_SUCCESS"
+        }
+
+        function manualHide(): string {
+            root.dankBarAutoHide = false
+            root.saveSettings()
+            return "BAR_MANUAL_HIDE_SUCCESS"
+        }
+
+        function toggleAutoHide(): string {
+            root.dankBarAutoHide = !root.dankBarAutoHide
+            root.saveSettings()
+            return root.dankBarAutoHide ?  "BAR_MANUAL_HIDE_SUCCESS": "BAR_AUTO_HIDE_SUCCESS"
+        }
+
         target: "bar"
     }
 
