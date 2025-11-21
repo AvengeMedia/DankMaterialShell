@@ -44,7 +44,8 @@ Item {
                 return "transparent"
             }
 
-            return Qt.rgba(privacyArea.containsMouse ? Theme.errorPressed.r : Theme.errorHover.r, privacyArea.containsMouse ? Theme.errorPressed.g : Theme.errorHover.g, privacyArea.containsMouse ? Theme.errorPressed.b : Theme.errorHover.b, (privacyArea.containsMouse ? Theme.errorPressed.a : Theme.errorHover.a) * Theme.widgetTransparency)
+            const baseColor = Theme.widgetBaseBackgroundColor
+            return Qt.rgba(privacyArea.containsMouse ? Theme.errorPressed.r : baseColor.r, privacyArea.containsMouse ? Theme.errorPressed.g : baseColor.g, privacyArea.containsMouse ? Theme.errorPressed.b : baseColor.b, (privacyArea.containsMouse ? Theme.errorPressed.a : baseColor.a) * Theme.widgetTransparency)
         }
 
         Column {
