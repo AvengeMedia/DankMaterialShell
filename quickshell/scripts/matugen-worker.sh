@@ -227,7 +227,7 @@ EOF
   DANK_JSON=$(get_dank_json "$mode" "$TMP_CFG")
 
   if [[ -s "$TMP_CFG" ]] && grep -q '\[templates\.' "$TMP_CFG"; then
-    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >dev/null 2>&1
+    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null
   fi
 
   pushd "$SHELL_DIR" >/dev/null
