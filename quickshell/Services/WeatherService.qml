@@ -6,6 +6,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import '../Common/suncalc.js' as SunCalc
 
 Singleton {
     id: root
@@ -118,19 +119,19 @@ Singleton {
     function getWeatherCondition(code) {
         const conditions = {
             "0": "Clear",
-            "1": "Clear", 
+            "1": "Clear",
             "2": "Partly cloudy",
             "3": "Overcast",
             "45": "Fog",
             "48": "Fog",
             "51": "Drizzle",
-            "53": "Drizzle", 
+            "53": "Drizzle",
             "55": "Drizzle",
             "56": "Freezing drizzle",
             "57": "Freezing drizzle",
             "61": "Light rain",
             "63": "Rain",
-            "65": "Heavy rain", 
+            "65": "Heavy rain",
             "66": "Light rain",
             "67": "Heavy rain",
             "71": "Light snow",
@@ -147,6 +148,127 @@ Singleton {
             "99": "Thunderstorm with hail"
         }
         return conditions[String(code)] || "Unknown"
+    }
+
+
+    property var moonWeatherIcons: ({
+                                       "0":  "",
+                                       "1":  "",
+                                       "2":  "",
+                                       "3":  "",
+                                       "4":  "",
+                                       "5":  "",
+                                       "6":  "",
+                                       "7":  "",
+                                       "8":  "",
+                                       "9":  "",
+                                       "10": "",
+                                       "11": "",
+                                       "12": "",
+                                       "13": "",
+                                       "14": "",
+                                       "15": "",
+                                       "16": "",
+                                       "17": "",
+                                       "18": "",
+                                       "19": "",
+                                       "20": "",
+                                       "21": "",
+                                       "22": "",
+                                       "23": "",
+                                       "24": "",
+                                       "25": "",
+                                       "26": "",
+                                       "27": "",
+                                   })
+
+    property var moonMaterialIcons: ({
+                                        "0":  "󰽤",
+                                        "1":  "󰽧",
+                                        "2":  "󰽡",
+                                        "3":  "󰽦",
+                                        "4":  "󰽢",
+                                        "5":  "󰽨",
+                                        "6":  "󰽣",
+                                        "7":  "󰽥",
+                                    })
+
+    function getMoonPhase(date) {
+        const icons = moonWeatherIcons // more icons in this set but thinner outline than material icons
+        // const icons = moonMaterialIcons
+        const iconCount = Object.keys(icons).length
+        const moon = SunCalc.getMoonIllumination(date)
+        const index = ((Math.floor(moon.phase * iconCount + 0.5) % iconCount) + iconCount) % iconCount
+
+        return icons[index]
+    }
+
+    function getMoonAngle(date) {
+        const pos = SunCalc.getMoonPosition(date, location.latitude, location.longitude)
+        return pos.parralacticAngle
+    }
+
+    function getLocation() {
+        return location
+    }
+
+    function getSunTimes(date) {
+        // NOTE: this can take a height argument (meters above sealevel)
+        return SunCalc.getTimes(date, location.latitude, location.longitude)
+    }
+
+    function getCurrentSunTime(date) {
+        const times = getSunTimes(date)
+        const dateObj = new Date(date)
+
+        const periods = [
+            { name: "Dawn (Astronomical Twilight)", start: new Date(times.nightEnd),      end: new Date(times.nauticalDawn) },
+            { name: "Dawn (Nautical Twilight)",     start: new Date(times.nauticalDawn),  end: new Date(times.dawn) },
+            { name: "Dawn (Civil Twilight)",        start: new Date(times.dawn),          end: new Date(times.sunrise) },
+            { name: "Sunrise",                      start: new Date(times.sunrise),       end: new Date(times.sunriseEnd) },
+            { name: "Golden Hour",                  start: new Date(times.sunriseEnd),    end: new Date(times.goldenHourEnd) },
+            { name: "Morning",                      start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
+            { name: "Afternoon",                    start: new Date(times.solarNoon),     end: new Date(times.goldenHour) },
+            { name: "Golden Hour",                  start: new Date(times.goldenHour),    end: new Date(times.sunsetStart) },
+            { name: "Sunset",                       start: new Date(times.sunsetStart),   end: new Date(times.sunset) },
+            { name: "Dusk (Civil Twighlight)",      start: new Date(times.sunset),        end: new Date(times.dusk) },
+            { name: "Dusk (Nautical Twilight)",     start: new Date(times.dusk),          end: new Date(times.nauticalDusk) },
+            { name: "Dusk (Astronomical Twilight)", start: new Date(times.nauticalDusk),  end: new Date(times.night) },
+        ]
+
+        const sunrise = new Date(times.nightEnd)
+        const sunset = new Date(times.night)
+        const dayPercent = dateObj > sunrise && dateObj < sunset ? (dateObj - sunrise) / (sunset - sunrise) : 0
+
+        for (let i = 0; i < periods.length; i++) {
+            const { name, start, end } = periods[i]
+            if (dateObj >= start && dateObj < end) {
+                const percent = (dateObj - start) / (end - start)
+                return { period: name, periodIndex: i, periodPercent: Math.min(Math.max(percent, 0), 1), dayPercent: dayPercent }
+            }
+        }
+
+        return { period: "Night", periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
+    }
+
+    function getSkyArcPosition(date, isSun) {
+        if (!location) { return null }
+        const lat = location.latitude
+        const lon = location.longitude
+
+        const pos = isSun
+          ? SunCalc.getPosition(date, lat, lon)
+          : SunCalc.getMoonPosition(date, lat, lon)
+
+        const transitAzimuth = lat >= 0 ? Math.PI : 0
+
+        let h = (((pos.azimuth - transitAzimuth) / (2*Math.PI)) + 1) % 1
+        h = Math.max(0, Math.min(1, h))
+        // let v = pos.altitude / (Math.PI/2)
+        let v = Math.sin(pos.altitude)
+        v = Math.max(-1, Math.min(1, v))
+
+        return { h, v }
     }
 
     function formatTime(isoString) {
