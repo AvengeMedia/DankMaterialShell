@@ -332,14 +332,15 @@ PanelWindow {
                 layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
+                readonly property int blurMax: 64
+
                 layer.effect: MultiEffect {
                     id: shadowFx
                     autoPaddingEnabled: true
                     shadowEnabled: true
                     blurEnabled: false
                     maskEnabled: false
-                    property int blurMax: 64
-                    shadowBlur: Math.max(0, Math.min(1, contentWrapper.shadowBlurPx / blurMax))
+                    shadowBlur: Math.max(0, Math.min(1, contentWrapper.shadowBlurPx / bgShadowLayer.blurMax))
                     shadowScale: 1 + (2 * contentWrapper.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
                     shadowColor: {
                         const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest

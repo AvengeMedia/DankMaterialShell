@@ -639,13 +639,14 @@ Item {
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
                 layer.samples: 4
 
+                readonly property int blurMax: 64
+
                 layer.effect: MultiEffect {
                     autoPaddingEnabled: true
                     shadowEnabled: true
                     blurEnabled: false
                     maskEnabled: false
-                    property int blurMax: 64
-                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / bgShadowLayer.blurMax))
                     shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
                     shadowColor: {
                         const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
@@ -1107,13 +1108,14 @@ Item {
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
+                        readonly property int blurMax: 64
+
                         layer.effect: MultiEffect {
                             autoPaddingEnabled: true
                             shadowEnabled: true
                             blurEnabled: false
                             maskEnabled: false
-                            property int blurMax: 64
-                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / menuBgShadowLayer.blurMax))
                             shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(menuBgShadowLayer.width, menuBgShadowLayer.height))
                             shadowColor: {
                                 const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;

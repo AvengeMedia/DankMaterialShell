@@ -189,6 +189,7 @@ Variants {
                 MultiEffect {
                     anchors.fill: parent
                     source: currentWallpaper
+                    visible: currentWallpaper.source !== ""
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75
@@ -199,6 +200,7 @@ Variants {
                 MultiEffect {
                     anchors.fill: parent
                     source: nextWallpaper
+                    visible: nextWallpaper.source !== ""
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75

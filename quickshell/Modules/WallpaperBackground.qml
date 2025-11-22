@@ -463,7 +463,7 @@ Variants {
             MultiEffect {
                 anchors.fill: parent
                 source: effectLoader.active ? effectLoader.item : (root.actualTransitionType === "none" ? currentWallpaper : null)
-                visible: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview
+                visible: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && source !== null
                 blurEnabled: true
                 blur: 0.8
                 blurMax: 75
