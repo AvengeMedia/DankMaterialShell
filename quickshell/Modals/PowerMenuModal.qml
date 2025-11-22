@@ -192,8 +192,8 @@ DankModal {
     positioning: parentBounds.width > 0 ? "custom" : "center"
     customPosition: {
         if (parentBounds.width > 0) {
-            const effectiveBarThickness = Math.max(26 + SettingsData.dankBarInnerPadding * 0.6 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-            const barExclusionZone = effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
+            const effectiveBarThickness = Math.max(26 + (SettingsData.barConfigs[0]?.innerPadding ?? 4) * 0.6 + (SettingsData.barConfigs[0]?.innerPadding ?? 4) + 4, Theme.barHeight - 4 - (8 - (SettingsData.barConfigs[0]?.innerPadding ?? 4)))
+            const barExclusionZone = effectiveBarThickness + (SettingsData.barConfigs[0]?.spacing ?? 4) + (SettingsData.barConfigs[0]?.bottomGap ?? 0)
             const screenW = parentScreen?.width ?? 1920
             const screenH = parentScreen?.height ?? 1080
             const margin = Theme.spacingL
@@ -201,8 +201,8 @@ DankModal {
             let targetX = parentBounds.x + (parentBounds.width - width) / 2
             let targetY = parentBounds.y + (parentBounds.height - height) / 2
 
-            const minY = SettingsData.dankBarPosition === SettingsData.Position.Top ? barExclusionZone + margin : margin
-            const maxY = SettingsData.dankBarPosition === SettingsData.Position.Bottom ? screenH - height - barExclusionZone - margin : screenH - height - margin
+            const minY = (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Top ? barExclusionZone + margin : margin
+            const maxY = (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Bottom ? screenH - height - barExclusionZone - margin : screenH - height - margin
 
             targetY = Math.max(minY, Math.min(maxY, targetY))
 

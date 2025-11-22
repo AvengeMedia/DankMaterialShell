@@ -37,18 +37,24 @@ Variants {
     readonly property real widgetHeight: SettingsData.dockIconSize
     readonly property real effectiveBarHeight: widgetHeight + SettingsData.dockSpacing * 2 + 10
     readonly property real barSpacing: {
-        const barIsHorizontal = (SettingsData.dankBarPosition === SettingsData.Position.Top || SettingsData.dankBarPosition === SettingsData.Position.Bottom)
-        const barIsVertical = (SettingsData.dankBarPosition === SettingsData.Position.Left || SettingsData.dankBarPosition === SettingsData.Position.Right)
-        const samePosition = (SettingsData.dockPosition === SettingsData.dankBarPosition)
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar) return 0
+
+        const barPos = defaultBar.position ?? SettingsData.Position.Top
+        const barIsHorizontal = (barPos === SettingsData.Position.Top || barPos === SettingsData.Position.Bottom)
+        const barIsVertical = (barPos === SettingsData.Position.Left || barPos === SettingsData.Position.Right)
+        const samePosition = (SettingsData.dockPosition === barPos)
         const dockIsHorizontal = !isVertical
         const dockIsVertical = isVertical
 
-        if (!SettingsData.dankBarVisible) return 0
+        if (!(defaultBar.visible ?? true)) return 0
+        const spacing = defaultBar.spacing ?? 4
+        const bottomGap = defaultBar.bottomGap ?? 0
         if (dockIsHorizontal && barIsHorizontal && samePosition) {
-            return SettingsData.dankBarSpacing + effectiveBarHeight + SettingsData.dankBarBottomGap
+            return spacing + effectiveBarHeight + bottomGap
         }
         if (dockIsVertical && barIsVertical && samePosition) {
-            return SettingsData.dankBarSpacing + effectiveBarHeight + SettingsData.dankBarBottomGap
+            return spacing + effectiveBarHeight + bottomGap
         }
         return 0
     }

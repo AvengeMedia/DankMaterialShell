@@ -1,7 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Services
-import qs.Widgets
 
 Item {
     id: root
@@ -12,6 +10,8 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property alias content: contentLoader.sourceComponent
     property bool isVerticalOrientation: axis?.isVertical ?? false
     property bool isFirst: false
@@ -21,7 +21,7 @@ Item {
     property bool isRightBarEdge: false
     property bool isTopBarEdge: false
     property bool isBottomBarEdge: false
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
+    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 0 : Math.max(Theme.spacingXS, Theme.spacingS * (widgetThickness / 30))
     readonly property real visualWidth: isVerticalOrientation ? widgetThickness : (contentLoader.item ? (contentLoader.item.implicitWidth + horizontalPadding * 2) : 0)
     readonly property real visualHeight: isVerticalOrientation ? (contentLoader.item ? (contentLoader.item.implicitHeight + horizontalPadding * 2) : 0) : widgetThickness
     readonly property alias visualContent: visualContent
@@ -32,8 +32,8 @@ Item {
     readonly property real topMargin: isVerticalOrientation ? (isTopBarEdge && isFirst ? barEdgeExtension : (isFirst ? gapExtension : gapExtension / 2)) : 0
     readonly property real bottomMargin: isVerticalOrientation ? (isBottomBarEdge && isLast ? barEdgeExtension : (isLast ? gapExtension : gapExtension / 2)) : 0
 
-    signal clicked()
-    signal rightClicked()
+    signal clicked
+    signal rightClicked
 
     width: isVerticalOrientation ? barThickness : visualWidth
     height: isVerticalOrientation ? visualHeight : barThickness
@@ -43,15 +43,16 @@ Item {
         width: root.visualWidth
         height: root.visualHeight
         anchors.centerIn: parent
-        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
+        radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
         color: {
-            if (SettingsData.dankBarNoBackground) {
-                return "transparent"
+            if (barConfig?.noBackground ?? false) {
+                return "transparent";
             }
 
-            const isHovered = mouseArea.containsMouse || (root.isHovered ?? false)
-            const baseColor = isHovered ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor
-            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency)
+            const isHovered = mouseArea.containsMouse || (root.isHovered || false);
+            const baseColor = isHovered ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
+            const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
+            return Theme.withAlpha(baseColor, transparency);
         }
 
         Loader {
@@ -73,16 +74,26 @@ Item {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: function (mouse) {
             if (mouse.button === Qt.RightButton) {
-                root.rightClicked()
-                return
+                root.rightClicked();
+                return;
             }
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
+            if (popoutTarget) {
+                // Ensure bar context is set first if supported
+                if (popoutTarget.setBarContext) {
+                    const pos = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+                    const bottomGap = root.barConfig ? (root.barConfig.bottomGap !== undefined ? root.barConfig.bottomGap : 0) : 0;
+                    popoutTarget.setBarContext(pos, bottomGap);
+                }
+
+                if (popoutTarget.setTriggerPosition) {
+                    const globalPos = root.visualContent.mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth, root.barSpacing, barPosition, root.barConfig);
+                    popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barThickness, root.barSpacing, root.barConfig);
+                }
             }
-            root.clicked()
+            root.clicked();
         }
     }
 }

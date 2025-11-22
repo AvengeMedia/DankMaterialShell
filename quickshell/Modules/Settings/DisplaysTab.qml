@@ -9,53 +9,83 @@ import qs.Widgets
 Item {
     id: displaysTab
 
-    property var variantComponents: [{
-        "id": "dankBar",
-        "name": "Dank Bar",
-        "description": I18n.tr("System bar with widgets and system information"),
-        "icon": "toolbar"
-    }, {
-        "id": "dock",
-        "name": I18n.tr("Application Dock"),
-        "description": I18n.tr("Bottom dock for pinned and running applications"),
-        "icon": "dock"
-    }, {
-        "id": "notifications",
-        "name": I18n.tr("Notification Popups"),
-        "description": I18n.tr("Notification toast popups"),
-        "icon": "notifications"
-    }, {
-        "id": "wallpaper",
-        "name": I18n.tr("Wallpaper"),
-        "description": I18n.tr("Desktop background images"),
-        "icon": "wallpaper"
-    }, {
-        "id": "osd",
-        "name": I18n.tr("On-Screen Displays"),
-        "description": I18n.tr("Volume, brightness, and other system OSDs"),
-        "icon": "picture_in_picture"
-    }, {
-        "id": "toast",
-        "name": I18n.tr("Toast Messages"),
-        "description": I18n.tr("System toast notifications"),
-        "icon": "campaign"
-    }, {
-        "id": "notepad",
-        "name": I18n.tr("Notepad Slideout"),
-        "description": I18n.tr("Quick note-taking slideout panel"),
-        "icon": "sticky_note_2"
-    }, {
-        "id": "systemTray",
-        "name": I18n.tr("System Tray"),
-        "description": I18n.tr("System tray icons"),
-        "icon": "notifications"
-    }]
+    function getBarComponentsFromSettings() {
+        const bars = SettingsData.barConfigs || []
+        return bars.map(bar => ({
+            "id": "bar:" + bar.id,
+            "name": bar.name || "Bar",
+            "description": I18n.tr("Individual bar configuration"),
+            "icon": "toolbar",
+            "barId": bar.id
+        }))
+    }
+
+    property var variantComponents: getVariantComponentsList()
+
+    function getVariantComponentsList() {
+        return [
+            ...getBarComponentsFromSettings(),
+            {
+                "id": "dock",
+                "name": I18n.tr("Application Dock"),
+                "description": I18n.tr("Bottom dock for pinned and running applications"),
+                "icon": "dock"
+            }, {
+                "id": "notifications",
+                "name": I18n.tr("Notification Popups"),
+                "description": I18n.tr("Notification toast popups"),
+                "icon": "notifications"
+            }, {
+                "id": "wallpaper",
+                "name": I18n.tr("Wallpaper"),
+                "description": I18n.tr("Desktop background images"),
+                "icon": "wallpaper"
+            }, {
+                "id": "osd",
+                "name": I18n.tr("On-Screen Displays"),
+                "description": I18n.tr("Volume, brightness, and other system OSDs"),
+                "icon": "picture_in_picture"
+            }, {
+                "id": "toast",
+                "name": I18n.tr("Toast Messages"),
+                "description": I18n.tr("System toast notifications"),
+                "icon": "campaign"
+            }, {
+                "id": "notepad",
+                "name": I18n.tr("Notepad Slideout"),
+                "description": I18n.tr("Quick note-taking slideout panel"),
+                "icon": "sticky_note_2"
+            }, {
+                "id": "systemTray",
+                "name": I18n.tr("System Tray"),
+                "description": I18n.tr("System tray icons"),
+                "icon": "notifications"
+            }
+        ]
+    }
+
+    Connections {
+        target: SettingsData
+        function onBarConfigsChanged() {
+            variantComponents = getVariantComponentsList()
+        }
+    }
 
     function getScreenPreferences(componentId) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4)
+            const barConfig = SettingsData.getBarConfig(barId)
+            return barConfig?.screenPreferences || ["all"]
+        }
         return SettingsData.screenPreferences && SettingsData.screenPreferences[componentId] || ["all"];
     }
 
     function setScreenPreferences(componentId, screenNames) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4)
+            SettingsData.updateBarConfig(barId, { screenPreferences: screenNames })
+            return
+        }
         var prefs = SettingsData.screenPreferences || {};
         var newPrefs = Object.assign({}, prefs);
         newPrefs[componentId] = screenNames;
@@ -63,10 +93,20 @@ Item {
     }
 
     function getShowOnLastDisplay(componentId) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4)
+            const barConfig = SettingsData.getBarConfig(barId)
+            return barConfig?.showOnLastDisplay ?? true
+        }
         return SettingsData.showOnLastDisplay && SettingsData.showOnLastDisplay[componentId] || false;
     }
 
     function setShowOnLastDisplay(componentId, enabled) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4)
+            SettingsData.updateBarConfig(barId, { showOnLastDisplay: enabled })
+            return
+        }
         var prefs = SettingsData.showOnLastDisplay || {};
         var newPrefs = Object.assign({}, prefs);
         newPrefs[componentId] = enabled;
@@ -251,7 +291,6 @@ Item {
                                 }
 
                                 onTabClicked: index => {
-                                                  console.log("Tab clicked:", index, "Setting mode to:", index === 1 ? "location" : "time")
                                                   DisplayService.setNightModeAutomationMode(index === 1 ? "location" : "time")
                                                   currentIndex = index
                                               }
@@ -756,8 +795,9 @@ Item {
                                                 displaysTab.setScreenPreferences(parent.componentId, ["all"])
                                             } else {
                                                 displaysTab.setScreenPreferences(parent.componentId, [])
-                                                if (["dankBar", "dock", "notifications", "osd", "toast"].includes(parent.componentId)) {
-                                                    displaysTab.setShowOnLastDisplay(parent.componentId, true)
+                                                const cid = parent.componentId
+                                                if (["dankBar", "dock", "notifications", "osd", "toast"].includes(cid) || cid.startsWith("bar:")) {
+                                                    displaysTab.setShowOnLastDisplay(cid, true)
                                                 }
                                             }
                                         }
@@ -769,9 +809,11 @@ Item {
                                         description: I18n.tr("Always show when there's only one connected display")
                                         checked: displaysTab.getShowOnLastDisplay(parent.componentId)
                                         visible: {
-                                            var prefs = displaysTab.getScreenPreferences(parent.componentId)
-                                            var isAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")
-                                            return !isAll && ["dankBar", "dock", "notifications", "osd", "toast", "notepad", "systemTray"].includes(parent.componentId)
+                                            const prefs = displaysTab.getScreenPreferences(parent.componentId)
+                                            const isAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")
+                                            const cid = parent.componentId
+                                            const isRelevantComponent = ["dankBar", "dock", "notifications", "osd", "toast", "notepad", "systemTray"].includes(cid) || cid.startsWith("bar:")
+                                            return !isAll && isRelevantComponent
                                         }
                                         onToggled: (checked) => {
                                             displaysTab.setShowOnLastDisplay(parent.componentId, checked)

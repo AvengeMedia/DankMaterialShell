@@ -43,7 +43,7 @@ BasePill {
                         const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
                         return temp;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -70,7 +70,7 @@ BasePill {
                         const temp = SettingsData.useFahrenheit ? WeatherService.weather.tempF : WeatherService.weather.temp;
                         return temp + "°" + (SettingsData.useFahrenheit ? "F" : "C");
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

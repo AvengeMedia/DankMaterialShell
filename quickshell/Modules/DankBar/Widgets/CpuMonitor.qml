@@ -15,6 +15,8 @@ BasePill {
     property var widgetData: null
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
 
+    signal cpuClicked()
+
     Component.onCompleted: {
         DgopService.addRef(["cpu"]);
     }
@@ -58,7 +60,7 @@ BasePill {
 
                         return DgopService.cpuUsage.toFixed(0);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -95,7 +97,7 @@ BasePill {
 
                         return DgopService.cpuUsage.toFixed(0) + "%";
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
@@ -103,7 +105,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: cpuBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         text: "100%"
                     }
 
@@ -125,16 +127,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            DgopService.setSortBy("cpu");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "cpu");
-            }
+            DgopService.setSortBy("cpu")
+            cpuClicked()
         }
     }
 }

@@ -15,6 +15,7 @@ import "StockThemes.js" as StockThemes
 Singleton {
     id: root
 
+
     readonly property string stateDir: Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericCacheLocation).toString()) + "/DankMaterialShell"
 
     readonly property bool envDisableMatugen: Quickshell.env("DMS_DISABLE_MATUGEN") === "1" || Quickshell.env("DMS_DISABLE_MATUGEN") === "true"
@@ -22,7 +23,12 @@ Singleton {
     readonly property real popupDistance: {
         if (typeof SettingsData === "undefined")
         return 4
-        return SettingsData.popupGapsAuto ? Math.max(4, SettingsData.dankBarSpacing) : SettingsData.popupGapsManual
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar) return 4
+        const useAuto = defaultBar.popupGapsAuto ?? true
+        const manualValue = defaultBar.popupGapsManual ?? 4
+        const spacing = defaultBar.spacing ?? 4
+        return useAuto ? Math.max(4, spacing) : manualValue
     }
 
     property string currentTheme: "blue"
@@ -465,7 +471,6 @@ Singleton {
     property real iconSizeLarge: 32
 
     property real panelTransparency: 0.85
-    property real widgetTransparency: typeof SettingsData !== "undefined" && SettingsData.dankBarWidgetTransparency !== undefined ? SettingsData.dankBarWidgetTransparency : 1.0
     property real popupTransparency: typeof SettingsData !== "undefined" && SettingsData.popupTransparency !== undefined ? SettingsData.popupTransparency : 1.0
 
     function screenTransition() {
@@ -650,20 +655,6 @@ Singleton {
         return isLightMode ? Qt.darker(baseColor, factor) : Qt.lighter(baseColor, factor)
     }
 
-    property var widgetBackground: {
-        const colorMode = typeof SettingsData !== "undefined" ? SettingsData.widgetBackgroundColor : "sch"
-        switch (colorMode) {
-            case "s":
-            return Qt.rgba(surface.r, surface.g, surface.b, widgetTransparency)
-            case "sc":
-            return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, widgetTransparency)
-            case "sch":
-            return Qt.rgba(surfaceContainerHigh.r, surfaceContainerHigh.g, surfaceContainerHigh.b, widgetTransparency)
-            case "sth":
-            default:
-            return Qt.rgba(surfaceContainer.r, surfaceContainer.g, surfaceContainer.b, widgetTransparency)
-        }
-    }
 
     property color widgetIconColor: {
         if (typeof SettingsData === "undefined") {
@@ -703,9 +694,9 @@ Singleton {
         return Math.round((barThickness / 48) * (iconSize + defaultOffset))
     }
 
-    function barTextSize(barThickness) {
+    function barTextSize(barThickness, fontScale) {
         const scale = barThickness / 48
-        const dankBarScale = (typeof SettingsData !== "undefined" ? SettingsData.dankBarFontScale : 1.0)
+        const dankBarScale = fontScale !== undefined ? fontScale : 1.0
         if (scale <= 0.75)
             return Math.round(fontSizeSmall * 0.9 * dankBarScale)
         if (scale >= 1.25)

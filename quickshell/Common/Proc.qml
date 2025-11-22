@@ -67,13 +67,21 @@ Singleton {
         })
 
         out.streamFinished.connect(function() {
-            capturedOut = out.text || ""
+            try {
+                capturedOut = out.text || ""
+            } catch (e) {
+                capturedOut = ""
+            }
             outSeen = true
             maybeComplete()
         })
 
         err.streamFinished.connect(function() {
-            capturedErr = err.text || ""
+            try {
+                capturedErr = err.text || ""
+            } catch (e) {
+                capturedErr = ""
+            }
             errSeen = true
             maybeComplete()
         })
@@ -88,8 +96,14 @@ Singleton {
         function maybeComplete() {
             if (!exitSeen || !outSeen || !errSeen) return
             timeoutTimer.stop()
-            if (typeof entry.callback === "function") {
-                try { entry.callback(capturedOut, exitCodeValue) } catch (e) { console.warn("runCommand callback error:", e) }
+            if (entry && entry.callback && typeof entry.callback === "function") {
+                try {
+                    const safeOutput = capturedOut !== null && capturedOut !== undefined ? capturedOut : ""
+                    const safeExitCode = exitCodeValue !== null && exitCodeValue !== undefined ? exitCodeValue : -1
+                    entry.callback(safeOutput, safeExitCode)
+                } catch (e) {
+                    console.warn("runCommand callback error for command:", entry.command, "Error:", e)
+                }
             }
             try { proc.destroy() } catch (_) {}
             try { timeoutTimer.destroy() } catch (_) {}

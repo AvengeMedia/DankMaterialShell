@@ -12,8 +12,6 @@ var SPEC = {
     runUserMatugenTemplates: { def: true, onChange: "regenSystemThemes" },
     matugenTargetMonitor: { def: "", onChange: "regenSystemThemes" },
 
-    dankBarTransparency: { def: 1.0, coerce: percentToUnit, migrate: ["topBarTransparency"] },
-    dankBarWidgetTransparency: { def: 1.0, coerce: percentToUnit, migrate: ["topBarWidgetTransparency"] },
     popupTransparency: { def: 1.0, coerce: percentToUnit },
     dockTransparency: { def: 1.0, coerce: percentToUnit },
 
@@ -89,11 +87,6 @@ var SPEC = {
     lockDateFormat: { def: "" },
     mediaSize: { def: 1 },
 
-    dankBarLeftWidgets: { def: ["launcherButton", "workspaceSwitcher", "focusedWindow"], migrate: ["topBarLeftWidgets"] },
-    dankBarCenterWidgets: { def: ["music", "clock", "weather"], migrate: ["topBarCenterWidgets"] },
-    dankBarRightWidgets: { def: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"], migrate: ["topBarRightWidgets"] },
-    dankBarWidgetOrder: { def: [] },
-
     appLauncherViewMode: { def: "list" },
     spotlightModalViewMode: { def: "list" },
     sortAppsAlphabetically: { def: false },
@@ -127,7 +120,6 @@ var SPEC = {
     monoFontFamily: { def: "Fira Code" },
     fontWeight: { def: 400 },
     fontScale: { def: 1.0 },
-    dankBarFontScale: { def: 1.0 },
 
     notepadUseMonospace: { def: true },
     notepadFontFamily: { def: "" },
@@ -177,31 +169,9 @@ var SPEC = {
     dockIndicatorStyle: { def: "circle" },
 
     notificationOverlayEnabled: { def: false },
-    dankBarAutoHide: { def: false, migrate: ["topBarAutoHide"] },
-    dankBarAutoHideDelay: { def: 250 },
-    dankBarOpenOnOverview: { def: false, migrate: ["topBarOpenOnOverview"] },
-    dankBarVisible: { def: true, migrate: ["topBarVisible"] },
     overviewRows: { def: 2, persist: false },
     overviewColumns: { def: 5, persist: false },
     overviewScale: { def: 0.16, persist: false },
-    dankBarSpacing: { def: 4, migrate: ["topBarSpacing"], onChange: "updateNiriLayout" },
-    dankBarBottomGap: { def: 0, migrate: ["topBarBottomGap"] },
-    dankBarInnerPadding: { def: 4, migrate: ["topBarInnerPadding"] },
-    dankBarPosition: { def: 0, migrate: ["dankBarAtBottom", "topBarAtBottom"] },
-    dankBarIsVertical: { def: false, persist: false },
-
-    dankBarSquareCorners: { def: false, migrate: ["topBarSquareCorners"] },
-    dankBarNoBackground: { def: false, migrate: ["topBarNoBackground"] },
-    dankBarGothCornersEnabled: { def: false, migrate: ["topBarGothCornersEnabled"] },
-    dankBarGothCornerRadiusOverride: { def: false },
-    dankBarGothCornerRadiusValue: { def: 12 },
-    dankBarBorderEnabled: { def: false },
-    dankBarBorderColor: { def: "surfaceText" },
-    dankBarBorderOpacity: { def: 1.0 },
-    dankBarBorderThickness: { def: 1 },
-
-    popupGapsAuto: { def: true },
-    popupGapsManual: { def: 4 },
 
     modalDarkenBackground: { def: true },
 
@@ -242,7 +212,40 @@ var SPEC = {
 
     displayNameMode: { def: "system" },
     screenPreferences: { def: {} },
-    showOnLastDisplay: { def: {} }
+    showOnLastDisplay: { def: {} },
+
+    barConfigs: { def: [{
+        id: "default",
+        name: "Main Bar",
+        enabled: true,
+        position: 0,
+        screenPreferences: ["all"],
+        showOnLastDisplay: true,
+        leftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"],
+        centerWidgets: ["music", "clock", "weather"],
+        rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
+        spacing: 4,
+        innerPadding: 4,
+        bottomGap: 0,
+        transparency: 1.0,
+        widgetTransparency: 1.0,
+        squareCorners: false,
+        noBackground: false,
+        gothCornersEnabled: false,
+        gothCornerRadiusOverride: false,
+        gothCornerRadiusValue: 12,
+        borderEnabled: false,
+        borderColor: "surfaceText",
+        borderOpacity: 1.0,
+        borderThickness: 1,
+        fontScale: 1.0,
+        autoHide: false,
+        autoHideDelay: 250,
+        openOnOverview: false,
+        visible: true,
+        popupGapsAuto: true,
+        popupGapsManual: 4
+    }], onChange: "updateBarConfigs" }
 };
 
 function getValidKeys() {

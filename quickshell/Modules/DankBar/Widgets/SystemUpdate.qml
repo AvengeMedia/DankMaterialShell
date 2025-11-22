@@ -62,8 +62,8 @@ BasePill {
                 color: Theme.error
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.rightMargin: SettingsData.dankBarNoBackground ? 0 : 6
-                anchors.topMargin: SettingsData.dankBarNoBackground ? 0 : 6
+                anchors.rightMargin: (barConfig?.noBackground ?? false) ? 0 : 6
+                anchors.topMargin: (barConfig?.noBackground ?? false) ? 0 : 6
                 visible: root.isVerticalOrientation && root.hasUpdates && !root.isChecking
             }
 
@@ -111,7 +111,7 @@ BasePill {
                     id: countText
                     anchors.verticalCenter: parent.verticalCenter
                     text: SystemUpdateService.updateCount.toString()
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     visible: root.hasUpdates && !root.isChecking
                 }

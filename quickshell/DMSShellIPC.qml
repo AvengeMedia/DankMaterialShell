@@ -14,8 +14,14 @@ Item {
     required property var dankDashPopoutLoader
     required property var notepadSlideoutVariants
     required property var hyprKeybindsModalLoader
-    required property var dankBarLoader
+    required property var dankBarRepeater
     required property var hyprlandOverviewLoader
+
+    function getFirstBar() {
+        if (!root.dankBarRepeater || root.dankBarRepeater.count === 0) return null
+        const firstLoader = root.dankBarRepeater.itemAt(0)
+        return firstLoader ? firstLoader.item : null
+    }
 
     IpcHandler {
         function open() {
@@ -78,27 +84,33 @@ Item {
 
     IpcHandler {
         function open(): string {
-            if (root.dankBarLoader.item) {
-                root.dankBarLoader.item.triggerControlCenterOnFocusedScreen()
+            const bar = root.getFirstBar()
+            if (bar) {
+                bar.triggerControlCenterOnFocusedScreen()
                 return "CONTROL_CENTER_OPEN_SUCCESS"
             }
             return "CONTROL_CENTER_OPEN_FAILED"
         }
 
-        function close(): string {
-            if (root.controlCenterLoader.item) {
+        function hide(): string {
+            if (root.controlCenterLoader.item && root.controlCenterLoader.item.shouldBeVisible) {
                 root.controlCenterLoader.item.close()
-                return "CONTROL_CENTER_CLOSE_SUCCESS"
+                return "CONTROL_CENTER_HIDE_SUCCESS"
             }
-            return "CONTROL_CENTER_CLOSE_FAILED"
+            return "CONTROL_CENTER_HIDE_FAILED"
         }
 
         function toggle(): string {
-            if (root.dankBarLoader.item) {
-                root.dankBarLoader.item.triggerControlCenterOnFocusedScreen()
+            const bar = root.getFirstBar()
+            if (bar) {
+                bar.triggerControlCenterOnFocusedScreen()
                 return "CONTROL_CENTER_TOGGLE_SUCCESS"
             }
             return "CONTROL_CENTER_TOGGLE_FAILED"
+        }
+
+        function status(): string {
+            return (root.controlCenterLoader.item && root.controlCenterLoader.item.shouldBeVisible) ? "visible" : "hidden"
         }
 
         target: "control-center"
@@ -135,7 +147,8 @@ Item {
         }
 
         function toggle(tab: string): string {
-            if (root.dankBarLoader.item && root.dankBarLoader.item.triggerWallpaperBrowserOnFocusedScreen()) {
+            const bar = root.getFirstBar()
+            if (bar && bar.triggerWallpaperBrowserOnFocusedScreen()) {
                 if (root.dankDashPopoutLoader.item) {
                     switch (tab.toLowerCase()) {
                     case "media":
@@ -457,12 +470,57 @@ Item {
 
     IpcHandler {
         function wallpaper(): string {
-            if (root.dankBarLoader.item && root.dankBarLoader.item.triggerWallpaperBrowserOnFocusedScreen()) {
+            const bar = root.getFirstBar()
+            if (bar && bar.triggerWallpaperBrowserOnFocusedScreen()) {
                 return "SUCCESS: Toggled wallpaper browser"
             }
             return "ERROR: Failed to toggle wallpaper browser"
         }
 
         target: "dankdash"
+    }
+
+    IpcHandler {
+        function reveal(index: string): string {
+            const idx = parseInt(index) - 1
+            if (isNaN(idx) || idx < 0 || idx >= SettingsData.barConfigs.length) {
+                return `BAR_${index}_NOT_FOUND`
+            }
+            const bar = SettingsData.barConfigs[idx]
+            SettingsData.updateBarConfig(bar.id, { visible: true })
+            return `BAR_${index}_SHOW_SUCCESS`
+        }
+
+        function hide(index: string): string {
+            const idx = parseInt(index) - 1
+            if (isNaN(idx) || idx < 0 || idx >= SettingsData.barConfigs.length) {
+                return `BAR_${index}_NOT_FOUND`
+            }
+            const bar = SettingsData.barConfigs[idx]
+            SettingsData.updateBarConfig(bar.id, { visible: false })
+            return `BAR_${index}_HIDE_SUCCESS`
+        }
+
+        function toggle(index: string): string {
+            const idx = parseInt(index) - 1
+            if (isNaN(idx) || idx < 0 || idx >= SettingsData.barConfigs.length) {
+                return `BAR_${index}_NOT_FOUND`
+            }
+            const bar = SettingsData.barConfigs[idx]
+            const newVisible = !(bar.visible ?? true)
+            SettingsData.updateBarConfig(bar.id, { visible: newVisible })
+            return newVisible ? `BAR_${index}_SHOW_SUCCESS` : `BAR_${index}_HIDE_SUCCESS`
+        }
+
+        function status(index: string): string {
+            const idx = parseInt(index) - 1
+            if (isNaN(idx) || idx < 0 || idx >= SettingsData.barConfigs.length) {
+                return `BAR_${index}_NOT_FOUND`
+            }
+            const bar = SettingsData.barConfigs[idx]
+            return (bar.visible ?? true) ? "visible" : "hidden"
+        }
+
+        target: "bar"
     }
 }

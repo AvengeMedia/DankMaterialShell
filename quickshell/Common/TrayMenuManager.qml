@@ -6,26 +6,30 @@ import QtQuick
 Singleton {
     id: root
 
-    property var activeTrayBars: ({})
+    property var activeTrayMenus: ({})
 
-    function register(screenName, trayBar) {
-        if (!screenName || !trayBar) return
-        activeTrayBars[screenName] = trayBar
+    function registerMenu(screenName, menu) {
+        if (!screenName || !menu) return
+        const newMenus = Object.assign({}, activeTrayMenus)
+        newMenus[screenName] = menu
+        activeTrayMenus = newMenus
     }
 
-    function unregister(screenName) {
+    function unregisterMenu(screenName) {
         if (!screenName) return
-        delete activeTrayBars[screenName]
+        const newMenus = Object.assign({}, activeTrayMenus)
+        delete newMenus[screenName]
+        activeTrayMenus = newMenus
     }
 
     function closeAllMenus() {
-        for (const screenName in activeTrayBars) {
-            const trayBar = activeTrayBars[screenName]
-            if (!trayBar) continue
-
-            trayBar.menuOpen = false
-            if (trayBar.currentTrayMenu) {
-                trayBar.currentTrayMenu.showMenu = false
+        for (const screenName in activeTrayMenus) {
+            const menu = activeTrayMenus[screenName]
+            if (!menu) continue
+            if (typeof menu.close === "function") {
+                menu.close()
+            } else if (menu.showMenu !== undefined) {
+                menu.showMenu = false
             }
         }
     }

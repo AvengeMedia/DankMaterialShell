@@ -51,10 +51,6 @@ DankPopout {
 
     readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        StateUtils.setTriggerPosition(root, x, y, width, section, screen)
-    }
-
     function openWithSection(section) {
         StateUtils.openWithSection(root, section)
     }
@@ -70,8 +66,8 @@ DankPopout {
         const contentHeight = contentLoader.item && contentLoader.item.implicitHeight > 0 ? contentLoader.item.implicitHeight + 20 : 400
         return Math.min(maxHeight, contentHeight)
     }
-    triggerX: (triggerScreen?.width ?? 1920) - 600 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing
+    triggerX: 0
+    triggerY: 0
     triggerWidth: 80
     positioning: ""
     screen: triggerScreen

@@ -11,6 +11,8 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property bool overrideAxisLayout: false
     property bool forceVerticalLayout: false
 
@@ -37,14 +39,15 @@ Item {
                 model: root.widgetsModel
                 Item {
                     readonly property real rowSpacing: parent.widgetSpacing
+                    property var itemData: modelData
                     width: widgetLoader.item ? widgetLoader.item.width : 0
                     height: widgetLoader.item ? widgetLoader.item.height : 0
                     WidgetHost {
                         id: widgetLoader
                         anchors.verticalCenter: parent.verticalCenter
-                        widgetId: model.widgetId
-                        widgetData: model
-                        spacerSize: model.size || 20
+                        widgetId: itemData.widgetId
+                        widgetData: itemData
+                        spacerSize: itemData.size || 20
                         components: root.components
                         isInColumn: false
                         axis: root.axis
@@ -52,8 +55,10 @@ Item {
                         parentScreen: root.parentScreen
                         widgetThickness: root.widgetThickness
                         barThickness: root.barThickness
-                        isFirst: model.index === 0
-                        isLast: model.index === rowRepeater.count - 1
+                        barSpacing: root.barSpacing
+                        barConfig: root.barConfig
+                        isFirst: index === 0
+                        isLast: index === rowRepeater.count - 1
                         sectionSpacing: parent.rowSpacing
                         isLeftBarEdge: false
                         isRightBarEdge: true
@@ -66,22 +71,23 @@ Item {
     Component {
         id: columnComp
         Column {
-            width: parent ? parent.width : 0
+            width: parent.width
             readonly property real widgetSpacing: noBackground ? 2 : Theme.spacingXS
             spacing: widgetSpacing
             Repeater {
                 id: columnRepeater
                 model: root.widgetsModel
                 Item {
-                    readonly property real columnSpacing: parent.widgetSpacing
                     width: parent.width
+                    readonly property real columnSpacing: parent.widgetSpacing
+                    property var itemData: modelData
                     height: widgetLoader.item ? widgetLoader.item.height : 0
                     WidgetHost {
                         id: widgetLoader
                         anchors.horizontalCenter: parent.horizontalCenter
-                        widgetId: model.widgetId
-                        widgetData: model
-                        spacerSize: model.size || 20
+                        widgetId: itemData.widgetId
+                        widgetData: itemData
+                        spacerSize: itemData.size || 20
                         components: root.components
                         isInColumn: true
                         axis: root.axis
@@ -89,8 +95,10 @@ Item {
                         parentScreen: root.parentScreen
                         widgetThickness: root.widgetThickness
                         barThickness: root.barThickness
-                        isFirst: model.index === 0
-                        isLast: model.index === columnRepeater.count - 1
+                        barSpacing: root.barSpacing
+                        barConfig: root.barConfig
+                        isFirst: index === 0
+                        isLast: index === columnRepeater.count - 1
                         sectionSpacing: parent.columnSpacing
                         isTopBarEdge: false
                         isBottomBarEdge: true

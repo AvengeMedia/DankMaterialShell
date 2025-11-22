@@ -15,7 +15,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 1
+    readonly property int settingsConfigVersion: 2
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -70,8 +70,6 @@ Singleton {
     property string matugenScheme: "scheme-tonal-spot"
     property bool runUserMatugenTemplates: true
     property string matugenTargetMonitor: ""
-    property real dankBarTransparency: 1.0
-    property real dankBarWidgetTransparency: 1.0
     property real popupTransparency: 1.0
     property real dockTransparency: 1
     property string widgetBackgroundColor: "sch"
@@ -168,10 +166,6 @@ Singleton {
     property string lockDateFormat: ""
     property int mediaSize: 1
 
-    property var dankBarLeftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"]
-    property var dankBarCenterWidgets: ["music", "clock", "weather"]
-    property var dankBarRightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"]
-    property var dankBarWidgetOrder: []
 
     property string appLauncherViewMode: "list"
     property string spotlightModalViewMode: "list"
@@ -268,39 +262,9 @@ Singleton {
     property string dockIndicatorStyle: "circle"
 
     property bool notificationOverlayEnabled: false
-    property bool dankBarAutoHide: false
-    property int dankBarAutoHideDelay: 250
-    property bool dankBarOpenOnOverview: false
-    property bool dankBarVisible: true
     property int overviewRows: 2
     property int overviewColumns: 5
     property real overviewScale: 0.16
-    property real dankBarSpacing: 4
-    property real dankBarBottomGap: 0
-    property real dankBarInnerPadding: 4
-    property int dankBarPosition: SettingsData.Position.Top
-    property bool dankBarIsVertical: dankBarPosition === SettingsData.Position.Left || dankBarPosition === SettingsData.Position.Right
-
-    onDankBarAutoHideDelayChanged: saveSettings()
-
-    property bool dankBarSquareCorners: false
-    property bool dankBarNoBackground: false
-    property bool dankBarGothCornersEnabled: false
-    property bool dankBarGothCornerRadiusOverride: false
-    property real dankBarGothCornerRadiusValue: 12
-    property bool dankBarBorderEnabled: false
-    property string dankBarBorderColor: "surfaceText"
-    property real dankBarBorderOpacity: 1.0
-    property real dankBarBorderThickness: 1
-
-    onDankBarGothCornerRadiusOverrideChanged: saveSettings()
-    onDankBarGothCornerRadiusValueChanged: saveSettings()
-    onDankBarBorderColorChanged: saveSettings()
-    onDankBarBorderOpacityChanged: saveSettings()
-    onDankBarBorderThicknessChanged: saveSettings()
-
-    property bool popupGapsAuto: true
-    property int popupGapsManual: 4
 
     property bool modalDarkenBackground: true
 
@@ -342,6 +306,39 @@ Singleton {
     property string displayNameMode: "system"
     property var screenPreferences: ({})
     property var showOnLastDisplay: ({})
+
+    property var barConfigs: [{
+        id: "default",
+        name: "Main Bar",
+        enabled: true,
+        position: 0,
+        screenPreferences: ["all"],
+        showOnLastDisplay: true,
+        leftWidgets: ["launcherButton", "workspaceSwitcher", "focusedWindow"],
+        centerWidgets: ["music", "clock", "weather"],
+        rightWidgets: ["systemTray", "clipboard", "cpuUsage", "memUsage", "notificationButton", "battery", "controlCenterButton"],
+        spacing: 4,
+        innerPadding: 4,
+        bottomGap: 0,
+        transparency: 1.0,
+        widgetTransparency: 1.0,
+        squareCorners: false,
+        noBackground: false,
+        gothCornersEnabled: false,
+        gothCornerRadiusOverride: false,
+        gothCornerRadiusValue: 12,
+        borderEnabled: false,
+        borderColor: "surfaceText",
+        borderOpacity: 1.0,
+        borderThickness: 1,
+        fontScale: 1.0,
+        autoHide: false,
+        autoHideDelay: 250,
+        openOnOverview: false,
+        visible: true,
+        popupGapsAuto: true,
+        popupGapsManual: 4
+    }]
 
     signal forceDankBarLayoutRefresh
     signal forceDockLayoutRefresh
@@ -456,7 +453,8 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         applyStoredTheme: applyStoredTheme,
         regenSystemThemes: regenSystemThemes,
         updateNiriLayout: updateNiriLayout,
-        applyStoredIconTheme: applyStoredIconTheme
+        applyStoredIconTheme: applyStoredIconTheme,
+        updateBarConfigs: updateBarConfigs
     })
 
     function set(key, value) {
@@ -467,24 +465,22 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         _loading = true
         try {
             const txt = settingsFile.text()
-            const obj = (txt && txt.trim()) ? JSON.parse(txt) : null
+            let obj = (txt && txt.trim()) ? JSON.parse(txt) : null
+
+            const oldVersion = obj?.configVersion ?? 0
+            if (oldVersion < settingsConfigVersion) {
+                const migrated = Store.migrateToVersion(obj, settingsConfigVersion)
+                if (migrated) {
+                    settingsFile.setText(JSON.stringify(migrated, null, 2))
+                    obj = migrated
+                }
+            }
+
             Store.parse(root, obj)
-            const shouldMigrate = Store.migrate(root, obj)
             applyStoredTheme()
             applyStoredIconTheme()
             Processes.detectIcons()
             Processes.detectQtTools()
-            if (obj && obj.configVersion === undefined) {
-                const cleaned = Store.cleanup(txt)
-                if (cleaned) {
-                    settingsFile.setText(cleaned)
-                }
-                saveSettings()
-            }
-            if (shouldMigrate) {
-                savePluginSettings()
-                saveSettings()
-            }
         } catch (e) {
             console.warn("SettingsData: Failed to load settings:", e.message)
             applyStoredTheme()
@@ -548,7 +544,10 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     function initializeListModels() {
-        Lists.init(leftWidgetsModel, centerWidgetsModel, rightWidgetsModel, dankBarLeftWidgets, dankBarCenterWidgets, dankBarRightWidgets)
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            Lists.init(leftWidgetsModel, centerWidgetsModel, rightWidgetsModel, defaultBar.leftWidgets, defaultBar.centerWidgets, defaultBar.rightWidgets)
+        }
     }
 
     function updateListModel(listModel, order) {
@@ -579,75 +578,300 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     function getPopupYPosition(barHeight) {
-        const gothOffset = dankBarGothCornersEnabled ? Theme.cornerRadius : 0
-        return barHeight + dankBarSpacing + dankBarBottomGap - gothOffset + Theme.popupDistance
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const gothOffset = defaultBar?.gothCornersEnabled ? Theme.cornerRadius : 0
+        const spacing = defaultBar?.spacing ?? 4
+        const bottomGap = defaultBar?.bottomGap ?? 0
+        return barHeight + spacing + bottomGap - gothOffset + Theme.popupDistance
     }
 
-    function getPopupTriggerPosition(globalPos, screen, barThickness, widgetWidth) {
+    function getPopupTriggerPosition(globalPos, screen, barThickness, widgetWidth, barSpacing, barPosition, barConfig) {
         const screenX = screen ? screen.x : 0
         const screenY = screen ? screen.y : 0
         const relativeX = globalPos.x - screenX
         const relativeY = globalPos.y - screenY
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const spacing = barSpacing !== undefined ? barSpacing : (defaultBar?.spacing ?? 4)
+        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top)
+        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0)
 
-        if (dankBarPosition === SettingsData.Position.Left || dankBarPosition === SettingsData.Position.Right) {
+        const useAutoGaps = (barConfig && barConfig.popupGapsAuto !== undefined) ? barConfig.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true)
+        const manualGapValue = (barConfig && barConfig.popupGapsManual !== undefined) ? barConfig.popupGapsManual : (defaultBar?.popupGapsManual ?? 4)
+        const popupGap = useAutoGaps ? Math.max(4, spacing) : manualGapValue
+        
+        switch (position) {
+        case SettingsData.Position.Left:
             return {
-                "x": relativeY,
-                "y": barThickness + dankBarSpacing + Theme.popupDistance,
+                "x": barThickness + spacing + popupGap,
+                "y": relativeY,
+                "width": widgetWidth
+            }
+        case SettingsData.Position.Right:
+            return {
+                "x": (screen?.width || 0) - (barThickness + spacing + popupGap),
+                "y": relativeY,
+                "width": widgetWidth
+            }
+        case SettingsData.Position.Bottom:
+            return {
+                "x": relativeX,
+                "y": (screen?.height || 0) - (barThickness + spacing + bottomGap + popupGap),
+                "width": widgetWidth
+            }
+        default:
+            return {
+                "x": relativeX,
+                "y": barThickness + spacing + bottomGap + popupGap,
                 "width": widgetWidth
             }
         }
-        return {
-            "x": relativeX,
-            "y": barThickness + dankBarSpacing + Theme.popupDistance,
-            "width": widgetWidth
-        }
     }
 
-    function getBarBounds(screen, barThickness) {
+    function getAdjacentBarInfo(screen, barPosition, barConfig) {
+        if (!screen || !barConfig) {
+            return { "topBar": 0, "bottomBar": 0, "leftBar": 0, "rightBar": 0 }
+        }
+
+        if (barConfig.autoHide) {
+            return { "topBar": 0, "bottomBar": 0, "leftBar": 0, "rightBar": 0 }
+        }
+
+        const enabledBars = getEnabledBarConfigs()
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top)
+        let topBar = 0
+        let bottomBar = 0
+        let leftBar = 0
+        let rightBar = 0
+
+        for (let i = 0; i < enabledBars.length; i++) {
+            const other = enabledBars[i]
+            if (other.id === barConfig.id) continue
+            if (other.autoHide) continue
+
+            const otherScreens = other.screenPreferences || ["all"]
+            const barScreens = barConfig.screenPreferences || ["all"]
+            const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") ||
+                                otherScreens.some(s => isScreenInPreferences(screen, [s]))
+
+            if (!onSameScreen) continue
+
+            const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4)
+            const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4)
+            const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing
+
+            const useAutoGaps = other.popupGapsAuto !== undefined ? other.popupGapsAuto : (defaultBar?.popupGapsAuto ?? true)
+            const manualGap = other.popupGapsManual !== undefined ? other.popupGapsManual : (defaultBar?.popupGapsManual ?? 4)
+            const popupGap = useAutoGaps ? Math.max(4, otherSpacing) : manualGap
+
+            switch (other.position) {
+            case SettingsData.Position.Top:
+                topBar = Math.max(topBar, otherThickness + popupGap)
+                break
+            case SettingsData.Position.Bottom:
+                bottomBar = Math.max(bottomBar, otherThickness + popupGap)
+                break
+            case SettingsData.Position.Left:
+                leftBar = Math.max(leftBar, otherThickness + popupGap)
+                break
+            case SettingsData.Position.Right:
+                rightBar = Math.max(rightBar, otherThickness + popupGap)
+                break
+            }
+        }
+
+        return { "topBar": topBar, "bottomBar": bottomBar, "leftBar": leftBar, "rightBar": rightBar }
+    }
+
+    function getBarBounds(screen, barThickness, barPosition, barConfig) {
         if (!screen) {
             return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
         }
 
-        const wingRadius = dankBarGothCornerRadiusOverride ? dankBarGothCornerRadiusValue : Theme.cornerRadius
-        const wingSize = dankBarGothCornersEnabled ? Math.max(0, wingRadius) : 0
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const wingRadius = (defaultBar?.gothCornerRadiusOverride ?? false) ? (defaultBar?.gothCornerRadiusValue ?? 12) : Theme.cornerRadius
+        const wingSize = (defaultBar?.gothCornersEnabled ?? false) ? Math.max(0, wingRadius) : 0
         const screenWidth = screen.width
         const screenHeight = screen.height
+        const position = barPosition !== undefined ? barPosition : (defaultBar?.position ?? SettingsData.Position.Top)
+        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : (defaultBar?.bottomGap ?? 0)) : (defaultBar?.bottomGap ?? 0)
 
-        if (dankBarPosition === SettingsData.Position.Top) {
-            return {
-                "x": 0,
-                "y": 0,
-                "width": screenWidth,
-                "height": barThickness + dankBarSpacing + wingSize,
-                "wingSize": wingSize
-            }
-        } else if (dankBarPosition === SettingsData.Position.Bottom) {
-            return {
-                "x": 0,
-                "y": screenHeight - barThickness - dankBarSpacing - wingSize,
-                "width": screenWidth,
-                "height": barThickness + dankBarSpacing + wingSize,
-                "wingSize": wingSize
-            }
-        } else if (dankBarPosition === SettingsData.Position.Left) {
-            return {
-                "x": 0,
-                "y": 0,
-                "width": barThickness + dankBarSpacing + wingSize,
-                "height": screenHeight,
-                "wingSize": wingSize
-            }
-        } else if (dankBarPosition === SettingsData.Position.Right) {
-            return {
-                "x": screenWidth - barThickness - dankBarSpacing - wingSize,
-                "y": 0,
-                "width": barThickness + dankBarSpacing + wingSize,
-                "height": screenHeight,
-                "wingSize": wingSize
+        let topOffset = 0
+        let bottomOffset = 0
+        let leftOffset = 0
+        let rightOffset = 0
+
+        if (barConfig) {
+            const enabledBars = getEnabledBarConfigs()
+            for (let i = 0; i < enabledBars.length; i++) {
+                const other = enabledBars[i]
+                if (other.id === barConfig.id) continue
+
+                const otherScreens = other.screenPreferences || ["all"]
+                const barScreens = barConfig.screenPreferences || ["all"]
+                const onSameScreen = otherScreens.includes("all") || barScreens.includes("all") ||
+                                    otherScreens.some(s => isScreenInPreferences(screen, [s]))
+
+                if (!onSameScreen) continue
+
+                const otherSpacing = other.spacing !== undefined ? other.spacing : (defaultBar?.spacing ?? 4)
+                const otherPadding = other.innerPadding !== undefined ? other.innerPadding : (defaultBar?.innerPadding ?? 4)
+                const otherThickness = Math.max(26 + otherPadding * 0.6, Theme.barHeight - 4 - (8 - otherPadding)) + otherSpacing + wingSize
+                const otherBottomGap = other.bottomGap !== undefined ? other.bottomGap : (defaultBar?.bottomGap ?? 0)
+
+                switch (other.position) {
+                case SettingsData.Position.Top:
+                    if (position === SettingsData.Position.Top && other.id < barConfig.id) {
+                        topOffset += otherThickness // Simple stacking for same pos
+                    } else if (position === SettingsData.Position.Left || position === SettingsData.Position.Right) {
+                        topOffset = Math.max(topOffset, otherThickness)
+                    }
+                    break
+                case SettingsData.Position.Bottom:
+                    if (position === SettingsData.Position.Bottom && other.id < barConfig.id) {
+                        bottomOffset += (otherThickness + otherBottomGap)
+                    } else if (position === SettingsData.Position.Left || position === SettingsData.Position.Right) {
+                        bottomOffset = Math.max(bottomOffset, otherThickness + otherBottomGap)
+                    }
+                    break
+                case SettingsData.Position.Left:
+                    if (position === SettingsData.Position.Top || position === SettingsData.Position.Bottom) {
+                        leftOffset = Math.max(leftOffset, otherThickness)
+                    } else if (position === SettingsData.Position.Left && other.id < barConfig.id) {
+                        leftOffset += otherThickness
+                    }
+                    break
+                case SettingsData.Position.Right:
+                    if (position === SettingsData.Position.Top || position === SettingsData.Position.Bottom) {
+                        rightOffset = Math.max(rightOffset, otherThickness)
+                    } else if (position === SettingsData.Position.Right && other.id < barConfig.id) {
+                        rightOffset += otherThickness
+                    }
+                    break
+                }
             }
         }
 
+        switch (position) {
+        case SettingsData.Position.Top:
+            return {
+                "x": leftOffset,
+                "y": topOffset + bottomGap,
+                "width": screenWidth - leftOffset - rightOffset,
+                "height": barThickness + wingSize,
+                "wingSize": wingSize
+            }
+        case SettingsData.Position.Bottom:
+            return {
+                "x": leftOffset,
+                "y": screenHeight - barThickness - wingSize - bottomGap - bottomOffset,
+                "width": screenWidth - leftOffset - rightOffset,
+                "height": barThickness + wingSize,
+                "wingSize": wingSize
+            }
+        case SettingsData.Position.Left:
+            return {
+                "x": 0,
+                "y": topOffset,
+                "width": barThickness + wingSize,
+                "height": screenHeight - topOffset - bottomOffset,
+                "wingSize": wingSize
+            }
+        case SettingsData.Position.Right:
+            return {
+                "x": screenWidth - barThickness - wingSize,
+                "y": topOffset,
+                "width": barThickness + wingSize,
+                "height": screenHeight - topOffset - bottomOffset,
+                "wingSize": wingSize
+            }
+        }
+        
         return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+    }
+
+    function updateBarConfigs() {
+        barConfigsChanged()
+        saveSettings()
+    }
+
+    function getBarConfig(barId) {
+        return barConfigs.find(cfg => cfg.id === barId) || null
+    }
+
+    function addBarConfig(config) {
+        const configs = JSON.parse(JSON.stringify(barConfigs))
+        configs.push(config)
+        barConfigs = configs
+        updateBarConfigs()
+    }
+
+    function updateBarConfig(barId, updates) {
+        const configs = JSON.parse(JSON.stringify(barConfigs))
+        const index = configs.findIndex(cfg => cfg.id === barId)
+        if (index === -1) return
+
+        const positionChanged = updates.position !== undefined && configs[index].position !== updates.position
+
+        Object.assign(configs[index], updates)
+        barConfigs = configs
+        updateBarConfigs()
+
+        if (positionChanged) {
+            NotificationService.clearAllPopups()
+        }
+    }
+
+    function checkBarCollisions(barId) {
+        const bar = getBarConfig(barId)
+        if (!bar || !bar.enabled) return []
+
+        const conflicts = []
+        const enabledBars = getEnabledBarConfigs()
+
+        for (let i = 0; i < enabledBars.length; i++) {
+            const other = enabledBars[i]
+            if (other.id === barId) continue
+
+            const samePosition = bar.position === other.position
+            if (!samePosition) continue
+
+            const barScreens = bar.screenPreferences || ["all"]
+            const otherScreens = other.screenPreferences || ["all"]
+
+            const hasAll = barScreens.includes("all") || otherScreens.includes("all")
+            if (hasAll) {
+                conflicts.push({
+                    barId: other.id,
+                    barName: other.name,
+                    reason: "Same position on all screens"
+                })
+                continue
+            }
+
+            const overlapping = barScreens.some(screen => otherScreens.includes(screen))
+            if (overlapping) {
+                conflicts.push({
+                    barId: other.id,
+                    barName: other.name,
+                    reason: "Same position on overlapping screens"
+                })
+            }
+        }
+
+        return conflicts
+    }
+
+    function deleteBarConfig(barId) {
+        if (barId === "default") return
+
+        const configs = barConfigs.filter(cfg => cfg.id !== barId)
+        barConfigs = configs
+        updateBarConfigs()
+    }
+
+    function getEnabledBarConfigs() {
+        return barConfigs.filter(cfg => cfg.enabled)
     }
 
     function getScreenDisplayName(screen) {
@@ -686,6 +910,7 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     function sendTestNotifications() {
+        NotificationService.clearAllPopups()
         sendTestNotification(0)
         testNotifTimer1.start()
         testNotifTimer2.start()
@@ -765,20 +990,22 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
 
     function setShowDock(enabled) {
         showDock = enabled
-        if (enabled && dockPosition === dankBarPosition) {
-            if (dankBarPosition === SettingsData.Position.Top) {
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const barPos = defaultBar?.position ?? SettingsData.Position.Top
+        if (enabled && dockPosition === barPos) {
+            if (barPos === SettingsData.Position.Top) {
                 setDockPosition(SettingsData.Position.Bottom)
                 return
             }
-            if (dankBarPosition === SettingsData.Position.Bottom) {
+            if (barPos === SettingsData.Position.Bottom) {
                 setDockPosition(SettingsData.Position.Top)
                 return
             }
-            if (dankBarPosition === SettingsData.Position.Left) {
+            if (barPos === SettingsData.Position.Left) {
                 setDockPosition(SettingsData.Position.Right)
                 return
             }
-            if (dankBarPosition === SettingsData.Position.Right) {
+            if (barPos === SettingsData.Position.Right) {
                 setDockPosition(SettingsData.Position.Left)
                 return
             }
@@ -788,16 +1015,18 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
 
     function setDockPosition(position) {
         dockPosition = position
-        if (position === SettingsData.Position.Bottom && dankBarPosition === SettingsData.Position.Bottom && showDock) {
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        const barPos = defaultBar?.position ?? SettingsData.Position.Top
+        if (position === SettingsData.Position.Bottom && barPos === SettingsData.Position.Bottom && showDock) {
             setDankBarPosition(SettingsData.Position.Top)
         }
-        if (position === SettingsData.Position.Top && dankBarPosition === SettingsData.Position.Top && showDock) {
+        if (position === SettingsData.Position.Top && barPos === SettingsData.Position.Top && showDock) {
             setDankBarPosition(SettingsData.Position.Bottom)
         }
-        if (position === SettingsData.Position.Left && dankBarPosition === SettingsData.Position.Left && showDock) {
+        if (position === SettingsData.Position.Left && barPos === SettingsData.Position.Left && showDock) {
             setDankBarPosition(SettingsData.Position.Right)
         }
-        if (position === SettingsData.Position.Right && dankBarPosition === SettingsData.Position.Right && showDock) {
+        if (position === SettingsData.Position.Right && barPos === SettingsData.Position.Right && showDock) {
             setDankBarPosition(SettingsData.Position.Left)
         }
         saveSettings()
@@ -805,14 +1034,19 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     function setDankBarSpacing(spacing) {
-        set("dankBarSpacing", spacing)
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, { spacing: spacing })
+        }
         if (typeof NiriService !== "undefined" && CompositorService.isNiri) {
             NiriService.generateNiriLayoutConfig()
         }
     }
 
     function setDankBarPosition(position) {
-        dankBarPosition = position
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (!defaultBar) return
+
         if (position === SettingsData.Position.Bottom && dockPosition === SettingsData.Position.Bottom && showDock) {
             setDockPosition(SettingsData.Position.Top)
             return
@@ -829,34 +1063,45 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
             setDockPosition(SettingsData.Position.Left)
             return
         }
-        saveSettings()
+        updateBarConfig(defaultBar.id, { position: position })
     }
 
     function setDankBarLeftWidgets(order) {
-        dankBarLeftWidgets = order
-        updateListModel(leftWidgetsModel, order)
-        saveSettings()
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, { leftWidgets: order })
+            updateListModel(leftWidgetsModel, order)
+        }
     }
 
     function setDankBarCenterWidgets(order) {
-        dankBarCenterWidgets = order
-        updateListModel(centerWidgetsModel, order)
-        saveSettings()
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, { centerWidgets: order })
+            updateListModel(centerWidgetsModel, order)
+        }
     }
 
     function setDankBarRightWidgets(order) {
-        dankBarRightWidgets = order
-        updateListModel(rightWidgetsModel, order)
-        saveSettings()
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, { rightWidgets: order })
+            updateListModel(rightWidgetsModel, order)
+        }
     }
 
     function resetDankBarWidgetsToDefault() {
         var defaultLeft = ["launcherButton", "workspaceSwitcher", "focusedWindow"]
         var defaultCenter = ["music", "clock", "weather"]
         var defaultRight = ["systemTray", "clipboard", "notificationButton", "battery", "controlCenterButton"]
-        dankBarLeftWidgets = defaultLeft
-        dankBarCenterWidgets = defaultCenter
-        dankBarRightWidgets = defaultRight
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, {
+                leftWidgets: defaultLeft,
+                centerWidgets: defaultCenter,
+                rightWidgets: defaultRight
+            })
+        }
         updateListModel(leftWidgetsModel, defaultLeft)
         updateListModel(centerWidgetsModel, defaultCenter)
         updateListModel(rightWidgetsModel, defaultRight)
@@ -876,7 +1121,6 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         showBattery = true
         showControlCenterButton = true
         showCapsLockIndicator = true
-        saveSettings()
     }
 
     function setWorkspaceNameIcon(workspaceName, iconData) {
@@ -900,8 +1144,10 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     function toggleDankBarVisible() {
-        dankBarVisible = !dankBarVisible
-        saveSettings()
+        const defaultBar = barConfigs[0] || getBarConfig("default")
+        if (defaultBar) {
+            updateBarConfig(defaultBar.id, { visible: !defaultBar.visible })
+        }
     }
 
     function toggleShowDock() {
@@ -1027,31 +1273,6 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     property bool pluginSettingsFileExists: false
-
-    IpcHandler {
-        function reveal(): string {
-            root.dankBarVisible = true
-            root.saveSettings()
-            return "BAR_SHOW_SUCCESS"
-        }
-
-        function hide(): string {
-            root.dankBarVisible = false
-            root.saveSettings()
-            return "BAR_HIDE_SUCCESS"
-        }
-
-        function toggle(): string {
-            root.toggleDankBarVisible()
-            return root.dankBarVisible ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS"
-        }
-
-        function status(): string {
-            return root.dankBarVisible ? "visible" : "hidden"
-        }
-
-        target: "bar"
-    }
 
     IpcHandler {
         function reveal(): string {

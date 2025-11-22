@@ -11,6 +11,7 @@ import qs.Widgets
 Item {
     id: root
 
+    property var barConfig: null
     property bool isVertical: axis?.isVertical ?? false
     property var axis: null
     property string section: "left"
@@ -19,8 +20,46 @@ Item {
     property var topBar: null
     property real widgetThickness: 30
     property real barThickness: 48
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
+    property real barSpacing: 4
+    property bool isAutoHideBar: false
+    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 2 : Theme.spacingS
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
+
+    readonly property real effectiveBarThickness: {
+        if (barThickness > 0 && barSpacing > 0) {
+            return barThickness + barSpacing
+        }
+        const innerPadding = barConfig?.innerPadding ?? 4
+        const spacing = barConfig?.spacing ?? 4
+        return Math.max(26 + innerPadding * 0.6, Theme.barHeight - 4 - (8 - innerPadding)) + spacing
+    }
+
+    readonly property var barBounds: {
+        if (!parentScreen || !barConfig) {
+            return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+        }
+        const barPosition = axis.edge === "left" ? 2 : (axis.edge === "right" ? 3 : (axis.edge === "top" ? 0 : 1))
+        return SettingsData.getBarBounds(parentScreen, effectiveBarThickness, barPosition, barConfig)
+    }
+
+    readonly property real barY: barBounds.y
+
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVertical) {
+            return 0
+        }
+
+        if (isAutoHideBar) {
+            return 0
+        }
+
+        if (parentScreen.y > 0) {
+            return effectiveBarThickness
+        }
+
+        return 0
+    }
+    
     property int _desktopEntriesUpdateTrigger: 0
     property int _toplevelsUpdateTrigger: 0
 
@@ -75,7 +114,6 @@ Item {
                                     })
             return Array.from(appGroups.values())
         } catch (e) {
-            console.error("RunningApps: groupedWindows error:", e)
             return []
         }
     }
@@ -101,19 +139,20 @@ Item {
         width: root.isVertical ? root.widgetThickness : root.calculatedSize
         height: root.isVertical ? root.calculatedSize : root.widgetThickness
         anchors.centerIn: parent
-        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
+        radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
         clip: false
         color: {
             if (windowCount === 0) {
                 return "transparent"
             }
 
-            if (SettingsData.dankBarNoBackground) {
+            if ((barConfig?.noBackground ?? false)) {
                 return "transparent"
             }
 
             const baseColor = Theme.widgetBaseBackgroundColor
-            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency)
+            const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0
+            return Theme.withAlpha(baseColor, transparency)
         }
     }
 
@@ -353,7 +392,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: !SettingsData.runningAppsCompactMode
                             text: windowTitle
-                            font.pixelSize: Theme.barTextSize(barThickness)
+                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
                             color: Theme.widgetTextColor
                             elide: Text.ElideRight
                             maximumLineCount: 1
@@ -390,18 +429,25 @@ Item {
                                            windowContextMenuLoader.active = true
                                            if (windowContextMenuLoader.item) {
                                                windowContextMenuLoader.item.currentWindow = toplevelObject
+                                               // Pass bar context
+                                               windowContextMenuLoader.item.triggerBarConfig = root.barConfig
+                                               windowContextMenuLoader.item.triggerBarPosition = root.axis.edge === "left" ? 2 : (root.axis.edge === "right" ? 3 : (root.axis.edge === "top" ? 0 : 1))
+                                               windowContextMenuLoader.item.triggerBarThickness = root.barThickness
+                                               windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing
                                                if (root.isVertical) {
                                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2)
                                                    const screenX = root.parentScreen ? root.parentScreen.x : 0
                                                    const screenY = root.parentScreen ? root.parentScreen.y : 0
                                                    const relativeY = globalPos.y - screenY
-                                                   const xPos = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
-                                                   windowContextMenuLoader.item.showAt(xPos, relativeY, true, root.axis?.edge)
+                                                   // Add minTooltipY offset to account for top bar
+                                                   const adjustedY = relativeY + root.minTooltipY
+                                                   const xPos = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS)
+                                                   windowContextMenuLoader.item.showAt(xPos, adjustedY, true, root.axis?.edge)
                                                } else {
                                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, 0)
                                                    const screenX = root.parentScreen ? root.parentScreen.x : 0
                                                    const relativeX = globalPos.x - screenX
-                                                   const yPos = Theme.barHeight + SettingsData.dankBarSpacing - 7
+                                                   const yPos = root.barThickness + root.barSpacing - 7
                                                    windowContextMenuLoader.item.showAt(relativeX, yPos, false, "top")
                                                }
                                            }
@@ -416,16 +462,18 @@ Item {
                                     const screenX = root.parentScreen ? root.parentScreen.x : 0
                                     const screenY = root.parentScreen ? root.parentScreen.y : 0
                                     const relativeY = globalPos.y - screenY
-                                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
+                                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS)
                                     const isLeft = root.axis?.edge === "left"
-                                    tooltipLoader.item.show(delegateItem.tooltipText, screenX + tooltipX, relativeY, root.parentScreen, isLeft, !isLeft)
+                                    const adjustedY = relativeY + root.minTooltipY
+                                    const finalX = screenX + tooltipX
+                                    tooltipLoader.item.show(delegateItem.tooltipText, finalX, adjustedY, root.parentScreen, isLeft, !isLeft)
                                 } else {
                                     const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height)
                                     const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height
                                     const isBottom = root.axis?.edge === "bottom"
                                     const tooltipY = isBottom
-                                        ? (screenHeight - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS - 35)
-                                        : (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS)
+                                        ? (screenHeight - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS - 35)
+                                        : (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS)
                                     tooltipLoader.item.show(delegateItem.tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false)
                                 }
                             }
@@ -586,7 +634,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: !SettingsData.runningAppsCompactMode
                             text: windowTitle
-                            font.pixelSize: Theme.barTextSize(barThickness)
+                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
                             color: Theme.widgetTextColor
                             elide: Text.ElideRight
                             maximumLineCount: 1
@@ -623,18 +671,25 @@ Item {
                                            windowContextMenuLoader.active = true
                                            if (windowContextMenuLoader.item) {
                                                windowContextMenuLoader.item.currentWindow = toplevelObject
+                                               // Pass bar context
+                                               windowContextMenuLoader.item.triggerBarConfig = root.barConfig
+                                               windowContextMenuLoader.item.triggerBarPosition = root.axis.edge === "left" ? 2 : (root.axis.edge === "right" ? 3 : (root.axis.edge === "top" ? 0 : 1))
+                                               windowContextMenuLoader.item.triggerBarThickness = root.barThickness
+                                               windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing
                                                if (root.isVertical) {
                                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2)
                                                    const screenX = root.parentScreen ? root.parentScreen.x : 0
                                                    const screenY = root.parentScreen ? root.parentScreen.y : 0
                                                    const relativeY = globalPos.y - screenY
-                                                   const xPos = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
-                                                   windowContextMenuLoader.item.showAt(xPos, relativeY, true, root.axis?.edge)
+                                                   // Add minTooltipY offset to account for top bar
+                                                   const adjustedY = relativeY + root.minTooltipY
+                                                   const xPos = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS)
+                                                   windowContextMenuLoader.item.showAt(xPos, adjustedY, true, root.axis?.edge)
                                                } else {
                                                    const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, 0)
                                                    const screenX = root.parentScreen ? root.parentScreen.x : 0
                                                    const relativeX = globalPos.x - screenX
-                                                   const yPos = Theme.barHeight + SettingsData.dankBarSpacing - 7
+                                                   const yPos = root.barThickness + root.barSpacing - 7
                                                    windowContextMenuLoader.item.showAt(relativeX, yPos, false, "top")
                                                }
                                            }
@@ -649,16 +704,18 @@ Item {
                                     const screenX = root.parentScreen ? root.parentScreen.x : 0
                                     const screenY = root.parentScreen ? root.parentScreen.y : 0
                                     const relativeY = globalPos.y - screenY
-                                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
+                                    const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (root.parentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS)
                                     const isLeft = root.axis?.edge === "left"
-                                    tooltipLoader.item.show(delegateItem.tooltipText, screenX + tooltipX, relativeY, root.parentScreen, isLeft, !isLeft)
+                                    const adjustedY = relativeY + root.minTooltipY
+                                    const finalX = screenX + tooltipX
+                                    tooltipLoader.item.show(delegateItem.tooltipText, finalX, adjustedY, root.parentScreen, isLeft, !isLeft)
                                 } else {
                                     const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height)
                                     const screenHeight = root.parentScreen ? root.parentScreen.height : Screen.height
                                     const isBottom = root.axis?.edge === "bottom"
                                     const tooltipY = isBottom
-                                        ? (screenHeight - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS - 35)
-                                        : (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS)
+                                        ? (screenHeight - root.barThickness - root.barSpacing - Theme.spacingXS - 35)
+                                        : (root.barThickness + root.barSpacing + Theme.spacingXS)
                                     tooltipLoader.item.show(delegateItem.tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false)
                                 }
                             }
@@ -698,6 +755,28 @@ Item {
             property point anchorPos: Qt.point(0, 0)
             property bool isVertical: false
             property string edge: "top"
+
+            // New properties for bar context
+            property int triggerBarPosition: (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top)
+            property real triggerBarThickness: 0
+            property real triggerBarSpacing: 0
+            property var triggerBarConfig: null
+
+            readonly property real effectiveBarThickness: {
+                if (triggerBarThickness > 0 && triggerBarSpacing > 0) {
+                    return triggerBarThickness + triggerBarSpacing
+                }
+                return Math.max(26 + (barConfig?.innerPadding ?? 4) * 0.6, Theme.barHeight - 4 - (8 - (barConfig?.innerPadding ?? 4))) + (barConfig?.spacing ?? 4)
+            }
+
+            property var barBounds: {
+                if (!contextMenuWindow.screen || !triggerBarConfig) {
+                    return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+                }
+                return SettingsData.getBarBounds(contextMenuWindow.screen, effectiveBarThickness, triggerBarPosition, triggerBarConfig)
+            }
+
+            property real barY: barBounds.y
 
             function showAt(x, y, vertical, barEdge) {
                 screen = root.parentScreen
@@ -752,7 +831,7 @@ Item {
                 }
                 y: {
                     if (contextMenuWindow.isVertical) {
-                        const top = 10
+                        const top = Math.max(barY, 10)
                         const bottom = contextMenuWindow.height - height - 10
                         const want = contextMenuWindow.anchorPos.y - height / 2
                         return Math.max(top, Math.min(bottom, want))

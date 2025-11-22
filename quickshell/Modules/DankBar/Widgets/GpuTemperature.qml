@@ -15,6 +15,9 @@ BasePill {
     property var widgetData: null
     property int selectedGpuIndex: (widgetData && widgetData.selectedGpuIndex !== undefined) ? widgetData.selectedGpuIndex : 0
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
+
+    signal gpuTempClicked()
+
     property real displayTemp: {
         if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
             return 0;
@@ -29,15 +32,18 @@ BasePill {
 
     function updateWidgetPciId(pciId) {
         const sections = ["left", "center", "right"];
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar) return
+
         for (let s = 0; s < sections.length; s++) {
             const sectionId = sections[s];
             let widgets = [];
             if (sectionId === "left") {
-                widgets = SettingsData.dankBarLeftWidgets.slice();
+                widgets = (defaultBar.leftWidgets || []).slice();
             } else if (sectionId === "center") {
-                widgets = SettingsData.dankBarCenterWidgets.slice();
+                widgets = (defaultBar.centerWidgets || []).slice();
             } else if (sectionId === "right") {
-                widgets = SettingsData.dankBarRightWidgets.slice();
+                widgets = (defaultBar.rightWidgets || []).slice();
             }
             for (let i = 0; i < widgets.length; i++) {
                 const widget = widgets[i];
@@ -122,7 +128,7 @@ BasePill {
 
                         return Math.round(root.displayTemp).toString();
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -159,7 +165,7 @@ BasePill {
 
                         return Math.round(root.displayTemp) + "°";
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
@@ -167,7 +173,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: gpuTempBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         text: "100°"
                     }
 
@@ -189,16 +195,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            DgopService.setSortBy("cpu");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "gpu_temp");
-            }
+            DgopService.setSortBy("cpu")
+            gpuTempClicked()
         }
     }
 

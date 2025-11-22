@@ -29,15 +29,23 @@ PanelWindow {
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property bool shouldBeVisible: false
 
+    property real storedBarThickness: Theme.barHeight - 4
+    property real storedBarSpacing: 4
+    property var storedBarConfig: null
+    property var adjacentBarInfo: ({ "topBar": 0, "bottomBar": 0, "leftBar": 0, "rightBar": 0 })
+
     visible: false
 
-    readonly property real effectiveBarThickness: Math.max(26 + SettingsData.dankBarInnerPadding * 0.6, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing
+    readonly property real effectiveBarThickness: {
+        const padding = storedBarConfig ? (storedBarConfig.innerPadding !== undefined ? storedBarConfig.innerPadding : 4) : 4
+        return Math.max(26 + padding * 0.6, Theme.barHeight - 4 - (8 - padding)) + storedBarSpacing
+    }
 
     readonly property var barBounds: {
         if (!root.screen) {
             return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
         }
-        return SettingsData.getBarBounds(root.screen, effectiveBarThickness)
+        return SettingsData.getBarBounds(root.screen, effectiveBarThickness, effectiveBarPosition, storedBarConfig)
     }
 
     readonly property real barX: barBounds.x
@@ -49,6 +57,31 @@ PanelWindow {
     signal opened
     signal popoutClosed
     signal backgroundClicked
+
+    function setBarContext(position, bottomGap) {
+        effectiveBarPosition = position !== undefined ? position : 0
+        effectiveBarBottomGap = bottomGap !== undefined ? bottomGap : 0
+    }
+
+    function setTriggerPosition(x, y, width, section, screen, barPosition, barThickness, barSpacing, barConfig) {
+        triggerX = x
+        triggerY = y
+        triggerWidth = width
+        triggerSection = section
+        root.screen = screen
+
+        storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4)
+        storedBarSpacing = barSpacing !== undefined ? barSpacing : 4
+        storedBarConfig = barConfig
+
+        const pos = barPosition !== undefined ? barPosition : 0
+        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : 0) : 0
+
+        // Get adjacent bar info for proper positioning
+        adjacentBarInfo = SettingsData.getAdjacentBarInfo(screen, pos, barConfig)
+
+        setBarContext(pos, bottomGap)
+    }
 
     function open() {
         closeTimer.stop()
@@ -115,75 +148,71 @@ PanelWindow {
 
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+    property int effectiveBarPosition: 0
+    property real effectiveBarBottomGap: 0
+
     readonly property real alignedX: Theme.snap((() => {
-        if (SettingsData.dankBarPosition === SettingsData.Position.Left) {
-            return triggerY + SettingsData.dankBarBottomGap
-        } else if (SettingsData.dankBarPosition === SettingsData.Position.Right) {
-            return screenWidth - triggerY - SettingsData.dankBarBottomGap - popupWidth
+        const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true
+        const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4
+        const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue
+
+        let rawX = 0
+        if (effectiveBarPosition === SettingsData.Position.Left) {
+            rawX = triggerX
+        } else if (effectiveBarPosition === SettingsData.Position.Right) {
+            rawX = triggerX - popupWidth
         } else {
-            const centerX = triggerX + (triggerWidth / 2) - (popupWidth / 2)
-            return Math.max(Theme.popupDistance, Math.min(screenWidth - popupWidth - Theme.popupDistance, centerX))
+            rawX = triggerX + (triggerWidth / 2) - (popupWidth / 2)
+            const minX = adjacentBarInfo.leftBar > 0 ? adjacentBarInfo.leftBar : popupGap
+            const maxX = screenWidth - popupWidth - (adjacentBarInfo.rightBar > 0 ? adjacentBarInfo.rightBar : popupGap)
+            return Math.max(minX, Math.min(maxX, rawX))
         }
+        return Math.max(popupGap, Math.min(screenWidth - popupWidth - popupGap, rawX))
     })(), dpr)
+
     readonly property real alignedY: Theme.snap((() => {
-        if (SettingsData.dankBarPosition === SettingsData.Position.Left || SettingsData.dankBarPosition === SettingsData.Position.Right) {
-            const centerY = triggerX + (triggerWidth / 2) - (popupHeight / 2)
-            return Math.max(Theme.popupDistance, Math.min(screenHeight - popupHeight - Theme.popupDistance, centerY))
-        } else if (SettingsData.dankBarPosition === SettingsData.Position.Bottom) {
-            return Math.max(Theme.popupDistance, screenHeight - triggerY - popupHeight)
+        const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true
+        const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4
+        const popupGap = useAutoGaps ? Math.max(4, storedBarSpacing) : manualGapValue
+
+        let rawY = 0
+        if (effectiveBarPosition === SettingsData.Position.Bottom) {
+            rawY = triggerY - popupHeight
+        } else if (effectiveBarPosition === SettingsData.Position.Top) {
+             rawY = triggerY
         } else {
-            return Math.min(screenHeight - popupHeight - Theme.popupDistance, triggerY)
+             rawY = triggerY - (popupHeight / 2)
+             const minY = adjacentBarInfo.topBar > 0 ? adjacentBarInfo.topBar : popupGap
+             const maxY = screenHeight - popupHeight - (adjacentBarInfo.bottomBar > 0 ? adjacentBarInfo.bottomBar : popupGap)
+             return Math.max(minY, Math.min(maxY, rawY))
         }
+        return Math.max(popupGap, Math.min(screenHeight - popupHeight - popupGap, rawY))
     })(), dpr)
 
     readonly property real maskX: {
-        switch (SettingsData.dankBarPosition) {
-        case SettingsData.Position.Left:
-            return root.barWidth > 0 ? root.barWidth : 0
-        case SettingsData.Position.Right:
-        case SettingsData.Position.Top:
-        case SettingsData.Position.Bottom:
-        default:
-            return 0
-        }
+        const triggeringBarX = (effectiveBarPosition === SettingsData.Position.Left && root.barWidth > 0) ? root.barWidth : 0
+        const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0
+        return Math.max(triggeringBarX, adjacentLeftBar)
     }
 
     readonly property real maskY: {
-        switch (SettingsData.dankBarPosition) {
-        case SettingsData.Position.Top:
-            return root.barHeight > 0 ? root.barHeight : 0
-        case SettingsData.Position.Bottom:
-        case SettingsData.Position.Left:
-        case SettingsData.Position.Right:
-        default:
-            return 0
-        }
+        const triggeringBarY = (effectiveBarPosition === SettingsData.Position.Top && root.barHeight > 0) ? root.barHeight : 0
+        const adjacentTopBar = adjacentBarInfo?.topBar ?? 0
+        return Math.max(triggeringBarY, adjacentTopBar)
     }
 
     readonly property real maskWidth: {
-        switch (SettingsData.dankBarPosition) {
-        case SettingsData.Position.Left:
-            return root.barWidth > 0 ? root.width - root.barWidth : root.width
-        case SettingsData.Position.Right:
-            return root.barWidth > 0 ? root.width - root.barWidth : root.width
-        case SettingsData.Position.Top:
-        case SettingsData.Position.Bottom:
-        default:
-            return root.width
-        }
+        const triggeringBarRight = (effectiveBarPosition === SettingsData.Position.Right && root.barWidth > 0) ? root.barWidth : 0
+        const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0
+        const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar)
+        return Math.max(100, root.width - maskX - rightExclusion)
     }
 
     readonly property real maskHeight: {
-        switch (SettingsData.dankBarPosition) {
-        case SettingsData.Position.Top:
-            return root.barHeight > 0 ? root.height - root.barHeight : root.height
-        case SettingsData.Position.Bottom:
-            return root.barHeight > 0 ? root.height - root.barHeight : root.height
-        case SettingsData.Position.Left:
-        case SettingsData.Position.Right:
-        default:
-            return root.height
-        }
+        const triggeringBarBottom = (effectiveBarPosition === SettingsData.Position.Bottom && root.barHeight > 0) ? root.barHeight : 0
+        const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0
+        const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar)
+        return Math.max(100, root.height - maskY - bottomExclusion)
     }
 
     mask: Region {
@@ -222,10 +251,10 @@ PanelWindow {
         width: alignedWidth
         height: alignedHeight
 
-        readonly property bool barTop: SettingsData.dankBarPosition === SettingsData.Position.Top
-        readonly property bool barBottom: SettingsData.dankBarPosition === SettingsData.Position.Bottom
-        readonly property bool barLeft: SettingsData.dankBarPosition === SettingsData.Position.Left
-        readonly property bool barRight: SettingsData.dankBarPosition === SettingsData.Position.Right
+        readonly property bool barTop: effectiveBarPosition === SettingsData.Position.Top
+        readonly property bool barBottom: effectiveBarPosition === SettingsData.Position.Bottom
+        readonly property bool barLeft: effectiveBarPosition === SettingsData.Position.Left
+        readonly property bool barRight: effectiveBarPosition === SettingsData.Position.Right
         readonly property real offsetX: barLeft ? root.animationOffset : (barRight ? -root.animationOffset : 0)
         readonly property real offsetY: barBottom ? -root.animationOffset : (barTop ? root.animationOffset : 0)
 

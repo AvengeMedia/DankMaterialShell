@@ -17,6 +17,8 @@ BasePill {
     property bool showSwap: (widgetData && widgetData.showSwap !== undefined) ? widgetData.showSwap : false
     readonly property real swapUsage: DgopService.totalSwapKB > 0 ? (DgopService.usedSwapKB / DgopService.totalSwapKB) * 100 : 0
 
+    signal ramClicked()
+
     Component.onCompleted: {
         DgopService.addRef(["memory"]);
     }
@@ -60,7 +62,7 @@ BasePill {
 
                         return DgopService.memoryUsage.toFixed(0);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -68,7 +70,7 @@ BasePill {
                 StyledText {
                     visible: root.showSwap && DgopService.totalSwapKB > 0
                     text: root.swapUsage.toFixed(0)
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.surfaceVariantText
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -109,7 +111,7 @@ BasePill {
                         }
                         return ramText;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
@@ -118,7 +120,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: ramBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         text: {
                             if (!root.showSwap) {
                                 return "100%";
@@ -148,16 +150,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            DgopService.setSortBy("memory");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "memory");
-            }
+            DgopService.setSortBy("memory")
+            ramClicked()
         }
     }
 }

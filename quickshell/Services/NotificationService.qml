@@ -411,6 +411,16 @@ Singleton {
         NotifWrapper {}
     }
 
+    function clearAllPopups() {
+        for (const w of visibleNotifications) {
+            if (w) {
+                w.popup = false
+            }
+        }
+        visibleNotifications = []
+        notificationQueue = []
+    }
+
     function clearAllNotifications() {
         bulkDismissing = true
         popupsDisabled = true

@@ -66,37 +66,31 @@ Item {
         id: lock
     }
 
-    Loader {
-        id: dankBarLoader
-        asynchronous: false
+    Repeater {
+        id: dankBarRepeater
+        model: ScriptModel {
+            values: SettingsData.barConfigs
+        }
 
-        property var currentPosition: SettingsData.dankBarPosition
-        property bool initialized: false
         property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
 
-        sourceComponent: DankBar {
-            hyprlandOverviewLoader: dankBarLoader.hyprlandOverviewLoaderRef
+        delegate: Loader {
+            id: barLoader
+            active: modelData.enabled
+            asynchronous: false
 
-            onColorPickerRequested: {
-                if (colorPickerModal.shouldBeVisible) {
-                    colorPickerModal.close()
-                } else {
-                    colorPickerModal.show()
+            sourceComponent: DankBar {
+                barConfig: modelData
+                hyprlandOverviewLoader: dankBarRepeater.hyprlandOverviewLoaderRef
+
+                onColorPickerRequested: {
+                    if (colorPickerModal.shouldBeVisible) {
+                        colorPickerModal.close()
+                    } else {
+                        colorPickerModal.show()
+                    }
                 }
             }
-        }
-
-        Component.onCompleted: {
-            initialized = true
-        }
-
-        onCurrentPositionChanged: {
-            if (!initialized)
-                return
-
-            const component = sourceComponent
-            sourceComponent = null
-            sourceComponent = component
         }
     }
 
@@ -126,7 +120,6 @@ Item {
             if (!initialized)
                 return
 
-            console.log("DEBUG: Dock position changed to:", currentPosition, "- recreating dock")
             const comp = sourceComponent
             sourceComponent = null
             sourceComponent = comp
@@ -137,7 +130,7 @@ Item {
         id: dankDashPopoutLoader
 
         active: false
-        asynchronous: true
+        asynchronous: false
 
         sourceComponent: Component {
             DankDashPopout {
@@ -513,7 +506,7 @@ Item {
         dankDashPopoutLoader: dankDashPopoutLoader
         notepadSlideoutVariants: notepadSlideoutVariants
         hyprKeybindsModalLoader: hyprKeybindsModalLoader
-        dankBarLoader: dankBarLoader
+        dankBarRepeater: dankBarRepeater
         hyprlandOverviewLoader: hyprlandOverviewLoader
     }
 

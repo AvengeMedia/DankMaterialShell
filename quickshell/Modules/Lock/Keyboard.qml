@@ -8,7 +8,7 @@ Rectangle {
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    color: Theme.widgetBackground
+    color: Theme.surfaceContainerHigh
 
     signal dismissed
 

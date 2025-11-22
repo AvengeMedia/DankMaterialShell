@@ -64,7 +64,7 @@ BasePill {
 
                 StyledText {
                     text: layout.currentLayoutSymbol
-                    font.pixelSize: Theme.barTextSize(layout.barThickness)
+                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -74,7 +74,7 @@ BasePill {
                 id: layoutContent
                 visible: !layout.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: SettingsData.dankBarNoBackground ? 1 : 2
+                spacing: (barConfig?.noBackground ?? false) ? 1 : 2
 
                 DankIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
@@ -85,7 +85,7 @@ BasePill {
 
                 StyledText {
                     text: layout.currentLayoutSymbol
-                    font.pixelSize: Theme.barTextSize(layout.barThickness)
+                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -94,12 +94,6 @@ BasePill {
     }
 
     onClicked: {
-        if (popoutTarget && popoutTarget.setTriggerPosition) {
-            const globalPos = layout.visualContent.mapToGlobal(0, 0)
-            const currentScreen = parentScreen || Screen
-            const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, layout.visualWidth)
-            popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-        }
         toggleLayoutPopup()
     }
 

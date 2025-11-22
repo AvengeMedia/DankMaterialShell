@@ -759,43 +759,6 @@ Item {
                         width: parent.width
                         spacing: Theme.spacingS
 
-                        StyledText {
-                            text: I18n.tr("Dank Bar Transparency")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Controls opacity of the DankBar panel background")
-                            font.pixelSize: Theme.fontSizeSmall - 2
-                            color: Theme.surfaceVariantText
-                            width: parent.width
-                            wrapMode: Text.WordWrap
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: Math.round(
-                                       SettingsData.dankBarTransparency * 100)
-                            minimum: 0
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dankBarTransparency", 
-                                                          newValue / 100)
-                                                  }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
                         Item {
                             width: parent.width
                             height: Math.max(transparencyLabel.height, widgetColorGroup.height)
@@ -808,14 +771,14 @@ Item {
 
                                 StyledText {
                                     id: transparencyLabel
-                                    text: I18n.tr("Dank Bar Widget Transparency")
+                                    text: I18n.tr("Widget Background Color")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceText
                                     font.weight: Font.Medium
                                 }
 
                                 StyledText {
-                                    text: I18n.tr("Controls opacity of individual widgets inside DankBar")
+                                    text: I18n.tr("Choose the background color for widgets")
                                     font.pixelSize: Theme.fontSizeSmall - 2
                                     color: Theme.surfaceVariantText
                                     width: parent.width
@@ -854,23 +817,6 @@ Item {
                                     SettingsData.set("widgetBackgroundColor", colorOptions[index])
                                 }
                             }
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: Math.round(
-                                       SettingsData.dankBarWidgetTransparency * 100)
-                            minimum: 0
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dankBarWidgetTransparency", 
-                                                          newValue / 100)
-                                                  }
                         }
                     }
 

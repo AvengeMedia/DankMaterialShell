@@ -26,19 +26,8 @@ DankPopout {
                  }
     }
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x
-        triggerY = y
-        triggerWidth = width
-        triggerSection = section
-        triggerScreen = screen
-    }
-
     popupWidth: 400
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 400
-    triggerX: 0
-    triggerY: 0
-    triggerWidth: 40
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: notificationHistoryVisible

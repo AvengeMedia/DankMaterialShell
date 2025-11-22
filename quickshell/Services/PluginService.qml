@@ -428,9 +428,12 @@ Singleton {
             return id !== widgetId
         }
 
-        const leftWidgets = SettingsData.dankBarLeftWidgets
-        const centerWidgets = SettingsData.dankBarCenterWidgets
-        const rightWidgets = SettingsData.dankBarRightWidgets
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar) return
+
+        const leftWidgets = defaultBar.leftWidgets || []
+        const centerWidgets = defaultBar.centerWidgets || []
+        const rightWidgets = defaultBar.rightWidgets || []
 
         const newLeft = leftWidgets.filter(filterWidget)
         const newCenter = centerWidgets.filter(filterWidget)

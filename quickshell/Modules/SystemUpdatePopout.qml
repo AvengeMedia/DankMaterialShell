@@ -11,22 +11,12 @@ DankPopout {
     property var parentWidget: null
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x;
-        triggerY = y;
-        triggerWidth = width;
-        triggerSection = section;
-        triggerScreen = screen;
-    }
-
     Ref {
         service: SystemUpdateService
     }
 
     popupWidth: 400
     popupHeight: 500
-    triggerX: Screen.width - 600 - Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 55
     positioning: ""
     screen: triggerScreen

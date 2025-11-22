@@ -17,7 +17,7 @@ Item {
     property MprisPlayer activePlayer: MprisController.activePlayer
     property var allPlayers: MprisController.availablePlayers
 
-    readonly property bool isRightEdge: SettingsData.dankBarPosition === SettingsData.Position.Right
+    readonly property bool isRightEdge: (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Right
     property var defaultSink: AudioService.sink
 
     // Palette that stays stable across track switches until new colors are ready

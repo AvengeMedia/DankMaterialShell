@@ -28,9 +28,8 @@ Item {
 
     function handleClick() {
         if (!enabled) return
-        checked = !checked
         clicked()
-        toggled(checked)
+        toggled(!checked)
     }
 
     StyledRect {

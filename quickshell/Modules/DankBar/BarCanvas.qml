@@ -8,15 +8,17 @@ Item {
 
     required property var barWindow
     required property var axis
+    required property var barConfig
 
     anchors.fill: parent
 
     anchors.left: parent.left
     anchors.top: parent.top
-    anchors.leftMargin: -(SettingsData.dankBarGothCornersEnabled && axis.isVertical && axis.edge === "right" ? barWindow._wingR : 0)
-    anchors.rightMargin: -(SettingsData.dankBarGothCornersEnabled && axis.isVertical && axis.edge === "left" ? barWindow._wingR : 0)
-    anchors.topMargin: -(SettingsData.dankBarGothCornersEnabled && !axis.isVertical && axis.edge === "bottom" ? barWindow._wingR : 0)
-    anchors.bottomMargin: -(SettingsData.dankBarGothCornersEnabled && !axis.isVertical && axis.edge === "top" ? barWindow._wingR : 0)
+    readonly property bool gothEnabled: barConfig?.gothCornersEnabled ?? false
+    anchors.leftMargin: -(gothEnabled && axis.isVertical && axis.edge === "right" ? barWindow._wingR : 0)
+    anchors.rightMargin: -(gothEnabled && axis.isVertical && axis.edge === "left" ? barWindow._wingR : 0)
+    anchors.topMargin: -(gothEnabled && !axis.isVertical && axis.edge === "bottom" ? barWindow._wingR : 0)
+    anchors.bottomMargin: -(gothEnabled && !axis.isVertical && axis.edge === "top" ? barWindow._wingR : 0)
 
     readonly property real dpr: CompositorService.getScreenScale(barWindow.screen)
 
@@ -65,8 +67,8 @@ Item {
         readonly property real correctHeight: Theme.px(root.height, dpr)
         canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
+        property real wing: (barConfig?.gothCornersEnabled ?? false) ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: (barConfig?.squareCorners ?? false) ? 0 : Theme.px(Theme.cornerRadius, dpr)
 
         onWingChanged: root.requestRepaint()
         onRtChanged: root.requestRepaint()
@@ -83,18 +85,14 @@ Item {
         Connections {
             target: barWindow
             function on_BgColorChanged() { root.requestRepaint() }
+            function onGothCornersEnabledChanged() { root.requestRepaint() }
+            function onWingtipsRadiusChanged() { root.requestRepaint() }
         }
 
         Connections {
             target: Theme
             function onIsLightModeChanged() { root.requestRepaint() }
             function onSurfaceContainerChanged() { root.requestRepaint() }
-        }
-
-        Connections {
-            target: SettingsData
-            function onDankBarGothCornerRadiusOverrideChanged() { root.requestRepaint() }
-            function onDankBarGothCornerRadiusValueChanged() { root.requestRepaint() }
         }
 
         onPaint: {
@@ -104,10 +102,11 @@ Item {
             const R = wing
             const RT = rt
             const H = H_raw - (R > 0 ? R : 0)
-            const isTop = SettingsData.dankBarPosition === SettingsData.Position.Top
-            const isBottom = SettingsData.dankBarPosition === SettingsData.Position.Bottom
-            const isLeft = SettingsData.dankBarPosition === SettingsData.Position.Left
-            const isRight = SettingsData.dankBarPosition === SettingsData.Position.Right
+            const barPos = barConfig?.position ?? 0
+            const isTop = barPos === SettingsData.Position.Top
+            const isBottom = barPos === SettingsData.Position.Bottom
+            const isLeft = barPos === SettingsData.Position.Left
+            const isRight = barPos === SettingsData.Position.Right
 
             function drawTopPath() {
                 ctx.beginPath()
@@ -168,8 +167,8 @@ Item {
         readonly property real correctHeight: Theme.px(root.height, dpr)
         canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
+        property real wing: (barConfig?.gothCornersEnabled ?? false) ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: (barConfig?.squareCorners ?? false) ? 0 : Theme.px(Theme.cornerRadius, dpr)
         property real alphaTint: (barWindow._bgColor?.a ?? 1) < 0.99 ? (Theme.stateLayerOpacity ?? 0) : 0
 
         onWingChanged: root.requestRepaint()
@@ -188,18 +187,14 @@ Item {
         Connections {
             target: barWindow
             function on_BgColorChanged() { root.requestRepaint() }
+            function onGothCornersEnabledChanged() { root.requestRepaint() }
+            function onWingtipsRadiusChanged() { root.requestRepaint() }
         }
 
         Connections {
             target: Theme
             function onIsLightModeChanged() { root.requestRepaint() }
             function onSurfaceChanged() { root.requestRepaint() }
-        }
-
-        Connections {
-            target: SettingsData
-            function onDankBarGothCornerRadiusOverrideChanged() { root.requestRepaint() }
-            function onDankBarGothCornerRadiusValueChanged() { root.requestRepaint() }
         }
 
         onPaint: {
@@ -209,10 +204,11 @@ Item {
             const R = wing
             const RT = rt
             const H = H_raw - (R > 0 ? R : 0)
-            const isTop = SettingsData.dankBarPosition === SettingsData.Position.Top
-            const isBottom = SettingsData.dankBarPosition === SettingsData.Position.Bottom
-            const isLeft = SettingsData.dankBarPosition === SettingsData.Position.Left
-            const isRight = SettingsData.dankBarPosition === SettingsData.Position.Right
+            const barPos = barConfig?.position ?? 0
+            const isTop = barPos === SettingsData.Position.Top
+            const isBottom = barPos === SettingsData.Position.Bottom
+            const isLeft = barPos === SettingsData.Position.Left
+            const isRight = barPos === SettingsData.Position.Right
 
             function drawTopPath() {
                 ctx.beginPath()
@@ -265,7 +261,7 @@ Item {
     Canvas {
         id: barBorder
         anchors.fill: parent
-        visible: SettingsData.dankBarBorderEnabled
+        visible: barConfig?.borderEnabled ?? false
         renderTarget: Canvas.FramebufferObject
         renderStrategy: Canvas.Cooperative
 
@@ -273,9 +269,9 @@ Item {
         readonly property real correctHeight: Theme.px(root.height, dpr)
         canvasSize: Qt.size(correctWidth, correctHeight)
 
-        property real wing: SettingsData.dankBarGothCornersEnabled ? Theme.px(barWindow._wingR, dpr) : 0
-        property real rt: SettingsData.dankBarSquareCorners ? 0 : Theme.px(Theme.cornerRadius, dpr)
-        property bool borderEnabled: SettingsData.dankBarBorderEnabled
+        property real wing: (barConfig?.gothCornersEnabled ?? false) ? Theme.px(barWindow._wingR, dpr) : 0
+        property real rt: (barConfig?.squareCorners ?? false) ? 0 : Theme.px(Theme.cornerRadius, dpr)
+        property bool borderEnabled: barConfig?.borderEnabled ?? false
 
         antialiasing: rt > 0 || wing > 0
 
@@ -302,15 +298,9 @@ Item {
         }
 
         Connections {
-            target: SettingsData
-            function onDankBarBorderColorChanged() { root.requestRepaint() }
-            function onDankBarBorderOpacityChanged() { root.requestRepaint() }
-            function onDankBarBorderThicknessChanged() { root.requestRepaint() }
-            function onDankBarSpacingChanged() { root.requestRepaint() }
-            function onDankBarSquareCornersChanged() { root.requestRepaint() }
-            function onDankBarTransparencyChanged() { root.requestRepaint() }
-            function onDankBarGothCornerRadiusOverrideChanged() { root.requestRepaint() }
-            function onDankBarGothCornerRadiusValueChanged() { root.requestRepaint() }
+            target: barWindow
+            function onGothCornersEnabledChanged() { root.requestRepaint() }
+            function onWingtipsRadiusChanged() { root.requestRepaint() }
         }
 
         onPaint: {
@@ -322,12 +312,13 @@ Item {
             const R = wing
             const RT = rt
             const H = H_raw - (R > 0 ? R : 0)
-            const isTop = SettingsData.dankBarPosition === SettingsData.Position.Top
-            const isBottom = SettingsData.dankBarPosition === SettingsData.Position.Bottom
-            const isLeft = SettingsData.dankBarPosition === SettingsData.Position.Left
-            const isRight = SettingsData.dankBarPosition === SettingsData.Position.Right
+            const barPos = barConfig?.position ?? 0
+            const isTop = barPos === SettingsData.Position.Top
+            const isBottom = barPos === SettingsData.Position.Bottom
+            const isLeft = barPos === SettingsData.Position.Left
+            const isRight = barPos === SettingsData.Position.Right
 
-            const spacing = SettingsData.dankBarSpacing
+            const spacing = barConfig?.spacing ?? 4
             const hasEdgeGap = spacing > 0 || RT > 0
 
             ctx.reset()
@@ -345,14 +336,14 @@ Item {
                 ctx.rotate(Math.PI / 2)
             }
 
-            const uiThickness = Math.max(1, SettingsData.dankBarBorderThickness ?? 1)
+            const uiThickness = Math.max(1, barConfig?.borderThickness ?? 1)
             const devThickness = Math.max(1, Math.round(Theme.px(uiThickness, dpr)))
 
-            const key = SettingsData.dankBarBorderColor || "surfaceText"
+            const key = barConfig?.borderColor || "surfaceText"
             const base = (key === "surfaceText") ? Theme.surfaceText
                        : (key === "primary") ? Theme.primary
                        : Theme.secondary
-            const color = Theme.withAlpha(base, SettingsData.dankBarBorderOpacity ?? 1.0)
+            const color = Theme.withAlpha(base, barConfig?.borderOpacity ?? 1.0)
 
             ctx.globalCompositeOperation = "source-over"
             ctx.fillStyle = color

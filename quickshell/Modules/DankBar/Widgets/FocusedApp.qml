@@ -18,6 +18,23 @@ BasePill {
     readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
+    property bool isAutoHideBar: false
+
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVerticalOrientation) {
+            return 0
+        }
+
+        if (isAutoHideBar) {
+            return 0
+        }
+
+        if (parentScreen.y > 0) {
+            return barThickness + (barSpacing || 4)
+        }
+
+        return 0
+    }
 
     Component.onCompleted: {
         updateDesktopEntry()
@@ -80,7 +97,6 @@ BasePill {
 
                 return activeHyprToplevel.workspace.id === Hyprland.focusedWorkspace.id
             } catch (e) {
-                console.error("FocusedApp: hasWindowsOnCurrentWorkspace error:", e)
                 return false
             }
         }
@@ -167,7 +183,7 @@ BasePill {
                         const desktopEntry = DesktopEntries.heuristicLookup(activeWindow.appId);
                         return desktopEntry && desktopEntry.name ? desktopEntry.name : activeWindow.appId;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
@@ -178,7 +194,7 @@ BasePill {
 
                 StyledText {
                     text: "•"
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.outlineButton
                     anchors.verticalCenter: parent.verticalCenter
                     visible: !compactMode && appText.text && titleText.text
@@ -203,7 +219,7 @@ BasePill {
 
                         return title;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
@@ -229,14 +245,16 @@ BasePill {
                     const screenX = currentScreen ? currentScreen.x : 0
                     const screenY = currentScreen ? currentScreen.y : 0
                     const relativeY = globalPos.y - screenY
-                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
+                    // Add minTooltipY offset to account for top bar
+                    const adjustedY = relativeY + root.minTooltipY
+                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS)
 
                     const appName = activeDesktopEntry && activeDesktopEntry.name ? activeDesktopEntry.name : activeWindow.appId
                     const title = activeWindow.title || ""
                     const tooltipText = appName + (title ? " • " + title : "")
 
                     const isLeft = root.axis?.edge === "left"
-                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, relativeY, currentScreen, isLeft, !isLeft)
+                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft)
                 }
             }
         }

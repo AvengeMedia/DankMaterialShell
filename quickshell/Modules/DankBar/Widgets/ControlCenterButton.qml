@@ -236,22 +236,4 @@ BasePill {
             }
         }
     }
-
-    MouseArea {
-        x: -root.leftMargin
-        y: -root.topMargin
-        width: root.width + root.leftMargin + root.rightMargin
-        height: root.height + root.topMargin + root.bottomMargin
-        cursorShape: Qt.PointingHandCursor
-        acceptedButtons: Qt.LeftButton
-        onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            root.clicked()
-        }
-    }
 }

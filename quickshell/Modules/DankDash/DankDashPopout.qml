@@ -18,30 +18,8 @@ DankPopout {
     property var triggerScreen: null
     property int currentTabIndex: 0
 
-
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerSection = section
-        triggerScreen = screen
-        triggerY = y
-
-        if (section === "center" && (SettingsData.dankBarPosition === SettingsData.Position.Top || SettingsData.dankBarPosition === SettingsData.Position.Bottom)) {
-            const screenWidth = screen ? screen.width : Screen.width
-            triggerX = (screenWidth - popupWidth) / 2
-            triggerWidth = popupWidth
-        } else if (section === "center" && (SettingsData.dankBarPosition === SettingsData.Position.Left || SettingsData.dankBarPosition === SettingsData.Position.Right)) {
-            const screenHeight = screen ? screen.height : Screen.height
-            triggerX = (screenHeight - popupHeight) / 2
-            triggerWidth = popupHeight
-        } else {
-            triggerX = x
-            triggerWidth = width
-        }
-    }
-
     popupWidth: 700
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
-    triggerX: Screen.width - 620 - Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 80
     screen: triggerScreen
     shouldBeVisible: dashVisible
