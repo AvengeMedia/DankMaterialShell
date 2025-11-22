@@ -234,7 +234,10 @@ Next steps:
 2. Enable greetd service:
      sudo systemctl enable greetd
 
-3. (Optional) Sync your theme with the greeter:
+3. Make your system load the greeter at startup:
+     sudo systemctl set-default graphical.target
+
+4. (Optional) Sync your theme with the greeter:
      If you have DankMaterialShell (DMS) installed, you can sync with:
      dms greeter sync
 
