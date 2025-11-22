@@ -139,7 +139,7 @@ Item {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     if (WeatherService.weather.available) {
-                                        SettingsData.set("temperatureUnit", !SettingsData.useFahrenheit)
+                                        SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit)
                                     }
                                 }
                                 enabled: WeatherService.weather.available
