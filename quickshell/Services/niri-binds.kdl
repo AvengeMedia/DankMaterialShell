@@ -11,7 +11,7 @@ binds {
         spawn "dms" "ipc" "call" "processlist" "toggle"; 
     }
 
-    Mod+Comma hotkey-overlay-title="Settings" { 
+    Mod+S hotkey-overlay-title="Settings" { 
         spawn "dms" "ipc" "call" "settings" "toggle"; 
     }
 
