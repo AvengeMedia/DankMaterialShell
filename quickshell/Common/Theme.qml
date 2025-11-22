@@ -200,7 +200,7 @@ Singleton {
                                                          "value": "scheme-tonal-spot",
                                                          "label": "Tonal Spot",
                                                          "description": I18n.tr("Balanced palette with focused accents (default).")
-                                                     }), 
+                                                     }),
                                                      ({
                                                         "value": "scheme-vibrant",
                                                         "label": "Vibrant",
@@ -928,6 +928,15 @@ Singleton {
 
     function withAlpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a)
+    }
+
+    function blend(c1, c2, r) {
+        return Qt.rgba(
+            c1.r * (1-r) + c2.r * r,
+            c1.g * (1-r) + c2.g * r,
+            c1.b * (1-r) + c2.b * r,
+            c1.a * (1-r) + c2.a * r,
+        )
     }
 
     function getFillMode(modeName) {
