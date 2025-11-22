@@ -8,3 +8,6 @@ cursor_border = '{{colors.primary.default.hex}}'
 
 selection_bg = '{{colors.primary_container.default.hex}}'
 selection_fg = '{{colors.on_surface.default.hex}}'
+
+ansi = ['{{dank16.color0}}', '{{dank16.color1}}', '{{dank16.color2}}', '{{dank16.color3}}', '{{dank16.color4}}', '{{dank16.color5}}', '{{dank16.color6}}', '{{dank16.color7}}']
+brights = ['{{dank16.color8}}', '{{dank16.color9}}', '{{dank16.color10}}', '{{dank16.color11}}', '{{dank16.color12}}', '{{dank16.color13}}', '{{dank16.color14}}', '{{dank16.color15}}']

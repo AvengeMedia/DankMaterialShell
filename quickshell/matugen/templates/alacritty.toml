@@ -9,3 +9,23 @@ background = '{{colors.primary_container.default.hex}}'
 [colors.cursor]
 text = '{{colors.background.default.hex}}'
 cursor = '{{colors.primary.default.hex}}'
+
+[colors.normal]
+black   = '{{dank16.color0}}'
+red     = '{{dank16.color1}}'
+green   = '{{dank16.color2}}'
+yellow  = '{{dank16.color3}}'
+blue    = '{{dank16.color4}}'
+magenta = '{{dank16.color5}}'
+cyan    = '{{dank16.color6}}'
+white   = '{{dank16.color7}}'
+
+[colors.bright]
+black   = '{{dank16.color8}}'
+red     = '{{dank16.color9}}'
+green   = '{{dank16.color10}}'
+yellow  = '{{dank16.color11}}'
+blue    = '{{dank16.color12}}'
+magenta = '{{dank16.color13}}'
+cyan    = '{{dank16.color14}}'
+white   = '{{dank16.color15}}'

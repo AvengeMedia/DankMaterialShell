@@ -93,6 +93,74 @@ set_system_color_scheme() {
   fi
 }
 
+run_matugen() {
+  local value="$1"
+  local kind="$2"
+  shift 2
+  local MAT_ARGS=("$@")
+
+  case "$kind" in
+  image)
+    [[ -f "$value" ]] || { echo "wallpaper not found: $value" >&2; popd >/dev/null; return 2; }
+    matugen image "$value" "${MAT_ARGS[@]}"
+    ;;
+  hex)
+    [[ "$value" =~ ^#[0-9A-Fa-f]{6}$ ]] || { echo "invalid hex: $value" >&2; popd >/dev/null; return 2; }
+    matugen color hex "$value" "${MAT_ARGS[@]}"
+    ;;
+  *)
+    echo "unknown kind: $kind" >&2
+    popd >/dev/null
+    return 2
+    ;;
+  esac
+
+}
+
+append_matugen_config() {
+  local check_cmd="$1"
+  local file_name="$2"
+  local cfg_file="$3"
+  local target_config="$SHELL_DIR/matugen/configs/$file_name"
+
+  # Check if command exists AND if the config file exists
+  if [[ "$check_cmd" == "skip" ]] || command -v "$check_cmd" >/dev/null 2>&1; then
+    if [[ -f "$target_config" ]]; then
+      # The sed command
+      sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target_config" >> "$cfg_file"
+      echo "" >> "$cfg_file"
+    fi
+  fi
+}
+
+get_dank_json() {
+  local theme_mode="$1"
+  local cfg=$2
+  local MODE_ARG=(-m "$theme_mode")
+  local MAT_ARGS=("${MODE_ARG[@]}" "${MAT_TYPE[@]}" --json hex --dry-run -c "$cfg")
+
+  local MAT_JSON
+  MAT_JSON=$(run_matugen "$value" "$kind" "${MAT_ARGS[@]}" | tr -d '\n' 2>/dev/null)
+
+  local LIGHT_FLAG=""
+  [[ "$theme_mode" == "light" ]] && LIGHT_FLAG="--light"
+
+  local primary
+  local surface
+  primary=$(echo "$MAT_JSON" | sed -n "s/.*\"primary\" *: *{ *[^}]*\"$theme_mode\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
+  surface=$(echo "$MAT_JSON" | sed -n "s/.*\"surface\" *: *{ *[^}]*\"$theme_mode\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
+
+  if [[ -z "$primary" ]]; then
+    echo "Error: Failed to extract PRIMARY color from matugen JSON (mode: $mode)" >&2
+    echo "This may indicate an incompatible matugen JSON format" >&2
+    return 2
+  fi
+
+  echo "$MAT_JSON" > "$LAST_JSON"
+
+  echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
+}
+
 build_once() {
   local json="$1"
   local kind value mode icon matugen_type run_user_templates
@@ -107,7 +175,7 @@ build_once() {
   [[ -z "$run_user_templates" ]] && run_user_templates="true"
 
   USER_MATUGEN_DIR="$CONFIG_DIR/matugen/dms"
-  
+
   TMP_CFG="$(mktemp)"
   trap 'rm -f "$TMP_CFG"' RETURN
 
@@ -129,45 +197,21 @@ input_path = '$SHELL_DIR/matugen/templates/dank.json'
 output_path = '$STATE_DIR/dms-colors.json'
 
 EOF
+  MAT_TYPE=(-t "$matugen_type")
 
   # If light mode, use gtk3 light config
   if [[ "$mode" == "light" ]]; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/gtk3-light.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
+    append_matugen_config "skip" "gtk3-light.toml" "$TMP_CFG"
   else
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/gtk3-dark.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
+    append_matugen_config "skip" "gtk3-dark.toml" "$TMP_CFG"
   fi
 
-  if command -v niri >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/niri.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
-
-  if command -v qt5ct >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/qt5ct.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
-
-  if command -v qt6ct >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/qt6ct.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
-
-  if command -v firefox >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/firefox.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
-
-  if command -v pywalfox >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/pywalfox.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
-
-  if command -v vesktop >/dev/null 2>&1 && [[ -d "$CONFIG_DIR/vesktop" ]]; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/vesktop.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
+  append_matugen_config "niri" "niri.toml" "$TMP_CFG"
+  append_matugen_config "qt5ct" "qt5ct.toml" "$TMP_CFG"
+  append_matugen_config "qt6ct" "qt6ct.toml" "$TMP_CFG"
+  append_matugen_config "firefox" "firefox.toml" "$TMP_CFG"
+  append_matugen_config "pywalfox" "pywalfox.toml" "$TMP_CFG"
+  append_matugen_config "vesktop" "vesktop.toml" "$TMP_CFG"
 
   if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
     awk '/^\[templates/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >> "$TMP_CFG"
@@ -180,91 +224,36 @@ EOF
     echo "" >> "$TMP_CFG"
   done
 
-  pushd "$SHELL_DIR" >/dev/null
-  MAT_MODE=(-m "$mode")
-  MAT_TYPE=(-t "$matugen_type")
+  DANK_JSON=$(get_dank_json "$mode" "$TMP_CFG")
 
-  case "$kind" in
-    image)
-      [[ -f "$value" ]] || { echo "wallpaper not found: $value" >&2; popd >/dev/null; return 2; }
-      JSON=$(matugen -c "$TMP_CFG" --json hex image "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}")
-      matugen -c "$TMP_CFG" image "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
-      ;;
-    hex)
-      [[ "$value" =~ ^#[0-9A-Fa-f]{6}$ ]] || { echo "invalid hex: $value" >&2; popd >/dev/null; return 2; }
-      JSON=$(matugen -c "$TMP_CFG" --json hex color hex "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}")
-      matugen -c "$TMP_CFG" color hex "$value" "${MAT_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
-      ;;
-    *)
-      echo "unknown kind: $kind" >&2; popd >/dev/null; return 2;;
-  esac
-  
+  if [[ -s "$TMP_CFG" ]] && grep -q '\[templates\.' "$TMP_CFG"; then
+    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null
+  fi
+
+  pushd "$SHELL_DIR" >/dev/null
   TMP_CONTENT_CFG="$(mktemp)"
   echo "[config]" > "$TMP_CONTENT_CFG"
   echo "" >> "$TMP_CONTENT_CFG"
 
-  TERMINAL_MODE="$mode"
-  if [[ "$TERMINALS_ALWAYS_DARK" == "true" ]]; then
-    TERMINAL_MODE="dark"
-  fi
+  append_matugen_config "ghostty" "ghostty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "kitty" "kitty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "foot" "foot.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "alacritty" "alacritty.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "wezterm" "wezterm.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "dgop" "dgop.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "code" "vscode.toml" "$TMP_CONTENT_CFG"
+  append_matugen_config "codium" "codium.toml" "$TMP_CONTENT_CFG"
 
-  if command -v ghostty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/ghostty.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v kitty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/kitty.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v foot >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/foot.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v alacritty >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/alacritty.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v wezterm >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/wezterm.toml" >>"$TMP_CONTENT_CFG"
-    echo "" >>"$TMP_CONTENT_CFG"
-  fi
-
-  if command -v dgop >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/dgop.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v code >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/vscode.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
-  fi
-
-  if command -v codium >/dev/null 2>&1; then
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$SHELL_DIR/matugen/configs/codium.toml" >> "$TMP_CONTENT_CFG"
-    echo "" >> "$TMP_CONTENT_CFG"
+  if [[ $TERMINALS_ALWAYS_DARK == "true" ]] && [[ "$mode" == "light" ]]; then
+    DANK_JSON=$(get_dank_json "dark" "$TMP_CONTENT_CFG")
   fi
 
   if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
-    MAT_TERMINAL_MODE=(-m "$TERMINAL_MODE")
-    case "$kind" in
-      image)
-        matugen -c "$TMP_CONTENT_CFG" image "$value" "${MAT_TERMINAL_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
-        ;;
-      hex)
-        matugen -c "$TMP_CONTENT_CFG" color hex "$value" "${MAT_TERMINAL_MODE[@]}" "${MAT_TYPE[@]}" >/dev/null
-        ;;
-    esac
+    run_matugen "$value" "$kind" -c "$TMP_CONTENT_CFG" --import-json-string "$DANK_JSON" >/dev/null
   fi
 
   rm -f "$TMP_CONTENT_CFG"
   popd >/dev/null
-
-  echo "$JSON" | grep -q '"primary"' || { echo "matugen JSON missing primary" >&2; set_system_color_scheme "$mode"; return 2; }
-  printf "%s" "$JSON" > "$LAST_JSON"
 
   GTK_CSS="$CONFIG_DIR/gtk-3.0/gtk.css"
   SHOULD_RUN_HOOK=false
@@ -283,166 +272,78 @@ EOF
     gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-${mode}" >/dev/null 2>&1 || true
   fi
 
-  COLOR_EXTRACT_MODE="$mode"
-  if [[ "$TERMINALS_ALWAYS_DARK" == "true" ]]; then
-    COLOR_EXTRACT_MODE="dark"
-  fi
-
-  if [[ "$MATUGEN_VERSION" == "2" ]]; then
-    PRIMARY=$(echo "$JSON" | sed -n "s/.*\"$COLOR_EXTRACT_MODE\":{[^}]*\"primary\":\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-    SURFACE=$(echo "$JSON" | sed -n "s/.*\"$COLOR_EXTRACT_MODE\":{[^}]*\"surface\":\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-  else
-    JSON_FLAT=$(echo "$JSON" | tr -d '\n')
-    PRIMARY=$(echo "$JSON_FLAT" | sed -n "s/.*\"primary\" *: *{ *[^}]*\"$COLOR_EXTRACT_MODE\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-    SURFACE=$(echo "$JSON_FLAT" | sed -n "s/.*\"surface\" *: *{ *[^}]*\"$COLOR_EXTRACT_MODE\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-  fi
-
-  if [[ -z "$PRIMARY" ]]; then
-    echo "Error: Failed to extract PRIMARY color from matugen JSON (mode: $mode)" >&2
-    echo "This may indicate an incompatible matugen JSON format" >&2
-    set_system_color_scheme "$mode"
-    return 2
-  fi
-
-  TERMINAL_LIGHT_FLAG=""
-  if [[ "$TERMINALS_ALWAYS_DARK" != "true" ]] && [[ "$mode" == "light" ]]; then
-    TERMINAL_LIGHT_FLAG="--light"
-  fi
-
-  if command -v ghostty >/dev/null 2>&1 && [[ -f "$CONFIG_DIR/ghostty/config-dankcolors" ]]; then
-    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --ghostty 2>/dev/null || true)
-    if [[ -n "${OUT:-}" ]]; then
-      printf "\n%s\n" "$OUT" >> "$CONFIG_DIR/ghostty/config-dankcolors"
-      if [[ -f "$CONFIG_DIR/ghostty/config" ]] && grep -q "^[^#]*config-dankcolors" "$CONFIG_DIR/ghostty/config" 2>/dev/null; then
-        pkill -USR2 -x 'ghostty|.ghostty-wrappe' >/dev/null 2>&1 || true
-      fi
-    fi
-  fi
-
-  if command -v kitty >/dev/null 2>&1 && [[ -f "$CONFIG_DIR/kitty/dank-theme.conf" ]]; then
-    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --kitty 2>/dev/null || true)
-    if [[ -n "${OUT:-}" ]]; then
-      printf "\n%s\n" "$OUT" >> "$CONFIG_DIR/kitty/dank-theme.conf"
-      if [[ -f "$CONFIG_DIR/kitty/kitty.conf" ]] && grep -q "^[^#]*dank-theme.conf" "$CONFIG_DIR/kitty/kitty.conf" 2>/dev/null; then
-        pkill -USR1 -x kitty >/dev/null 2>&1 || true
-      fi
-    fi
-  fi
-
-  if command -v foot >/dev/null 2>&1; then
-    FOOT_CONFIG="$CONFIG_DIR/foot/dank-colors.ini"
-
-    if [[ ! -f "$FOOT_CONFIG" ]]; then
-      mkdir -p "$(dirname "$FOOT_CONFIG")"
-      echo "[colors]" > "$FOOT_CONFIG"
-    fi
-
-    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --foot 2>/dev/null || true)
-    if [[ -n "${OUT:-}" ]]; then
-      printf "\n%s\n" "$OUT" >> "$FOOT_CONFIG"
-    fi
-  fi
-
-  if command -v wezterm >/dev/null 2>&1; then
-    WEZTERM_CONFIG="$CONFIG_DIR/wezterm/colors/dank-theme.toml"
-
-    if [[ ! -f "$WEZTERM_CONFIG" ]]; then
-      mkdir -p "$(dirname "$WEZTERM_CONFIG")"
-      touch "$WEZTERM_CONFIG"
-    fi
-
-    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --wezterm 2>/dev/null || true)
-    if [[ -n "${OUT:-}" ]]; then
-      printf "\n%s\n" "$OUT" >>"$WEZTERM_CONFIG"
-    fi
-  fi
-
-  if command -v alacritty >/dev/null 2>&1; then
-    ALACRITTY_CONFIG="$CONFIG_DIR/alacritty/dank-theme.toml"
-
-    if [[ ! -f "$ALACRITTY_CONFIG" ]]; then
-      mkdir -p "$(dirname "$ALACRITTY_CONFIG")"
-      touch "$ALACRITTY_CONFIG"
-    fi
-
-    OUT=$(dms dank16 "$PRIMARY" $TERMINAL_LIGHT_FLAG ${SURFACE:+--background "$SURFACE"} --alacritty 2>/dev/null || true)
-    if [[ -n "${OUT:-}" ]]; then
-      printf "\n%s\n" "$OUT" >> "$ALACRITTY_CONFIG"
-    fi
-  fi
-
-  if command -v code >/dev/null 2>&1; then
-    VSCODE_EXT_DIR="$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1"
-    VSCODE_THEME_DIR="$VSCODE_EXT_DIR/themes"
-    VSCODE_BASE_THEME="$VSCODE_THEME_DIR/dankshell-color-theme-base.json"
-    VSCODE_FINAL_THEME="$VSCODE_THEME_DIR/dankshell-color-theme.json"
-
-    mkdir -p "$VSCODE_THEME_DIR"
-
-    cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$VSCODE_EXT_DIR/package.json"
-    cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$VSCODE_EXT_DIR/.vsixmanifest"
-
-    for variant in default dark light; do
-      VSCODE_BASE="$VSCODE_THEME_DIR/dankshell-${variant}-base.json"
-      VSCODE_FINAL="$VSCODE_THEME_DIR/dankshell-${variant}.json"
-
-      if [[ -f "$VSCODE_BASE" ]]; then
-        VARIANT_FLAG=""
-        if [[ "$variant" == "light" ]]; then
-          VARIANT_FLAG="--light"
-        elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
-          VARIANT_FLAG="--light"
-        fi
-
-        dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$VSCODE_BASE" > "$VSCODE_FINAL" 2>/dev/null || cp "$VSCODE_BASE" "$VSCODE_FINAL"
-      fi
-    done
-  fi
-
-  if command -v codium >/dev/null 2>&1; then
-    CODIUM_EXT_DIR="$HOME/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1"
-    CODIUM_THEME_DIR="$CODIUM_EXT_DIR/themes"
-    CODIUM_BASE_THEME="$CODIUM_THEME_DIR/dankshell-color-theme-base.json"
-    CODIUM_FINAL_THEME="$CODIUM_THEME_DIR/dankshell-color-theme.json"
-    CODIUM_EXTENSIONS_JSON="$HOME/.vscode-oss/extensions/extensions.json"
-
-    mkdir -p "$CODIUM_THEME_DIR"
-
-    cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$CODIUM_EXT_DIR/package.json"
-    cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$CODIUM_EXT_DIR/.vsixmanifest"
-
-    if [[ -f "$CODIUM_EXTENSIONS_JSON" ]]; then
-      if ! grep -q "local.dynamic-base16-dankshell" "$CODIUM_EXTENSIONS_JSON" 2>/dev/null; then
-        cp "$CODIUM_EXTENSIONS_JSON" "$CODIUM_EXTENSIONS_JSON.backup-$(date +%s)" 2>/dev/null || true
-
-        CODIUM_ENTRY='{"identifier":{"id":"local.dynamic-base16-dankshell"},"version":"0.0.1","location":{"$mid":1,"path":"'"$CODIUM_EXT_DIR"'","scheme":"file"},"relativeLocation":"local.dynamic-base16-dankshell-0.0.1","metadata":{"id":"local.dynamic-base16-dankshell","publisherId":"local","publisherDisplayName":"local","targetPlatform":"undefined","isApplicationScoped":false,"updated":false,"isPreReleaseVersion":false,"installedTimestamp":'"$(date +%s)000"',"preRelease":false}}'
-
-        if [[ "$(cat "$CODIUM_EXTENSIONS_JSON")" == "[]" ]]; then
-          echo "[$CODIUM_ENTRY]" > "$CODIUM_EXTENSIONS_JSON"
-        else
-          TMP_JSON="$(mktemp)"
-          sed 's/]$/,'"$CODIUM_ENTRY"']/' "$CODIUM_EXTENSIONS_JSON" > "$TMP_JSON"
-          mv "$TMP_JSON" "$CODIUM_EXTENSIONS_JSON"
-        fi
-      fi
-    fi
-
-    for variant in default dark light; do
-      CODIUM_BASE="$CODIUM_THEME_DIR/dankshell-${variant}-base.json"
-      CODIUM_FINAL="$CODIUM_THEME_DIR/dankshell-${variant}.json"
-
-      if [[ -f "$CODIUM_BASE" ]]; then
-        VARIANT_FLAG=""
-        if [[ "$variant" == "light" ]]; then
-          VARIANT_FLAG="--light"
-        elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
-          VARIANT_FLAG="--light"
-        fi
-
-        dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$CODIUM_BASE" > "$CODIUM_FINAL" 2>/dev/null || cp "$CODIUM_BASE" "$CODIUM_FINAL"
-      fi
-    done
-  fi
+  # if command -v code >/dev/null 2>&1; then
+  #   VSCODE_EXT_DIR="$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1"
+  #   VSCODE_THEME_DIR="$VSCODE_EXT_DIR/themes"
+  #   VSCODE_BASE_THEME="$VSCODE_THEME_DIR/dankshell-color-theme-base.json"
+  #   VSCODE_FINAL_THEME="$VSCODE_THEME_DIR/dankshell-color-theme.json"
+  #
+  #   mkdir -p "$VSCODE_THEME_DIR"
+  #
+  #   cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$VSCODE_EXT_DIR/package.json"
+  #   cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$VSCODE_EXT_DIR/.vsixmanifest"
+  #
+  #   for variant in default dark light; do
+  #     VSCODE_BASE="$VSCODE_THEME_DIR/dankshell-${variant}-base.json"
+  #     VSCODE_FINAL="$VSCODE_THEME_DIR/dankshell-${variant}.json"
+  #
+  #     if [[ -f "$VSCODE_BASE" ]]; then
+  #       VARIANT_FLAG=""
+  #       if [[ "$variant" == "light" ]]; then
+  #         VARIANT_FLAG="--light"
+  #       elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
+  #         VARIANT_FLAG="--light"
+  #       fi
+  #
+  #       dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$VSCODE_BASE" >"$VSCODE_FINAL" 2>/dev/null || cp "$VSCODE_BASE" "$VSCODE_FINAL"
+  #     fi
+  #   done
+  # fi
+  #
+  # if command -v codium >/dev/null 2>&1; then
+  #   CODIUM_EXT_DIR="$HOME/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1"
+  #   CODIUM_THEME_DIR="$CODIUM_EXT_DIR/themes"
+  #   CODIUM_BASE_THEME="$CODIUM_THEME_DIR/dankshell-color-theme-base.json"
+  #   CODIUM_FINAL_THEME="$CODIUM_THEME_DIR/dankshell-color-theme.json"
+  #   CODIUM_EXTENSIONS_JSON="$HOME/.vscode-oss/extensions/extensions.json"
+  #
+  #   mkdir -p "$CODIUM_THEME_DIR"
+  #
+  #   cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$CODIUM_EXT_DIR/package.json"
+  #   cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$CODIUM_EXT_DIR/.vsixmanifest"
+  #
+  #   if [[ -f "$CODIUM_EXTENSIONS_JSON" ]]; then
+  #     if ! grep -q "local.dynamic-base16-dankshell" "$CODIUM_EXTENSIONS_JSON" 2>/dev/null; then
+  #       cp "$CODIUM_EXTENSIONS_JSON" "$CODIUM_EXTENSIONS_JSON.backup-$(date +%s)" 2>/dev/null || true
+  #
+  #       CODIUM_ENTRY='{"identifier":{"id":"local.dynamic-base16-dankshell"},"version":"0.0.1","location":{"$mid":1,"path":"'"$CODIUM_EXT_DIR"'","scheme":"file"},"relativeLocation":"local.dynamic-base16-dankshell-0.0.1","metadata":{"id":"local.dynamic-base16-dankshell","publisherId":"local","publisherDisplayName":"local","targetPlatform":"undefined","isApplicationScoped":false,"updated":false,"isPreReleaseVersion":false,"installedTimestamp":'"$(date +%s)000"',"preRelease":false}}'
+  #
+  #       if [[ "$(cat "$CODIUM_EXTENSIONS_JSON")" == "[]" ]]; then
+  #         echo "[$CODIUM_ENTRY]" >"$CODIUM_EXTENSIONS_JSON"
+  #       else
+  #         TMP_JSON="$(mktemp)"
+  #         sed 's/]$/,'"$CODIUM_ENTRY"']/' "$CODIUM_EXTENSIONS_JSON" >"$TMP_JSON"
+  #         mv "$TMP_JSON" "$CODIUM_EXTENSIONS_JSON"
+  #       fi
+  #     fi
+  #   fi
+  #
+  #   for variant in default dark light; do
+  #     CODIUM_BASE="$CODIUM_THEME_DIR/dankshell-${variant}-base.json"
+  #     CODIUM_FINAL="$CODIUM_THEME_DIR/dankshell-${variant}.json"
+  #
+  #     if [[ -f "$CODIUM_BASE" ]]; then
+  #       VARIANT_FLAG=""
+  #       if [[ "$variant" == "light" ]]; then
+  #         VARIANT_FLAG="--light"
+  #       elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
+  #         VARIANT_FLAG="--light"
+  #       fi
+  #
+  #       dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$CODIUM_BASE" >"$CODIUM_FINAL" 2>/dev/null || cp "$CODIUM_BASE" "$CODIUM_FINAL"
+  #     fi
+  #   done
+  # fi
 
   set_system_color_scheme "$mode"
 }
