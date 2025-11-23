@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Pipewire
 import qs.Common
@@ -384,14 +383,14 @@ Rectangle {
                             Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: Theme.spacingM
-                                width: 20
+                                width: Theme.iconSize + Theme.spacingS * 2
                                 height: Theme.iconSize + Theme.spacingS * 2
-                                anchors.verticalCenter: parent.verticalRight
-                                radius: (Theme.iconSize + Theme.spacingS * 2) / 2
-                                color: iconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.primary, 0)
+                                anchors.verticalCenter: parent.verticalCenter
+                                radius: Theme.cornerRadius
+                                color: appIconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.primary, 0)
 
                                 MouseArea {
-                                    id: iconArea
+                                    id: appIconArea
                                     anchors.fill: parent
                                     visible: modelData !== null
                                     hoverEnabled: true
