@@ -39,6 +39,33 @@ BasePill {
         return audioVizHeight + Theme.spacingXS + playButtonHeight;
     }
 
+    onWheel: function (wheelEvent) {
+        if (!activePlayer) {
+            wheelEvent.accepted = false;
+            return;
+        }
+
+        wheelEvent.accepted = true;
+
+        // If volume is not supported, return early to avoid error logs but accepting the scroll,
+        // to keep the consistency of not scrolling workspaces when scrolling in the media widget.
+        if (!activePlayer.volumeSupported) {
+            return;
+        }
+
+        const delta = wheelEvent.angleDelta.y;
+        const currentVolume = (activePlayer.volume * 100) || 0;
+
+        let newVolume;
+        if (delta > 0) {
+            newVolume = Math.min(100, currentVolume + 5);
+        } else {
+            newVolume = Math.max(0, currentVolume - 5);
+        }
+
+        activePlayer.volume = newVolume / 100;
+    }
+
     content: Component {
         Item {
             implicitWidth: root.playerAvailable ? root.currentContentWidth : 0

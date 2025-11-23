@@ -34,6 +34,7 @@ Item {
 
     signal clicked
     signal rightClicked
+    signal wheel(var wheelEvent)
 
     width: isVerticalOrientation ? barThickness : visualWidth
     height: isVerticalOrientation ? visualHeight : barThickness
@@ -97,6 +98,9 @@ Item {
                 }
             }
             root.clicked();
+        }
+        onWheel: function (wheelEvent) {
+            root.wheel(wheelEvent)
         }
     }
 }
