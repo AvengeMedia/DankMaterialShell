@@ -240,7 +240,7 @@ binds {
     Mod+M hotkey-overlay-title="Task Manager" {
         spawn "dms" "ipc" "call" "processlist" "toggle";
     }
-    Mod+Comma hotkey-overlay-title="Settings" {
+    Mod+S hotkey-overlay-title="Settings" {
         spawn "dms" "ipc" "call" "settings" "toggle";
     }
     Mod+Y hotkey-overlay-title="Browse Wallpapers" {
@@ -391,6 +391,7 @@ binds {
     // === Column Management ===
     Mod+BracketLeft  { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
+    Mod+Comma  { consume-window-into-column; }
     Mod+Period { expel-window-from-column; }
 
     // === Sizing & Layout ===
