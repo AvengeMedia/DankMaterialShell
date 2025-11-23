@@ -18,7 +18,7 @@ Item {
     property var allPlayers: MprisController.availablePlayers
 
     readonly property bool isRightEdge: (SettingsData.barConfigs[0]?.position ?? SettingsData.Position.Top) === SettingsData.Position.Right
-    property var defaultSink: AudioService.sink
+    readonly property bool volumeAvailable: activePlayer && activePlayer.volumeSupported
 
     // Palette that stays stable across track switches until new colors are ready
     property color dom: Qt.rgba(Theme.surface.r, Theme.surface.g, Theme.surface.b, 1.0)
@@ -143,29 +143,24 @@ Item {
         return "speaker"
     }
 
-    function getVolumeIcon(sink) {
-        if (!sink || !sink.audio) return "volume_off"
+    function getVolumeIcon() {
+        if (!volumeAvailable) return "volume_off"
 
-        const volume = sink.audio.volume
-        const muted = sink.audio.muted
+        const volume = activePlayer.volume
 
-        if (muted || volume === 0.0) return "volume_off"
+        if (volume === 0.0) return "volume_off"
         if (volume <= 0.33) return "volume_down"
         if (volume <= 0.66) return "volume_up"
         return "volume_up"
     }
 
     function adjustVolume(step) {
-        if (!defaultSink?.audio) return
+        if (!volumeAvailable) return
 
-        const currentVolume = Math.round(defaultSink.audio.volume * 100)
+        const currentVolume = Math.round(activePlayer.volume * 100)
         const newVolume = Math.min(100, Math.max(0, currentVolume + step))
 
-        defaultSink.audio.volume = newVolume / 100
-        if (newVolume > 0 && defaultSink.audio.muted) {
-            defaultSink.audio.muted = false
-        }
-        AudioService.playVolumeChangeSoundIfEnabled()
+        activePlayer.volume = newVolume / 100
     }
 
     Process {
@@ -1076,12 +1071,14 @@ Item {
             radius: 20
             x: isRightEdge ? Theme.spacingM : parent.width - 40 - Theme.spacingM
             y: 130
-            color: volumeButtonArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
-            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
+            color: volumeButtonArea.containsMouse && volumeAvailable ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : "transparent"
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, volumeAvailable ? 0.3 : 0.15)
             border.width: 1
             z: 101
+            enabled: volumeAvailable
 
             property bool volumeExpanded: false
+            property real previousVolume: 1.0
 
             Timer {
                 id: volumeHideTimer
@@ -1091,10 +1088,9 @@ Item {
 
             DankIcon {
                 anchors.centerIn: parent
-                name: getVolumeIcon(defaultSink)
+                name: getVolumeIcon()
                 size: 18
-                color: defaultSink && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
-            }
+                color: volumeAvailable && activePlayer.volume > 0 ? Theme.primary : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, volumeAvailable ? 1.0 : 0.5)            }
 
             MouseArea {
                 id: volumeButtonArea
@@ -1109,13 +1105,25 @@ Item {
                     volumeHideTimer.restart()
                 }
                 onClicked: {
-                    if (defaultSink?.audio) {
-                        defaultSink.audio.muted = !defaultSink.audio.muted
+                    if (activePlayer.volume > 0) {
+                        volumeButton.previousVolume = activePlayer.volume
+                        activePlayer.volume = 0
+                    } else {
+                        activePlayer.volume = volumeButton.previousVolume || 1
                     }
                 }
                 onWheel: wheelEvent => {
-                    const step = Math.max(0.5, 100 / 100)
-                    adjustVolume(wheelEvent.angleDelta.y > 0 ? step : -step)
+                    let delta = wheelEvent.angleDelta.y
+                    let currentVolume = (activePlayer.volume * 100) || 0
+                    let newVolume
+
+                    if (delta > 0) {
+                        newVolume = Math.min(100, currentVolume + 5)
+                    } else {
+                        newVolume = Math.max(0, currentVolume - 5)
+                    }
+
+                    activePlayer.volume = newVolume / 100
                     volumeButton.volumeExpanded = true
                     wheelEvent.accepted = true
                 }
@@ -1184,7 +1192,7 @@ Item {
         height: 180
         x: isRightEdge ? -width - Theme.spacingS : root.width + Theme.spacingS
         y: volumeButton.y - 50
-        visible: volumeButton.volumeExpanded
+        visible: volumeButton.volumeExpanded && volumeAvailable
         closePolicy: Popup.NoAutoClose
         modal: false
         dim: false
@@ -1257,7 +1265,7 @@ Item {
                 Rectangle {
                     id: sliderFill
                     width: parent.width
-                    height: defaultSink ? (Math.min(1.0, defaultSink.audio.volume) * parent.height) : 0
+                    height: volumeAvailable ? (Math.min(1.0, activePlayer.volume) * parent.height) : 0
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
@@ -1273,7 +1281,7 @@ Item {
                     height: 8
                     radius: Theme.cornerRadius
                     y: {
-                        const ratio = defaultSink ? Math.min(1.0, defaultSink.audio.volume) : 0
+                        const ratio = volumeAvailable ? Math.min(1.0, activePlayer.volume) : 0
                         const travel = parent.height - height
                         return Math.max(0, Math.min(travel, travel * (1 - ratio)))
                     }
@@ -1347,7 +1355,7 @@ Item {
                     id: volumeSliderArea
                     anchors.fill: parent
                     anchors.margins: -12
-                    enabled: defaultSink !== null
+                    enabled: volumeAvailable
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     preventStealing: true
@@ -1380,20 +1388,16 @@ Item {
                     }
 
                     onWheel: wheelEvent => {
-                        const step = Math.max(0.5, 100 / 100)
+                        const step = 1
                         adjustVolume(wheelEvent.angleDelta.y > 0 ? step : -step)
                         wheelEvent.accepted = true
                     }
 
                     function updateVolume(mouse) {
-                        if (defaultSink) {
+                        if (volumeAvailable) {
                             const ratio = 1.0 - (mouse.y / height)
                             const volume = Math.max(0, Math.min(1, ratio))
-                            defaultSink.audio.volume = volume
-                            if (volume > 0 && defaultSink.audio.muted) {
-                                defaultSink.audio.muted = false
-                            }
-                            AudioService.playVolumeChangeSoundIfEnabled()
+                            activePlayer.volume = volume
                         }
                     }
                 }
@@ -1403,7 +1407,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottomMargin: Theme.spacingL
-                text: defaultSink ? Math.round(defaultSink.audio.volume * 100) + "%" : "0%"
+                text: volumeAvailable ? Math.round(activePlayer.volume * 100) + "%" : "0%"
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
                 font.weight: Font.Medium
