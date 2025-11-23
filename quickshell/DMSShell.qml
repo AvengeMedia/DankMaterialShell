@@ -530,6 +530,14 @@ Item {
     Variants {
         model: SettingsData.getFilteredScreens("osd")
 
+        delegate: MediaVolumeOSD {
+            modelData: item
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
         delegate: MicMuteOSD {
             modelData: item
         }

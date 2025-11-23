@@ -810,6 +810,17 @@ Item {
                         }
                     }
 
+
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Media Volume OSD")
+                        description: I18n.tr("Show on-screen display when media player volume changes")
+                        checked: SettingsData.osdMediaVolumeEnabled
+                        onToggled: checked => {
+                            return SettingsData.set("osdMediaVolumeEnabled", checked)
+                        }
+                    }
+
                     DankToggle {
                         width: parent.width
                         text: I18n.tr("Brightness OSD")
