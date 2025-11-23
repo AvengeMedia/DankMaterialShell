@@ -453,7 +453,8 @@ PanelWindow {
                 const activeTrayMenu = TrayMenuManager.activeTrayMenus[screenName];
                 const trayOpen = rootWindow.systemTrayMenuOpen;
 
-                topBarCore.hasActivePopout = !!(activePopout || activeTrayMenu || trayOpen);
+                const hasVisiblePopout = activePopout && activePopout.shouldBeVisible;
+                topBarCore.hasActivePopout = !!(hasVisiblePopout || activeTrayMenu || trayOpen);
             }
         }
 

@@ -93,6 +93,7 @@ PanelWindow {
 
     function close() {
         shouldBeVisible = false
+        PopoutManager.popoutChanged()
         closeTimer.restart()
     }
 
