@@ -445,16 +445,27 @@ PanelWindow {
 
         onHasActivePopoutChanged: evaluateReveal()
 
+        function updateActivePopoutState() {
+            const screenName = barWindow.screen.name;
+            const activePopout = PopoutManager.currentPopoutsByScreen[screenName];
+            const activeTrayMenu = TrayMenuManager.activeTrayMenus[screenName];
+            const trayOpen = rootWindow.systemTrayMenuOpen;
+
+            const hasVisiblePopout = activePopout && activePopout.shouldBeVisible;
+            topBarCore.hasActivePopout = !!(hasVisiblePopout || activeTrayMenu || trayOpen);
+        }
+
         Connections {
             target: PopoutManager
             function onPopoutChanged() {
-                const screenName = barWindow.screen.name;
-                const activePopout = PopoutManager.currentPopoutsByScreen[screenName];
-                const activeTrayMenu = TrayMenuManager.activeTrayMenus[screenName];
-                const trayOpen = rootWindow.systemTrayMenuOpen;
+                topBarCore.updateActivePopoutState();
+            }
+        }
 
-                const hasVisiblePopout = activePopout && activePopout.shouldBeVisible;
-                topBarCore.hasActivePopout = !!(hasVisiblePopout || activeTrayMenu || trayOpen);
+        Connections {
+            target: TrayMenuManager
+            function onActiveTrayMenusChanged() {
+                topBarCore.updateActivePopoutState();
             }
         }
 
