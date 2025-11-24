@@ -97,6 +97,22 @@
 
     "terminal.background": "{{colors.background.light.hex}}",
     "terminal.foreground": "{{colors.on_surface.light.hex}}",
+    "terminal.ansiBlack": "{{dank16.color0}}",
+    "terminal.ansiRed": "{{dank16.color1}}",
+    "terminal.ansiGreen": "{{dank16.color2}}",
+    "terminal.ansiYellow": "{{dank16.color3}}",
+    "terminal.ansiBlue": "{{dank16.color4}}",
+    "terminal.ansiMagenta": "{{dank16.color5}}",
+    "terminal.ansiCyan": "{{dank16.color6}}",
+    "terminal.ansiWhite": "{{dank16.color7}}",
+    "terminal.ansiBrightBlack": "{{dank16.color8}}",
+    "terminal.ansiBrightRed": "{{dank16.color9}}",
+    "terminal.ansiBrightGreen": "{{dank16.color10}}",
+    "terminal.ansiBrightYellow": "{{dank16.color11}}",
+    "terminal.ansiBrightBlue": "{{dank16.color12}}",
+    "terminal.ansiBrightMagenta": "{{dank16.color13}}",
+    "terminal.ansiBrightCyan": "{{dank16.color14}}",
+    "terminal.ansiBrightWhite": "{{dank16.color15}}",
 
     "gitDecoration.modifiedResourceForeground": "{{colors.primary.light.hex}}",
     "gitDecoration.addedResourceForeground": "{{colors.primary.light.hex}}",
@@ -158,19 +174,6 @@
   },
 
   "tokenColors": [
-    {
-      "scope": ["comment", "punctuation.definition.comment"],
-      "settings": {
-        "foreground": "{{colors.outline.light.hex}}",
-        "fontStyle": "italic"
-      }
-    },
-    {
-      "scope": ["keyword", "storage.type", "storage.modifier"],
-      "settings": {
-        "foreground": "{{colors.primary.light.hex}}"
-      }
-    },
     {
       "scope": ["variable", "meta.object-literal.key"],
       "settings": {
@@ -263,53 +266,166 @@
       "settings": {
         "foreground": "{{colors.secondary.light.hex}}"
       }
+    },
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": {
+        "foreground": "{{dank16.color8}}"
+      }
+    },
+    {
+      "scope": "keyword",
+      "settings": {
+        "foreground": "{{dank16.color5}}"
+      }
+    },
+    {
+      "scope": "storage.type",
+      "settings": {
+        "foreground": "{{dank16.color13}}"
+      }
+    },
+    {
+      "scope": "storage.modifier",
+      "settings": {
+        "foreground": "{{dank16.color5}}"
+      }
+    },
+    {
+      "scope": "variable",
+      "settings": {
+        "foreground": "{{dank16.color15}}"
+      }
+    },
+    {
+      "scope": "variable.parameter",
+      "settings": {
+        "foreground": "{{dank16.color7}}"
+      }
+    },
+    {
+      "scope": ["meta.object-literal.key", "meta.property.object", "variable.other.property"],
+      "settings": {
+        "foreground": "{{dank16.color4}}"
+      }
+    },
+    {
+      "scope": "constant.other.symbol",
+      "settings": {
+        "foreground": "{{dank16.color12}}"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language"],
+      "settings": {
+        "foreground": "{{dank16.color12}}"
+      }
+    },
+    {
+      "scope": "constant.character",
+      "settings": {
+        "foreground": "{{dank16.color3}}"
+      }
+    },
+    {
+      "scope": ["entity.name.type", "entity.name.class"],
+      "settings": {
+        "foreground": "{{dank16.color12}}"
+      }
+    },
+    {
+      "scope": "support.type",
+      "settings": {
+        "foreground": "{{dank16.color13}}"
+      }
+    },
+    {
+      "scope": ["entity.name.function", "support.function"],
+      "settings": {
+        "foreground": "{{dank16.color2}}"
+      }
+    },
+    {
+      "scope": ["support.class", "support.variable"],
+      "settings": {
+        "foreground": "{{dank16.color15}}"
+      }
+    },
+    {
+      "scope": "variable.language",
+      "settings": {
+        "foreground": "{{dank16.color12}}"
+      }
+    },
+    {
+      "scope": "entity.name.tag.yaml",
+      "settings": {
+        "foreground": "{{dank16.color12}}"
+      }
+    },
+    {
+      "scope": ["string.unquoted.plain.out.yaml", "string.unquoted.yaml"],
+      "settings": {
+        "foreground": "{{dank16.color15}}"
+      }
+    },
+    {
+      "scope": "string",
+      "settings": {
+        "foreground": "{{dank16.color3}}"
+      }
     }
   ],
 
   "semanticHighlighting": true,
   "semanticTokenColors": {
+    "variable": {
+      "foreground": "{{dank16.color15}}"
+    },
     "variable.readonly": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color12}}"
     },
     "property": {
-      "foreground": "{{colors.on_surface.light.hex}}"
+      "foreground": "{{dank16.color4}}"
     },
     "function": {
-      "foreground": "{{colors.primary.light.hex}}"
+      "foreground": "{{dank16.color2}}"
     },
     "method": {
-      "foreground": "{{colors.primary.light.hex}}"
+      "foreground": "{{dank16.color2}}"
     },
     "type": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color12}}"
     },
     "class": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color12}}"
+    },
+    "typeParameter": {
+      "foreground": "{{dank16.color13}}"
     },
     "enumMember": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color12}}"
     },
     "string": {
-      "foreground": "{{colors.secondary.light.hex}}"
+      "foreground": "{{dank16.color3}}"
     },
     "number": {
-      "foreground": "{{colors.tertiary.light.hex}}"
+      "foreground": "{{dank16.color12}}"
     },
     "comment": {
-      "foreground": "{{colors.outline.light.hex}}",
-      "fontStyle": "italic"
+      "foreground": "{{dank16.color8}}"
     },
     "keyword": {
-      "foreground": "{{colors.primary.light.hex}}"
+      "foreground": "{{dank16.color5}}"
     },
     "operator": {
-      "foreground": "{{colors.on_surface.light.hex}}"
+      "foreground": "{{dank16.color15}}"
     },
     "parameter": {
-      "foreground": "{{colors.on_surface.light.hex}}"
+      "foreground": "{{dank16.color7}}"
     },
     "namespace": {
-      "foreground": "{{colors.secondary.light.hex}}"
+      "foreground": "{{dank16.color15}}"
     }
   }
 }
