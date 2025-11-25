@@ -92,8 +92,6 @@ DankPopout {
             });
         } else {
             Qt.callLater(() => {
-                collapseAll();
-
                 if (NetworkService.activeService) {
                     NetworkService.activeService.autoRefreshEnabled = false;
                 }
