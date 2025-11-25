@@ -458,7 +458,7 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                         onClicked: mouse => {
                             if (mouse.button === Qt.LeftButton) {
                                 if (isGrouped && windowCount > 1) {
@@ -503,6 +503,12 @@ Item {
                                         const relativeX = globalPos.x - screenX;
                                         const yPos = root.barThickness + root.barSpacing - 7;
                                         windowContextMenuLoader.item.showAt(relativeX, yPos, false, "top");
+                                    }
+                                }
+                            } else if (mouse.button === Qt.MiddleButton) {
+                                if (toplevelObject) {
+                                    if (typeof toplevelObject.close === "function") {
+                                        toplevelObject.close();
                                     }
                                 }
                             }
