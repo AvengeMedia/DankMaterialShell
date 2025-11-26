@@ -354,7 +354,12 @@ Rectangle {
                             }
 
                             StyledText {
-                                text: AudioService.displayName(modelData)
+                                text: {
+                                    const mediaName = modelData && modelData.properties ? (modelData.properties["media.name"] || "") : "";
+                                    const max = 30;
+                                    const truncated = mediaName.length > max ? mediaName.substring(0, max) + "..." : mediaName;
+                                    return AudioService.displayName(modelData) + (truncated ? ": " + truncated : "");
+                                }
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
                                 font.weight: modelData === AudioService.sink ? Font.Medium : Font.Normal
