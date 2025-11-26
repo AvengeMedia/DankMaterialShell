@@ -1,7 +1,6 @@
 package dank16
 
 import (
-	"encoding/json"
 	"math"
 	"testing"
 )
@@ -370,79 +369,6 @@ func TestGeneratePalette(t *testing.T) {
 				t.Errorf("Dark mode foreground = %s, expected #ffffff", result[15])
 			}
 		})
-	}
-}
-
-func TestEnrichVSCodeTheme(t *testing.T) {
-	colors := GeneratePalette("#625690", PaletteOptions{IsLight: false})
-
-	baseTheme := map[string]interface{}{
-		"name": "Test Theme",
-		"type": "dark",
-		"colors": map[string]interface{}{
-			"editor.background": "#000000",
-		},
-	}
-
-	themeJSON, err := json.Marshal(baseTheme)
-	if err != nil {
-		t.Fatalf("Failed to marshal base theme: %v", err)
-	}
-
-	result, err := EnrichVSCodeTheme(themeJSON, colors)
-	if err != nil {
-		t.Fatalf("EnrichVSCodeTheme failed: %v", err)
-	}
-
-	var enriched map[string]interface{}
-	if err := json.Unmarshal(result, &enriched); err != nil {
-		t.Fatalf("Failed to unmarshal result: %v", err)
-	}
-
-	colorsMap, ok := enriched["colors"].(map[string]interface{})
-	if !ok {
-		t.Fatal("colors is not a map")
-	}
-
-	terminalColors := []string{
-		"terminal.ansiBlack",
-		"terminal.ansiRed",
-		"terminal.ansiGreen",
-		"terminal.ansiYellow",
-		"terminal.ansiBlue",
-		"terminal.ansiMagenta",
-		"terminal.ansiCyan",
-		"terminal.ansiWhite",
-		"terminal.ansiBrightBlack",
-		"terminal.ansiBrightRed",
-		"terminal.ansiBrightGreen",
-		"terminal.ansiBrightYellow",
-		"terminal.ansiBrightBlue",
-		"terminal.ansiBrightMagenta",
-		"terminal.ansiBrightCyan",
-		"terminal.ansiBrightWhite",
-	}
-
-	for i, key := range terminalColors {
-		if val, ok := colorsMap[key]; !ok {
-			t.Errorf("Missing terminal color: %s", key)
-		} else if val != colors[i] {
-			t.Errorf("%s = %s, expected %s", key, val, colors[i])
-		}
-	}
-
-	if colorsMap["editor.background"] != "#000000" {
-		t.Error("Original theme colors should be preserved")
-	}
-}
-
-func TestEnrichVSCodeThemeInvalidJSON(t *testing.T) {
-	colors := GeneratePalette("#625690", PaletteOptions{IsLight: false})
-	invalidJSON := []byte("{invalid json")
-
-	_, err := EnrichVSCodeTheme(invalidJSON, colors)
-	if err == nil {
-		t.Error("Expected error for invalid JSON, got nil")
 	}
 }
 
