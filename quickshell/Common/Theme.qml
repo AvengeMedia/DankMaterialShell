@@ -89,7 +89,9 @@ Singleton {
     property bool gtkThemingEnabled: typeof SettingsData !== "undefined" ? SettingsData.gtkAvailable : false
     property bool qtThemingEnabled: typeof SettingsData !== "undefined" ? (SettingsData.qt5ctAvailable || SettingsData.qt6ctAvailable) : false
     property var workerRunning: false
+    property var pendingThemeRequest: null
     property var matugenColors: ({})
+    property var _pendingGenerateParams: null
     property var customThemeData: null
 
     Component.onCompleted: {
@@ -799,13 +801,26 @@ Singleton {
         }
     }
 
-    function setDesiredTheme(kind, value, isLight, iconTheme, matugenType) {
+    function setDesiredTheme(kind, value, isLight, iconTheme, matugenType, stockColors) {
         if (!matugenAvailable) {
             console.warn("Theme: matugen not available or disabled - cannot set system theme");
             return;
         }
 
-        console.info("Theme: Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", "type:", matugenType);
+        if (workerRunning) {
+            console.info("Theme: Worker already running, queueing request");
+            pendingThemeRequest = {
+                kind,
+                value,
+                isLight,
+                iconTheme,
+                matugenType,
+                stockColors
+            };
+            return;
+        }
+
+        console.info("Theme: Setting desired theme -", kind, "mode:", isLight ? "light" : "dark", stockColors ? "(stock colors)" : "(dynamic)");
 
         if (typeof NiriService !== "undefined" && CompositorService.isNiri) {
             NiriService.suppressNextToast();
@@ -820,15 +835,18 @@ Singleton {
             "runUserTemplates": (typeof SettingsData !== "undefined") ? SettingsData.runUserMatugenTemplates : true
         };
 
+        if (stockColors) {
+            desired.stockColors = JSON.stringify(stockColors);
+        }
+
         const json = JSON.stringify(desired);
         const desiredPath = stateDir + "/matugen.desired.json";
-
-        Quickshell.execDetached(["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF`]);
-        workerRunning = true;
         const syncModeWithPortal = (typeof SettingsData !== "undefined" && SettingsData.syncModeWithPortal) ? "true" : "false";
         const terminalsAlwaysDark = (typeof SettingsData !== "undefined" && SettingsData.terminalsAlwaysDark) ? "true" : "false";
+
         console.log("Theme: Starting matugen worker");
-        systemThemeGenerator.command = [shellDir + "/scripts/matugen-worker.sh", stateDir, shellDir, configDir, syncModeWithPortal, terminalsAlwaysDark, "--run"];
+        workerRunning = true;
+        systemThemeGenerator.command = ["sh", "-c", `mkdir -p '${stateDir}' && cat > '${desiredPath}' << 'EOF'\n${json}\nEOF\nexec '${shellDir}/scripts/matugen-worker.sh' '${stateDir}' '${shellDir}' '${configDir}' '${syncModeWithPortal}' '${terminalsAlwaysDark}' --run`];
         systemThemeGenerator.running = true;
     }
 
@@ -836,40 +854,122 @@ Singleton {
         const isGreeterMode = (typeof SessionData !== "undefined" && SessionData.isGreeterMode);
         if (!matugenAvailable || isGreeterMode)
             return;
+
+        _pendingGenerateParams = true;
+        _themeGenerateDebounce.restart();
+    }
+
+    function _executeThemeGeneration() {
+        if (!_pendingGenerateParams)
+            return;
+        _pendingGenerateParams = null;
+
         const isLight = (typeof SessionData !== "undefined" && SessionData.isLightMode);
         const iconTheme = (typeof SettingsData !== "undefined" && SettingsData.iconTheme) ? SettingsData.iconTheme : "System Default";
 
         if (currentTheme === dynamic) {
-            if (!rawWallpaperPath) {
+            if (!rawWallpaperPath)
                 return;
-            }
             const selectedMatugenType = (typeof SettingsData !== "undefined" && SettingsData.matugenScheme) ? SettingsData.matugenScheme : "scheme-tonal-spot";
-            if (rawWallpaperPath.startsWith("#")) {
-                setDesiredTheme("hex", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-            } else {
-                setDesiredTheme("image", rawWallpaperPath, isLight, iconTheme, selectedMatugenType);
-            }
-        } else {
-            let primaryColor;
-            let matugenType;
-            if (currentTheme === "custom") {
-                if (!customThemeData || !customThemeData.primary) {
-                    console.warn("Custom theme data not available for system theme generation");
-                    return;
-                }
-                primaryColor = customThemeData.primary;
-                matugenType = customThemeData.matugen_type;
-            } else {
-                primaryColor = currentThemeData.primary;
-                matugenType = currentThemeData.matugen_type;
-            }
-
-            if (!primaryColor) {
-                console.warn("No primary color available for theme:", currentTheme);
-                return;
-            }
-            setDesiredTheme("hex", primaryColor, isLight, iconTheme, matugenType);
+            const kind = rawWallpaperPath.startsWith("#") ? "hex" : "image";
+            setDesiredTheme(kind, rawWallpaperPath, isLight, iconTheme, selectedMatugenType, null);
+            return;
         }
+
+        let darkTheme, lightTheme;
+        if (currentTheme === "custom") {
+            darkTheme = customThemeData;
+            lightTheme = customThemeData;
+        } else {
+            darkTheme = StockThemes.getThemeByName(currentTheme, false);
+            lightTheme = StockThemes.getThemeByName(currentTheme, true);
+        }
+
+        if (!darkTheme || !darkTheme.primary) {
+            console.warn("Theme data not available for:", currentTheme);
+            return;
+        }
+
+        const stockColors = buildMatugenColorsFromTheme(darkTheme, lightTheme);
+        const themeData = isLight ? lightTheme : darkTheme;
+        setDesiredTheme("hex", themeData.primary, isLight, iconTheme, themeData.matugen_type, stockColors);
+    }
+
+    function buildMatugenColorsFromTheme(darkTheme, lightTheme) {
+        const colors = {};
+
+        function addColor(matugenKey, darkVal, lightVal) {
+            if (!darkVal && !lightVal)
+                return;
+            colors[matugenKey] = {
+                "dark": {
+                    "color": String(darkVal || lightVal)
+                },
+                "light": {
+                    "color": String(lightVal || darkVal)
+                },
+                "default": {
+                    "color": String(darkVal || lightVal)
+                }
+            };
+        }
+
+        function get(theme, key, fallback) {
+            return theme[key] || fallback;
+        }
+
+        addColor("primary", darkTheme.primary, lightTheme.primary);
+        addColor("on_primary", darkTheme.primaryText, lightTheme.primaryText);
+        addColor("primary_container", darkTheme.primaryContainer, lightTheme.primaryContainer);
+        addColor("on_primary_container", darkTheme.primaryContainerText || darkTheme.surfaceText, lightTheme.primaryContainerText || lightTheme.surfaceText);
+        addColor("secondary", darkTheme.secondary, lightTheme.secondary);
+        addColor("on_secondary", darkTheme.secondaryText || darkTheme.primaryText, lightTheme.secondaryText || lightTheme.primaryText);
+        addColor("secondary_container", darkTheme.secondaryContainer || darkTheme.surfaceContainerHigh, lightTheme.secondaryContainer || lightTheme.surfaceContainerHigh);
+        addColor("on_secondary_container", darkTheme.secondaryContainerText || darkTheme.surfaceText, lightTheme.secondaryContainerText || lightTheme.surfaceText);
+        addColor("tertiary", darkTheme.tertiary || darkTheme.secondary, lightTheme.tertiary || lightTheme.secondary);
+        addColor("on_tertiary", darkTheme.tertiaryText || darkTheme.secondaryText || darkTheme.primaryText, lightTheme.tertiaryText || lightTheme.secondaryText || lightTheme.primaryText);
+        addColor("tertiary_container", darkTheme.tertiaryContainer || darkTheme.secondaryContainer || darkTheme.surfaceContainerHigh, lightTheme.tertiaryContainer || lightTheme.secondaryContainer || lightTheme.surfaceContainerHigh);
+        addColor("on_tertiary_container", darkTheme.tertiaryContainerText || darkTheme.surfaceText, lightTheme.tertiaryContainerText || lightTheme.surfaceText);
+        addColor("error", darkTheme.error || "#F2B8B5", lightTheme.error || "#B3261E");
+        addColor("on_error", darkTheme.errorText || "#601410", lightTheme.errorText || "#FFFFFF");
+        addColor("error_container", darkTheme.errorContainer || "#8C1D18", lightTheme.errorContainer || "#F9DEDC");
+        addColor("on_error_container", darkTheme.errorContainerText || "#F9DEDC", lightTheme.errorContainerText || "#410E0B");
+        addColor("surface", darkTheme.surface, lightTheme.surface);
+        addColor("on_surface", darkTheme.surfaceText, lightTheme.surfaceText);
+        addColor("surface_variant", darkTheme.surfaceVariant, lightTheme.surfaceVariant);
+        addColor("on_surface_variant", darkTheme.surfaceVariantText, lightTheme.surfaceVariantText);
+        addColor("surface_tint", darkTheme.surfaceTint, lightTheme.surfaceTint);
+        addColor("background", darkTheme.background, lightTheme.background);
+        addColor("on_background", darkTheme.backgroundText, lightTheme.backgroundText);
+        addColor("outline", darkTheme.outline, lightTheme.outline);
+        addColor("outline_variant", darkTheme.outlineVariant || darkTheme.surfaceVariant, lightTheme.outlineVariant || lightTheme.surfaceVariant);
+        addColor("surface_container", darkTheme.surfaceContainer, lightTheme.surfaceContainer);
+        addColor("surface_container_high", darkTheme.surfaceContainerHigh, lightTheme.surfaceContainerHigh);
+        addColor("surface_container_highest", darkTheme.surfaceContainerHighest || darkTheme.surfaceContainerHigh, lightTheme.surfaceContainerHighest || lightTheme.surfaceContainerHigh);
+        addColor("surface_container_low", darkTheme.surfaceContainerLow || darkTheme.surface, lightTheme.surfaceContainerLow || lightTheme.surface);
+        addColor("surface_container_lowest", darkTheme.surfaceContainerLowest || darkTheme.background, lightTheme.surfaceContainerLowest || lightTheme.background);
+        addColor("surface_bright", darkTheme.surfaceBright || darkTheme.surfaceContainerHighest || darkTheme.surfaceContainerHigh, lightTheme.surfaceBright || lightTheme.surface);
+        addColor("surface_dim", darkTheme.surfaceDim || darkTheme.background, lightTheme.surfaceDim || lightTheme.surfaceContainer);
+        addColor("inverse_surface", darkTheme.inverseSurface || lightTheme.surface, lightTheme.inverseSurface || darkTheme.surface);
+        addColor("inverse_on_surface", darkTheme.inverseOnSurface || lightTheme.surfaceText, lightTheme.inverseOnSurface || darkTheme.surfaceText);
+        addColor("inverse_primary", darkTheme.inversePrimary || lightTheme.primary, lightTheme.inversePrimary || darkTheme.primary);
+        addColor("scrim", darkTheme.scrim || "#000000", lightTheme.scrim || "#000000");
+        addColor("shadow", darkTheme.shadow || "#000000", lightTheme.shadow || "#000000");
+        addColor("source_color", darkTheme.primary, lightTheme.primary);
+        addColor("primary_fixed", darkTheme.primaryFixed || darkTheme.primaryContainer, lightTheme.primaryFixed || lightTheme.primaryContainer);
+        addColor("primary_fixed_dim", darkTheme.primaryFixedDim || darkTheme.primary, lightTheme.primaryFixedDim || lightTheme.primary);
+        addColor("on_primary_fixed", darkTheme.onPrimaryFixed || darkTheme.primaryText, lightTheme.onPrimaryFixed || lightTheme.primaryText);
+        addColor("on_primary_fixed_variant", darkTheme.onPrimaryFixedVariant || darkTheme.primaryText, lightTheme.onPrimaryFixedVariant || lightTheme.primaryText);
+        addColor("secondary_fixed", darkTheme.secondaryFixed || darkTheme.secondary, lightTheme.secondaryFixed || lightTheme.secondary);
+        addColor("secondary_fixed_dim", darkTheme.secondaryFixedDim || darkTheme.secondary, lightTheme.secondaryFixedDim || lightTheme.secondary);
+        addColor("on_secondary_fixed", darkTheme.onSecondaryFixed || darkTheme.primaryText, lightTheme.onSecondaryFixed || lightTheme.primaryText);
+        addColor("on_secondary_fixed_variant", darkTheme.onSecondaryFixedVariant || darkTheme.primaryText, lightTheme.onSecondaryFixedVariant || lightTheme.primaryText);
+        addColor("tertiary_fixed", darkTheme.tertiaryFixed || darkTheme.tertiary || darkTheme.secondary, lightTheme.tertiaryFixed || lightTheme.tertiary || lightTheme.secondary);
+        addColor("tertiary_fixed_dim", darkTheme.tertiaryFixedDim || darkTheme.tertiary || darkTheme.secondary, lightTheme.tertiaryFixedDim || lightTheme.tertiary || lightTheme.secondary);
+        addColor("on_tertiary_fixed", darkTheme.onTertiaryFixed || darkTheme.primaryText, lightTheme.onTertiaryFixed || lightTheme.primaryText);
+        addColor("on_tertiary_fixed_variant", darkTheme.onTertiaryFixedVariant || darkTheme.primaryText, lightTheme.onTertiaryFixedVariant || lightTheme.primaryText);
+
+        return colors;
     }
 
     function applyGtkColors() {
@@ -1020,10 +1120,6 @@ Singleton {
 
             if (exitCode === 0) {
                 console.info("Theme: Matugen worker completed successfully");
-                if (currentTheme === dynamic) {
-                    console.log("Theme: Reloading dynamic colors file");
-                    dynamicColorsFileView.reload();
-                }
             } else if (exitCode === 2) {
                 console.log("Theme: Matugen worker completed with code 2 (no changes needed)");
             } else {
@@ -1031,6 +1127,13 @@ Singleton {
                     ToastService.showError("Theme worker failed (" + exitCode + ")");
                 }
                 console.warn("Theme: Matugen worker failed with exit code:", exitCode);
+            }
+
+            if (pendingThemeRequest) {
+                const req = pendingThemeRequest;
+                pendingThemeRequest = null;
+                console.info("Theme: Processing queued theme request");
+                setDesiredTheme(req.kind, req.value, req.isLight, req.iconTheme, req.matugenType, req.stockColors);
             }
         }
     }
@@ -1142,6 +1245,13 @@ Singleton {
         function getMode(): string {
             return root.isLightMode ? "light" : "dark";
         }
+    }
+
+    Timer {
+        id: _themeGenerateDebounce
+        interval: 100
+        repeat: false
+        onTriggered: root._executeThemeGeneration()
     }
 
     // These timers are for screen transitions, since sometimes QML still beats the niri call

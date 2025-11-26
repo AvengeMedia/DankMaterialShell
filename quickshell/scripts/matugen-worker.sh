@@ -1,375 +1,275 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
-if [ $# -lt 5 ]; then
-    echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
-    exit 1
-fi
+log() { echo "[matugen-worker] $*" >&2; }
+err() { echo "[matugen-worker] ERROR: $*" >&2; }
+
+[[ $# -lt 6 ]] && { echo "Usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2; exit 1; }
 
 STATE_DIR="$1"
 SHELL_DIR="$2"
 CONFIG_DIR="$3"
 SYNC_MODE_WITH_PORTAL="$4"
 TERMINALS_ALWAYS_DARK="$5"
-
-if [ ! -d "$STATE_DIR" ]; then
-    echo "Error: STATE_DIR '$STATE_DIR' does not exist" >&2
-    exit 1
-fi
-
-if [ ! -d "$SHELL_DIR" ]; then
-    echo "Error: SHELL_DIR '$SHELL_DIR' does not exist" >&2
-    exit 1
-fi
-
-if [ ! -d "$CONFIG_DIR" ]; then
-    echo "Error: CONFIG_DIR '$CONFIG_DIR' does not exist" >&2
-    exit 1
-fi
-
 shift 5
+[[ "${1:-}" != "--run" ]] && { echo "Usage: $0 ... --run" >&2; exit 1; }
 
-if [[ "${1:-}" != "--run" ]]; then
-  echo "usage: $0 STATE_DIR SHELL_DIR CONFIG_DIR SYNC_MODE_WITH_PORTAL TERMINALS_ALWAYS_DARK --run" >&2
-  exit 1
-fi
+[[ ! -d "$STATE_DIR" ]] && { err "STATE_DIR '$STATE_DIR' does not exist"; exit 1; }
+[[ ! -d "$SHELL_DIR" ]] && { err "SHELL_DIR '$SHELL_DIR' does not exist"; exit 1; }
+[[ ! -d "$CONFIG_DIR" ]] && { err "CONFIG_DIR '$CONFIG_DIR' does not exist"; exit 1; }
 
 DESIRED_JSON="$STATE_DIR/matugen.desired.json"
 BUILT_KEY="$STATE_DIR/matugen.key"
-LAST_JSON="$STATE_DIR/last.json"
 LOCK="$STATE_DIR/matugen-worker.lock"
+COLORS_OUTPUT="$STATE_DIR/dms-colors.json"
 
 exec 9>"$LOCK"
 flock 9
-
 rm -f "$BUILT_KEY"
 
-get_matugen_major_version() {
-  local version_output=$(matugen --version 2>&1)
-  local version=$(echo "$version_output" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
-  local major=$(echo "$version" | cut -d. -f1)
-  echo "$major"
+read_json_field() {
+  local json="$1" field="$2"
+  echo "$json" | sed -n "s/.*\"$field\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" | head -1
 }
 
-MATUGEN_VERSION=$(get_matugen_major_version)
-
-read_desired() {
-  [[ ! -f "$DESIRED_JSON" ]] && { echo "no desired state" >&2; exit 0; }
-  cat "$DESIRED_JSON"
+read_json_escaped_field() {
+  local json="$1" field="$2"
+  local after="${json#*\"$field\":\"}"
+  [[ "$after" == "$json" ]] && return
+  local result=""
+  while [[ -n "$after" ]]; do
+    local char="${after:0:1}"
+    after="${after:1}"
+    [[ "$char" == '"' ]] && break
+    [[ "$char" == '\' ]] && { result+="${after:0:1}"; after="${after:1}"; continue; }
+    result+="$char"
+  done
+  echo "$result"
 }
 
-key_of() {
+read_json_bool() {
+  local json="$1" field="$2"
+  echo "$json" | sed -n "s/.*\"$field\"[[:space:]]*:[[:space:]]*\([^,}]*\).*/\1/p" | head -1 | tr -d ' '
+}
+
+compute_key() {
   local json="$1"
-  local kind=$(echo "$json" | sed 's/.*"kind": *"\([^"]*\)".*/\1/')
-  local value=$(echo "$json" | sed 's/.*"value": *"\([^"]*\)".*/\1/')
-  local mode=$(echo "$json" | sed 's/.*"mode": *"\([^"]*\)".*/\1/')
-  local icon=$(echo "$json" | sed 's/.*"iconTheme": *"\([^"]*\)".*/\1/')
-  local matugen_type=$(echo "$json" | sed 's/.*"matugenType": *"\([^"]*\)".*/\1/')
-  local run_user_templates=$(echo "$json" | sed 's/.*"runUserTemplates": *\([^,}]*\).*/\1/')
-  [[ -z "$icon" ]] && icon="System Default"
-  [[ -z "$matugen_type" ]] && matugen_type="scheme-tonal-spot"
-  [[ -z "$run_user_templates" ]] && run_user_templates="true"
-  echo "${kind}|${value}|${mode}|${icon}|${matugen_type}|${run_user_templates}" | sha256sum | cut -d' ' -f1
+  local kind=$(read_json_field "$json" "kind")
+  local value=$(read_json_field "$json" "value")
+  local mode=$(read_json_field "$json" "mode")
+  local icon=$(read_json_field "$json" "iconTheme")
+  local mtype=$(read_json_field "$json" "matugenType")
+  local run_user=$(read_json_bool "$json" "runUserTemplates")
+  local stock_colors=$(read_json_escaped_field "$json" "stockColors")
+  echo "${kind}|${value}|${mode}|${icon:-default}|${mtype:-scheme-tonal-spot}|${run_user:-true}|${stock_colors:-}" | sha256sum | cut -d' ' -f1
+}
+
+append_config() {
+  local check_cmd="$1" file_name="$2" cfg_file="$3"
+  local target="$SHELL_DIR/matugen/configs/$file_name"
+  [[ ! -f "$target" ]] && return
+  [[ "$check_cmd" != "skip" ]] && ! command -v "$check_cmd" >/dev/null 2>&1 && return
+  sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target" >> "$cfg_file"
+  echo "" >> "$cfg_file"
+}
+
+build_merged_config() {
+  local mode="$1" run_user="$2" cfg_file="$3"
+
+  if [[ "$run_user" == "true" && -f "$CONFIG_DIR/matugen/config.toml" ]]; then
+    awk '/^\[config\]/{p=1} /^\[templates\]/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >> "$cfg_file"
+  else
+    echo "[config]" >> "$cfg_file"
+  fi
+  echo "" >> "$cfg_file"
+
+  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" | sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" >> "$cfg_file"
+  echo "" >> "$cfg_file"
+
+  cat >> "$cfg_file" << EOF
+[templates.dank]
+input_path = '$SHELL_DIR/matugen/templates/dank.json'
+output_path = '$COLORS_OUTPUT'
+
+EOF
+
+  [[ "$mode" == "light" ]] && append_config "skip" "gtk3-light.toml" "$cfg_file" || append_config "skip" "gtk3-dark.toml" "$cfg_file"
+
+  append_config "niri" "niri.toml" "$cfg_file"
+  append_config "qt5ct" "qt5ct.toml" "$cfg_file"
+  append_config "qt6ct" "qt6ct.toml" "$cfg_file"
+  append_config "firefox" "firefox.toml" "$cfg_file"
+  append_config "pywalfox" "pywalfox.toml" "$cfg_file"
+  append_config "vesktop" "vesktop.toml" "$cfg_file"
+  append_config "ghostty" "ghostty.toml" "$cfg_file"
+  append_config "kitty" "kitty.toml" "$cfg_file"
+  append_config "foot" "foot.toml" "$cfg_file"
+  append_config "alacritty" "alacritty.toml" "$cfg_file"
+  append_config "wezterm" "wezterm.toml" "$cfg_file"
+  append_config "dgop" "dgop.toml" "$cfg_file"
+  append_config "code" "vscode.toml" "$cfg_file"
+  append_config "codium" "codium.toml" "$cfg_file"
+
+  if [[ "$run_user" == "true" && -f "$CONFIG_DIR/matugen/config.toml" ]]; then
+    awk '/^\[templates\]/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >> "$cfg_file"
+    echo "" >> "$cfg_file"
+  fi
+
+  if [[ -d "$CONFIG_DIR/matugen/dms/configs" ]]; then
+    for config in "$CONFIG_DIR/matugen/dms/configs"/*.toml; do
+      [[ -f "$config" ]] || continue
+      cat "$config" >> "$cfg_file"
+      echo "" >> "$cfg_file"
+    done
+  fi
+}
+
+generate_dank16() {
+  local primary="$1" surface="$2" light_flag="$3"
+  local args=("$primary" --json)
+  [[ -n "$light_flag" ]] && args+=("$light_flag")
+  [[ -n "$surface" ]] && args+=(--background "$surface")
+  dms dank16 "${args[@]}" 2>/dev/null || echo '{}'
 }
 
 set_system_color_scheme() {
+  [[ "$SYNC_MODE_WITH_PORTAL" != "true" ]] && return
   local mode="$1"
-
-  if [[ "$SYNC_MODE_WITH_PORTAL" != "true" ]]; then
-    return 0
-  fi
-
-  local target_scheme
-  if [[ "$mode" == "light" ]]; then
-    target_scheme="default"
-  else
-    target_scheme="prefer-dark"
-  fi
-
-  if command -v gsettings >/dev/null 2>&1; then
-    gsettings set org.gnome.desktop.interface color-scheme "$target_scheme" >/dev/null 2>&1 || true
-  elif command -v dconf >/dev/null 2>&1; then
-    dconf write /org/gnome/desktop/interface/color-scheme "'$target_scheme'" >/dev/null 2>&1 || true
-  fi
+  local scheme="prefer-dark"
+  [[ "$mode" == "light" ]] && scheme="default"
+  gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null || \
+    dconf write /org/gnome/desktop/interface/color-scheme "'$scheme'" 2>/dev/null || true
 }
 
-run_matugen() {
-  local value="$1"
-  local kind="$2"
-  shift 2
-  local MAT_ARGS=("$@")
-
-  case "$kind" in
-  image)
-    [[ -f "$value" ]] || { echo "wallpaper not found: $value" >&2; popd >/dev/null; return 2; }
-    matugen image "$value" "${MAT_ARGS[@]}"
-    ;;
-  hex)
-    [[ "$value" =~ ^#[0-9A-Fa-f]{6}$ ]] || { echo "invalid hex: $value" >&2; popd >/dev/null; return 2; }
-    matugen color hex "$value" "${MAT_ARGS[@]}"
-    ;;
-  *)
-    echo "unknown kind: $kind" >&2
-    popd >/dev/null
-    return 2
-    ;;
-  esac
-
+refresh_gtk() {
+  local mode="$1"
+  local gtk_css="$CONFIG_DIR/gtk-3.0/gtk.css"
+  [[ ! -e "$gtk_css" ]] && return
+  local should_run=false
+  if [[ -L "$gtk_css" ]]; then
+    [[ "$(readlink "$gtk_css")" == *"dank-colors.css"* ]] && should_run=true
+  elif grep -q "dank-colors.css" "$gtk_css" 2>/dev/null; then
+    should_run=true
+  fi
+  [[ "$should_run" != "true" ]] && return
+  gsettings set org.gnome.desktop.interface gtk-theme "" 2>/dev/null || true
+  gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-${mode}" 2>/dev/null || true
 }
 
-append_matugen_config() {
-  local check_cmd="$1"
-  local file_name="$2"
-  local cfg_file="$3"
-  local target_config="$SHELL_DIR/matugen/configs/$file_name"
-
-  # Check if command exists AND if the config file exists
-  if [[ "$check_cmd" == "skip" ]] || command -v "$check_cmd" >/dev/null 2>&1; then
-    if [[ -f "$target_config" ]]; then
-      # The sed command
-      sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target_config" >> "$cfg_file"
-      echo "" >> "$cfg_file"
-    fi
-  fi
+setup_vscode_extension() {
+  local cmd="$1" ext_dir="$2" config_dir="$3"
+  command -v "$cmd" >/dev/null 2>&1 || return
+  [[ ! -d "$config_dir" ]] && return
+  local theme_dir="$ext_dir/themes"
+  mkdir -p "$theme_dir"
+  cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$ext_dir/package.json" 2>/dev/null || true
+  cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$ext_dir/.vsixmanifest" 2>/dev/null || true
 }
 
-get_dank_json() {
-  local theme_mode="$1"
-  local cfg=$2
-  local MODE_ARG=(-m "$theme_mode")
-  local MAT_ARGS=("${MODE_ARG[@]}" "${MAT_TYPE[@]}" --json hex --dry-run -c "$cfg")
-
-  local MAT_JSON
-  MAT_JSON=$(run_matugen "$value" "$kind" "${MAT_ARGS[@]}" | tr -d '\n' 2>/dev/null)
-
-  local LIGHT_FLAG=""
-  [[ "$theme_mode" == "light" ]] && LIGHT_FLAG="--light"
-
-  local primary
-  local surface
-  primary=$(echo "$MAT_JSON" | sed -n "s/.*\"primary\" *: *{ *[^}]*\"$theme_mode\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-  surface=$(echo "$MAT_JSON" | sed -n "s/.*\"surface\" *: *{ *[^}]*\"$theme_mode\" *: *\"\\(#[0-9a-fA-F]\\{6\\}\\)\".*/\\1/p")
-
-  if [[ -z "$primary" ]]; then
-    echo "Error: Failed to extract PRIMARY color from matugen JSON (mode: $mode)" >&2
-    echo "This may indicate an incompatible matugen JSON format" >&2
-    return 2
-  fi
-
-  echo "$MAT_JSON" > "$LAST_JSON"
-
-  echo "{\"dank16\": $(dms dank16 "$primary" $LIGHT_FLAG ${surface:+--background "$surface"} --json)}"
+signal_terminals() {
+  pgrep -x kitty >/dev/null 2>&1 && pkill -USR1 kitty
+  pgrep -x ghostty >/dev/null 2>&1 && pkill -USR2 ghostty
 }
 
 build_once() {
   local json="$1"
-  local kind value mode icon matugen_type run_user_templates
-  kind=$(echo "$json" | sed 's/.*"kind": *"\([^"]*\)".*/\1/')
-  value=$(echo "$json" | sed 's/.*"value": *"\([^"]*\)".*/\1/')
-  mode=$(echo "$json" | sed 's/.*"mode": *"\([^"]*\)".*/\1/')
-  icon=$(echo "$json" | sed 's/.*"iconTheme": *"\([^"]*\)".*/\1/')
-  matugen_type=$(echo "$json" | sed 's/.*"matugenType": *"\([^"]*\)".*/\1/')
-  run_user_templates=$(echo "$json" | sed 's/.*"runUserTemplates": *\([^,}]*\).*/\1/')
-  [[ -z "$icon" ]] && icon="System Default"
-  [[ -z "$matugen_type" ]] && matugen_type="scheme-tonal-spot"
-  [[ -z "$run_user_templates" ]] && run_user_templates="true"
+  local kind=$(read_json_field "$json" "kind")
+  local value=$(read_json_field "$json" "value")
+  local mode=$(read_json_field "$json" "mode")
+  local mtype=$(read_json_field "$json" "matugenType")
+  local run_user=$(read_json_bool "$json" "runUserTemplates")
+  local stock_colors=$(read_json_escaped_field "$json" "stockColors")
 
-  USER_MATUGEN_DIR="$CONFIG_DIR/matugen/dms"
+  [[ -z "$mtype" ]] && mtype="scheme-tonal-spot"
+  [[ -z "$run_user" ]] && run_user="true"
 
-  TMP_CFG="$(mktemp)"
-  # trap 'rm -f "$TMP_CFG"' RETURN
+  local TMP_CFG=$(mktemp)
+  trap "rm -f '$TMP_CFG'" RETURN
 
-  if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
-    awk '/^\[config/{p=1} /^\[templates/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  else
-    echo "[config]" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
+  build_merged_config "$mode" "$run_user" "$TMP_CFG"
 
-  grep -v '^\[config\]' "$SHELL_DIR/matugen/configs/base.toml" | \
-    sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" >> "$TMP_CFG"
-  echo "" >> "$TMP_CFG"
+  local light_flag=""
+  [[ "$mode" == "light" ]] && light_flag="--light"
 
-  cat >> "$TMP_CFG" << EOF
-[templates.dank]
-input_path = '$SHELL_DIR/matugen/templates/dank.json'
-output_path = '$STATE_DIR/dms-colors.json'
+  local primary surface dank16_dark dank16_light import_args=()
 
-EOF
-  MAT_TYPE=(-t "$matugen_type")
+  if [[ -n "$stock_colors" ]]; then
+    log "Using stock/custom theme colors with matugen base"
+    primary=$(echo "$stock_colors" | sed -n 's/.*"primary"[^{]*{[^}]*"dark"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+    surface=$(echo "$stock_colors" | sed -n 's/.*"surface"[^{]*{[^}]*"dark"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 
-  # If light mode, use gtk3 light config
-  if [[ "$mode" == "light" ]]; then
-    append_matugen_config "skip" "gtk3-light.toml" "$TMP_CFG"
-  else
-    append_matugen_config "skip" "gtk3-dark.toml" "$TMP_CFG"
-  fi
+    [[ -z "$primary" ]] && { err "Failed to extract primary from stock colors"; return 1; }
 
-  append_matugen_config "niri" "niri.toml" "$TMP_CFG"
-  append_matugen_config "qt5ct" "qt5ct.toml" "$TMP_CFG"
-  append_matugen_config "qt6ct" "qt6ct.toml" "$TMP_CFG"
-  append_matugen_config "firefox" "firefox.toml" "$TMP_CFG"
-  append_matugen_config "pywalfox" "pywalfox.toml" "$TMP_CFG"
-  append_matugen_config "vesktop" "vesktop.toml" "$TMP_CFG"
+    dank16_dark=$(generate_dank16 "$primary" "$surface" "")
+    dank16_light=$(generate_dank16 "$primary" "$surface" "--light")
 
-  if [[ "$run_user_templates" == "true" ]] && [[ -f "$CONFIG_DIR/matugen/config.toml" ]]; then
-    awk '/^\[templates/{p=1} p' "$CONFIG_DIR/matugen/config.toml" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  fi
+    local dank16_current
+    [[ "$mode" == "light" ]] && dank16_current="$dank16_light" || dank16_current="$dank16_dark"
+    [[ "$TERMINALS_ALWAYS_DARK" == "true" && "$mode" == "light" ]] && dank16_current="$dank16_dark"
 
-  for config in "$USER_MATUGEN_DIR/configs"/*.toml; do
-    [[ -f "$config" ]] || continue
-    cat "$config" >> "$TMP_CFG"
-    echo "" >> "$TMP_CFG"
-  done
+    import_args+=(--import-json-string "{\"colors\": $stock_colors, \"dank16\": $dank16_current}")
 
-  LIGHT_JSON=$(get_dank_json "light" "$TMP_CFG")
-  DARK_JSON=$(get_dank_json "dark" "$TMP_CFG")
-
-  if [[ "$mode" == "light" ]]; then
-    DANK_JSON="$LIGHT_JSON"
-  else
-    DANK_JSON="$DARK_JSON"
-  fi
-
-  if [[ -s "$TMP_CFG" ]] && grep -q '\[templates\.' "$TMP_CFG"; then
-    run_matugen "$value" "$kind" --import-json-string "$DANK_JSON" -c "$TMP_CFG" >/dev/null
-  fi
-
-  pushd "$SHELL_DIR" >/dev/null
-  TMP_CONTENT_CFG="$(mktemp)"
-  echo "[config]" > "$TMP_CONTENT_CFG"
-  echo "" >> "$TMP_CONTENT_CFG"
-
-  append_matugen_config "ghostty" "ghostty.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "kitty" "kitty.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "foot" "foot.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "alacritty" "alacritty.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "wezterm" "wezterm.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "dgop" "dgop.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "code" "vscode.toml" "$TMP_CONTENT_CFG"
-  append_matugen_config "codium" "codium.toml" "$TMP_CONTENT_CFG"
-
-  if [[ $TERMINALS_ALWAYS_DARK == "true" ]] && [[ "$mode" == "light" ]]; then
-    DANK_JSON="$DARK_JSON"
-  fi
-
-  if [[ -s "$TMP_CONTENT_CFG" ]] && grep -q '\[templates\.' "$TMP_CONTENT_CFG"; then
-    run_matugen "$value" "$kind" -c "$TMP_CONTENT_CFG" --import-json-string "$DANK_JSON" >/dev/null
-  fi
-
-  # rm -f "$TMP_CONTENT_CFG"
-  popd >/dev/null
-
-  GTK_CSS="$CONFIG_DIR/gtk-3.0/gtk.css"
-  SHOULD_RUN_HOOK=false
-
-  if [[ -L "$GTK_CSS" ]]; then
-    LINK_TARGET=$(readlink "$GTK_CSS")
-    if [[ "$LINK_TARGET" == *"dank-colors.css"* ]]; then
-      SHOULD_RUN_HOOK=true
+    log "Running matugen color hex with stock color overrides"
+    if ! matugen color hex "$primary" -m "$mode" -t "${mtype:-scheme-tonal-spot}" -c "$TMP_CFG" "${import_args[@]}"; then
+      err "matugen failed"
+      return 1
     fi
-  elif [[ -f "$GTK_CSS" ]] && grep -q "dank-colors.css" "$GTK_CSS"; then
-    SHOULD_RUN_HOOK=true
-  fi
+  else
+    log "Using dynamic theme from $kind: $value"
 
-  if [[ "$SHOULD_RUN_HOOK" == "true" ]]; then
-    gsettings set org.gnome.desktop.interface gtk-theme "" >/dev/null 2>&1 || true
-    gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-${mode}" >/dev/null 2>&1 || true
-  fi
+    local matugen_cmd=("matugen")
+    [[ "$kind" == "hex" ]] && matugen_cmd+=("color" "hex") || matugen_cmd+=("$kind")
+    matugen_cmd+=("$value")
 
-  if command -v code >/dev/null 2>&1; then
-    VSCODE_EXT_DIR="$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1"
-    VSCODE_THEME_DIR="$VSCODE_EXT_DIR/themes"
-    VSCODE_BASE_THEME="$VSCODE_THEME_DIR/dankshell-color-theme-base.json"
-    VSCODE_FINAL_THEME="$VSCODE_THEME_DIR/dankshell-color-theme.json"
+    local mat_json
+    mat_json=$("${matugen_cmd[@]}" -m dark -t "$mtype" --json hex --dry-run 2>/dev/null | tr -d '\n')
+    [[ -z "$mat_json" ]] && { err "matugen dry-run failed"; return 1; }
 
-    mkdir -p "$VSCODE_THEME_DIR"
+    primary=$(echo "$mat_json" | sed -n 's/.*"primary"[[:space:]]*:[[:space:]]*{[^}]*"dark"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+    surface=$(echo "$mat_json" | sed -n 's/.*"surface"[[:space:]]*:[[:space:]]*{[^}]*"dark"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 
-    cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$VSCODE_EXT_DIR/package.json"
-    cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$VSCODE_EXT_DIR/.vsixmanifest"
+    [[ -z "$primary" ]] && { err "Failed to extract primary color"; return 1; }
 
-    # for variant in default dark light; do
-    #   VSCODE_BASE="$VSCODE_THEME_DIR/dankshell-${variant}-base.json"
-    #   VSCODE_FINAL="$VSCODE_THEME_DIR/dankshell-${variant}.json"
-    #
-    #   if [[ -f "$VSCODE_BASE" ]]; then
-    #     VARIANT_FLAG=""
-    #     if [[ "$variant" == "light" ]]; then
-    #       VARIANT_FLAG="--light"
-    #     elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
-    #       VARIANT_FLAG="--light"
-    #     fi
-    #
-    #     dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$VSCODE_BASE" >"$VSCODE_FINAL" 2>/dev/null || cp "$VSCODE_BASE" "$VSCODE_FINAL"
-    #   fi
-    # done
-  fi
+    dank16_dark=$(generate_dank16 "$primary" "$surface" "")
+    dank16_light=$(generate_dank16 "$primary" "$surface" "--light")
 
-  if command -v codium >/dev/null 2>&1; then
-    CODIUM_EXT_DIR="$HOME/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1"
-    CODIUM_THEME_DIR="$CODIUM_EXT_DIR/themes"
-    CODIUM_BASE_THEME="$CODIUM_THEME_DIR/dankshell-color-theme-base.json"
-    CODIUM_FINAL_THEME="$CODIUM_THEME_DIR/dankshell-color-theme.json"
-    CODIUM_EXTENSIONS_JSON="$HOME/.vscode-oss/extensions/extensions.json"
+    local dank16_current
+    [[ "$mode" == "light" ]] && dank16_current="$dank16_light" || dank16_current="$dank16_dark"
+    [[ "$TERMINALS_ALWAYS_DARK" == "true" && "$mode" == "light" ]] && dank16_current="$dank16_dark"
 
-    mkdir -p "$CODIUM_THEME_DIR"
+    import_args+=(--import-json-string "{\"dank16\": $dank16_current}")
 
-    cp "$SHELL_DIR/matugen/templates/vscode-package.json" "$CODIUM_EXT_DIR/package.json"
-    cp "$SHELL_DIR/matugen/templates/vscode-vsixmanifest.xml" "$CODIUM_EXT_DIR/.vsixmanifest"
-
-    if [[ -f "$CODIUM_EXTENSIONS_JSON" ]]; then
-      if ! grep -q "local.dynamic-base16-dankshell" "$CODIUM_EXTENSIONS_JSON" 2>/dev/null; then
-        cp "$CODIUM_EXTENSIONS_JSON" "$CODIUM_EXTENSIONS_JSON.backup-$(date +%s)" 2>/dev/null || true
-
-        CODIUM_ENTRY='{"identifier":{"id":"local.dynamic-base16-dankshell"},"version":"0.0.1","location":{"$mid":1,"path":"'"$CODIUM_EXT_DIR"'","scheme":"file"},"relativeLocation":"local.dynamic-base16-dankshell-0.0.1","metadata":{"id":"local.dynamic-base16-dankshell","publisherId":"local","publisherDisplayName":"local","targetPlatform":"undefined","isApplicationScoped":false,"updated":false,"isPreReleaseVersion":false,"installedTimestamp":'"$(date +%s)000"',"preRelease":false}}'
-
-        if [[ "$(cat "$CODIUM_EXTENSIONS_JSON")" == "[]" ]]; then
-          echo "[$CODIUM_ENTRY]" >"$CODIUM_EXTENSIONS_JSON"
-        else
-          TMP_JSON="$(mktemp)"
-          sed 's/]$/,'"$CODIUM_ENTRY"']/' "$CODIUM_EXTENSIONS_JSON" >"$TMP_JSON"
-          mv "$TMP_JSON" "$CODIUM_EXTENSIONS_JSON"
-        fi
-      fi
+    log "Running matugen $kind with dank16 injection"
+    if ! "${matugen_cmd[@]}" -m "$mode" -t "$mtype" -c "$TMP_CFG" "${import_args[@]}"; then
+      err "matugen failed"
+      return 1
     fi
-
-    # for variant in default dark light; do
-    #   CODIUM_BASE="$CODIUM_THEME_DIR/dankshell-${variant}-base.json"
-    #   CODIUM_FINAL="$CODIUM_THEME_DIR/dankshell-${variant}.json"
-    #
-    #   if [[ -f "$CODIUM_BASE" ]]; then
-    #     VARIANT_FLAG=""
-    #     if [[ "$variant" == "light" ]]; then
-    #       VARIANT_FLAG="--light"
-    #     elif [[ "$variant" == "default" && "$mode" == "light" ]]; then
-    #       VARIANT_FLAG="--light"
-    #     fi
-    #
-    #     dms dank16 "$PRIMARY" $VARIANT_FLAG ${SURFACE:+--background "$SURFACE"} --vscode-enrich "$CODIUM_BASE" >"$CODIUM_FINAL" 2>/dev/null || cp "$CODIUM_BASE" "$CODIUM_FINAL"
-    #   fi
-    # done
   fi
 
+  refresh_gtk "$mode"
+  setup_vscode_extension "code" "$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1" "$HOME/.vscode"
+  setup_vscode_extension "codium" "$HOME/.vscode-oss/extensions/local.dynamic-base16-dankshell-0.0.1" "$HOME/.vscode-oss"
   set_system_color_scheme "$mode"
+  signal_terminals
+
+  return 0
 }
 
-while :; do
-  DESIRED="$(read_desired)"
-  WANT_KEY="$(key_of "$DESIRED")"
-  HAVE_KEY=""
-  [[ -f "$BUILT_KEY" ]] && HAVE_KEY="$(cat "$BUILT_KEY" 2>/dev/null || true)"
+[[ ! -f "$DESIRED_JSON" ]] && { log "No desired state file"; exit 0; }
 
-  if [[ "$WANT_KEY" == "$HAVE_KEY" ]]; then
-    exit 0
-  fi
+DESIRED=$(cat "$DESIRED_JSON")
+WANT_KEY=$(compute_key "$DESIRED")
+HAVE_KEY=""
+[[ -f "$BUILT_KEY" ]] && HAVE_KEY=$(cat "$BUILT_KEY" 2>/dev/null || true)
 
-  if build_once "$DESIRED"; then
-    echo "$WANT_KEY" > "$BUILT_KEY"
-  else
-    exit 2
-  fi
-done
+[[ "$WANT_KEY" == "$HAVE_KEY" ]] && { log "Already up to date"; exit 0; }
 
-exit 0
+log "Building theme (key: ${WANT_KEY:0:12}...)"
+if build_once "$DESIRED"; then
+  echo "$WANT_KEY" > "$BUILT_KEY"
+  log "Done"
+  exit 0
+else
+  err "Build failed"
+  exit 2
+fi
