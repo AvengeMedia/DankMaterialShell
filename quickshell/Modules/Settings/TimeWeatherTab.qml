@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
 import QtQuick.Layouts
 import qs.Common
@@ -12,13 +11,14 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             StyledRect {
@@ -26,8 +26,7 @@ Item {
                 height: timeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -49,8 +48,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - toggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - toggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -76,9 +74,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.use24HourClock
                             onToggled: checked => {
-                                           return SettingsData.set("use24HourClock",
-                                               checked)
-                                       }
+                                return SettingsData.set("use24HourClock", checked);
+                            }
                         }
                     }
                 }
@@ -89,8 +86,7 @@ Item {
                 height: timeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -112,8 +108,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - toggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - toggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -139,9 +134,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.showSeconds
                             onToggled: checked => {
-                                           return SettingsData.set("showSeconds",
-                                               checked)
-                                       }
+                                return SettingsData.set("showSeconds", checked);
+                            }
                         }
                     }
                 }
@@ -152,8 +146,7 @@ Item {
                 height: dateSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -189,60 +182,67 @@ Item {
                         description: "Preview: " + (SettingsData.clockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(Qt.locale(), "ddd d"))
                         currentValue: {
                             if (!SettingsData.clockDateFormat || SettingsData.clockDateFormat.length === 0) {
-                                return "System Default"
+                                return "System Default";
                             }
-                            const presets = [{
-                                                 "format": "ddd d",
-                                                 "label": "Day Date"
-                                             }, {
-                                                 "format": "ddd MMM d",
-                                                 "label": "Day Month Date"
-                                             }, {
-                                                 "format": "MMM d",
-                                                 "label": "Month Date"
-                                             }, {
-                                                 "format": "M/d",
-                                                 "label": "Numeric (M/D)"
-                                             }, {
-                                                 "format": "d/M",
-                                                 "label": "Numeric (D/M)"
-                                             }, {
-                                                 "format": "ddd d MMM yyyy",
-                                                 "label": "Full with Year"
-                                             }, {
-                                                 "format": "yyyy-MM-dd",
-                                                 "label": "ISO Date"
-                                             }, {
-                                                 "format": "dddd, MMMM d",
-                                                 "label": "Full Day & Month"
-                                             }]
+                            const presets = [
+                                {
+                                    "format": "ddd d",
+                                    "label": "Day Date"
+                                },
+                                {
+                                    "format": "ddd MMM d",
+                                    "label": "Day Month Date"
+                                },
+                                {
+                                    "format": "MMM d",
+                                    "label": "Month Date"
+                                },
+                                {
+                                    "format": "M/d",
+                                    "label": "Numeric (M/D)"
+                                },
+                                {
+                                    "format": "d/M",
+                                    "label": "Numeric (D/M)"
+                                },
+                                {
+                                    "format": "ddd d MMM yyyy",
+                                    "label": "Full with Year"
+                                },
+                                {
+                                    "format": "yyyy-MM-dd",
+                                    "label": "ISO Date"
+                                },
+                                {
+                                    "format": "dddd, MMMM d",
+                                    "label": "Full Day & Month"
+                                }
+                            ];
                             const match = presets.find(p => {
-                                                           return p.format
-                                                           === SettingsData.clockDateFormat
-                                                       })
-                            return match ? match.label: I18n.tr("Custom: ") + SettingsData.clockDateFormat
+                                return p.format === SettingsData.clockDateFormat;
+                            });
+                            return match ? match.label : I18n.tr("Custom: ") + SettingsData.clockDateFormat;
                         }
                         options: ["System Default", "Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
                         onValueChanged: value => {
-                                            const formatMap = {
-                                                "System Default": "",
-                                                "Day Date": "ddd d",
-                                                "Day Month Date": "ddd MMM d",
-                                                "Month Date": "MMM d",
-                                                "Numeric (M/D)": "M/d",
-                                                "Numeric (D/M)": "d/M",
-                                                "Full with Year": "ddd d MMM yyyy",
-                                                "ISO Date": "yyyy-MM-dd",
-                                                "Full Day & Month": "dddd, MMMM d"
-                                            }
-                                            if (value === "Custom...") {
-                                                customFormatInput.visible = true
-                                            } else {
-                                                customFormatInput.visible = false
-                                                SettingsData.set("clockDateFormat", 
-                                                    formatMap[value])
-                                            }
-                                        }
+                            const formatMap = {
+                                "System Default": "",
+                                "Day Date": "ddd d",
+                                "Day Month Date": "ddd MMM d",
+                                "Month Date": "MMM d",
+                                "Numeric (M/D)": "M/d",
+                                "Numeric (D/M)": "d/M",
+                                "Full with Year": "ddd d MMM yyyy",
+                                "ISO Date": "yyyy-MM-dd",
+                                "Full Day & Month": "dddd, MMMM d"
+                            };
+                            if (value === "Custom...") {
+                                customFormatInput.visible = true;
+                            } else {
+                                customFormatInput.visible = false;
+                                SettingsData.set("clockDateFormat", formatMap[value]);
+                            }
+                        }
                     }
 
                     DankDropdown {
@@ -251,60 +251,67 @@ Item {
                         description: "Preview: " + (SettingsData.lockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(Qt.locale(), Locale.LongFormat))
                         currentValue: {
                             if (!SettingsData.lockDateFormat || SettingsData.lockDateFormat.length === 0) {
-                                return "System Default"
+                                return "System Default";
                             }
-                            const presets = [{
-                                                 "format": "ddd d",
-                                                 "label": "Day Date"
-                                             }, {
-                                                 "format": "ddd MMM d",
-                                                 "label": "Day Month Date"
-                                             }, {
-                                                 "format": "MMM d",
-                                                 "label": "Month Date"
-                                             }, {
-                                                 "format": "M/d",
-                                                 "label": "Numeric (M/D)"
-                                             }, {
-                                                 "format": "d/M",
-                                                 "label": "Numeric (D/M)"
-                                             }, {
-                                                 "format": "ddd d MMM yyyy",
-                                                 "label": "Full with Year"
-                                             }, {
-                                                 "format": "yyyy-MM-dd",
-                                                 "label": "ISO Date"
-                                             }, {
-                                                 "format": "dddd, MMMM d",
-                                                 "label": "Full Day & Month"
-                                             }]
+                            const presets = [
+                                {
+                                    "format": "ddd d",
+                                    "label": "Day Date"
+                                },
+                                {
+                                    "format": "ddd MMM d",
+                                    "label": "Day Month Date"
+                                },
+                                {
+                                    "format": "MMM d",
+                                    "label": "Month Date"
+                                },
+                                {
+                                    "format": "M/d",
+                                    "label": "Numeric (M/D)"
+                                },
+                                {
+                                    "format": "d/M",
+                                    "label": "Numeric (D/M)"
+                                },
+                                {
+                                    "format": "ddd d MMM yyyy",
+                                    "label": "Full with Year"
+                                },
+                                {
+                                    "format": "yyyy-MM-dd",
+                                    "label": "ISO Date"
+                                },
+                                {
+                                    "format": "dddd, MMMM d",
+                                    "label": "Full Day & Month"
+                                }
+                            ];
                             const match = presets.find(p => {
-                                                           return p.format
-                                                           === SettingsData.lockDateFormat
-                                                       })
-                            return match ? match.label: I18n.tr("Custom: ") + SettingsData.lockDateFormat
+                                return p.format === SettingsData.lockDateFormat;
+                            });
+                            return match ? match.label : I18n.tr("Custom: ") + SettingsData.lockDateFormat;
                         }
                         options: ["System Default", "Day Date", "Day Month Date", "Month Date", "Numeric (M/D)", "Numeric (D/M)", "Full with Year", "ISO Date", "Full Day & Month", "Custom..."]
                         onValueChanged: value => {
-                                            const formatMap = {
-                                                "System Default": "",
-                                                "Day Date": "ddd d",
-                                                "Day Month Date": "ddd MMM d",
-                                                "Month Date": "MMM d",
-                                                "Numeric (M/D)": "M/d",
-                                                "Numeric (D/M)": "d/M",
-                                                "Full with Year": "ddd d MMM yyyy",
-                                                "ISO Date": "yyyy-MM-dd",
-                                                "Full Day & Month": "dddd, MMMM d"
-                                            }
-                                            if (value === "Custom...") {
-                                                customLockFormatInput.visible = true
-                                            } else {
-                                                customLockFormatInput.visible = false
-                                                SettingsData.set("lockDateFormat", 
-                                                    formatMap[value])
-                                            }
-                                        }
+                            const formatMap = {
+                                "System Default": "",
+                                "Day Date": "ddd d",
+                                "Day Month Date": "ddd MMM d",
+                                "Month Date": "MMM d",
+                                "Numeric (M/D)": "M/d",
+                                "Numeric (D/M)": "d/M",
+                                "Full with Year": "ddd d MMM yyyy",
+                                "ISO Date": "yyyy-MM-dd",
+                                "Full Day & Month": "dddd, MMMM d"
+                            };
+                            if (value === "Custom...") {
+                                customLockFormatInput.visible = true;
+                            } else {
+                                customLockFormatInput.visible = false;
+                                SettingsData.set("lockDateFormat", formatMap[value]);
+                            }
+                        }
                     }
 
                     DankTextField {
@@ -316,7 +323,7 @@ Item {
                         text: SettingsData.clockDateFormat
                         onTextChanged: {
                             if (visible && text)
-                                SettingsData.set("clockDateFormat", text)
+                                SettingsData.set("clockDateFormat", text);
                         }
                     }
 
@@ -329,7 +336,7 @@ Item {
                         text: SettingsData.lockDateFormat
                         onTextChanged: {
                             if (visible && text)
-                                SettingsData.set("lockDateFormat", text)
+                                SettingsData.set("lockDateFormat", text);
                         }
                     }
 
@@ -338,8 +345,7 @@ Item {
                         height: formatHelp.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
                         color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                              Theme.outline.b, 0.1)
+                        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
                         border.width: 0
 
                         Column {
@@ -440,8 +446,7 @@ Item {
                 height: enableWeatherSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -463,8 +468,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - enableToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - enableToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -490,9 +494,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.weatherEnabled
                             onToggled: checked => {
-                                           return SettingsData.set("weatherEnabled", 
-                                               checked)
-                                       }
+                                return SettingsData.set("weatherEnabled", checked);
+                            }
                         }
                     }
                 }
@@ -503,8 +506,7 @@ Item {
                 height: temperatureSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: SettingsData.weatherEnabled
                 opacity: visible ? 1 : 0
@@ -528,8 +530,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - temperatureToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - temperatureToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -555,9 +556,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.useFahrenheit
                             onToggled: checked => {
-                                           return SettingsData.set("useFahrenheit",
-                                               checked)
-                                       }
+                                return SettingsData.set("useFahrenheit", checked);
+                            }
                         }
                     }
                 }
@@ -575,8 +575,7 @@ Item {
                 height: locationSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: SettingsData.weatherEnabled
                 opacity: visible ? 1 : 0
@@ -600,8 +599,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - autoLocationToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - autoLocationToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -627,9 +625,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.useAutoLocation
                             onToggled: checked => {
-                                           return SettingsData.set("useAutoLocation",
-                                               checked)
-                                       }
+                                return SettingsData.set("useAutoLocation", checked);
+                            }
                         }
                     }
 
@@ -653,112 +650,112 @@ Item {
                         }
 
                         Row {
-                                width: parent.width
-                                spacing: Theme.spacingM
+                            width: parent.width
+                            spacing: Theme.spacingM
 
-                                Column {
-                                    width: (parent.width - Theme.spacingM) / 2
-                                    spacing: Theme.spacingXS
+                            Column {
+                                width: (parent.width - Theme.spacingM) / 2
+                                spacing: Theme.spacingXS
 
-                                    StyledText {
-                                        text: I18n.tr("Latitude")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                    }
-
-                                    DankTextField {
-                                        id: latitudeInput
-                                        width: parent.width
-                                        height: 48
-                                        placeholderText: "40.7128"
-                                        backgroundColor: Theme.surfaceVariant
-                                        normalBorderColor: Theme.primarySelected
-                                        focusedBorderColor: Theme.primary
-                                        keyNavigationTab: longitudeInput
-
-                                        Component.onCompleted: {
-                                            if (SettingsData.weatherCoordinates) {
-                                                const coords = SettingsData.weatherCoordinates.split(',')
-                                                if (coords.length > 0) {
-                                                    text = coords[0].trim()
-                                                }
-                                            }
-                                        }
-
-                                        Connections {
-                                            target: SettingsData
-                                            function onWeatherCoordinatesChanged() {
-                                                if (SettingsData.weatherCoordinates) {
-                                                    const coords = SettingsData.weatherCoordinates.split(',')
-                                                    if (coords.length > 0) {
-                                                        latitudeInput.text = coords[0].trim()
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        onTextEdited: {
-                                            if (text && longitudeInput.text) {
-                                                const coords = text + "," + longitudeInput.text
-                                                SettingsData.weatherCoordinates = coords
-                                                SettingsData.saveSettings()
-                                            }
-                                        }
-                                    }
+                                StyledText {
+                                    text: I18n.tr("Latitude")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
                                 }
 
-                                Column {
-                                    width: (parent.width - Theme.spacingM) / 2
-                                    spacing: Theme.spacingXS
+                                DankTextField {
+                                    id: latitudeInput
+                                    width: parent.width
+                                    height: 48
+                                    placeholderText: "40.7128"
+                                    backgroundColor: Theme.surfaceVariant
+                                    normalBorderColor: Theme.primarySelected
+                                    focusedBorderColor: Theme.primary
+                                    keyNavigationTab: longitudeInput
 
-                                    StyledText {
-                                        text: I18n.tr("Longitude")
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
+                                    Component.onCompleted: {
+                                        if (SettingsData.weatherCoordinates) {
+                                            const coords = SettingsData.weatherCoordinates.split(',');
+                                            if (coords.length > 0) {
+                                                text = coords[0].trim();
+                                            }
+                                        }
                                     }
 
-                                    DankTextField {
-                                        id: longitudeInput
-                                        width: parent.width
-                                        height: 48
-                                        placeholderText: "-74.0060"
-                                        backgroundColor: Theme.surfaceVariant
-                                        normalBorderColor: Theme.primarySelected
-                                        focusedBorderColor: Theme.primary
-                                        keyNavigationTab: locationSearchInput
-                                        keyNavigationBacktab: latitudeInput
-
-                                        Component.onCompleted: {
+                                    Connections {
+                                        target: SettingsData
+                                        function onWeatherCoordinatesChanged() {
                                             if (SettingsData.weatherCoordinates) {
-                                                const coords = SettingsData.weatherCoordinates.split(',')
-                                                if (coords.length > 1) {
-                                                    text = coords[1].trim()
+                                                const coords = SettingsData.weatherCoordinates.split(',');
+                                                if (coords.length > 0) {
+                                                    latitudeInput.text = coords[0].trim();
                                                 }
                                             }
                                         }
+                                    }
 
-                                        Connections {
-                                            target: SettingsData
-                                            function onWeatherCoordinatesChanged() {
-                                                if (SettingsData.weatherCoordinates) {
-                                                    const coords = SettingsData.weatherCoordinates.split(',')
-                                                    if (coords.length > 1) {
-                                                        longitudeInput.text = coords[1].trim()
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        onTextEdited: {
-                                            if (text && latitudeInput.text) {
-                                                const coords = latitudeInput.text + "," + text
-                                                SettingsData.weatherCoordinates = coords
-                                                SettingsData.saveSettings()
-                                            }
+                                    onTextEdited: {
+                                        if (text && longitudeInput.text) {
+                                            const coords = text + "," + longitudeInput.text;
+                                            SettingsData.weatherCoordinates = coords;
+                                            SettingsData.saveSettings();
                                         }
                                     }
                                 }
                             }
+
+                            Column {
+                                width: (parent.width - Theme.spacingM) / 2
+                                spacing: Theme.spacingXS
+
+                                StyledText {
+                                    text: I18n.tr("Longitude")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                }
+
+                                DankTextField {
+                                    id: longitudeInput
+                                    width: parent.width
+                                    height: 48
+                                    placeholderText: "-74.0060"
+                                    backgroundColor: Theme.surfaceVariant
+                                    normalBorderColor: Theme.primarySelected
+                                    focusedBorderColor: Theme.primary
+                                    keyNavigationTab: locationSearchInput
+                                    keyNavigationBacktab: latitudeInput
+
+                                    Component.onCompleted: {
+                                        if (SettingsData.weatherCoordinates) {
+                                            const coords = SettingsData.weatherCoordinates.split(',');
+                                            if (coords.length > 1) {
+                                                text = coords[1].trim();
+                                            }
+                                        }
+                                    }
+
+                                    Connections {
+                                        target: SettingsData
+                                        function onWeatherCoordinatesChanged() {
+                                            if (SettingsData.weatherCoordinates) {
+                                                const coords = SettingsData.weatherCoordinates.split(',');
+                                                if (coords.length > 1) {
+                                                    longitudeInput.text = coords[1].trim();
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    onTextEdited: {
+                                        if (text && latitudeInput.text) {
+                                            const coords = latitudeInput.text + "," + text;
+                                            SettingsData.weatherCoordinates = coords;
+                                            SettingsData.saveSettings();
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         Column {
                             width: parent.width
@@ -778,14 +775,14 @@ Item {
                                 placeholderText: I18n.tr("New York, NY")
                                 keyNavigationBacktab: longitudeInput
                                 onLocationSelected: (displayName, coordinates) => {
-                                                        SettingsData.setWeatherLocation(displayName, coordinates)
+                                    SettingsData.setWeatherLocation(displayName, coordinates);
 
-                                                        const coords = coordinates.split(',')
-                                                        if (coords.length >= 2) {
-                                                            latitudeInput.text = coords[0].trim()
-                                                            longitudeInput.text = coords[1].trim()
-                                                        }
-                                                    }
+                                    const coords = coordinates.split(',');
+                                    if (coords.length >= 2) {
+                                        latitudeInput.text = coords[0].trim();
+                                        longitudeInput.text = coords[1].trim();
+                                    }
+                                }
                             }
                         }
                     }
@@ -804,8 +801,7 @@ Item {
                 height: weatherDisplaySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: SettingsData.weatherEnabled
                 opacity: visible ? 1 : 0
@@ -882,9 +878,9 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: parent.enabled ? Qt.PointingHandCursor : Qt.ForbiddenCursor
                                     onClicked: {
-                                        refreshButton.isRefreshing = true
-                                        WeatherService.forceRefresh()
-                                        refreshTimer.restart()
+                                        refreshButton.isRefreshing = true;
+                                        WeatherService.forceRefresh();
+                                        refreshTimer.restart();
                                     }
                                     enabled: parent.enabled
                                 }
@@ -965,7 +961,7 @@ Item {
                                                 cursorShape: Qt.PointingHandCursor
                                                 onClicked: {
                                                     if (WeatherService.weather.available) {
-                                                        SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit)
+                                                        SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit);
                                                     }
                                                 }
                                                 enabled: WeatherService.weather.available
@@ -1185,14 +1181,16 @@ Item {
 
                                         StyledText {
                                             text: {
-                                                if (!WeatherService.weather.wind) return "--"
-                                                const windKmh = parseFloat(WeatherService.weather.wind)
-                                                if (isNaN(windKmh)) return WeatherService.weather.wind
+                                                if (!WeatherService.weather.wind)
+                                                    return "--";
+                                                const windKmh = parseFloat(WeatherService.weather.wind);
+                                                if (isNaN(windKmh))
+                                                    return WeatherService.weather.wind;
                                                 if (SettingsData.useFahrenheit) {
-                                                    const windMph = Math.round(windKmh * 0.621371)
-                                                    return windMph + " mph"
+                                                    const windMph = Math.round(windKmh * 0.621371);
+                                                    return windMph + " mph";
                                                 }
-                                                return WeatherService.weather.wind
+                                                return WeatherService.weather.wind;
                                             }
                                             font.pixelSize: Theme.fontSizeSmall + 1
                                             color: Theme.surfaceText
@@ -1241,13 +1239,14 @@ Item {
 
                                         StyledText {
                                             text: {
-                                                if (!WeatherService.weather.pressure) return "--"
-                                                const pressureHpa = WeatherService.weather.pressure
+                                                if (!WeatherService.weather.pressure)
+                                                    return "--";
+                                                const pressureHpa = WeatherService.weather.pressure;
                                                 if (SettingsData.useFahrenheit) {
-                                                    const pressureInHg = (pressureHpa * 0.02953).toFixed(2)
-                                                    return pressureInHg + " inHg"
+                                                    const pressureInHg = (pressureHpa * 0.02953).toFixed(2);
+                                                    return pressureInHg + " inHg";
                                                 }
-                                                return pressureHpa + " hPa"
+                                                return pressureHpa + " hPa";
                                             }
                                             font.pixelSize: Theme.fontSizeSmall + 1
                                             color: Theme.surfaceText

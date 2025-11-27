@@ -31,7 +31,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 19
+const APIVersion = 20
 
 type Capabilities struct {
 	Capabilities []string `json:"capabilities"`
@@ -1071,10 +1071,10 @@ func Start(printDocs bool) error {
 		log.Info(" plugins.search              - Search plugins (params: query, category?, compositor?, capability?)")
 		log.Info("Network:")
 		log.Info(" network.getState            - Get current network state")
-		log.Info(" network.wifi.scan           - Scan for WiFi networks")
+		log.Info(" network.wifi.scan           - Scan for WiFi networks (params: device?)")
 		log.Info(" network.wifi.networks       - Get WiFi network list")
-		log.Info(" network.wifi.connect        - Connect to WiFi (params: ssid, password?, username?)")
-		log.Info(" network.wifi.disconnect     - Disconnect WiFi")
+		log.Info(" network.wifi.connect        - Connect to WiFi (params: ssid, password?, username?, device?)")
+		log.Info(" network.wifi.disconnect     - Disconnect WiFi (params: device?)")
 		log.Info(" network.wifi.forget         - Forget network (params: ssid)")
 		log.Info(" network.wifi.toggle         - Toggle WiFi radio")
 		log.Info(" network.wifi.enable         - Enable WiFi")

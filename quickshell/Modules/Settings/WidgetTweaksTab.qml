@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -10,12 +9,13 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             StyledRect {
@@ -23,8 +23,7 @@ Item {
                 height: workspaceSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -60,9 +59,8 @@ Item {
                         description: I18n.tr("Show workspace index numbers in the top bar workspace switcher")
                         checked: SettingsData.showWorkspaceIndex
                         onToggled: checked => {
-                                       return SettingsData.set("showWorkspaceIndex", 
-                                           checked)
-                                   }
+                            return SettingsData.set("showWorkspaceIndex", checked);
+                        }
                     }
                     DankToggle {
                         width: parent.width
@@ -70,9 +68,8 @@ Item {
                         description: I18n.tr("Always show a minimum of 3 workspaces, even if fewer are available")
                         checked: SettingsData.showWorkspacePadding
                         onToggled: checked => {
-                                       return SettingsData.set("showWorkspacePadding", 
-                                           checked)
-                                   }
+                            return SettingsData.set("showWorkspacePadding", checked);
+                        }
                     }
 
                     DankToggle {
@@ -82,12 +79,11 @@ Item {
                         checked: SettingsData.showWorkspaceApps
                         visible: CompositorService.isNiri || CompositorService.isHyprland
                         onToggled: checked => {
-                                       return SettingsData.set("showWorkspaceApps",
-                                           checked)
-                                   }
+                            return SettingsData.set("showWorkspaceApps", checked);
+                        }
                     }
 
-		    Row {
+                    Row {
                         width: parent.width - Theme.spacingL
                         spacing: Theme.spacingL
                         visible: SettingsData.showWorkspaceApps
@@ -116,7 +112,7 @@ Item {
                                 topPadding: Theme.spacingXS
                                 bottomPadding: Theme.spacingXS
                                 onEditingFinished: {
-                                    SettingsData.set("maxWorkspaceIcons", parseInt(text, 10))
+                                    SettingsData.set("maxWorkspaceIcons", parseInt(text, 10));
                                 }
                             }
                         }
@@ -141,6 +137,17 @@ Item {
 
                     DankToggle {
                         width: parent.width
+                        text: I18n.tr("Show Occupied Workspaces Only")
+                        description: I18n.tr("Display only workspaces that contain windows")
+                        checked: SettingsData.showOccupiedWorkspacesOnly
+                        visible: CompositorService.isNiri || CompositorService.isHyprland
+                        onToggled: checked => {
+                            return SettingsData.set("showOccupiedWorkspacesOnly", checked);
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
                         text: I18n.tr("Show All Tags")
                         description: I18n.tr("Show all 9 tags instead of only occupied tags (DWL only)")
                         checked: SettingsData.dwlShowAllTags
@@ -157,8 +164,7 @@ Item {
                 height: mediaSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -290,8 +296,8 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
                                     onPressed: mouse => {
-                                        updaterCustomCommand.forceActiveFocus()
-                                        mouse.accepted = false
+                                        updaterCustomCommand.forceActiveFocus();
+                                        mouse.accepted = false;
                                     }
                                 }
                             }
@@ -337,8 +343,8 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
                                     onPressed: mouse => {
-                                        updaterTerminalCustomClass.forceActiveFocus()
-                                        mouse.accepted = false
+                                        updaterTerminalCustomClass.forceActiveFocus();
+                                        mouse.accepted = false;
                                     }
                                 }
                             }
@@ -352,8 +358,7 @@ Item {
                 height: runningAppsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: CompositorService.isNiri || CompositorService.isHyprland
 
@@ -390,9 +395,8 @@ Item {
                         description: I18n.tr("Show only apps running in current workspace")
                         checked: SettingsData.runningAppsCurrentWorkspace
                         onToggled: checked => {
-                                       return SettingsData.set("runningAppsCurrentWorkspace", 
-                                           checked)
-                                   }
+                            return SettingsData.set("runningAppsCurrentWorkspace", checked);
+                        }
                     }
                 }
             }
@@ -402,8 +406,7 @@ Item {
                 height: workspaceIconsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: SettingsData.hasNamedWorkspaces()
 
@@ -449,12 +452,8 @@ Item {
                             width: parent.width
                             height: workspaceIconRow.implicitHeight + Theme.spacingM
                             radius: Theme.cornerRadius
-                            color: Qt.rgba(Theme.surfaceContainer.r,
-                                           Theme.surfaceContainer.g,
-                                           Theme.surfaceContainer.b, 0.5)
-                            border.color: Qt.rgba(Theme.outline.r,
-                                                  Theme.outline.g,
-                                                  Theme.outline.b, 0.3)
+                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.5)
+                            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
                             border.width: 0
 
                             Row {
@@ -482,35 +481,28 @@ Item {
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     Component.onCompleted: {
-                                        var iconData = SettingsData.getWorkspaceNameIcon(
-                                                    modelData)
+                                        var iconData = SettingsData.getWorkspaceNameIcon(modelData);
                                         if (iconData) {
-                                            setIcon(iconData.value,
-                                                    iconData.type)
+                                            setIcon(iconData.value, iconData.type);
                                         }
                                     }
 
                                     onIconSelected: (iconName, iconType) => {
-                                                        SettingsData.setWorkspaceNameIcon(
-                                                            modelData, {
-                                                                "type": iconType,
-                                                                "value": iconName
-                                                            })
-                                                        setIcon(iconName,
-                                                                iconType)
-                                                    }
+                                        SettingsData.setWorkspaceNameIcon(modelData, {
+                                            "type": iconType,
+                                            "value": iconName
+                                        });
+                                        setIcon(iconName, iconType);
+                                    }
 
                                     Connections {
                                         target: SettingsData
                                         function onWorkspaceIconsUpdated() {
-                                            var iconData = SettingsData.getWorkspaceNameIcon(
-                                                        modelData)
+                                            var iconData = SettingsData.getWorkspaceNameIcon(modelData);
                                             if (iconData) {
-                                                iconPicker.setIcon(
-                                                            iconData.value,
-                                                            iconData.type)
+                                                iconPicker.setIcon(iconData.value, iconData.type);
                                             } else {
-                                                iconPicker.setIcon("", "icon")
+                                                iconPicker.setIcon("", "icon");
                                             }
                                         }
                                     }
@@ -539,8 +531,7 @@ Item {
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
-                                            SettingsData.removeWorkspaceNameIcon(
-                                                        modelData)
+                                            SettingsData.removeWorkspaceNameIcon(modelData);
                                         }
                                     }
                                 }
@@ -560,8 +551,7 @@ Item {
                 height: notificationSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -603,41 +593,41 @@ Item {
                             description: I18n.tr("Choose where notification popups appear on screen")
                             currentValue: {
                                 if (SettingsData.notificationPopupPosition === -1) {
-                                    return "Top Center"
+                                    return "Top Center";
                                 }
                                 switch (SettingsData.notificationPopupPosition) {
                                 case SettingsData.Position.Top:
-                                    return "Top Right"
+                                    return "Top Right";
                                 case SettingsData.Position.Bottom:
-                                    return "Bottom Left"
+                                    return "Bottom Left";
                                 case SettingsData.Position.Left:
-                                    return "Top Left"
+                                    return "Top Left";
                                 case SettingsData.Position.Right:
-                                    return "Bottom Right"
+                                    return "Bottom Right";
                                 default:
-                                    return "Top Right"
+                                    return "Top Right";
                                 }
                             }
                             options: ["Top Right", "Top Left", "Top Center", "Bottom Right", "Bottom Left"]
                             onValueChanged: value => {
                                 switch (value) {
                                 case "Top Right":
-                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Top)
-                                    break
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Top);
+                                    break;
                                 case "Top Left":
-                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Left)
-                                    break
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Left);
+                                    break;
                                 case "Top Center":
-                                    SettingsData.set("notificationPopupPosition", -1)
-                                    break
+                                    SettingsData.set("notificationPopupPosition", -1);
+                                    break;
                                 case "Bottom Right":
-                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Right)
-                                    break
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Right);
+                                    break;
                                 case "Bottom Left":
-                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom)
-                                    break
+                                    SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
+                                    break;
                                 }
-                                SettingsData.sendTestNotifications()
+                                SettingsData.sendTestNotifications();
                             }
                         }
                     }
@@ -649,8 +639,7 @@ Item {
                 height: osdRow.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Row {
@@ -693,9 +682,9 @@ Item {
 
                         anchors.verticalCenter: parent.verticalCenter
                         checked: SettingsData.osdAlwaysShowValue
-                        onToggleCompleted: checked => {
-                                       SettingsData.set("osdAlwaysShowValue", checked)
-                                   }
+                        onToggled: checked => {
+                            SettingsData.set("osdAlwaysShowValue", checked);
+                        }
                     }
                 }
             }
@@ -705,8 +694,7 @@ Item {
                 height: osdSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -749,52 +737,52 @@ Item {
                             currentValue: {
                                 switch (SettingsData.osdPosition) {
                                 case SettingsData.Position.Top:
-                                    return "Top Right"
+                                    return "Top Right";
                                 case SettingsData.Position.Left:
-                                    return "Top Left"
+                                    return "Top Left";
                                 case SettingsData.Position.TopCenter:
-                                    return "Top Center"
+                                    return "Top Center";
                                 case SettingsData.Position.Right:
-                                    return "Bottom Right"
+                                    return "Bottom Right";
                                 case SettingsData.Position.Bottom:
-                                    return "Bottom Left"
+                                    return "Bottom Left";
                                 case SettingsData.Position.BottomCenter:
-                                    return "Bottom Center"
+                                    return "Bottom Center";
                                 case SettingsData.Position.LeftCenter:
-                                    return "Left Center"
+                                    return "Left Center";
                                 case SettingsData.Position.RightCenter:
-                                    return "Right Center"
+                                    return "Right Center";
                                 default:
-                                    return "Bottom Center"
+                                    return "Bottom Center";
                                 }
                             }
                             options: ["Top Right", "Top Left", "Top Center", "Bottom Right", "Bottom Left", "Bottom Center", "Left Center", "Right Center"]
                             onValueChanged: value => {
                                 switch (value) {
                                 case "Top Right":
-                                    SettingsData.set("osdPosition", SettingsData.Position.Top)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.Top);
+                                    break;
                                 case "Top Left":
-                                    SettingsData.set("osdPosition", SettingsData.Position.Left)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.Left);
+                                    break;
                                 case "Top Center":
-                                    SettingsData.set("osdPosition", SettingsData.Position.TopCenter)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.TopCenter);
+                                    break;
                                 case "Bottom Right":
-                                    SettingsData.set("osdPosition", SettingsData.Position.Right)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.Right);
+                                    break;
                                 case "Bottom Left":
-                                    SettingsData.set("osdPosition", SettingsData.Position.Bottom)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.Bottom);
+                                    break;
                                 case "Bottom Center":
-                                    SettingsData.set("osdPosition", SettingsData.Position.BottomCenter)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.BottomCenter);
+                                    break;
                                 case "Left Center":
-                                    SettingsData.set("osdPosition", SettingsData.Position.LeftCenter)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.LeftCenter);
+                                    break;
                                 case "Right Center":
-                                    SettingsData.set("osdPosition", SettingsData.Position.RightCenter)
-                                    break
+                                    SettingsData.set("osdPosition", SettingsData.Position.RightCenter);
+                                    break;
                                 }
                             }
                         }
@@ -806,7 +794,17 @@ Item {
                         description: I18n.tr("Show on-screen display when volume changes")
                         checked: SettingsData.osdVolumeEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdVolumeEnabled", checked)
+                            return SettingsData.set("osdVolumeEnabled", checked);
+                        }
+                    }
+
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Media Volume OSD")
+                        description: I18n.tr("Show on-screen display when media player volume changes")
+                        checked: SettingsData.osdMediaVolumeEnabled
+                        onToggled: checked => {
+                            return SettingsData.set("osdMediaVolumeEnabled", checked);
                         }
                     }
 
@@ -816,7 +814,7 @@ Item {
                         description: I18n.tr("Show on-screen display when brightness changes")
                         checked: SettingsData.osdBrightnessEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdBrightnessEnabled", checked)
+                            return SettingsData.set("osdBrightnessEnabled", checked);
                         }
                     }
 
@@ -826,7 +824,7 @@ Item {
                         description: I18n.tr("Show on-screen display when idle inhibitor state changes")
                         checked: SettingsData.osdIdleInhibitorEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdIdleInhibitorEnabled", checked)
+                            return SettingsData.set("osdIdleInhibitorEnabled", checked);
                         }
                     }
 
@@ -836,7 +834,7 @@ Item {
                         description: I18n.tr("Show on-screen display when microphone is muted/unmuted")
                         checked: SettingsData.osdMicMuteEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdMicMuteEnabled", checked)
+                            return SettingsData.set("osdMicMuteEnabled", checked);
                         }
                     }
 
@@ -846,7 +844,7 @@ Item {
                         description: I18n.tr("Show on-screen display when caps lock state changes")
                         checked: SettingsData.osdCapsLockEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdCapsLockEnabled", checked)
+                            return SettingsData.set("osdCapsLockEnabled", checked);
                         }
                     }
 
@@ -856,7 +854,7 @@ Item {
                         description: I18n.tr("Show on-screen display when power profile changes")
                         checked: SettingsData.osdPowerProfileEnabled
                         onToggled: checked => {
-                            return SettingsData.set("osdPowerProfileEnabled", checked)
+                            return SettingsData.set("osdPowerProfileEnabled", checked);
                         }
                     }
                 }

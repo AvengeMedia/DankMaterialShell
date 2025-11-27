@@ -1,92 +1,169 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.I3
-import Quickshell.Io
-import Quickshell.Services.Mpris
-import Quickshell.Services.Notifications
-import Quickshell.Services.SystemTray
-import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Common
-import qs.Modules
-import qs.Modules.DankBar.Widgets
-import qs.Modules.DankBar.Popouts
 import qs.Services
-import qs.Widgets
 
 Item {
     id: root
 
+    required property var barConfig
+
     signal colorPickerRequested
+    signal barReady(var barConfig)
 
     property alias barVariants: barVariants
     property var hyprlandOverviewLoader: null
     property bool systemTrayMenuOpen: false
 
+    property alias leftWidgetsModel: leftWidgetsModel
+    property alias centerWidgetsModel: centerWidgetsModel
+    property alias rightWidgetsModel: rightWidgetsModel
+
+    ScriptModel {
+        id: leftWidgetsModel
+        values: {
+            root.barConfig;
+            const leftWidgets = root.barConfig?.leftWidgets || [];
+            return leftWidgets.map((w, index) => {
+                if (typeof w === "string") {
+                    return {
+                        widgetId: w,
+                        id: w + "_" + index,
+                        enabled: true
+                    };
+                } else {
+                    const obj = Object.assign({}, w);
+                    obj.widgetId = w.id || w.widgetId;
+                    obj.id = (w.id || w.widgetId) + "_" + index;
+                    obj.enabled = w.enabled !== false;
+                    return obj;
+                }
+            });
+        }
+    }
+
+    ScriptModel {
+        id: centerWidgetsModel
+        values: {
+            root.barConfig;
+            const centerWidgets = root.barConfig?.centerWidgets || [];
+            return centerWidgets.map((w, index) => {
+                if (typeof w === "string") {
+                    return {
+                        widgetId: w,
+                        id: w + "_" + index,
+                        enabled: true
+                    };
+                } else {
+                    const obj = Object.assign({}, w);
+                    obj.widgetId = w.id || w.widgetId;
+                    obj.id = (w.id || w.widgetId) + "_" + index;
+                    obj.enabled = w.enabled !== false;
+                    return obj;
+                }
+            });
+        }
+    }
+
+    ScriptModel {
+        id: rightWidgetsModel
+        values: {
+            root.barConfig;
+            const rightWidgets = root.barConfig?.rightWidgets || [];
+            return rightWidgets.map((w, index) => {
+                if (typeof w === "string") {
+                    return {
+                        widgetId: w,
+                        id: w + "_" + index,
+                        enabled: true
+                    };
+                } else {
+                    const obj = Object.assign({}, w);
+                    obj.widgetId = w.id || w.widgetId;
+                    obj.id = (w.id || w.widgetId) + "_" + index;
+                    obj.enabled = w.enabled !== false;
+                    return obj;
+                }
+            });
+        }
+    }
+
     function triggerControlCenterOnFocusedScreen() {
-        let focusedScreenName = ""
+        let focusedScreenName = "";
         if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
-            focusedScreenName = Hyprland.focusedWorkspace.monitor.name
+            focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
-            focusedScreenName = NiriService.currentOutput
+            focusedScreenName = NiriService.currentOutput;
         } else if (CompositorService.isSway) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true)
-            focusedScreenName = focusedWs?.monitor?.name || ""
+            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
+            focusedScreenName = focusedWs?.monitor?.name || "";
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {
-            const firstBar = barVariants.instances[0]
-            firstBar.triggerControlCenter()
-            return true
+            const firstBar = barVariants.instances[0];
+            firstBar.triggerControlCenter();
+            return true;
         }
 
         for (var i = 0; i < barVariants.instances.length; i++) {
-            const barInstance = barVariants.instances[i]
+            const barInstance = barVariants.instances[i];
             if (barInstance.modelData && barInstance.modelData.name === focusedScreenName) {
-                barInstance.triggerControlCenter()
-                return true
+                barInstance.triggerControlCenter();
+                return true;
             }
         }
-        return false
+        return false;
     }
 
     function triggerWallpaperBrowserOnFocusedScreen() {
-        let focusedScreenName = ""
+        let focusedScreenName = "";
         if (CompositorService.isHyprland && Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.monitor) {
-            focusedScreenName = Hyprland.focusedWorkspace.monitor.name
+            focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
-            focusedScreenName = NiriService.currentOutput
+            focusedScreenName = NiriService.currentOutput;
         } else if (CompositorService.isSway) {
-            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true)
-            focusedScreenName = focusedWs?.monitor?.name || ""
+            const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
+            focusedScreenName = focusedWs?.monitor?.name || "";
         }
 
         if (!focusedScreenName && barVariants.instances.length > 0) {
-            const firstBar = barVariants.instances[0]
-            firstBar.triggerWallpaperBrowser()
-            return true
+            const firstBar = barVariants.instances[0];
+            firstBar.triggerWallpaperBrowser();
+            return true;
         }
 
         for (var i = 0; i < barVariants.instances.length; i++) {
-            const barInstance = barVariants.instances[i]
+            const barInstance = barVariants.instances[i];
             if (barInstance.modelData && barInstance.modelData.name === focusedScreenName) {
-                barInstance.triggerWallpaperBrowser()
-                return true
+                barInstance.triggerWallpaperBrowser();
+                return true;
             }
         }
-        return false
+        return false;
     }
 
     Variants {
         id: barVariants
-        model: SettingsData.getFilteredScreens("dankBar")
+        model: {
+            const prefs = root.barConfig?.screenPreferences || ["all"];
+            if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")) {
+                return Quickshell.screens;
+            }
+            const filtered = Quickshell.screens.filter(screen => SettingsData.isScreenInPreferences(screen, prefs));
+            if (filtered.length === 0 && root.barConfig?.showOnLastDisplay && Quickshell.screens.length === 1) {
+                return Quickshell.screens;
+            }
+            return filtered;
+        }
 
         delegate: DankBarWindow {
             rootWindow: root
+            barConfig: root.barConfig
+            leftWidgetsModel: root.leftWidgetsModel
+            centerWidgetsModel: root.centerWidgetsModel
+            rightWidgetsModel: root.rightWidgetsModel
         }
     }
 }

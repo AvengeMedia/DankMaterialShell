@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Services
 
 Text {
     property bool isMonospace: false
@@ -16,13 +15,13 @@ Text {
     }
 
     readonly property string resolvedFontFamily: {
-        const requestedFont = isMonospace ? SettingsData.monoFontFamily : SettingsData.fontFamily
-        const defaultFont = isMonospace ? SettingsData.defaultMonoFontFamily : SettingsData.defaultFontFamily
+        const requestedFont = isMonospace ? Theme.monoFontFamily : Theme.fontFamily;
+        const defaultFont = isMonospace ? Theme.defaultMonoFontFamily : Theme.defaultFontFamily;
 
         if (requestedFont === defaultFont) {
-            return isMonospace ? firaCodeFont.name : interFont.name
+            return isMonospace ? firaCodeFont.name : interFont.name;
         }
-        return requestedFont
+        return requestedFont;
     }
 
     readonly property var standardAnimation: {
@@ -34,7 +33,7 @@ Text {
     color: Theme.surfaceText
     font.pixelSize: Appearance.fontSize.normal
     font.family: resolvedFontFamily
-    font.weight: SettingsData.fontWeight
+    font.weight: Theme.fontWeight
     wrapMode: Text.WordWrap
     elide: Text.ElideRight
     verticalAlignment: Text.AlignVCenter

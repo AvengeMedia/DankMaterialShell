@@ -16,16 +16,17 @@ Column {
     property var bluetoothCodecSelector: null
     property bool darkModeTransitionPending: false
     property string screenName: ""
+    property string screenModel: ""
     property var parentScreen: null
 
     signal expandClicked(var widgetData, int globalIndex)
     signal removeWidget(int index)
     signal moveWidget(int fromIndex, int toIndex)
     signal toggleWidgetSize(int index)
-    signal collapseRequested()
+    signal collapseRequested
 
     function requestCollapse() {
-        collapseRequested()
+        collapseRequested();
     }
 
     spacing: editMode ? Theme.spacingL : Theme.spacingS
@@ -36,27 +37,27 @@ Column {
     property var colorPickerModal: null
 
     function calculateRowsAndWidgets() {
-        return LayoutUtils.calculateRowsAndWidgets(root, expandedSection, expandedWidgetIndex)
+        return LayoutUtils.calculateRowsAndWidgets(root, expandedSection, expandedWidgetIndex);
     }
 
     property var layoutResult: {
-        const dummy = [expandedSection, expandedWidgetIndex, model?.controlCenterWidgets]
-        return calculateRowsAndWidgets()
+        const dummy = [expandedSection, expandedWidgetIndex, model?.controlCenterWidgets];
+        return calculateRowsAndWidgets();
     }
 
     onLayoutResultChanged: {
-        expandedRowIndex = layoutResult.expandedRowIndex
+        expandedRowIndex = layoutResult.expandedRowIndex;
     }
 
     function moveToTop(item) {
-        const children = root.children
+        const children = root.children;
         for (var i = 0; i < children.length; i++) {
             if (children[i] === item)
-                continue
+                continue;
             if (children[i].z)
-                children[i].z = Math.min(children[i].z, 999)
+                children[i].z = Math.min(children[i].z, 999);
         }
-        item.z = 1000
+        item.z = 1000;
     }
 
     Repeater {
@@ -68,10 +69,10 @@ Column {
             property int rowIndex: index
             property var rowWidgets: modelData
             property bool isSliderOnlyRow: {
-                const widgets = rowWidgets || []
+                const widgets = rowWidgets || [];
                 if (widgets.length === 0)
-                    return false
-                return widgets.every(w => w.id === "volumeSlider" || w.id === "brightnessSlider" || w.id === "inputVolumeSlider")
+                    return false;
+                return widgets.every(w => w.id === "volumeSlider" || w.id === "brightnessSlider" || w.id === "inputVolumeSlider");
             }
             topPadding: isSliderOnlyRow ? (root.editMode ? 4 : -6) : 0
             bottomPadding: isSliderOnlyRow ? (root.editMode ? 4 : -6) : 0
@@ -86,32 +87,32 @@ Column {
                     DragDropWidgetWrapper {
                         widgetData: modelData
                         property int globalWidgetIndex: {
-                            const widgets = SettingsData.controlCenterWidgets || []
+                            const widgets = SettingsData.controlCenterWidgets || [];
                             for (var i = 0; i < widgets.length; i++) {
                                 if (widgets[i].id === modelData.id) {
                                     if (modelData.id === "diskUsage" || modelData.id === "brightnessSlider") {
                                         if (widgets[i].instanceId === modelData.instanceId) {
-                                            return i
+                                            return i;
                                         }
                                     } else {
-                                        return i
+                                        return i;
                                     }
                                 }
                             }
-                            return -1
+                            return -1;
                         }
                         property int widgetWidth: modelData.width || 50
                         width: {
-                            const baseWidth = root.width
-                            const spacing = Theme.spacingS
+                            const baseWidth = root.width;
+                            const spacing = Theme.spacingS;
                             if (widgetWidth <= 25) {
-                                return (baseWidth - spacing * 3) / 4
+                                return (baseWidth - spacing * 3) / 4;
                             } else if (widgetWidth <= 50) {
-                                return (baseWidth - spacing) / 2
+                                return (baseWidth - spacing) / 2;
                             } else if (widgetWidth <= 75) {
-                                return (baseWidth - spacing * 2) * 0.75
+                                return (baseWidth - spacing * 2) * 0.75;
                             } else {
-                                return baseWidth
+                                return baseWidth;
                             }
                         }
                         height: isSliderOnlyRow ? 48 : 60
@@ -123,32 +124,32 @@ Column {
                         gridColumns: 4
                         gridLayout: root
                         isSlider: {
-                            const id = modelData.id || ""
-                            return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider"
+                            const id = modelData.id || "";
+                            return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
                         }
 
                         widgetComponent: {
-                            const id = modelData.id || ""
+                            const id = modelData.id || "";
                             if (id.startsWith("builtin_")) {
-                                return builtinPluginWidgetComponent
+                                return builtinPluginWidgetComponent;
                             } else if (id.startsWith("plugin_")) {
-                                return pluginWidgetComponent
+                                return pluginWidgetComponent;
                             } else if (id === "wifi" || id === "bluetooth" || id === "audioOutput" || id === "audioInput") {
-                                return compoundPillComponent
+                                return compoundPillComponent;
                             } else if (id === "volumeSlider") {
-                                return audioSliderComponent
+                                return audioSliderComponent;
                             } else if (id === "brightnessSlider") {
-                                return brightnessSliderComponent
+                                return brightnessSliderComponent;
                             } else if (id === "inputVolumeSlider") {
-                                return inputAudioSliderComponent
+                                return inputAudioSliderComponent;
                             } else if (id === "battery") {
-                                return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent
+                                return widgetWidth <= 25 ? smallBatteryComponent : batteryPillComponent;
                             } else if (id === "diskUsage") {
-                                return diskUsagePillComponent
+                                return diskUsagePillComponent;
                             } else if (id === "colorPicker") {
-                                return colorPickerPillComponent
+                                return colorPickerPillComponent;
                             } else {
-                                return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent
+                                return widgetWidth <= 25 ? smallToggleComponent : toggleButtonComponent;
                             }
                         }
 
@@ -165,19 +166,19 @@ Column {
                 height: active ? (getDetailHeight(root.expandedSection) + Theme.spacingS) : 0
                 property bool active: {
                     if (root.expandedSection === "")
-                        return false
+                        return false;
 
                     if (root.expandedSection.startsWith("diskUsage_") && root.expandedWidgetData) {
-                        const expandedInstanceId = root.expandedWidgetData.instanceId
-                        return rowWidgets.some(w => w.id === "diskUsage" && w.instanceId === expandedInstanceId)
+                        const expandedInstanceId = root.expandedWidgetData.instanceId;
+                        return rowWidgets.some(w => w.id === "diskUsage" && w.instanceId === expandedInstanceId);
                     }
 
                     if (root.expandedSection.startsWith("brightnessSlider_") && root.expandedWidgetData) {
-                        const expandedInstanceId = root.expandedWidgetData.instanceId
-                        return rowWidgets.some(w => w.id === "brightnessSlider" && w.instanceId === expandedInstanceId)
+                        const expandedInstanceId = root.expandedWidgetData.instanceId;
+                        return rowWidgets.some(w => w.id === "brightnessSlider" && w.instanceId === expandedInstanceId);
                     }
 
-                    return rowIndex === root.expandedRowIndex
+                    return rowIndex === root.expandedRowIndex;
                 }
                 visible: active
                 expandedSection: root.expandedSection
@@ -186,6 +187,7 @@ Column {
                 widgetModel: root.model
                 collapseCallback: root.requestCollapse
                 screenName: root.screenName
+                screenModel: root.screenModel
             }
         }
     }
@@ -198,9 +200,9 @@ Column {
             height: 60
             primaryMessage: {
                 if (!DMSService.dmsAvailable) {
-                    return I18n.tr("DMS_SOCKET not available")
+                    return I18n.tr("DMS_SOCKET not available");
                 }
-                return I18n.tr("NM not supported")
+                return I18n.tr("NM not supported");
             }
             secondaryMessage: I18n.tr("update dms for NM integration.")
         }
@@ -217,258 +219,258 @@ Column {
             iconName: {
                 switch (widgetData.id || "") {
                 case "wifi":
-                {
-                    if (NetworkService.wifiToggling)
-                        return "sync"
+                    {
+                        if (NetworkService.wifiToggling)
+                            return "sync";
 
-                    const status = NetworkService.networkStatus
-                    if (status === "ethernet")
-                        return "settings_ethernet"
-                    if (status === "vpn")
-                        return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon
-                    if (status === "wifi")
-                        return NetworkService.wifiSignalIcon
-                    if (NetworkService.wifiEnabled)
-                        return "wifi_off"
-                    return "wifi_off"
-                }
+                        const status = NetworkService.networkStatus;
+                        if (status === "ethernet")
+                            return "settings_ethernet";
+                        if (status === "vpn")
+                            return NetworkService.ethernetConnected ? "settings_ethernet" : NetworkService.wifiSignalIcon;
+                        if (status === "wifi")
+                            return NetworkService.wifiSignalIcon;
+                        if (NetworkService.wifiEnabled)
+                            return "wifi_off";
+                        return "wifi_off";
+                    }
                 case "bluetooth":
-                {
-                    if (!BluetoothService.available)
-                        return "bluetooth_disabled"
-                    if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
-                        return "bluetooth_disabled"
-                    return "bluetooth"
-                }
+                    {
+                        if (!BluetoothService.available)
+                            return "bluetooth_disabled";
+                        if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
+                            return "bluetooth_disabled";
+                        return "bluetooth";
+                    }
                 case "audioOutput":
-                {
-                    if (!AudioService.sink)
-                        return "volume_off"
-                    let volume = AudioService.sink.audio.volume
-                    let muted = AudioService.sink.audio.muted
-                    if (muted || volume === 0.0)
-                        return "volume_off"
-                    if (volume <= 0.33)
-                        return "volume_down"
-                    if (volume <= 0.66)
-                        return "volume_up"
-                    return "volume_up"
-                }
+                    {
+                        if (!AudioService.sink)
+                            return "volume_off";
+                        let volume = AudioService.sink.audio.volume;
+                        let muted = AudioService.sink.audio.muted;
+                        if (muted || volume === 0.0)
+                            return "volume_off";
+                        if (volume <= 0.33)
+                            return "volume_down";
+                        if (volume <= 0.66)
+                            return "volume_up";
+                        return "volume_up";
+                    }
                 case "audioInput":
-                {
-                    if (!AudioService.source)
-                        return "mic_off"
-                    let muted = AudioService.source.audio.muted
-                    return muted ? "mic_off" : "mic"
-                }
+                    {
+                        if (!AudioService.source)
+                            return "mic_off";
+                        let muted = AudioService.source.audio.muted;
+                        return muted ? "mic_off" : "mic";
+                    }
                 default:
-                    return widgetDef?.icon || "help"
+                    return widgetDef?.icon || "help";
                 }
             }
             primaryText: {
                 switch (widgetData.id || "") {
                 case "wifi":
-                {
-                    if (NetworkService.wifiToggling)
-                        return NetworkService.wifiEnabled ? "Disabling WiFi..." : "Enabling WiFi..."
+                    {
+                        if (NetworkService.wifiToggling)
+                            return NetworkService.wifiEnabled ? "Disabling WiFi..." : "Enabling WiFi...";
 
-                    const status = NetworkService.networkStatus
-                    if (status === "ethernet")
-                        return "Ethernet"
-                    if (status === "vpn") {
-                        if (NetworkService.ethernetConnected)
-                            return "Ethernet"
-                        if (NetworkService.wifiConnected && NetworkService.currentWifiSSID)
-                            return NetworkService.currentWifiSSID
+                        const status = NetworkService.networkStatus;
+                        if (status === "ethernet")
+                            return "Ethernet";
+                        if (status === "vpn") {
+                            if (NetworkService.ethernetConnected)
+                                return "Ethernet";
+                            if (NetworkService.wifiConnected && NetworkService.currentWifiSSID)
+                                return NetworkService.currentWifiSSID;
+                        }
+                        if (status === "wifi" && NetworkService.currentWifiSSID)
+                            return NetworkService.currentWifiSSID;
+                        if (NetworkService.wifiEnabled)
+                            return "Not connected";
+                        return "WiFi off";
                     }
-                    if (status === "wifi" && NetworkService.currentWifiSSID)
-                        return NetworkService.currentWifiSSID
-                    if (NetworkService.wifiEnabled)
-                        return "Not connected"
-                    return "WiFi off"
-                }
                 case "bluetooth":
-                {
-                    if (!BluetoothService.available)
-                        return "Bluetooth"
-                    if (!BluetoothService.adapter)
-                        return "No adapter"
-                    if (!BluetoothService.adapter.enabled)
-                        return "Disabled"
-                    return "Enabled"
-                }
+                    {
+                        if (!BluetoothService.available)
+                            return "Bluetooth";
+                        if (!BluetoothService.adapter)
+                            return "No adapter";
+                        if (!BluetoothService.adapter.enabled)
+                            return "Disabled";
+                        return "Enabled";
+                    }
                 case "audioOutput":
-                    return AudioService.sink?.description || "No output device"
+                    return AudioService.sink?.description || "No output device";
                 case "audioInput":
-                    return AudioService.source?.description || "No input device"
+                    return AudioService.source?.description || "No input device";
                 default:
-                    return widgetDef?.text || "Unknown"
+                    return widgetDef?.text || "Unknown";
                 }
             }
             secondaryText: {
                 switch (widgetData.id || "") {
                 case "wifi":
-                {
-                    if (NetworkService.wifiToggling)
-                        return "Please wait..."
+                    {
+                        if (NetworkService.wifiToggling)
+                            return "Please wait...";
 
-                    const status = NetworkService.networkStatus
-                    if (status === "ethernet")
-                        return "Connected"
-                    if (status === "vpn") {
-                        if (NetworkService.ethernetConnected)
-                            return "Connected"
-                        if (NetworkService.wifiConnected)
-                            return NetworkService.wifiSignalStrength > 0 ? NetworkService.wifiSignalStrength + "%" : "Connected"
+                        const status = NetworkService.networkStatus;
+                        if (status === "ethernet")
+                            return "Connected";
+                        if (status === "vpn") {
+                            if (NetworkService.ethernetConnected)
+                                return "Connected";
+                            if (NetworkService.wifiConnected)
+                                return NetworkService.wifiSignalStrength > 0 ? NetworkService.wifiSignalStrength + "%" : "Connected";
+                        }
+                        if (status === "wifi")
+                            return NetworkService.wifiSignalStrength > 0 ? NetworkService.wifiSignalStrength + "%" : "Connected";
+                        if (NetworkService.wifiEnabled)
+                            return "Select network";
+                        return "";
                     }
-                    if (status === "wifi")
-                        return NetworkService.wifiSignalStrength > 0 ? NetworkService.wifiSignalStrength + "%" : "Connected"
-                    if (NetworkService.wifiEnabled)
-                        return "Select network"
-                    return ""
-                }
                 case "bluetooth":
-                {
-                    if (!BluetoothService.available)
-                        return "No adapters"
-                    if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
-                        return "Off"
-                    const primaryDevice = (() => {
-                                               if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
-                                               return null
-                                               let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
-                                               for (let device of devices) {
-                                                   if (device && device.connected)
-                                                   return device
-                                               }
-                                               return null
-                                           })()
-                    if (primaryDevice)
-                        return primaryDevice.name || primaryDevice.alias || primaryDevice.deviceName || "Connected Device"
-                    return "No devices"
-                }
+                    {
+                        if (!BluetoothService.available)
+                            return "No adapters";
+                        if (!BluetoothService.adapter || !BluetoothService.adapter.enabled)
+                            return "Off";
+                        const primaryDevice = (() => {
+                                if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
+                                    return null;
+                                let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))];
+                                for (let device of devices) {
+                                    if (device && device.connected)
+                                        return device;
+                                }
+                                return null;
+                            })();
+                        if (primaryDevice)
+                            return primaryDevice.name || primaryDevice.alias || primaryDevice.deviceName || "Connected Device";
+                        return "No devices";
+                    }
                 case "audioOutput":
-                {
-                    if (!AudioService.sink)
-                        return "Select device"
-                    if (AudioService.sink.audio.muted)
-                        return "Muted"
-                    const volume = AudioService.sink.audio.volume
-                    if (typeof volume !== "number" || isNaN(volume))
-                        return "0%"
-                    return Math.round(volume * 100) + "%"
-                }
+                    {
+                        if (!AudioService.sink)
+                            return "Select device";
+                        if (AudioService.sink.audio.muted)
+                            return "Muted";
+                        const volume = AudioService.sink.audio.volume;
+                        if (typeof volume !== "number" || isNaN(volume))
+                            return "0%";
+                        return Math.round(volume * 100) + "%";
+                    }
                 case "audioInput":
-                {
-                    if (!AudioService.source)
-                        return "Select device"
-                    if (AudioService.source.audio.muted)
-                        return "Muted"
-                    const volume = AudioService.source.audio.volume
-                    if (typeof volume !== "number" || isNaN(volume))
-                        return "0%"
-                    return Math.round(volume * 100) + "%"
-                }
+                    {
+                        if (!AudioService.source)
+                            return "Select device";
+                        if (AudioService.source.audio.muted)
+                            return "Muted";
+                        const volume = AudioService.source.audio.volume;
+                        if (typeof volume !== "number" || isNaN(volume))
+                            return "0%";
+                        return Math.round(volume * 100) + "%";
+                    }
                 default:
-                    return widgetDef?.description || ""
+                    return widgetDef?.description || "";
                 }
             }
             isActive: {
                 switch (widgetData.id || "") {
                 case "wifi":
-                {
-                    if (NetworkService.wifiToggling)
-                        return false
+                    {
+                        if (NetworkService.wifiToggling)
+                            return false;
 
-                    const status = NetworkService.networkStatus
-                    if (status === "ethernet")
-                        return true
-                    if (status === "vpn")
-                        return NetworkService.ethernetConnected || NetworkService.wifiConnected
-                    if (status === "wifi")
-                        return true
-                    return NetworkService.wifiEnabled
-                }
+                        const status = NetworkService.networkStatus;
+                        if (status === "ethernet")
+                            return true;
+                        if (status === "vpn")
+                            return NetworkService.ethernetConnected || NetworkService.wifiConnected;
+                        if (status === "wifi")
+                            return true;
+                        return NetworkService.wifiEnabled;
+                    }
                 case "bluetooth":
-                    return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled)
+                    return !!(BluetoothService.available && BluetoothService.adapter && BluetoothService.adapter.enabled);
                 case "audioOutput":
-                    return !!(AudioService.sink && !AudioService.sink.audio.muted)
+                    return !!(AudioService.sink && !AudioService.sink.audio.muted);
                 case "audioInput":
-                    return !!(AudioService.source && !AudioService.source.audio.muted)
+                    return !!(AudioService.source && !AudioService.source.audio.muted);
                 default:
-                    return false
+                    return false;
                 }
             }
             enabled: widgetDef?.enabled ?? true
             onToggled: {
                 if (root.editMode)
-                    return
+                    return;
                 switch (widgetData.id || "") {
                 case "wifi":
-                {
-                    if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
-                        NetworkService.toggleWifiRadio()
+                    {
+                        if (NetworkService.networkStatus !== "ethernet" && !NetworkService.wifiToggling) {
+                            NetworkService.toggleWifiRadio();
+                        }
+                        break;
                     }
-                    break
-                }
                 case "bluetooth":
-                {
-                    if (BluetoothService.available && BluetoothService.adapter) {
-                        BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled
+                    {
+                        if (BluetoothService.available && BluetoothService.adapter) {
+                            BluetoothService.adapter.enabled = !BluetoothService.adapter.enabled;
+                        }
+                        break;
                     }
-                    break
-                }
                 case "audioOutput":
-                {
-                    if (AudioService.sink && AudioService.sink.audio) {
-                        AudioService.sink.audio.muted = !AudioService.sink.audio.muted
+                    {
+                        if (AudioService.sink && AudioService.sink.audio) {
+                            AudioService.sink.audio.muted = !AudioService.sink.audio.muted;
+                        }
+                        break;
                     }
-                    break
-                }
                 case "audioInput":
-                {
-                    if (AudioService.source && AudioService.source.audio) {
-                        AudioService.source.audio.muted = !AudioService.source.audio.muted
+                    {
+                        if (AudioService.source && AudioService.source.audio) {
+                            AudioService.source.audio.muted = !AudioService.source.audio.muted;
+                        }
+                        break;
                     }
-                    break
-                }
                 }
             }
             onExpandClicked: {
                 if (root.editMode)
-                    return
-                root.expandClicked(widgetData, widgetIndex)
+                    return;
+                root.expandClicked(widgetData, widgetIndex);
             }
             onWheelEvent: function (wheelEvent) {
                 if (root.editMode)
-                    return
-                const id = widgetData.id || ""
+                    return;
+                const id = widgetData.id || "";
                 if (id === "audioOutput") {
                     if (!AudioService.sink || !AudioService.sink.audio)
-                        return
-                    let delta = wheelEvent.angleDelta.y
-                    let currentVolume = AudioService.sink.audio.volume * 100
-                    let newVolume
+                        return;
+                    let delta = wheelEvent.angleDelta.y;
+                    let currentVolume = AudioService.sink.audio.volume * 100;
+                    let newVolume;
                     if (delta > 0)
-                        newVolume = Math.min(100, currentVolume + 5)
+                        newVolume = Math.min(100, currentVolume + 5);
                     else
-                        newVolume = Math.max(0, currentVolume - 5)
-                    AudioService.sink.audio.muted = false
-                    AudioService.sink.audio.volume = newVolume / 100
-                    wheelEvent.accepted = true
+                        newVolume = Math.max(0, currentVolume - 5);
+                    AudioService.sink.audio.muted = false;
+                    AudioService.sink.audio.volume = newVolume / 100;
+                    wheelEvent.accepted = true;
                 } else if (id === "audioInput") {
                     if (!AudioService.source || !AudioService.source.audio)
-                        return
-                    let delta = wheelEvent.angleDelta.y
-                    let currentVolume = AudioService.source.audio.volume * 100
-                    let newVolume
+                        return;
+                    let delta = wheelEvent.angleDelta.y;
+                    let currentVolume = AudioService.source.audio.volume * 100;
+                    let newVolume;
                     if (delta > 0)
-                        newVolume = Math.min(100, currentVolume + 5)
+                        newVolume = Math.min(100, currentVolume + 5);
                     else
-                        newVolume = Math.max(0, currentVolume - 5)
-                    AudioService.source.audio.muted = false
-                    AudioService.source.audio.volume = newVolume / 100
-                    wheelEvent.accepted = true
+                        newVolume = Math.max(0, currentVolume - 5);
+                    AudioService.source.audio.muted = false;
+                    AudioService.source.audio.volume = newVolume / 100;
+                    wheelEvent.accepted = true;
                 }
             }
         }
@@ -512,7 +514,7 @@ Column {
 
                 onIconClicked: {
                     if (!root.editMode && DisplayService.devices && DisplayService.devices.length > 1) {
-                        root.expandClicked(widgetData, widgetIndex)
+                        root.expandClicked(widgetData, widgetIndex);
                     }
                 }
             }
@@ -546,7 +548,7 @@ Column {
 
             onExpandClicked: {
                 if (!root.editMode) {
-                    root.expandClicked(widgetData, widgetIndex)
+                    root.expandClicked(widgetData, widgetIndex);
                 }
             }
         }
@@ -562,7 +564,7 @@ Column {
 
             onClicked: {
                 if (!root.editMode) {
-                    root.expandClicked(widgetData, widgetIndex)
+                    root.expandClicked(widgetData, widgetIndex);
                 }
             }
         }
@@ -579,54 +581,54 @@ Column {
             iconName: {
                 switch (widgetData.id || "") {
                 case "nightMode":
-                    return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode"
+                    return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode";
                 case "darkMode":
-                    return "contrast"
+                    return "contrast";
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off"
+                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle"
+                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
                 default:
-                    return "help"
+                    return "help";
                 }
             }
 
             text: {
                 switch (widgetData.id || "") {
                 case "nightMode":
-                    return I18n.tr("Night Mode")
+                    return I18n.tr("Night Mode");
                 case "darkMode":
-                    return I18n.tr("Dark Mode")
+                    return I18n.tr("Dark Mode");
                 case "doNotDisturb":
-                    return I18n.tr("Do Not Disturb")
+                    return I18n.tr("Do Not Disturb");
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake")
+                    return SessionService.idleInhibited ? I18n.tr("Keeping Awake") : I18n.tr("Keep Awake");
                 default:
-                    return "Unknown"
+                    return "Unknown";
                 }
             }
 
             iconRotation: {
                 if (widgetData.id !== "darkMode")
-                    return 0
+                    return 0;
                 if (darkModeTransitionPending) {
-                    return SessionData.isLightMode ? 180 : 0
+                    return SessionData.isLightMode ? 180 : 0;
                 }
-                return SessionData.isLightMode ? 180 : 0
+                return SessionData.isLightMode ? 180 : 0;
             }
 
             isActive: {
                 switch (widgetData.id || "") {
                 case "nightMode":
-                    return DisplayService.nightModeEnabled || false
+                    return DisplayService.nightModeEnabled || false;
                 case "darkMode":
-                    return !SessionData.isLightMode
+                    return !SessionData.isLightMode;
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb || false
+                    return SessionData.doNotDisturb || false;
                 case "idleInhibitor":
-                    return SessionService.idleInhibited || false
+                    return SessionService.idleInhibited || false;
                 default:
-                    return false
+                    return false;
                 }
             }
 
@@ -634,31 +636,31 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 switch (widgetData.id || "") {
                 case "nightMode":
-                {
-                    if (DisplayService.automationAvailable)
-                        DisplayService.toggleNightMode()
-                    break
-                }
+                    {
+                        if (DisplayService.automationAvailable)
+                            DisplayService.toggleNightMode();
+                        break;
+                    }
                 case "darkMode":
-                {
-                    const newMode = !SessionData.isLightMode
-                    Theme.screenTransition()
-                    Theme.setLightMode(newMode)
-                    break
-                }
+                    {
+                        const newMode = !SessionData.isLightMode;
+                        Theme.screenTransition();
+                        Theme.setLightMode(newMode);
+                        break;
+                    }
                 case "doNotDisturb":
-                {
-                    SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
-                    break
-                }
+                    {
+                        SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
+                        break;
+                    }
                 case "idleInhibitor":
-                {
-                    SessionService.toggleIdleInhibit()
-                    break
-                }
+                    {
+                        SessionService.toggleIdleInhibit();
+                        break;
+                    }
                 }
             }
         }
@@ -675,39 +677,39 @@ Column {
             iconName: {
                 switch (widgetData.id || "") {
                 case "nightMode":
-                    return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode"
+                    return DisplayService.nightModeEnabled ? "nightlight" : "dark_mode";
                 case "darkMode":
-                    return "contrast"
+                    return "contrast";
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off"
+                    return SessionData.doNotDisturb ? "do_not_disturb_on" : "do_not_disturb_off";
                 case "idleInhibitor":
-                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle"
+                    return SessionService.idleInhibited ? "motion_sensor_active" : "motion_sensor_idle";
                 default:
-                    return "help"
+                    return "help";
                 }
             }
 
             iconRotation: {
                 if (widgetData.id !== "darkMode")
-                    return 0
+                    return 0;
                 if (darkModeTransitionPending) {
-                    return SessionData.isLightMode ? 180 : 0
+                    return SessionData.isLightMode ? 180 : 0;
                 }
-                return SessionData.isLightMode ? 180 : 0
+                return SessionData.isLightMode ? 180 : 0;
             }
 
             isActive: {
                 switch (widgetData.id || "") {
                 case "nightMode":
-                    return DisplayService.nightModeEnabled || false
+                    return DisplayService.nightModeEnabled || false;
                 case "darkMode":
-                    return !SessionData.isLightMode
+                    return !SessionData.isLightMode;
                 case "doNotDisturb":
-                    return SessionData.doNotDisturb || false
+                    return SessionData.doNotDisturb || false;
                 case "idleInhibitor":
-                    return SessionService.idleInhibited || false
+                    return SessionService.idleInhibited || false;
                 default:
-                    return false
+                    return false;
                 }
             }
 
@@ -715,31 +717,31 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 switch (widgetData.id || "") {
                 case "nightMode":
-                {
-                    if (DisplayService.automationAvailable)
-                        DisplayService.toggleNightMode()
-                    break
-                }
+                    {
+                        if (DisplayService.automationAvailable)
+                            DisplayService.toggleNightMode();
+                        break;
+                    }
                 case "darkMode":
-                {
-                    const newMode = !SessionData.isLightMode
-                    Theme.screenTransition()
-                    Theme.setLightMode(newMode)
-                    break
-                }
+                    {
+                        const newMode = !SessionData.isLightMode;
+                        Theme.screenTransition();
+                        Theme.setLightMode(newMode);
+                        break;
+                    }
                 case "doNotDisturb":
-                {
-                    SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
-                    break
-                }
+                    {
+                        SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
+                        break;
+                    }
                 case "idleInhibitor":
-                {
-                    SessionService.toggleIdleInhibit()
-                    break
-                }
+                    {
+                        SessionService.toggleIdleInhibit();
+                        break;
+                    }
                 }
             }
         }
@@ -758,7 +760,7 @@ Column {
 
             onExpandClicked: {
                 if (!root.editMode) {
-                    root.expandClicked(widgetData, widgetIndex)
+                    root.expandClicked(widgetData, widgetIndex);
                 }
             }
         }
@@ -788,33 +790,33 @@ Column {
             property var builtinInstance: null
 
             Component.onCompleted: {
-                const id = widgetData.id || ""
+                const id = widgetData.id || "";
                 if (id === "builtin_vpn") {
                     if (root.model?.vpnLoader) {
-                        root.model.vpnLoader.active = true
+                        root.model.vpnLoader.active = true;
                     }
-                    builtinInstance = Qt.binding(() => root.model?.vpnBuiltinInstance)
+                    builtinInstance = Qt.binding(() => root.model?.vpnBuiltinInstance);
                 }
                 if (id === "builtin_cups") {
                     if (root.model?.cupsLoader) {
-                        root.model.cupsLoader.active = true
+                        root.model.cupsLoader.active = true;
                     }
-                    builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance)
+                    builtinInstance = Qt.binding(() => root.model?.cupsBuiltinInstance);
                 }
             }
 
             sourceComponent: {
                 if (!builtinInstance)
-                    return null
+                    return null;
 
-                const hasDetail = builtinInstance.ccDetailContent !== null
+                const hasDetail = builtinInstance.ccDetailContent !== null;
 
                 if (widgetWidth <= 25) {
-                    return builtinSmallToggleComponent
+                    return builtinSmallToggleComponent;
                 } else if (hasDetail) {
-                    return builtinCompoundPillComponent
+                    return builtinCompoundPillComponent;
                 } else {
-                    return builtinToggleComponent
+                    return builtinToggleComponent;
                 }
             }
         }
@@ -834,19 +836,19 @@ Column {
 
             onToggled: {
                 if (root.editMode)
-                    return
+                    return;
                 if (builtinInstance) {
-                    builtinInstance.ccWidgetToggled()
+                    builtinInstance.ccWidgetToggled();
                 }
             }
 
             onExpandClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (builtinInstance) {
-                    builtinInstance.ccWidgetExpanded()
+                    builtinInstance.ccWidgetExpanded();
                 }
-                root.expandClicked(widgetData, widgetIndex)
+                root.expandClicked(widgetData, widgetIndex);
             }
         }
     }
@@ -865,9 +867,9 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (builtinInstance) {
-                    builtinInstance.ccWidgetToggled()
+                    builtinInstance.ccWidgetToggled();
                 }
             }
         }
@@ -886,9 +888,9 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (builtinInstance) {
-                    builtinInstance.ccWidgetToggled()
+                    builtinInstance.ccWidgetToggled();
                 }
             }
         }
@@ -908,49 +910,49 @@ Column {
 
             sourceComponent: {
                 if (!pluginInstance)
-                    return null
+                    return null;
 
-                const hasDetail = pluginInstance.ccDetailContent !== null
+                const hasDetail = pluginInstance.ccDetailContent !== null;
 
                 if (widgetWidth <= 25) {
-                    return pluginSmallToggleComponent
+                    return pluginSmallToggleComponent;
                 } else if (hasDetail) {
-                    return pluginCompoundPillComponent
+                    return pluginCompoundPillComponent;
                 } else {
-                    return pluginToggleComponent
+                    return pluginToggleComponent;
                 }
             }
 
             Component.onCompleted: {
                 Qt.callLater(() => {
-                                 const pluginComponent = PluginService.pluginWidgetComponents[pluginId]
-                                 if (pluginComponent) {
-                                     const instance = pluginComponent.createObject(null, {
-                                                                                       "pluginId": pluginId,
-                                                                                       "pluginService": PluginService,
-                                                                                       "visible": false,
-                                                                                       "width": 0,
-                                                                                       "height": 0
-                                                                                   })
-                                     if (instance) {
-                                         pluginInstance = instance
-                                     }
-                                 }
-                             })
+                    const pluginComponent = PluginService.pluginWidgetComponents[pluginId];
+                    if (pluginComponent) {
+                        const instance = pluginComponent.createObject(null, {
+                            "pluginId": pluginId,
+                            "pluginService": PluginService,
+                            "visible": false,
+                            "width": 0,
+                            "height": 0
+                        });
+                        if (instance) {
+                            pluginInstance = instance;
+                        }
+                    }
+                });
             }
 
             Connections {
                 target: PluginService
                 function onPluginDataChanged(changedPluginId) {
                     if (changedPluginId === pluginId && pluginInstance) {
-                        pluginInstance.loadPluginData()
+                        pluginInstance.loadPluginData();
                     }
                 }
             }
 
             Component.onDestruction: {
                 if (pluginInstance) {
-                    pluginInstance.destroy()
+                    pluginInstance.destroy();
                 }
             }
         }
@@ -970,19 +972,19 @@ Column {
 
             onToggled: {
                 if (root.editMode)
-                    return
+                    return;
                 if (pluginInstance) {
-                    pluginInstance.ccWidgetToggled()
+                    pluginInstance.ccWidgetToggled();
                 }
             }
 
             onExpandClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (pluginInstance) {
-                    pluginInstance.ccWidgetExpanded()
+                    pluginInstance.ccWidgetExpanded();
                 }
-                root.expandClicked(widgetData, widgetIndex)
+                root.expandClicked(widgetData, widgetIndex);
             }
         }
     }
@@ -1003,9 +1005,9 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (pluginInstance) {
-                    pluginInstance.ccWidgetToggled()
+                    pluginInstance.ccWidgetToggled();
                 }
             }
         }
@@ -1025,11 +1027,11 @@ Column {
 
             onClicked: {
                 if (root.editMode)
-                    return
+                    return;
                 if (pluginInstance && pluginInstance.ccDetailContent) {
-                    root.expandClicked(widgetData, widgetIndex)
+                    root.expandClicked(widgetData, widgetIndex);
                 } else if (pluginInstance) {
-                    pluginInstance.ccWidgetToggled()
+                    pluginInstance.ccWidgetToggled();
                 }
             }
         }

@@ -78,14 +78,19 @@ PanelWindow {
     readonly property bool isVerticalLayout: SettingsData.osdPosition === SettingsData.Position.LeftCenter || SettingsData.osdPosition === SettingsData.Position.RightCenter
 
     readonly property real barThickness: {
-        if (!SettingsData.dankBarVisible) return 0
-        const widgetThickness = Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
-        return Math.max(widgetThickness + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar || !(defaultBar.visible ?? true)) return 0
+        const innerPadding = defaultBar.innerPadding ?? 4
+        const widgetThickness = Math.max(20, 26 + innerPadding * 0.6)
+        return Math.max(widgetThickness + innerPadding + 4, Theme.barHeight - 4 - (8 - innerPadding))
     }
 
     readonly property real barOffset: {
-        if (!SettingsData.dankBarVisible) return 0
-        return barThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        if (!defaultBar || !(defaultBar.visible ?? true)) return 0
+        const spacing = defaultBar.spacing ?? 4
+        const bottomGap = defaultBar.bottomGap ?? 0
+        return barThickness + spacing + bottomGap
     }
 
     readonly property real dockThickness: {
@@ -102,23 +107,26 @@ PanelWindow {
         const margin = Theme.spacingM
         const centerX = (screenWidth - alignedWidth) / 2
 
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        const barPos = defaultBar?.position ?? SettingsData.Position.Top
+
         switch (SettingsData.osdPosition) {
         case SettingsData.Position.Left:
         case SettingsData.Position.Bottom:
-            const leftBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Left ? barOffset : 0
+            const leftBarOffset = barPos === SettingsData.Position.Left ? barOffset : 0
             const leftDockOffset = SettingsData.dockPosition === SettingsData.Position.Left ? dockOffset : 0
             return Theme.snap(margin + Math.max(leftBarOffset, leftDockOffset), dpr)
         case SettingsData.Position.Top:
         case SettingsData.Position.Right:
-            const rightBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Right ? barOffset : 0
+            const rightBarOffset = barPos === SettingsData.Position.Right ? barOffset : 0
             const rightDockOffset = SettingsData.dockPosition === SettingsData.Position.Right ? dockOffset : 0
             return Theme.snap(screenWidth - alignedWidth - margin - Math.max(rightBarOffset, rightDockOffset), dpr)
         case SettingsData.Position.LeftCenter:
-            const leftCenterBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Left ? barOffset : 0
+            const leftCenterBarOffset = barPos === SettingsData.Position.Left ? barOffset : 0
             const leftCenterDockOffset = SettingsData.dockPosition === SettingsData.Position.Left ? dockOffset : 0
             return Theme.snap(margin + Math.max(leftCenterBarOffset, leftCenterDockOffset), dpr)
         case SettingsData.Position.RightCenter:
-            const rightCenterBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Right ? barOffset : 0
+            const rightCenterBarOffset = barPos === SettingsData.Position.Right ? barOffset : 0
             const rightCenterDockOffset = SettingsData.dockPosition === SettingsData.Position.Right ? dockOffset : 0
             return Theme.snap(screenWidth - alignedWidth - margin - Math.max(rightCenterBarOffset, rightCenterDockOffset), dpr)
         case SettingsData.Position.TopCenter:
@@ -132,17 +140,20 @@ PanelWindow {
         const margin = Theme.spacingM
         const centerY = (screenHeight - alignedHeight) / 2
 
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")
+        const barPos = defaultBar?.position ?? SettingsData.Position.Top
+
         switch (SettingsData.osdPosition) {
         case SettingsData.Position.Top:
         case SettingsData.Position.Left:
         case SettingsData.Position.TopCenter:
-            const topBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Top ? barOffset : 0
+            const topBarOffset = barPos === SettingsData.Position.Top ? barOffset : 0
             const topDockOffset = SettingsData.dockPosition === SettingsData.Position.Top ? dockOffset : 0
             return Theme.snap(margin + Math.max(topBarOffset, topDockOffset), dpr)
         case SettingsData.Position.Right:
         case SettingsData.Position.Bottom:
         case SettingsData.Position.BottomCenter:
-            const bottomBarOffset = SettingsData.dankBarPosition === SettingsData.Position.Bottom ? barOffset : 0
+            const bottomBarOffset = barPos === SettingsData.Position.Bottom ? barOffset : 0
             const bottomDockOffset = SettingsData.dockPosition === SettingsData.Position.Bottom ? dockOffset : 0
             return Theme.snap(screenHeight - alignedHeight - margin - Math.max(bottomBarOffset, bottomDockOffset), dpr)
         case SettingsData.Position.LeftCenter:
@@ -217,14 +228,15 @@ PanelWindow {
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
+            readonly property int blurMax: 64
+
             layer.effect: MultiEffect {
                 id: shadowFx
                 autoPaddingEnabled: true
                 shadowEnabled: true
                 blurEnabled: false
                 maskEnabled: false
-                property int blurMax: 64
-                shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / blurMax))
+                shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
                 shadowColor: {
                     const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest

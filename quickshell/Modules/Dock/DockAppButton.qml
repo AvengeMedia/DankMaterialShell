@@ -1,8 +1,7 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Hyprland
 import Quickshell.Widgets
 import qs.Common
 import qs.Services
@@ -32,11 +31,11 @@ Item {
 
     function updateDesktopEntry() {
         if (!appData || appData.appId === "__SEPARATOR__") {
-            cachedDesktopEntry = null
-            return
+            cachedDesktopEntry = null;
+            return;
         }
-        const moddedId = Paths.moddedAppId(appData.appId)
-        cachedDesktopEntry = DesktopEntries.heuristicLookup(moddedId)
+        const moddedId = Paths.moddedAppId(appData.appId);
+        cachedDesktopEntry = DesktopEntries.heuristicLookup(moddedId);
     }
 
     Component.onCompleted: updateDesktopEntry()
@@ -46,80 +45,81 @@ Item {
     Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
-            updateDesktopEntry()
+            updateDesktopEntry();
         }
     }
     property bool isWindowFocused: {
         if (!appData) {
-            return false
+            return false;
         }
 
         if (appData.type === "window") {
-            const toplevel = getToplevelObject()
+            const toplevel = getToplevelObject();
             if (!toplevel) {
-                return false
+                return false;
             }
-            return toplevel.activated
+            return toplevel.activated;
         } else if (appData.type === "grouped") {
             // For grouped apps, check if any window is focused
-            const allToplevels = ToplevelManager.toplevels.values
+            const allToplevels = ToplevelManager.toplevels.values;
             for (let i = 0; i < allToplevels.length; i++) {
-                const toplevel = allToplevels[i]
+                const toplevel = allToplevels[i];
                 if (toplevel.appId === appData.appId && toplevel.activated) {
-                    return true
+                    return true;
                 }
             }
         }
 
-        return false
+        return false;
     }
     property string tooltipText: {
-        if (!appData) {
-            return ""
+        if (!appData || !appData.appId) {
+            return "";
         }
+
+        const appName = Paths.getAppName(appData.appId, cachedDesktopEntry);
 
         if ((appData.type === "window" && showWindowTitle) || (appData.type === "grouped" && appData.windowTitle)) {
-            const appName = cachedDesktopEntry && cachedDesktopEntry.name ? cachedDesktopEntry.name : appData.appId
-            const title = appData.type === "window" ? windowTitle : appData.windowTitle
-            return appName + (title ? " • " + title : "")
+            const title = appData.type === "window" ? windowTitle : appData.windowTitle;
+            return appName + (title ? " • " + title : "");
         }
 
-        if (!appData.appId) {
-            return ""
-        }
-
-        return cachedDesktopEntry && cachedDesktopEntry.name ? cachedDesktopEntry.name : appData.appId
+        return appName;
     }
 
     function getToplevelObject() {
-        return appData?.toplevel || null
+        return appData?.toplevel || null;
     }
 
     function getGroupedToplevels() {
-        return appData?.allWindows?.map(w => w.toplevel).filter(t => t !== null) || []
+        return appData?.allWindows?.map(w => w.toplevel).filter(t => t !== null) || [];
     }
     onIsHoveredChanged: {
-        if (mouseArea.pressed) return
-
+        if (mouseArea.pressed)
+            return;
         if (isHovered) {
-            exitAnimation.stop()
+            exitAnimation.stop();
             if (!bounceAnimation.running) {
-                bounceAnimation.restart()
+                bounceAnimation.restart();
             }
         } else {
-            bounceAnimation.stop()
-            exitAnimation.restart()
+            bounceAnimation.stop();
+            exitAnimation.restart();
         }
     }
 
     readonly property bool animateX: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right
     readonly property real animationDistance: actualIconSize
     readonly property real animationDirection: {
-        if (SettingsData.dockPosition === SettingsData.Position.Bottom) return -1
-        if (SettingsData.dockPosition === SettingsData.Position.Top) return 1
-        if (SettingsData.dockPosition === SettingsData.Position.Right) return -1
-        if (SettingsData.dockPosition === SettingsData.Position.Left) return 1
-        return -1
+        if (SettingsData.dockPosition === SettingsData.Position.Bottom)
+            return -1;
+        if (SettingsData.dockPosition === SettingsData.Position.Top)
+            return 1;
+        if (SettingsData.dockPosition === SettingsData.Position.Right)
+            return -1;
+        if (SettingsData.dockPosition === SettingsData.Position.Left)
+            return 1;
+        return -1;
     }
 
     SequentialAnimation {
@@ -165,7 +165,7 @@ Item {
         repeat: false
         onTriggered: {
             if (appData && appData.isPinned) {
-                longPressing = true
+                longPressing = true;
             }
         }
     }
@@ -180,134 +180,137 @@ Item {
         cursorShape: longPressing ? Qt.DragMoveCursor : Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
         onPressed: mouse => {
-                       if (mouse.button === Qt.LeftButton && appData && appData.isPinned) {
-                           dragStartPos = Qt.point(mouse.x, mouse.y)
-                           longPressTimer.start()
-                       }
-                   }
+            if (mouse.button === Qt.LeftButton && appData && appData.isPinned) {
+                dragStartPos = Qt.point(mouse.x, mouse.y);
+                longPressTimer.start();
+            }
+        }
         onReleased: mouse => {
-                        longPressTimer.stop()
-                        if (longPressing) {
-                            if (dragging && targetIndex >= 0 && targetIndex !== originalIndex && dockApps) {
-                                dockApps.movePinnedApp(originalIndex, targetIndex)
-                            }
+            longPressTimer.stop();
+            if (longPressing) {
+                if (dragging && targetIndex >= 0 && targetIndex !== originalIndex && dockApps) {
+                    dockApps.movePinnedApp(originalIndex, targetIndex);
+                }
 
-                            longPressing = false
-                            dragging = false
-                            dragOffset = Qt.point(0, 0)
-                            targetIndex = -1
-                            originalIndex = -1
+                longPressing = false;
+                dragging = false;
+                dragOffset = Qt.point(0, 0);
+                targetIndex = -1;
+                originalIndex = -1;
+            }
+        }
+        onPositionChanged: mouse => {
+            if (longPressing && !dragging) {
+                const distance = Math.sqrt(Math.pow(mouse.x - dragStartPos.x, 2) + Math.pow(mouse.y - dragStartPos.y, 2));
+                if (distance > 5) {
+                    dragging = true;
+                    targetIndex = index;
+                    originalIndex = index;
+                }
+            }
+            if (dragging) {
+                dragOffset = Qt.point(mouse.x - dragStartPos.x, mouse.y - dragStartPos.y);
+                if (dockApps) {
+                    const threshold = actualIconSize;
+                    let newTargetIndex = targetIndex;
+                    if (dragOffset.x > threshold && targetIndex < dockApps.pinnedAppCount - 1) {
+                        newTargetIndex = targetIndex + 1;
+                    } else if (dragOffset.x < -threshold && targetIndex > 0) {
+                        newTargetIndex = targetIndex - 1;
+                    }
+                    if (newTargetIndex !== targetIndex) {
+                        targetIndex = newTargetIndex;
+                        dragStartPos = Qt.point(mouse.x, mouse.y);
+                    }
+                }
+            }
+        }
+        onClicked: mouse => {
+            if (!appData || longPressing) {
+                return;
+            }
+
+            if (mouse.button === Qt.LeftButton) {
+                if (appData.type === "pinned") {
+                    if (appData && appData.appId) {
+                        const desktopEntry = cachedDesktopEntry;
+                        if (desktopEntry) {
+                            AppUsageHistoryData.addAppUsage({
+                                "id": appData.appId,
+                                "name": desktopEntry.name || appData.appId,
+                                "icon": desktopEntry.icon || "",
+                                "exec": desktopEntry.exec || "",
+                                "comment": desktopEntry.comment || ""
+                            });
+                        }
+                        SessionService.launchDesktopEntry(desktopEntry);
+                    }
+                } else if (appData.type === "window") {
+                    const toplevel = getToplevelObject();
+                    if (toplevel) {
+                        toplevel.activate();
+                    }
+                } else if (appData.type === "grouped") {
+                    if (appData.windowCount === 0) {
+                        if (appData && appData.appId) {
+                            const desktopEntry = cachedDesktopEntry;
+                            if (desktopEntry) {
+                                AppUsageHistoryData.addAppUsage({
+                                    "id": appData.appId,
+                                    "name": desktopEntry.name || appData.appId,
+                                    "icon": desktopEntry.icon || "",
+                                    "exec": desktopEntry.exec || "",
+                                    "comment": desktopEntry.comment || ""
+                                });
+                            }
+                            SessionService.launchDesktopEntry(desktopEntry);
+                        }
+                    } else if (appData.windowCount === 1) {
+                        // For single window, activate directly
+                        const toplevel = getToplevelObject();
+                        if (toplevel) {
+                            console.log("Activating grouped app window:", appData.windowTitle);
+                            toplevel.activate();
+                        } else {
+                            console.warn("No toplevel found for grouped app");
+                        }
+                    } else {
+                        if (contextMenu) {
+                            const shouldHidePin = appData.appId === "org.quickshell";
+                            contextMenu.showForButton(root, appData, root.height + 25, shouldHidePin, cachedDesktopEntry, parentDockScreen);
                         }
                     }
-        onPositionChanged: mouse => {
-                               if (longPressing && !dragging) {
-                                   const distance = Math.sqrt(Math.pow(mouse.x - dragStartPos.x, 2) + Math.pow(mouse.y - dragStartPos.y, 2))
-                                   if (distance > 5) {
-                                       dragging = true
-                                       targetIndex = index
-                                       originalIndex = index
-                                   }
-                               }
-                               if (dragging) {
-                                   dragOffset = Qt.point(mouse.x - dragStartPos.x, mouse.y - dragStartPos.y)
-                                   if (dockApps) {
-                                       const threshold = actualIconSize
-                                       let newTargetIndex = targetIndex
-                                       if (dragOffset.x > threshold && targetIndex < dockApps.pinnedAppCount - 1) {
-                                           newTargetIndex = targetIndex + 1
-                                       } else if (dragOffset.x < -threshold && targetIndex > 0) {
-                                           newTargetIndex = targetIndex - 1
-                                       }
-                                       if (newTargetIndex !== targetIndex) {
-                                           targetIndex = newTargetIndex
-                                           dragStartPos = Qt.point(mouse.x, mouse.y)
-                                       }
-                                   }
-                               }
-                           }
-        onClicked: mouse => {
-                       if (!appData || longPressing) {
-                           return
-                       }
-
-                       if (mouse.button === Qt.LeftButton) {
-                           if (appData.type === "pinned") {
-                               if (appData && appData.appId) {
-                                   const desktopEntry = cachedDesktopEntry
-                                   if (desktopEntry) {
-                                       AppUsageHistoryData.addAppUsage({
-                                                                           "id": appData.appId,
-                                                                           "name": desktopEntry.name || appData.appId,
-                                                                           "icon": desktopEntry.icon || "",
-                                                                           "exec": desktopEntry.exec || "",
-                                                                           "comment": desktopEntry.comment || ""
-                                                                       })
-                                   }
-                                   SessionService.launchDesktopEntry(desktopEntry)
-                               }
-                           } else if (appData.type === "window") {
-                               const toplevel = getToplevelObject()
-                               if (toplevel) {
-                                   toplevel.activate()
-                               }
-                           } else if (appData.type === "grouped") {
-                               if (appData.windowCount === 0) {
-                                   if (appData && appData.appId) {
-                                       const desktopEntry = cachedDesktopEntry
-                                       if (desktopEntry) {
-                                           AppUsageHistoryData.addAppUsage({
-                                                                               "id": appData.appId,
-                                                                               "name": desktopEntry.name || appData.appId,
-                                                                               "icon": desktopEntry.icon || "",
-                                                                               "exec": desktopEntry.exec || "",
-                                                                               "comment": desktopEntry.comment || ""
-                                                                           })
-                                       }
-                                       SessionService.launchDesktopEntry(desktopEntry)
-                                   }
-                               } else if (appData.windowCount === 1) {
-                                   // For single window, activate directly
-                                   const toplevel = getToplevelObject()
-                                   if (toplevel) {
-                                       console.log("Activating grouped app window:", appData.windowTitle)
-                                       toplevel.activate()
-                                   } else {
-                                       console.warn("No toplevel found for grouped app")
-                                   }
-                               } else {
-                                   if (contextMenu) {
-                                       contextMenu.showForButton(root, appData, root.height + 25, true, cachedDesktopEntry, parentDockScreen)
-                                   }
-                               }
-                           }
-                       } else if (mouse.button === Qt.MiddleButton) {
-                           if (appData?.type === "window") {
-                               appData?.toplevel?.close()
-                           } else if (appData?.type === "grouped") {
-                               if (contextMenu) {
-                                   contextMenu.showForButton(root, appData, root.height, false, cachedDesktopEntry, parentDockScreen)
-                               }
-                           } else if (appData && appData.appId) {
-                               const desktopEntry = cachedDesktopEntry
-                               if (desktopEntry) {
-                                   AppUsageHistoryData.addAppUsage({
-                                                                       "id": appData.appId,
-                                                                       "name": desktopEntry.name || appData.appId,
-                                                                       "icon": desktopEntry.icon || "",
-                                                                       "exec": desktopEntry.exec || "",
-                                                                       "comment": desktopEntry.comment || ""
-                                                                   })
-                               }
-                               SessionService.launchDesktopEntry(desktopEntry)
-                           }
-                       } else if (mouse.button === Qt.RightButton) {
-                           if (contextMenu && appData) {
-                               contextMenu.showForButton(root, appData, root.height, false, cachedDesktopEntry, parentDockScreen)
-                           } else {
-                               console.warn("No context menu or appData available")
-                           }
-                       }
-                   }
+                }
+            } else if (mouse.button === Qt.MiddleButton) {
+                if (appData?.type === "window") {
+                    appData?.toplevel?.close();
+                } else if (appData?.type === "grouped") {
+                    if (contextMenu) {
+                        const shouldHidePin = appData.appId === "org.quickshell";
+                        contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen);
+                    }
+                } else if (appData && appData.appId) {
+                    const desktopEntry = cachedDesktopEntry;
+                    if (desktopEntry) {
+                        AppUsageHistoryData.addAppUsage({
+                            "id": appData.appId,
+                            "name": desktopEntry.name || appData.appId,
+                            "icon": desktopEntry.icon || "",
+                            "exec": desktopEntry.exec || "",
+                            "comment": desktopEntry.comment || ""
+                        });
+                    }
+                    SessionService.launchDesktopEntry(desktopEntry);
+                }
+            } else if (mouse.button === Qt.RightButton) {
+                if (contextMenu && appData) {
+                    const shouldHidePin = appData.appId === "org.quickshell";
+                    contextMenu.showForButton(root, appData, root.height, shouldHidePin, cachedDesktopEntry, parentDockScreen);
+                } else {
+                    console.warn("No context menu or appData available");
+                }
+            }
+        }
     }
 
     Item {
@@ -334,21 +337,25 @@ Item {
             id: iconImg
 
             anchors.centerIn: parent
-            implicitSize: actualIconSize
+            implicitSize: appData && appData.appId === "org.quickshell" ? actualIconSize * 0.85 : actualIconSize
             source: {
-                if (appData.appId === "__SEPARATOR__") {
-                    return ""
+                if (!appData || appData.appId === "__SEPARATOR__") {
+                    return "";
                 }
-                const moddedId = Paths.moddedAppId(appData.appId)
-                if (moddedId.toLowerCase().includes("steam_app")) {
-                    return ""
-                }
-                return cachedDesktopEntry && cachedDesktopEntry.icon ? Quickshell.iconPath(cachedDesktopEntry.icon, true) : ""
+                return Paths.getAppIcon(appData.appId, cachedDesktopEntry);
             }
             mipmap: true
             smooth: true
             asynchronous: true
             visible: status === Image.Ready
+            layer.enabled: appData && appData.appId === "org.quickshell"
+            layer.smooth: true
+            layer.mipmap: true
+            layer.effect: MultiEffect {
+                saturation: 0
+                colorization: 1
+                colorizationColor: Theme.primary
+            }
         }
 
         DankIcon {
@@ -358,10 +365,10 @@ Item {
             color: Theme.surfaceText
             visible: {
                 if (!appData || !appData.appId || appData.appId === "__SEPARATOR__") {
-                    return false
+                    return false;
                 }
-                const moddedId = Paths.moddedAppId(appData.appId)
-                return moddedId.toLowerCase().includes("steam_app")
+                const moddedId = Paths.moddedAppId(appData.appId);
+                return moddedId.toLowerCase().includes("steam_app");
             }
         }
 
@@ -379,15 +386,11 @@ Item {
                 anchors.centerIn: parent
                 text: {
                     if (!appData || !appData.appId) {
-                        return "?"
+                        return "?";
                     }
 
-                    const desktopEntry = cachedDesktopEntry
-                    if (desktopEntry && desktopEntry.name) {
-                        return desktopEntry.name.charAt(0).toUpperCase()
-                    }
-
-                    return appData.appId.charAt(0).toUpperCase()
+                    const appName = Paths.getAppName(appData.appId, cachedDesktopEntry);
+                    return appName.charAt(0).toUpperCase();
                 }
                 font.pixelSize: Math.max(8, parent.width * 0.35)
                 color: Theme.primary
@@ -410,10 +413,13 @@ Item {
             sourceComponent: SettingsData.dockPosition === SettingsData.Position.Left || SettingsData.dockPosition === SettingsData.Position.Right ? columnIndicator : rowIndicator
 
             visible: {
-                if (!appData) return false
-                if (appData.type === "window") return true
-                if (appData.type === "grouped") return appData.windowCount > 0
-                return appData.isRunning
+                if (!appData)
+                    return false;
+                if (appData.type === "window")
+                    return true;
+                if (appData.type === "grouped")
+                    return appData.windowCount > 0;
+                return appData.isRunning;
             }
         }
     }
@@ -426,49 +432,50 @@ Item {
 
             Repeater {
                 model: {
-                    if (!appData) return 0
+                    if (!appData)
+                        return 0;
                     if (appData.type === "grouped") {
-                        return Math.min(appData.windowCount, 4)
+                        return Math.min(appData.windowCount, 4);
                     } else if (appData.type === "window" || appData.isRunning) {
-                        return 1
+                        return 1;
                     }
-                    return 0
+                    return 0;
                 }
 
                 Rectangle {
                     width: {
                         if (SettingsData.dockIndicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1)
+                            return Math.max(4, actualIconSize * 0.1);
                         }
-                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2)
+                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
                     height: {
                         if (SettingsData.dockIndicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1)
+                            return Math.max(4, actualIconSize * 0.1);
                         }
-                        return Math.max(2, actualIconSize * 0.05)
+                        return Math.max(2, actualIconSize * 0.05);
                     }
                     radius: SettingsData.dockIndicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
                     color: {
                         if (!appData) {
-                            return "transparent"
+                            return "transparent";
                         }
 
                         if (appData.type !== "grouped" || appData.windowCount === 1) {
                             if (isWindowFocused) {
-                                return Theme.primary
+                                return Theme.primary;
                             }
-                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
                         }
 
                         if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels()
+                            const groupToplevels = getGroupedToplevels();
                             if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary
+                                return Theme.primary;
                             }
                         }
 
-                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
                     }
                 }
             }
@@ -483,49 +490,50 @@ Item {
 
             Repeater {
                 model: {
-                    if (!appData) return 0
+                    if (!appData)
+                        return 0;
                     if (appData.type === "grouped") {
-                        return Math.min(appData.windowCount, 4)
+                        return Math.min(appData.windowCount, 4);
                     } else if (appData.type === "window" || appData.isRunning) {
-                        return 1
+                        return 1;
                     }
-                    return 0
+                    return 0;
                 }
 
                 Rectangle {
                     width: {
                         if (SettingsData.dockIndicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1)
+                            return Math.max(4, actualIconSize * 0.1);
                         }
-                        return Math.max(2, actualIconSize * 0.05)
+                        return Math.max(2, actualIconSize * 0.05);
                     }
                     height: {
                         if (SettingsData.dockIndicatorStyle === "circle") {
-                            return Math.max(4, actualIconSize * 0.1)
+                            return Math.max(4, actualIconSize * 0.1);
                         }
-                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2)
+                        return appData && appData.type === "grouped" && appData.windowCount > 1 ? Math.max(3, actualIconSize * 0.1) : Math.max(6, actualIconSize * 0.2);
                     }
                     radius: SettingsData.dockIndicatorStyle === "circle" ? width / 2 : Theme.cornerRadius
                     color: {
                         if (!appData) {
-                            return "transparent"
+                            return "transparent";
                         }
 
                         if (appData.type !== "grouped" || appData.windowCount === 1) {
                             if (isWindowFocused) {
-                                return Theme.primary
+                                return Theme.primary;
                             }
-                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                            return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
                         }
 
                         if (appData.type === "grouped" && appData.windowCount > 1) {
-                            const groupToplevels = getGroupedToplevels()
+                            const groupToplevels = getGroupedToplevels();
                             if (index < groupToplevels.length && groupToplevels[index].activated) {
-                                return Theme.primary
+                                return Theme.primary;
                             }
                         }
 
-                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
+                        return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6);
                     }
                 }
             }

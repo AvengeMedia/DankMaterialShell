@@ -1,14 +1,12 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Services
-import qs.Widgets
 
 DankModal {
     id: clipboardHistoryModal
@@ -16,7 +14,7 @@ DankModal {
     layerNamespace: "dms:clipboard"
 
     HyprlandFocusGrab {
-        windows: [clipboardHistoryModal]
+        windows: [clipboardHistoryModal.contentWindow]
         active: CompositorService.isHyprland && clipboardHistoryModal.shouldHaveFocus
     }
 
@@ -31,119 +29,119 @@ DankModal {
     readonly property int maxConcurrentLoads: 3
 
     function updateFilteredModel() {
-        filteredClipboardModel.clear()
+        filteredClipboardModel.clear();
         for (var i = 0; i < clipboardModel.count; i++) {
-            const entry = clipboardModel.get(i).entry
+            const entry = clipboardModel.get(i).entry;
             if (searchText.trim().length === 0) {
                 filteredClipboardModel.append({
-                                                  "entry": entry
-                                              })
+                    "entry": entry
+                });
             } else {
-                const content = getEntryPreview(entry).toLowerCase()
+                const content = getEntryPreview(entry).toLowerCase();
                 if (content.includes(searchText.toLowerCase())) {
                     filteredClipboardModel.append({
-                                                      "entry": entry
-                                                  })
+                        "entry": entry
+                    });
                 }
             }
         }
-        clipboardHistoryModal.totalCount = filteredClipboardModel.count
+        clipboardHistoryModal.totalCount = filteredClipboardModel.count;
         if (filteredClipboardModel.count === 0) {
-            keyboardNavigationActive = false
-            selectedIndex = 0
+            keyboardNavigationActive = false;
+            selectedIndex = 0;
         } else if (selectedIndex >= filteredClipboardModel.count) {
-            selectedIndex = filteredClipboardModel.count - 1
+            selectedIndex = filteredClipboardModel.count - 1;
         }
     }
 
     function toggle() {
         if (shouldBeVisible) {
-            hide()
+            hide();
         } else {
-            show()
+            show();
         }
     }
 
     function show() {
-        open()
-        clipboardHistoryModal.searchText = ""
-        clipboardHistoryModal.activeImageLoads = 0
-        clipboardHistoryModal.shouldHaveFocus = true
-        refreshClipboard()
-        keyboardController.reset()
+        open();
+        clipboardHistoryModal.searchText = "";
+        clipboardHistoryModal.activeImageLoads = 0;
+        clipboardHistoryModal.shouldHaveFocus = true;
+        refreshClipboard();
+        keyboardController.reset();
 
         Qt.callLater(function () {
             if (contentLoader.item && contentLoader.item.searchField) {
-                contentLoader.item.searchField.text = ""
-                contentLoader.item.searchField.forceActiveFocus()
+                contentLoader.item.searchField.text = "";
+                contentLoader.item.searchField.forceActiveFocus();
             }
-        })
+        });
     }
 
     function hide() {
-        close()
-        clipboardHistoryModal.searchText = ""
-        clipboardHistoryModal.activeImageLoads = 0
-        updateFilteredModel()
-        keyboardController.reset()
-        cleanupTempFiles()
+        close();
+        clipboardHistoryModal.searchText = "";
+        clipboardHistoryModal.activeImageLoads = 0;
+        updateFilteredModel();
+        keyboardController.reset();
+        cleanupTempFiles();
     }
 
     function cleanupTempFiles() {
-        Quickshell.execDetached(["sh", "-c", "rm -f /tmp/clipboard_*.png"])
+        Quickshell.execDetached(["sh", "-c", "rm -f /tmp/clipboard_*.png"]);
     }
 
     function refreshClipboard() {
-        clipboardProcesses.refresh()
+        clipboardProcesses.refresh();
     }
 
     function copyEntry(entry) {
-        const entryId = entry.split('\t')[0]
-        Quickshell.execDetached(["sh", "-c", `cliphist decode ${entryId} | wl-copy`])
-        ToastService.showInfo(I18n.tr("Copied to clipboard"))
-        hide()
+        const entryId = entry.split('\t')[0];
+        Quickshell.execDetached(["sh", "-c", `cliphist decode ${entryId} | wl-copy`]);
+        ToastService.showInfo(I18n.tr("Copied to clipboard"));
+        hide();
     }
 
     function deleteEntry(entry) {
-        clipboardProcesses.deleteEntry(entry)
+        clipboardProcesses.deleteEntry(entry);
     }
 
     function clearAll() {
-        clipboardProcesses.clearAll()
+        clipboardProcesses.clearAll();
     }
 
     function getEntryPreview(entry) {
-        let content = entry.replace(/^\s*\d+\s+/, "")
+        let content = entry.replace(/^\s*\d+\s+/, "");
         if (content.includes("image/") || content.includes("binary data") || /\.(png|jpg|jpeg|gif|bmp|webp)/i.test(content)) {
-            const dimensionMatch = content.match(/(\d+)x(\d+)/)
+            const dimensionMatch = content.match(/(\d+)x(\d+)/);
             if (dimensionMatch) {
-                return `Image ${dimensionMatch[1]}×${dimensionMatch[2]}`
+                return `Image ${dimensionMatch[1]}×${dimensionMatch[2]}`;
             }
-            const typeMatch = content.match(/\b(png|jpg|jpeg|gif|bmp|webp)\b/i)
+            const typeMatch = content.match(/\b(png|jpg|jpeg|gif|bmp|webp)\b/i);
             if (typeMatch) {
-                return `Image (${typeMatch[1].toUpperCase()})`
+                return `Image (${typeMatch[1].toUpperCase()})`;
             }
-            return "Image"
+            return "Image";
         }
         if (content.length > ClipboardConstants.previewLength) {
-            return content.substring(0, ClipboardConstants.previewLength) + "..."
+            return content.substring(0, ClipboardConstants.previewLength) + "...";
         }
-        return content
+        return content;
     }
 
     function getEntryType(entry) {
         if (entry.includes("image/") || entry.includes("binary data") || /\.(png|jpg|jpeg|gif|bmp|webp)/i.test(entry) || /\b(png|jpg|jpeg|gif|bmp|webp)\b/i.test(entry)) {
-            return "image"
+            return "image";
         }
         if (entry.length > ClipboardConstants.longTextThreshold) {
-            return "long_text"
+            return "long_text";
         }
-        return "text"
+        return "text";
     }
 
     visible: false
-    width: ClipboardConstants.modalWidth
-    height: ClipboardConstants.modalHeight
+    modalWidth: ClipboardConstants.modalWidth
+    modalHeight: ClipboardConstants.modalHeight
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
@@ -151,7 +149,7 @@ DankModal {
     enableShadow: true
     onBackgroundClicked: hide()
     modalFocusScope.Keys.onPressed: function (event) {
-        keyboardController.handleKey(event)
+        keyboardController.handleKey(event);
     }
     content: clipboardContent
 
@@ -166,12 +164,12 @@ DankModal {
         confirmButtonColor: Theme.primary
         onVisibleChanged: {
             if (visible) {
-                clipboardHistoryModal.shouldHaveFocus = false
+                clipboardHistoryModal.shouldHaveFocus = false;
             } else if (clipboardHistoryModal.shouldBeVisible) {
-                clipboardHistoryModal.shouldHaveFocus = true
-                clipboardHistoryModal.modalFocusScope.forceActiveFocus()
+                clipboardHistoryModal.shouldHaveFocus = true;
+                clipboardHistoryModal.modalFocusScope.forceActiveFocus();
                 if (clipboardHistoryModal.contentLoader.item && clipboardHistoryModal.contentLoader.item.searchField) {
-                    clipboardHistoryModal.contentLoader.item.searchField.forceActiveFocus()
+                    clipboardHistoryModal.contentLoader.item.searchField.forceActiveFocus();
                 }
             }
         }
@@ -198,18 +196,18 @@ DankModal {
 
     IpcHandler {
         function open(): string {
-            clipboardHistoryModal.show()
-            return "CLIPBOARD_OPEN_SUCCESS"
+            clipboardHistoryModal.show();
+            return "CLIPBOARD_OPEN_SUCCESS";
         }
 
         function close(): string {
-            clipboardHistoryModal.hide()
-            return "CLIPBOARD_CLOSE_SUCCESS"
+            clipboardHistoryModal.hide();
+            return "CLIPBOARD_CLOSE_SUCCESS";
         }
 
         function toggle(): string {
-            clipboardHistoryModal.toggle()
-            return "CLIPBOARD_TOGGLE_SUCCESS"
+            clipboardHistoryModal.toggle();
+            return "CLIPBOARD_TOGGLE_SUCCESS";
         }
 
         target: "clipboard"

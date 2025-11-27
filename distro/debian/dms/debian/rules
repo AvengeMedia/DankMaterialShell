@@ -1,0 +1,71 @@
+#!/usr/bin/make -f
+
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	if [ "$(DEB_HOST_ARCH)" = "amd64" ]; then \
+		if [ -f dms-distropkg-amd64.gz ]; then \
+			gunzip -c dms-distropkg-amd64.gz > dms; \
+		elif [ -f ../SOURCES/dms-distropkg-amd64.gz ]; then \
+			gunzip -c ../SOURCES/dms-distropkg-amd64.gz > dms; \
+		elif [ -f ../../SOURCES/dms-distropkg-amd64.gz ]; then \
+			gunzip -c ../../SOURCES/dms-distropkg-amd64.gz > dms; \
+		else \
+			echo "ERROR: dms-distropkg-amd64.gz not found!" && exit 1; \
+		fi \
+	elif [ "$(DEB_HOST_ARCH)" = "arm64" ]; then \
+		if [ -f dms-distropkg-arm64.gz ]; then \
+			gunzip -c dms-distropkg-arm64.gz > dms; \
+		elif [ -f ../SOURCES/dms-distropkg-arm64.gz ]; then \
+			gunzip -c ../SOURCES/dms-distropkg-arm64.gz > dms; \
+		elif [ -f ../../SOURCES/dms-distropkg-arm64.gz ]; then \
+			gunzip -c ../../SOURCES/dms-distropkg-arm64.gz > dms; \
+		else \
+			echo "ERROR: dms-distropkg-arm64.gz not found!" && exit 1; \
+		fi \
+	else \
+		echo "Unsupported architecture: $(DEB_HOST_ARCH)" && exit 1; \
+	fi
+	chmod +x dms
+
+	if [ ! -d DankMaterialShell-$(UPSTREAM_VERSION) ]; then \
+		if [ -f ../SOURCES/dms-source.tar.gz ]; then \
+			tar -xzf ../SOURCES/dms-source.tar.gz; \
+		elif [ -f dms-source.tar.gz ]; then \
+			tar -xzf dms-source.tar.gz; \
+		fi; \
+		if [ ! -d DankMaterialShell-$(UPSTREAM_VERSION) ] && [ -d DankMaterialShell-0.6.2 ]; then \
+			mv DankMaterialShell-0.6.2 DankMaterialShell-$(UPSTREAM_VERSION); \
+		fi; \
+	fi
+
+
+override_dh_auto_install:
+	install -Dm755 dms debian/dms/usr/bin/dms
+
+	mkdir -p debian/dms/usr/share/quickshell/dms debian/dms/usr/lib/systemd/user
+	# Handle directory name mismatch again for install step if needed
+	if [ ! -d DankMaterialShell-$(UPSTREAM_VERSION) ] && [ -d DankMaterialShell-0.6.2 ]; then \
+		mv DankMaterialShell-0.6.2 DankMaterialShell-$(UPSTREAM_VERSION); \
+	fi
+	if [ -d DankMaterialShell-$(UPSTREAM_VERSION) ]; then \
+		cp -r DankMaterialShell-$(UPSTREAM_VERSION)/quickshell/* debian/dms/usr/share/quickshell/dms/; \
+		install -Dm644 DankMaterialShell-$(UPSTREAM_VERSION)/quickshell/assets/systemd/dms.service debian/dms/usr/lib/systemd/user/dms.service; \
+	else \
+		echo "ERROR: DankMaterialShell-$(UPSTREAM_VERSION) directory not found!" && \
+		echo "Contents of current directory:" && ls -la && \
+		exit 1; \
+	fi
+
+	rm -rf debian/dms/usr/share/quickshell/dms/core \
+		debian/dms/usr/share/quickshell/dms/distro
+
+override_dh_auto_clean:
+	rm -f dms
+	rm -rf DankMaterialShell-$(UPSTREAM_VERSION)
+	dh_auto_clean

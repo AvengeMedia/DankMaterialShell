@@ -1,0 +1,7 @@
+dms (0.6.2) stable; urgency=medium
+
+  * Update to v0.6.2 release
+  * Fix binary download paths for OBS builds
+  * Native format: removed revisions
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Tue, 19 Nov 2025 10:00:00 -0500

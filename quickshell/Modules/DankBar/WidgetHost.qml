@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Services.Mpris
 import qs.Services
 
 Loader {
@@ -15,6 +14,8 @@ Loader {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property bool isFirst: false
     property bool isLast: false
     property real sectionSpacing: 0
@@ -27,9 +28,7 @@ Loader {
 
     readonly property bool orientationMatches: (axis?.isVertical ?? false) === isInColumn
 
-    active: orientationMatches &&
-            getWidgetVisible(widgetId, DgopService.dgopAvailable) &&
-            (widgetId !== "music" || MprisController.activePlayer !== null)
+    active: orientationMatches && getWidgetVisible(widgetId, DgopService.dgopAvailable) && (widgetId !== "music" || MprisController.activePlayer !== null)
     sourceComponent: getWidgetComponent(widgetId, components)
     opacity: getWidgetEnabled(widgetData?.enabled) ? 1 : 0
 
@@ -64,6 +63,22 @@ Loader {
         when: root.item && "barThickness" in root.item
         property: "barThickness"
         value: root.barThickness
+        restoreMode: Binding.RestoreNone
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "barSpacing" in root.item
+        property: "barSpacing"
+        value: root.barSpacing
+        restoreMode: Binding.RestoreNone
+    }
+
+    Binding {
+        target: root.item
+        when: root.item && "barConfig" in root.item
+        property: "barConfig"
+        value: root.barConfig
         restoreMode: Binding.RestoreNone
     }
 
@@ -140,36 +155,56 @@ Loader {
     }
 
     onLoaded: {
-        if (item) {
-            contentItemReady(item)            
-            if (axis && "isVertical" in item) {
-                try {
-                    item.isVertical = axis.isVertical
-                } catch (e) {
-                }
-            }
+        if (!item)
+            return;
 
-            if (item.pluginService !== undefined) {
-                var parts = widgetId.split(":")
-                var pluginId = parts[0]
-                var variantId = parts.length > 1 ? parts[1] : null
+        contentItemReady(item);
 
-                if (item.pluginId !== undefined) {
-                    item.pluginId = pluginId
-                }
-                if (item.variantId !== undefined) {
-                    item.variantId = variantId
-                }
-                if (item.variantData !== undefined && variantId) {
-                    item.variantData = PluginService.getPluginVariantData(pluginId, variantId)
-                }
-                item.pluginService = PluginService
-            }
-
-            if (item.popoutService !== undefined) {
-                item.popoutService = PopoutService
-            }
+        if (axis && "isVertical" in item) {
+            try {
+                item.isVertical = axis.isVertical;
+            } catch (e) {}
         }
+
+        if (item.pluginService !== undefined) {
+            var parts = widgetId.split(":");
+            var pluginId = parts[0];
+            var variantId = parts.length > 1 ? parts[1] : null;
+
+            if (item.pluginId !== undefined)
+                item.pluginId = pluginId;
+            if (item.variantId !== undefined)
+                item.variantId = variantId;
+            if (item.variantData !== undefined && variantId)
+                item.variantData = PluginService.getPluginVariantData(pluginId, variantId);
+            item.pluginService = PluginService;
+        }
+
+        if (item.popoutService !== undefined)
+            item.popoutService = PopoutService;
+
+        registerWidgetIfEligible();
+    }
+
+    Component.onDestruction: {
+        unregisterWidget();
+    }
+
+    function registerWidgetIfEligible() {
+        if (!item || !widgetId || !parentScreen?.name)
+            return;
+
+        const hasPopout = item.popoutTarget !== undefined || typeof item.triggerPopout === "function" || typeof item.clicked === "function";
+        if (!hasPopout)
+            return;
+
+        BarWidgetService.registerWidget(widgetId, parentScreen.name, item);
+    }
+
+    function unregisterWidget() {
+        if (!widgetId || !parentScreen?.name)
+            return;
+        BarWidgetService.unregisterWidget(widgetId, parentScreen.name);
     }
 
     function getWidgetComponent(widgetId, components) {
@@ -203,17 +238,17 @@ Loader {
             "colorPicker": components.colorPickerComponent,
             "systemUpdate": components.systemUpdateComponent,
             "layout": components.layoutComponent
-        }
+        };
 
         if (componentMap[widgetId]) {
-            return componentMap[widgetId]
+            return componentMap[widgetId];
         }
 
-        var parts = widgetId.split(":")
-        var pluginId = parts[0]
+        var parts = widgetId.split(":");
+        var pluginId = parts[0];
 
-        let pluginMap = PluginService.getWidgetComponents()
-        return pluginMap[pluginId] || null
+        let pluginMap = PluginService.getWidgetComponents();
+        return pluginMap[pluginId] || null;
     }
 
     function getWidgetVisible(widgetId, dgopAvailable) {
@@ -224,12 +259,12 @@ Loader {
             "gpuTemp": dgopAvailable,
             "network_speed_monitor": dgopAvailable,
             "layout": CompositorService.isDwl && DwlService.dwlAvailable
-        }
+        };
 
-        return widgetVisibility[widgetId] ?? true
+        return widgetVisibility[widgetId] ?? true;
     }
 
     function getWidgetEnabled(enabled) {
-        return enabled !== false
+        return enabled !== false;
     }
 }

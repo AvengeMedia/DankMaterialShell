@@ -196,3 +196,15 @@ func (b *HybridIwdNetworkdBackend) CancelCredentials(token string) error {
 func (b *HybridIwdNetworkdBackend) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 	return b.wifi.SetWiFiAutoconnect(ssid, autoconnect)
 }
+
+func (b *HybridIwdNetworkdBackend) ScanWiFiDevice(device string) error {
+	return b.wifi.ScanWiFiDevice(device)
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectWiFiDevice(device string) error {
+	return b.wifi.DisconnectWiFiDevice(device)
+}
+
+func (b *HybridIwdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
+	return b.wifi.GetWiFiDevices()
+}

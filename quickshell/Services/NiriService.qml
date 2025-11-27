@@ -962,7 +962,7 @@ Singleton {
         console.log("NiriService: Generating layout config...")
 
         const cornerRadius = typeof SettingsData !== "undefined" ? SettingsData.cornerRadius : 12
-        const gaps = typeof SettingsData !== "undefined" ? Math.max(4, SettingsData.dankBarSpacing) : 4
+        const gaps = typeof SettingsData !== "undefined" ? Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4)) : 4
 
         const configContent = `layout {
     gaps ${gaps}

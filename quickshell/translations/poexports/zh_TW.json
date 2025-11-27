@@ -2,6 +2,12 @@
   "%1 characters": {
     "%1 characters": "%1 個字元"
   },
+  "%1 display(s)": {
+    "%1 display(s)": ""
+  },
+  "%1 widgets": {
+    "%1 widgets": ""
+  },
   "(Unnamed)": {
     "(Unnamed)": "(未命名)"
   },
@@ -46,6 +52,9 @@
   },
   "Add": {
     "Add": "新增"
+  },
+  "Add Bar": {
+    "Add Bar": ""
   },
   "Add Widget": {
     "Add Widget": "新增部件"
@@ -227,6 +236,12 @@
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "顏色平衡且帶有重點點綴的調色板 (預設)。"
   },
+  "Bar Configurations": {
+    "Bar Configurations": ""
+  },
+  "Bar Transparency": {
+    "Bar Transparency": ""
+  },
   "Battery": {
     "Battery": "電池"
   },
@@ -326,17 +341,26 @@
   "Center Tiling": {
     "Center Tiling": "居中平鋪"
   },
+  "Change bar appearance": {
+    "Change bar appearance": ""
+  },
   "Changes:": {
     "Changes:": "變更："
   },
   "Check for system updates": {
     "Check for system updates": "檢查系統更新"
   },
+  "Choose Color": {
+    "Choose Color": ""
+  },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "選擇啟動器 Logo 顏色"
   },
   "Choose icon": {
     "Choose icon": "選擇圖示"
+  },
+  "Choose the background color for widgets": {
+    "Choose the background color for widgets": ""
   },
   "Choose the border accent color": {
     "Choose the border accent color": "選擇邊框強調色"
@@ -373,6 +397,9 @@
   },
   "Close": {
     "Close": "關閉"
+  },
+  "Close Overview on Launch": {
+    "Close Overview on Launch": ""
   },
   "Color Override": {
     "Color Override": "顏色覆蓋"
@@ -626,6 +653,9 @@
   "Dismiss": {
     "Dismiss": "忽略"
   },
+  "Display Assignment": {
+    "Display Assignment": ""
+  },
   "Display Name Format": {
     "Display Name Format": "顯示名稱格式"
   },
@@ -706,6 +736,9 @@
   },
   "Enable Autoconnect": {
     "Enable Autoconnect": "啟用自動連線"
+  },
+  "Enable Bar": {
+    "Enable Bar": ""
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "啟用 GPU 溫度"
@@ -1001,6 +1034,9 @@
   "Individual Batteries": {
     "Individual Batteries": "獨立電池"
   },
+  "Individual bar configuration": {
+    "Individual bar configuration": ""
+  },
   "Inhibit idle timeout when audio or video is playing": {
     "Inhibit idle timeout when audio or video is playing": "當音訊或視訊播放時禁止閒置逾時"
   },
@@ -1028,8 +1064,14 @@
   "Jobs: ": {
     "Jobs: ": "工作: "
   },
+  "Keep Awake": {
+    "Keep Awake": ""
+  },
   "Keep Changes": {
     "Keep Changes": "保留變更"
+  },
+  "Keeping Awake": {
+    "Keeping Awake": ""
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "鍵盤布局名稱"
@@ -1121,6 +1163,9 @@
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "管理和配置用於擴展 DMS 功能的插件"
   },
+  "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": ""
+  },
   "Manual Coordinates": {
     "Manual Coordinates": "手動設定座標"
   },
@@ -1184,6 +1229,9 @@
   "Media Players (": {
     "Media Players (": "媒體播放 ("
   },
+  "Media Volume OSD": {
+    "Media Volume OSD": ""
+  },
   "Memory": {
     "Memory": "記憶體"
   },
@@ -1198,6 +1246,9 @@
   },
   "Microphone Mute OSD": {
     "Microphone Mute OSD": "麥克風靜音 OSD"
+  },
+  "Middle Section": {
+    "Middle Section": ""
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "圍繞單一色調構建的最小調色板。"
@@ -1670,6 +1721,9 @@
   "Save Notepad File": {
     "Save Notepad File": "儲存記事本"
   },
+  "Save password": {
+    "Save password": ""
+  },
   "Saved": {
     "Saved": "已儲存"
   },
@@ -1828,6 +1882,9 @@
   },
   "Show on-screen display when idle inhibitor state changes": {
     "Show on-screen display when idle inhibitor state changes": "閒置抑制器狀態改變時顯示螢幕顯示"
+  },
+  "Show on-screen display when media player volume changes": {
+    "Show on-screen display when media player volume changes": ""
   },
   "Show on-screen display when microphone is muted/unmuted": {
     "Show on-screen display when microphone is muted/unmuted": "麥克風靜音/取消靜音時顯示螢幕顯示"
@@ -2051,6 +2108,9 @@
   "Toggle top bar visibility manually (can be controlled via IPC)": {
     "Toggle top bar visibility manually (can be controlled via IPC)": "手動切換頂部欄可見性 (可透過 IPC 控制)"
   },
+  "Toggle visibility of this bar configuration": {
+    "Toggle visibility of this bar configuration": ""
+  },
   "Tomorrow": {
     "Tomorrow": "明天"
   },
@@ -2240,11 +2300,20 @@
   "WiFi is off": {
     "WiFi is off": "WiFi 關閉"
   },
+  "Widget Background Color": {
+    "Widget Background Color": ""
+  },
   "Widget Management": {
     "Widget Management": "部件管理"
   },
+  "Widget Style": {
+    "Widget Style": ""
+  },
   "Widget Styling": {
     "Widget Styling": "部件樣式"
+  },
+  "Widget Transparency": {
+    "Widget Transparency": ""
   },
   "Widgets": {
     "Widgets": "部件"
@@ -2279,6 +2348,12 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "您有未儲存的變更。是否先保存再開檔案？"
   },
+  "custom theme file browser title": {
+    "Select Custom Theme": ""
+  },
+  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
+    "Select Wallpaper": ""
+  },
   "events": {
     "events": "活動"
   },
@@ -2291,8 +2366,20 @@
   "official": {
     "official": "官方"
   },
+  "profile image file browser title": {
+    "Select Profile Image": ""
+  },
+  "settings window title": {
+    "Settings": ""
+  },
+  "sysmon window title": {
+    "System Monitor": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "更新 dms 以進行 NM 整合。"
+  },
+  "wallpaper directory file browser title": {
+    "Select Wallpaper Directory": ""
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• 僅從受信任的來源安裝"

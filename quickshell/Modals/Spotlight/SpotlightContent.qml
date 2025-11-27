@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modals.Spotlight
 import qs.Modules.AppDrawer
@@ -17,33 +16,33 @@ Item {
 
     function resetScroll() {
         if (searchMode === "apps") {
-            resultsView.resetScroll()
+            resultsView.resetScroll();
         } else {
-            fileSearchResults.resetScroll()
+            fileSearchResults.resetScroll();
         }
     }
 
     function updateSearchMode() {
         if (searchField.text.startsWith("/")) {
             if (searchMode !== "files") {
-                searchMode = "files"
+                searchMode = "files";
             }
-            const query = searchField.text.substring(1)
-            fileSearchController.searchQuery = query
+            const query = searchField.text.substring(1);
+            fileSearchController.searchQuery = query;
         } else {
             if (searchMode !== "apps") {
-                searchMode = "apps"
-                fileSearchController.reset()
-                appLauncher.searchQuery = searchField.text
+                searchMode = "apps";
+                fileSearchController.reset();
+                appLauncher.searchQuery = searchField.text;
             }
         }
     }
 
     onSearchModeChanged: {
         if (searchMode === "files") {
-            appLauncher.keyboardNavigationActive = false
+            appLauncher.keyboardNavigationActive = false;
         } else {
-            fileSearchController.keyboardNavigationActive = false
+            fileSearchController.keyboardNavigationActive = false;
         }
     }
 
@@ -51,104 +50,104 @@ Item {
     focus: true
     clip: false
     Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
-                            if (parentModal)
-                            parentModal.hide()
+        if (event.key === Qt.Key_Escape) {
+            if (parentModal)
+                parentModal.hide();
 
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Down) {
-                            if (searchMode === "apps") {
-                                appLauncher.selectNext()
-                            } else {
-                                fileSearchController.selectNext()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Up) {
-                            if (searchMode === "apps") {
-                                appLauncher.selectPrevious()
-                            } else {
-                                fileSearchController.selectPrevious()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Right && searchMode === "apps" && appLauncher.viewMode === "grid") {
-                            appLauncher.selectNextInRow()
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Left && searchMode === "apps" && appLauncher.viewMode === "grid") {
-                            appLauncher.selectPreviousInRow()
-                            event.accepted = true
-                        } else if (event.key == Qt.Key_J && event.modifiers & Qt.ControlModifier) {
-                            if (searchMode === "apps") {
-                                appLauncher.selectNext()
-                            } else {
-                                fileSearchController.selectNext()
-                            }
-                            event.accepted = true
-                        } else if (event.key == Qt.Key_K && event.modifiers & Qt.ControlModifier) {
-                            if (searchMode === "apps") {
-                                appLauncher.selectPrevious()
-                            } else {
-                                fileSearchController.selectPrevious()
-                            }
-                            event.accepted = true
-                        } else if (event.key == Qt.Key_L && event.modifiers & Qt.ControlModifier && searchMode === "apps" && appLauncher.viewMode === "grid") {
-                            appLauncher.selectNextInRow()
-                            event.accepted = true
-                        } else if (event.key == Qt.Key_H && event.modifiers & Qt.ControlModifier && searchMode === "apps" && appLauncher.viewMode === "grid") {
-                            appLauncher.selectPreviousInRow()
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Tab) {
-                            if (searchMode === "apps") {
-                                if (appLauncher.viewMode === "grid") {
-                                    appLauncher.selectNextInRow()
-                                } else {
-                                    appLauncher.selectNext()
-                                }
-                            } else {
-                                fileSearchController.selectNext()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Backtab) {
-                            if (searchMode === "apps") {
-                                if (appLauncher.viewMode === "grid") {
-                                    appLauncher.selectPreviousInRow()
-                                } else {
-                                    appLauncher.selectPrevious()
-                                }
-                            } else {
-                                fileSearchController.selectPrevious()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_N && event.modifiers & Qt.ControlModifier) {
-                            if (searchMode === "apps") {
-                                if (appLauncher.viewMode === "grid") {
-                                    appLauncher.selectNextInRow()
-                                } else {
-                                    appLauncher.selectNext()
-                                }
-                            } else {
-                                fileSearchController.selectNext()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_P && event.modifiers & Qt.ControlModifier) {
-                            if (searchMode === "apps") {
-                                if (appLauncher.viewMode === "grid") {
-                                    appLauncher.selectPreviousInRow()
-                                } else {
-                                    appLauncher.selectPrevious()
-                                }
-                            } else {
-                                fileSearchController.selectPrevious()
-                            }
-                            event.accepted = true
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            if (searchMode === "apps") {
-                                appLauncher.launchSelected()
-                            } else if (searchMode === "files") {
-                                fileSearchController.openSelected()
-                            }
-                            event.accepted = true
-                        }
-                    }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Down) {
+            if (searchMode === "apps") {
+                appLauncher.selectNext();
+            } else {
+                fileSearchController.selectNext();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Up) {
+            if (searchMode === "apps") {
+                appLauncher.selectPrevious();
+            } else {
+                fileSearchController.selectPrevious();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Right && searchMode === "apps" && appLauncher.viewMode === "grid") {
+            appLauncher.selectNextInRow();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Left && searchMode === "apps" && appLauncher.viewMode === "grid") {
+            appLauncher.selectPreviousInRow();
+            event.accepted = true;
+        } else if (event.key == Qt.Key_J && event.modifiers & Qt.ControlModifier) {
+            if (searchMode === "apps") {
+                appLauncher.selectNext();
+            } else {
+                fileSearchController.selectNext();
+            }
+            event.accepted = true;
+        } else if (event.key == Qt.Key_K && event.modifiers & Qt.ControlModifier) {
+            if (searchMode === "apps") {
+                appLauncher.selectPrevious();
+            } else {
+                fileSearchController.selectPrevious();
+            }
+            event.accepted = true;
+        } else if (event.key == Qt.Key_L && event.modifiers & Qt.ControlModifier && searchMode === "apps" && appLauncher.viewMode === "grid") {
+            appLauncher.selectNextInRow();
+            event.accepted = true;
+        } else if (event.key == Qt.Key_H && event.modifiers & Qt.ControlModifier && searchMode === "apps" && appLauncher.viewMode === "grid") {
+            appLauncher.selectPreviousInRow();
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Tab) {
+            if (searchMode === "apps") {
+                if (appLauncher.viewMode === "grid") {
+                    appLauncher.selectNextInRow();
+                } else {
+                    appLauncher.selectNext();
+                }
+            } else {
+                fileSearchController.selectNext();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Backtab) {
+            if (searchMode === "apps") {
+                if (appLauncher.viewMode === "grid") {
+                    appLauncher.selectPreviousInRow();
+                } else {
+                    appLauncher.selectPrevious();
+                }
+            } else {
+                fileSearchController.selectPrevious();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_N && event.modifiers & Qt.ControlModifier) {
+            if (searchMode === "apps") {
+                if (appLauncher.viewMode === "grid") {
+                    appLauncher.selectNextInRow();
+                } else {
+                    appLauncher.selectNext();
+                }
+            } else {
+                fileSearchController.selectNext();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_P && event.modifiers & Qt.ControlModifier) {
+            if (searchMode === "apps") {
+                if (appLauncher.viewMode === "grid") {
+                    appLauncher.selectPreviousInRow();
+                } else {
+                    appLauncher.selectPrevious();
+                }
+            } else {
+                fileSearchController.selectPrevious();
+            }
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+            if (searchMode === "apps") {
+                appLauncher.launchSelected();
+            } else if (searchMode === "files") {
+                fileSearchController.openSelected();
+            }
+            event.accepted = true;
+        }
+    }
 
     AppLauncher {
         id: appLauncher
@@ -156,29 +155,27 @@ Item {
         viewMode: SettingsData.spotlightModalViewMode
         gridColumns: SettingsData.appLauncherGridColumns
         onAppLaunched: () => {
-                           if (parentModal)
-                           parentModal.hide()
-                           
-                           if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
-                               NiriService.toggleOverview()
-                           }
-                       }
+            if (parentModal)
+                parentModal.hide();
+            if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
+                NiriService.toggleOverview();
+            }
+        }
         onViewModeSelected: mode => {
-                                SettingsData.set("spotlightModalViewMode", mode)
-                            }
+            SettingsData.set("spotlightModalViewMode", mode);
+        }
     }
 
     FileSearchController {
         id: fileSearchController
 
         onFileOpened: () => {
-                          if (parentModal)
-                          parentModal.hide()
-                          
-                          if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
-                              NiriService.toggleOverview()
-                          }
-                      }
+            if (parentModal)
+                parentModal.hide();
+            if (SettingsData.spotlightCloseNiriOverview && NiriService.inOverview) {
+                NiriService.toggleOverview();
+            }
+        }
     }
 
     Column {
@@ -216,34 +213,33 @@ Item {
                 keyForwardTargets: [spotlightKeyHandler]
                 onTextChanged: {
                     if (searchMode === "apps") {
-                        appLauncher.searchQuery = text
+                        appLauncher.searchQuery = text;
                     }
                 }
                 onTextEdited: {
-                    updateSearchMode()
+                    updateSearchMode();
                 }
                 Keys.onPressed: event => {
-                                    if (event.key === Qt.Key_Escape) {
-                                        if (parentModal)
-                                        parentModal.hide()
+                    if (event.key === Qt.Key_Escape) {
+                        if (parentModal)
+                            parentModal.hide();
 
-                                        event.accepted = true
-                                    } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && text.length > 0) {
-                                        if (searchMode === "apps") {
-                                            if (appLauncher.keyboardNavigationActive && appLauncher.model.count > 0)
-                                            appLauncher.launchSelected()
-                                            else if (appLauncher.model.count > 0)
-                                            appLauncher.launchApp(appLauncher.model.get(0))
-                                        } else if (searchMode === "files") {
-                                            if (fileSearchController.model.count > 0)
-                                            fileSearchController.openSelected()
-                                        }
-                                        event.accepted = true
-                                    } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up || event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Tab || event.key
-                                               === Qt.Key_Backtab || ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && text.length === 0)) {
-                                        event.accepted = false
-                                    }
-                                }
+                        event.accepted = true;
+                    } else if ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && text.length > 0) {
+                        if (searchMode === "apps") {
+                            if (appLauncher.keyboardNavigationActive && appLauncher.model.count > 0)
+                                appLauncher.launchSelected();
+                            else if (appLauncher.model.count > 0)
+                                appLauncher.launchApp(appLauncher.model.get(0));
+                        } else if (searchMode === "files") {
+                            if (fileSearchController.model.count > 0)
+                                fileSearchController.openSelected();
+                        }
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Down || event.key === Qt.Key_Up || event.key === Qt.Key_Left || event.key === Qt.Key_Right || event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab || ((event.key === Qt.Key_Return || event.key === Qt.Key_Enter) && text.length === 0)) {
+                        event.accepted = false;
+                    }
+                }
             }
 
             Row {
@@ -271,8 +267,8 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: () => {
-                                       appLauncher.setViewMode("list")
-                                   }
+                            appLauncher.setViewMode("list");
+                        }
                     }
                 }
 
@@ -296,8 +292,8 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: () => {
-                                       appLauncher.setViewMode("grid")
-                                   }
+                            appLauncher.setViewMode("grid");
+                        }
                     }
                 }
             }
@@ -329,22 +325,22 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: () => {
-                                       fileSearchController.searchField = "filename"
-                                   }
+                            fileSearchController.searchField = "filename";
+                        }
                         onEntered: {
-                            filenameTooltipLoader.active = true
+                            filenameTooltipLoader.active = true;
                             Qt.callLater(() => {
-                                             if (filenameTooltipLoader.item) {
-                                                 const p = mapToItem(null, width / 2, height + Theme.spacingXS)
-                                                 filenameTooltipLoader.item.show(I18n.tr("Search filenames"), p.x, p.y, null)
-                                             }
-                                         })
+                                if (filenameTooltipLoader.item) {
+                                    const p = mapToItem(null, width / 2, height + Theme.spacingXS);
+                                    filenameTooltipLoader.item.show(I18n.tr("Search filenames"), p.x, p.y, null);
+                                }
+                            });
                         }
                         onExited: {
                             if (filenameTooltipLoader.item)
-                                filenameTooltipLoader.item.hide()
+                                filenameTooltipLoader.item.hide();
 
-                            filenameTooltipLoader.active = false
+                            filenameTooltipLoader.active = false;
                         }
                     }
                 }
@@ -371,22 +367,22 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: () => {
-                                       fileSearchController.searchField = "body"
-                                   }
+                            fileSearchController.searchField = "body";
+                        }
                         onEntered: {
-                            contentTooltipLoader.active = true
+                            contentTooltipLoader.active = true;
                             Qt.callLater(() => {
-                                             if (contentTooltipLoader.item) {
-                                                 const p = mapToItem(null, width / 2, height + Theme.spacingXS)
-                                                 contentTooltipLoader.item.show(I18n.tr("Search file contents"), p.x, p.y, null)
-                                             }
-                                         })
+                                if (contentTooltipLoader.item) {
+                                    const p = mapToItem(null, width / 2, height + Theme.spacingXS);
+                                    contentTooltipLoader.item.show(I18n.tr("Search file contents"), p.x, p.y, null);
+                                }
+                            });
                         }
                         onExited: {
                             if (contentTooltipLoader.item)
-                                contentTooltipLoader.item.hide()
+                                contentTooltipLoader.item.hide();
 
-                            contentTooltipLoader.active = false
+                            contentTooltipLoader.active = false;
                         }
                     }
                 }
@@ -426,8 +422,8 @@ Item {
         visible: contextMenu.visible
         z: 999
         onClicked: () => {
-                       contextMenu.hide()
-                   }
+            contextMenu.hide();
+        }
 
         MouseArea {
 

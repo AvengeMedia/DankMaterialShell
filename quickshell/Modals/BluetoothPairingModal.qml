@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
@@ -12,7 +11,7 @@ DankModal {
     layerNamespace: "dms:bluetooth-pairing"
 
     HyprlandFocusGrab {
-        windows: [root]
+        windows: [root.contentWindow]
         active: CompositorService.isHyprland && root.shouldHaveFocus
     }
 
@@ -25,38 +24,38 @@ DankModal {
     property string passkeyInput: ""
 
     function show(pairingData) {
-        console.log("BluetoothPairingModal.show() called:", JSON.stringify(pairingData))
-        token = pairingData.token || ""
-        deviceName = pairingData.deviceName || ""
-        deviceAddress = pairingData.deviceAddr || ""
-        requestType = pairingData.requestType || ""
-        passkey = pairingData.passkey || 0
-        pinInput = ""
-        passkeyInput = ""
+        console.log("BluetoothPairingModal.show() called:", JSON.stringify(pairingData));
+        token = pairingData.token || "";
+        deviceName = pairingData.deviceName || "";
+        deviceAddress = pairingData.deviceAddr || "";
+        requestType = pairingData.requestType || "";
+        passkey = pairingData.passkey || 0;
+        pinInput = "";
+        passkeyInput = "";
 
-        console.log("BluetoothPairingModal: Calling open()")
-        open()
+        console.log("BluetoothPairingModal: Calling open()");
+        open();
         Qt.callLater(() => {
             if (contentLoader.item) {
                 if (requestType === "pin" && contentLoader.item.pinInputField) {
-                    contentLoader.item.pinInputField.forceActiveFocus()
+                    contentLoader.item.pinInputField.forceActiveFocus();
                 } else if (requestType === "passkey" && contentLoader.item.passkeyInputField) {
-                    contentLoader.item.passkeyInputField.forceActiveFocus()
+                    contentLoader.item.passkeyInputField.forceActiveFocus();
                 }
             }
-        })
+        });
     }
 
     shouldBeVisible: false
     allowStacking: true
     keepPopoutsOpen: true
-    width: 420
-    height: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 240
+    modalWidth: 420
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 240
 
     onShouldBeVisibleChanged: () => {
         if (!shouldBeVisible) {
-            pinInput = ""
-            passkeyInput = ""
+            pinInput = "";
+            passkeyInput = "";
         }
     }
 
@@ -64,22 +63,22 @@ DankModal {
         Qt.callLater(() => {
             if (contentLoader.item) {
                 if (requestType === "pin" && contentLoader.item.pinInputField) {
-                    contentLoader.item.pinInputField.forceActiveFocus()
+                    contentLoader.item.pinInputField.forceActiveFocus();
                 } else if (requestType === "passkey" && contentLoader.item.passkeyInputField) {
-                    contentLoader.item.passkeyInputField.forceActiveFocus()
+                    contentLoader.item.passkeyInputField.forceActiveFocus();
                 }
             }
-        })
+        });
     }
 
     onBackgroundClicked: () => {
         if (token) {
-            DMSService.bluetoothCancelPairing(token)
+            DMSService.bluetoothCancelPairing(token);
         }
-        close()
-        token = ""
-        pinInput = ""
-        passkeyInput = ""
+        close();
+        token = "";
+        pinInput = "";
+        passkeyInput = "";
     }
 
     content: Component {
@@ -95,13 +94,13 @@ DankModal {
 
             Keys.onEscapePressed: event => {
                 if (token) {
-                    DMSService.bluetoothCancelPairing(token)
+                    DMSService.bluetoothCancelPairing(token);
                 }
-                close()
-                token = ""
-                pinInput = ""
-                passkeyInput = ""
-                event.accepted = true
+                close();
+                token = "";
+                pinInput = "";
+                passkeyInput = "";
+                event.accepted = true;
             }
 
             Column {
@@ -129,19 +128,19 @@ DankModal {
                         text: {
                             switch (requestType) {
                             case "confirm":
-                                return I18n.tr("Confirm passkey for ") + deviceName
+                                return I18n.tr("Confirm passkey for ") + deviceName;
                             case "display-passkey":
-                                return I18n.tr("Enter this passkey on ") + deviceName
+                                return I18n.tr("Enter this passkey on ") + deviceName;
                             case "authorize":
-                                return I18n.tr("Authorize pairing with ") + deviceName
+                                return I18n.tr("Authorize pairing with ") + deviceName;
                             case "pin":
-                                return I18n.tr("Enter PIN for ") + deviceName
+                                return I18n.tr("Enter PIN for ") + deviceName;
                             case "passkey":
-                                return I18n.tr("Enter passkey for ") + deviceName
+                                return I18n.tr("Enter passkey for ") + deviceName;
                             default:
                                 if (requestType.startsWith("authorize-service"))
-                                    return I18n.tr("Authorize service for ") + deviceName
-                                return deviceName
+                                    return I18n.tr("Authorize service for ") + deviceName;
+                                return deviceName;
                             }
                         }
                         font.pixelSize: Theme.fontSizeMedium
@@ -163,7 +162,7 @@ DankModal {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: () => {
-                            pinInputField.forceActiveFocus()
+                            pinInputField.forceActiveFocus();
                         }
                     }
 
@@ -178,10 +177,10 @@ DankModal {
                         backgroundColor: "transparent"
                         enabled: root.shouldBeVisible
                         onTextEdited: () => {
-                            pinInput = text
+                            pinInput = text;
                         }
                         onAccepted: () => {
-                            submitPairing()
+                            submitPairing();
                         }
                     }
                 }
@@ -198,7 +197,7 @@ DankModal {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: () => {
-                            passkeyInputField.forceActiveFocus()
+                            passkeyInputField.forceActiveFocus();
                         }
                     }
 
@@ -213,10 +212,10 @@ DankModal {
                         backgroundColor: "transparent"
                         enabled: root.shouldBeVisible
                         onTextEdited: () => {
-                            passkeyInput = text
+                            passkeyInput = text;
                         }
                         onAccepted: () => {
-                            submitPairing()
+                            submitPairing();
                         }
                     }
                 }
@@ -284,12 +283,12 @@ DankModal {
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: () => {
                                     if (token) {
-                                        DMSService.bluetoothCancelPairing(token)
+                                        DMSService.bluetoothCancelPairing(token);
                                     }
-                                    close()
-                                    token = ""
-                                    pinInput = ""
-                                    passkeyInput = ""
+                                    close();
+                                    token = "";
+                                    pinInput = "";
+                                    passkeyInput = "";
                                 }
                             }
                         }
@@ -301,10 +300,10 @@ DankModal {
                             color: pairArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
                             enabled: {
                                 if (requestType === "pin")
-                                    return pinInput.length > 0
+                                    return pinInput.length > 0;
                                 if (requestType === "passkey")
-                                    return passkeyInput.length === 6
-                                return true
+                                    return passkeyInput.length === 6;
+                                return true;
                             }
                             opacity: enabled ? 1 : 0.5
 
@@ -316,13 +315,13 @@ DankModal {
                                     switch (requestType) {
                                     case "confirm":
                                     case "display-passkey":
-                                        return I18n.tr("Confirm")
+                                        return I18n.tr("Confirm");
                                     case "authorize":
-                                        return I18n.tr("Authorize")
+                                        return I18n.tr("Authorize");
                                     default:
                                         if (requestType.startsWith("authorize-service"))
-                                            return I18n.tr("Authorize")
-                                        return I18n.tr("Pair")
+                                            return I18n.tr("Authorize");
+                                        return I18n.tr("Pair");
                                     }
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
@@ -338,7 +337,7 @@ DankModal {
                                 cursorShape: Qt.PointingHandCursor
                                 enabled: parent.enabled
                                 onClicked: () => {
-                                    submitPairing()
+                                    submitPairing();
                                 }
                             }
 
@@ -363,48 +362,48 @@ DankModal {
                 iconColor: Theme.surfaceText
                 onClicked: () => {
                     if (token) {
-                        DMSService.bluetoothCancelPairing(token)
+                        DMSService.bluetoothCancelPairing(token);
                     }
-                    close()
-                    token = ""
-                    pinInput = ""
-                    passkeyInput = ""
+                    close();
+                    token = "";
+                    pinInput = "";
+                    passkeyInput = "";
                 }
             }
         }
     }
 
     function submitPairing() {
-        const secrets = {}
+        const secrets = {};
 
         switch (requestType) {
         case "pin":
-            secrets["pin"] = pinInput
-            break
+            secrets["pin"] = pinInput;
+            break;
         case "passkey":
-            secrets["passkey"] = passkeyInput
-            break
+            secrets["passkey"] = passkeyInput;
+            break;
         case "confirm":
         case "display-passkey":
         case "authorize":
-            secrets["decision"] = "yes"
-            break
+            secrets["decision"] = "yes";
+            break;
         default:
             if (requestType.startsWith("authorize-service")) {
-                secrets["decision"] = "yes"
+                secrets["decision"] = "yes";
             }
-            break
+            break;
         }
 
         DMSService.bluetoothSubmitPairing(token, secrets, true, response => {
             if (response.error) {
-                ToastService.showError(I18n.tr("Pairing failed"), response.error)
+                ToastService.showError(I18n.tr("Pairing failed"), response.error);
             }
-        })
+        });
 
-        close()
-        token = ""
-        pinInput = ""
-        passkeyInput = ""
+        close();
+        token = "";
+        pinInput = "";
+        passkeyInput = "";
     }
 }

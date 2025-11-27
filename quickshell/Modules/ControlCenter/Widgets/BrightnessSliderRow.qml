@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -18,65 +16,69 @@ Row {
     height: 40
     spacing: 0
 
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
+
     property string targetDeviceName: {
         if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
-            return ""
+            return "";
         }
 
         if (screenName && screenName.length > 0) {
-            const pins = SettingsData.brightnessDevicePins || {}
-            const pinnedDevice = pins[screenName]
+            const pins = SettingsData.brightnessDevicePins || {};
+            const pinnedDevice = pins[screenName];
             if (pinnedDevice && pinnedDevice.length > 0) {
-                const found = DisplayService.devices.find(dev => dev.name === pinnedDevice)
+                const found = DisplayService.devices.find(dev => dev.name === pinnedDevice);
                 if (found) {
-                    return found.name
+                    return found.name;
                 }
             }
         }
 
         if (deviceName && deviceName.length > 0) {
-            const found = DisplayService.devices.find(dev => dev.name === deviceName)
+            const found = DisplayService.devices.find(dev => dev.name === deviceName);
             if (found) {
-                return found.name
+                return found.name;
             }
         }
 
-        const currentDeviceName = DisplayService.currentDevice
+        const currentDeviceName = DisplayService.currentDevice;
         if (currentDeviceName) {
-            const found = DisplayService.devices.find(dev => dev.name === currentDeviceName)
+            const found = DisplayService.devices.find(dev => dev.name === currentDeviceName);
             if (found) {
-                return found.name
+                return found.name;
             }
         }
 
-        const backlight = DisplayService.devices.find(d => d.class === "backlight")
+        const backlight = DisplayService.devices.find(d => d.class === "backlight");
         if (backlight) {
-            return backlight.name
+            return backlight.name;
         }
 
-        const ddc = DisplayService.devices.find(d => d.class === "ddc")
+        const ddc = DisplayService.devices.find(d => d.class === "ddc");
         if (ddc) {
-            return ddc.name
+            return ddc.name;
         }
 
-        return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : ""
+        return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : "";
     }
 
     property var targetDevice: {
         if (!targetDeviceName || !DisplayService.devices) {
-            return null
+            return null;
         }
 
-        return DisplayService.devices.find(dev => dev.name === targetDeviceName) || null
+        return DisplayService.devices.find(dev => dev.name === targetDeviceName) || null;
     }
 
     property real targetBrightness: {
-        DisplayService.brightnessVersion
+        DisplayService.brightnessVersion;
         if (!targetDeviceName) {
-            return 0
+            return 0;
         }
 
-        return DisplayService.getDeviceBrightness(targetDeviceName)
+        return DisplayService.getDeviceBrightness(targetDeviceName);
     }
 
     Rectangle {
@@ -94,46 +96,37 @@ Row {
 
             onClicked: {
                 if (DisplayService.devices && DisplayService.devices.length > 1) {
-                    root.iconClicked()
+                    root.iconClicked();
                 }
             }
 
             onEntered: {
-                tooltipLoader.active = true
-                if (tooltipLoader.item) {
-                    const tooltipText = targetDevice ? "bl device: " + targetDevice.name : "Backlight Control"
-                    const globalPos = iconArea.mapToGlobal(iconArea.width / 2, iconArea.height / 2)
-                    const screenY = root.parentScreen?.y ?? 0
-                    const relativeY = globalPos.y - screenY - 55
-                    tooltipLoader.item.show(tooltipText, globalPos.x, relativeY, root.parentScreen)
-                }
+                const tooltipText = targetDevice ? "bl device: " + targetDevice.name : "Backlight Control";
+                sharedTooltip.show(tooltipText, iconArea, 0, 0, "bottom");
             }
 
             onExited: {
-                if (tooltipLoader.item) {
-                    tooltipLoader.item.hide()
-                }
-                tooltipLoader.active = false
+                sharedTooltip.hide();
             }
 
             DankIcon {
                 anchors.centerIn: parent
                 name: {
                     if (!DisplayService.brightnessAvailable || !targetDevice) {
-                        return "brightness_low"
+                        return "brightness_low";
                     }
 
                     if (targetDevice.class === "backlight" || targetDevice.class === "ddc") {
-                        const brightness = targetBrightness
+                        const brightness = targetBrightness;
                         if (brightness <= 33)
-                            return "brightness_low"
+                            return "brightness_low";
                         if (brightness <= 66)
-                            return "brightness_medium"
-                        return "brightness_high"
+                            return "brightness_medium";
+                        return "brightness_high";
                     } else if (targetDevice.name.includes("kbd")) {
-                        return "keyboard"
+                        return "keyboard";
                     } else {
-                        return "lightbulb"
+                        return "lightbulb";
                     }
                 }
                 size: Theme.iconSize
@@ -149,43 +142,40 @@ Row {
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
         enabled: DisplayService.brightnessAvailable && targetDeviceName.length > 0
         minimum: {
-            if (!targetDevice) return 1
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (!targetDevice)
+                return 1;
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
             if (isExponential) {
-                return 1
+                return 1;
             }
-            return (targetDevice.class === "backlight" || targetDevice.class === "ddc") ? 1 : 0
+            return (targetDevice.class === "backlight" || targetDevice.class === "ddc") ? 1 : 0;
         }
         maximum: {
-            if (!targetDevice) return 100
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (!targetDevice)
+                return 100;
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
             if (isExponential) {
-                return 100
+                return 100;
             }
-            return targetDevice.displayMax || 100
+            return targetDevice.displayMax || 100;
         }
         value: !isDragging ? targetBrightness : value
         showValue: true
         unit: {
-            if (!targetDevice) return "%"
-            const isExponential = SessionData.getBrightnessExponential(targetDevice.id)
+            if (!targetDevice)
+                return "%";
+            const isExponential = SessionData.getBrightnessExponential(targetDevice.id);
             if (isExponential) {
-                return "%"
+                return "%";
             }
-            return targetDevice.class === "ddc" ? "" : "%"
+            return targetDevice.class === "ddc" ? "" : "%";
         }
         onSliderValueChanged: function (newValue) {
             if (DisplayService.brightnessAvailable && targetDeviceName) {
-                DisplayService.setBrightness(newValue, targetDeviceName, true)
+                DisplayService.setBrightness(newValue, targetDeviceName, true);
             }
         }
         thumbOutlineColor: Theme.surfaceContainer
         trackColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    }
-
-    Loader {
-        id: tooltipLoader
-        active: false
-        sourceComponent: DankTooltip {}
     }
 }

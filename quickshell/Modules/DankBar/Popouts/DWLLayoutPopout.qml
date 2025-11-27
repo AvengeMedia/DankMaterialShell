@@ -14,18 +14,30 @@ DankPopout {
 
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
+    function setTriggerPosition(x, y, width, section, screen, barPosition, barThickness, barSpacing, barConfig) {
         triggerX = x
         triggerY = y
         triggerWidth = width
         triggerSection = section
-        triggerScreen = screen
+        root.screen = screen
+
+        storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4)
+        storedBarSpacing = barSpacing !== undefined ? barSpacing : 4
+        storedBarConfig = barConfig
+
+        const pos = barPosition !== undefined ? barPosition : 0
+        const bottomGap = barConfig ? (barConfig.bottomGap !== undefined ? barConfig.bottomGap : 0) : 0
+
+        setBarContext(pos, bottomGap)
+
         updateOutputState()
     }
 
+    onScreenChanged: updateOutputState()
+
     function updateOutputState() {
-        if (triggerScreen && DwlService.dwlAvailable) {
-            outputState = DwlService.getOutputState(triggerScreen.name)
+        if (screen && DwlService.dwlAvailable) {
+            outputState = DwlService.getOutputState(screen.name)
         } else {
             outputState = null
         }
@@ -89,8 +101,6 @@ DankPopout {
 
     popupWidth: 300
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 550
-    triggerX: Screen.width - 380 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing
     triggerWidth: 70
     positioning: ""
     screen: triggerScreen
@@ -271,19 +281,13 @@ DankPopout {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onPressed: {
-                                    console.log("DWLLayoutPopout: Pressed layout", modelData, "at index", index)
-                                    console.log("DWLLayoutPopout: triggerScreen:", root.triggerScreen, "dwlAvailable:", DwlService.dwlAvailable)
-
                                     if (!root.triggerScreen) {
-                                        console.error("DWLLayoutPopout: triggerScreen is null!")
                                         return
                                     }
                                     if (!DwlService.dwlAvailable) {
-                                        console.error("DWLLayoutPopout: DwlService not available!")
                                         return
                                     }
 
-                                    console.log("DWLLayoutPopout: CALLING setLayout with output:", root.triggerScreen.name, "index:", index)
                                     DwlService.setLayout(root.triggerScreen.name, index)
                                     root.close()
                                 }

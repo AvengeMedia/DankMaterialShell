@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -11,12 +9,13 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             // Dock Position
@@ -25,8 +24,7 @@ Item {
                 height: dockPositionSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -67,20 +65,33 @@ Item {
                             model: ["Top", "Bottom", "Left", "Right"]
                             currentIndex: {
                                 switch (SettingsData.dockPosition) {
-                                    case SettingsData.Position.Top: return 0
-                                    case SettingsData.Position.Bottom: return 1
-                                    case SettingsData.Position.Left: return 2
-                                    case SettingsData.Position.Right: return 3
-                                    default: return 1
+                                case SettingsData.Position.Top:
+                                    return 0;
+                                case SettingsData.Position.Bottom:
+                                    return 1;
+                                case SettingsData.Position.Left:
+                                    return 2;
+                                case SettingsData.Position.Right:
+                                    return 3;
+                                default:
+                                    return 1;
                                 }
                             }
                             onSelectionChanged: (index, selected) => {
                                 if (selected) {
                                     switch (index) {
-                                        case 0: SettingsData.setDockPosition(SettingsData.Position.Top); break
-                                        case 1: SettingsData.setDockPosition(SettingsData.Position.Bottom); break
-                                        case 2: SettingsData.setDockPosition(SettingsData.Position.Left); break
-                                        case 3: SettingsData.setDockPosition(SettingsData.Position.Right); break
+                                    case 0:
+                                        SettingsData.setDockPosition(SettingsData.Position.Top);
+                                        break;
+                                    case 1:
+                                        SettingsData.setDockPosition(SettingsData.Position.Bottom);
+                                        break;
+                                    case 2:
+                                        SettingsData.setDockPosition(SettingsData.Position.Left);
+                                        break;
+                                    case 3:
+                                        SettingsData.setDockPosition(SettingsData.Position.Right);
+                                        break;
                                     }
                                 }
                             }
@@ -95,8 +106,7 @@ Item {
                 height: dockVisibilitySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -118,8 +128,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - enableToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - enableToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -145,8 +154,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.showDock
                             onToggled: checked => {
-                                           SettingsData.setShowDock(checked)
-                                       }
+                                SettingsData.setShowDock(checked);
+                            }
                         }
                     }
 
@@ -172,8 +181,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - autoHideToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - autoHideToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -199,8 +207,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockAutoHide
                             onToggled: checked => {
-                                           SettingsData.set("dockAutoHide", checked)
-                                       }
+                                SettingsData.set("dockAutoHide", checked);
+                            }
                         }
 
                         Behavior on opacity {
@@ -232,8 +240,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - overviewToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - overviewToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -259,8 +266,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockOpenOnOverview
                             onToggled: checked => {
-                                           SettingsData.set("dockOpenOnOverview", checked)
-                                       }
+                                SettingsData.set("dockOpenOnOverview", checked);
+                            }
                         }
                     }
                 }
@@ -272,8 +279,7 @@ Item {
                 height: groupByAppSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -295,8 +301,7 @@ Item {
                         }
 
                         Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - groupByAppToggle.width - Theme.spacingM
+                            width: parent.width - Theme.iconSize - Theme.spacingM - groupByAppToggle.width - Theme.spacingM
                             spacing: Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -322,8 +327,8 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.dockGroupByApp
                             onToggled: checked => {
-                                           SettingsData.set("dockGroupByApp", checked)
-                                       }
+                                SettingsData.set("dockGroupByApp", checked);
+                            }
                         }
                     }
                 }
@@ -335,8 +340,7 @@ Item {
                 height: indicatorStyleSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -378,7 +382,7 @@ Item {
                             currentIndex: SettingsData.dockIndicatorStyle === "circle" ? 0 : 1
                             onSelectionChanged: (index, selected) => {
                                 if (selected) {
-                                    SettingsData.set("dockIndicatorStyle", index === 0 ? "circle" : "line")
+                                    SettingsData.set("dockIndicatorStyle", index === 0 ? "circle" : "line");
                                 }
                             }
                         }
@@ -392,8 +396,7 @@ Item {
                 height: iconSizeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -437,7 +440,7 @@ Item {
                             iconColor: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                             onClicked: {
-                                SettingsData.set("dockIconSize", 48)
+                                SettingsData.set("dockIconSize", 48);
                             }
                         }
                     }
@@ -453,8 +456,8 @@ Item {
                         wheelEnabled: false
                         thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         onSliderValueChanged: newValue => {
-                                                  SettingsData.set("dockIconSize", newValue)
-                                              }
+                            SettingsData.set("dockIconSize", newValue);
+                        }
                     }
                 }
             }
@@ -465,8 +468,7 @@ Item {
                 height: dockSpacingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -533,7 +535,7 @@ Item {
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
-                                    SettingsData.set("dockSpacing", 8)
+                                    SettingsData.set("dockSpacing", 8);
                                 }
                             }
 
@@ -554,9 +556,8 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockSpacing",
-                                                          newValue)
-                                                  }
+                                SettingsData.set("dockSpacing", newValue);
+                            }
                         }
                     }
 
@@ -597,7 +598,7 @@ Item {
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
-                                    SettingsData.set("dockBottomGap", 0)
+                                    SettingsData.set("dockBottomGap", 0);
                                 }
                             }
 
@@ -618,9 +619,8 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockBottomGap",
-                                                          newValue)
-                                                  }
+                                SettingsData.set("dockBottomGap", newValue);
+                            }
                         }
                     }
 
@@ -661,7 +661,7 @@ Item {
                                 iconColor: Theme.surfaceText
                                 anchors.verticalCenter: parent.verticalCenter
                                 onClicked: {
-                                    SettingsData.set("dockMargin", 0)
+                                    SettingsData.set("dockMargin", 0);
                                 }
                             }
 
@@ -682,8 +682,8 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockMargin", newValue)
-                                                  }
+                                SettingsData.set("dockMargin", newValue);
+                            }
                         }
                     }
                 }
@@ -695,8 +695,7 @@ Item {
                 height: transparencySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -740,7 +739,7 @@ Item {
                             iconColor: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                             onClicked: {
-                                SettingsData.set("dockTransparency", 0.85)
+                                SettingsData.set("dockTransparency", 0.85);
                             }
                         }
                     }
@@ -756,9 +755,8 @@ Item {
                         wheelEnabled: false
                         thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                         onSliderValueChanged: newValue => {
-                                                  SettingsData.set("dockTransparency",
-                                                      newValue / 100)
-                                              }
+                            SettingsData.set("dockTransparency", newValue / 100);
+                        }
                     }
                 }
             }

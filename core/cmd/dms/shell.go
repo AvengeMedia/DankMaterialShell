@@ -57,6 +57,11 @@ func getRuntimeDir() string {
 	return os.TempDir()
 }
 
+func hasSystemdRun() bool {
+	_, err := exec.LookPath("systemd-run")
+	return err == nil
+}
+
 func getPIDFilePath() string {
 	return filepath.Join(getRuntimeDir(), fmt.Sprintf("danklinux-%d.pid", os.Getpid()))
 }
@@ -163,6 +168,10 @@ func runShellInteractive(session bool) {
 	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
 	if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 		cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
+	}
+
+	if isSessionManaged && hasSystemdRun() {
+		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -385,6 +394,10 @@ func runShellDaemon(session bool) {
 	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
 	if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 		cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
+	}
+
+	if isSessionManaged && hasSystemdRun() {
+		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
 	}
 
 	homeDir, err := os.UserHomeDir()

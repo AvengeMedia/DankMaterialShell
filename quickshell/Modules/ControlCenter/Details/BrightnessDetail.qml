@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import qs.Common
 import qs.Services
@@ -11,88 +10,97 @@ Rectangle {
     property string initialDeviceName: ""
     property string instanceId: ""
     property string screenName: ""
+    property string screenModel: ""
 
     signal deviceNameChanged(string newDeviceName)
 
     property string currentDeviceName: ""
 
+    function getScreenPinKey() {
+        if (!screenName)
+            return "";
+        const screen = Quickshell.screens.find(s => s.name === screenName);
+        if (screen) {
+            return SettingsData.getScreenDisplayName(screen);
+        }
+        if (SettingsData.displayNameMode === "model" && screenModel && screenModel.length > 0) {
+            return screenModel;
+        }
+        return screenName;
+    }
+
     function resolveDeviceName() {
         if (!DisplayService.brightnessAvailable || !DisplayService.devices || DisplayService.devices.length === 0) {
-            return ""
+            return "";
         }
 
-        if (screenName && screenName.length > 0) {
-            const pins = SettingsData.brightnessDevicePins || {}
-            const pinnedDevice = pins[screenName]
+        const pinKey = getScreenPinKey();
+        if (pinKey.length > 0) {
+            const pins = SettingsData.brightnessDevicePins || {};
+            const pinnedDevice = pins[pinKey];
             if (pinnedDevice && pinnedDevice.length > 0) {
-                const found = DisplayService.devices.find(dev => dev.name === pinnedDevice)
-                if (found) {
-                    return found.name
-                }
+                const found = DisplayService.devices.find(dev => dev.name === pinnedDevice);
+                if (found)
+                    return found.name;
             }
         }
 
         if (initialDeviceName && initialDeviceName.length > 0) {
-            const found = DisplayService.devices.find(dev => dev.name === initialDeviceName)
-            if (found) {
-                return found.name
-            }
+            const found = DisplayService.devices.find(dev => dev.name === initialDeviceName);
+            if (found)
+                return found.name;
         }
 
-        const currentDeviceNameFromService = DisplayService.currentDevice
+        const currentDeviceNameFromService = DisplayService.currentDevice;
         if (currentDeviceNameFromService) {
-            const found = DisplayService.devices.find(dev => dev.name === currentDeviceNameFromService)
-            if (found) {
-                return found.name
-            }
+            const found = DisplayService.devices.find(dev => dev.name === currentDeviceNameFromService);
+            if (found)
+                return found.name;
         }
 
-        const backlight = DisplayService.devices.find(d => d.class === "backlight")
-        if (backlight) {
-            return backlight.name
-        }
+        const backlight = DisplayService.devices.find(d => d.class === "backlight");
+        if (backlight)
+            return backlight.name;
 
-        const ddc = DisplayService.devices.find(d => d.class === "ddc")
-        if (ddc) {
-            return ddc.name
-        }
+        const ddc = DisplayService.devices.find(d => d.class === "ddc");
+        if (ddc)
+            return ddc.name;
 
-        return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : ""
+        return DisplayService.devices.length > 0 ? DisplayService.devices[0].name : "";
     }
 
     Component.onCompleted: {
-        currentDeviceName = resolveDeviceName()
+        currentDeviceName = resolveDeviceName();
     }
 
     property bool isPinnedToScreen: {
-        if (!screenName || screenName.length === 0) {
-            return false
-        }
-        const pins = SettingsData.brightnessDevicePins || {}
-        return pins[screenName] === currentDeviceName
+        const pinKey = getScreenPinKey();
+        if (!pinKey || pinKey.length === 0)
+            return false;
+        const pins = SettingsData.brightnessDevicePins || {};
+        return pins[pinKey] === currentDeviceName;
     }
 
     function togglePinToScreen() {
-        if (!screenName || screenName.length === 0 || !currentDeviceName || currentDeviceName.length === 0) {
-            return
-        }
-
-        const pins = JSON.parse(JSON.stringify(SettingsData.brightnessDevicePins || {}))
+        const pinKey = getScreenPinKey();
+        if (!pinKey || pinKey.length === 0 || !currentDeviceName || currentDeviceName.length === 0)
+            return;
+        const pins = JSON.parse(JSON.stringify(SettingsData.brightnessDevicePins || {}));
 
         if (isPinnedToScreen) {
-            delete pins[screenName]
+            delete pins[pinKey];
         } else {
-            pins[screenName] = currentDeviceName
+            pins[pinKey] = currentDeviceName;
         }
 
-        SettingsData.set("brightnessDevicePins", pins)
+        SettingsData.set("brightnessDevicePins", pins);
     }
 
     implicitHeight: {
         if (height > 0) {
-            return height
+            return height;
         }
-        return brightnessContent.height + Theme.spacingM
+        return brightnessContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
@@ -165,7 +173,7 @@ Rectangle {
                         }
 
                         StyledText {
-                            text: screenName || "Unknown Monitor"
+                            text: root.getScreenPinKey() || "Unknown Monitor"
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
@@ -216,8 +224,8 @@ Rectangle {
                     required property int index
 
                     property real deviceBrightness: {
-                        DisplayService.brightnessVersion
-                        return DisplayService.getDeviceBrightness(modelData.name)
+                        DisplayService.brightnessVersion;
+                        return DisplayService.getDeviceBrightness(modelData.name);
                     }
 
                     width: parent.width
@@ -248,19 +256,19 @@ Rectangle {
 
                                     DankIcon {
                                         name: {
-                                            const deviceClass = modelData.class || ""
-                                            const deviceName = modelData.name || ""
+                                            const deviceClass = modelData.class || "";
+                                            const deviceName = modelData.name || "";
 
                                             if (deviceClass === "backlight" || deviceClass === "ddc") {
                                                 if (deviceBrightness <= 33)
-                                                    return "brightness_low"
+                                                    return "brightness_low";
                                                 if (deviceBrightness <= 66)
-                                                    return "brightness_medium"
-                                                return "brightness_high"
+                                                    return "brightness_medium";
+                                                return "brightness_high";
                                             } else if (deviceName.includes("kbd")) {
-                                                return "keyboard"
+                                                return "keyboard";
                                             } else {
-                                                return "lightbulb"
+                                                return "lightbulb";
                                             }
                                         }
                                         size: Theme.iconSize
@@ -283,12 +291,12 @@ Rectangle {
 
                                     StyledText {
                                         text: {
-                                            const name = modelData.name || ""
-                                            const deviceClass = modelData.class || ""
+                                            const name = modelData.name || "";
+                                            const deviceClass = modelData.class || "";
                                             if (deviceClass === "backlight") {
-                                                return name.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())
+                                                return name.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase());
                                             }
-                                            return name
+                                            return name;
                                         }
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.surfaceText
@@ -307,14 +315,14 @@ Rectangle {
 
                                     StyledText {
                                         text: {
-                                            const deviceClass = modelData.class || ""
+                                            const deviceClass = modelData.class || "";
                                             if (deviceClass === "backlight")
-                                                return "Backlight device"
+                                                return "Backlight device";
                                             if (deviceClass === "ddc")
-                                                return "DDC/CI monitor"
+                                                return "DDC/CI monitor";
                                             if (deviceClass === "leds")
-                                                return "LED device"
-                                            return deviceClass
+                                                return "LED device";
+                                            return deviceClass;
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
@@ -353,9 +361,9 @@ Rectangle {
                                         cornerRadius: parent.radius
                                         enabled: SessionData.getBrightnessExponent(modelData.name) > 1.0
                                         onClicked: {
-                                            const current = SessionData.getBrightnessExponent(modelData.name)
-                                            const newValue = Math.max(1.0, Math.round((current - 0.1) * 10) / 10)
-                                            SessionData.setBrightnessExponent(modelData.name, newValue)
+                                            const current = SessionData.getBrightnessExponent(modelData.name);
+                                            const newValue = Math.max(1.0, Math.round((current - 0.1) * 10) / 10);
+                                            SessionData.setBrightnessExponent(modelData.name, newValue);
                                         }
                                     }
                                 }
@@ -395,9 +403,9 @@ Rectangle {
                                         cornerRadius: parent.radius
                                         enabled: SessionData.getBrightnessExponent(modelData.name) < 2.5
                                         onClicked: {
-                                            const current = SessionData.getBrightnessExponent(modelData.name)
-                                            const newValue = Math.min(2.5, Math.round((current + 0.1) * 10) / 10)
-                                            SessionData.setBrightnessExponent(modelData.name, newValue)
+                                            const current = SessionData.getBrightnessExponent(modelData.name);
+                                            const newValue = Math.min(2.5, Math.round((current + 0.1) * 10) / 10);
+                                            SessionData.setBrightnessExponent(modelData.name, newValue);
                                         }
                                     }
                                 }
@@ -433,8 +441,8 @@ Rectangle {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    const currentState = SessionData.getBrightnessExponential(modelData.name)
-                                    SessionData.setBrightnessExponential(modelData.name, !currentState)
+                                    const currentState = SessionData.getBrightnessExponential(modelData.name);
+                                    SessionData.setBrightnessExponential(modelData.name, !currentState);
                                 }
                             }
                         }
@@ -447,15 +455,16 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            if (screenName && screenName.length > 0 && modelData.name !== currentDeviceName) {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.brightnessDevicePins || {}))
-                                if (pins[screenName]) {
-                                    delete pins[screenName]
-                                    SettingsData.set("brightnessDevicePins", pins)
+                            const pinKey = root.getScreenPinKey();
+                            if (pinKey.length > 0 && modelData.name !== currentDeviceName) {
+                                const pins = JSON.parse(JSON.stringify(SettingsData.brightnessDevicePins || {}));
+                                if (pins[pinKey]) {
+                                    delete pins[pinKey];
+                                    SettingsData.set("brightnessDevicePins", pins);
                                 }
                             }
-                            currentDeviceName = modelData.name
-                            deviceNameChanged(modelData.name)
+                            currentDeviceName = modelData.name;
+                            deviceNameChanged(modelData.name);
                         }
                     }
                 }

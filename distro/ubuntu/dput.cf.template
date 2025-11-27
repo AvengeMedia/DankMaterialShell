@@ -1,0 +1,44 @@
+# dput configuration for AvengeMedia DMS PPAs
+# Copy this to ~/.dput.cf (or merge with existing ~/.dput.cf)
+#
+# Usage:
+#   dput ppa:avengemedia/dms ../package_version_source.changes
+#   dput ppa:avengemedia/dms-git ../package_version_source.changes
+
+# Stable DMS PPA - for release versions
+[ppa:avengemedia/dms]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~avengemedia/ubuntu/dms/
+login = anonymous
+allow_unsigned_uploads = 0
+
+# Nightly/Git DMS PPA - for development builds
+[ppa:avengemedia/dms-git]
+fqdn = ppa.launchpad.net
+method = ftp
+incoming = ~avengemedia/ubuntu/dms-git/
+login = anonymous
+allow_unsigned_uploads = 0
+
+# Alternative: Use HTTPS instead of FTP (more reliable through firewalls)
+# Uncomment these if FTP doesn't work:
+#
+# [ppa:avengemedia/dms-https]
+# fqdn = ppa.launchpad.net
+# method = https
+# incoming = ~avengemedia/ubuntu/dms/
+# login = anonymous
+# allow_unsigned_uploads = 0
+#
+# [ppa:avengemedia/dms-git-https]
+# fqdn = ppa.launchpad.net
+# method = https
+# incoming = ~avengemedia/ubuntu/dms-git/
+# login = anonymous
+# allow_unsigned_uploads = 0
+
+# Notes:
+# - allow_unsigned_uploads = 0 enforces GPG signing (required by Launchpad)
+# - anonymous login is standard for PPA uploads
+# - The incoming path must match your Launchpad username and PPA name

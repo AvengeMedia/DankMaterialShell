@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell
 import qs.Common
@@ -9,53 +8,90 @@ import qs.Widgets
 Item {
     id: displaysTab
 
-    property var variantComponents: [{
-        "id": "dankBar",
-        "name": "Dank Bar",
-        "description": I18n.tr("System bar with widgets and system information"),
-        "icon": "toolbar"
-    }, {
-        "id": "dock",
-        "name": I18n.tr("Application Dock"),
-        "description": I18n.tr("Bottom dock for pinned and running applications"),
-        "icon": "dock"
-    }, {
-        "id": "notifications",
-        "name": I18n.tr("Notification Popups"),
-        "description": I18n.tr("Notification toast popups"),
-        "icon": "notifications"
-    }, {
-        "id": "wallpaper",
-        "name": I18n.tr("Wallpaper"),
-        "description": I18n.tr("Desktop background images"),
-        "icon": "wallpaper"
-    }, {
-        "id": "osd",
-        "name": I18n.tr("On-Screen Displays"),
-        "description": I18n.tr("Volume, brightness, and other system OSDs"),
-        "icon": "picture_in_picture"
-    }, {
-        "id": "toast",
-        "name": I18n.tr("Toast Messages"),
-        "description": I18n.tr("System toast notifications"),
-        "icon": "campaign"
-    }, {
-        "id": "notepad",
-        "name": I18n.tr("Notepad Slideout"),
-        "description": I18n.tr("Quick note-taking slideout panel"),
-        "icon": "sticky_note_2"
-    }, {
-        "id": "systemTray",
-        "name": I18n.tr("System Tray"),
-        "description": I18n.tr("System tray icons"),
-        "icon": "notifications"
-    }]
+    function getBarComponentsFromSettings() {
+        const bars = SettingsData.barConfigs || [];
+        return bars.map(bar => ({
+                    "id": "bar:" + bar.id,
+                    "name": bar.name || "Bar",
+                    "description": I18n.tr("Individual bar configuration"),
+                    "icon": "toolbar",
+                    "barId": bar.id
+                }));
+    }
+
+    property var variantComponents: getVariantComponentsList()
+
+    function getVariantComponentsList() {
+        return [...getBarComponentsFromSettings(),
+            {
+                "id": "dock",
+                "name": I18n.tr("Application Dock"),
+                "description": I18n.tr("Bottom dock for pinned and running applications"),
+                "icon": "dock"
+            },
+            {
+                "id": "notifications",
+                "name": I18n.tr("Notification Popups"),
+                "description": I18n.tr("Notification toast popups"),
+                "icon": "notifications"
+            },
+            {
+                "id": "wallpaper",
+                "name": I18n.tr("Wallpaper"),
+                "description": I18n.tr("Desktop background images"),
+                "icon": "wallpaper"
+            },
+            {
+                "id": "osd",
+                "name": I18n.tr("On-Screen Displays"),
+                "description": I18n.tr("Volume, brightness, and other system OSDs"),
+                "icon": "picture_in_picture"
+            },
+            {
+                "id": "toast",
+                "name": I18n.tr("Toast Messages"),
+                "description": I18n.tr("System toast notifications"),
+                "icon": "campaign"
+            },
+            {
+                "id": "notepad",
+                "name": I18n.tr("Notepad Slideout"),
+                "description": I18n.tr("Quick note-taking slideout panel"),
+                "icon": "sticky_note_2"
+            },
+            {
+                "id": "systemTray",
+                "name": I18n.tr("System Tray"),
+                "description": I18n.tr("System tray icons"),
+                "icon": "notifications"
+            }
+        ];
+    }
+
+    Connections {
+        target: SettingsData
+        function onBarConfigsChanged() {
+            variantComponents = getVariantComponentsList();
+        }
+    }
 
     function getScreenPreferences(componentId) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4);
+            const barConfig = SettingsData.getBarConfig(barId);
+            return barConfig?.screenPreferences || ["all"];
+        }
         return SettingsData.screenPreferences && SettingsData.screenPreferences[componentId] || ["all"];
     }
 
     function setScreenPreferences(componentId, screenNames) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4);
+            SettingsData.updateBarConfig(barId, {
+                screenPreferences: screenNames
+            });
+            return;
+        }
         var prefs = SettingsData.screenPreferences || {};
         var newPrefs = Object.assign({}, prefs);
         newPrefs[componentId] = screenNames;
@@ -63,10 +99,22 @@ Item {
     }
 
     function getShowOnLastDisplay(componentId) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4);
+            const barConfig = SettingsData.getBarConfig(barId);
+            return barConfig?.showOnLastDisplay ?? true;
+        }
         return SettingsData.showOnLastDisplay && SettingsData.showOnLastDisplay[componentId] || false;
     }
 
     function setShowOnLastDisplay(componentId, enabled) {
+        if (componentId.startsWith("bar:")) {
+            const barId = componentId.substring(4);
+            SettingsData.updateBarConfig(barId, {
+                showOnLastDisplay: enabled
+            });
+            return;
+        }
         var prefs = SettingsData.showOnLastDisplay || {};
         var newPrefs = Object.assign({}, prefs);
         newPrefs[componentId] = enabled;
@@ -76,13 +124,14 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             StyledRect {
@@ -129,12 +178,12 @@ Item {
                         checked: DisplayService.nightModeEnabled
                         enabled: DisplayService.gammaControlAvailable
                         onToggled: checked => {
-                                       DisplayService.toggleNightMode()
-                                   }
+                            DisplayService.toggleNightMode();
+                        }
 
                         Connections {
                             function onNightModeEnabledChanged() {
-                                nightModeToggle.checked = DisplayService.nightModeEnabled
+                                nightModeToggle.checked = DisplayService.nightModeEnabled;
                             }
 
                             target: DisplayService
@@ -154,19 +203,19 @@ Item {
                             description: I18n.tr("Color temperature for night mode")
                             currentValue: SessionData.nightModeTemperature + "K"
                             options: {
-                                var temps = []
+                                var temps = [];
                                 for (var i = 2500; i <= 6000; i += 500) {
-                                    temps.push(i + "K")
+                                    temps.push(i + "K");
                                 }
-                                return temps
+                                return temps;
                             }
                             onValueChanged: value => {
-                                                var temp = parseInt(value.replace("K", ""))
-                                                SessionData.setNightModeTemperature(temp)
-                                                if (SessionData.nightModeHighTemperature < temp) {
-                                                    SessionData.setNightModeHighTemperature(temp)
-                                                }
-                                            }
+                                var temp = parseInt(value.replace("K", ""));
+                                SessionData.setNightModeTemperature(temp);
+                                if (SessionData.nightModeHighTemperature < temp) {
+                                    SessionData.setNightModeHighTemperature(temp);
+                                }
+                            }
                         }
 
                         DankDropdown {
@@ -175,19 +224,19 @@ Item {
                             description: I18n.tr("Color temperature for day time")
                             currentValue: SessionData.nightModeHighTemperature + "K"
                             options: {
-                                var temps = []
-                                var minTemp = SessionData.nightModeTemperature
+                                var temps = [];
+                                var minTemp = SessionData.nightModeTemperature;
                                 for (var i = Math.max(2500, minTemp); i <= 10000; i += 500) {
-                                    temps.push(i + "K")
+                                    temps.push(i + "K");
                                 }
-                                return temps
+                                return temps;
                             }
                             onValueChanged: value => {
-                                                var temp = parseInt(value.replace("K", ""))
-                                                if (temp >= SessionData.nightModeTemperature) {
-                                                    SessionData.setNightModeHighTemperature(temp)
-                                                }
-                                            }
+                                var temp = parseInt(value.replace("K", ""));
+                                if (temp >= SessionData.nightModeTemperature) {
+                                    SessionData.setNightModeHighTemperature(temp);
+                                }
+                            }
                         }
                     }
 
@@ -199,18 +248,18 @@ Item {
                         checked: SessionData.nightModeAutoEnabled
                         visible: DisplayService.gammaControlAvailable
                         onToggled: checked => {
-                                       if (checked && !DisplayService.nightModeEnabled) {
-                                           DisplayService.toggleNightMode()
-                                       } else if (!checked && DisplayService.nightModeEnabled) {
-                                           DisplayService.toggleNightMode()
-                                       }
-                                       SessionData.setNightModeAutoEnabled(checked)
-                                   }
+                            if (checked && !DisplayService.nightModeEnabled) {
+                                DisplayService.toggleNightMode();
+                            } else if (!checked && DisplayService.nightModeEnabled) {
+                                DisplayService.toggleNightMode();
+                            }
+                            SessionData.setNightModeAutoEnabled(checked);
+                        }
 
                         Connections {
                             target: SessionData
                             function onNightModeAutoEnabledChanged() {
-                                automaticToggle.checked = SessionData.nightModeAutoEnabled
+                                automaticToggle.checked = SessionData.nightModeAutoEnabled;
                             }
                         }
                     }
@@ -224,7 +273,7 @@ Item {
                         Connections {
                             target: SessionData
                             function onNightModeAutoEnabledChanged() {
-                                automaticSettings.visible = SessionData.nightModeAutoEnabled
+                                automaticSettings.visible = SessionData.nightModeAutoEnabled;
                             }
                         }
 
@@ -237,30 +286,32 @@ Item {
                                 width: 200
                                 height: 45
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                model: [{
+                                model: [
+                                    {
                                         "text": "Time",
                                         "icon": "access_time"
-                                    }, {
+                                    },
+                                    {
                                         "text": "Location",
                                         "icon": "place"
-                                    }]
+                                    }
+                                ]
 
                                 Component.onCompleted: {
-                                    currentIndex = SessionData.nightModeAutoMode === "location" ? 1 : 0
-                                    Qt.callLater(updateIndicator)
+                                    currentIndex = SessionData.nightModeAutoMode === "location" ? 1 : 0;
+                                    Qt.callLater(updateIndicator);
                                 }
 
                                 onTabClicked: index => {
-                                                  console.log("Tab clicked:", index, "Setting mode to:", index === 1 ? "location" : "time")
-                                                  DisplayService.setNightModeAutomationMode(index === 1 ? "location" : "time")
-                                                  currentIndex = index
-                                              }
+                                    DisplayService.setNightModeAutomationMode(index === 1 ? "location" : "time");
+                                    currentIndex = index;
+                                }
 
                                 Connections {
                                     target: SessionData
                                     function onNightModeAutoModeChanged() {
-                                        modeTabBarNight.currentIndex = SessionData.nightModeAutoMode === "location" ? 1 : 0
-                                        Qt.callLater(modeTabBarNight.updateIndicator)
+                                        modeTabBarNight.currentIndex = SessionData.nightModeAutoMode === "location" ? 1 : 0;
+                                        Qt.callLater(modeTabBarNight.updateIndicator);
                                     }
                                 }
                             }
@@ -317,30 +368,30 @@ Item {
                                         dropdownWidth: 70
                                         currentValue: SessionData.nightModeStartHour.toString()
                                         options: {
-                                            var hours = []
+                                            var hours = [];
                                             for (var i = 0; i < 24; i++) {
-                                                hours.push(i.toString())
+                                                hours.push(i.toString());
                                             }
-                                            return hours
+                                            return hours;
                                         }
                                         onValueChanged: value => {
-                                                            SessionData.setNightModeStartHour(parseInt(value))
-                                                        }
+                                            SessionData.setNightModeStartHour(parseInt(value));
+                                        }
                                     }
 
                                     DankDropdown {
                                         dropdownWidth: 70
                                         currentValue: SessionData.nightModeStartMinute.toString().padStart(2, '0')
                                         options: {
-                                            var minutes = []
+                                            var minutes = [];
                                             for (var i = 0; i < 60; i += 5) {
-                                                minutes.push(i.toString().padStart(2, '0'))
+                                                minutes.push(i.toString().padStart(2, '0'));
                                             }
-                                            return minutes
+                                            return minutes;
                                         }
                                         onValueChanged: value => {
-                                                            SessionData.setNightModeStartMinute(parseInt(value))
-                                                        }
+                                            SessionData.setNightModeStartMinute(parseInt(value));
+                                        }
                                     }
                                 }
 
@@ -360,30 +411,30 @@ Item {
                                         dropdownWidth: 70
                                         currentValue: SessionData.nightModeEndHour.toString()
                                         options: {
-                                            var hours = []
+                                            var hours = [];
                                             for (var i = 0; i < 24; i++) {
-                                                hours.push(i.toString())
+                                                hours.push(i.toString());
                                             }
-                                            return hours
+                                            return hours;
                                         }
                                         onValueChanged: value => {
-                                                            SessionData.setNightModeEndHour(parseInt(value))
-                                                        }
+                                            SessionData.setNightModeEndHour(parseInt(value));
+                                        }
                                     }
 
                                     DankDropdown {
                                         dropdownWidth: 70
                                         currentValue: SessionData.nightModeEndMinute.toString().padStart(2, '0')
                                         options: {
-                                            var minutes = []
+                                            var minutes = [];
                                             for (var i = 0; i < 60; i += 5) {
-                                                minutes.push(i.toString().padStart(2, '0'))
+                                                minutes.push(i.toString().padStart(2, '0'));
                                             }
-                                            return minutes
+                                            return minutes;
                                         }
                                         onValueChanged: value => {
-                                                            SessionData.setNightModeEndMinute(parseInt(value))
-                                                        }
+                                            SessionData.setNightModeEndMinute(parseInt(value));
+                                        }
                                     }
                                 }
                             }
@@ -402,13 +453,13 @@ Item {
                                 description: I18n.tr("Automatically detect location based on IP address")
                                 checked: SessionData.nightModeUseIPLocation || false
                                 onToggled: checked => {
-                                    SessionData.setNightModeUseIPLocation(checked)
+                                    SessionData.setNightModeUseIPLocation(checked);
                                 }
 
                                 Connections {
                                     target: SessionData
                                     function onNightModeUseIPLocationChanged() {
-                                        ipLocationToggle.checked = SessionData.nightModeUseIPLocation
+                                        ipLocationToggle.checked = SessionData.nightModeUseIPLocation;
                                     }
                                 }
                             }
@@ -443,9 +494,9 @@ Item {
                                             text: SessionData.latitude.toString()
                                             placeholderText: "0.0"
                                             onEditingFinished: {
-                                                const lat = parseFloat(text)
+                                                const lat = parseFloat(text);
                                                 if (!isNaN(lat) && lat >= -90 && lat <= 90 && lat !== SessionData.latitude) {
-                                                    SessionData.setLatitude(lat)
+                                                    SessionData.setLatitude(lat);
                                                 }
                                             }
                                         }
@@ -466,9 +517,9 @@ Item {
                                             text: SessionData.longitude.toString()
                                             placeholderText: "0.0"
                                             onEditingFinished: {
-                                                const lon = parseFloat(text)
+                                                const lon = parseFloat(text);
                                                 if (!isNaN(lon) && lon >= -180 && lon <= 180 && lon !== SessionData.longitude) {
-                                                    SessionData.setLongitude(lon)
+                                                    SessionData.setLongitude(lon);
                                                 }
                                             }
                                         }
@@ -533,9 +584,7 @@ Item {
                                 wrapMode: Text.WordWrap
                                 width: parent.width
                             }
-
                         }
-
                     }
 
                     Column {
@@ -579,15 +628,16 @@ Item {
                                         model: [I18n.tr("Name"), I18n.tr("Model")]
                                         currentIndex: SettingsData.displayNameMode === "model" ? 1 : 0
                                         onSelectionChanged: (index, selected) => {
-                                            if (!selected) return
-                                            SettingsData.displayNameMode = index === 1 ? "model" : "system"
-                                            SettingsData.saveSettings()
+                                            if (!selected)
+                                                return;
+                                            SettingsData.displayNameMode = index === 1 ? "model" : "system";
+                                            SettingsData.saveSettings();
                                         }
 
                                         Connections {
                                             target: SettingsData
                                             function onDisplayNameModeChanged() {
-                                                displayModeGroup.currentIndex = SettingsData.displayNameMode === "model" ? 1 : 0
+                                                displayModeGroup.currentIndex = SettingsData.displayNameMode === "model" ? 1 : 0;
                                             }
                                         }
                                     }
@@ -635,8 +685,16 @@ Item {
                                         Row {
                                             spacing: Theme.spacingS
 
+                                            property var wlrOutput: WlrOutputService.wlrOutputAvailable ? WlrOutputService.getOutput(modelData.name) : null
+                                            property var currentMode: wlrOutput?.currentMode
+
                                             StyledText {
-                                                text: modelData.width + "×" + modelData.height
+                                                text: {
+                                                    if (parent.currentMode) {
+                                                        return parent.currentMode.width + "×" + parent.currentMode.height + "@" + Math.round(parent.currentMode.refresh / 1000) + "Hz";
+                                                    }
+                                                    return modelData.width + "×" + modelData.height;
+                                                }
                                                 font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceVariantText
                                             }
@@ -652,21 +710,13 @@ Item {
                                                 font.pixelSize: Theme.fontSizeSmall
                                                 color: Theme.surfaceVariantText
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
 
             Column {
@@ -721,9 +771,7 @@ Item {
                                         wrapMode: Text.WordWrap
                                         width: parent.width
                                     }
-
                                 }
-
                             }
 
                             Column {
@@ -748,16 +796,17 @@ Item {
                                         text: I18n.tr("All displays")
                                         description: I18n.tr("Show on all connected displays")
                                         checked: {
-                                            var prefs = displaysTab.getScreenPreferences(parent.componentId)
-                                            return prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")
+                                            var prefs = displaysTab.getScreenPreferences(parent.componentId);
+                                            return prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all");
                                         }
-                                        onToggled: (checked) => {
+                                        onToggled: checked => {
                                             if (checked) {
-                                                displaysTab.setScreenPreferences(parent.componentId, ["all"])
+                                                displaysTab.setScreenPreferences(parent.componentId, ["all"]);
                                             } else {
-                                                displaysTab.setScreenPreferences(parent.componentId, [])
-                                                if (["dankBar", "dock", "notifications", "osd", "toast"].includes(parent.componentId)) {
-                                                    displaysTab.setShowOnLastDisplay(parent.componentId, true)
+                                                displaysTab.setScreenPreferences(parent.componentId, []);
+                                                const cid = parent.componentId;
+                                                if (["dankBar", "dock", "notifications", "osd", "toast"].includes(cid) || cid.startsWith("bar:")) {
+                                                    displaysTab.setShowOnLastDisplay(cid, true);
                                                 }
                                             }
                                         }
@@ -769,12 +818,14 @@ Item {
                                         description: I18n.tr("Always show when there's only one connected display")
                                         checked: displaysTab.getShowOnLastDisplay(parent.componentId)
                                         visible: {
-                                            var prefs = displaysTab.getScreenPreferences(parent.componentId)
-                                            var isAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all")
-                                            return !isAll && ["dankBar", "dock", "notifications", "osd", "toast", "notepad", "systemTray"].includes(parent.componentId)
+                                            const prefs = displaysTab.getScreenPreferences(parent.componentId);
+                                            const isAll = prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all");
+                                            const cid = parent.componentId;
+                                            const isRelevantComponent = ["dankBar", "dock", "notifications", "osd", "toast", "notepad", "systemTray"].includes(cid) || cid.startsWith("bar:");
+                                            return !isAll && isRelevantComponent;
                                         }
-                                        onToggled: (checked) => {
-                                            displaysTab.setShowOnLastDisplay(parent.componentId, checked)
+                                        onToggled: checked => {
+                                            displaysTab.setShowOnLastDisplay(parent.componentId, checked);
                                         }
                                     }
 
@@ -784,8 +835,8 @@ Item {
                                         color: Theme.outline
                                         opacity: 0.2
                                         visible: {
-                                            var prefs = displaysTab.getScreenPreferences(parent.componentId)
-                                            return !prefs.includes("all") && !(typeof prefs[0] === "string" && prefs[0] === "all")
+                                            var prefs = displaysTab.getScreenPreferences(parent.componentId);
+                                            return !prefs.includes("all") && !(typeof prefs[0] === "string" && prefs[0] === "all");
                                         }
                                     }
 
@@ -793,8 +844,8 @@ Item {
                                         width: parent.width
                                         spacing: Theme.spacingXS
                                         visible: {
-                                            var prefs = displaysTab.getScreenPreferences(parent.componentId)
-                                            return !prefs.includes("all") && !(typeof prefs[0] === "string" && prefs[0] === "all")
+                                            var prefs = displaysTab.getScreenPreferences(parent.componentId);
+                                            return !prefs.includes("all") && !(typeof prefs[0] === "string" && prefs[0] === "all");
                                         }
 
                                         Repeater {
@@ -808,50 +859,50 @@ Item {
                                                 text: SettingsData.getScreenDisplayName(screenData)
                                                 description: screenData.width + "×" + screenData.height + " • " + (SettingsData.displayNameMode === "system" ? (screenData.model || "Unknown Model") : screenData.name)
                                                 checked: {
-                                                    var prefs = displaysTab.getScreenPreferences(componentId)
-                                                    if (typeof prefs[0] === "string" && prefs[0] === "all") return false
-                                                    return SettingsData.isScreenInPreferences(screenData, prefs)
+                                                    var prefs = displaysTab.getScreenPreferences(componentId);
+                                                    if (typeof prefs[0] === "string" && prefs[0] === "all")
+                                                        return false;
+                                                    return SettingsData.isScreenInPreferences(screenData, prefs);
                                                 }
-                                                onToggled: (checked) => {
-                                                    var currentPrefs = displaysTab.getScreenPreferences(componentId)
+                                                onToggled: checked => {
+                                                    var currentPrefs = displaysTab.getScreenPreferences(componentId);
                                                     if (typeof currentPrefs[0] === "string" && currentPrefs[0] === "all") {
-                                                        currentPrefs = []
+                                                        currentPrefs = [];
                                                     }
+
+                                                    const screenModelIndex = SettingsData.getScreenModelIndex(screenData);
 
                                                     var newPrefs = currentPrefs.filter(pref => {
-                                                        if (typeof pref === "string") return false
-                                                        return pref.name !== screenData.name || pref.model !== screenData.model
-                                                    })
+                                                        if (typeof pref === "string")
+                                                            return false;
+                                                        if (pref.modelIndex !== undefined && screenModelIndex >= 0) {
+                                                            return !(pref.model === screenData.model && pref.modelIndex === screenModelIndex);
+                                                        }
+                                                        return pref.name !== screenData.name || pref.model !== screenData.model;
+                                                    });
 
                                                     if (checked) {
-                                                        newPrefs.push({
+                                                        const prefObj = {
                                                             name: screenData.name,
                                                             model: screenData.model || ""
-                                                        })
+                                                        };
+                                                        if (screenModelIndex >= 0) {
+                                                            prefObj.modelIndex = screenModelIndex;
+                                                        }
+                                                        newPrefs.push(prefObj);
                                                     }
 
-                                                    displaysTab.setScreenPreferences(componentId, newPrefs)
+                                                    displaysTab.setScreenPreferences(componentId, newPrefs);
                                                 }
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

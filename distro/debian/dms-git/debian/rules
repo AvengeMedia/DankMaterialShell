@@ -1,0 +1,77 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Version info from changelog
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+# Go needs writable directories for cache
+export HOME := $(CURDIR)/debian/tmp-home
+export GOCACHE := $(CURDIR)/debian/tmp-home/go-cache
+export GOMODCACHE := $(CURDIR)/debian/tmp-home/go-mod
+
+export GOTOOLCHAIN := local
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Create Go cache directories
+	mkdir -p $(HOME) $(GOCACHE) $(GOMODCACHE)
+
+	# Verify core directory exists (native package format has source at root)
+	test -d core || (echo "ERROR: core directory not found!" && exit 1)
+
+	# Patch go.mod to use Go 1.24 base version (Debian 13 has 1.23.x, may vary)
+	sed -i 's/^go 1\.24\.[0-9]*/go 1.24/' core/go.mod
+
+	# Extract version info for embedding
+	VERSION="$(UPSTREAM_VERSION)"
+	COMMIT=$$(echo "$(UPSTREAM_VERSION)" | grep -oP '(?<=git)[0-9]+\.[a-f0-9]+' | cut -d. -f2 | head -c8 || echo "unknown")
+
+	# Build dms-cli from source using vendored dependencies
+	# Architecture mapping: Debian amd64/arm64 -> Makefile amd64/arm64
+	if [ "$(DEB_HOST_ARCH)" = "amd64" ]; then \
+		MAKE_ARCH=amd64; \
+		BINARY_NAME=dms-linux-amd64; \
+	elif [ "$(DEB_HOST_ARCH)" = "arm64" ]; then \
+		MAKE_ARCH=arm64; \
+		BINARY_NAME=dms-linux-arm64; \
+	else \
+		echo "ERROR: Unsupported architecture: $(DEB_HOST_ARCH)" && exit 1; \
+	fi; \
+	echo "Building with VERSION=$$VERSION COMMIT=$$COMMIT ARCH=$$MAKE_ARCH"; \
+	cd core && $(MAKE) GOFLAGS="-mod=vendor" dist ARCH=$$MAKE_ARCH VERSION="$$VERSION" COMMIT="$$COMMIT"
+
+	# Copy binary to expected location
+	if [ "$(DEB_HOST_ARCH)" = "amd64" ]; then \
+		cp core/bin/dms-linux-amd64 dms; \
+	elif [ "$(DEB_HOST_ARCH)" = "arm64" ]; then \
+		cp core/bin/dms-linux-arm64 dms; \
+	fi
+	chmod +x dms
+
+override_dh_auto_install:
+	install -Dm755 dms debian/dms-git/usr/bin/dms
+
+	mkdir -p debian/dms-git/usr/share/quickshell/dms debian/dms-git/usr/lib/systemd/user
+	if [ -d quickshell ]; then \
+		cp -r quickshell/* debian/dms-git/usr/share/quickshell/dms/; \
+		install -Dm644 quickshell/assets/systemd/dms.service debian/dms-git/usr/lib/systemd/user/dms.service; \
+	else \
+		echo "ERROR: quickshell directory not found!" && \
+		echo "Contents of current directory:" && ls -la && \
+		exit 1; \
+	fi
+
+	rm -rf debian/dms-git/usr/share/quickshell/dms/core \
+		debian/dms-git/usr/share/quickshell/dms/distro
+
+override_dh_auto_clean:
+	# Clean up build artifacts
+	rm -f dms
+	rm -rf core/bin
+	rm -rf debian/tmp-home
+	dh_auto_clean

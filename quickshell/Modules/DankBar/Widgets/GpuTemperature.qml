@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -15,6 +14,9 @@ BasePill {
     property var widgetData: null
     property int selectedGpuIndex: (widgetData && widgetData.selectedGpuIndex !== undefined) ? widgetData.selectedGpuIndex : 0
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
+
+    signal gpuTempClicked
+
     property real displayTemp: {
         if (!DgopService.availableGpus || DgopService.availableGpus.length === 0) {
             return 0;
@@ -29,15 +31,18 @@ BasePill {
 
     function updateWidgetPciId(pciId) {
         const sections = ["left", "center", "right"];
+        const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
+        if (!defaultBar)
+            return;
         for (let s = 0; s < sections.length; s++) {
             const sectionId = sections[s];
             let widgets = [];
             if (sectionId === "left") {
-                widgets = SettingsData.dankBarLeftWidgets.slice();
+                widgets = (defaultBar.leftWidgets || []).slice();
             } else if (sectionId === "center") {
-                widgets = SettingsData.dankBarCenterWidgets.slice();
+                widgets = (defaultBar.centerWidgets || []).slice();
             } else if (sectionId === "right") {
-                widgets = SettingsData.dankBarRightWidgets.slice();
+                widgets = (defaultBar.rightWidgets || []).slice();
             }
             for (let i = 0; i < widgets.length; i++) {
                 const widget = widgets[i];
@@ -55,7 +60,7 @@ BasePill {
                     } else if (sectionId === "right") {
                         SettingsData.setDankBarRightWidgets(widgets);
                     }
-                    return ;
+                    return;
                 }
             }
         }
@@ -88,8 +93,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : gpuTempContent.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? gpuTempColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : gpuTempRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? gpuTempColumn.implicitHeight : gpuTempRow.implicitHeight
 
             Column {
                 id: gpuTempColumn
@@ -122,19 +127,20 @@ BasePill {
 
                         return Math.round(root.displayTemp).toString();
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
             Row {
-                id: gpuTempContent
+                id: gpuTempRow
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: 3
+                spacing: Theme.spacingXS
 
                 DankIcon {
+                    id: gpuTempIcon
                     name: "auto_awesome_mosaic"
                     size: Theme.barIconSize(root.barThickness)
                     color: {
@@ -148,36 +154,51 @@ BasePill {
 
                         return Theme.widgetIconColor;
                     }
-                    anchors.verticalCenter: parent.verticalCenter
+
+                    implicitWidth: size
+                    implicitHeight: size
+                    width: size
+                    height: size
                 }
 
-                StyledText {
-                    text: {
-                        if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
-                            return "--°";
-                        }
+                Item {
+                    id: textBox
 
-                        return Math.round(root.displayTemp) + "°";
-                    }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
-                    color: Theme.widgetTextColor
-                    anchors.verticalCenter: parent.verticalCenter
-                    horizontalAlignment: Text.AlignLeft
-                    elide: Text.ElideNone
+                    implicitWidth: root.minimumWidth ? Math.max(gpuTempBaseline.width, gpuTempText.paintedWidth) : gpuTempText.paintedWidth
+                    implicitHeight: gpuTempText.implicitHeight
 
-                    StyledTextMetrics {
-                        id: gpuTempBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
-                        text: "100°"
-                    }
-
-                    width: root.minimumWidth ? Math.max(gpuTempBaseline.width, paintedWidth) : paintedWidth
+                    width: implicitWidth
+                    height: implicitHeight
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 120
+                            duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
                         }
+                    }
+
+                    StyledTextMetrics {
+                        id: gpuTempBaseline
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        text: "88°"
+                    }
+
+                    StyledText {
+                        id: gpuTempText
+                        text: {
+                            if (root.displayTemp === undefined || root.displayTemp === null || root.displayTemp === 0) {
+                                return "--°";
+                            }
+
+                            return Math.round(root.displayTemp) + "°";
+                        }
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        color: Theme.widgetTextColor
+
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideNone
                     }
                 }
             }
@@ -189,16 +210,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
             DgopService.setSortBy("cpu");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "gpu_temp");
-            }
+            gpuTempClicked();
         }
     }
 

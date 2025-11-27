@@ -37,6 +37,19 @@ type WiFiNetwork struct {
 	Mode        string `json:"mode"`
 	Rate        uint32 `json:"rate"`
 	Channel     uint32 `json:"channel"`
+	Device      string `json:"device,omitempty"`
+}
+
+type WiFiDevice struct {
+	Name      string        `json:"name"`
+	HwAddress string        `json:"hwAddress"`
+	State     string        `json:"state"`
+	Connected bool          `json:"connected"`
+	SSID      string        `json:"ssid,omitempty"`
+	BSSID     string        `json:"bssid,omitempty"`
+	Signal    uint8         `json:"signal,omitempty"`
+	IP        string        `json:"ip,omitempty"`
+	Networks  []WiFiNetwork `json:"networks"`
 }
 
 type VPNProfile struct {
@@ -76,11 +89,13 @@ type NetworkState struct {
 	WiFiBSSID              string               `json:"wifiBSSID"`
 	WiFiSignal             uint8                `json:"wifiSignal"`
 	WiFiNetworks           []WiFiNetwork        `json:"wifiNetworks"`
+	WiFiDevices            []WiFiDevice         `json:"wifiDevices"`
 	WiredConnections       []WiredConnection    `json:"wiredConnections"`
 	VPNProfiles            []VPNProfile         `json:"vpnProfiles"`
 	VPNActive              []VPNActive          `json:"vpnActive"`
 	IsConnecting           bool                 `json:"isConnecting"`
 	ConnectingSSID         string               `json:"connectingSSID"`
+	ConnectingDevice       string               `json:"connectingDevice,omitempty"`
 	LastError              string               `json:"lastError"`
 }
 
@@ -91,6 +106,7 @@ type ConnectionRequest struct {
 	AnonymousIdentity string `json:"anonymousIdentity,omitempty"`
 	DomainSuffixMatch string `json:"domainSuffixMatch,omitempty"`
 	Interactive       bool   `json:"interactive,omitempty"`
+	Device            string `json:"device,omitempty"`
 }
 
 type WiredConnection struct {

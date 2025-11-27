@@ -1,0 +1,24 @@
+Source: danksearch
+Section: utils
+Priority: optional
+Maintainer: Avenge Media <AvengeMedia.US@gmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/AvengeMedia/danksearch
+Vcs-Browser: https://github.com/AvengeMedia/danksearch
+Vcs-Git: https://github.com/AvengeMedia/danksearch.git
+
+Package: danksearch
+Architecture: amd64 arm64
+Depends: ${misc:Depends}
+Description: Fast file search utility for DMS
+ DankSearch is a fast file search utility designed for DankMaterialShell.
+ It provides efficient file and content search capabilities with minimal
+ dependencies. This package contains the pre-built binary from the official
+ GitHub release.
+ .
+ Features include:
+  - Fast file searching
+  - Lightweight and efficient
+  - Designed for DMS integration
+  - Minimal resource usage

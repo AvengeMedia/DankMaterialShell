@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+
+	mocks_version "github.com/AvengeMedia/DankMaterialShell/core/internal/mocks/version"
 )
 
 func TestCompareVersions(t *testing.T) {
@@ -33,34 +35,105 @@ func TestCompareVersions(t *testing.T) {
 }
 
 func TestGetDMSVersionInfo_Structure(t *testing.T) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		t.Skip("Cannot get home directory")
-	}
+	// Create a temp directory with a fake DMS installation
+	tempDir := t.TempDir()
+	dmsPath := filepath.Join(tempDir, ".config", "quickshell", "dms")
+	os.MkdirAll(dmsPath, 0755)
 
-	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
-	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
-		t.Skip("DMS not installed, skipping version info test")
-	}
+	// Create a .git directory to simulate git installation
+	os.MkdirAll(filepath.Join(dmsPath, ".git"), 0755)
 
-	info, err := GetDMSVersionInfo()
+	originalHome := os.Getenv("HOME")
+	defer os.Setenv("HOME", originalHome)
+	os.Setenv("HOME", tempDir)
+
+	// Create mock fetcher
+	mockFetcher := mocks_version.NewMockVersionFetcher(t)
+	mockFetcher.EXPECT().GetCurrentVersion(dmsPath).Return("v0.1.0", nil)
+	mockFetcher.EXPECT().GetLatestVersion(dmsPath).Return("v0.1.1", nil)
+
+	info, err := GetDMSVersionInfoWithFetcher(mockFetcher)
 	if err != nil {
-		t.Fatalf("GetDMSVersionInfo() failed: %v", err)
+		t.Fatalf("GetDMSVersionInfoWithFetcher() failed: %v", err)
 	}
 
 	if info == nil {
-		t.Fatal("GetDMSVersionInfo() returned nil")
+		t.Fatal("GetDMSVersionInfoWithFetcher() returned nil")
 	}
 
-	if info.Current == "" {
-		t.Error("Current version is empty")
+	if info.Current != "v0.1.0" {
+		t.Errorf("Current version = %s, expected v0.1.0", info.Current)
 	}
 
-	if info.Latest == "" {
-		t.Error("Latest version is empty")
+	if info.Latest != "v0.1.1" {
+		t.Errorf("Latest version = %s, expected v0.1.1", info.Latest)
+	}
+
+	if !info.HasUpdate {
+		t.Error("HasUpdate should be true when current != latest")
+	}
+
+	if !info.IsTag {
+		t.Error("IsTag should be true for v0.1.0")
 	}
 
 	t.Logf("Current: %s, Latest: %s, HasUpdate: %v", info.Current, info.Latest, info.HasUpdate)
+}
+
+func TestGetDMSVersionInfo_BranchVersion(t *testing.T) {
+	tempDir := t.TempDir()
+	dmsPath := filepath.Join(tempDir, ".config", "quickshell", "dms")
+	os.MkdirAll(dmsPath, 0755)
+	os.MkdirAll(filepath.Join(dmsPath, ".git"), 0755)
+
+	originalHome := os.Getenv("HOME")
+	defer os.Setenv("HOME", originalHome)
+	os.Setenv("HOME", tempDir)
+
+	mockFetcher := mocks_version.NewMockVersionFetcher(t)
+	mockFetcher.EXPECT().GetCurrentVersion(dmsPath).Return("master@abc1234", nil)
+	mockFetcher.EXPECT().GetLatestVersion(dmsPath).Return("master@def5678", nil)
+
+	info, err := GetDMSVersionInfoWithFetcher(mockFetcher)
+	if err != nil {
+		t.Fatalf("GetDMSVersionInfoWithFetcher() failed: %v", err)
+	}
+
+	if !info.IsBranch {
+		t.Error("IsBranch should be true for branch@commit format")
+	}
+
+	if !info.IsGit {
+		t.Error("IsGit should be true for branch@commit format")
+	}
+
+	if !info.HasUpdate {
+		t.Error("HasUpdate should be true when commits differ")
+	}
+}
+
+func TestGetDMSVersionInfo_NoUpdate(t *testing.T) {
+	tempDir := t.TempDir()
+	dmsPath := filepath.Join(tempDir, ".config", "quickshell", "dms")
+	os.MkdirAll(dmsPath, 0755)
+	os.MkdirAll(filepath.Join(dmsPath, ".git"), 0755)
+
+	originalHome := os.Getenv("HOME")
+	defer os.Setenv("HOME", originalHome)
+	os.Setenv("HOME", tempDir)
+
+	mockFetcher := mocks_version.NewMockVersionFetcher(t)
+	mockFetcher.EXPECT().GetCurrentVersion(dmsPath).Return("v0.1.0", nil)
+	mockFetcher.EXPECT().GetLatestVersion(dmsPath).Return("v0.1.0", nil)
+
+	info, err := GetDMSVersionInfoWithFetcher(mockFetcher)
+	if err != nil {
+		t.Fatalf("GetDMSVersionInfoWithFetcher() failed: %v", err)
+	}
+
+	if info.HasUpdate {
+		t.Error("HasUpdate should be false when current == latest")
+	}
 }
 
 func TestGetCurrentDMSVersion_NotInstalled(t *testing.T) {

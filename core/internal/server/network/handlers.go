@@ -135,7 +135,14 @@ func handleGetState(conn net.Conn, req Request, manager *Manager) {
 }
 
 func handleScanWiFi(conn net.Conn, req Request, manager *Manager) {
-	if err := manager.ScanWiFi(); err != nil {
+	device, _ := req.Params["device"].(string)
+	var err error
+	if device != "" {
+		err = manager.ScanWiFiDevice(device)
+	} else {
+		err = manager.ScanWiFi()
+	}
+	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}
@@ -163,6 +170,9 @@ func handleConnectWiFi(conn net.Conn, req Request, manager *Manager) {
 	if username, ok := req.Params["username"].(string); ok {
 		connReq.Username = username
 	}
+	if device, ok := req.Params["device"].(string); ok {
+		connReq.Device = device
+	}
 
 	if interactive, ok := req.Params["interactive"].(bool); ok {
 		connReq.Interactive = interactive
@@ -170,7 +180,7 @@ func handleConnectWiFi(conn net.Conn, req Request, manager *Manager) {
 		state := manager.GetState()
 		alreadyConnected := state.WiFiConnected && state.WiFiSSID == ssid
 
-		if alreadyConnected {
+		if alreadyConnected && connReq.Device == "" {
 			connReq.Interactive = false
 		} else {
 			networkInfo, err := manager.GetNetworkInfo(ssid)
@@ -200,7 +210,14 @@ func handleConnectWiFi(conn net.Conn, req Request, manager *Manager) {
 }
 
 func handleDisconnectWiFi(conn net.Conn, req Request, manager *Manager) {
-	if err := manager.DisconnectWiFi(); err != nil {
+	device, _ := req.Params["device"].(string)
+	var err error
+	if device != "" {
+		err = manager.DisconnectWiFiDevice(device)
+	} else {
+		err = manager.DisconnectWiFi()
+	}
+	if err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

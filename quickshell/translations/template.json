@@ -7,6 +7,20 @@
     "comment": ""
   },
   {
+    "term": "%1 display(s)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "%1 widgets",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "(Unnamed)",
     "translation": "",
     "context": "",
@@ -106,6 +120,13 @@
   },
   {
     "term": "Add",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Add Bar",
     "translation": "",
     "context": "",
     "reference": "",
@@ -532,6 +553,20 @@
     "comment": ""
   },
   {
+    "term": "Bar Configurations",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Bar Transparency",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Battery",
     "translation": "",
     "context": "",
@@ -756,6 +791,13 @@
     "comment": ""
   },
   {
+    "term": "Change bar appearance",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Changes:",
     "translation": "",
     "context": "",
@@ -770,6 +812,13 @@
     "comment": ""
   },
   {
+    "term": "Choose Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose Launcher Logo Color",
     "translation": "",
     "context": "",
@@ -778,6 +827,13 @@
   },
   {
     "term": "Choose icon",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose the background color for widgets",
     "translation": "",
     "context": "",
     "reference": "",
@@ -862,6 +918,13 @@
   },
   {
     "term": "Close",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Close Overview on Launch",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1071,20 +1134,6 @@
     "comment": ""
   },
   {
-    "term": "Controls opacity of individual widgets inside DankBar",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Controls opacity of the DankBar panel background",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Copied to clipboard",
     "translation": "",
     "context": "",
@@ -1281,20 +1330,6 @@
     "comment": ""
   },
   {
-    "term": "Dank Bar Transparency",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Dank Bar Widget Transparency",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "DankBar Font Scale",
     "translation": "",
     "context": "",
@@ -1450,6 +1485,13 @@
   },
   {
     "term": "Dismiss",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Display Assignment",
     "translation": "",
     "context": "",
     "reference": "",
@@ -1639,6 +1681,13 @@
   },
   {
     "term": "Enable Autoconnect",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Enable Bar",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2324,6 +2373,13 @@
     "comment": ""
   },
   {
+    "term": "Individual bar configuration",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Inhibit idle timeout when audio or video is playing",
     "translation": "",
     "context": "",
@@ -2387,7 +2443,21 @@
     "comment": ""
   },
   {
+    "term": "Keep Awake",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Keep Changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Keeping Awake",
     "translation": "",
     "context": "",
     "reference": "",
@@ -2604,6 +2674,13 @@
     "comment": ""
   },
   {
+    "term": "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Manual Coordinates",
     "translation": "",
     "context": "",
@@ -2751,6 +2828,13 @@
     "comment": ""
   },
   {
+    "term": "Media Volume OSD",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Memory",
     "translation": "",
     "context": "",
@@ -2780,6 +2864,13 @@
   },
   {
     "term": "Microphone Mute OSD",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Middle Section",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3878,6 +3969,13 @@
     "comment": ""
   },
   {
+    "term": "Save password",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Saved",
     "translation": "",
     "context": "",
@@ -3969,9 +4067,37 @@
     "comment": ""
   },
   {
+    "term": "Select Custom Theme",
+    "translation": "",
+    "context": "custom theme file browser title",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Select Launcher Logo",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select Profile Image",
+    "translation": "",
+    "context": "profile image file browser title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select Wallpaper",
+    "translation": "",
+    "context": "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Select Wallpaper Directory",
+    "translation": "",
+    "context": "wallpaper directory file browser title",
     "reference": "",
     "comment": ""
   },
@@ -4083,7 +4209,7 @@
   {
     "term": "Settings",
     "translation": "",
-    "context": "",
+    "context": "settings window title",
     "reference": "",
     "comment": ""
   },
@@ -4243,6 +4369,13 @@
   },
   {
     "term": "Show on-screen display when idle inhibitor state changes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show on-screen display when media player volume changes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4538,7 +4671,7 @@
   {
     "term": "System Monitor",
     "translation": "",
-    "context": "",
+    "context": "sysmon window title",
     "reference": "",
     "comment": ""
   },
@@ -4579,13 +4712,6 @@
   },
   {
     "term": "System Updates",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "System bar with widgets and system information",
     "translation": "",
     "context": "",
     "reference": "",
@@ -4761,6 +4887,13 @@
   },
   {
     "term": "Toggle top bar visibility manually (can be controlled via IPC)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Toggle visibility of this bar configuration",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5194,6 +5327,13 @@
     "comment": ""
   },
   {
+    "term": "Widget Background Color",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Widget Management",
     "translation": "",
     "context": "",
@@ -5201,7 +5341,21 @@
     "comment": ""
   },
   {
+    "term": "Widget Style",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Widget Styling",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Widget Transparency",
     "translation": "",
     "context": "",
     "reference": "",

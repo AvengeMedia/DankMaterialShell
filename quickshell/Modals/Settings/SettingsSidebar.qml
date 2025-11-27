@@ -10,47 +10,59 @@ Rectangle {
 
     property int currentIndex: 0
     property var parentModal: null
-    readonly property var sidebarItems: [{
-        "text": I18n.tr("Personalization"),
-        "icon": "person"
-    }, {
-        "text": I18n.tr("Time & Weather"),
-        "icon": "schedule"
-    }, {
-        "text": I18n.tr("Dank Bar"),
-        "icon": "toolbar"
-    }, {
-        "text": I18n.tr("Widgets"),
-        "icon": "widgets"
-    }, {
-        "text": I18n.tr("Dock"),
-        "icon": "dock_to_bottom"
-    }, {
-        "text": I18n.tr("Displays"),
-        "icon": "monitor"
-    }, {
-        "text": I18n.tr("Launcher"),
-        "icon": "apps"
-    }, {
-        "text": I18n.tr("Theme & Colors"),
-        "icon": "palette"
-    }, {
-        "text": I18n.tr("Power & Security"),
-        "icon": "power"
-    }, {
-        "text": I18n.tr("Plugins"),
-        "icon": "extension"
-    }, {
-        "text": I18n.tr("About"),
-        "icon": "info"
-    }]
+    readonly property var sidebarItems: [
+        {
+            "text": I18n.tr("Personalization"),
+            "icon": "person"
+        },
+        {
+            "text": I18n.tr("Time & Weather"),
+            "icon": "schedule"
+        },
+        {
+            "text": I18n.tr("Dank Bar"),
+            "icon": "toolbar"
+        },
+        {
+            "text": I18n.tr("Widgets"),
+            "icon": "widgets"
+        },
+        {
+            "text": I18n.tr("Dock"),
+            "icon": "dock_to_bottom"
+        },
+        {
+            "text": I18n.tr("Displays"),
+            "icon": "monitor"
+        },
+        {
+            "text": I18n.tr("Launcher"),
+            "icon": "apps"
+        },
+        {
+            "text": I18n.tr("Theme & Colors"),
+            "icon": "palette"
+        },
+        {
+            "text": I18n.tr("Power & Security"),
+            "icon": "power"
+        },
+        {
+            "text": I18n.tr("Plugins"),
+            "icon": "extension"
+        },
+        {
+            "text": I18n.tr("About"),
+            "icon": "info"
+        }
+    ]
 
     function navigateNext() {
-        currentIndex = (currentIndex + 1) % sidebarItems.length
+        currentIndex = (currentIndex + 1) % sidebarItems.length;
     }
 
     function navigatePrevious() {
-        currentIndex = (currentIndex - 1 + sidebarItems.length) % sidebarItems.length
+        currentIndex = (currentIndex - 1 + sidebarItems.length) % sidebarItems.length;
     }
 
     width: 270
@@ -61,31 +73,32 @@ Rectangle {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: sidebarColumn.implicitHeight
+        contentHeight: sidebarColumn.height
 
         Column {
             id: sidebarColumn
 
-            anchors.fill: parent
-            anchors.leftMargin: Theme.spacingS
-            anchors.rightMargin: Theme.spacingS
-            anchors.bottomMargin: Theme.spacingS
-            anchors.topMargin: Theme.spacingM + 2
+            width: parent.width
+            leftPadding: Theme.spacingS
+            rightPadding: Theme.spacingS
+            bottomPadding: Theme.spacingL
+            topPadding: Theme.spacingM + 2
             spacing: Theme.spacingXS
 
             ProfileSection {
+                width: parent.width - parent.leftPadding - parent.rightPadding
                 parentModal: sidebarContainer.parentModal
             }
 
             Rectangle {
-                width: parent.width - Theme.spacingS * 2
+                width: parent.width - parent.leftPadding - parent.rightPadding
                 height: 1
                 color: Theme.outline
                 opacity: 0.2
             }
 
             Item {
-                width: parent.width
+                width: parent.width - parent.leftPadding - parent.rightPadding
                 height: Theme.spacingL
             }
 
@@ -100,7 +113,7 @@ Rectangle {
 
                     property bool isActive: sidebarContainer.currentIndex === index
 
-                    width: parent.width
+                    width: parent.width - parent.leftPadding - parent.rightPadding
                     height: 44
                     radius: Theme.cornerRadius
                     color: isActive ? Theme.primary : tabMouseArea.containsMouse ? Theme.surfaceHover : "transparent"
@@ -125,7 +138,6 @@ Rectangle {
                             font.weight: parent.parent.isActive ? Font.Medium : Font.Normal
                             anchors.verticalCenter: parent.verticalCenter
                         }
-
                     }
 
                     MouseArea {
@@ -144,15 +156,9 @@ Rectangle {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

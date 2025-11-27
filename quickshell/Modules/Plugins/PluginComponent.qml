@@ -1,7 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Services
-import qs.Widgets
 
 Item {
     id: root
@@ -13,6 +11,8 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property string pluginId: ""
     property var pluginService: null
 
@@ -33,8 +33,8 @@ Item {
     property Component ccDetailContent: null
     property real ccDetailHeight: 250
 
-    signal ccWidgetToggled()
-    signal ccWidgetExpanded()
+    signal ccWidgetToggled
+    signal ccWidgetExpanded
 
     property var pluginData: ({})
     property var variants: []
@@ -45,55 +45,55 @@ Item {
     readonly property bool hasPopout: popoutContent !== null
 
     Component.onCompleted: {
-        loadPluginData()
+        loadPluginData();
     }
 
     onPluginServiceChanged: {
-        loadPluginData()
+        loadPluginData();
     }
 
     onPluginIdChanged: {
-        loadPluginData()
+        loadPluginData();
     }
 
     Connections {
         target: pluginService
         function onPluginDataChanged(changedPluginId) {
             if (changedPluginId === pluginId) {
-                loadPluginData()
+                loadPluginData();
             }
         }
     }
 
     function loadPluginData() {
         if (!pluginService || !pluginId) {
-            pluginData = {}
-            variants = []
-            return
+            pluginData = {};
+            variants = [];
+            return;
         }
-        pluginData = SettingsData.getPluginSettingsForPlugin(pluginId)
-        variants = pluginService.getPluginVariants(pluginId)
+        pluginData = SettingsData.getPluginSettingsForPlugin(pluginId);
+        variants = pluginService.getPluginVariants(pluginId);
     }
 
     function createVariant(variantName, variantConfig) {
         if (!pluginService || !pluginId) {
-            return null
+            return null;
         }
-        return pluginService.createPluginVariant(pluginId, variantName, variantConfig)
+        return pluginService.createPluginVariant(pluginId, variantName, variantConfig);
     }
 
     function removeVariant(variantId) {
         if (!pluginService || !pluginId) {
-            return
+            return;
         }
-        pluginService.removePluginVariant(pluginId, variantId)
+        pluginService.removePluginVariant(pluginId, variantId);
     }
 
     function updateVariant(variantId, variantConfig) {
         if (!pluginService || !pluginId) {
-            return
+            return;
         }
-        pluginService.updatePluginVariant(pluginId, variantId, variantConfig)
+        pluginService.updatePluginVariant(pluginId, variantId, variantConfig);
     }
 
     width: isVertical ? (hasVerticalPill ? verticalPill.width : 0) : (hasHorizontalPill ? horizontalPill.width : 0)
@@ -108,30 +108,32 @@ Item {
         parentScreen: root.parentScreen
         widgetThickness: root.widgetThickness
         barThickness: root.barThickness
+        barSpacing: root.barSpacing
+        barConfig: root.barConfig
         content: root.horizontalBarPill
         onClicked: {
             if (pillClickAction) {
                 if (pillClickAction.length === 0) {
-                    pillClickAction()
+                    pillClickAction();
                 } else {
-                    const globalPos = mapToGlobal(0, 0)
-                    const currentScreen = parentScreen || Screen
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                    const globalPos = mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
+                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
                 }
             } else if (hasPopout) {
-                pluginPopout.toggle()
+                pluginPopout.toggle();
             }
         }
         onRightClicked: {
             if (pillRightClickAction) {
                 if (pillRightClickAction.length === 0) {
-                    pillRightClickAction()
+                    pillRightClickAction();
                 } else {
-                    const globalPos = mapToGlobal(0, 0)
-                    const currentScreen = parentScreen || Screen
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                    const globalPos = mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
+                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen);
                 }
             }
         }
@@ -146,31 +148,33 @@ Item {
         parentScreen: root.parentScreen
         widgetThickness: root.widgetThickness
         barThickness: root.barThickness
+        barSpacing: root.barSpacing
+        barConfig: root.barConfig
         content: root.verticalBarPill
         isVerticalOrientation: true
         onClicked: {
             if (pillClickAction) {
                 if (pillClickAction.length === 0) {
-                    pillClickAction()
+                    pillClickAction();
                 } else {
-                    const globalPos = mapToGlobal(0, 0)
-                    const currentScreen = parentScreen || Screen
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                    const globalPos = mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
+                    pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
                 }
             } else if (hasPopout) {
-                pluginPopout.toggle()
+                pluginPopout.toggle();
             }
         }
         onRightClicked: {
             if (pillRightClickAction) {
                 if (pillRightClickAction.length === 0) {
-                    pillRightClickAction()
+                    pillRightClickAction();
                 } else {
-                    const globalPos = mapToGlobal(0, 0)
-                    const currentScreen = parentScreen || Screen
-                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width)
-                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen)
+                    const globalPos = mapToGlobal(0, 0);
+                    const currentScreen = parentScreen || Screen;
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, width);
+                    pillRightClickAction(pos.x, pos.y, pos.width, section, currentScreen);
                 }
             }
         }
@@ -178,8 +182,34 @@ Item {
 
     function closePopout() {
         if (pluginPopout) {
-            pluginPopout.close()
+            pluginPopout.close();
         }
+    }
+
+    function triggerPopout() {
+        if (pillClickAction) {
+            if (pillClickAction.length === 0) {
+                pillClickAction();
+                return;
+            }
+            const pill = isVertical ? verticalPill : horizontalPill;
+            const globalPos = pill.mapToGlobal(0, 0);
+            const currentScreen = parentScreen || Screen;
+            const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.width);
+            pillClickAction(pos.x, pos.y, pos.width, section, currentScreen);
+            return;
+        }
+        if (!hasPopout)
+            return;
+
+        const pill = isVertical ? verticalPill : horizontalPill;
+        const globalPos = pill.visualContent.mapToGlobal(0, 0);
+        const currentScreen = parentScreen || Screen;
+        const barPosition = axis?.edge === "left" ? 2 : (axis?.edge === "right" ? 3 : (axis?.edge === "top" ? 0 : 1));
+        const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, pill.visualWidth, barSpacing, barPosition, barConfig);
+
+        pluginPopout.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen, barPosition, barThickness, barSpacing, barConfig);
+        pluginPopout.toggle();
     }
 
     PluginPopout {

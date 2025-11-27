@@ -1,9 +1,5 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
-import Quickshell.Widgets
 import qs.Common
-import qs.Modals
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
@@ -18,19 +14,20 @@ Item {
         browserType: "generic"
         filterExtensions: ["*.svg", "*.png", "*.jpg", "*.jpeg", "*.webp"]
         onFileSelected: path => {
-            SettingsData.set("launcherLogoCustomPath", path.replace("file://", ""))
+            SettingsData.set("launcherLogoCustomPath", path.replace("file://", ""));
         }
     }
 
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             StyledRect {
@@ -38,8 +35,7 @@ Item {
                 height: launcherLogoSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -85,41 +81,47 @@ Item {
                             id: logoModeGroup
                             anchors.horizontalCenter: parent.horizontalCenter
                             model: {
-                                const modes = [I18n.tr("Apps Icon"), I18n.tr("OS Logo"), I18n.tr("Dank")]
+                                const modes = [I18n.tr("Apps Icon"), I18n.tr("OS Logo"), I18n.tr("Dank")];
                                 if (CompositorService.isNiri) {
-                                    modes.push("niri")
+                                    modes.push("niri");
                                 } else if (CompositorService.isHyprland) {
-                                    modes.push("Hyprland")
+                                    modes.push("Hyprland");
                                 } else if (CompositorService.isDwl) {
-                                    modes.push("mango")
+                                    modes.push("mango");
                                 } else if (CompositorService.isSway) {
-                                    modes.push("Sway")
+                                    modes.push("Sway");
                                 } else {
-                                    modes.push(I18n.tr("Compositor"))
+                                    modes.push(I18n.tr("Compositor"));
                                 }
-                                modes.push(I18n.tr("Custom"))
-                                return modes
+                                modes.push(I18n.tr("Custom"));
+                                return modes;
                             }
                             currentIndex: {
-                                if (SettingsData.launcherLogoMode === "apps") return 0
-                                if (SettingsData.launcherLogoMode === "os") return 1
-                                if (SettingsData.launcherLogoMode === "dank") return 2
-                                if (SettingsData.launcherLogoMode === "compositor") return 3
-                                if (SettingsData.launcherLogoMode === "custom") return 4
-                                return 0
+                                if (SettingsData.launcherLogoMode === "apps")
+                                    return 0;
+                                if (SettingsData.launcherLogoMode === "os")
+                                    return 1;
+                                if (SettingsData.launcherLogoMode === "dank")
+                                    return 2;
+                                if (SettingsData.launcherLogoMode === "compositor")
+                                    return 3;
+                                if (SettingsData.launcherLogoMode === "custom")
+                                    return 4;
+                                return 0;
                             }
                             onSelectionChanged: (index, selected) => {
-                                if (!selected) return
+                                if (!selected)
+                                    return;
                                 if (index === 0) {
-                                    SettingsData.set("launcherLogoMode", "apps")
+                                    SettingsData.set("launcherLogoMode", "apps");
                                 } else if (index === 1) {
-                                    SettingsData.set("launcherLogoMode", "os")
+                                    SettingsData.set("launcherLogoMode", "os");
                                 } else if (index === 2) {
-                                    SettingsData.set("launcherLogoMode", "dank")
+                                    SettingsData.set("launcherLogoMode", "dank");
                                 } else if (index === 3) {
-                                    SettingsData.set("launcherLogoMode", "compositor")
+                                    SettingsData.set("launcherLogoMode", "compositor");
                                 } else if (index === 4) {
-                                    SettingsData.set("launcherLogoMode", "custom")
+                                    SettingsData.set("launcherLogoMode", "custom");
                                 }
                             }
                         }
@@ -200,25 +202,29 @@ Item {
                                     id: colorModeGroup
                                     model: [I18n.tr("Default"), I18n.tr("Primary"), I18n.tr("Surface"), I18n.tr("Custom")]
                                     currentIndex: {
-                                        const override = SettingsData.launcherLogoColorOverride
-                                        if (override === "") return 0
-                                        if (override === "primary") return 1
-                                        if (override === "surface") return 2
-                                        return 3
+                                        const override = SettingsData.launcherLogoColorOverride;
+                                        if (override === "")
+                                            return 0;
+                                        if (override === "primary")
+                                            return 1;
+                                        if (override === "surface")
+                                            return 2;
+                                        return 3;
                                     }
                                     onSelectionChanged: (index, selected) => {
-                                        if (!selected) return
+                                        if (!selected)
+                                            return;
                                         if (index === 0) {
-                                            SettingsData.set("launcherLogoColorOverride", "")
+                                            SettingsData.set("launcherLogoColorOverride", "");
                                         } else if (index === 1) {
-                                            SettingsData.set("launcherLogoColorOverride", "primary")
+                                            SettingsData.set("launcherLogoColorOverride", "primary");
                                         } else if (index === 2) {
-                                            SettingsData.set("launcherLogoColorOverride", "surface")
+                                            SettingsData.set("launcherLogoColorOverride", "surface");
                                         } else if (index === 3) {
-                                            const currentOverride = SettingsData.launcherLogoColorOverride
-                                            const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface"
+                                            const currentOverride = SettingsData.launcherLogoColorOverride;
+                                            const isPreset = currentOverride === "" || currentOverride === "primary" || currentOverride === "surface";
                                             if (isPreset) {
-                                                SettingsData.set("launcherLogoColorOverride", "#ffffff")
+                                                SettingsData.set("launcherLogoColorOverride", "#ffffff");
                                             }
                                         }
                                     }
@@ -226,18 +232,18 @@ Item {
 
                                 Rectangle {
                                     visible: {
-                                        const override = SettingsData.launcherLogoColorOverride
-                                        return override !== "" && override !== "primary" && override !== "surface"
+                                        const override = SettingsData.launcherLogoColorOverride;
+                                        return override !== "" && override !== "primary" && override !== "surface";
                                     }
                                     width: 36
                                     height: 36
                                     radius: 18
                                     color: {
-                                        const override = SettingsData.launcherLogoColorOverride
+                                        const override = SettingsData.launcherLogoColorOverride;
                                         if (override !== "" && override !== "primary" && override !== "surface") {
-                                            return override
+                                            return override;
                                         }
-                                        return "#ffffff"
+                                        return "#ffffff";
                                     }
                                     border.color: Theme.outline
                                     border.width: 1
@@ -248,12 +254,12 @@ Item {
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
                                             if (PopoutService.colorPickerModal) {
-                                                PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride
-                                                PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color")
-                                                PopoutService.colorPickerModal.onColorSelectedCallback = function(selectedColor) {
-                                                    SettingsData.set("launcherLogoColorOverride", selectedColor)
-                                                }
-                                                PopoutService.colorPickerModal.show()
+                                                PopoutService.colorPickerModal.selectedColor = SettingsData.launcherLogoColorOverride;
+                                                PopoutService.colorPickerModal.pickerTitle = I18n.tr("Choose Launcher Logo Color");
+                                                PopoutService.colorPickerModal.onColorSelectedCallback = function (selectedColor) {
+                                                    SettingsData.set("launcherLogoColorOverride", selectedColor);
+                                                };
+                                                PopoutService.colorPickerModal.show();
                                             }
                                         }
                                     }
@@ -290,7 +296,7 @@ Item {
                                     thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     onSliderValueChanged: newValue => {
-                                        SettingsData.set("launcherLogoSizeOffset", newValue)
+                                        SettingsData.set("launcherLogoSizeOffset", newValue);
                                     }
                                 }
                             }
@@ -300,8 +306,8 @@ Item {
                             width: parent.width
                             height: customControlsFlow.height
                             visible: {
-                                const override = SettingsData.launcherLogoColorOverride
-                                return override !== "" && override !== "primary" && override !== "surface"
+                                const override = SettingsData.launcherLogoColorOverride;
+                                return override !== "" && override !== "primary" && override !== "surface";
                             }
                             opacity: visible ? 1 : 0
 
@@ -341,7 +347,7 @@ Item {
                                         thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onSliderValueChanged: newValue => {
-                                            SettingsData.set("launcherLogoBrightness", newValue / 100)
+                                            SettingsData.set("launcherLogoBrightness", newValue / 100);
                                         }
                                     }
                                 }
@@ -370,7 +376,7 @@ Item {
                                         thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onSliderValueChanged: newValue => {
-                                            SettingsData.set("launcherLogoContrast", newValue / 100)
+                                            SettingsData.set("launcherLogoContrast", newValue / 100);
                                         }
                                     }
                                 }
@@ -393,7 +399,7 @@ Item {
                                         checked: SettingsData.launcherLogoColorInvertOnMode
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         onToggled: checked => {
-                                            SettingsData.set("launcherLogoColorInvertOnMode", checked)
+                                            SettingsData.set("launcherLogoColorInvertOnMode", checked);
                                         }
                                     }
                                 }
@@ -408,8 +414,7 @@ Item {
                 height: launchPrefixSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -452,7 +457,7 @@ Item {
                         text: SettingsData.launchPrefix
                         placeholderText: I18n.tr("Enter launch prefix (e.g., 'uwsm-app')")
                         onTextEdited: {
-                            SettingsData.set("launchPrefix", text)
+                            SettingsData.set("launchPrefix", text);
                         }
                     }
                 }
@@ -463,8 +468,7 @@ Item {
                 height: sortingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -494,9 +498,7 @@ Item {
                         }
 
                         Item {
-                            width: parent.width - parent.children[0].width
-                                   - parent.children[1].width
-                                   - sortToggle.width - Theme.spacingM * 3
+                            width: parent.width - parent.children[0].width - parent.children[1].width - sortToggle.width - Theme.spacingM * 3
                             height: 1
                         }
 
@@ -508,7 +510,7 @@ Item {
                             checked: SettingsData.sortAppsAlphabetically
                             anchors.verticalCenter: parent.verticalCenter
                             onToggled: checked => {
-                                SettingsData.set("sortAppsAlphabetically", checked)
+                                SettingsData.set("sortAppsAlphabetically", checked);
                             }
                         }
                     }
@@ -528,8 +530,7 @@ Item {
                 height: gridColumnsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -584,7 +585,7 @@ Item {
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             anchors.horizontalCenter: parent.horizontalCenter
                             onSliderValueChanged: newValue => {
-                                SettingsData.set("appLauncherGridColumns", newValue)
+                                SettingsData.set("appLauncherGridColumns", newValue);
                             }
                         }
                     }
@@ -596,8 +597,7 @@ Item {
                 height: niriOverviewSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: CompositorService.isNiri
 
@@ -628,9 +628,7 @@ Item {
                         }
 
                         Item {
-                            width: parent.width - parent.children[0].width
-                                   - parent.children[1].width
-                                   - niriOverviewToggle.width - Theme.spacingM * 3
+                            width: parent.width - parent.children[0].width - parent.children[1].width - niriOverviewToggle.width - Theme.spacingM * 3
                             height: 1
                         }
 
@@ -642,7 +640,7 @@ Item {
                             checked: SettingsData.spotlightCloseNiriOverview
                             anchors.verticalCenter: parent.verticalCenter
                             onToggled: checked => {
-                                SettingsData.set("spotlightCloseNiriOverview", checked)
+                                SettingsData.set("spotlightCloseNiriOverview", checked);
                             }
                         }
                     }
@@ -662,36 +660,33 @@ Item {
                 height: recentlyUsedSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
                     id: recentlyUsedSection
 
                     property var rankedAppsModel: {
-                        var apps = []
-                        for (var appId in (AppUsageHistoryData.appUsageRanking
-                                           || {})) {
-                            var appData = (AppUsageHistoryData.appUsageRanking
-                                           || {})[appId]
+                        var apps = [];
+                        for (var appId in (AppUsageHistoryData.appUsageRanking || {})) {
+                            var appData = (AppUsageHistoryData.appUsageRanking || {})[appId];
                             apps.push({
-                                          "id": appId,
-                                          "name": appData.name,
-                                          "exec": appData.exec,
-                                          "icon": appData.icon,
-                                          "comment": appData.comment,
-                                          "usageCount": appData.usageCount,
-                                          "lastUsed": appData.lastUsed
-                                      })
+                                "id": appId,
+                                "name": appData.name,
+                                "exec": appData.exec,
+                                "icon": appData.icon,
+                                "comment": appData.comment,
+                                "usageCount": appData.usageCount,
+                                "lastUsed": appData.lastUsed
+                            });
                         }
                         apps.sort(function (a, b) {
                             if (a.usageCount !== b.usageCount)
-                                return b.usageCount - a.usageCount
+                                return b.usageCount - a.usageCount;
 
-                            return a.name.localeCompare(b.name)
-                        })
-                        return apps.slice(0, 20)
+                            return a.name.localeCompare(b.name);
+                        });
+                        return apps.slice(0, 20);
                     }
 
                     anchors.fill: parent
@@ -718,9 +713,7 @@ Item {
                         }
 
                         Item {
-                            width: parent.width - parent.children[0].width
-                                   - parent.children[1].width
-                                   - clearAllButton.width - Theme.spacingM * 3
+                            width: parent.width - parent.children[0].width - parent.children[1].width - clearAllButton.width - Theme.spacingM * 3
                             height: 1
                         }
 
@@ -732,8 +725,8 @@ Item {
                             iconColor: Theme.error
                             anchors.verticalCenter: parent.verticalCenter
                             onClicked: {
-                                AppUsageHistoryData.appUsageRanking = {}
-                                AppUsageHistoryData.saveSettings()
+                                AppUsageHistoryData.appUsageRanking = {};
+                                AppUsageHistoryData.saveSettings();
                             }
                         }
                     }
@@ -759,12 +752,8 @@ Item {
                                 width: rankedAppsList.width
                                 height: 48
                                 radius: Theme.cornerRadius
-                                color: Qt.rgba(Theme.surfaceContainer.r,
-                                               Theme.surfaceContainer.g,
-                                               Theme.surfaceContainer.b, 0.3)
-                                border.color: Qt.rgba(Theme.outline.r,
-                                                      Theme.outline.g,
-                                                      Theme.outline.b, 0.1)
+                                color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.3)
+                                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
                                 border.width: 0
 
                                 Row {
@@ -792,7 +781,7 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         onStatusChanged: {
                                             if (status === Image.Error)
-                                                source = "image://icon/application-x-executable"
+                                                source = "image://icon/application-x-executable";
                                         }
                                     }
 
@@ -801,8 +790,7 @@ Item {
                                         spacing: 2
 
                                         StyledText {
-                                            text: modelData.name
-                                                  || "Unknown App"
+                                            text: modelData.name || "Unknown App"
                                             font.pixelSize: Theme.fontSizeMedium
                                             font.weight: Font.Medium
                                             color: Theme.surfaceText
@@ -811,37 +799,27 @@ Item {
                                         StyledText {
                                             text: {
                                                 if (!modelData.lastUsed)
-                                                    return "Never used"
+                                                    return "Never used";
 
-                                                var date = new Date(modelData.lastUsed)
-                                                var now = new Date()
-                                                var diffMs = now - date
-                                                var diffMins = Math.floor(
-                                                            diffMs / (1000 * 60))
-                                                var diffHours = Math.floor(
-                                                            diffMs / (1000 * 60 * 60))
-                                                var diffDays = Math.floor(
-                                                            diffMs / (1000 * 60 * 60 * 24))
+                                                var date = new Date(modelData.lastUsed);
+                                                var now = new Date();
+                                                var diffMs = now - date;
+                                                var diffMins = Math.floor(diffMs / (1000 * 60));
+                                                var diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                                                var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                                                 if (diffMins < 1)
-                                                    return I18n.tr("Last launched just now")
+                                                    return I18n.tr("Last launched just now");
 
                                                 if (diffMins < 60)
-                                                    return I18n.tr("Last launched %1 minute%2 ago")
-                                                            .arg(diffMins)
-                                                            .arg(diffMins === 1 ? "" : "s")
+                                                    return I18n.tr("Last launched %1 minute%2 ago").arg(diffMins).arg(diffMins === 1 ? "" : "s");
 
                                                 if (diffHours < 24)
-                                                    return I18n.tr("Last launched %1 hour%2 ago")
-                                                            .arg(diffHours)
-                                                            .arg(diffHours === 1 ? "" : "s")
+                                                    return I18n.tr("Last launched %1 hour%2 ago").arg(diffHours).arg(diffHours === 1 ? "" : "s");
 
                                                 if (diffDays < 7)
-                                                    return I18n.tr("Last launched %1 day%2 ago")
-                                                            .arg(diffDays)
-                                                            .arg(diffDays === 1 ? "" : "s")
+                                                    return I18n.tr("Last launched %1 day%2 ago").arg(diffDays).arg(diffDays === 1 ? "" : "s");
 
-                                                return I18n.tr("Last launched %1")
-                                                        .arg(date.toLocaleDateString())
+                                                return I18n.tr("Last launched %1").arg(date.toLocaleDateString());
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
@@ -858,13 +836,10 @@ Item {
                                     iconSize: 16
                                     iconColor: Theme.error
                                     onClicked: {
-                                        var currentRanking = Object.assign(
-                                                    {},
-                                                    AppUsageHistoryData.appUsageRanking
-                                                    || {})
-                                        delete currentRanking[modelData.id]
-                                        AppUsageHistoryData.appUsageRanking = currentRanking
-                                        AppUsageHistoryData.saveSettings()
+                                        var currentRanking = Object.assign({}, AppUsageHistoryData.appUsageRanking || {});
+                                        delete currentRanking[modelData.id];
+                                        AppUsageHistoryData.appUsageRanking = currentRanking;
+                                        AppUsageHistoryData.saveSettings();
                                     }
                                 }
                             }
@@ -872,8 +847,7 @@ Item {
 
                         StyledText {
                             width: parent.width
-                            text: recentlyUsedSection.rankedAppsModel.length
-                                  === 0 ? "No apps have been launched yet." : ""
+                            text: recentlyUsedSection.rankedAppsModel.length === 0 ? "No apps have been launched yet." : ""
                             font.pixelSize: Theme.fontSizeMedium
                             color: Theme.surfaceVariantText
                             horizontalAlignment: Text.AlignHCenter

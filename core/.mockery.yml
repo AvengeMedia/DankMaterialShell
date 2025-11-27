@@ -28,7 +28,7 @@ packages:
       outpkg: mocks_brightness
     interfaces:
       DBusConn:
-  github.com/AvengeMedia/danklinux/internal/server/network:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/network:
     config:
       dir: "internal/mocks/network"
       outpkg: mocks_network
@@ -46,3 +46,9 @@ packages:
       outpkg: mocks_evdev
     interfaces:
       EvdevDevice:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/version:
+    config:
+      dir: "internal/mocks/version"
+      outpkg: mocks_version
+    interfaces:
+      VersionFetcher:

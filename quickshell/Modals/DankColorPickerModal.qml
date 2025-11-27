@@ -1,8 +1,6 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -14,11 +12,11 @@ DankModal {
     layerNamespace: "dms:color-picker"
 
     HyprlandFocusGrab {
-        windows: [root]
+        windows: [root.contentWindow]
         active: CompositorService.isHyprland && root.shouldHaveFocus
     }
 
-    property string pickerTitle: "Choose Color"
+    property string pickerTitle: I18n.tr("Choose Color")
     property color selectedColor: SessionData.recentColors.length > 0 ? SessionData.recentColors[0] : Theme.primary
     property var onColorSelectedCallback: null
 
@@ -32,87 +30,79 @@ DankModal {
     property real gradientX: 0
     property real gradientY: 0
 
-    readonly property var standardColors: [
-        "#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4",
-        "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722",
-        "#d32f2f", "#c2185b", "#7b1fa2", "#512da8", "#303f9f", "#1976d2", "#0288d1", "#0097a7",
-        "#00796b", "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000", "#f57c00", "#e64a19",
-        "#c62828", "#ad1457", "#6a1b9a", "#4527a0", "#283593", "#1565c0", "#0277bd", "#00838f",
-        "#00695c", "#2e7d32", "#558b2f", "#9e9d24", "#f9a825", "#ff8f00", "#ef6c00", "#d84315",
-        "#ffffff", "#9e9e9e", "#212121"
-    ]
+    readonly property var standardColors: ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#d32f2f", "#c2185b", "#7b1fa2", "#512da8", "#303f9f", "#1976d2", "#0288d1", "#0097a7", "#00796b", "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000", "#f57c00", "#e64a19", "#c62828", "#ad1457", "#6a1b9a", "#4527a0", "#283593", "#1565c0", "#0277bd", "#00838f", "#00695c", "#2e7d32", "#558b2f", "#9e9d24", "#f9a825", "#ff8f00", "#ef6c00", "#d84315", "#ffffff", "#9e9e9e", "#212121"]
 
     function show() {
-        currentColor = selectedColor
-        updateFromColor(currentColor)
-        open()
+        currentColor = selectedColor;
+        updateFromColor(currentColor);
+        open();
     }
 
     function hide() {
-        onColorSelectedCallback = null
-        close()
+        onColorSelectedCallback = null;
+        close();
     }
 
     function hideInstant() {
-        onColorSelectedCallback = null
-        shouldBeVisible = false
-        visible = false
+        onColorSelectedCallback = null;
+        shouldBeVisible = false;
+        visible = false;
     }
 
-    onColorSelected: (color) => {
+    onColorSelected: color => {
         if (onColorSelectedCallback) {
-            onColorSelectedCallback(color)
+            onColorSelectedCallback(color);
         }
     }
 
     function copyColorToClipboard(colorValue) {
-        Quickshell.execDetached(["sh", "-c", `echo -n "${colorValue}" | wl-copy`])
-        ToastService.showInfo(`Color ${colorValue} copied`)
-        SessionData.addRecentColor(currentColor)
+        Quickshell.execDetached(["sh", "-c", `echo -n "${colorValue}" | wl-copy`]);
+        ToastService.showInfo(`Color ${colorValue} copied`);
+        SessionData.addRecentColor(currentColor);
     }
 
     function updateFromColor(color) {
-        hue = color.hsvHue
-        saturation = color.hsvSaturation
-        value = color.hsvValue
-        alpha = color.a
-        gradientX = saturation
-        gradientY = 1 - value
+        hue = color.hsvHue;
+        saturation = color.hsvSaturation;
+        value = color.hsvValue;
+        alpha = color.a;
+        gradientX = saturation;
+        gradientY = 1 - value;
     }
 
     function updateColor() {
-        currentColor = Qt.hsva(hue, saturation, value, alpha)
+        currentColor = Qt.hsva(hue, saturation, value, alpha);
     }
 
     function updateColorFromGradient(x, y) {
-        saturation = Math.max(0, Math.min(1, x))
-        value = Math.max(0, Math.min(1, 1 - y))
-        updateColor()
-        selectedColor = currentColor
+        saturation = Math.max(0, Math.min(1, x));
+        value = Math.max(0, Math.min(1, 1 - y));
+        updateColor();
+        selectedColor = currentColor;
     }
 
     function pickColorFromScreen() {
-        hideInstant()
+        hideInstant();
         Proc.runCommand("hyprpicker", ["hyprpicker", "--format=hex"], (output, errorCode) => {
             if (errorCode !== 0) {
-                console.warn("hyprpicker exited with code:", errorCode)
-                root.show()
-                return
+                console.warn("hyprpicker exited with code:", errorCode);
+                root.show();
+                return;
             }
-            const colorStr = output.trim()
+            const colorStr = output.trim();
             if (colorStr.length >= 7 && colorStr.startsWith('#')) {
-                const pickedColor = Qt.color(colorStr)
-                root.selectedColor = pickedColor
-                root.currentColor = pickedColor
-                root.updateFromColor(pickedColor)
-                copyColorToClipboard(colorStr)
-                root.show()
+                const pickedColor = Qt.color(colorStr);
+                root.selectedColor = pickedColor;
+                root.currentColor = pickedColor;
+                root.updateFromColor(pickedColor);
+                copyColorToClipboard(colorStr);
+                root.show();
             }
-        })
+        });
     }
 
-    width: 680
-    height: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 680
+    modalWidth: 680
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 680
     backgroundColor: Theme.surfaceContainer
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
@@ -133,8 +123,8 @@ DankModal {
             focus: true
 
             Keys.onEscapePressed: event => {
-                root.hide()
-                event.accepted = true
+                root.hide();
+                event.accepted = true;
             }
 
             Column {
@@ -172,7 +162,7 @@ DankModal {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: () => {
-                            root.pickColorFromScreen()
+                            root.pickColorFromScreen();
                         }
                     }
 
@@ -181,7 +171,7 @@ DankModal {
                         iconSize: Theme.iconSize - 4
                         iconColor: Theme.surfaceText
                         onClicked: () => {
-                            root.hide()
+                            root.hide();
                         }
                     }
                 }
@@ -207,8 +197,14 @@ DankModal {
                                 anchors.fill: parent
                                 gradient: Gradient {
                                     orientation: Gradient.Horizontal
-                                    GradientStop { position: 0.0; color: "#ffffff" }
-                                    GradientStop { position: 1.0; color: "transparent" }
+                                    GradientStop {
+                                        position: 0.0
+                                        color: "#ffffff"
+                                    }
+                                    GradientStop {
+                                        position: 1.0
+                                        color: "transparent"
+                                    }
                                 }
                             }
 
@@ -216,8 +212,14 @@ DankModal {
                                 anchors.fill: parent
                                 gradient: Gradient {
                                     orientation: Gradient.Vertical
-                                    GradientStop { position: 0.0; color: "transparent" }
-                                    GradientStop { position: 1.0; color: "#000000" }
+                                    GradientStop {
+                                        position: 0.0
+                                        color: "transparent"
+                                    }
+                                    GradientStop {
+                                        position: 1.0
+                                        color: "#000000"
+                                    }
                                 }
                             }
                         }
@@ -248,19 +250,19 @@ DankModal {
                             anchors.fill: parent
                             cursorShape: Qt.CrossCursor
                             onPressed: mouse => {
-                                const x = Math.max(0, Math.min(1, mouse.x / width))
-                                const y = Math.max(0, Math.min(1, mouse.y / height))
-                                root.gradientX = x
-                                root.gradientY = y
-                                root.updateColorFromGradient(x, y)
+                                const x = Math.max(0, Math.min(1, mouse.x / width));
+                                const y = Math.max(0, Math.min(1, mouse.y / height));
+                                root.gradientX = x;
+                                root.gradientY = y;
+                                root.updateColorFromGradient(x, y);
                             }
                             onPositionChanged: mouse => {
                                 if (pressed) {
-                                    const x = Math.max(0, Math.min(1, mouse.x / width))
-                                    const y = Math.max(0, Math.min(1, mouse.y / height))
-                                    root.gradientX = x
-                                    root.gradientY = y
-                                    root.updateColorFromGradient(x, y)
+                                    const x = Math.max(0, Math.min(1, mouse.x / width));
+                                    const y = Math.max(0, Math.min(1, mouse.y / height));
+                                    root.gradientX = x;
+                                    root.gradientY = y;
+                                    root.updateColorFromGradient(x, y);
                                 }
                             }
                         }
@@ -276,13 +278,34 @@ DankModal {
 
                         gradient: Gradient {
                             orientation: Gradient.Vertical
-                            GradientStop { position: 0.00; color: "#ff0000" }
-                            GradientStop { position: 0.17; color: "#ffff00" }
-                            GradientStop { position: 0.33; color: "#00ff00" }
-                            GradientStop { position: 0.50; color: "#00ffff" }
-                            GradientStop { position: 0.67; color: "#0000ff" }
-                            GradientStop { position: 0.83; color: "#ff00ff" }
-                            GradientStop { position: 1.00; color: "#ff0000" }
+                            GradientStop {
+                                position: 0.00
+                                color: "#ff0000"
+                            }
+                            GradientStop {
+                                position: 0.17
+                                color: "#ffff00"
+                            }
+                            GradientStop {
+                                position: 0.33
+                                color: "#00ff00"
+                            }
+                            GradientStop {
+                                position: 0.50
+                                color: "#00ffff"
+                            }
+                            GradientStop {
+                                position: 0.67
+                                color: "#0000ff"
+                            }
+                            GradientStop {
+                                position: 0.83
+                                color: "#ff00ff"
+                            }
+                            GradientStop {
+                                position: 1.00
+                                color: "#ff0000"
+                            }
                         }
 
                         Rectangle {
@@ -299,17 +322,17 @@ DankModal {
                             anchors.fill: parent
                             cursorShape: Qt.SizeVerCursor
                             onPressed: mouse => {
-                                const h = Math.max(0, Math.min(1, mouse.y / height))
-                                root.hue = h
-                                root.updateColor()
-                                root.selectedColor = root.currentColor
+                                const h = Math.max(0, Math.min(1, mouse.y / height));
+                                root.hue = h;
+                                root.updateColor();
+                                root.selectedColor = root.currentColor;
                             }
                             onPositionChanged: mouse => {
                                 if (pressed) {
-                                    const h = Math.max(0, Math.min(1, mouse.y / height))
-                                    root.hue = h
-                                    root.updateColor()
-                                    root.selectedColor = root.currentColor
+                                    const h = Math.max(0, Math.min(1, mouse.y / height));
+                                    root.hue = h;
+                                    root.updateColor();
+                                    root.selectedColor = root.currentColor;
                                 }
                             }
                         }
@@ -348,10 +371,10 @@ DankModal {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: () => {
-                                    const pickedColor = Qt.color(modelData)
-                                    root.selectedColor = pickedColor
-                                    root.currentColor = pickedColor
-                                    root.updateFromColor(pickedColor)
+                                    const pickedColor = Qt.color(modelData);
+                                    root.selectedColor = pickedColor;
+                                    root.currentColor = pickedColor;
+                                    root.updateFromColor(pickedColor);
                                 }
                             }
                         }
@@ -393,9 +416,9 @@ DankModal {
 
                                         color: {
                                             if (index < SessionData.recentColors.length) {
-                                                return SessionData.recentColors[index]
+                                                return SessionData.recentColors[index];
                                             }
-                                            return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                                            return Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
                                         }
 
                                         opacity: index < SessionData.recentColors.length ? 1.0 : 0.3
@@ -406,10 +429,10 @@ DankModal {
                                             enabled: index < SessionData.recentColors.length
                                             onClicked: () => {
                                                 if (index < SessionData.recentColors.length) {
-                                                    const pickedColor = SessionData.recentColors[index]
-                                                    root.selectedColor = pickedColor
-                                                    root.currentColor = pickedColor
-                                                    root.updateFromColor(pickedColor)
+                                                    const pickedColor = SessionData.recentColors[index];
+                                                    root.selectedColor = pickedColor;
+                                                    root.currentColor = pickedColor;
+                                                    root.updateFromColor(pickedColor);
                                                 }
                                             }
                                         }
@@ -435,10 +458,10 @@ DankModal {
                                 minimum: 0
                                 maximum: 100
                                 showValue: false
-                                onSliderValueChanged: (newValue) => {
-                                    root.alpha = newValue / 100
-                                    root.updateColor()
-                                    root.selectedColor = root.currentColor
+                                onSliderValueChanged: newValue => {
+                                    root.alpha = newValue / 100;
+                                    root.updateColor();
+                                    root.selectedColor = root.currentColor;
                                 }
                             }
                         }
@@ -485,9 +508,10 @@ DankModal {
                                     text: root.currentColor.toString()
                                     font.pixelSize: Theme.fontSizeMedium
                                     textColor: {
-                                        if (text.length === 0) return Theme.surfaceText
-                                        const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/
-                                        return hexPattern.test(text) ? Theme.surfaceText : Theme.error
+                                        if (text.length === 0)
+                                            return Theme.surfaceText;
+                                        const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/;
+                                        return hexPattern.test(text) ? Theme.surfaceText : Theme.error;
                                     }
                                     placeholderText: "#000000"
                                     backgroundColor: Theme.surfaceHover
@@ -496,13 +520,14 @@ DankModal {
                                     topPadding: Theme.spacingS
                                     bottomPadding: Theme.spacingS
                                     onAccepted: () => {
-                                        const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/
-                                        if (!hexPattern.test(text)) return
-                                        const color = Qt.color(text)
+                                        const hexPattern = /^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/;
+                                        if (!hexPattern.test(text))
+                                            return;
+                                        const color = Qt.color(text);
                                         if (color) {
-                                            root.selectedColor = color
-                                            root.currentColor = color
-                                            root.updateFromColor(color)
+                                            root.selectedColor = color;
+                                            root.currentColor = color;
+                                            root.updateFromColor(color);
                                         }
                                     }
                                 }
@@ -514,7 +539,7 @@ DankModal {
                                     buttonSize: 36
                                     anchors.verticalCenter: parent.verticalCenter
                                     onClicked: () => {
-                                        root.copyColorToClipboard(hexInput.text)
+                                        root.copyColorToClipboard(hexInput.text);
                                     }
                                 }
                             }
@@ -546,14 +571,14 @@ DankModal {
                                     StyledText {
                                         anchors.centerIn: parent
                                         text: {
-                                            const r = Math.round(root.currentColor.r * 255)
-                                            const g = Math.round(root.currentColor.g * 255)
-                                            const b = Math.round(root.currentColor.b * 255)
+                                            const r = Math.round(root.currentColor.r * 255);
+                                            const g = Math.round(root.currentColor.g * 255);
+                                            const b = Math.round(root.currentColor.b * 255);
                                             if (root.alpha < 1) {
-                                                const a = Math.round(root.alpha * 255)
-                                                return `${r}, ${g}, ${b}, ${a}`
+                                                const a = Math.round(root.alpha * 255);
+                                                return `${r}, ${g}, ${b}, ${a}`;
                                             }
-                                            return `${r}, ${g}, ${b}`
+                                            return `${r}, ${g}, ${b}`;
                                         }
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.surfaceText
@@ -567,18 +592,18 @@ DankModal {
                                     buttonSize: 36
                                     anchors.verticalCenter: parent.verticalCenter
                                     onClicked: () => {
-                                        const r = Math.round(root.currentColor.r * 255)
-                                        const g = Math.round(root.currentColor.g * 255)
-                                        const b = Math.round(root.currentColor.b * 255)
-                                        let rgbString
+                                        const r = Math.round(root.currentColor.r * 255);
+                                        const g = Math.round(root.currentColor.g * 255);
+                                        const b = Math.round(root.currentColor.b * 255);
+                                        let rgbString;
                                         if (root.alpha < 1) {
-                                            const a = Math.round(root.alpha * 255)
-                                            rgbString = `rgba(${r}, ${g}, ${b}, ${a})`
+                                            const a = Math.round(root.alpha * 255);
+                                            rgbString = `rgba(${r}, ${g}, ${b}, ${a})`;
                                         } else {
-                                            rgbString = `rgb(${r}, ${g}, ${b})`
+                                            rgbString = `rgb(${r}, ${g}, ${b})`;
                                         }
-                                        Quickshell.execDetached(["sh", "-c", `echo -n "${rgbString}" | wl-copy`])
-                                        ToastService.showInfo(`${rgbString} copied`)
+                                        Quickshell.execDetached(["sh", "-c", `echo -n "${rgbString}" | wl-copy`]);
+                                        ToastService.showInfo(`${rgbString} copied`);
                                     }
                                 }
                             }
@@ -610,14 +635,14 @@ DankModal {
                                     StyledText {
                                         anchors.centerIn: parent
                                         text: {
-                                            const h = Math.round(root.hue * 360)
-                                            const s = Math.round(root.saturation * 100)
-                                            const v = Math.round(root.value * 100)
+                                            const h = Math.round(root.hue * 360);
+                                            const s = Math.round(root.saturation * 100);
+                                            const v = Math.round(root.value * 100);
                                             if (root.alpha < 1) {
-                                                const a = Math.round(root.alpha * 100)
-                                                return `${h}°, ${s}%, ${v}%, ${a}%`
+                                                const a = Math.round(root.alpha * 100);
+                                                return `${h}°, ${s}%, ${v}%, ${a}%`;
                                             }
-                                            return `${h}°, ${s}%, ${v}%`
+                                            return `${h}°, ${s}%, ${v}%`;
                                         }
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.surfaceText
@@ -631,18 +656,18 @@ DankModal {
                                     buttonSize: 36
                                     anchors.verticalCenter: parent.verticalCenter
                                     onClicked: () => {
-                                        const h = Math.round(root.hue * 360)
-                                        const s = Math.round(root.saturation * 100)
-                                        const v = Math.round(root.value * 100)
-                                        let hsvString
+                                        const h = Math.round(root.hue * 360);
+                                        const s = Math.round(root.saturation * 100);
+                                        const v = Math.round(root.value * 100);
+                                        let hsvString;
                                         if (root.alpha < 1) {
-                                            const a = Math.round(root.alpha * 100)
-                                            hsvString = `${h}, ${s}, ${v}, ${a}`
+                                            const a = Math.round(root.alpha * 100);
+                                            hsvString = `${h}, ${s}, ${v}, ${a}`;
                                         } else {
-                                            hsvString = `${h}, ${s}, ${v}`
+                                            hsvString = `${h}, ${s}, ${v}`;
                                         }
-                                        Quickshell.execDetached(["sh", "-c", `echo -n "${hsvString}" | wl-copy`])
-                                        ToastService.showInfo(`HSV ${hsvString} copied`)
+                                        Quickshell.execDetached(["sh", "-c", `echo -n "${hsvString}" | wl-copy`]);
+                                        ToastService.showInfo(`HSV ${hsvString} copied`);
                                     }
                                 }
                             }
@@ -658,9 +683,9 @@ DankModal {
                         textColor: Theme.background
                         anchors.right: parent.right
                         onClicked: {
-                            SessionData.addRecentColor(root.currentColor)
-                            root.colorSelected(root.currentColor)
-                            root.hide()
+                            SessionData.addRecentColor(root.currentColor);
+                            root.colorSelected(root.currentColor);
+                            root.hide();
                         }
                     }
                 }

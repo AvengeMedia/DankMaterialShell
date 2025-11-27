@@ -1,5 +1,4 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtCore
@@ -70,476 +69,472 @@ Singleton {
     property bool nonNvidiaGpuTempEnabled: false
     property var enabledGpuPciIds: []
 
+    property string wifiDeviceOverride: ""
+
     Component.onCompleted: {
         if (!isGreeterMode) {
-            loadSettings()
+            loadSettings();
         }
     }
 
     function loadSettings() {
         if (isGreeterMode) {
-            parseSettings(greeterSessionFile.text())
+            parseSettings(greeterSessionFile.text());
         } else {
-            parseSettings(settingsFile.text())
+            parseSettings(settingsFile.text());
         }
     }
 
     function parseSettings(content) {
         try {
             if (content && content.trim()) {
-                var settings = JSON.parse(content)
-                isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false
+                var settings = JSON.parse(content);
+                isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false;
 
                 if (settings.wallpaperPath && settings.wallpaperPath.startsWith("we:")) {
-                    console.warn("WallpaperEngine wallpaper detected, resetting wallpaper")
-                    wallpaperPath = ""
-                    Quickshell.execDetached([
-                        "notify-send",
-                        "-u", "critical",
-                        "-a", "DMS",
-                        "-i", "dialog-warning",
-                        "WallpaperEngine Support Moved",
-                        "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."
-                    ])
+                    console.warn("WallpaperEngine wallpaper detected, resetting wallpaper");
+                    wallpaperPath = "";
+                    Quickshell.execDetached(["notify-send", "-u", "critical", "-a", "DMS", "-i", "dialog-warning", "WallpaperEngine Support Moved", "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."]);
                 } else {
-                    wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : ""
+                    wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : "";
                 }
-                perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false
-                monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {}
-                perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false
-                wallpaperPathLight = settings.wallpaperPathLight !== undefined ? settings.wallpaperPathLight : ""
-                wallpaperPathDark = settings.wallpaperPathDark !== undefined ? settings.wallpaperPathDark : ""
-                monitorWallpapersLight = settings.monitorWallpapersLight !== undefined ? settings.monitorWallpapersLight : {}
-                monitorWallpapersDark = settings.monitorWallpapersDark !== undefined ? settings.monitorWallpapersDark : {}
-                brightnessExponentialDevices = settings.brightnessExponentialDevices !== undefined ? settings.brightnessExponentialDevices : (settings.brightnessLogarithmicDevices || {})
-                brightnessUserSetValues = settings.brightnessUserSetValues !== undefined ? settings.brightnessUserSetValues : {}
-                brightnessExponentValues = settings.brightnessExponentValues !== undefined ? settings.brightnessExponentValues : {}
-                doNotDisturb = settings.doNotDisturb !== undefined ? settings.doNotDisturb : false
-                nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false
-                nightModeTemperature = settings.nightModeTemperature !== undefined ? settings.nightModeTemperature : 4500
-                nightModeHighTemperature = settings.nightModeHighTemperature !== undefined ? settings.nightModeHighTemperature : 6500
-                nightModeAutoEnabled = settings.nightModeAutoEnabled !== undefined ? settings.nightModeAutoEnabled : false
-                nightModeAutoMode = settings.nightModeAutoMode !== undefined ? settings.nightModeAutoMode : "time"
+                perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false;
+                monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {};
+                perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false;
+                wallpaperPathLight = settings.wallpaperPathLight !== undefined ? settings.wallpaperPathLight : "";
+                wallpaperPathDark = settings.wallpaperPathDark !== undefined ? settings.wallpaperPathDark : "";
+                monitorWallpapersLight = settings.monitorWallpapersLight !== undefined ? settings.monitorWallpapersLight : {};
+                monitorWallpapersDark = settings.monitorWallpapersDark !== undefined ? settings.monitorWallpapersDark : {};
+                brightnessExponentialDevices = settings.brightnessExponentialDevices !== undefined ? settings.brightnessExponentialDevices : (settings.brightnessLogarithmicDevices || {});
+                brightnessUserSetValues = settings.brightnessUserSetValues !== undefined ? settings.brightnessUserSetValues : {};
+                brightnessExponentValues = settings.brightnessExponentValues !== undefined ? settings.brightnessExponentValues : {};
+                doNotDisturb = settings.doNotDisturb !== undefined ? settings.doNotDisturb : false;
+                nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
+                nightModeTemperature = settings.nightModeTemperature !== undefined ? settings.nightModeTemperature : 4500;
+                nightModeHighTemperature = settings.nightModeHighTemperature !== undefined ? settings.nightModeHighTemperature : 6500;
+                nightModeAutoEnabled = settings.nightModeAutoEnabled !== undefined ? settings.nightModeAutoEnabled : false;
+                nightModeAutoMode = settings.nightModeAutoMode !== undefined ? settings.nightModeAutoMode : "time";
                 if (settings.nightModeStartTime !== undefined) {
-                    const parts = settings.nightModeStartTime.split(":")
-                    nightModeStartHour = parseInt(parts[0]) || 18
-                    nightModeStartMinute = parseInt(parts[1]) || 0
+                    const parts = settings.nightModeStartTime.split(":");
+                    nightModeStartHour = parseInt(parts[0]) || 18;
+                    nightModeStartMinute = parseInt(parts[1]) || 0;
                 } else {
-                    nightModeStartHour = settings.nightModeStartHour !== undefined ? settings.nightModeStartHour : 18
-                    nightModeStartMinute = settings.nightModeStartMinute !== undefined ? settings.nightModeStartMinute : 0
+                    nightModeStartHour = settings.nightModeStartHour !== undefined ? settings.nightModeStartHour : 18;
+                    nightModeStartMinute = settings.nightModeStartMinute !== undefined ? settings.nightModeStartMinute : 0;
                 }
                 if (settings.nightModeEndTime !== undefined) {
-                    const parts = settings.nightModeEndTime.split(":")
-                    nightModeEndHour = parseInt(parts[0]) || 6
-                    nightModeEndMinute = parseInt(parts[1]) || 0
+                    const parts = settings.nightModeEndTime.split(":");
+                    nightModeEndHour = parseInt(parts[0]) || 6;
+                    nightModeEndMinute = parseInt(parts[1]) || 0;
                 } else {
-                    nightModeEndHour = settings.nightModeEndHour !== undefined ? settings.nightModeEndHour : 6
-                    nightModeEndMinute = settings.nightModeEndMinute !== undefined ? settings.nightModeEndMinute : 0
+                    nightModeEndHour = settings.nightModeEndHour !== undefined ? settings.nightModeEndHour : 6;
+                    nightModeEndMinute = settings.nightModeEndMinute !== undefined ? settings.nightModeEndMinute : 0;
                 }
-                latitude = settings.latitude !== undefined ? settings.latitude : 0.0
-                longitude = settings.longitude !== undefined ? settings.longitude : 0.0
-                nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false
-                nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : ""
-                pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : []
-                hiddenTrayIds = settings.hiddenTrayIds !== undefined ? settings.hiddenTrayIds : []
-                selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0
-                nvidiaGpuTempEnabled = settings.nvidiaGpuTempEnabled !== undefined ? settings.nvidiaGpuTempEnabled : false
-                nonNvidiaGpuTempEnabled = settings.nonNvidiaGpuTempEnabled !== undefined ? settings.nonNvidiaGpuTempEnabled : false
-                enabledGpuPciIds = settings.enabledGpuPciIds !== undefined ? settings.enabledGpuPciIds : []
-                wallpaperCyclingEnabled = settings.wallpaperCyclingEnabled !== undefined ? settings.wallpaperCyclingEnabled : false
-                wallpaperCyclingMode = settings.wallpaperCyclingMode !== undefined ? settings.wallpaperCyclingMode : "interval"
-                wallpaperCyclingInterval = settings.wallpaperCyclingInterval !== undefined ? settings.wallpaperCyclingInterval : 300
-                wallpaperCyclingTime = settings.wallpaperCyclingTime !== undefined ? settings.wallpaperCyclingTime : "06:00"
-                monitorCyclingSettings = settings.monitorCyclingSettings !== undefined ? settings.monitorCyclingSettings : {}
-                lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : ""
-                launchPrefix = settings.launchPrefix !== undefined ? settings.launchPrefix : ""
-                wallpaperTransition = settings.wallpaperTransition !== undefined ? settings.wallpaperTransition : "fade"
-                includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none")
-                recentColors = settings.recentColors !== undefined ? settings.recentColors : []
-                showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false
+                latitude = settings.latitude !== undefined ? settings.latitude : 0.0;
+                longitude = settings.longitude !== undefined ? settings.longitude : 0.0;
+                nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false;
+                nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : "";
+                pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : [];
+                hiddenTrayIds = settings.hiddenTrayIds !== undefined ? settings.hiddenTrayIds : [];
+                selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0;
+                nvidiaGpuTempEnabled = settings.nvidiaGpuTempEnabled !== undefined ? settings.nvidiaGpuTempEnabled : false;
+                nonNvidiaGpuTempEnabled = settings.nonNvidiaGpuTempEnabled !== undefined ? settings.nonNvidiaGpuTempEnabled : false;
+                enabledGpuPciIds = settings.enabledGpuPciIds !== undefined ? settings.enabledGpuPciIds : [];
+                wifiDeviceOverride = settings.wifiDeviceOverride !== undefined ? settings.wifiDeviceOverride : "";
+                wallpaperCyclingEnabled = settings.wallpaperCyclingEnabled !== undefined ? settings.wallpaperCyclingEnabled : false;
+                wallpaperCyclingMode = settings.wallpaperCyclingMode !== undefined ? settings.wallpaperCyclingMode : "interval";
+                wallpaperCyclingInterval = settings.wallpaperCyclingInterval !== undefined ? settings.wallpaperCyclingInterval : 300;
+                wallpaperCyclingTime = settings.wallpaperCyclingTime !== undefined ? settings.wallpaperCyclingTime : "06:00";
+                monitorCyclingSettings = settings.monitorCyclingSettings !== undefined ? settings.monitorCyclingSettings : {};
+                lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : "";
+                launchPrefix = settings.launchPrefix !== undefined ? settings.launchPrefix : "";
+                wallpaperTransition = settings.wallpaperTransition !== undefined ? settings.wallpaperTransition : "fade";
+                includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none");
+                recentColors = settings.recentColors !== undefined ? settings.recentColors : [];
+                showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false;
 
                 if (settings.configVersion === undefined) {
-                    migrateFromUndefinedToV1(settings)
-                    saveSettings()
+                    migrateFromUndefinedToV1(settings);
+                    saveSettings();
                 } else if (settings.configVersion === sessionConfigVersion) {
-                    cleanupUnusedKeys()
+                    cleanupUnusedKeys();
                 }
 
                 if (!isGreeterMode) {
                     if (typeof Theme !== "undefined") {
-                        Theme.generateSystemThemesFromCurrentTheme()
+                        Theme.generateSystemThemesFromCurrentTheme();
                     }
                 }
 
                 if (typeof WallpaperCyclingService !== "undefined") {
-                    WallpaperCyclingService.updateCyclingState()
+                    WallpaperCyclingService.updateCyclingState();
                 }
             }
-        } catch (e) {
-
-        }
+        } catch (e) {}
     }
 
     function saveSettings() {
         if (isGreeterMode)
-            return
+            return;
         settingsFile.setText(JSON.stringify({
-                                                "isLightMode": isLightMode,
-                                                "wallpaperPath": wallpaperPath,
-                                                "perMonitorWallpaper": perMonitorWallpaper,
-                                                "monitorWallpapers": monitorWallpapers,
-                                                "perModeWallpaper": perModeWallpaper,
-                                                "wallpaperPathLight": wallpaperPathLight,
-                                                "wallpaperPathDark": wallpaperPathDark,
-                                                "monitorWallpapersLight": monitorWallpapersLight,
-                                                "monitorWallpapersDark": monitorWallpapersDark,
-                                                "brightnessExponentialDevices": brightnessExponentialDevices,
-                                                "brightnessUserSetValues": brightnessUserSetValues,
-                                                "brightnessExponentValues": brightnessExponentValues,
-                                                "doNotDisturb": doNotDisturb,
-                                                "nightModeEnabled": nightModeEnabled,
-                                                "nightModeTemperature": nightModeTemperature,
-                                                "nightModeHighTemperature": nightModeHighTemperature,
-                                                "nightModeAutoEnabled": nightModeAutoEnabled,
-                                                "nightModeAutoMode": nightModeAutoMode,
-                                                "nightModeStartHour": nightModeStartHour,
-                                                "nightModeStartMinute": nightModeStartMinute,
-                                                "nightModeEndHour": nightModeEndHour,
-                                                "nightModeEndMinute": nightModeEndMinute,
-                                                "latitude": latitude,
-                                                "longitude": longitude,
-                                                "nightModeUseIPLocation": nightModeUseIPLocation,
-                                                "nightModeLocationProvider": nightModeLocationProvider,
-                                                "pinnedApps": pinnedApps,
-                                                "hiddenTrayIds": hiddenTrayIds,
-                                                "selectedGpuIndex": selectedGpuIndex,
-                                                "nvidiaGpuTempEnabled": nvidiaGpuTempEnabled,
-                                                "nonNvidiaGpuTempEnabled": nonNvidiaGpuTempEnabled,
-                                                "enabledGpuPciIds": enabledGpuPciIds,
-                                                "wallpaperCyclingEnabled": wallpaperCyclingEnabled,
-                                                "wallpaperCyclingMode": wallpaperCyclingMode,
-                                                "wallpaperCyclingInterval": wallpaperCyclingInterval,
-                                                "wallpaperCyclingTime": wallpaperCyclingTime,
-                                                "monitorCyclingSettings": monitorCyclingSettings,
-                                                "lastBrightnessDevice": lastBrightnessDevice,
-                                                "launchPrefix": launchPrefix,
-                                                "wallpaperTransition": wallpaperTransition,
-                                                "includedTransitions": includedTransitions,
-                                                "recentColors": recentColors,
-                                                "showThirdPartyPlugins": showThirdPartyPlugins,
-                                                "configVersion": sessionConfigVersion
-                                            }, null, 2))
+            "isLightMode": isLightMode,
+            "wallpaperPath": wallpaperPath,
+            "perMonitorWallpaper": perMonitorWallpaper,
+            "monitorWallpapers": monitorWallpapers,
+            "perModeWallpaper": perModeWallpaper,
+            "wallpaperPathLight": wallpaperPathLight,
+            "wallpaperPathDark": wallpaperPathDark,
+            "monitorWallpapersLight": monitorWallpapersLight,
+            "monitorWallpapersDark": monitorWallpapersDark,
+            "brightnessExponentialDevices": brightnessExponentialDevices,
+            "brightnessUserSetValues": brightnessUserSetValues,
+            "brightnessExponentValues": brightnessExponentValues,
+            "doNotDisturb": doNotDisturb,
+            "nightModeEnabled": nightModeEnabled,
+            "nightModeTemperature": nightModeTemperature,
+            "nightModeHighTemperature": nightModeHighTemperature,
+            "nightModeAutoEnabled": nightModeAutoEnabled,
+            "nightModeAutoMode": nightModeAutoMode,
+            "nightModeStartHour": nightModeStartHour,
+            "nightModeStartMinute": nightModeStartMinute,
+            "nightModeEndHour": nightModeEndHour,
+            "nightModeEndMinute": nightModeEndMinute,
+            "latitude": latitude,
+            "longitude": longitude,
+            "nightModeUseIPLocation": nightModeUseIPLocation,
+            "nightModeLocationProvider": nightModeLocationProvider,
+            "pinnedApps": pinnedApps,
+            "hiddenTrayIds": hiddenTrayIds,
+            "selectedGpuIndex": selectedGpuIndex,
+            "nvidiaGpuTempEnabled": nvidiaGpuTempEnabled,
+            "nonNvidiaGpuTempEnabled": nonNvidiaGpuTempEnabled,
+            "enabledGpuPciIds": enabledGpuPciIds,
+            "wifiDeviceOverride": wifiDeviceOverride,
+            "wallpaperCyclingEnabled": wallpaperCyclingEnabled,
+            "wallpaperCyclingMode": wallpaperCyclingMode,
+            "wallpaperCyclingInterval": wallpaperCyclingInterval,
+            "wallpaperCyclingTime": wallpaperCyclingTime,
+            "monitorCyclingSettings": monitorCyclingSettings,
+            "lastBrightnessDevice": lastBrightnessDevice,
+            "launchPrefix": launchPrefix,
+            "wallpaperTransition": wallpaperTransition,
+            "includedTransitions": includedTransitions,
+            "recentColors": recentColors,
+            "showThirdPartyPlugins": showThirdPartyPlugins,
+            "configVersion": sessionConfigVersion
+        }, null, 2));
     }
 
     function migrateFromUndefinedToV1(settings) {
-        console.info("SessionData: Migrating configuration from undefined to version 1")
+        console.info("SessionData: Migrating configuration from undefined to version 1");
         if (typeof SettingsData !== "undefined") {
             if (settings.acMonitorTimeout !== undefined) {
-                SettingsData.set("acMonitorTimeout", settings.acMonitorTimeout)
+                SettingsData.set("acMonitorTimeout", settings.acMonitorTimeout);
             }
             if (settings.acLockTimeout !== undefined) {
-                SettingsData.set("acLockTimeout", settings.acLockTimeout)
+                SettingsData.set("acLockTimeout", settings.acLockTimeout);
             }
             if (settings.acSuspendTimeout !== undefined) {
-                SettingsData.set("acSuspendTimeout", settings.acSuspendTimeout)
+                SettingsData.set("acSuspendTimeout", settings.acSuspendTimeout);
             }
             if (settings.acHibernateTimeout !== undefined) {
-                SettingsData.set("acHibernateTimeout", settings.acHibernateTimeout)
+                SettingsData.set("acHibernateTimeout", settings.acHibernateTimeout);
             }
             if (settings.batteryMonitorTimeout !== undefined) {
-                SettingsData.set("batteryMonitorTimeout", settings.batteryMonitorTimeout)
+                SettingsData.set("batteryMonitorTimeout", settings.batteryMonitorTimeout);
             }
             if (settings.batteryLockTimeout !== undefined) {
-                SettingsData.set("batteryLockTimeout", settings.batteryLockTimeout)
+                SettingsData.set("batteryLockTimeout", settings.batteryLockTimeout);
             }
             if (settings.batterySuspendTimeout !== undefined) {
-                SettingsData.set("batterySuspendTimeout", settings.batterySuspendTimeout)
+                SettingsData.set("batterySuspendTimeout", settings.batterySuspendTimeout);
             }
             if (settings.batteryHibernateTimeout !== undefined) {
-                SettingsData.set("batteryHibernateTimeout", settings.batteryHibernateTimeout)
+                SettingsData.set("batteryHibernateTimeout", settings.batteryHibernateTimeout);
             }
             if (settings.lockBeforeSuspend !== undefined) {
-                SettingsData.set("lockBeforeSuspend", settings.lockBeforeSuspend)
+                SettingsData.set("lockBeforeSuspend", settings.lockBeforeSuspend);
             }
             if (settings.loginctlLockIntegration !== undefined) {
-                SettingsData.set("loginctlLockIntegration", settings.loginctlLockIntegration)
+                SettingsData.set("loginctlLockIntegration", settings.loginctlLockIntegration);
             }
             if (settings.launchPrefix !== undefined) {
-                SettingsData.set("launchPrefix", settings.launchPrefix)
+                SettingsData.set("launchPrefix", settings.launchPrefix);
             }
         }
         if (typeof CacheData !== "undefined") {
             if (settings.wallpaperLastPath !== undefined) {
-                CacheData.wallpaperLastPath = settings.wallpaperLastPath
+                CacheData.wallpaperLastPath = settings.wallpaperLastPath;
             }
             if (settings.profileLastPath !== undefined) {
-                CacheData.profileLastPath = settings.profileLastPath
+                CacheData.profileLastPath = settings.profileLastPath;
             }
-            CacheData.saveCache()
+            CacheData.saveCache();
         }
     }
 
     function cleanupUnusedKeys() {
-        const validKeys = ["isLightMode", "wallpaperPath", "perMonitorWallpaper", "monitorWallpapers", "perModeWallpaper", "wallpaperPathLight", "wallpaperPathDark", "monitorWallpapersLight", "monitorWallpapersDark", "doNotDisturb", "nightModeEnabled", "nightModeTemperature", "nightModeHighTemperature", "nightModeAutoEnabled", "nightModeAutoMode", "nightModeStartHour", "nightModeStartMinute", "nightModeEndHour", "nightModeEndMinute", "latitude", "longitude", "nightModeUseIPLocation", "nightModeLocationProvider", "pinnedApps", "hiddenTrayIds", "selectedGpuIndex", "nvidiaGpuTempEnabled", "nonNvidiaGpuTempEnabled", "enabledGpuPciIds", "wallpaperCyclingEnabled", "wallpaperCyclingMode", "wallpaperCyclingInterval", "wallpaperCyclingTime", "monitorCyclingSettings", "lastBrightnessDevice", "brightnessExponentialDevices", "brightnessUserSetValues", "brightnessExponentValues", "launchPrefix", "wallpaperTransition", "includedTransitions", "recentColors", "showThirdPartyPlugins", "configVersion"]
+        const validKeys = ["isLightMode", "wallpaperPath", "perMonitorWallpaper", "monitorWallpapers", "perModeWallpaper", "wallpaperPathLight", "wallpaperPathDark", "monitorWallpapersLight", "monitorWallpapersDark", "doNotDisturb", "nightModeEnabled", "nightModeTemperature", "nightModeHighTemperature", "nightModeAutoEnabled", "nightModeAutoMode", "nightModeStartHour", "nightModeStartMinute", "nightModeEndHour", "nightModeEndMinute", "latitude", "longitude", "nightModeUseIPLocation", "nightModeLocationProvider", "pinnedApps", "hiddenTrayIds", "selectedGpuIndex", "nvidiaGpuTempEnabled", "nonNvidiaGpuTempEnabled", "enabledGpuPciIds", "wifiDeviceOverride", "wallpaperCyclingEnabled", "wallpaperCyclingMode", "wallpaperCyclingInterval", "wallpaperCyclingTime", "monitorCyclingSettings", "lastBrightnessDevice", "brightnessExponentialDevices", "brightnessUserSetValues", "brightnessExponentValues", "launchPrefix", "wallpaperTransition", "includedTransitions", "recentColors", "showThirdPartyPlugins", "configVersion"];
 
         try {
-            const content = settingsFile.text()
+            const content = settingsFile.text();
             if (!content || !content.trim())
-                return
-
-            const settings = JSON.parse(content)
-            let needsSave = false
+                return;
+            const settings = JSON.parse(content);
+            let needsSave = false;
 
             for (const key in settings) {
                 if (!validKeys.includes(key)) {
-                    console.log("SessionData: Removing unused key:", key)
-                    delete settings[key]
-                    needsSave = true
+                    console.log("SessionData: Removing unused key:", key);
+                    delete settings[key];
+                    needsSave = true;
                 }
             }
 
             if (needsSave) {
-                settingsFile.setText(JSON.stringify(settings, null, 2))
+                settingsFile.setText(JSON.stringify(settings, null, 2));
             }
         } catch (e) {
-            console.warn("SessionData: Failed to cleanup unused keys:", e.message)
+            console.warn("SessionData: Failed to cleanup unused keys:", e.message);
         }
     }
 
     function setLightMode(lightMode) {
-        isSwitchingMode = true
-        isLightMode = lightMode
-        syncWallpaperForCurrentMode()
-        saveSettings()
-        Qt.callLater(() => { isSwitchingMode = false })
+        isSwitchingMode = true;
+        isLightMode = lightMode;
+        syncWallpaperForCurrentMode();
+        saveSettings();
+        Qt.callLater(() => {
+            isSwitchingMode = false;
+        });
     }
 
     function setDoNotDisturb(enabled) {
-        doNotDisturb = enabled
-        saveSettings()
+        doNotDisturb = enabled;
+        saveSettings();
     }
 
     function setWallpaperPath(path) {
-        wallpaperPath = path
-        saveSettings()
+        wallpaperPath = path;
+        saveSettings();
     }
 
     function setWallpaper(imagePath) {
-        wallpaperPath = imagePath
+        wallpaperPath = imagePath;
         if (perModeWallpaper) {
             if (isLightMode) {
-                wallpaperPathLight = imagePath
+                wallpaperPathLight = imagePath;
             } else {
-                wallpaperPathDark = imagePath
+                wallpaperPathDark = imagePath;
             }
         }
-        saveSettings()
+        saveSettings();
 
         if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme()
+            Theme.generateSystemThemesFromCurrentTheme();
         }
     }
 
     function setWallpaperColor(color) {
-        wallpaperPath = color
+        wallpaperPath = color;
         if (perModeWallpaper) {
             if (isLightMode) {
-                wallpaperPathLight = color
+                wallpaperPathLight = color;
             } else {
-                wallpaperPathDark = color
+                wallpaperPathDark = color;
             }
         }
-        saveSettings()
+        saveSettings();
 
         if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme()
+            Theme.generateSystemThemesFromCurrentTheme();
         }
     }
 
     function clearWallpaper() {
-        wallpaperPath = ""
-        saveSettings()
+        wallpaperPath = "";
+        saveSettings();
 
         if (typeof Theme !== "undefined") {
             if (typeof SettingsData !== "undefined" && SettingsData.theme) {
-                Theme.switchTheme(SettingsData.theme)
+                Theme.switchTheme(SettingsData.theme);
             } else {
-                Theme.switchTheme("blue")
+                Theme.switchTheme("blue");
             }
         }
     }
 
     function setPerMonitorWallpaper(enabled) {
-        perMonitorWallpaper = enabled
+        perMonitorWallpaper = enabled;
         if (enabled && perModeWallpaper) {
-            syncWallpaperForCurrentMode()
+            syncWallpaperForCurrentMode();
         }
-        saveSettings()
+        saveSettings();
 
         if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme()
+            Theme.generateSystemThemesFromCurrentTheme();
         }
     }
 
     function setPerModeWallpaper(enabled) {
         if (enabled && wallpaperCyclingEnabled) {
-            setWallpaperCyclingEnabled(false)
+            setWallpaperCyclingEnabled(false);
         }
         if (enabled && perMonitorWallpaper) {
-            var monitorCyclingAny = false
+            var monitorCyclingAny = false;
             for (var key in monitorCyclingSettings) {
                 if (monitorCyclingSettings[key].enabled) {
-                    monitorCyclingAny = true
-                    break
+                    monitorCyclingAny = true;
+                    break;
                 }
             }
             if (monitorCyclingAny) {
-                var newSettings = Object.assign({}, monitorCyclingSettings)
+                var newSettings = Object.assign({}, monitorCyclingSettings);
                 for (var screenName in newSettings) {
-                    newSettings[screenName].enabled = false
+                    newSettings[screenName].enabled = false;
                 }
-                monitorCyclingSettings = newSettings
+                monitorCyclingSettings = newSettings;
             }
         }
 
-        perModeWallpaper = enabled
+        perModeWallpaper = enabled;
         if (enabled) {
             if (perMonitorWallpaper) {
-                monitorWallpapersLight = Object.assign({}, monitorWallpapers)
-                monitorWallpapersDark = Object.assign({}, monitorWallpapers)
+                monitorWallpapersLight = Object.assign({}, monitorWallpapers);
+                monitorWallpapersDark = Object.assign({}, monitorWallpapers);
             } else {
-                wallpaperPathLight = wallpaperPath
-                wallpaperPathDark = wallpaperPath
+                wallpaperPathLight = wallpaperPath;
+                wallpaperPathDark = wallpaperPath;
             }
         } else {
-            syncWallpaperForCurrentMode()
+            syncWallpaperForCurrentMode();
         }
-        saveSettings()
+        saveSettings();
 
         if (typeof Theme !== "undefined") {
-            Theme.generateSystemThemesFromCurrentTheme()
+            Theme.generateSystemThemesFromCurrentTheme();
         }
     }
 
     function setMonitorWallpaper(screenName, path) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found:", screenName)
-            return
+            console.warn("SessionData: Screen not found:", screenName);
+            return;
         }
 
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
 
-        var newMonitorWallpapers = {}
+        var newMonitorWallpapers = {};
         for (var key in monitorWallpapers) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
             if (!isThisScreen) {
-                newMonitorWallpapers[key] = monitorWallpapers[key]
+                newMonitorWallpapers[key] = monitorWallpapers[key];
             }
         }
 
         if (path && path !== "") {
-            newMonitorWallpapers[identifier] = path
+            newMonitorWallpapers[identifier] = path;
         }
 
-        monitorWallpapers = newMonitorWallpapers
+        monitorWallpapers = newMonitorWallpapers;
 
         if (perModeWallpaper) {
             if (isLightMode) {
-                var newLight = {}
+                var newLight = {};
                 for (var key in monitorWallpapersLight) {
-                    var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+                    var isThisScreen = key === screen.name || (screen.model && key === screen.model);
                     if (!isThisScreen) {
-                        newLight[key] = monitorWallpapersLight[key]
+                        newLight[key] = monitorWallpapersLight[key];
                     }
                 }
                 if (path && path !== "") {
-                    newLight[identifier] = path
+                    newLight[identifier] = path;
                 }
-                monitorWallpapersLight = newLight
+                monitorWallpapersLight = newLight;
             } else {
-                var newDark = {}
+                var newDark = {};
                 for (var key in monitorWallpapersDark) {
-                    var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+                    var isThisScreen = key === screen.name || (screen.model && key === screen.model);
                     if (!isThisScreen) {
-                        newDark[key] = monitorWallpapersDark[key]
+                        newDark[key] = monitorWallpapersDark[key];
                     }
                 }
                 if (path && path !== "") {
-                    newDark[identifier] = path
+                    newDark[identifier] = path;
                 }
-                monitorWallpapersDark = newDark
+                monitorWallpapersDark = newDark;
             }
         }
 
-        saveSettings()
+        saveSettings();
 
         if (typeof Theme !== "undefined" && typeof Quickshell !== "undefined" && typeof SettingsData !== "undefined") {
-            var screens = Quickshell.screens
+            var screens = Quickshell.screens;
             if (screens.length > 0) {
-                var targetMonitor = (SettingsData.matugenTargetMonitor && SettingsData.matugenTargetMonitor !== "") ? SettingsData.matugenTargetMonitor : screens[0].name
+                var targetMonitor = (SettingsData.matugenTargetMonitor && SettingsData.matugenTargetMonitor !== "") ? SettingsData.matugenTargetMonitor : screens[0].name;
                 if (screenName === targetMonitor) {
-                    Theme.generateSystemThemesFromCurrentTheme()
+                    Theme.generateSystemThemesFromCurrentTheme();
                 }
             }
         }
     }
 
     function setWallpaperTransition(transition) {
-        wallpaperTransition = transition
-        saveSettings()
+        wallpaperTransition = transition;
+        saveSettings();
     }
 
     function setWallpaperCyclingEnabled(enabled) {
-        wallpaperCyclingEnabled = enabled
-        saveSettings()
+        wallpaperCyclingEnabled = enabled;
+        saveSettings();
     }
 
     function setWallpaperCyclingMode(mode) {
-        wallpaperCyclingMode = mode
-        saveSettings()
+        wallpaperCyclingMode = mode;
+        saveSettings();
     }
 
     function setWallpaperCyclingInterval(interval) {
-        wallpaperCyclingInterval = interval
-        saveSettings()
+        wallpaperCyclingInterval = interval;
+        saveSettings();
     }
 
     function setWallpaperCyclingTime(time) {
-        wallpaperCyclingTime = time
-        saveSettings()
+        wallpaperCyclingTime = time;
+        saveSettings();
     }
 
     function setMonitorCyclingEnabled(screenName, enabled) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found:", screenName)
-            return
+            console.warn("SessionData: Screen not found:", screenName);
+            return;
         }
 
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
 
-        var newSettings = {}
+        var newSettings = {};
         for (var key in monitorCyclingSettings) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
             if (!isThisScreen) {
-                newSettings[key] = monitorCyclingSettings[key]
+                newSettings[key] = monitorCyclingSettings[key];
             }
         }
 
@@ -549,35 +544,35 @@ Singleton {
                 "mode": "interval",
                 "interval": 300,
                 "time": "06:00"
-            }
+            };
         }
-        newSettings[identifier].enabled = enabled
-        monitorCyclingSettings = newSettings
-        saveSettings()
+        newSettings[identifier].enabled = enabled;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
     }
 
     function setMonitorCyclingMode(screenName, mode) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found:", screenName)
-            return
+            console.warn("SessionData: Screen not found:", screenName);
+            return;
         }
 
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
 
-        var newSettings = {}
+        var newSettings = {};
         for (var key in monitorCyclingSettings) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
             if (!isThisScreen) {
-                newSettings[key] = monitorCyclingSettings[key]
+                newSettings[key] = monitorCyclingSettings[key];
             }
         }
 
@@ -587,35 +582,35 @@ Singleton {
                 "mode": "interval",
                 "interval": 300,
                 "time": "06:00"
-            }
+            };
         }
-        newSettings[identifier].mode = mode
-        monitorCyclingSettings = newSettings
-        saveSettings()
+        newSettings[identifier].mode = mode;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
     }
 
     function setMonitorCyclingInterval(screenName, interval) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found:", screenName)
-            return
+            console.warn("SessionData: Screen not found:", screenName);
+            return;
         }
 
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
 
-        var newSettings = {}
+        var newSettings = {};
         for (var key in monitorCyclingSettings) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
             if (!isThisScreen) {
-                newSettings[key] = monitorCyclingSettings[key]
+                newSettings[key] = monitorCyclingSettings[key];
             }
         }
 
@@ -625,35 +620,35 @@ Singleton {
                 "mode": "interval",
                 "interval": 300,
                 "time": "06:00"
-            }
+            };
         }
-        newSettings[identifier].interval = interval
-        monitorCyclingSettings = newSettings
-        saveSettings()
+        newSettings[identifier].interval = interval;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
     }
 
     function setMonitorCyclingTime(screenName, time) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            console.warn("SessionData: Screen not found:", screenName)
-            return
+            console.warn("SessionData: Screen not found:", screenName);
+            return;
         }
 
-        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name
+        var identifier = typeof SettingsData !== "undefined" ? SettingsData.getScreenDisplayName(screen) : screen.name;
 
-        var newSettings = {}
+        var newSettings = {};
         for (var key in monitorCyclingSettings) {
-            var isThisScreen = key === screen.name || (screen.model && key === screen.model)
+            var isThisScreen = key === screen.name || (screen.model && key === screen.model);
             if (!isThisScreen) {
-                newSettings[key] = monitorCyclingSettings[key]
+                newSettings[key] = monitorCyclingSettings[key];
             }
         }
 
@@ -663,266 +658,272 @@ Singleton {
                 "mode": "interval",
                 "interval": 300,
                 "time": "06:00"
-            }
+            };
         }
-        newSettings[identifier].time = time
-        monitorCyclingSettings = newSettings
-        saveSettings()
+        newSettings[identifier].time = time;
+        monitorCyclingSettings = newSettings;
+        saveSettings();
     }
 
     function setNightModeEnabled(enabled) {
-        nightModeEnabled = enabled
-        saveSettings()
+        nightModeEnabled = enabled;
+        saveSettings();
     }
 
     function setNightModeTemperature(temperature) {
-        nightModeTemperature = temperature
-        saveSettings()
+        nightModeTemperature = temperature;
+        saveSettings();
     }
 
     function setNightModeHighTemperature(temperature) {
-        nightModeHighTemperature = temperature
-        saveSettings()
+        nightModeHighTemperature = temperature;
+        saveSettings();
     }
 
     function setNightModeAutoEnabled(enabled) {
-        console.log("SessionData: Setting nightModeAutoEnabled to", enabled)
-        nightModeAutoEnabled = enabled
-        saveSettings()
+        console.log("SessionData: Setting nightModeAutoEnabled to", enabled);
+        nightModeAutoEnabled = enabled;
+        saveSettings();
     }
 
     function setNightModeAutoMode(mode) {
-        nightModeAutoMode = mode
-        saveSettings()
+        nightModeAutoMode = mode;
+        saveSettings();
     }
 
     function setNightModeStartHour(hour) {
-        nightModeStartHour = hour
-        saveSettings()
+        nightModeStartHour = hour;
+        saveSettings();
     }
 
     function setNightModeStartMinute(minute) {
-        nightModeStartMinute = minute
-        saveSettings()
+        nightModeStartMinute = minute;
+        saveSettings();
     }
 
     function setNightModeEndHour(hour) {
-        nightModeEndHour = hour
-        saveSettings()
+        nightModeEndHour = hour;
+        saveSettings();
     }
 
     function setNightModeEndMinute(minute) {
-        nightModeEndMinute = minute
-        saveSettings()
+        nightModeEndMinute = minute;
+        saveSettings();
     }
 
     function setNightModeUseIPLocation(use) {
-        nightModeUseIPLocation = use
-        saveSettings()
+        nightModeUseIPLocation = use;
+        saveSettings();
     }
 
     function setLatitude(lat) {
-        console.log("SessionData: Setting latitude to", lat)
-        latitude = lat
-        saveSettings()
+        console.log("SessionData: Setting latitude to", lat);
+        latitude = lat;
+        saveSettings();
     }
 
     function setLongitude(lng) {
-        console.log("SessionData: Setting longitude to", lng)
-        longitude = lng
-        saveSettings()
+        console.log("SessionData: Setting longitude to", lng);
+        longitude = lng;
+        saveSettings();
     }
 
     function setNightModeLocationProvider(provider) {
-        nightModeLocationProvider = provider
-        saveSettings()
+        nightModeLocationProvider = provider;
+        saveSettings();
     }
 
     function setPinnedApps(apps) {
-        pinnedApps = apps
-        saveSettings()
+        pinnedApps = apps;
+        saveSettings();
     }
 
     function addPinnedApp(appId) {
         if (!appId)
-            return
-        var currentPinned = [...pinnedApps]
+            return;
+        var currentPinned = [...pinnedApps];
         if (currentPinned.indexOf(appId) === -1) {
-            currentPinned.push(appId)
-            setPinnedApps(currentPinned)
+            currentPinned.push(appId);
+            setPinnedApps(currentPinned);
         }
     }
 
     function removePinnedApp(appId) {
         if (!appId)
-            return
-        var currentPinned = pinnedApps.filter(id => id !== appId)
-        setPinnedApps(currentPinned)
+            return;
+        var currentPinned = pinnedApps.filter(id => id !== appId);
+        setPinnedApps(currentPinned);
     }
 
     function isPinnedApp(appId) {
-        return appId && pinnedApps.indexOf(appId) !== -1
+        return appId && pinnedApps.indexOf(appId) !== -1;
     }
 
     function hideTrayId(trayId) {
-        if (!trayId) return
-        const current = [...hiddenTrayIds]
+        if (!trayId)
+            return;
+        const current = [...hiddenTrayIds];
         if (current.indexOf(trayId) === -1) {
-            current.push(trayId)
-            hiddenTrayIds = current
-            saveSettings()
+            current.push(trayId);
+            hiddenTrayIds = current;
+            saveSettings();
         }
     }
 
     function showTrayId(trayId) {
-        if (!trayId) return
-        hiddenTrayIds = hiddenTrayIds.filter(id => id !== trayId)
-        saveSettings()
+        if (!trayId)
+            return;
+        hiddenTrayIds = hiddenTrayIds.filter(id => id !== trayId);
+        saveSettings();
     }
 
     function isHiddenTrayId(trayId) {
-        return trayId && hiddenTrayIds.indexOf(trayId) !== -1
+        return trayId && hiddenTrayIds.indexOf(trayId) !== -1;
     }
 
     function addRecentColor(color) {
-        const colorStr = color.toString()
-        let recent = recentColors.slice()
-        recent = recent.filter(c => c !== colorStr)
-        recent.unshift(colorStr)
+        const colorStr = color.toString();
+        let recent = recentColors.slice();
+        recent = recent.filter(c => c !== colorStr);
+        recent.unshift(colorStr);
         if (recent.length > 5)
-            recent = recent.slice(0, 5)
-        recentColors = recent
-        saveSettings()
+            recent = recent.slice(0, 5);
+        recentColors = recent;
+        saveSettings();
     }
 
     function setShowThirdPartyPlugins(enabled) {
-        showThirdPartyPlugins = enabled
-        saveSettings()
+        showThirdPartyPlugins = enabled;
+        saveSettings();
     }
 
     function setLaunchPrefix(prefix) {
-        launchPrefix = prefix
-        saveSettings()
+        launchPrefix = prefix;
+        saveSettings();
     }
 
     function setLastBrightnessDevice(device) {
-        lastBrightnessDevice = device
-        saveSettings()
+        lastBrightnessDevice = device;
+        saveSettings();
     }
 
     function setBrightnessExponential(deviceName, enabled) {
-        var newSettings = Object.assign({}, brightnessExponentialDevices)
+        var newSettings = Object.assign({}, brightnessExponentialDevices);
         if (enabled) {
-            newSettings[deviceName] = true
+            newSettings[deviceName] = true;
         } else {
-            delete newSettings[deviceName]
+            delete newSettings[deviceName];
         }
-        brightnessExponentialDevices = newSettings
-        saveSettings()
+        brightnessExponentialDevices = newSettings;
+        saveSettings();
 
         if (typeof DisplayService !== "undefined") {
-            DisplayService.updateDeviceBrightnessDisplay(deviceName)
+            DisplayService.updateDeviceBrightnessDisplay(deviceName);
         }
     }
 
     function getBrightnessExponential(deviceName) {
-        return brightnessExponentialDevices[deviceName] === true
+        return brightnessExponentialDevices[deviceName] === true;
     }
 
     function setBrightnessUserSetValue(deviceName, value) {
-        var newValues = Object.assign({}, brightnessUserSetValues)
-        newValues[deviceName] = value
-        brightnessUserSetValues = newValues
-        saveSettings()
+        var newValues = Object.assign({}, brightnessUserSetValues);
+        newValues[deviceName] = value;
+        brightnessUserSetValues = newValues;
+        saveSettings();
     }
 
     function getBrightnessUserSetValue(deviceName) {
-        return brightnessUserSetValues[deviceName]
+        return brightnessUserSetValues[deviceName];
     }
 
     function setBrightnessExponent(deviceName, exponent) {
-        var newValues = Object.assign({}, brightnessExponentValues)
+        var newValues = Object.assign({}, brightnessExponentValues);
         if (exponent !== undefined && exponent !== null) {
-            newValues[deviceName] = exponent
+            newValues[deviceName] = exponent;
         } else {
-            delete newValues[deviceName]
+            delete newValues[deviceName];
         }
-        brightnessExponentValues = newValues
-        saveSettings()
+        brightnessExponentValues = newValues;
+        saveSettings();
     }
 
     function getBrightnessExponent(deviceName) {
-        const value = brightnessExponentValues[deviceName]
-        return value !== undefined ? value : 1.2
+        const value = brightnessExponentValues[deviceName];
+        return value !== undefined ? value : 1.2;
     }
 
     function setSelectedGpuIndex(index) {
-        selectedGpuIndex = index
-        saveSettings()
+        selectedGpuIndex = index;
+        saveSettings();
     }
 
     function setNvidiaGpuTempEnabled(enabled) {
-        nvidiaGpuTempEnabled = enabled
-        saveSettings()
+        nvidiaGpuTempEnabled = enabled;
+        saveSettings();
     }
 
     function setNonNvidiaGpuTempEnabled(enabled) {
-        nonNvidiaGpuTempEnabled = enabled
-        saveSettings()
+        nonNvidiaGpuTempEnabled = enabled;
+        saveSettings();
     }
 
     function setEnabledGpuPciIds(pciIds) {
-        enabledGpuPciIds = pciIds
-        saveSettings()
+        enabledGpuPciIds = pciIds;
+        saveSettings();
+    }
+
+    function setWifiDeviceOverride(device) {
+        wifiDeviceOverride = device || "";
+        saveSettings();
     }
 
     function syncWallpaperForCurrentMode() {
         if (!perModeWallpaper)
-            return
-
+            return;
         if (perMonitorWallpaper) {
-            monitorWallpapers = isLightMode ? Object.assign({}, monitorWallpapersLight) : Object.assign({}, monitorWallpapersDark)
-            return
+            monitorWallpapers = isLightMode ? Object.assign({}, monitorWallpapersLight) : Object.assign({}, monitorWallpapersDark);
+            return;
         }
 
-        wallpaperPath = isLightMode ? wallpaperPathLight : wallpaperPathDark
+        wallpaperPath = isLightMode ? wallpaperPathLight : wallpaperPathDark;
     }
 
     function getMonitorWallpaper(screenName) {
         if (!perMonitorWallpaper) {
-            return wallpaperPath
+            return wallpaperPath;
         }
 
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
         if (!screen) {
-            return monitorWallpapers[screenName] || wallpaperPath
+            return monitorWallpapers[screenName] || wallpaperPath;
         }
 
         if (monitorWallpapers[screen.name]) {
-            return monitorWallpapers[screen.name]
+            return monitorWallpapers[screen.name];
         }
         if (screen.model && monitorWallpapers[screen.model]) {
-            return monitorWallpapers[screen.model]
+            return monitorWallpapers[screen.model];
         }
 
-        return wallpaperPath
+        return wallpaperPath;
     }
 
     function getMonitorCyclingSettings(screenName) {
-        var screen = null
-        var screens = Quickshell.screens
+        var screen = null;
+        var screens = Quickshell.screens;
         for (var i = 0; i < screens.length; i++) {
             if (screens[i].name === screenName) {
-                screen = screens[i]
-                break
+                screen = screens[i];
+                break;
             }
         }
 
@@ -932,14 +933,14 @@ Singleton {
                 "mode": "interval",
                 "interval": 300,
                 "time": "06:00"
-            }
+            };
         }
 
         if (monitorCyclingSettings[screen.name]) {
-            return monitorCyclingSettings[screen.name]
+            return monitorCyclingSettings[screen.name];
         }
         if (screen.model && monitorCyclingSettings[screen.model]) {
-            return monitorCyclingSettings[screen.model]
+            return monitorCyclingSettings[screen.model];
         }
 
         return {
@@ -947,7 +948,7 @@ Singleton {
             "mode": "interval",
             "interval": 300,
             "time": "06:00"
-        }
+        };
     }
 
     FileView {
@@ -959,14 +960,14 @@ Singleton {
         watchChanges: !isGreeterMode
         onLoaded: {
             if (!isGreeterMode) {
-                parseSettings(settingsFile.text())
-                hasTriedDefaultSession = false
+                parseSettings(settingsFile.text());
+                hasTriedDefaultSession = false;
             }
         }
         onLoadFailed: error => {
             if (!isGreeterMode && !hasTriedDefaultSession) {
-                hasTriedDefaultSession = true
-                defaultSessionCheckProcess.running = true
+                hasTriedDefaultSession = true;
+                defaultSessionCheckProcess.running = true;
             }
         }
     }
@@ -975,8 +976,8 @@ Singleton {
         id: greeterSessionFile
 
         path: {
-            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms"
-            return greetCfgDir + "/session.json"
+            const greetCfgDir = Quickshell.env("DMS_GREET_CFG_DIR") || "/etc/greetd/.dms";
+            return greetCfgDir + "/session.json";
         }
         preload: isGreeterMode
         blockLoading: false
@@ -985,7 +986,7 @@ Singleton {
         printErrors: true
         onLoaded: {
             if (isGreeterMode) {
-                parseSettings(greeterSessionFile.text())
+                parseSettings(greeterSessionFile.text());
             }
         }
     }
@@ -993,13 +994,12 @@ Singleton {
     Process {
         id: defaultSessionCheckProcess
 
-        command: ["sh", "-c", "CONFIG_DIR=\"" + _stateDir
-            + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-session.json\" ] && [ ! -f \"$CONFIG_DIR/session.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-session.json\" \"$CONFIG_DIR/session.json\" && echo 'copied'; else echo 'not_found'; fi"]
+        command: ["sh", "-c", "CONFIG_DIR=\"" + _stateDir + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-session.json\" ] && [ ! -f \"$CONFIG_DIR/session.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-session.json\" \"$CONFIG_DIR/session.json\" && echo 'copied'; else echo 'not_found'; fi"]
         running: false
         onExited: exitCode => {
             if (exitCode === 0) {
-                console.info("Copied default-session.json to session.json")
-                settingsFile.reload()
+                console.info("Copied default-session.json to session.json");
+                settingsFile.reload();
             }
         }
     }
@@ -1009,134 +1009,134 @@ Singleton {
 
         function get(): string {
             if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use getFor(screenName) instead."
+                return "ERROR: Per-monitor mode enabled. Use getFor(screenName) instead.";
             }
-            return root.wallpaperPath || ""
+            return root.wallpaperPath || "";
         }
 
         function set(path: string): string {
             if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use setFor(screenName, path) instead."
+                return "ERROR: Per-monitor mode enabled. Use setFor(screenName, path) instead.";
             }
 
             if (!path) {
-                return "ERROR: No path provided"
+                return "ERROR: No path provided";
             }
 
-            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path
+            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
 
             try {
-                root.setWallpaper(absolutePath)
-                return "SUCCESS: Wallpaper set to " + absolutePath
+                root.setWallpaper(absolutePath);
+                return "SUCCESS: Wallpaper set to " + absolutePath;
             } catch (e) {
-                return "ERROR: Failed to set wallpaper: " + e.toString()
+                return "ERROR: Failed to set wallpaper: " + e.toString();
             }
         }
 
         function clear(): string {
-            root.setWallpaper("")
-            root.setPerMonitorWallpaper(false)
-            root.monitorWallpapers = {}
-            root.saveSettings()
-            return "SUCCESS: All wallpapers cleared"
+            root.setWallpaper("");
+            root.setPerMonitorWallpaper(false);
+            root.monitorWallpapers = {};
+            root.saveSettings();
+            return "SUCCESS: All wallpapers cleared";
         }
 
         function next(): string {
             if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use nextFor(screenName) instead."
+                return "ERROR: Per-monitor mode enabled. Use nextFor(screenName) instead.";
             }
 
             if (!root.wallpaperPath) {
-                return "ERROR: No wallpaper set"
+                return "ERROR: No wallpaper set";
             }
 
             try {
-                WallpaperCyclingService.cycleNextManually()
-                return "SUCCESS: Cycling to next wallpaper"
+                WallpaperCyclingService.cycleNextManually();
+                return "SUCCESS: Cycling to next wallpaper";
             } catch (e) {
-                return "ERROR: Failed to cycle wallpaper: " + e.toString()
+                return "ERROR: Failed to cycle wallpaper: " + e.toString();
             }
         }
 
         function prev(): string {
             if (root.perMonitorWallpaper) {
-                return "ERROR: Per-monitor mode enabled. Use prevFor(screenName) instead."
+                return "ERROR: Per-monitor mode enabled. Use prevFor(screenName) instead.";
             }
 
             if (!root.wallpaperPath) {
-                return "ERROR: No wallpaper set"
+                return "ERROR: No wallpaper set";
             }
 
             try {
-                WallpaperCyclingService.cyclePrevManually()
-                return "SUCCESS: Cycling to previous wallpaper"
+                WallpaperCyclingService.cyclePrevManually();
+                return "SUCCESS: Cycling to previous wallpaper";
             } catch (e) {
-                return "ERROR: Failed to cycle wallpaper: " + e.toString()
+                return "ERROR: Failed to cycle wallpaper: " + e.toString();
             }
         }
 
         function getFor(screenName: string): string {
             if (!screenName) {
-                return "ERROR: No screen name provided"
+                return "ERROR: No screen name provided";
             }
-            return root.getMonitorWallpaper(screenName) || ""
+            return root.getMonitorWallpaper(screenName) || "";
         }
 
         function setFor(screenName: string, path: string): string {
             if (!screenName) {
-                return "ERROR: No screen name provided"
+                return "ERROR: No screen name provided";
             }
 
             if (!path) {
-                return "ERROR: No path provided"
+                return "ERROR: No path provided";
             }
 
-            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path
+            var absolutePath = path.startsWith("/") ? path : StandardPaths.writableLocation(StandardPaths.HomeLocation) + "/" + path;
 
             try {
                 if (!root.perMonitorWallpaper) {
-                    root.setPerMonitorWallpaper(true)
+                    root.setPerMonitorWallpaper(true);
                 }
-                root.setMonitorWallpaper(screenName, absolutePath)
-                return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath
+                root.setMonitorWallpaper(screenName, absolutePath);
+                return "SUCCESS: Wallpaper set for " + screenName + " to " + absolutePath;
             } catch (e) {
-                return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString()
+                return "ERROR: Failed to set wallpaper for " + screenName + ": " + e.toString();
             }
         }
 
         function nextFor(screenName: string): string {
             if (!screenName) {
-                return "ERROR: No screen name provided"
+                return "ERROR: No screen name provided";
             }
 
-            var currentWallpaper = root.getMonitorWallpaper(screenName)
+            var currentWallpaper = root.getMonitorWallpaper(screenName);
             if (!currentWallpaper) {
-                return "ERROR: No wallpaper set for " + screenName
+                return "ERROR: No wallpaper set for " + screenName;
             }
 
             try {
-                WallpaperCyclingService.cycleNextForMonitor(screenName)
-                return "SUCCESS: Cycling to next wallpaper for " + screenName
+                WallpaperCyclingService.cycleNextForMonitor(screenName);
+                return "SUCCESS: Cycling to next wallpaper for " + screenName;
             } catch (e) {
-                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString()
+                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
             }
         }
 
         function prevFor(screenName: string): string {
             if (!screenName) {
-                return "ERROR: No screen name provided"
+                return "ERROR: No screen name provided";
             }
 
-            var currentWallpaper = root.getMonitorWallpaper(screenName)
+            var currentWallpaper = root.getMonitorWallpaper(screenName);
             if (!currentWallpaper) {
-                return "ERROR: No wallpaper set for " + screenName
+                return "ERROR: No wallpaper set for " + screenName;
             }
 
             try {
-                WallpaperCyclingService.cyclePrevForMonitor(screenName)
-                return "SUCCESS: Cycling to previous wallpaper for " + screenName
+                WallpaperCyclingService.cyclePrevForMonitor(screenName);
+                return "SUCCESS: Cycling to previous wallpaper for " + screenName;
             } catch (e) {
-                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString()
+                return "ERROR: Failed to cycle wallpaper for " + screenName + ": " + e.toString();
             }
         }
     }

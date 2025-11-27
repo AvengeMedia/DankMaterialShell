@@ -1,12 +1,10 @@
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Modules.Notifications.Center
 import qs.Services
-import qs.Widgets
 
 DankModal {
     id: notificationModal
@@ -14,7 +12,7 @@ DankModal {
     layerNamespace: "dms:notification-center-modal"
 
     HyprlandFocusGrab {
-        windows: [notificationModal]
+        windows: [notificationModal.contentWindow]
         active: CompositorService.isHyprland && notificationModal.shouldHaveFocus
     }
 
@@ -22,58 +20,58 @@ DankModal {
     property var notificationListRef: null
 
     function show() {
-        notificationModalOpen = true
-        NotificationService.onOverlayOpen()
-        open()
-        modalKeyboardController.reset()
+        notificationModalOpen = true;
+        NotificationService.onOverlayOpen();
+        open();
+        modalKeyboardController.reset();
         if (modalKeyboardController && notificationListRef) {
-            modalKeyboardController.listView = notificationListRef
-            modalKeyboardController.rebuildFlatNavigation()
+            modalKeyboardController.listView = notificationListRef;
+            modalKeyboardController.rebuildFlatNavigation();
 
             Qt.callLater(() => {
-                modalKeyboardController.keyboardNavigationActive = true
-                modalKeyboardController.selectedFlatIndex = 0
-                modalKeyboardController.updateSelectedIdFromIndex()
+                modalKeyboardController.keyboardNavigationActive = true;
+                modalKeyboardController.selectedFlatIndex = 0;
+                modalKeyboardController.updateSelectedIdFromIndex();
                 if (notificationListRef) {
-                    notificationListRef.keyboardActive = true
-                    notificationListRef.currentIndex = 0
+                    notificationListRef.keyboardActive = true;
+                    notificationListRef.currentIndex = 0;
                 }
-                modalKeyboardController.selectionVersion++
-                modalKeyboardController.ensureVisible()
-            })
+                modalKeyboardController.selectionVersion++;
+                modalKeyboardController.ensureVisible();
+            });
         }
     }
 
     function hide() {
-        notificationModalOpen = false
-        NotificationService.onOverlayClose()
-        close()
-        modalKeyboardController.reset()
+        notificationModalOpen = false;
+        NotificationService.onOverlayClose();
+        close();
+        modalKeyboardController.reset();
     }
 
     function toggle() {
         if (shouldBeVisible) {
-            hide()
+            hide();
         } else {
-            show()
+            show();
         }
     }
 
-    width: 500
-    height: 700
+    modalWidth: 500
+    modalHeight: 700
     visible: false
     onBackgroundClicked: hide()
     onOpened: () => {
         Qt.callLater(() => modalFocusScope.forceActiveFocus());
     }
-    onShouldBeVisibleChanged: (shouldBeVisible) => {
+    onShouldBeVisibleChanged: shouldBeVisible => {
         if (!shouldBeVisible) {
-            notificationModalOpen = false
-            modalKeyboardController.reset()
-            NotificationService.onOverlayClose()
+            notificationModalOpen = false;
+            modalKeyboardController.reset();
+            NotificationService.onOverlayClose();
         }
     }
-    modalFocusScope.Keys.onPressed: (event) => modalKeyboardController.handleKey(event)
+    modalFocusScope.Keys.onPressed: event => modalKeyboardController.handleKey(event)
 
     NotificationKeyboardController {
         id: modalKeyboardController
@@ -132,14 +130,13 @@ DankModal {
                     height: parent.height - y
                     keyboardController: modalKeyboardController
                     Component.onCompleted: {
-                        notificationModal.notificationListRef = notificationList
+                        notificationModal.notificationListRef = notificationList;
                         if (modalKeyboardController) {
-                            modalKeyboardController.listView = notificationList
-                            modalKeyboardController.rebuildFlatNavigation()
+                            modalKeyboardController.listView = notificationList;
+                            modalKeyboardController.rebuildFlatNavigation();
                         }
                     }
                 }
-
             }
 
             NotificationKeyboardHints {
@@ -151,9 +148,6 @@ DankModal {
                 anchors.margins: Theme.spacingL
                 showHints: modalKeyboardController.showKeyboardHints
             }
-
         }
-
     }
-
 }

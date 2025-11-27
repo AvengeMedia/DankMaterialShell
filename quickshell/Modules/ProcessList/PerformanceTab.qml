@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -76,7 +75,6 @@ Column {
                         color: Theme.primary
                         anchors.centerIn: parent
                     }
-
                 }
 
                 Item {
@@ -90,7 +88,6 @@ Column {
                     color: Theme.surfaceVariantText
                     anchors.verticalCenter: parent.verticalCenter
                 }
-
             }
 
             DankFlickable {
@@ -147,11 +144,8 @@ Column {
                                         NumberAnimation {
                                             duration: Theme.shortDuration
                                         }
-
                                     }
-
                                 }
-
                             }
 
                             StyledText {
@@ -163,182 +157,168 @@ Column {
                                 horizontalAlignment: Text.AlignRight
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
 
-    Rectangle {
+    Row {
         width: parent.width
         height: 80
-        radius: Theme.cornerRadius
-        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-        border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
-        border.width: 1
+        spacing: Theme.spacingM
 
-        Row {
-            anchors.centerIn: parent
-            anchors.margins: Theme.spacingM
-            spacing: Theme.spacingM
+        Rectangle {
+            width: (parent.width - Theme.spacingM) / 2
+            height: 80
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
+            border.width: 1
 
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
+            Row {
+                anchors.centerIn: parent
+                spacing: Theme.spacingM
 
-                StyledText {
-                    text: I18n.tr("Memory")
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                }
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
 
-                StyledText {
-                    text: `${DgopService.formatSystemMemory(DgopService.usedMemoryKB)} / ${DgopService.formatSystemMemory(DgopService.totalMemoryKB)}`
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
-            }
-
-            Item {
-                width: Theme.spacingL
-                height: 1
-            }
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
-                width: 200
-
-                Rectangle {
-                    width: parent.width
-                    height: 16
-                    radius: 8
-                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-
-                    Rectangle {
-                        width: DgopService.totalMemoryKB > 0 ? parent.width * (DgopService.usedMemoryKB / DgopService.totalMemoryKB) : 0
-                        height: parent.height
-                        radius: parent.radius
-                        color: {
-                            const usage = DgopService.totalMemoryKB > 0 ? (DgopService.usedMemoryKB / DgopService.totalMemoryKB) : 0;
-                            if (usage > 0.9) {
-                                return Theme.error;
-                            }
-                            if (usage > 0.7) {
-                                return Theme.warning;
-                            }
-                            return Theme.secondary;
-                        }
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                            }
-
-                        }
-
+                    StyledText {
+                        text: I18n.tr("Memory")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Bold
+                        color: Theme.surfaceText
                     }
 
+                    StyledText {
+                        text: `${DgopService.formatSystemMemory(DgopService.usedMemoryKB)} / ${DgopService.formatSystemMemory(DgopService.totalMemoryKB)}`
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
                 }
 
-                StyledText {
-                    text: DgopService.totalMemoryKB > 0 ? `${((DgopService.usedMemoryKB / DgopService.totalMemoryKB) * 100).toFixed(1)}% used` : "No data"
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                }
-
-            }
-
-            Item {
-                width: Theme.spacingL
-                height: 1
-            }
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
-
-                StyledText {
-                    text: I18n.tr("Swap")
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                }
-
-                StyledText {
-                    text: DgopService.totalSwapKB > 0 ? `${DgopService.formatSystemMemory(DgopService.usedSwapKB)} / ${DgopService.formatSystemMemory(DgopService.totalSwapKB)}` : "No swap configured"
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.surfaceVariantText
-                }
-
-            }
-
-            Item {
-                width: Theme.spacingL
-                height: 1
-            }
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 4
-                width: 200
-
-                Rectangle {
-                    width: parent.width
-                    height: 16
-                    radius: 8
-                    color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+                    width: 120
 
                     Rectangle {
-                        width: DgopService.totalSwapKB > 0 ? parent.width * (DgopService.usedSwapKB / DgopService.totalSwapKB) : 0
-                        height: parent.height
-                        radius: parent.radius
-                        color: {
-                            if (!DgopService.totalSwapKB) {
-                                return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3);
+                        width: parent.width
+                        height: 16
+                        radius: 8
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+
+                        Rectangle {
+                            width: DgopService.totalMemoryKB > 0 ? parent.width * (DgopService.usedMemoryKB / DgopService.totalMemoryKB) : 0
+                            height: parent.height
+                            radius: parent.radius
+                            color: {
+                                const usage = DgopService.totalMemoryKB > 0 ? (DgopService.usedMemoryKB / DgopService.totalMemoryKB) : 0;
+                                if (usage > 0.9) {
+                                    return Theme.error;
+                                }
+                                if (usage > 0.7) {
+                                    return Theme.warning;
+                                }
+                                return Theme.secondary;
                             }
-                            const usage = DgopService.usedSwapKB / DgopService.totalSwapKB;
-                            if (usage > 0.9) {
-                                return Theme.error;
+
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                }
                             }
-                            if (usage > 0.7) {
-                                return Theme.warning;
-                            }
-                            return Theme.info;
                         }
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                            }
-
-                        }
-
                     }
 
+                    StyledText {
+                        text: DgopService.totalMemoryKB > 0 ? `${((DgopService.usedMemoryKB / DgopService.totalMemoryKB) * 100).toFixed(1)}% used` : "No data"
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Bold
+                        color: Theme.surfaceText
+                    }
                 }
-
-                StyledText {
-                    text: DgopService.totalSwapKB > 0 ? `${((DgopService.usedSwapKB / DgopService.totalSwapKB) * 100).toFixed(1)}% used` : "Not available"
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                }
-
             }
-
         }
 
+        Rectangle {
+            width: (parent.width - Theme.spacingM) / 2
+            height: 80
+            radius: Theme.cornerRadius
+            color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.06)
+            border.width: 1
+
+            Row {
+                anchors.centerIn: parent
+                spacing: Theme.spacingM
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+
+                    StyledText {
+                        text: I18n.tr("Swap")
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Bold
+                        color: Theme.surfaceText
+                    }
+
+                    StyledText {
+                        text: DgopService.totalSwapKB > 0 ? `${DgopService.formatSystemMemory(DgopService.usedSwapKB)} / ${DgopService.formatSystemMemory(DgopService.totalSwapKB)}` : "No swap"
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 4
+                    width: 120
+
+                    Rectangle {
+                        width: parent.width
+                        height: 16
+                        radius: 8
+                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+
+                        Rectangle {
+                            width: DgopService.totalSwapKB > 0 ? parent.width * (DgopService.usedSwapKB / DgopService.totalSwapKB) : 0
+                            height: parent.height
+                            radius: parent.radius
+                            color: {
+                                if (!DgopService.totalSwapKB) {
+                                    return Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.3);
+                                }
+                                const usage = DgopService.usedSwapKB / DgopService.totalSwapKB;
+                                if (usage > 0.9) {
+                                    return Theme.error;
+                                }
+                                if (usage > 0.7) {
+                                    return Theme.warning;
+                                }
+                                return Theme.info;
+                            }
+
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                }
+                            }
+                        }
+                    }
+
+                    StyledText {
+                        text: DgopService.totalSwapKB > 0 ? `${((DgopService.usedSwapKB / DgopService.totalSwapKB) * 100).toFixed(1)}% used` : "N/A"
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Bold
+                        color: Theme.surfaceText
+                    }
+                }
+            }
+        }
     }
 
     Row {
@@ -385,7 +365,6 @@ Column {
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
-
                     }
 
                     Row {
@@ -403,13 +382,9 @@ Column {
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         Rectangle {
@@ -451,7 +426,6 @@ Column {
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
-
                     }
 
                     Row {
@@ -469,15 +443,9 @@ Column {
                             font.weight: Font.Bold
                             color: Theme.surfaceText
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

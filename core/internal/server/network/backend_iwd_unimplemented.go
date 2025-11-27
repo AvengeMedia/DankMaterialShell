@@ -45,3 +45,38 @@ func (b *IWDBackend) DisconnectAllVPN() error {
 func (b *IWDBackend) ClearVPNCredentials(uuidOrName string) error {
 	return fmt.Errorf("VPN not supported by iwd backend")
 }
+
+func (b *IWDBackend) ScanWiFiDevice(device string) error {
+	return b.ScanWiFi()
+}
+
+func (b *IWDBackend) DisconnectWiFiDevice(device string) error {
+	return b.DisconnectWiFi()
+}
+
+func (b *IWDBackend) GetWiFiDevices() []WiFiDevice {
+	b.stateMutex.RLock()
+	defer b.stateMutex.RUnlock()
+	return b.getWiFiDevicesLocked()
+}
+
+func (b *IWDBackend) getWiFiDevicesLocked() []WiFiDevice {
+	if b.state.WiFiDevice == "" {
+		return nil
+	}
+
+	stateStr := "disconnected"
+	if b.state.WiFiConnected {
+		stateStr = "connected"
+	}
+
+	return []WiFiDevice{{
+		Name:      b.state.WiFiDevice,
+		State:     stateStr,
+		Connected: b.state.WiFiConnected,
+		SSID:      b.state.WiFiSSID,
+		Signal:    b.state.WiFiSignal,
+		IP:        b.state.WiFiIP,
+		Networks:  b.state.WiFiNetworks,
+	}}
+}

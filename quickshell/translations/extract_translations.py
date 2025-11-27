@@ -6,9 +6,10 @@ from pathlib import Path
 from collections import defaultdict
 
 def extract_qstr_strings(root_dir):
-    translations = defaultdict(list)
+    translations = defaultdict(lambda: {'contexts': set(), 'occurrences': []})
     qstr_pattern = re.compile(r'qsTr\(["\']([^"\']+)["\']\)')
-    i18n_pattern = re.compile(r'I18n\.tr\(["\']([^"\']+)["\']\)')
+    i18n_pattern_with_context = re.compile(r'I18n\.tr\(["\']([^"\']+)["\']\s*,\s*["\']([^"\']+)["\']\)')
+    i18n_pattern_simple = re.compile(r'I18n\.tr\(["\']([^"\']+)["\']\)')
 
     for qml_file in Path(root_dir).rglob('*.qml'):
         relative_path = qml_file.relative_to(root_dir)
@@ -17,33 +18,45 @@ def extract_qstr_strings(root_dir):
             for line_num, line in enumerate(f, 1):
                 qstr_matches = qstr_pattern.findall(line)
                 for match in qstr_matches:
-                    translations[match].append({
+                    translations[match]['occurrences'].append({
                         'file': str(relative_path),
                         'line': line_num
                     })
 
-                i18n_matches = i18n_pattern.findall(line)
-                for match in i18n_matches:
-                    translations[match].append({
+                i18n_with_context = i18n_pattern_with_context.findall(line)
+                for term, context in i18n_with_context:
+                    translations[term]['contexts'].add(context)
+                    translations[term]['occurrences'].append({
                         'file': str(relative_path),
                         'line': line_num
                     })
+
+                i18n_simple = i18n_pattern_simple.findall(line)
+                for match in i18n_simple:
+                    if not i18n_pattern_with_context.search(line):
+                        translations[match]['occurrences'].append({
+                            'file': str(relative_path),
+                            'line': line_num
+                        })
 
     return translations
 
 def create_poeditor_json(translations):
     poeditor_data = []
 
-    for term, occurrences in sorted(translations.items()):
+    for term, data in sorted(translations.items()):
         references = []
 
-        for occ in occurrences:
+        for occ in data['occurrences']:
             ref = f"{occ['file']}:{occ['line']}"
             references.append(ref)
 
+        contexts = sorted(data['contexts']) if data['contexts'] else []
+        context_str = " | ".join(contexts) if contexts else term
+
         entry = {
             "term": term,
-            "context": term,
+            "context": context_str,
             "reference": ", ".join(references),
             "comment": ""
         }
@@ -54,11 +67,14 @@ def create_poeditor_json(translations):
 def create_template_json(translations):
     template_data = []
 
-    for term in sorted(translations.keys()):
+    for term, data in sorted(translations.items()):
+        contexts = sorted(data['contexts']) if data['contexts'] else []
+        context_str = " | ".join(contexts) if contexts else ""
+
         entry = {
             "term": term,
             "translation": "",
-            "context": "",
+            "context": context_str,
             "reference": "",
             "comment": ""
         }
@@ -90,7 +106,8 @@ def main():
 
     print("\nSummary:")
     print(f"  - Unique strings: {len(translations)}")
-    print(f"  - Total occurrences: {sum(len(occs) for occs in translations.values())}")
+    print(f"  - Total occurrences: {sum(len(data['occurrences']) for data in translations.values())}")
+    print(f"  - Strings with contexts: {sum(1 for data in translations.values() if data['contexts'])}")
     print(f"  - Source file: {en_json_path}")
     print(f"  - Template file: {template_json_path}")
 

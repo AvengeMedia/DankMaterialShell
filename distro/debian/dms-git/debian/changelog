@@ -1,0 +1,12 @@
+dms-git (0.6.2+git5) nightly; urgency=medium
+
+  * Fix debian/rules to use source at root level (native format)
+  * Remove incorrect dms-git-source subdirectory references
+  * Fix Build-Depends parsing path issue in obs-upload.sh auto-increment
+  * Fix Build-Depends parsing in obs-upload.sh for proper dependency extraction
+  * Build dms binary from source for true git version strings
+  * Match Fedora COPR git build behavior
+  * Now shows proper git version (e.g., v0.6.2-11-g12e91534)
+  * Add golang-go and make as build dependencies
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Wed, 27 Nov 2025 04:15:00 -0500

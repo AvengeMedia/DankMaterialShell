@@ -117,11 +117,13 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.WiFiBSSID = backendState.WiFiBSSID
 	m.state.WiFiSignal = backendState.WiFiSignal
 	m.state.WiFiNetworks = backendState.WiFiNetworks
+	m.state.WiFiDevices = backendState.WiFiDevices
 	m.state.WiredConnections = backendState.WiredConnections
 	m.state.VPNProfiles = backendState.VPNProfiles
 	m.state.VPNActive = backendState.VPNActive
 	m.state.IsConnecting = backendState.IsConnecting
 	m.state.ConnectingSSID = backendState.ConnectingSSID
+	m.state.ConnectingDevice = backendState.ConnectingDevice
 	m.state.LastError = backendState.LastError
 	m.stateMutex.Unlock()
 
@@ -151,6 +153,7 @@ func (m *Manager) snapshotState() NetworkState {
 	defer m.stateMutex.RUnlock()
 	s := *m.state
 	s.WiFiNetworks = append([]WiFiNetwork(nil), m.state.WiFiNetworks...)
+	s.WiFiDevices = append([]WiFiDevice(nil), m.state.WiFiDevices...)
 	s.WiredConnections = append([]WiredConnection(nil), m.state.WiredConnections...)
 	s.VPNProfiles = append([]VPNProfile(nil), m.state.VPNProfiles...)
 	s.VPNActive = append([]VPNActive(nil), m.state.VPNActive...)
@@ -202,6 +205,9 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 		return true
 	}
 	if len(old.WiFiNetworks) != len(new.WiFiNetworks) {
+		return true
+	}
+	if len(old.WiFiDevices) != len(new.WiFiDevices) {
 		return true
 	}
 	if len(old.WiredConnections) != len(new.WiredConnections) {
@@ -504,4 +510,20 @@ func (m *Manager) ClearVPNCredentials(uuidOrName string) error {
 
 func (m *Manager) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 	return m.backend.SetWiFiAutoconnect(ssid, autoconnect)
+}
+
+func (m *Manager) GetWiFiDevices() []WiFiDevice {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	devices := make([]WiFiDevice, len(m.state.WiFiDevices))
+	copy(devices, m.state.WiFiDevices)
+	return devices
+}
+
+func (m *Manager) ScanWiFiDevice(device string) error {
+	return m.backend.ScanWiFiDevice(device)
+}
+
+func (m *Manager) DisconnectWiFiDevice(device string) error {
+	return m.backend.DisconnectWiFiDevice(device)
 }

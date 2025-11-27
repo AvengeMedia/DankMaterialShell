@@ -1,0 +1,114 @@
+name: Update PPA Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to upload (dms, dms-git, or all)'
+        required: false
+        default: 'dms-git'
+      rebuild_release:
+        description: 'Release number for rebuilds (e.g., 2, 3, 4 for ppa2, ppa3, ppa4)'
+        required: false
+        default: ''
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours for dms-git builds
+
+jobs:
+  upload-ppa:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: false  
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debhelper \
+            devscripts \
+            dput \
+            lftp \
+            build-essential \
+            fakeroot \
+            dpkg-dev
+      
+      - name: Configure GPG
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_KEY" | gpg --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> $GITHUB_ENV
+      
+      - name: Determine packages to upload
+        id: packages
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "packages=dms-git" >> $GITHUB_OUTPUT
+            echo "Triggered by schedule: uploading git package"
+          elif [[ -n "${{ github.event.inputs.package }}" ]]; then
+            echo "packages=${{ github.event.inputs.package }}" >> $GITHUB_OUTPUT
+            echo "Manual trigger: ${{ github.event.inputs.package }}"
+          else
+            echo "packages=dms-git" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Upload to PPA
+        env:
+          REBUILD_RELEASE: ${{ github.event.inputs.rebuild_release }}
+        run: |
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+          
+          if [[ "$PACKAGES" == "all" ]]; then
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Uploading dms to PPA..."
+            if [ -n "$REBUILD_RELEASE" ]; then
+              echo "🔄 Using rebuild release number: ppa$REBUILD_RELEASE"
+            fi
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            bash distro/scripts/ppa-upload.sh "distro/ubuntu/dms" dms questing
+            
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Uploading dms-git to PPA..."
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            bash distro/scripts/ppa-upload.sh "distro/ubuntu/dms-git" dms-git questing
+          else
+            PPA_NAME="$PACKAGES"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Uploading $PACKAGES to PPA..."
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            bash distro/scripts/ppa-upload.sh "distro/ubuntu/$PACKAGES" "$PPA_NAME" questing
+          fi
+      
+      - name: Summary
+        run: |
+          echo "### PPA Package Upload Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Packages**: ${{ steps.packages.outputs.packages }}" >> $GITHUB_STEP_SUMMARY
+          
+          PACKAGES="${{ steps.packages.outputs.packages }}"
+          if [[ "$PACKAGES" == "all" ]]; then
+            echo "- **PPA dms**: https://launchpad.net/~avengemedia/+archive/ubuntu/dms/+packages" >> $GITHUB_STEP_SUMMARY
+            echo "- **PPA dms-git**: https://launchpad.net/~avengemedia/+archive/ubuntu/dms-git/+packages" >> $GITHUB_STEP_SUMMARY
+          elif [[ "$PACKAGES" == "dms" ]]; then
+            echo "- **PPA**: https://launchpad.net/~avengemedia/+archive/ubuntu/dms/+packages" >> $GITHUB_STEP_SUMMARY
+          elif [[ "$PACKAGES" == "dms-git" ]]; then
+            echo "- **PPA**: https://launchpad.net/~avengemedia/+archive/ubuntu/dms-git/+packages" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -n "${{ steps.packages.outputs.version }}" ]]; then
+            echo "- **Version**: ${{ steps.packages.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Builds will appear once Launchpad processes the uploads." >> $GITHUB_STEP_SUMMARY

@@ -13,11 +13,17 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property bool overrideAxisLayout: false
     property bool forceVerticalLayout: false
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
-    readonly property real spacing: noBackground ? 2 : Theme.spacingXS
+    readonly property real spacing: {
+        const baseSpacing = noBackground ? 2 : Theme.spacingXS;
+        const outlineThickness = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+        return baseSpacing + (outlineThickness * 2);
+    }
 
     property var centerWidgets: []
     property int totalWidgets: 0
@@ -25,238 +31,238 @@ Item {
 
     function updateLayout() {
         if ((isVertical ? height : width) <= 0 || !visible) {
-            return
+            return;
         }
 
-        centerWidgets = []
-        totalWidgets = 0
-        totalSize = 0
+        centerWidgets = [];
+        totalWidgets = 0;
+        totalSize = 0;
 
-        let configuredWidgets = 0
-        let configuredMiddleWidget = null
-        let configuredLeftWidget = null
-        let configuredRightWidget = null
+        let configuredWidgets = 0;
+        let configuredMiddleWidget = null;
+        let configuredLeftWidget = null;
+        let configuredRightWidget = null;
 
         for (var i = 0; i < centerRepeater.count; i++) {
-            const item = centerRepeater.itemAt(i)
+            const item = centerRepeater.itemAt(i);
             if (item && getWidgetVisible(item.widgetId)) {
-                configuredWidgets++
+                configuredWidgets++;
             }
         }
 
-        const isOddConfigured = configuredWidgets % 2 === 1
-        const configuredMiddlePos = Math.floor(configuredWidgets / 2)
-        const configuredLeftPos = isOddConfigured ? -1 : ((configuredWidgets / 2) - 1)
-        const configuredRightPos = isOddConfigured ? -1 : (configuredWidgets / 2)
-        let currentConfigIndex = 0
+        const isOddConfigured = configuredWidgets % 2 === 1;
+        const configuredMiddlePos = Math.floor(configuredWidgets / 2);
+        const configuredLeftPos = isOddConfigured ? -1 : ((configuredWidgets / 2) - 1);
+        const configuredRightPos = isOddConfigured ? -1 : (configuredWidgets / 2);
+        let currentConfigIndex = 0;
 
         for (var i = 0; i < centerRepeater.count; i++) {
-            const item = centerRepeater.itemAt(i)
+            const item = centerRepeater.itemAt(i);
             if (item && getWidgetVisible(item.widgetId)) {
                 if (isOddConfigured && currentConfigIndex === configuredMiddlePos && item.active && item.item) {
-                    configuredMiddleWidget = item.item
+                    configuredMiddleWidget = item.item;
                 }
                 if (!isOddConfigured && currentConfigIndex === configuredLeftPos && item.active && item.item) {
-                    configuredLeftWidget = item.item
+                    configuredLeftWidget = item.item;
                 }
                 if (!isOddConfigured && currentConfigIndex === configuredRightPos && item.active && item.item) {
-                    configuredRightWidget = item.item
+                    configuredRightWidget = item.item;
                 }
                 if (item.active && item.item) {
-                    centerWidgets.push(item.item)
-                    totalWidgets++
-                    totalSize += isVertical ? item.item.height : item.item.width
+                    centerWidgets.push(item.item);
+                    totalWidgets++;
+                    totalSize += isVertical ? item.item.height : item.item.width;
                 }
-                currentConfigIndex++
+                currentConfigIndex++;
             }
         }
 
         if (totalWidgets === 0) {
-            return
+            return;
         }
 
         if (totalWidgets > 1) {
-            totalSize += spacing * (totalWidgets - 1)
+            totalSize += spacing * (totalWidgets - 1);
         }
 
-        positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget)
+        positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget);
     }
 
     function positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget) {
-        const parentCenter = (isVertical ? height : width) / 2
-        const isOddConfigured = configuredWidgets % 2 === 1
+        const parentCenter = (isVertical ? height : width) / 2;
+        const isOddConfigured = configuredWidgets % 2 === 1;
 
         centerWidgets.forEach(widget => {
             if (isVertical) {
-                widget.anchors.verticalCenter = undefined
+                widget.anchors.verticalCenter = undefined;
             } else {
-                widget.anchors.horizontalCenter = undefined
+                widget.anchors.horizontalCenter = undefined;
             }
-        })
+        });
 
         if (isOddConfigured && configuredMiddleWidget) {
-            const middleWidget = configuredMiddleWidget
-            const middleIndex = centerWidgets.indexOf(middleWidget)
-            const middleSize = isVertical ? middleWidget.height : middleWidget.width
+            const middleWidget = configuredMiddleWidget;
+            const middleIndex = centerWidgets.indexOf(middleWidget);
+            const middleSize = isVertical ? middleWidget.height : middleWidget.width;
 
             if (isVertical) {
-                middleWidget.y = parentCenter - (middleSize / 2)
+                middleWidget.y = parentCenter - (middleSize / 2);
             } else {
-                middleWidget.x = parentCenter - (middleSize / 2)
+                middleWidget.x = parentCenter - (middleSize / 2);
             }
 
-            let currentPos = isVertical ? middleWidget.y : middleWidget.x
+            let currentPos = isVertical ? middleWidget.y : middleWidget.x;
             for (var i = middleIndex - 1; i >= 0; i--) {
-                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                currentPos -= (spacing + size)
+                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                currentPos -= (spacing + size);
                 if (isVertical) {
-                    centerWidgets[i].y = currentPos
+                    centerWidgets[i].y = currentPos;
                 } else {
-                    centerWidgets[i].x = currentPos
+                    centerWidgets[i].x = currentPos;
                 }
             }
 
-            currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize
+            currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize;
             for (var i = middleIndex + 1; i < totalWidgets; i++) {
-                currentPos += spacing
+                currentPos += spacing;
                 if (isVertical) {
-                    centerWidgets[i].y = currentPos
+                    centerWidgets[i].y = currentPos;
                 } else {
-                    centerWidgets[i].x = currentPos
+                    centerWidgets[i].x = currentPos;
                 }
-                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
+                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
             }
         } else {
             if (totalWidgets === 1) {
-                const widget = centerWidgets[0]
-                const size = isVertical ? widget.height : widget.width
+                const widget = centerWidgets[0];
+                const size = isVertical ? widget.height : widget.width;
                 if (isVertical) {
-                    widget.y = parentCenter - (size / 2)
+                    widget.y = parentCenter - (size / 2);
                 } else {
-                    widget.x = parentCenter - (size / 2)
+                    widget.x = parentCenter - (size / 2);
                 }
-                return
+                return;
             }
 
             if (!configuredLeftWidget || !configuredRightWidget) {
                 if (totalWidgets % 2 === 1) {
-                    const middleIndex = Math.floor(totalWidgets / 2)
-                    const middleWidget = centerWidgets[middleIndex]
+                    const middleIndex = Math.floor(totalWidgets / 2);
+                    const middleWidget = centerWidgets[middleIndex];
 
                     if (!middleWidget) {
-                        return
+                        return;
                     }
 
-                    const middleSize = isVertical ? middleWidget.height : middleWidget.width
+                    const middleSize = isVertical ? middleWidget.height : middleWidget.width;
 
                     if (isVertical) {
-                        middleWidget.y = parentCenter - (middleSize / 2)
+                        middleWidget.y = parentCenter - (middleSize / 2);
                     } else {
-                        middleWidget.x = parentCenter - (middleSize / 2)
+                        middleWidget.x = parentCenter - (middleSize / 2);
                     }
 
-                    let currentPos = isVertical ? middleWidget.y : middleWidget.x
+                    let currentPos = isVertical ? middleWidget.y : middleWidget.x;
                     for (var i = middleIndex - 1; i >= 0; i--) {
-                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                        currentPos -= (spacing + size)
+                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                        currentPos -= (spacing + size);
                         if (isVertical) {
-                            centerWidgets[i].y = currentPos
+                            centerWidgets[i].y = currentPos;
                         } else {
-                            centerWidgets[i].x = currentPos
+                            centerWidgets[i].x = currentPos;
                         }
                     }
 
-                    currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize
+                    currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize;
                     for (var i = middleIndex + 1; i < totalWidgets; i++) {
-                        currentPos += spacing
+                        currentPos += spacing;
                         if (isVertical) {
-                            centerWidgets[i].y = currentPos
+                            centerWidgets[i].y = currentPos;
                         } else {
-                            centerWidgets[i].x = currentPos
+                            centerWidgets[i].x = currentPos;
                         }
-                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
+                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
                     }
                 } else {
-                    const leftIndex = (totalWidgets / 2) - 1
-                    const rightIndex = totalWidgets / 2
-                    const fallbackLeft = centerWidgets[leftIndex]
-                    const fallbackRight = centerWidgets[rightIndex]
+                    const leftIndex = (totalWidgets / 2) - 1;
+                    const rightIndex = totalWidgets / 2;
+                    const fallbackLeft = centerWidgets[leftIndex];
+                    const fallbackRight = centerWidgets[rightIndex];
 
                     if (!fallbackLeft || !fallbackRight) {
-                        return
+                        return;
                     }
 
-                    const halfSpacing = spacing / 2
-                    const leftSize = isVertical ? fallbackLeft.height : fallbackLeft.width
+                    const halfSpacing = spacing / 2;
+                    const leftSize = isVertical ? fallbackLeft.height : fallbackLeft.width;
 
                     if (isVertical) {
-                        fallbackLeft.y = parentCenter - halfSpacing - leftSize
-                        fallbackRight.y = parentCenter + halfSpacing
+                        fallbackLeft.y = parentCenter - halfSpacing - leftSize;
+                        fallbackRight.y = parentCenter + halfSpacing;
                     } else {
-                        fallbackLeft.x = parentCenter - halfSpacing - leftSize
-                        fallbackRight.x = parentCenter + halfSpacing
+                        fallbackLeft.x = parentCenter - halfSpacing - leftSize;
+                        fallbackRight.x = parentCenter + halfSpacing;
                     }
 
-                    let currentPos = isVertical ? fallbackLeft.y : fallbackLeft.x
+                    let currentPos = isVertical ? fallbackLeft.y : fallbackLeft.x;
                     for (var i = leftIndex - 1; i >= 0; i--) {
-                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                        currentPos -= (spacing + size)
+                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                        currentPos -= (spacing + size);
                         if (isVertical) {
-                            centerWidgets[i].y = currentPos
+                            centerWidgets[i].y = currentPos;
                         } else {
-                            centerWidgets[i].x = currentPos
+                            centerWidgets[i].x = currentPos;
                         }
                     }
 
-                    currentPos = (isVertical ? fallbackRight.y + fallbackRight.height : fallbackRight.x + fallbackRight.width)
+                    currentPos = (isVertical ? fallbackRight.y + fallbackRight.height : fallbackRight.x + fallbackRight.width);
                     for (var i = rightIndex + 1; i < totalWidgets; i++) {
-                        currentPos += spacing
+                        currentPos += spacing;
                         if (isVertical) {
-                            centerWidgets[i].y = currentPos
+                            centerWidgets[i].y = currentPos;
                         } else {
-                            centerWidgets[i].x = currentPos
+                            centerWidgets[i].x = currentPos;
                         }
-                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
+                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
                     }
                 }
-                return
+                return;
             }
 
-            const leftWidget = configuredLeftWidget
-            const rightWidget = configuredRightWidget
-            const leftIndex = centerWidgets.indexOf(leftWidget)
-            const rightIndex = centerWidgets.indexOf(rightWidget)
-            const halfSpacing = spacing / 2
-            const leftSize = isVertical ? leftWidget.height : leftWidget.width
+            const leftWidget = configuredLeftWidget;
+            const rightWidget = configuredRightWidget;
+            const leftIndex = centerWidgets.indexOf(leftWidget);
+            const rightIndex = centerWidgets.indexOf(rightWidget);
+            const halfSpacing = spacing / 2;
+            const leftSize = isVertical ? leftWidget.height : leftWidget.width;
 
             if (isVertical) {
-                leftWidget.y = parentCenter - halfSpacing - leftSize
-                rightWidget.y = parentCenter + halfSpacing
+                leftWidget.y = parentCenter - halfSpacing - leftSize;
+                rightWidget.y = parentCenter + halfSpacing;
             } else {
-                leftWidget.x = parentCenter - halfSpacing - leftSize
-                rightWidget.x = parentCenter + halfSpacing
+                leftWidget.x = parentCenter - halfSpacing - leftSize;
+                rightWidget.x = parentCenter + halfSpacing;
             }
 
-            let currentPos = isVertical ? leftWidget.y : leftWidget.x
+            let currentPos = isVertical ? leftWidget.y : leftWidget.x;
             for (var i = leftIndex - 1; i >= 0; i--) {
-                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                currentPos -= (spacing + size)
+                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                currentPos -= (spacing + size);
                 if (isVertical) {
-                    centerWidgets[i].y = currentPos
+                    centerWidgets[i].y = currentPos;
                 } else {
-                    centerWidgets[i].x = currentPos
+                    centerWidgets[i].x = currentPos;
                 }
             }
 
-            currentPos = (isVertical ? rightWidget.y + rightWidget.height : rightWidget.x + rightWidget.width)
+            currentPos = (isVertical ? rightWidget.y + rightWidget.height : rightWidget.x + rightWidget.width);
             for (var i = rightIndex + 1; i < totalWidgets; i++) {
-                currentPos += spacing
+                currentPos += spacing;
                 if (isVertical) {
-                    centerWidgets[i].y = currentPos
+                    centerWidgets[i].y = currentPos;
                 } else {
-                    centerWidgets[i].x = currentPos
+                    centerWidgets[i].x = currentPos;
                 }
-                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
+                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
             }
         }
     }
@@ -268,8 +274,8 @@ Item {
             "cpuTemp": DgopService.dgopAvailable,
             "gpuTemp": DgopService.dgopAvailable,
             "network_speed_monitor": DgopService.dgopAvailable
-        }
-        return widgetVisibility[widgetId] ?? true
+        };
+        return widgetVisibility[widgetId] ?? true;
     }
 
     function getWidgetComponent(widgetId) {
@@ -302,19 +308,19 @@ Item {
             "notepadButton": "notepadButtonComponent",
             "colorPicker": "colorPickerComponent",
             "systemUpdate": "systemUpdateComponent"
-        }
+        };
 
         // For built-in components, get from components property
-        const componentKey = baseMap[widgetId]
+        const componentKey = baseMap[widgetId];
         if (componentKey && root.components[componentKey]) {
-            return root.components[componentKey]
+            return root.components[componentKey];
         }
 
         // For plugin components, get from PluginService
-        var parts = widgetId.split(":")
-        var pluginId = parts[0]
-        let pluginComponents = PluginService.getWidgetComponents()
-        return pluginComponents[pluginId] || null
+        var parts = widgetId.split(":");
+        var pluginId = parts[0];
+        let pluginComponents = PluginService.getWidgetComponents();
+        return pluginComponents[pluginId] || null;
     }
 
     height: parent.height
@@ -329,24 +335,24 @@ Item {
     }
 
     Component.onCompleted: {
-        layoutTimer.restart()
+        layoutTimer.restart();
     }
 
     onWidthChanged: {
         if (width > 0) {
-            layoutTimer.restart()
+            layoutTimer.restart();
         }
     }
 
     onHeightChanged: {
         if (height > 0) {
-            layoutTimer.restart()
+            layoutTimer.restart();
         }
     }
 
     onVisibleChanged: {
         if (visible && (isVertical ? height : width) > 0) {
-            layoutTimer.restart()
+            layoutTimer.restart();
         }
     }
 
@@ -354,144 +360,150 @@ Item {
         id: centerRepeater
         model: root.widgetsModel
 
-
         Loader {
-            property string widgetId: model.widgetId
-            property var widgetData: model
-            property int spacerSize: model.size || 20
+            property var itemData: modelData
+            property string widgetId: itemData.widgetId
+            property var widgetData: itemData
+            property int spacerSize: itemData.size || 20
 
             anchors.verticalCenter: !root.isVertical ? parent.verticalCenter : undefined
             anchors.horizontalCenter: root.isVertical ? parent.horizontalCenter : undefined
-            active: root.getWidgetVisible(model.widgetId) && (model.widgetId !== "music" || MprisController.activePlayer !== null)
-            sourceComponent: root.getWidgetComponent(model.widgetId)
-            opacity: (model.enabled !== false) ? 1 : 0
+            active: root.getWidgetVisible(itemData.widgetId) && (itemData.widgetId !== "music" || MprisController.activePlayer !== null)
+            sourceComponent: root.getWidgetComponent(itemData.widgetId)
+            opacity: (itemData.enabled !== false) ? 1 : 0
             asynchronous: false
 
             onLoaded: {
                 if (!item) {
-                    return
+                    return;
                 }
-                item.widthChanged.connect(() => layoutTimer.restart())
-                item.heightChanged.connect(() => layoutTimer.restart())
+                item.widthChanged.connect(() => {
+                    if (layoutTimer)
+                        layoutTimer.restart();
+                });
+                item.heightChanged.connect(() => {
+                    if (layoutTimer)
+                        layoutTimer.restart();
+                });
                 if (root.axis && "axis" in item) {
-                    item.axis = Qt.binding(() => root.axis)
+                    item.axis = Qt.binding(() => root.axis);
                 }
                 if (root.axis && "isVertical" in item) {
                     try {
-                        item.isVertical = Qt.binding(() => root.axis.isVertical)
-                    } catch (e) {
-                    }
+                        item.isVertical = Qt.binding(() => root.axis.isVertical);
+                    } catch (e) {}
                 }
 
                 // Inject properties for plugin widgets
                 if ("section" in item) {
-                    item.section = root.section
+                    item.section = root.section;
                 }
                 if ("parentScreen" in item) {
-                    item.parentScreen = Qt.binding(() => root.parentScreen)
+                    item.parentScreen = Qt.binding(() => root.parentScreen);
                 }
                 if ("widgetThickness" in item) {
-                    item.widgetThickness = Qt.binding(() => root.widgetThickness)
+                    item.widgetThickness = Qt.binding(() => root.widgetThickness);
                 }
                 if ("barThickness" in item) {
-                    item.barThickness = Qt.binding(() => root.barThickness)
+                    item.barThickness = Qt.binding(() => root.barThickness);
+                }
+                if ("barSpacing" in item) {
+                    item.barSpacing = Qt.binding(() => root.barSpacing);
+                }
+                if ("barConfig" in item) {
+                    item.barConfig = Qt.binding(() => root.barConfig);
                 }
                 if ("sectionSpacing" in item) {
-                    item.sectionSpacing = Qt.binding(() => root.spacing)
+                    item.sectionSpacing = Qt.binding(() => root.spacing);
+                }
+                if ("widgetData" in item) {
+                    item.widgetData = Qt.binding(() => widgetData);
                 }
 
                 if ("isFirst" in item) {
                     item.isFirst = Qt.binding(() => {
                         for (var i = 0; i < centerRepeater.count; i++) {
-                            const checkItem = centerRepeater.itemAt(i)
+                            const checkItem = centerRepeater.itemAt(i);
                             if (checkItem && checkItem.active && checkItem.item) {
-                                return checkItem.item === item
+                                return checkItem.item === item;
                             }
                         }
-                        return false
-                    })
+                        return false;
+                    });
                 }
 
                 if ("isLast" in item) {
                     item.isLast = Qt.binding(() => {
                         for (var i = centerRepeater.count - 1; i >= 0; i--) {
-                            const checkItem = centerRepeater.itemAt(i)
+                            const checkItem = centerRepeater.itemAt(i);
                             if (checkItem && checkItem.active && checkItem.item) {
-                                return checkItem.item === item
+                                return checkItem.item === item;
                             }
                         }
-                        return false
-                    })
+                        return false;
+                    });
                 }
 
                 if ("isLeftBarEdge" in item) {
-                    item.isLeftBarEdge = false
+                    item.isLeftBarEdge = false;
                 }
                 if ("isRightBarEdge" in item) {
-                    item.isRightBarEdge = false
+                    item.isRightBarEdge = false;
                 }
                 if ("isTopBarEdge" in item) {
-                    item.isTopBarEdge = false
+                    item.isTopBarEdge = false;
                 }
                 if ("isBottomBarEdge" in item) {
-                    item.isBottomBarEdge = false
+                    item.isBottomBarEdge = false;
                 }
 
                 if (item.pluginService !== undefined) {
-                    var parts = model.widgetId.split(":")
-                    var pluginId = parts[0]
-                    var variantId = parts.length > 1 ? parts[1] : null
+                    var parts = model.widgetId.split(":");
+                    var pluginId = parts[0];
+                    var variantId = parts.length > 1 ? parts[1] : null;
 
                     if (item.pluginId !== undefined) {
-                        item.pluginId = pluginId
+                        item.pluginId = pluginId;
                     }
                     if (item.variantId !== undefined) {
-                        item.variantId = variantId
+                        item.variantId = variantId;
                     }
                     if (item.variantData !== undefined && variantId) {
-                        item.variantData = PluginService.getPluginVariantData(pluginId, variantId)
+                        item.variantData = PluginService.getPluginVariantData(pluginId, variantId);
                     }
-                    item.pluginService = PluginService
+                    item.pluginService = PluginService;
                 }
 
                 if (item.popoutService !== undefined) {
-                    item.popoutService = PopoutService
+                    item.popoutService = PopoutService;
                 }
 
-                layoutTimer.restart()
+                layoutTimer.restart();
             }
 
             onActiveChanged: {
-                layoutTimer.restart()
+                layoutTimer.restart();
             }
         }
     }
 
-    Connections {
-        target: widgetsModel
-        function onCountChanged() {
-            layoutTimer.restart()
-        }
-    }
-
-    // Listen for plugin changes and refresh components
     Connections {
         target: PluginService
         function onPluginLoaded(pluginId) {
             // Force refresh of component lookups
             for (var i = 0; i < centerRepeater.count; i++) {
-                var item = centerRepeater.itemAt(i)
+                var item = centerRepeater.itemAt(i);
                 if (item && item.widgetId.startsWith(pluginId)) {
-                    item.sourceComponent = root.getWidgetComponent(item.widgetId)
+                    item.sourceComponent = root.getWidgetComponent(item.widgetId);
                 }
             }
         }
         function onPluginUnloaded(pluginId) {
             // Force refresh of component lookups
             for (var i = 0; i < centerRepeater.count; i++) {
-                var item = centerRepeater.itemAt(i)
+                var item = centerRepeater.itemAt(i);
                 if (item && item.widgetId.startsWith(pluginId)) {
-                    item.sourceComponent = root.getWidgetComponent(item.widgetId)
+                    item.sourceComponent = root.getWidgetComponent(item.widgetId);
                 }
             }
         }

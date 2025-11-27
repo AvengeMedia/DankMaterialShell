@@ -2,6 +2,12 @@
   "%1 characters": {
     "%1 characters": "%1 文字"
   },
+  "%1 display(s)": {
+    "%1 display(s)": ""
+  },
+  "%1 widgets": {
+    "%1 widgets": ""
+  },
   "(Unnamed)": {
     "(Unnamed)": "（名前なし）"
   },
@@ -46,6 +52,9 @@
   },
   "Add": {
     "Add": "追加"
+  },
+  "Add Bar": {
+    "Add Bar": ""
   },
   "Add Widget": {
     "Add Widget": "ウィジェットを追加"
@@ -227,6 +236,12 @@
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "アクセントに焦点を絞ったバランスの取れたパレット(デフォルト)。"
   },
+  "Bar Configurations": {
+    "Bar Configurations": ""
+  },
+  "Bar Transparency": {
+    "Bar Transparency": ""
+  },
   "Battery": {
     "Battery": "バッテリー"
   },
@@ -326,17 +341,26 @@
   "Center Tiling": {
     "Center Tiling": "中央タイルリング"
   },
+  "Change bar appearance": {
+    "Change bar appearance": ""
+  },
   "Changes:": {
     "Changes:": "変更:"
   },
   "Check for system updates": {
     "Check for system updates": "システムアップデートを検査"
   },
+  "Choose Color": {
+    "Choose Color": ""
+  },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "ランチャーロゴの色を選ぶ"
   },
   "Choose icon": {
     "Choose icon": "アイコンを選ぶ"
+  },
+  "Choose the background color for widgets": {
+    "Choose the background color for widgets": ""
   },
   "Choose the border accent color": {
     "Choose the border accent color": "ボーダーの強調色を選ぶ"
@@ -373,6 +397,9 @@
   },
   "Close": {
     "Close": "閉じる"
+  },
+  "Close Overview on Launch": {
+    "Close Overview on Launch": ""
   },
   "Color Override": {
     "Color Override": "色のオーバーライド"
@@ -626,6 +653,9 @@
   "Dismiss": {
     "Dismiss": "解除"
   },
+  "Display Assignment": {
+    "Display Assignment": ""
+  },
   "Display Name Format": {
     "Display Name Format": "名称形式を表示"
   },
@@ -706,6 +736,9 @@
   },
   "Enable Autoconnect": {
     "Enable Autoconnect": "自動接続を有効"
+  },
+  "Enable Bar": {
+    "Enable Bar": ""
   },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "GPU温度を有効にする"
@@ -1001,6 +1034,9 @@
   "Individual Batteries": {
     "Individual Batteries": "バッテリーごと"
   },
+  "Individual bar configuration": {
+    "Individual bar configuration": ""
+  },
   "Inhibit idle timeout when audio or video is playing": {
     "Inhibit idle timeout when audio or video is playing": "オーディオまたはビデオの再生中のアイドルタイムアウトを禁止"
   },
@@ -1028,8 +1064,14 @@
   "Jobs: ": {
     "Jobs: ": "ジョブ: "
   },
+  "Keep Awake": {
+    "Keep Awake": ""
+  },
   "Keep Changes": {
     "Keep Changes": "変更を保持"
+  },
+  "Keeping Awake": {
+    "Keeping Awake": ""
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "キーボードレイアウト名"
@@ -1121,6 +1163,9 @@
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "DMS 機能を拡張するためのプラグインを管理および構成"
   },
+  "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": ""
+  },
   "Manual Coordinates": {
     "Manual Coordinates": "手動座標"
   },
@@ -1184,6 +1229,9 @@
   "Media Players (": {
     "Media Players (": "メディアプレーヤー（"
   },
+  "Media Volume OSD": {
+    "Media Volume OSD": ""
+  },
   "Memory": {
     "Memory": "メモリ"
   },
@@ -1198,6 +1246,9 @@
   },
   "Microphone Mute OSD": {
     "Microphone Mute OSD": "マイクミュートOSD"
+  },
+  "Middle Section": {
+    "Middle Section": ""
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "単一の色相を中心に構築された最小限のパレット。"
@@ -1670,6 +1721,9 @@
   "Save Notepad File": {
     "Save Notepad File": "メモ帳ファイルを保存"
   },
+  "Save password": {
+    "Save password": ""
+  },
   "Saved": {
     "Saved": "保存されました"
   },
@@ -1828,6 +1882,9 @@
   },
   "Show on-screen display when idle inhibitor state changes": {
     "Show on-screen display when idle inhibitor state changes": "アイドルインヒビターの状態が変化した時にOSDを表示"
+  },
+  "Show on-screen display when media player volume changes": {
+    "Show on-screen display when media player volume changes": ""
   },
   "Show on-screen display when microphone is muted/unmuted": {
     "Show on-screen display when microphone is muted/unmuted": "マイクがミュート/ミュート解除された時にOSDを表示"
@@ -2051,6 +2108,9 @@
   "Toggle top bar visibility manually (can be controlled via IPC)": {
     "Toggle top bar visibility manually (can be controlled via IPC)": "トップバーの表示を手動で切り替える（IPC 経由で制御可能）"
   },
+  "Toggle visibility of this bar configuration": {
+    "Toggle visibility of this bar configuration": ""
+  },
   "Tomorrow": {
     "Tomorrow": "明日"
   },
@@ -2240,11 +2300,20 @@
   "WiFi is off": {
     "WiFi is off": "Wi-Fiはオフ中"
   },
+  "Widget Background Color": {
+    "Widget Background Color": ""
+  },
   "Widget Management": {
     "Widget Management": "ウィジェット管理"
   },
+  "Widget Style": {
+    "Widget Style": ""
+  },
   "Widget Styling": {
     "Widget Styling": "ウィジェットのスタイル"
+  },
+  "Widget Transparency": {
+    "Widget Transparency": ""
   },
   "Widgets": {
     "Widgets": "ウィジェット"
@@ -2279,6 +2348,12 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "保存されていない変更があります。ファイルを開く前に保存しますか?"
   },
+  "custom theme file browser title": {
+    "Select Custom Theme": ""
+  },
+  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
+    "Select Wallpaper": ""
+  },
   "events": {
     "events": "イベント"
   },
@@ -2291,8 +2366,20 @@
   "official": {
     "official": "公式"
   },
+  "profile image file browser title": {
+    "Select Profile Image": ""
+  },
+  "settings window title": {
+    "Settings": ""
+  },
+  "sysmon window title": {
+    "System Monitor": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "NM統合のためにDMSを更新します。"
+  },
+  "wallpaper directory file browser title": {
+    "Select Wallpaper Directory": ""
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• 信頼できるソースからのみインストールする"

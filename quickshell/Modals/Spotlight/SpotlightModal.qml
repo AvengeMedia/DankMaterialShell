@@ -1,14 +1,9 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-import Quickshell.Widgets
 import qs.Common
 import qs.Modals.Common
-import qs.Modules.AppDrawer
 import qs.Services
-import qs.Widgets
 
 DankModal {
     id: spotlightModal
@@ -16,7 +11,7 @@ DankModal {
     layerNamespace: "dms:spotlight"
 
     HyprlandFocusGrab {
-        windows: [spotlightModal]
+        windows: [spotlightModal.contentWindow]
         active: CompositorService.isHyprland && spotlightModal.shouldHaveFocus
     }
 
@@ -25,73 +20,73 @@ DankModal {
     property bool openedFromOverview: false
 
     function show() {
-        openedFromOverview = false
-        spotlightOpen = true
-        open()
+        openedFromOverview = false;
+        spotlightOpen = true;
+        open();
 
         Qt.callLater(() => {
-                         if (spotlightContent && spotlightContent.searchField) {
-                             spotlightContent.searchField.forceActiveFocus()
-                         }
-                     })
+            if (spotlightContent && spotlightContent.searchField) {
+                spotlightContent.searchField.forceActiveFocus();
+            }
+        });
     }
 
     function showWithQuery(query) {
         if (spotlightContent) {
             if (spotlightContent.appLauncher) {
-                spotlightContent.appLauncher.searchQuery = query
+                spotlightContent.appLauncher.searchQuery = query;
             }
             if (spotlightContent.searchField) {
-                spotlightContent.searchField.text = query
+                spotlightContent.searchField.text = query;
             }
         }
 
-        spotlightOpen = true
-        open()
+        spotlightOpen = true;
+        open();
 
         Qt.callLater(() => {
-                         if (spotlightContent && spotlightContent.searchField) {
-                             spotlightContent.searchField.forceActiveFocus()
-                         }
-                     })
+            if (spotlightContent && spotlightContent.searchField) {
+                spotlightContent.searchField.forceActiveFocus();
+            }
+        });
     }
 
     function hide() {
-        openedFromOverview = false
-        spotlightOpen = false
-        close()
+        openedFromOverview = false;
+        spotlightOpen = false;
+        close();
     }
 
     onDialogClosed: {
         if (spotlightContent) {
             if (spotlightContent.appLauncher) {
-                spotlightContent.appLauncher.searchQuery = ""
-                spotlightContent.appLauncher.selectedIndex = 0
-                spotlightContent.appLauncher.setCategory(I18n.tr("All"))
+                spotlightContent.appLauncher.searchQuery = "";
+                spotlightContent.appLauncher.selectedIndex = 0;
+                spotlightContent.appLauncher.setCategory(I18n.tr("All"));
             }
             if (spotlightContent.fileSearchController) {
-                spotlightContent.fileSearchController.reset()
+                spotlightContent.fileSearchController.reset();
             }
             if (spotlightContent.resetScroll) {
-                spotlightContent.resetScroll()
+                spotlightContent.resetScroll();
             }
             if (spotlightContent.searchField) {
-                spotlightContent.searchField.text = ""
+                spotlightContent.searchField.text = "";
             }
         }
     }
 
     function toggle() {
         if (spotlightOpen) {
-            hide()
+            hide();
         } else {
-            show()
+            show();
         }
     }
 
     shouldBeVisible: spotlightOpen
-    width: 500
-    height: 600
+    modalWidth: 500
+    modalHeight: 600
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     cornerRadius: Theme.cornerRadius
     borderColor: Theme.outlineMedium
@@ -99,25 +94,25 @@ DankModal {
     enableShadow: true
     keepContentLoaded: true
     onVisibleChanged: () => {
-                          if (visible && !spotlightOpen) {
-                              show()
-                          }
-                          if (visible && spotlightContent) {
-                              Qt.callLater(() => {
-                                               if (spotlightContent.searchField) {
-                                                   spotlightContent.searchField.forceActiveFocus()
-                                               }
-                                           })
-                          }
-                      }
+        if (visible && !spotlightOpen) {
+            show();
+        }
+        if (visible && spotlightContent) {
+            Qt.callLater(() => {
+                if (spotlightContent.searchField) {
+                    spotlightContent.searchField.forceActiveFocus();
+                }
+            });
+        }
+    }
     onBackgroundClicked: () => {
-                             return hide()
-                         }
+        return hide();
+    }
 
     Connections {
         function onCloseAllModalsExcept(excludedModal) {
             if (excludedModal !== spotlightModal && !allowStacking && spotlightOpen) {
-                spotlightOpen = false
+                spotlightOpen = false;
             }
         }
 
@@ -126,32 +121,32 @@ DankModal {
 
     IpcHandler {
         function open(): string {
-            spotlightModal.show()
-            return "SPOTLIGHT_OPEN_SUCCESS"
+            spotlightModal.show();
+            return "SPOTLIGHT_OPEN_SUCCESS";
         }
 
         function close(): string {
-            spotlightModal.hide()
-            return "SPOTLIGHT_CLOSE_SUCCESS"
+            spotlightModal.hide();
+            return "SPOTLIGHT_CLOSE_SUCCESS";
         }
 
         function toggle(): string {
-            spotlightModal.toggle()
-            return "SPOTLIGHT_TOGGLE_SUCCESS"
+            spotlightModal.toggle();
+            return "SPOTLIGHT_TOGGLE_SUCCESS";
         }
 
         function openQuery(query: string): string {
-            spotlightModal.showWithQuery(query)
-            return "SPOTLIGHT_OPEN_QUERY_SUCCESS"
+            spotlightModal.showWithQuery(query);
+            return "SPOTLIGHT_OPEN_QUERY_SUCCESS";
         }
 
         function toggleQuery(query: string): string {
             if (spotlightModal.spotlightOpen) {
-                spotlightModal.hide()
+                spotlightModal.hide();
             } else {
-                spotlightModal.showWithQuery(query)
+                spotlightModal.showWithQuery(query);
             }
-            return "SPOTLIGHT_TOGGLE_QUERY_SUCCESS"
+            return "SPOTLIGHT_TOGGLE_QUERY_SUCCESS";
         }
 
         target: "spotlight"

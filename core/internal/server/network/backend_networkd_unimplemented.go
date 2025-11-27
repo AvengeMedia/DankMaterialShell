@@ -57,3 +57,15 @@ func (b *SystemdNetworkdBackend) ClearVPNCredentials(uuidOrName string) error {
 func (b *SystemdNetworkdBackend) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 	return fmt.Errorf("WiFi autoconnect not supported by networkd backend")
 }
+
+func (b *SystemdNetworkdBackend) ScanWiFiDevice(device string) error {
+	return fmt.Errorf("WiFi scan not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) DisconnectWiFiDevice(device string) error {
+	return fmt.Errorf("WiFi disconnect not supported by networkd backend")
+}
+
+func (b *SystemdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
+	return nil
+}

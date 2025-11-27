@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
@@ -12,7 +11,7 @@ DankModal {
     layerNamespace: "dms:polkit"
 
     HyprlandFocusGrab {
-        windows: [root]
+        windows: [root.contentWindow]
         active: CompositorService.isHyprland && root.shouldHaveFocus
     }
 
@@ -22,27 +21,27 @@ DankModal {
     property real minHeight: 240
 
     function show() {
-        passwordInput = ""
-        isLoading = false
-        open()
+        passwordInput = "";
+        isLoading = false;
+        open();
         Qt.callLater(() => {
             if (contentLoader.item && contentLoader.item.passwordField) {
-                contentLoader.item.passwordField.forceActiveFocus()
+                contentLoader.item.passwordField.forceActiveFocus();
             }
-        })
+        });
     }
 
     shouldBeVisible: false
-    width: 420
-    height: Math.max(minHeight, contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 240)
+    modalWidth: 420
+    modalHeight: Math.max(minHeight, contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 240)
 
     Connections {
         target: contentLoader.item
         function onImplicitHeightChanged() {
             if (shouldBeVisible && contentLoader.item) {
-                const newHeight = contentLoader.item.implicitHeight + Theme.spacingM * 2
+                const newHeight = contentLoader.item.implicitHeight + Theme.spacingM * 2;
                 if (newHeight > minHeight) {
-                    minHeight = newHeight
+                    minHeight = newHeight;
                 }
             }
         }
@@ -51,19 +50,19 @@ DankModal {
     onOpened: {
         Qt.callLater(() => {
             if (contentLoader.item && contentLoader.item.passwordField) {
-                contentLoader.item.passwordField.forceActiveFocus()
+                contentLoader.item.passwordField.forceActiveFocus();
             }
-        })
+        });
     }
 
-    onClosed: {
-        passwordInput = ""
-        isLoading = false
+    onDialogClosed: {
+        passwordInput = "";
+        isLoading = false;
     }
 
     onBackgroundClicked: () => {
         if (currentFlow && !isLoading) {
-            currentFlow.cancelAuthenticationRequest()
+            currentFlow.cancelAuthenticationRequest();
         }
     }
 
@@ -72,12 +71,12 @@ DankModal {
         enabled: PolkitService.polkitAvailable
 
         function onAuthenticationRequestStarted() {
-            show()
+            show();
         }
 
         function onIsActiveChanged() {
             if (!(PolkitService.agent?.isActive ?? false)) {
-                close()
+                close();
             }
         }
     }
@@ -88,24 +87,24 @@ DankModal {
 
         function onIsResponseRequiredChanged() {
             if (currentFlow.isResponseRequired) {
-                isLoading = false
-                passwordInput = ""
+                isLoading = false;
+                passwordInput = "";
                 if (contentLoader.item && contentLoader.item.passwordField) {
-                    contentLoader.item.passwordField.forceActiveFocus()
+                    contentLoader.item.passwordField.forceActiveFocus();
                 }
             }
         }
 
         function onAuthenticationSucceeded() {
-            close()
+            close();
         }
 
         function onAuthenticationFailed() {
-            isLoading = false
+            isLoading = false;
         }
 
         function onAuthenticationRequestCancelled() {
-            close()
+            close();
         }
     }
 
@@ -121,9 +120,9 @@ DankModal {
 
             Keys.onEscapePressed: event => {
                 if (currentFlow && !isLoading) {
-                    currentFlow.cancelAuthenticationRequest()
+                    currentFlow.cancelAuthenticationRequest();
                 }
-                event.accepted = true
+                event.accepted = true;
             }
 
             Row {
@@ -178,7 +177,7 @@ DankModal {
                     opacity: enabled ? 1 : 0.5
                     onClicked: () => {
                         if (currentFlow) {
-                            currentFlow.cancelAuthenticationRequest()
+                            currentFlow.cancelAuthenticationRequest();
                         }
                     }
                 }
@@ -215,7 +214,7 @@ DankModal {
                         anchors.fill: parent
                         enabled: !isLoading
                         onClicked: () => {
-                            passwordField.forceActiveFocus()
+                            passwordField.forceActiveFocus();
                         }
                     }
 
@@ -231,13 +230,13 @@ DankModal {
                         backgroundColor: "transparent"
                         enabled: !isLoading
                         onTextEdited: () => {
-                            passwordInput = text
+                            passwordInput = text;
                         }
                         onAccepted: () => {
                             if (passwordInput.length > 0 && currentFlow && !isLoading) {
-                                isLoading = true
-                                currentFlow.submit(passwordInput)
-                                passwordInput = ""
+                                isLoading = true;
+                                currentFlow.submit(passwordInput);
+                                passwordInput = "";
                             }
                         }
                     }
@@ -310,7 +309,7 @@ DankModal {
                                 enabled: parent.enabled
                                 onClicked: () => {
                                     if (currentFlow) {
-                                        currentFlow.cancelAuthenticationRequest()
+                                        currentFlow.cancelAuthenticationRequest();
                                     }
                                 }
                             }
@@ -343,9 +342,9 @@ DankModal {
                                 enabled: parent.enabled
                                 onClicked: () => {
                                     if (currentFlow && !isLoading) {
-                                        isLoading = true
-                                        currentFlow.submit(passwordInput)
-                                        passwordInput = ""
+                                        isLoading = true;
+                                        currentFlow.submit(passwordInput);
+                                        passwordInput = "";
                                     }
                                 }
                             }

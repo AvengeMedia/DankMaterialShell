@@ -2,19 +2,16 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
-import Quickshell.Io
 import qs.Common
 import qs.Widgets
-import qs.Modules
 import qs.Services
 
 Variants {
     model: {
         if (SessionData.isGreeterMode) {
-            return Quickshell.screens
+            return Quickshell.screens;
         }
-        return SettingsData.getFilteredScreens("wallpaper")
+        return SettingsData.getFilteredScreens("wallpaper");
     }
 
     PanelWindow {
@@ -50,9 +47,9 @@ Variants {
                 target: SessionData
                 function onIsLightModeChanged() {
                     if (SessionData.perModeWallpaper) {
-                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || ""
+                        var newSource = SessionData.getMonitorWallpaper(modelData.name) || "";
                         if (newSource !== root.source) {
-                            root.source = newSource
+                            root.source = newSource;
                         }
                     }
                 }
@@ -61,32 +58,32 @@ Variants {
             function getFillMode(modeName) {
                 switch (modeName) {
                 case "Stretch":
-                    return Image.Stretch
+                    return Image.Stretch;
                 case "Fit":
                 case "PreserveAspectFit":
-                    return Image.PreserveAspectFit
+                    return Image.PreserveAspectFit;
                 case "Fill":
                 case "PreserveAspectCrop":
-                    return Image.PreserveAspectCrop
+                    return Image.PreserveAspectCrop;
                 case "Tile":
-                    return Image.Tile
+                    return Image.Tile;
                 case "TileVertically":
-                    return Image.TileVertically
+                    return Image.TileVertically;
                 case "TileHorizontally":
-                    return Image.TileHorizontally
+                    return Image.TileHorizontally;
                 case "Pad":
-                    return Image.Pad
+                    return Image.Pad;
                 default:
-                    return Image.PreserveAspectCrop
+                    return Image.PreserveAspectCrop;
                 }
             }
 
             Component.onCompleted: {
                 if (source) {
-                    const formattedSource = source.startsWith("file://") ? source : "file://" + source
-                    setWallpaperImmediate(formattedSource)
+                    const formattedSource = source.startsWith("file://") ? source : "file://" + source;
+                    setWallpaperImmediate(formattedSource);
                 }
-                isInitialized = true
+                isInitialized = true;
             }
 
             property bool isInitialized: false
@@ -94,55 +91,54 @@ Variants {
             readonly property bool transitioning: transitionAnimation.running
 
             onSourceChanged: {
-                const isColor = source.startsWith("#")
+                const isColor = source.startsWith("#");
 
                 if (!source) {
-                    setWallpaperImmediate("")
+                    setWallpaperImmediate("");
                 } else if (isColor) {
-                    setWallpaperImmediate("")
+                    setWallpaperImmediate("");
                 } else {
                     if (!isInitialized || !currentWallpaper.source) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
-                        isInitialized = true
+                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
+                        isInitialized = true;
                     } else if (CompositorService.isNiri && SessionData.isSwitchingMode) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source)
+                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
                     } else {
-                        changeWallpaper(source.startsWith("file://") ? source : "file://" + source)
+                        changeWallpaper(source.startsWith("file://") ? source : "file://" + source);
                     }
                 }
             }
 
             function setWallpaperImmediate(newSource) {
-                transitionAnimation.stop()
-                root.transitionProgress = 0.0
-                currentWallpaper.source = newSource
-                nextWallpaper.source = ""
-                currentWallpaper.opacity = 1
-                nextWallpaper.opacity = 0
+                transitionAnimation.stop();
+                root.transitionProgress = 0.0;
+                currentWallpaper.source = newSource;
+                nextWallpaper.source = "";
+                currentWallpaper.opacity = 1;
+                nextWallpaper.opacity = 0;
             }
 
             function changeWallpaper(newPath) {
                 if (newPath === currentWallpaper.source)
-                    return
+                    return;
                 if (!newPath || newPath.startsWith("#"))
-                    return
-
+                    return;
                 if (root.transitioning) {
-                    transitionAnimation.stop()
-                    root.transitionProgress = 0
-                    currentWallpaper.source = nextWallpaper.source
-                    nextWallpaper.source = ""
+                    transitionAnimation.stop();
+                    root.transitionProgress = 0;
+                    currentWallpaper.source = nextWallpaper.source;
+                    nextWallpaper.source = "";
                 }
 
                 if (!currentWallpaper.source) {
-                    setWallpaperImmediate(newPath)
-                    return
+                    setWallpaperImmediate(newPath);
+                    return;
                 }
 
-                nextWallpaper.source = newPath
+                nextWallpaper.source = newPath;
 
                 if (nextWallpaper.status === Image.Ready) {
-                    transitionAnimation.start()
+                    transitionAnimation.start();
                 }
             }
 
@@ -179,10 +175,9 @@ Variants {
 
                 onStatusChanged: {
                     if (status !== Image.Ready)
-                        return
-
+                        return;
                     if (!root.transitioning) {
-                        transitionAnimation.start()
+                        transitionAnimation.start();
                     }
                 }
             }
@@ -194,6 +189,7 @@ Variants {
                 MultiEffect {
                     anchors.fill: parent
                     source: currentWallpaper
+                    visible: currentWallpaper.source !== ""
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75
@@ -204,6 +200,7 @@ Variants {
                 MultiEffect {
                     anchors.fill: parent
                     source: nextWallpaper
+                    visible: nextWallpaper.source !== ""
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75
@@ -222,14 +219,14 @@ Variants {
                 easing.type: Easing.InOutCubic
                 onFinished: {
                     Qt.callLater(() => {
-                                     if (nextWallpaper.source && nextWallpaper.status === Image.Ready && !nextWallpaper.source.toString().startsWith("#")) {
-                                         currentWallpaper.source = nextWallpaper.source
-                                     }
-                                     nextWallpaper.source = ""
-                                     currentWallpaper.opacity = 1
-                                     nextWallpaper.opacity = 0
-                                     root.transitionProgress = 0.0
-                                 })
+                        if (nextWallpaper.source && nextWallpaper.status === Image.Ready && !nextWallpaper.source.toString().startsWith("#")) {
+                            currentWallpaper.source = nextWallpaper.source;
+                        }
+                        nextWallpaper.source = "";
+                        currentWallpaper.opacity = 1;
+                        nextWallpaper.opacity = 0;
+                        root.transitionProgress = 0.0;
+                    });
                 }
             }
         }

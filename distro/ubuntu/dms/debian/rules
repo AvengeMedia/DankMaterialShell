@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Extract version from debian/changelog
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+# Get upstream version (strip -1ppa1 suffix)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+# Strip ppa suffix and handle git versions
+# Examples: 0.5.2ppa9 -> 0.5.2, 0.5.2+git20251116 -> 0.5.2
+BASE_VERSION := $(shell echo $(UPSTREAM_VERSION) | sed 's/ppa[0-9]*$$//' | sed 's/+git.*//')
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# All files are included in source package (downloaded by build-source.sh)
+	# Launchpad build environment has no internet access
+	test -f dms-distropkg-amd64.gz || (echo "ERROR: dms-distropkg-amd64.gz not found!" && exit 1)
+	test -f dms-source.tar.gz || (echo "ERROR: dms-source.tar.gz not found!" && exit 1)
+
+	# Extract pre-built binary
+	gunzip -c dms-distropkg-amd64.gz > dms
+	chmod +x dms
+
+	# Extract source tarball for QML files
+	tar -xzf dms-source.tar.gz
+	# Find the extracted directory (it might have various names)
+	# and create a symlink to expected name for consistent install
+	SOURCE_DIR=$$(find . -maxdepth 1 -type d -name "DankMaterialShell*" | head -n1); \
+	if [ -n "$$SOURCE_DIR" ]; then \
+		ln -sf $$SOURCE_DIR DankMaterialShell-$(BASE_VERSION); \
+	fi
+
+override_dh_auto_install:
+	# Install binary
+	install -Dm755 dms debian/dms/usr/bin/dms
+
+	# Install QML files from source tarball
+	mkdir -p debian/dms/usr/share/quickshell/dms
+	cp -r DankMaterialShell-$(BASE_VERSION)/* debian/dms/usr/share/quickshell/dms/
+
+	# Remove unnecessary directories
+	rm -rf debian/dms/usr/share/quickshell/dms/core
+	rm -rf debian/dms/usr/share/quickshell/dms/distro
+
+	# Install systemd user service
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/quickshell/assets/systemd/dms.service \
+		debian/dms/usr/lib/systemd/user/dms.service
+
+	# Generate and install shell completions (if applicable)
+	# Uncomment if dms supports completion generation
+	# ./dms completion bash > dms.bash
+	# ./dms completion zsh > dms.zsh
+	# install -Dm644 dms.bash debian/dms/usr/share/bash-completion/completions/dms
+	# install -Dm644 dms.zsh debian/dms/usr/share/zsh/vendor-completions/_dms
+
+override_dh_auto_clean:
+	rm -f dms
+	rm -rf DankMaterialShell-*
+	# Don't remove dms-distropkg-amd64.gz and dms-source.tar.gz
+	# They need to be included in the source package for Launchpad builds
+	dh_auto_clean

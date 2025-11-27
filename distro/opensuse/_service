@@ -1,0 +1,25 @@
+<services>
+  <!-- Git source and vendoring -->
+  <service name="tar_scm" mode="disabled">
+    <param name="scm">git</param>
+    <param name="url">https://github.com/AvengeMedia/DankMaterialShell.git</param>
+    <param name="revision">master</param>
+    <param name="filename">dms-git-source</param>
+  </service>
+  <service name="recompress" mode="disabled">
+    <param name="file">*.tar</param>
+    <param name="compression">gz</param>
+  </service>
+  <!-- Binary downloads removed - building from source
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/AvengeMedia/DankMaterialShell/releases/latest/download/dms-distropkg-amd64.gz</param>
+  </service>
+  <service name="download_url">
+    <param name="protocol">https</param>
+    <param name="host">github.com</param>
+    <param name="path">/AvengeMedia/DankMaterialShell/releases/latest/download/dms-distropkg-arm64.gz</param>
+  </service>
+  -->
+</services>

@@ -1,9 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import Quickshell
 import Quickshell.Wayland
-import qs.Common
 
 Rectangle {
     id: root
@@ -14,7 +12,7 @@ Rectangle {
     required property bool isLocked
 
     signal passwordChanged(string newPassword)
-    signal unlockRequested()
+    signal unlockRequested
 
     color: "transparent"
 
@@ -28,14 +26,14 @@ Rectangle {
         onUnlockRequested: root.unlockRequested()
         onPasswordBufferChanged: {
             if (root.sharedPasswordBuffer !== passwordBuffer) {
-                root.passwordChanged(passwordBuffer)
+                root.passwordChanged(passwordBuffer);
             }
         }
     }
 
     onIsLockedChanged: {
         if (!isLocked) {
-            lockContent.unlocking = false
+            lockContent.unlocking = false;
         }
     }
 }

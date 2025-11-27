@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Pipewire
 import qs.Common
@@ -10,8 +9,8 @@ Rectangle {
     id: root
 
     property bool hasInputVolumeSliderInCC: {
-        const widgets = SettingsData.controlCenterWidgets || []
-        return widgets.some(widget => widget.id === "inputVolumeSlider")
+        const widgets = SettingsData.controlCenterWidgets || [];
+        return widgets.some(widget => widget.id === "inputVolumeSlider");
     }
 
     implicitHeight: headerRow.height + (hasInputVolumeSliderInCC ? 0 : volumeSlider.height) + audioContent.height + Theme.spacingM
@@ -66,7 +65,7 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
                     if (AudioService.source && AudioService.source.audio) {
-                        AudioService.source.audio.muted = !AudioService.source.audio.muted
+                        AudioService.source.audio.muted = !AudioService.source.audio.muted;
                     }
                 }
             }
@@ -74,9 +73,10 @@ Rectangle {
             DankIcon {
                 anchors.centerIn: parent
                 name: {
-                    if (!AudioService.source || !AudioService.source.audio) return "mic_off"
-                    let muted = AudioService.source.audio.muted
-                    return muted ? "mic_off" : "mic"
+                    if (!AudioService.source || !AudioService.source.audio)
+                        return "mic_off";
+                    let muted = AudioService.source.audio.muted;
+                    return muted ? "mic_off" : "mic";
                 }
                 size: Theme.iconSize
                 color: AudioService.source && AudioService.source.audio && !AudioService.source.audio.muted && AudioService.source.audio.volume > 0 ? Theme.primary : Theme.surfaceText
@@ -97,11 +97,11 @@ Rectangle {
             valueOverride: actualVolumePercent
             thumbOutlineColor: Theme.surfaceVariant
 
-            onSliderValueChanged: function(newValue) {
+            onSliderValueChanged: function (newValue) {
                 if (AudioService.source && AudioService.source.audio) {
-                    AudioService.source.audio.volume = newValue / 100
+                    AudioService.source.audio.volume = newValue / 100;
                     if (newValue > 0 && AudioService.source.audio.muted) {
-                        AudioService.source.audio.muted = false
+                        AudioService.source.audio.muted = false;
                     }
                 }
             }
@@ -128,22 +128,26 @@ Rectangle {
                 model: ScriptModel {
                     values: {
                         const nodes = Pipewire.nodes.values.filter(node => {
-                            return node.audio && !node.isSink && !node.isStream
-                        })
-                        const pins = SettingsData.audioInputDevicePins || {}
-                        const pinnedName = pins["preferredInput"]
-                        
-                        let sorted = [...nodes]
+                            return node.audio && !node.isSink && !node.isStream;
+                        });
+                        const pins = SettingsData.audioInputDevicePins || {};
+                        const pinnedName = pins["preferredInput"];
+
+                        let sorted = [...nodes];
                         sorted.sort((a, b) => {
                             // Pinned device first
-                            if (a.name === pinnedName && b.name !== pinnedName) return -1
-                            if (b.name === pinnedName && a.name !== pinnedName) return 1
+                            if (a.name === pinnedName && b.name !== pinnedName)
+                                return -1;
+                            if (b.name === pinnedName && a.name !== pinnedName)
+                                return 1;
                             // Then active device
-                            if (a === AudioService.source && b !== AudioService.source) return -1
-                            if (b === AudioService.source && a !== AudioService.source) return 1
-                            return 0
-                        })
-                        return sorted
+                            if (a === AudioService.source && b !== AudioService.source)
+                                return -1;
+                            if (b === AudioService.source && a !== AudioService.source)
+                                return 1;
+                            return 0;
+                        });
+                        return sorted;
                     }
                 }
 
@@ -167,11 +171,11 @@ Rectangle {
                         DankIcon {
                             name: {
                                 if (modelData.name.includes("bluez"))
-                                    return "headset"
+                                    return "headset";
                                 else if (modelData.name.includes("usb"))
-                                    return "headset"
+                                    return "headset";
                                 else
-                                    return "mic"
+                                    return "mic";
                             }
                             size: Theme.iconSize - 4
                             color: modelData === AudioService.source ? Theme.primary : Theme.surfaceText
@@ -181,9 +185,9 @@ Rectangle {
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             width: {
-                                const iconWidth = Theme.iconSize
-                                const pinButtonWidth = pinInputRow.width + Theme.spacingS * 4 + Theme.spacingM
-                                return parent.parent.width - iconWidth - parent.spacing - pinButtonWidth - Theme.spacingM * 2
+                                const iconWidth = Theme.iconSize;
+                                const pinButtonWidth = pinInputRow.width + Theme.spacingS * 4 + Theme.spacingM;
+                                return parent.parent.width - iconWidth - parent.spacing - pinButtonWidth - Theme.spacingM * 2;
                             }
 
                             StyledText {
@@ -215,8 +219,8 @@ Rectangle {
                         height: 28
                         radius: height / 2
                         color: {
-                            const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
-                            return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                            const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                            return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05);
                         }
 
                         Row {
@@ -228,21 +232,21 @@ Rectangle {
                                 name: "push_pin"
                                 size: 16
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
-                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             StyledText {
                                 text: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
-                                    return isThisDevicePinned ? "Pinned" : "Pin"
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    return isThisDevicePinned ? "Pinned" : "Pin";
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name
-                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText
+                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -252,16 +256,16 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}))
-                                const isCurrentlyPinned = pins["preferredInput"] === modelData.name
-                                
+                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}));
+                                const isCurrentlyPinned = pins["preferredInput"] === modelData.name;
+
                                 if (isCurrentlyPinned) {
-                                    delete pins["preferredInput"]
+                                    delete pins["preferredInput"];
                                 } else {
-                                    pins["preferredInput"] = modelData.name
+                                    pins["preferredInput"] = modelData.name;
                                 }
-                                
-                                SettingsData.set("audioInputDevicePins", pins)
+
+                                SettingsData.set("audioInputDevicePins", pins);
                             }
                         }
                     }
@@ -274,7 +278,7 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (modelData) {
-                                Pipewire.preferredDefaultAudioSource = modelData
+                                Pipewire.preferredDefaultAudioSource = modelData;
                             }
                         }
                     }

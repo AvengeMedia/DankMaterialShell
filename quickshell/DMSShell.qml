@@ -1,6 +1,5 @@
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import qs.Common
 import qs.Modals
 import qs.Modals.Clipboard
@@ -19,11 +18,9 @@ import qs.Widgets
 import qs.Modules.Notifications.Popup
 import qs.Modules.OSD
 import qs.Modules.ProcessList
-import qs.Modules.Settings
 import qs.Modules.DankBar
 import qs.Modules.DankBar.Popouts
 import qs.Modules.WorkspaceOverlays
-import qs.Modules.Plugins
 import qs.Services
 
 Item {
@@ -41,12 +38,12 @@ Item {
 
             onLoaded: {
                 if (item) {
-                    item.pluginService = PluginService
+                    item.pluginService = PluginService;
                     if (item.popoutService !== undefined) {
-                        item.popoutService = PopoutService
+                        item.popoutService = PopoutService;
                     }
-                    item.pluginId = pluginId
-                    console.info("Daemon plugin loaded:", pluginId)
+                    item.pluginId = pluginId;
+                    console.info("Daemon plugin loaded:", pluginId);
                 }
             }
         }
@@ -66,37 +63,80 @@ Item {
         id: lock
     }
 
-    Loader {
-        id: dankBarLoader
-        asynchronous: false
+    Variants {
+        model: Quickshell.screens
 
-        property var currentPosition: SettingsData.dankBarPosition
-        property bool initialized: false
-        property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
+        delegate: Loader {
+            id: fadeWindowLoader
+            required property var modelData
+            active: SettingsData.fadeToLockEnabled
+            asynchronous: false
 
-        sourceComponent: DankBar {
-            hyprlandOverviewLoader: dankBarLoader.hyprlandOverviewLoaderRef
+            sourceComponent: FadeToLockWindow {
+                screen: fadeWindowLoader.modelData
 
-            onColorPickerRequested: {
-                if (colorPickerModal.shouldBeVisible) {
-                    colorPickerModal.close()
-                } else {
-                    colorPickerModal.show()
+                onFadeCompleted: {
+                    IdleService.lockRequested();
+                }
+
+                onFadeCancelled: {
+                    console.log("Fade to lock cancelled by user on screen:", fadeWindowLoader.modelData.name);
+                }
+            }
+
+            Connections {
+                target: IdleService
+                enabled: fadeWindowLoader.item !== null
+
+                function onFadeToLockRequested() {
+                    if (fadeWindowLoader.item) {
+                        fadeWindowLoader.item.startFade();
+                    }
+                }
+
+                function onCancelFadeToLock() {
+                    if (fadeWindowLoader.item) {
+                        fadeWindowLoader.item.cancelFade();
+                    }
                 }
             }
         }
+    }
 
-        Component.onCompleted: {
-            initialized = true
+    Repeater {
+        id: dankBarRepeater
+        model: ScriptModel {
+            id: barRepeaterModel
+            values: {
+                const configs = SettingsData.barConfigs;
+                return configs.map(c => ({
+                            id: c.id,
+                            position: c.position
+                        }));
+            }
         }
 
-        onCurrentPositionChanged: {
-            if (!initialized)
-                return
+        property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
 
-            const component = sourceComponent
-            sourceComponent = null
-            sourceComponent = component
+        delegate: Loader {
+            id: barLoader
+            required property var modelData
+            property var barConfig: SettingsData.getBarConfig(modelData.id)
+            active: barConfig?.enabled ?? false
+            asynchronous: false
+
+            sourceComponent: DankBar {
+                barConfig: barLoader.barConfig
+                hyprlandOverviewLoader: dankBarRepeater.hyprlandOverviewLoaderRef
+
+                onColorPickerRequested: {
+                    if (colorPickerModal.shouldBeVisible) {
+                        colorPickerModal.close();
+                    } else {
+                        colorPickerModal.show();
+                    }
+                }
+            }
         }
     }
 
@@ -114,22 +154,20 @@ Item {
 
         onLoaded: {
             if (item) {
-                dockContextMenuLoader.active = true
+                dockContextMenuLoader.active = true;
             }
         }
 
         Component.onCompleted: {
-            initialized = true
+            initialized = true;
         }
 
         onCurrentPositionChanged: {
             if (!initialized)
-                return
-
-            console.log("DEBUG: Dock position changed to:", currentPosition, "- recreating dock")
-            const comp = sourceComponent
-            sourceComponent = null
-            sourceComponent = comp
+                return;
+            const comp = sourceComponent;
+            sourceComponent = null;
+            sourceComponent = comp;
         }
     }
 
@@ -137,14 +175,14 @@ Item {
         id: dankDashPopoutLoader
 
         active: false
-        asynchronous: true
+        asynchronous: false
 
         sourceComponent: Component {
             DankDashPopout {
                 id: dankDashPopout
 
                 Component.onCompleted: {
-                    PopoutService.dankDashPopout = dankDashPopout
+                    PopoutService.dankDashPopout = dankDashPopout;
                 }
             }
         }
@@ -169,7 +207,7 @@ Item {
             id: notificationCenter
 
             Component.onCompleted: {
-                PopoutService.notificationCenterPopout = notificationCenter
+                PopoutService.notificationCenterPopout = notificationCenter;
             }
         }
     }
@@ -196,11 +234,11 @@ Item {
             powerMenuModalLoader: controlCenterLoader.powerModalLoaderRef
 
             onLockRequested: {
-                lock.activate()
+                lock.activate();
             }
 
             Component.onCompleted: {
-                PopoutService.controlCenterPopout = controlCenterPopout
+                PopoutService.controlCenterPopout = controlCenterPopout;
             }
         }
     }
@@ -209,7 +247,7 @@ Item {
         id: wifiPasswordModal
 
         Component.onCompleted: {
-            PopoutService.wifiPasswordModal = wifiPasswordModal
+            PopoutService.wifiPasswordModal = wifiPasswordModal;
         }
     }
 
@@ -221,7 +259,7 @@ Item {
         id: bluetoothPairingModal
 
         Component.onCompleted: {
-            PopoutService.bluetoothPairingModal = bluetoothPairingModal
+            PopoutService.bluetoothPairingModal = bluetoothPairingModal;
         }
     }
 
@@ -232,20 +270,20 @@ Item {
         target: NetworkService
 
         function onCredentialsNeeded(token, ssid, setting, fields, hints, reason, connType, connName, vpnService) {
-            const now = Date.now()
-            const timeSinceLastPrompt = now - lastCredentialsTime
+            const now = Date.now();
+            const timeSinceLastPrompt = now - lastCredentialsTime;
 
             if (wifiPasswordModal.shouldBeVisible && timeSinceLastPrompt < 1000) {
-                NetworkService.cancelCredentials(lastCredentialsToken)
-                lastCredentialsToken = token
-                lastCredentialsTime = now
-                wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService)
-                return
+                NetworkService.cancelCredentials(lastCredentialsToken);
+                lastCredentialsToken = token;
+                lastCredentialsTime = now;
+                wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService);
+                return;
             }
 
-            lastCredentialsToken = token
-            lastCredentialsTime = now
-            wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService)
+            lastCredentialsToken = token;
+            lastCredentialsTime = now;
+            wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService);
         }
     }
 
@@ -258,7 +296,7 @@ Item {
             id: networkInfoModal
 
             Component.onCompleted: {
-                PopoutService.networkInfoModal = networkInfoModal
+                PopoutService.networkInfoModal = networkInfoModal;
             }
         }
     }
@@ -272,7 +310,7 @@ Item {
             id: batteryPopout
 
             Component.onCompleted: {
-                PopoutService.batteryPopout = batteryPopout
+                PopoutService.batteryPopout = batteryPopout;
             }
         }
     }
@@ -286,7 +324,7 @@ Item {
             id: layoutPopout
 
             Component.onCompleted: {
-                PopoutService.layoutPopout = layoutPopout
+                PopoutService.layoutPopout = layoutPopout;
             }
         }
     }
@@ -300,18 +338,8 @@ Item {
             id: vpnPopout
 
             Component.onCompleted: {
-                PopoutService.vpnPopout = vpnPopout
+                PopoutService.vpnPopout = vpnPopout;
             }
-        }
-    }
-
-    LazyLoader {
-        id: powerConfirmModalLoader
-
-        active: false
-
-        ConfirmModal {
-            id: powerConfirmModal
         }
     }
 
@@ -324,7 +352,7 @@ Item {
             id: processListPopout
 
             Component.onCompleted: {
-                PopoutService.processListPopout = processListPopout
+                PopoutService.processListPopout = processListPopout;
             }
         }
     }
@@ -333,7 +361,7 @@ Item {
         id: settingsModal
 
         Component.onCompleted: {
-            PopoutService.settingsModal = settingsModal
+            PopoutService.settingsModal = settingsModal;
         }
     }
 
@@ -346,7 +374,7 @@ Item {
             id: appDrawerPopout
 
             Component.onCompleted: {
-                PopoutService.appDrawerPopout = appDrawerPopout
+                PopoutService.appDrawerPopout = appDrawerPopout;
             }
         }
     }
@@ -355,7 +383,7 @@ Item {
         id: spotlightModal
 
         Component.onCompleted: {
-            PopoutService.spotlightModal = spotlightModal
+            PopoutService.spotlightModal = spotlightModal;
         }
     }
 
@@ -363,7 +391,7 @@ Item {
         id: clipboardHistoryModalPopup
 
         Component.onCompleted: {
-            PopoutService.clipboardHistoryModal = clipboardHistoryModalPopup
+            PopoutService.clipboardHistoryModal = clipboardHistoryModalPopup;
         }
     }
 
@@ -371,7 +399,7 @@ Item {
         id: notificationModal
 
         Component.onCompleted: {
-            PopoutService.notificationModal = notificationModal
+            PopoutService.notificationModal = notificationModal;
         }
     }
 
@@ -379,7 +407,7 @@ Item {
         id: colorPickerModal
 
         Component.onCompleted: {
-            PopoutService.colorPickerModal = colorPickerModal
+            PopoutService.colorPickerModal = colorPickerModal;
         }
     }
 
@@ -392,7 +420,7 @@ Item {
             id: processListModal
 
             Component.onCompleted: {
-                PopoutService.processListModal = processListModal
+                PopoutService.processListModal = processListModal;
             }
         }
     }
@@ -406,7 +434,7 @@ Item {
             id: systemUpdatePopout
 
             Component.onCompleted: {
-                PopoutService.systemUpdatePopout = systemUpdatePopout
+                PopoutService.systemUpdatePopout = systemUpdatePopout;
             }
         }
     }
@@ -427,16 +455,16 @@ Item {
             content: Component {
                 Notepad {
                     onHideRequested: {
-                        notepadSlideout.hide()
+                        notepadSlideout.hide();
                     }
                 }
             }
 
             function toggle() {
                 if (isVisible) {
-                    hide()
+                    hide();
                 } else {
-                    show()
+                    show();
                 }
             }
         }
@@ -451,43 +479,31 @@ Item {
             id: powerMenuModal
 
             onPowerActionRequested: (action, title, message) => {
-                                        if (SettingsData.powerActionConfirm) {
-                                            powerConfirmModalLoader.active = true
-                                            if (powerConfirmModalLoader.item) {
-                                                powerConfirmModalLoader.item.confirmButtonColor = action === "poweroff" ? Theme.error : action === "reboot" ? Theme.warning : Theme.primary
-                                                powerConfirmModalLoader.item.show(title, message, () => actionApply(action), function () {})
-                                            }
-                                        } else {
-                                            actionApply(action)
-                                        }
-                                    }
-
-            onLockRequested: {
-                lock.activate()
-            }
-
-            function actionApply(action) {
                 switch (action) {
                 case "logout":
-                    SessionService.logout()
-                    break
+                    SessionService.logout();
+                    break;
                 case "suspend":
-                    SessionService.suspend()
-                    break
+                    SessionService.suspend();
+                    break;
                 case "hibernate":
-                    SessionService.hibernate()
-                    break
+                    SessionService.hibernate();
+                    break;
                 case "reboot":
-                    SessionService.reboot()
-                    break
+                    SessionService.reboot();
+                    break;
                 case "poweroff":
-                    SessionService.poweroff()
-                    break
+                    SessionService.poweroff();
+                    break;
                 }
             }
 
+            onLockRequested: {
+                lock.activate();
+            }
+
             Component.onCompleted: {
-                PopoutService.powerMenuModal = powerMenuModal
+                PopoutService.powerMenuModal = powerMenuModal;
             }
         }
     }
@@ -501,7 +517,7 @@ Item {
             id: keybindsModal
 
             Component.onCompleted: {
-                PopoutService.hyprKeybindsModal = keybindsModal
+                PopoutService.hyprKeybindsModal = keybindsModal;
             }
         }
     }
@@ -513,8 +529,9 @@ Item {
         dankDashPopoutLoader: dankDashPopoutLoader
         notepadSlideoutVariants: notepadSlideoutVariants
         hyprKeybindsModalLoader: hyprKeybindsModalLoader
-        dankBarLoader: dankBarLoader
+        dankBarRepeater: dankBarRepeater
         hyprlandOverviewLoader: hyprlandOverviewLoader
+        settingsModal: settingsModal
     }
 
     Variants {
@@ -530,6 +547,14 @@ Item {
         model: SettingsData.getFilteredScreens("osd")
 
         delegate: VolumeOSD {
+            modelData: item
+        }
+    }
+
+    Variants {
+        model: SettingsData.getFilteredScreens("osd")
+
+        delegate: MediaVolumeOSD {
             modelData: item
         }
     }
@@ -558,8 +583,14 @@ Item {
         }
     }
 
+    Loader {
+        id: powerProfileWatcherLoader
+        active: SettingsData.osdPowerProfileEnabled
+        source: "Services/PowerProfileWatcher.qml"
+    }
+
     Variants {
-        model: SettingsData.getFilteredScreens("osd")
+        model: SettingsData.osdPowerProfileEnabled ? SettingsData.getFilteredScreens("osd") : []
 
         delegate: PowerProfileOSD {
             modelData: item

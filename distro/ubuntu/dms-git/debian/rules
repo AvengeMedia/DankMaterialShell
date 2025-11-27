@@ -1,0 +1,65 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Get git commit date for version
+GIT_DATE := $(shell date +%Y%m%d)
+GIT_COMMIT := HEAD
+
+# Go needs writable directories for its caches
+export HOME := $(CURDIR)/debian/tmp-home
+export GOCACHE := $(CURDIR)/debian/tmp-home/go-cache
+export GOMODCACHE := $(CURDIR)/debian/tmp-home/go-mod
+
+# Launchpad has no network access, so use local toolchain only
+export GOTOOLCHAIN := local
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Create Go cache directories (sbuild sets HOME to non-existent path)
+	mkdir -p $(HOME) $(GOCACHE) $(GOMODCACHE)
+
+	# Git source is already included in source package (cloned by ppa-build.sh)
+	# Launchpad build environment has no internet access
+	test -d dms-git-repo || (echo "ERROR: dms-git-repo directory not found!" && exit 1)
+
+	# Patch go.mod to use Go 1.24 base version (Ubuntu has 1.24.4, project requires 1.24.6)
+	sed -i 's/^go 1\.24\.[0-9]*/go 1.24/' dms-git-repo/core/go.mod
+
+	# Build dms-cli from source
+	@if [ -f dms-git-repo/.dms-version ]; then \
+		. dms-git-repo/.dms-version; \
+		echo "Building with VERSION=$$VERSION COMMIT=$$COMMIT"; \
+		cd dms-git-repo/core && $(MAKE) GOFLAGS="-mod=vendor" dist ARCH=amd64 VERSION="$$VERSION" COMMIT="$$COMMIT"; \
+	else \
+		echo "Warning: .dms-version not found, building without version info"; \
+		cd dms-git-repo/core && $(MAKE) GOFLAGS="-mod=vendor" dist ARCH=amd64; \
+	fi
+	cp dms-git-repo/core/bin/dms-linux-amd64 dms
+	chmod +x dms
+
+override_dh_auto_install:
+	# Install binary
+	install -Dm755 dms debian/dms-git/usr/bin/dms
+
+	# Install QML files from git clone
+	mkdir -p debian/dms-git/usr/share/quickshell/dms
+	cp -r dms-git-repo/* debian/dms-git/usr/share/quickshell/dms/
+
+	# Remove unnecessary directories
+	rm -rf debian/dms-git/usr/share/quickshell/dms/core
+	rm -rf debian/dms-git/usr/share/quickshell/dms/distro
+
+	# Install systemd user service
+	install -Dm644 dms-git-repo/quickshell/assets/systemd/dms.service \
+		debian/dms-git/usr/lib/systemd/user/dms.service
+
+override_dh_auto_clean:
+	# Don't delete dms-git-repo directory - it's part of the source package (native format)
+	# Clean up build artifacts
+	rm -f dms
+	rm -rf dms-git-repo/core/bin
+	rm -rf debian/tmp-home
+	dh_auto_clean

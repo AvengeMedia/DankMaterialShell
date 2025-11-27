@@ -8,10 +8,13 @@ type Backend interface {
 	SetWiFiEnabled(enabled bool) error
 
 	ScanWiFi() error
+	ScanWiFiDevice(device string) error
 	GetWiFiNetworkDetails(ssid string) (*NetworkInfoResponse, error)
+	GetWiFiDevices() []WiFiDevice
 
 	ConnectWiFi(req ConnectionRequest) error
 	DisconnectWiFi() error
+	DisconnectWiFiDevice(device string) error
 	ForgetWiFiNetwork(ssid string) error
 	SetWiFiAutoconnect(ssid string, autoconnect bool) error
 
@@ -54,11 +57,13 @@ type BackendState struct {
 	WiFiBSSID              string
 	WiFiSignal             uint8
 	WiFiNetworks           []WiFiNetwork
+	WiFiDevices            []WiFiDevice
 	WiredConnections       []WiredConnection
 	VPNProfiles            []VPNProfile
 	VPNActive              []VPNActive
 	IsConnecting           bool
 	ConnectingSSID         string
+	ConnectingDevice       string
 	IsConnectingVPN        bool
 	ConnectingVPNUUID      string
 	LastError              string

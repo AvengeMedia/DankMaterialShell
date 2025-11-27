@@ -1,7 +1,5 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -16,50 +14,70 @@ Item {
     property bool isLabwc: CompositorService.isLabwc
 
     property string compositorName: {
-        if (isHyprland) return "hyprland"
-        if (isSway) return "sway"
-        if (isDwl) return "mangowc"
-        if (isLabwc) return "labwc"
-        return "niri"
+        if (isHyprland)
+            return "hyprland";
+        if (isSway)
+            return "sway";
+        if (isDwl)
+            return "mangowc";
+        if (isLabwc)
+            return "labwc";
+        return "niri";
     }
 
     property string compositorLogo: {
-        if (isHyprland) return "/assets/hyprland.svg"
-        if (isSway) return "/assets/sway.svg"
-        if (isDwl) return "/assets/mango.png"
-        if (isLabwc) return "/assets/labwc.png"
-        return "/assets/niri.svg"
+        if (isHyprland)
+            return "/assets/hyprland.svg";
+        if (isSway)
+            return "/assets/sway.svg";
+        if (isDwl)
+            return "/assets/mango.png";
+        if (isLabwc)
+            return "/assets/labwc.png";
+        return "/assets/niri.svg";
     }
 
     property string compositorUrl: {
-        if (isHyprland) return "https://hypr.land"
-        if (isSway) return "https://swaywm.org"
-        if (isDwl) return "https://github.com/DreamMaoMao/mangowc"
-        if (isLabwc) return "https://labwc.github.io/"
-        return "https://github.com/YaLTeR/niri"
+        if (isHyprland)
+            return "https://hypr.land";
+        if (isSway)
+            return "https://swaywm.org";
+        if (isDwl)
+            return "https://github.com/DreamMaoMao/mangowc";
+        if (isLabwc)
+            return "https://labwc.github.io/";
+        return "https://github.com/YaLTeR/niri";
     }
 
     property string compositorTooltip: {
-        if (isHyprland) return "Hyprland Website"
-        if (isSway) return "Sway Website"
-        if (isDwl) return "mangowc GitHub"
-        if (isLabwc) return "LabWC Website"
-        return "niri GitHub"
+        if (isHyprland)
+            return "Hyprland Website";
+        if (isSway)
+            return "Sway Website";
+        if (isDwl)
+            return "mangowc GitHub";
+        if (isLabwc)
+            return "LabWC Website";
+        return "niri GitHub";
     }
 
     property string dmsDiscordUrl: "https://discord.gg/ppWTpKmPgT"
     property string dmsDiscordTooltip: "niri/dms Discord"
 
     property string compositorDiscordUrl: {
-        if (isHyprland) return "https://discord.com/invite/hQ9XvMUjjr"
-        if (isDwl) return "https://discord.gg/CPjbDxesh5"
-        return ""
+        if (isHyprland)
+            return "https://discord.com/invite/hQ9XvMUjjr";
+        if (isDwl)
+            return "https://discord.gg/CPjbDxesh5";
+        return "";
     }
 
     property string compositorDiscordTooltip: {
-        if (isHyprland) return "Hyprland Discord Server"
-        if (isDwl) return "mangowc Discord Server"
-        return ""
+        if (isHyprland)
+            return "Hyprland Discord Server";
+        if (isDwl)
+            return "mangowc Discord Server";
+        return "";
     }
 
     property string redditUrl: "https://reddit.com/r/niri"
@@ -76,13 +94,14 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             // ASCII Art Header
@@ -91,8 +110,7 @@ Item {
                 height: asciiSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -157,20 +175,20 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         height: 24
                         width: {
-                            let baseWidth = compositorButton.width + dmsDiscordButton.width + Theme.spacingM
+                            let baseWidth = compositorButton.width + dmsDiscordButton.width + Theme.spacingM;
                             if (showMatrix) {
-                                baseWidth += matrixButton.width + 4
+                                baseWidth += matrixButton.width + 4;
                             }
                             if (showIrc) {
-                                baseWidth += ircButton.width + Theme.spacingM
+                                baseWidth += ircButton.width + Theme.spacingM;
                             }
                             if (showCompositorDiscord) {
-                                baseWidth += compositorDiscordButton.width + Theme.spacingM
+                                baseWidth += compositorDiscordButton.width + Theme.spacingM;
                             }
                             if (showReddit) {
-                                baseWidth += redditButton.width + Theme.spacingM
+                                baseWidth += redditButton.width + Theme.spacingM;
                             }
-                            return baseWidth
+                            return baseWidth;
                         }
 
                         Item {
@@ -186,10 +204,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + compositorLogo
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + compositorLogo
                                 sourceSize: Qt.size(24, 24)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -217,10 +232,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/matrix-logo-white.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/matrix-logo-white.svg"
                                 sourceSize: Qt.size(28, 18)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -238,8 +250,7 @@ Item {
                                 hoverEnabled: true
                                 onEntered: parent.hovered = true
                                 onExited: parent.hovered = false
-                                onClicked: Qt.openUrlExternally(
-                                               "https://matrix.to/#/#niri:matrix.org")
+                                onClicked: Qt.openUrlExternally("https://matrix.to/#/#niri:matrix.org")
                             }
                         }
 
@@ -276,9 +287,11 @@ Item {
                             width: 20
                             height: 20
                             x: {
-                                if (showMatrix) return matrixButton.x + matrixButton.width + Theme.spacingM
-                                if (showIrc) return ircButton.x + ircButton.width + Theme.spacingM
-                                return compositorButton.x + compositorButton.width + Theme.spacingM
+                                if (showMatrix)
+                                    return matrixButton.x + matrixButton.width + Theme.spacingM;
+                                if (showIrc)
+                                    return ircButton.x + ircButton.width + Theme.spacingM;
+                                return compositorButton.x + compositorButton.width + Theme.spacingM;
                             }
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -287,10 +300,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/discord.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/discord.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -319,10 +329,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/discord.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/discord.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -351,10 +358,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/reddit.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/reddit.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -373,15 +377,13 @@ Item {
                 }
             }
 
-
             // Project Information
             StyledRect {
                 width: parent.width
                 height: projectSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -438,8 +440,7 @@ Item {
                 height: techSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -600,8 +601,7 @@ Item {
                 height: supportSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Row {
@@ -648,7 +648,6 @@ Item {
                     }
                 }
             }
-
         }
     }
 
@@ -659,13 +658,19 @@ Item {
         z: 1000
 
         property var hoveredButton: {
-            if (compositorButton.hovered) return compositorButton
-            if (matrixButton.visible && matrixButton.hovered) return matrixButton
-            if (ircButton.visible && ircButton.hovered) return ircButton
-            if (dmsDiscordButton.hovered) return dmsDiscordButton
-            if (compositorDiscordButton.visible && compositorDiscordButton.hovered) return compositorDiscordButton
-            if (redditButton.visible && redditButton.hovered) return redditButton
-            return null
+            if (compositorButton.hovered)
+                return compositorButton;
+            if (matrixButton.visible && matrixButton.hovered)
+                return matrixButton;
+            if (ircButton.visible && ircButton.hovered)
+                return ircButton;
+            if (dmsDiscordButton.hovered)
+                return dmsDiscordButton;
+            if (compositorDiscordButton.visible && compositorDiscordButton.hovered)
+                return compositorDiscordButton;
+            if (redditButton.visible && redditButton.hovered)
+                return redditButton;
+            return null;
         }
 
         property string tooltipText: hoveredButton ? hoveredButton.tooltipText : ""

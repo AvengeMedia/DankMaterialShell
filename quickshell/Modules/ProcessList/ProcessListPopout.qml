@@ -19,14 +19,6 @@ DankPopout {
     property var parentWidget: null
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x;
-        triggerY = y;
-        triggerWidth = width;
-        triggerSection = section;
-        triggerScreen = screen;
-    }
-
     function hide() {
         close();
         if (processContextMenu.visible) {
@@ -40,8 +32,6 @@ DankPopout {
 
     popupWidth: 600
     popupHeight: 600
-    triggerX: Screen.width - 600 - Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 55
     positioning: ""
     screen: triggerScreen

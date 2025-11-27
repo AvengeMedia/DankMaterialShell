@@ -15,23 +15,23 @@ Scope {
     property bool processingExternalEvent: false
 
     Component.onCompleted: {
-        IdleService.lockComponent = this
+        IdleService.lockComponent = this;
     }
 
     function lock() {
         if (SettingsData.customPowerActionLock && SettingsData.customPowerActionLock.length > 0) {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock])
-            return
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLock]);
+            return;
         }
         if (!processingExternalEvent && SettingsData.loginctlLockIntegration && DMSService.isConnected) {
             DMSService.lockSession(response => {
                 if (response.error) {
-                    console.warn("Lock: Failed to call loginctl.lock:", response.error)
-                    shouldLock = true
+                    console.warn("Lock: Failed to call loginctl.lock:", response.error);
+                    shouldLock = true;
                 }
-            })
+            });
         } else {
-            shouldLock = true
+            shouldLock = true;
         }
     }
 
@@ -39,32 +39,32 @@ Scope {
         if (!processingExternalEvent && SettingsData.loginctlLockIntegration && DMSService.isConnected) {
             DMSService.unlockSession(response => {
                 if (response.error) {
-                    console.warn("Lock: Failed to call loginctl.unlock:", response.error)
-                    shouldLock = false
+                    console.warn("Lock: Failed to call loginctl.unlock:", response.error);
+                    shouldLock = false;
                 }
-            })
+            });
         } else {
-            shouldLock = false
+            shouldLock = false;
         }
     }
 
     function activate() {
-        lock()
+        lock();
     }
 
     Connections {
         target: SessionService
 
         function onSessionLocked() {
-            processingExternalEvent = true
-            shouldLock = true
-            processingExternalEvent = false
+            processingExternalEvent = true;
+            shouldLock = true;
+            processingExternalEvent = false;
         }
 
         function onSessionUnlocked() {
-            processingExternalEvent = true
-            shouldLock = false
-            processingExternalEvent = false
+            processingExternalEvent = true;
+            shouldLock = false;
+            processingExternalEvent = false;
         }
     }
 
@@ -72,7 +72,7 @@ Scope {
         target: IdleService
 
         function onLockRequested() {
-            lock()
+            lock();
         }
     }
 
@@ -93,11 +93,11 @@ Scope {
                 screenName: lockSurface.screen?.name ?? ""
                 isLocked: shouldLock
                 onUnlockRequested: {
-                    root.unlock()
+                    root.unlock();
                 }
                 onPasswordChanged: newPassword => {
-                                       root.sharedPasswordBuffer = newPassword
-                                   }
+                    root.sharedPasswordBuffer = newPassword;
+                }
             }
         }
     }
@@ -113,21 +113,21 @@ Scope {
             if (!root.processingExternalEvent && SettingsData.loginctlLockIntegration && DMSService.isConnected) {
                 DMSService.lockSession(response => {
                     if (response.error) {
-                        console.warn("Lock: Failed to call loginctl.lock:", response.error)
-                        root.shouldLock = true
+                        console.warn("Lock: Failed to call loginctl.lock:", response.error);
+                        root.shouldLock = true;
                     }
-                })
+                });
             } else {
-                root.shouldLock = true
+                root.shouldLock = true;
             }
         }
 
         function demo() {
-            demoWindow.showDemo()
+            demoWindow.showDemo();
         }
 
         function isLocked(): bool {
-            return sessionLock.locked
+            return sessionLock.locked;
         }
     }
 }

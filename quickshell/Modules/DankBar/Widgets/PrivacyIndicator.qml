@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -14,14 +13,15 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property var barConfig: null
 
     property bool showMicIcon: SettingsData.privacyShowMicIcon
     property bool showCameraIcon: SettingsData.privacyShowCameraIcon
     property bool showScreenSharingIcon: SettingsData.privacyShowScreenShareIcon
 
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
+    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 2 : Theme.spacingS
     readonly property bool hasActivePrivacy: showMicIcon || showCameraIcon || showScreenSharingIcon || PrivacyService.anyPrivacyActive
-    readonly property int activeCount: ( showMicIcon ? 1 : PrivacyService.microphoneActive) + (showCameraIcon ? 1 : PrivacyService.cameraActive) + (showScreenSharingIcon ? 1 : PrivacyService.screensharingActive)
+    readonly property int activeCount: (showMicIcon ? 1 : PrivacyService.microphoneActive) + (showCameraIcon ? 1 : PrivacyService.cameraActive) + (showScreenSharingIcon ? 1 : PrivacyService.screensharingActive)
     readonly property real contentWidth: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
     readonly property real contentHeight: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
     readonly property real visualWidth: isVertical ? widgetThickness : (hasActivePrivacy ? (contentWidth + horizontalPadding * 2) : 0)
@@ -33,19 +33,63 @@ Item {
     opacity: hasActivePrivacy ? 1 : 0
     enabled: hasActivePrivacy
 
-    Rectangle {
+    Item {
         id: visualContent
         width: root.visualWidth
         height: root.visualHeight
         anchors.centerIn: parent
-        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-        color: {
-            if (SettingsData.dankBarNoBackground) {
-                return "transparent"
-            }
 
-            const baseColor = Theme.widgetBaseBackgroundColor
-            return Qt.rgba(privacyArea.containsMouse ? Theme.errorPressed.r : baseColor.r, privacyArea.containsMouse ? Theme.errorPressed.g : baseColor.g, privacyArea.containsMouse ? Theme.errorPressed.b : baseColor.b, (privacyArea.containsMouse ? Theme.errorPressed.a : baseColor.a) * Theme.widgetTransparency)
+        Rectangle {
+            id: outline
+            anchors.centerIn: parent
+            width: {
+                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+                return parent.width + borderWidth * 2;
+            }
+            height: {
+                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+                return parent.height + borderWidth * 2;
+            }
+            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
+            color: "transparent"
+            border.width: {
+                if (barConfig?.widgetOutlineEnabled ?? false) {
+                    return barConfig?.widgetOutlineThickness ?? 1;
+                }
+                return 0;
+            }
+            border.color: {
+                if (!(barConfig?.widgetOutlineEnabled ?? false)) {
+                    return "transparent";
+                }
+                const colorOption = barConfig?.widgetOutlineColor || "primary";
+                const opacity = barConfig?.widgetOutlineOpacity ?? 1.0;
+                switch (colorOption) {
+                case "surfaceText":
+                    return Theme.withAlpha(Theme.surfaceText, opacity);
+                case "secondary":
+                    return Theme.withAlpha(Theme.secondary, opacity);
+                case "primary":
+                    return Theme.withAlpha(Theme.primary, opacity);
+                default:
+                    return Theme.withAlpha(Theme.primary, opacity);
+                }
+            }
+        }
+
+        Rectangle {
+            id: background
+            anchors.fill: parent
+            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
+            color: {
+                if (barConfig?.noBackground ?? false) {
+                    return "transparent";
+                }
+
+                const baseColor = privacyArea.containsMouse ? Theme.errorPressed : Theme.errorHover;
+                const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
+                return Theme.withAlpha(baseColor, transparency);
+            }
         }
 
         Column {
@@ -61,10 +105,11 @@ Item {
 
                 DankIcon {
                     name: {
-                        const sourceAudio = AudioService.source?.audio
-                        const muted = !sourceAudio || sourceAudio.muted || sourceAudio.volume === 0.0
-                        if (muted) return "mic_off"
-                        return "mic"
+                        const sourceAudio = AudioService.source?.audio;
+                        const muted = !sourceAudio || sourceAudio.muted || sourceAudio.volume === 0.0;
+                        if (muted)
+                            return "mic_off";
+                        return "mic";
                     }
                     size: Theme.iconSizeSmall
                     color: Theme.error
@@ -128,10 +173,11 @@ Item {
 
                 DankIcon {
                     name: {
-                        const sourceAudio = AudioService.source?.audio
-                        const muted = !sourceAudio || sourceAudio.muted || sourceAudio.volume === 0.0
-                        if (muted) return "mic_off"
-                        return "mic"
+                        const sourceAudio = AudioService.source?.audio;
+                        const muted = !sourceAudio || sourceAudio.muted || sourceAudio.volume === 0.0;
+                        if (muted)
+                            return "mic_off";
+                        return "mic";
                     }
                     size: Theme.iconSizeSmall
                     color: PrivacyService.microphoneActive ? Theme.error : Theme.surfaceText
@@ -191,8 +237,7 @@ Item {
         hoverEnabled: hasActivePrivacy
         enabled: hasActivePrivacy
         cursorShape: Qt.PointingHandCursor
-        onClicked: {
-        }
+        onClicked: {}
     }
 
     Rectangle {
@@ -213,7 +258,7 @@ Item {
             id: tooltipText
             anchors.centerIn: parent
             text: PrivacyService.getPrivacySummary()
-            font.pixelSize: Theme.barTextSize(barThickness)
+            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
             color: Theme.widgetTextColor
         }
 

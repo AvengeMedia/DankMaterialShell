@@ -11,15 +11,15 @@ Rectangle {
 
     implicitHeight: {
         if (height > 0) {
-            return height
+            return height;
         }
         if (NetworkService.wifiToggling) {
-            return headerRow.height + wifiToggleContent.height + Theme.spacingM
+            return headerRow.height + wifiToggleContent.height + Theme.spacingM;
         }
         if (NetworkService.wifiEnabled) {
-            return headerRow.height + wifiContent.height + Theme.spacingM
+            return headerRow.height + wifiContent.height + Theme.spacingM;
         }
-        return headerRow.height + wifiOffContent.height + Theme.spacingM
+        return headerRow.height + wifiOffContent.height + Theme.spacingM;
     }
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
@@ -27,35 +27,35 @@ Rectangle {
     border.width: 0
 
     Component.onCompleted: {
-        NetworkService.addRef()
+        NetworkService.addRef();
     }
 
     Component.onDestruction: {
-        NetworkService.removeRef()
+        NetworkService.removeRef();
     }
 
     property int currentPreferenceIndex: {
         if (DMSService.apiVersion < 5) {
-            return 1
+            return 1;
         }
 
         if (NetworkService.backend !== "networkmanager" || DMSService.apiVersion <= 10) {
-            return 1
+            return 1;
         }
 
-        const pref = NetworkService.userPreference
-        const status = NetworkService.networkStatus
-        let index = 1
+        const pref = NetworkService.userPreference;
+        const status = NetworkService.networkStatus;
+        let index = 1;
 
         if (pref === "ethernet") {
-            index = 0
+            index = 0;
         } else if (pref === "wifi") {
-            index = 1
+            index = 1;
         } else {
-            index = status === "ethernet" ? 0 : 1
+            index = status === "ethernet" ? 0 : 1;
         }
 
-        return index
+        return index;
     }
 
     Row {
@@ -78,27 +78,55 @@ Rectangle {
         }
 
         Item {
-            width: Math.max(0, parent.width - headerText.implicitWidth - preferenceControls.width - Theme.spacingM)
-            height: parent.height
+            height: 1
+            width: parent.width - headerText.width - rightControls.width
         }
 
-        DankButtonGroup {
-            id: preferenceControls
+        Row {
+            id: rightControls
             anchors.verticalCenter: parent.verticalCenter
-            visible: NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
+            spacing: Theme.spacingS
 
-            model: ["Ethernet", "WiFi"]
-            currentIndex: currentPreferenceIndex
-            selectionMode: "single"
-            onSelectionChanged: (index, selected) => {
-                if (!selected) return
-                console.log("NetworkDetail: Setting preference to", index === 0 ? "ethernet" : "wifi")
-                NetworkService.setNetworkPreference(index === 0 ? "ethernet" : "wifi")
+            DankDropdown {
+                id: wifiDeviceDropdown
+                anchors.verticalCenter: parent.verticalCenter
+                visible: currentPreferenceIndex === 1 && (NetworkService.wifiDevices?.length ?? 0) > 1
+                compactMode: true
+                dropdownWidth: 120
+                popupWidth: 160
+                alignPopupRight: true
+
+                options: {
+                    const devices = NetworkService.wifiDevices;
+                    if (!devices || devices.length === 0)
+                        return [I18n.tr("Auto")];
+                    return [I18n.tr("Auto")].concat(devices.map(d => d.name));
+                }
+
+                currentValue: NetworkService.wifiDeviceOverride || I18n.tr("Auto")
+
+                onValueChanged: value => {
+                    const deviceName = value === I18n.tr("Auto") ? "" : value;
+                    NetworkService.setWifiDeviceOverride(deviceName);
+                }
+            }
+
+            DankButtonGroup {
+                id: preferenceControls
+                anchors.verticalCenter: parent.verticalCenter
+                visible: NetworkService.backend === "networkmanager" && DMSService.apiVersion > 10
+
+                model: ["Ethernet", "WiFi"]
+                currentIndex: currentPreferenceIndex
+                selectionMode: "single"
+                onSelectionChanged: (index, selected) => {
+                    if (!selected)
+                        return;
+                    NetworkService.setNetworkPreference(index === 0 ? "ethernet" : "wifi");
+                }
             }
         }
     }
-
-
 
     Item {
         id: wifiToggleContent
@@ -194,7 +222,6 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor
                     onClicked: NetworkService.toggleWifiRadio()
                 }
-
             }
         }
     }
@@ -219,15 +246,17 @@ Rectangle {
             Repeater {
                 model: ScriptModel {
                     values: {
-                        const currentUuid = NetworkService.ethernetConnectionUuid
-                        const networks = NetworkService.wiredConnections
-                        let sorted = [...networks]
+                        const currentUuid = NetworkService.ethernetConnectionUuid;
+                        const networks = NetworkService.wiredConnections;
+                        let sorted = [...networks];
                         sorted.sort((a, b) => {
-                            if (a.isActive && !b.isActive) return -1
-                            if (!a.isActive && b.isActive) return 1
-                            return a.id.localeCompare(b.id)
-                        })
-                        return sorted
+                            if (a.isActive && !b.isActive)
+                                return -1;
+                            if (!a.isActive && b.isActive)
+                                return 1;
+                            return a.id.localeCompare(b.id);
+                        });
+                        return sorted;
                     }
                 }
 
@@ -279,12 +308,12 @@ Rectangle {
                         buttonSize: 28
                         onClicked: {
                             if (wiredNetworkContextMenu.visible) {
-                                wiredNetworkContextMenu.close()
+                                wiredNetworkContextMenu.close();
                             } else {
-                                wiredNetworkContextMenu.currentID = modelData.id
-                                wiredNetworkContextMenu.currentUUID = modelData.uuid                               
-                                wiredNetworkContextMenu.currentConnected = modelData.isActive
-                                wiredNetworkContextMenu.popup(wiredOptionsButton, -wiredNetworkContextMenu.width + wiredOptionsButton.width, wiredOptionsButton.height + Theme.spacingXS)
+                                wiredNetworkContextMenu.currentID = modelData.id;
+                                wiredNetworkContextMenu.currentUUID = modelData.uuid;
+                                wiredNetworkContextMenu.currentConnected = modelData.isActive;
+                                wiredNetworkContextMenu.popup(wiredOptionsButton, -wiredNetworkContextMenu.width + wiredOptionsButton.width, wiredOptionsButton.height + Theme.spacingXS);
                             }
                         }
                     }
@@ -295,14 +324,13 @@ Rectangle {
                         anchors.rightMargin: wiredOptionsButton.width + Theme.spacingS
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: function(event) {
+                        onClicked: function (event) {
                             if (modelData.uuid !== NetworkService.ethernetConnectionUuid) {
-                                NetworkService.connectToSpecificWiredConfig(modelData.uuid)
+                                NetworkService.connectToSpecificWiredConfig(modelData.uuid);
                             }
-                            event.accepted = true
+                            event.accepted = true;
                         }
                     }
-
                 }
             }
         }
@@ -343,7 +371,7 @@ Rectangle {
 
             onTriggered: {
                 if (!networkContextMenu.currentConnected) {
-                    NetworkService.connectToSpecificWiredConfig(wiredNetworkContextMenu.currentUUID)
+                    NetworkService.connectToSpecificWiredConfig(wiredNetworkContextMenu.currentUUID);
                 }
             }
         }
@@ -366,8 +394,8 @@ Rectangle {
             }
 
             onTriggered: {
-                let networkData = NetworkService.getWiredNetworkInfo(wiredNetworkContextMenu.currentUUID)
-                networkWiredInfoModal.showNetworkInfo(wiredNetworkContextMenu.currentID, networkData)
+                let networkData = NetworkService.getWiredNetworkInfo(wiredNetworkContextMenu.currentUUID);
+                networkWiredInfoModal.showNetworkInfo(wiredNetworkContextMenu.currentID, networkData);
             }
         }
     }
@@ -416,26 +444,30 @@ Rectangle {
             Repeater {
                 model: ScriptModel {
                     values: {
-                        const ssid = NetworkService.currentWifiSSID
-                        const networks = NetworkService.wifiNetworks
-                        const pins = SettingsData.wifiNetworkPins || {}
-                        const pinnedSSID = pins["preferredWifi"]
-                        
-                        let sorted = [...networks]
+                        const ssid = NetworkService.currentWifiSSID;
+                        const networks = NetworkService.wifiNetworks;
+                        const pins = SettingsData.wifiNetworkPins || {};
+                        const pinnedSSID = pins["preferredWifi"];
+
+                        let sorted = [...networks];
                         sorted.sort((a, b) => {
                             // Pinned network first
-                            if (a.ssid === pinnedSSID && b.ssid !== pinnedSSID) return -1
-                            if (b.ssid === pinnedSSID && a.ssid !== pinnedSSID) return 1
+                            if (a.ssid === pinnedSSID && b.ssid !== pinnedSSID)
+                                return -1;
+                            if (b.ssid === pinnedSSID && a.ssid !== pinnedSSID)
+                                return 1;
                             // Then currently connected
-                            if (a.ssid === ssid) return -1
-                            if (b.ssid === ssid) return 1
+                            if (a.ssid === ssid)
+                                return -1;
+                            if (b.ssid === ssid)
+                                return 1;
                             // Then by signal strength
-                            return b.signal - a.signal
-                        })
+                            return b.signal - a.signal;
+                        });
                         if (!wifiContent.menuOpen) {
-                            wifiContent.frozenNetworks = sorted
+                            wifiContent.frozenNetworks = sorted;
                         }
-                        return wifiContent.menuOpen ? wifiContent.frozenNetworks : sorted
+                        return wifiContent.menuOpen ? wifiContent.frozenNetworks : sorted;
                     }
                 }
 
@@ -458,10 +490,12 @@ Rectangle {
 
                         DankIcon {
                             name: {
-                                let strength = modelData.signal || 0
-                                if (strength >= 50) return "wifi"
-                                if (strength >= 25) return "wifi_2_bar"
-                                return "wifi_1_bar"
+                                let strength = modelData.signal || 0;
+                                if (strength >= 50)
+                                    return "wifi";
+                                if (strength >= 25)
+                                    return "wifi_2_bar";
+                                return "wifi_1_bar";
                             }
                             size: Theme.iconSize - 4
                             color: modelData.ssid === NetworkService.currentWifiSSID ? Theme.primary : Theme.surfaceText
@@ -515,16 +549,16 @@ Rectangle {
                         buttonSize: 28
                         onClicked: {
                             if (networkContextMenu.visible) {
-                                networkContextMenu.close()
+                                networkContextMenu.close();
                             } else {
-                                wifiContent.menuOpen = true
-                                networkContextMenu.currentSSID = modelData.ssid
-                                networkContextMenu.currentSecured = modelData.secured
-                                networkContextMenu.currentConnected = modelData.ssid === NetworkService.currentWifiSSID
-                                networkContextMenu.currentSaved = modelData.saved
-                                networkContextMenu.currentSignal = modelData.signal
-                                networkContextMenu.currentAutoconnect = modelData.autoconnect || false
-                                networkContextMenu.popup(optionsButton, -networkContextMenu.width + optionsButton.width, optionsButton.height + Theme.spacingXS)
+                                wifiContent.menuOpen = true;
+                                networkContextMenu.currentSSID = modelData.ssid;
+                                networkContextMenu.currentSecured = modelData.secured;
+                                networkContextMenu.currentConnected = modelData.ssid === NetworkService.currentWifiSSID;
+                                networkContextMenu.currentSaved = modelData.saved;
+                                networkContextMenu.currentSignal = modelData.signal;
+                                networkContextMenu.currentAutoconnect = modelData.autoconnect || false;
+                                networkContextMenu.popup(optionsButton, -networkContextMenu.width + optionsButton.width, optionsButton.height + Theme.spacingXS);
                             }
                         }
                     }
@@ -537,8 +571,8 @@ Rectangle {
                         height: 28
                         radius: height / 2
                         color: {
-                            const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
-                            return isThisNetworkPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
+                            const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid;
+                            return isThisNetworkPinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05);
                         }
 
                         Row {
@@ -550,21 +584,21 @@ Rectangle {
                                 name: "push_pin"
                                 size: 16
                                 color: {
-                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
-                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid;
+                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             StyledText {
                                 text: {
-                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
-                                    return isThisNetworkPinned ? "Pinned" : "Pin"
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid;
+                                    return isThisNetworkPinned ? "Pinned" : "Pin";
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: {
-                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid
-                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText
+                                    const isThisNetworkPinned = (SettingsData.wifiNetworkPins || {})["preferredWifi"] === modelData.ssid;
+                                    return isThisNetworkPinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -574,16 +608,16 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}))
-                                const isCurrentlyPinned = pins["preferredWifi"] === modelData.ssid
-                                
+                                const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}));
+                                const isCurrentlyPinned = pins["preferredWifi"] === modelData.ssid;
+
                                 if (isCurrentlyPinned) {
-                                    delete pins["preferredWifi"]
+                                    delete pins["preferredWifi"];
                                 } else {
-                                    pins["preferredWifi"] = modelData.ssid
+                                    pins["preferredWifi"] = modelData.ssid;
                                 }
-                                
-                                SettingsData.set("wifiNetworkPins", pins)
+
+                                SettingsData.set("wifiNetworkPins", pins);
                             }
                         }
                     }
@@ -594,22 +628,21 @@ Rectangle {
                         anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS + pinWifiRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: function(event) {
+                        onClicked: function (event) {
                             if (modelData.ssid !== NetworkService.currentWifiSSID) {
                                 if (modelData.secured && !modelData.saved) {
                                     if (DMSService.apiVersion >= 7) {
-                                        NetworkService.connectToWifi(modelData.ssid)
+                                        NetworkService.connectToWifi(modelData.ssid);
                                     } else if (PopoutService.wifiPasswordModal) {
-                                        PopoutService.wifiPasswordModal.show(modelData.ssid)
+                                        PopoutService.wifiPasswordModal.show(modelData.ssid);
                                     }
                                 } else {
-                                    NetworkService.connectToWifi(modelData.ssid)
+                                    NetworkService.connectToWifi(modelData.ssid);
                                 }
                             }
-                            event.accepted = true
+                            event.accepted = true;
                         }
                     }
-
                 }
             }
         }
@@ -628,7 +661,7 @@ Rectangle {
         property bool currentAutoconnect: false
 
         onClosed: {
-            wifiContent.menuOpen = false
+            wifiContent.menuOpen = false;
         }
 
         background: Rectangle {
@@ -657,16 +690,16 @@ Rectangle {
 
             onTriggered: {
                 if (networkContextMenu.currentConnected) {
-                    NetworkService.disconnectWifi()
+                    NetworkService.disconnectWifi();
                 } else {
                     if (networkContextMenu.currentSecured && !networkContextMenu.currentSaved) {
                         if (DMSService.apiVersion >= 7) {
-                            NetworkService.connectToWifi(networkContextMenu.currentSSID)
+                            NetworkService.connectToWifi(networkContextMenu.currentSSID);
                         } else if (PopoutService.wifiPasswordModal) {
-                            PopoutService.wifiPasswordModal.show(networkContextMenu.currentSSID)
+                            PopoutService.wifiPasswordModal.show(networkContextMenu.currentSSID);
                         }
                     } else {
-                        NetworkService.connectToWifi(networkContextMenu.currentSSID)
+                        NetworkService.connectToWifi(networkContextMenu.currentSSID);
                     }
                 }
             }
@@ -690,8 +723,8 @@ Rectangle {
             }
 
             onTriggered: {
-                let networkData = NetworkService.getNetworkInfo(networkContextMenu.currentSSID)
-                networkInfoModal.showNetworkInfo(networkContextMenu.currentSSID, networkData)
+                let networkData = NetworkService.getNetworkInfo(networkContextMenu.currentSSID);
+                networkInfoModal.showNetworkInfo(networkContextMenu.currentSSID, networkData);
             }
         }
 
@@ -714,7 +747,7 @@ Rectangle {
             }
 
             onTriggered: {
-                NetworkService.setWifiAutoconnect(networkContextMenu.currentSSID, !networkContextMenu.currentAutoconnect)
+                NetworkService.setWifiAutoconnect(networkContextMenu.currentSSID, !networkContextMenu.currentAutoconnect);
             }
         }
 
@@ -737,7 +770,7 @@ Rectangle {
             }
 
             onTriggered: {
-                NetworkService.forgetWifiNetwork(networkContextMenu.currentSSID)
+                NetworkService.forgetWifiNetwork(networkContextMenu.currentSSID);
             }
         }
     }

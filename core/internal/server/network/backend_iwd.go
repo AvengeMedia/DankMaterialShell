@@ -139,9 +139,13 @@ func (b *IWDBackend) discoverDevices() error {
 }
 
 func (b *IWDBackend) GetCurrentState() (*BackendState, error) {
+	b.stateMutex.RLock()
+	defer b.stateMutex.RUnlock()
+
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
+	state.WiFiDevices = b.getWiFiDevicesLocked()
 
 	return &state, nil
 }

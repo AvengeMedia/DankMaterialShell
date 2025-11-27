@@ -18,6 +18,7 @@ PanelWindow {
     property int margin: 10
     property bool hidePin: false
     property var desktopEntry: null
+    property bool isDmsWindow: appData?.appId === "org.quickshell"
 
     function showForButton(button, data, dockHeight, hidePinOption, entry, dockScreen) {
         if (dockScreen) {
@@ -351,7 +352,12 @@ PanelWindow {
             }
 
             Rectangle {
-                visible: root.desktopEntry && root.desktopEntry.actions && root.desktopEntry.actions.length > 0
+                visible: {
+                    if (!root.desktopEntry?.actions || root.desktopEntry.actions.length === 0) {
+                        return false
+                    }
+                    return !root.hidePin || (!root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun)
+                }
                 width: parent.width
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
@@ -398,14 +404,20 @@ PanelWindow {
             }
 
             Rectangle {
-                visible: (root.appData && root.appData.type === "window") || (root.desktopEntry && SessionService.hasPrimeRun)
+                visible: {
+                    const hasPrimeRun = !root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun
+                    const hasWindow = root.appData && (root.appData.type === "window" || (root.appData.type === "grouped" && root.appData.windowCount > 0))
+                    const hasPinOption = !root.hidePin
+                    const hasContentAbove = hasPinOption || hasPrimeRun
+                    return hasContentAbove && hasWindow
+                }
                 width: parent.width
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
             }
 
             Rectangle {
-                visible: root.desktopEntry && SessionService.hasPrimeRun
+                visible: !root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
@@ -437,13 +449,6 @@ PanelWindow {
                         root.close()
                     }
                 }
-            }
-
-            Rectangle {
-                visible: root.appData && (root.appData.type === "window" || (root.appData.type === "grouped" && root.appData.windowCount > 0))
-                width: parent.width
-                height: 1
-                color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
             }
 
             Rectangle {

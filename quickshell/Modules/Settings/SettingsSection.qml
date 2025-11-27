@@ -16,7 +16,7 @@ Column {
     spacing: expanded ? Theme.spacingM : 0
     Component.onCompleted: {
         if (!collapsible)
-        expanded = true
+            expanded = true;
     }
 
     MouseArea {
@@ -26,15 +26,12 @@ Column {
         hoverEnabled: collapsible
         onClicked: {
             if (collapsible)
-            expanded = !expanded
+                expanded = !expanded;
         }
 
         Rectangle {
             anchors.fill: parent
-            color: parent.containsMouse ? Qt.rgba(Theme.primary.r,
-                                                  Theme.primary.g,
-                                                  Theme.primary.b,
-                                                  0.08) : "transparent"
+            color: parent.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
             radius: Theme.radiusS
         }
 

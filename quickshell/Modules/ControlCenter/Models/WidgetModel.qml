@@ -17,17 +17,17 @@ QtObject {
         }
 
         onItemChanged: {
-            root.vpnBuiltinInstance = item
+            root.vpnBuiltinInstance = item;
         }
 
         Connections {
             target: SettingsData
             function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || []
-                const hasVpnWidget = widgets.some(w => w.id === "builtin_vpn")
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasVpnWidget = widgets.some(w => w.id === "builtin_vpn");
                 if (!hasVpnWidget && vpnLoader.active) {
-                    console.log("VpnWidget: No VPN widget in control center, deactivating loader")
-                    vpnLoader.active = false
+                    console.log("VpnWidget: No VPN widget in control center, deactivating loader");
+                    vpnLoader.active = false;
                 }
             }
         }
@@ -40,35 +40,36 @@ QtObject {
         }
 
         onItemChanged: {
-            root.cupsBuiltinInstance = item
+            root.cupsBuiltinInstance = item;
             if (item && !DMSService.activeSubscriptions.includes("cups") && !DMSService.activeSubscriptions.includes("all")) {
-                DMSService.addSubscription("cups")
+                DMSService.addSubscription("cups");
             }
         }
 
         onActiveChanged: {
             if (!active) {
                 if (DMSService.activeSubscriptions.includes("cups")) {
-                    DMSService.removeSubscription("cups")
+                    DMSService.removeSubscription("cups");
                 }
-                root.cupsBuiltinInstance = null
+                root.cupsBuiltinInstance = null;
             }
         }
 
         Connections {
             target: SettingsData
             function onControlCenterWidgetsChanged() {
-                const widgets = SettingsData.controlCenterWidgets || []
-                const hasCupsWidget = widgets.some(w => w.id === "builtin_cups")
+                const widgets = SettingsData.controlCenterWidgets || [];
+                const hasCupsWidget = widgets.some(w => w.id === "builtin_cups");
                 if (!hasCupsWidget && cupsLoader.active) {
-                    console.log("CupsWidget: No CUPS widget in control center, deactivating loader")
-                    cupsLoader.active = false
+                    console.log("CupsWidget: No CUPS widget in control center, deactivating loader");
+                    cupsLoader.active = false;
                 }
             }
         }
     }
 
-    readonly property var coreWidgetDefinitions: [{
+    readonly property var coreWidgetDefinitions: [
+        {
             "id": "nightMode",
             "text": "Night Mode",
             "description": "Blue light filter",
@@ -76,28 +77,32 @@ QtObject {
             "type": "toggle",
             "enabled": DisplayService.automationAvailable,
             "warning": !DisplayService.automationAvailable ? "Requires night mode support" : undefined
-        }, {
+        },
+        {
             "id": "darkMode",
             "text": "Dark Mode",
             "description": "System theme toggle",
             "icon": "contrast",
             "type": "toggle",
             "enabled": true
-        }, {
+        },
+        {
             "id": "doNotDisturb",
             "text": "Do Not Disturb",
             "description": "Block notifications",
             "icon": "do_not_disturb_on",
             "type": "toggle",
             "enabled": true
-        }, {
+        },
+        {
             "id": "idleInhibitor",
             "text": "Keep Awake",
             "description": "Prevent screen timeout",
             "icon": "motion_sensor_active",
             "type": "toggle",
             "enabled": true
-        }, {
+        },
+        {
             "id": "wifi",
             "text": "Network",
             "description": "Wi-Fi and Ethernet connection",
@@ -105,7 +110,8 @@ QtObject {
             "type": "connection",
             "enabled": NetworkService.wifiAvailable,
             "warning": !NetworkService.wifiAvailable ? "Wi-Fi not available" : undefined
-        }, {
+        },
+        {
             "id": "bluetooth",
             "text": "Bluetooth",
             "description": "Device connections",
@@ -113,28 +119,32 @@ QtObject {
             "type": "connection",
             "enabled": BluetoothService.available,
             "warning": !BluetoothService.available ? "Bluetooth not available" : undefined
-        }, {
+        },
+        {
             "id": "audioOutput",
             "text": "Audio Output",
             "description": "Speaker settings",
             "icon": "volume_up",
             "type": "connection",
             "enabled": true
-        }, {
+        },
+        {
             "id": "audioInput",
             "text": "Audio Input",
             "description": "Microphone settings",
             "icon": "mic",
             "type": "connection",
             "enabled": true
-        }, {
+        },
+        {
             "id": "volumeSlider",
             "text": "Volume Slider",
             "description": "Audio volume control",
             "icon": "volume_up",
             "type": "slider",
             "enabled": true
-        }, {
+        },
+        {
             "id": "brightnessSlider",
             "text": "Brightness Slider",
             "description": "Display brightness control",
@@ -143,21 +153,24 @@ QtObject {
             "enabled": DisplayService.brightnessAvailable,
             "warning": !DisplayService.brightnessAvailable ? "Brightness control not available" : undefined,
             "allowMultiple": true
-        }, {
+        },
+        {
             "id": "inputVolumeSlider",
             "text": "Input Volume Slider",
             "description": "Microphone volume control",
             "icon": "mic",
             "type": "slider",
             "enabled": true
-        }, {
+        },
+        {
             "id": "battery",
             "text": "Battery",
             "description": "Battery and power management",
             "icon": "battery_std",
             "type": "action",
             "enabled": true
-        }, {
+        },
+        {
             "id": "diskUsage",
             "text": "Disk Usage",
             "description": "Filesystem usage monitoring",
@@ -166,14 +179,16 @@ QtObject {
             "enabled": DgopService.dgopAvailable,
             "warning": !DgopService.dgopAvailable ? "Requires 'dgop' tool" : undefined,
             "allowMultiple": true
-        }, {
+        },
+        {
             "id": "colorPicker",
             "text": "Color Picker",
             "description": "Choose colors from palette",
             "icon": "palette",
             "type": "action",
             "enabled": true
-        }, {
+        },
+        {
             "id": "builtin_vpn",
             "text": "VPN",
             "description": "VPN connections",
@@ -182,7 +197,8 @@ QtObject {
             "enabled": DMSNetworkService.available,
             "warning": !DMSNetworkService.available ? "VPN not available" : undefined,
             "isBuiltinPlugin": true
-        }, {
+        },
+        {
             "id": "builtin_cups",
             "text": "Printers",
             "description": "Print Server Management",
@@ -191,78 +207,79 @@ QtObject {
             "enabled": CupsService.available,
             "warning": !CupsService.available ? "CUPS not available" : undefined,
             "isBuiltinPlugin": true
-        }]
+        }
+    ]
 
     function getPluginWidgets() {
-        const plugins = []
-        const loadedPlugins = PluginService.getLoadedPlugins()
+        const plugins = [];
+        const loadedPlugins = PluginService.getLoadedPlugins();
 
         for (var i = 0; i < loadedPlugins.length; i++) {
-            const plugin = loadedPlugins[i]
+            const plugin = loadedPlugins[i];
 
             if (plugin.type === "daemon") {
-                continue
+                continue;
             }
 
-            const pluginComponent = PluginService.pluginWidgetComponents[plugin.id]
+            const pluginComponent = PluginService.pluginWidgetComponents[plugin.id];
             if (!pluginComponent || typeof pluginComponent.createObject !== 'function') {
-                continue
+                continue;
             }
 
-            const tempInstance = pluginComponent.createObject(null)
+            const tempInstance = pluginComponent.createObject(null);
             if (!tempInstance) {
-                continue
+                continue;
             }
 
-            const hasCCWidget = tempInstance.ccWidgetIcon && tempInstance.ccWidgetIcon.length > 0
-            tempInstance.destroy()
+            const hasCCWidget = tempInstance.ccWidgetIcon && tempInstance.ccWidgetIcon.length > 0;
+            tempInstance.destroy();
 
             if (!hasCCWidget) {
-                continue
+                continue;
             }
 
             plugins.push({
-                             "id": "plugin_" + plugin.id,
-                             "pluginId": plugin.id,
-                             "text": plugin.name || "Plugin",
-                             "description": plugin.description || "",
-                             "icon": plugin.icon || "extension",
-                             "type": "plugin",
-                             "enabled": true,
-                             "isPlugin": true
-                         })
+                "id": "plugin_" + plugin.id,
+                "pluginId": plugin.id,
+                "text": plugin.name || "Plugin",
+                "description": plugin.description || "",
+                "icon": plugin.icon || "extension",
+                "type": "plugin",
+                "enabled": true,
+                "isPlugin": true
+            });
         }
 
-        return plugins
+        return plugins;
     }
 
     readonly property var baseWidgetDefinitions: coreWidgetDefinitions
 
     function getWidgetForId(widgetId) {
-        return WidgetUtils.getWidgetForId(baseWidgetDefinitions, widgetId)
+        return WidgetUtils.getWidgetForId(baseWidgetDefinitions, widgetId);
     }
 
     function addWidget(widgetId) {
-        WidgetUtils.addWidget(widgetId)
+        WidgetUtils.addWidget(widgetId);
     }
 
     function removeWidget(index) {
-        WidgetUtils.removeWidget(index)
+        WidgetUtils.removeWidget(index);
     }
 
     function toggleWidgetSize(index) {
-        WidgetUtils.toggleWidgetSize(index)
+        WidgetUtils.toggleWidgetSize(index);
     }
 
     function moveWidget(fromIndex, toIndex) {
-        WidgetUtils.moveWidget(fromIndex, toIndex)
+        WidgetUtils.moveWidget(fromIndex, toIndex);
     }
 
     function resetToDefault() {
-        WidgetUtils.resetToDefault()
+        WidgetUtils.resetToDefault();
     }
 
     function clearAll() {
-        WidgetUtils.clearAll()
+        WidgetUtils.clearAll();
     }
 }

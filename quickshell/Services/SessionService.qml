@@ -152,7 +152,9 @@ Singleton {
             cmd = ["prime-run"].concat(cmd)
         }
 
-        const prefix = SettingsData.launchPrefix?.trim() || ""
+        const userPrefix = SettingsData.launchPrefix?.trim() || ""
+        const defaultPrefix = Quickshell.env("DMS_DEFAULT_LAUNCH_PREFIX") || ""
+        const prefix = userPrefix.length > 0 ? userPrefix : defaultPrefix
 
         if (prefix.length > 0 && needsShellExecution(prefix)) {
             const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ")
@@ -181,7 +183,9 @@ Singleton {
             cmd = ["prime-run"].concat(cmd)
         }
 
-        const prefix = SettingsData.launchPrefix?.trim() || ""
+        const userPrefix = SettingsData.launchPrefix?.trim() || ""
+        const defaultPrefix = Quickshell.env("DMS_DEFAULT_LAUNCH_PREFIX") || ""
+        const prefix = userPrefix.length > 0 ? userPrefix : defaultPrefix
 
         if (prefix.length > 0 && needsShellExecution(prefix)) {
             const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ")

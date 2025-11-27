@@ -1,10 +1,7 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
-import Quickshell.Io
 import qs.Common
-import qs.Modals
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
@@ -19,61 +16,58 @@ Item {
     property bool fontsEnumerated: false
 
     function enumerateFonts() {
-        var fonts = []
-        var availableFonts = Qt.fontFamilies()
+        var fonts = [];
+        var availableFonts = Qt.fontFamilies();
 
         for (var i = 0; i < availableFonts.length; i++) {
-            var fontName = availableFonts[i]
+            var fontName = availableFonts[i];
             if (fontName.startsWith("."))
-                continue
-            fonts.push(fontName)
+                continue;
+            fonts.push(fontName);
         }
-        fonts.sort()
-        fonts.unshift("Default")
-        cachedFontFamilies = fonts
+        fonts.sort();
+        fonts.unshift("Default");
+        cachedFontFamilies = fonts;
 
-        var monoFonts = []
+        var monoFonts = [];
         for (var j = 0; j < availableFonts.length; j++) {
-            var fontName2 = availableFonts[j]
+            var fontName2 = availableFonts[j];
             if (fontName2.startsWith("."))
-                continue
-
-            var lowerName = fontName2.toLowerCase()
-            if (lowerName.includes("mono") || lowerName.includes("code") ||
-                lowerName.includes("console") || lowerName.includes("terminal") ||
-                lowerName.includes("courier") || lowerName.includes("jetbrains") ||
-                lowerName.includes("fira") || lowerName.includes("hack") ||
-                lowerName.includes("source code") || lowerName.includes("cascadia")) {
-                monoFonts.push(fontName2)
+                continue;
+            var lowerName = fontName2.toLowerCase();
+            if (lowerName.includes("mono") || lowerName.includes("code") || lowerName.includes("console") || lowerName.includes("terminal") || lowerName.includes("courier") || lowerName.includes("jetbrains") || lowerName.includes("fira") || lowerName.includes("hack") || lowerName.includes("source code") || lowerName.includes("cascadia")) {
+                monoFonts.push(fontName2);
             }
         }
-        monoFonts.sort()
-        monoFonts.unshift("Default")
-        cachedMonoFamilies = monoFonts
+        monoFonts.sort();
+        monoFonts.unshift("Default");
+        cachedMonoFamilies = monoFonts;
     }
 
     Component.onCompleted: {
         if (!fontsEnumerated) {
-            enumerateFonts()
-            fontsEnumerated = true
+            enumerateFonts();
+            fontsEnumerated = true;
         }
-        SettingsData.detectAvailableIconThemes()
-        cachedIconThemes = SettingsData.availableIconThemes
-        cachedMatugenSchemes = Theme.availableMatugenSchemes.map(function (option) { return option.label })
+        SettingsData.detectAvailableIconThemes();
+        cachedIconThemes = SettingsData.availableIconThemes;
+        cachedMatugenSchemes = Theme.availableMatugenSchemes.map(function (option) {
+            return option.label;
+        });
     }
 
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
-
 
             // Theme Color
             StyledRect {
@@ -81,8 +75,7 @@ Item {
                 height: themeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -119,11 +112,11 @@ Item {
                         StyledText {
                             text: {
                                 if (Theme.currentTheme === Theme.dynamic) {
-                                    return "Current Theme: Dynamic"
+                                    return "Current Theme: Dynamic";
                                 } else if (Theme.currentThemeCategory === "catppuccin") {
-                                    return "Current Theme: Catppuccin " + Theme.getThemeColors(Theme.currentThemeName).name
+                                    return "Current Theme: Catppuccin " + Theme.getThemeColors(Theme.currentThemeName).name;
                                 } else {
-                                    return "Current Theme: " + Theme.getThemeColors(Theme.currentThemeName).name
+                                    return "Current Theme: " + Theme.getThemeColors(Theme.currentThemeName).name;
                                 }
                             }
                             font.pixelSize: Theme.fontSizeMedium
@@ -135,15 +128,15 @@ Item {
                         StyledText {
                             text: {
                                 if (Theme.currentTheme === Theme.dynamic) {
-                                    return "Material colors generated from wallpaper"
+                                    return "Material colors generated from wallpaper";
                                 }
                                 if (Theme.currentThemeCategory === "catppuccin") {
-                                    return "Soothing pastel theme based on Catppuccin"
+                                    return "Soothing pastel theme based on Catppuccin";
                                 }
                                 if (Theme.currentTheme === Theme.custom) {
-                                    return "Custom theme loaded from JSON file"
+                                    return "Custom theme loaded from JSON file";
                                 }
-                                return "Material Design inspired color themes"
+                                return "Material Design inspired color themes";
                             }
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
@@ -154,17 +147,19 @@ Item {
                         }
                     }
 
-
                     Column {
                         spacing: Theme.spacingM
                         anchors.horizontalCenter: parent.horizontalCenter
 
                         DankButtonGroup {
                             property int currentThemeIndex: {
-                                if (Theme.currentTheme === Theme.dynamic) return 2
-                                if (Theme.currentThemeName === "custom") return 3
-                                if (Theme.currentThemeCategory === "catppuccin") return 1
-                                return 0
+                                if (Theme.currentTheme === Theme.dynamic)
+                                    return 2;
+                                if (Theme.currentThemeName === "custom")
+                                    return 3;
+                                if (Theme.currentThemeCategory === "catppuccin")
+                                    return 1;
+                                return 0;
                             }
                             property int pendingThemeIndex: -1
 
@@ -173,29 +168,35 @@ Item {
                             selectionMode: "single"
                             anchors.horizontalCenter: parent.horizontalCenter
                             onSelectionChanged: (index, selected) => {
-                                if (!selected) return
-                                pendingThemeIndex = index
+                                if (!selected)
+                                    return;
+                                pendingThemeIndex = index;
                             }
                             onAnimationCompleted: {
-                                if (pendingThemeIndex === -1) return
+                                if (pendingThemeIndex === -1)
+                                    return;
                                 switch (pendingThemeIndex) {
-                                    case 0: Theme.switchThemeCategory("generic", "blue"); break
-                                    case 1: Theme.switchThemeCategory("catppuccin", "cat-mauve"); break
-                                    case 2:
-                                        if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                            ToastService.showError("matugen not found - install matugen package for dynamic theming")
-                                        else if (ToastService.wallpaperErrorStatus === "error")
-                                            ToastService.showError("Wallpaper processing failed - check wallpaper path")
-                                        else
-                                            Theme.switchTheme(Theme.dynamic, true, true)
-                                        break
-                                    case 3:
-                                        if (Theme.currentThemeName !== "custom") {
-                                            Theme.switchTheme("custom", true, true)
-                                        }
-                                        break
+                                case 0:
+                                    Theme.switchThemeCategory("generic", "blue");
+                                    break;
+                                case 1:
+                                    Theme.switchThemeCategory("catppuccin", "cat-mauve");
+                                    break;
+                                case 2:
+                                    if (ToastService.wallpaperErrorStatus === "matugen_missing")
+                                        ToastService.showError("matugen not found - install matugen package for dynamic theming");
+                                    else if (ToastService.wallpaperErrorStatus === "error")
+                                        ToastService.showError("Wallpaper processing failed - check wallpaper path");
+                                    else
+                                        Theme.switchTheme(Theme.dynamic, true, true);
+                                    break;
+                                case 3:
+                                    if (Theme.currentThemeName !== "custom") {
+                                        Theme.switchTheme("custom", true, true);
+                                    }
+                                    break;
                                 }
-                                pendingThemeIndex = -1
+                                pendingThemeIndex = -1;
                             }
                         }
 
@@ -248,7 +249,7 @@ Item {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                Theme.switchTheme(themeName)
+                                                Theme.switchTheme(themeName);
                                             }
                                         }
 
@@ -313,7 +314,7 @@ Item {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                Theme.switchTheme(themeName)
+                                                Theme.switchTheme(themeName);
                                             }
                                         }
 
@@ -384,7 +385,7 @@ Item {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                Theme.switchTheme(themeName)
+                                                Theme.switchTheme(themeName);
                                             }
                                         }
 
@@ -449,7 +450,7 @@ Item {
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                Theme.switchTheme(themeName)
+                                                Theme.switchTheme(themeName);
                                             }
                                         }
 
@@ -525,16 +526,16 @@ Item {
                                         anchors.centerIn: parent
                                         name: {
                                             if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing")
-                                                return "error"
+                                                return "error";
                                             else
-                                                return "palette"
+                                                return "palette";
                                         }
                                         size: Theme.iconSizeLarge
                                         color: {
                                             if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing")
-                                                return Theme.error
+                                                return Theme.error;
                                             else
-                                                return Theme.surfaceVariantText
+                                                return Theme.surfaceVariantText;
                                         }
                                         visible: !Theme.wallpaperPath
                                     }
@@ -548,13 +549,13 @@ Item {
                                     StyledText {
                                         text: {
                                             if (ToastService.wallpaperErrorStatus === "error")
-                                                return "Wallpaper Error"
+                                                return "Wallpaper Error";
                                             else if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                                return "Matugen Missing"
+                                                return "Matugen Missing";
                                             else if (Theme.wallpaperPath)
-                                                return Theme.wallpaperPath.split('/').pop()
+                                                return Theme.wallpaperPath.split('/').pop();
                                             else
-                                                return "No wallpaper selected"
+                                                return "No wallpaper selected";
                                         }
                                         font.pixelSize: Theme.fontSizeLarge
                                         color: Theme.surfaceText
@@ -566,20 +567,20 @@ Item {
                                     StyledText {
                                         text: {
                                             if (ToastService.wallpaperErrorStatus === "error")
-                                                return "Wallpaper processing failed"
+                                                return "Wallpaper processing failed";
                                             else if (ToastService.wallpaperErrorStatus === "matugen_missing")
-                                                return "Install matugen package for dynamic theming"
+                                                return "Install matugen package for dynamic theming";
                                             else if (Theme.wallpaperPath)
-                                                return Theme.wallpaperPath
+                                                return Theme.wallpaperPath;
                                             else
-                                                return "Dynamic colors from wallpaper"
+                                                return "Dynamic colors from wallpaper";
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: {
                                             if (ToastService.wallpaperErrorStatus === "error" || ToastService.wallpaperErrorStatus === "matugen_missing")
-                                                return Theme.error
+                                                return Theme.error;
                                             else
-                                                return Theme.surfaceVariantText
+                                                return Theme.surfaceVariantText;
                                         }
                                         elide: Text.ElideMiddle
                                         maximumLineCount: 2
@@ -599,10 +600,10 @@ Item {
                                 opacity: enabled ? 1 : 0.4
                                 onValueChanged: value => {
                                     for (var i = 0; i < Theme.availableMatugenSchemes.length; i++) {
-                                        var option = Theme.availableMatugenSchemes[i]
+                                        var option = Theme.availableMatugenSchemes[i];
                                         if (option.label === value) {
-                                            SettingsData.setMatugenScheme(option.value)
-                                            break
+                                            SettingsData.setMatugenScheme(option.value);
+                                            break;
                                         }
                                     }
                                 }
@@ -610,8 +611,8 @@ Item {
 
                             StyledText {
                                 text: {
-                                    var scheme = Theme.getMatugenScheme(SettingsData.matugenScheme)
-                                    return scheme.description + " (" + scheme.value + ")"
+                                    var scheme = Theme.getMatugenScheme(SettingsData.matugenScheme);
+                                    return scheme.description + " (" + scheme.value + ")";
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
@@ -673,8 +674,7 @@ Item {
                 height: transparencySection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -736,9 +736,12 @@ Item {
                             id: widgetColorModeGroup
                             property int currentColorModeIndex: {
                                 switch (SettingsData.widgetColorMode) {
-                                    case "default": return 0
-                                    case "colorful": return 1
-                                    default: return 0
+                                case "default":
+                                    return 0;
+                                case "colorful":
+                                    return 1;
+                                default:
+                                    return 0;
                                 }
                             }
 
@@ -748,47 +751,11 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             onSelectionChanged: (index, selected) => {
-                                if (!selected) return
-                                const colorModeOptions = ["default", "colorful"]
-                                SettingsData.set("widgetColorMode", colorModeOptions[index])
+                                if (!selected)
+                                    return;
+                                const colorModeOptions = ["default", "colorful"];
+                                SettingsData.set("widgetColorMode", colorModeOptions[index]);
                             }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        StyledText {
-                            text: I18n.tr("Dank Bar Transparency")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Controls opacity of the DankBar panel background")
-                            font.pixelSize: Theme.fontSizeSmall - 2
-                            color: Theme.surfaceVariantText
-                            width: parent.width
-                            wrapMode: Text.WordWrap
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: Math.round(
-                                       SettingsData.dankBarTransparency * 100)
-                            minimum: 0
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dankBarTransparency", 
-                                                          newValue / 100)
-                                                  }
                         }
                     }
 
@@ -808,14 +775,14 @@ Item {
 
                                 StyledText {
                                     id: transparencyLabel
-                                    text: I18n.tr("Dank Bar Widget Transparency")
+                                    text: I18n.tr("Widget Background Color")
                                     font.pixelSize: Theme.fontSizeSmall
                                     color: Theme.surfaceText
                                     font.weight: Font.Medium
                                 }
 
                                 StyledText {
-                                    text: I18n.tr("Controls opacity of individual widgets inside DankBar")
+                                    text: I18n.tr("Choose the background color for widgets")
                                     font.pixelSize: Theme.fontSizeSmall - 2
                                     color: Theme.surfaceVariantText
                                     width: parent.width
@@ -827,11 +794,16 @@ Item {
                                 id: widgetColorGroup
                                 property int currentColorIndex: {
                                     switch (SettingsData.widgetBackgroundColor) {
-                                        case "sth": return 0
-                                        case "s": return 1
-                                        case "sc": return 2
-                                        case "sch": return 3
-                                        default: return 0
+                                    case "sth":
+                                        return 0;
+                                    case "s":
+                                        return 1;
+                                    case "sc":
+                                        return 2;
+                                    case "sch":
+                                        return 3;
+                                    default:
+                                        return 0;
                                     }
                                 }
 
@@ -849,28 +821,12 @@ Item {
                                 spacing: 1
 
                                 onSelectionChanged: (index, selected) => {
-                                    if (!selected) return
-                                    const colorOptions = ["sth", "s", "sc", "sch"]
-                                    SettingsData.set("widgetBackgroundColor", colorOptions[index])
+                                    if (!selected)
+                                        return;
+                                    const colorOptions = ["sth", "s", "sc", "sch"];
+                                    SettingsData.set("widgetBackgroundColor", colorOptions[index]);
                                 }
                             }
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: Math.round(
-                                       SettingsData.dankBarWidgetTransparency * 100)
-                            minimum: 0
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dankBarWidgetTransparency", 
-                                                          newValue / 100)
-                                                  }
                         }
                     }
 
@@ -896,8 +852,7 @@ Item {
                         DankSlider {
                             width: parent.width
                             height: 24
-                            value: Math.round(
-                                       SettingsData.popupTransparency * 100)
+                            value: Math.round(SettingsData.popupTransparency * 100)
                             minimum: 0
                             maximum: 100
                             unit: ""
@@ -905,9 +860,8 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.set("popupTransparency", 
-                                                          newValue / 100)
-                                                  }
+                                SettingsData.set("popupTransparency", newValue / 100);
+                            }
                         }
                     }
 
@@ -940,9 +894,8 @@ Item {
                             wheelEnabled: false
                             thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                             onSliderValueChanged: newValue => {
-                                                      SettingsData.setCornerRadius(
-                                                          newValue)
-                                                  }
+                                SettingsData.setCornerRadius(newValue);
+                            }
                         }
                     }
 
@@ -984,7 +937,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             checked: SettingsData.modalDarkenBackground
                             onToggled: checked => {
-                                SettingsData.set("modalDarkenBackground", checked)
+                                SettingsData.set("modalDarkenBackground", checked);
                             }
                         }
                     }
@@ -996,8 +949,7 @@ Item {
                 height: fontSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -1031,21 +983,21 @@ Item {
                         text: I18n.tr("Font Family")
                         description: I18n.tr("Select system font family")
                         currentValue: {
-                            if (SettingsData.fontFamily === SettingsData.defaultFontFamily)
-                                return "Default"
+                            if (SettingsData.fontFamily === Theme.defaultFontFamily)
+                                return "Default";
                             else
-                                return SettingsData.fontFamily || "Default"
+                                return SettingsData.fontFamily || "Default";
                         }
                         enableFuzzySearch: true
                         popupWidthOffset: 100
                         maxPopupHeight: 400
                         options: cachedFontFamilies
                         onValueChanged: value => {
-                                            if (value.startsWith("Default"))
-                                            SettingsData.set("fontFamily", SettingsData.defaultFontFamily)
-                                            else
-                                            SettingsData.set("fontFamily", value)
-                                        }
+                            if (value.startsWith("Default"))
+                                SettingsData.set("fontFamily", Theme.defaultFontFamily);
+                            else
+                                SettingsData.set("fontFamily", value);
+                        }
                     }
 
                     DankDropdown {
@@ -1054,64 +1006,64 @@ Item {
                         currentValue: {
                             switch (SettingsData.fontWeight) {
                             case Font.Thin:
-                                return "Thin"
+                                return "Thin";
                             case Font.ExtraLight:
-                                return "Extra Light"
+                                return "Extra Light";
                             case Font.Light:
-                                return "Light"
+                                return "Light";
                             case Font.Normal:
-                                return "Regular"
+                                return "Regular";
                             case Font.Medium:
-                                return "Medium"
+                                return "Medium";
                             case Font.DemiBold:
-                                return "Demi Bold"
+                                return "Demi Bold";
                             case Font.Bold:
-                                return "Bold"
+                                return "Bold";
                             case Font.ExtraBold:
-                                return "Extra Bold"
+                                return "Extra Bold";
                             case Font.Black:
-                                return "Black"
+                                return "Black";
                             default:
-                                return "Regular"
+                                return "Regular";
                             }
                         }
                         options: ["Thin", "Extra Light", "Light", "Regular", "Medium", "Demi Bold", "Bold", "Extra Bold", "Black"]
                         onValueChanged: value => {
-                                            var weight
-                                            switch (value) {
-                                                case "Thin":
-                                                weight = Font.Thin
-                                                break
-                                                case "Extra Light":
-                                                weight = Font.ExtraLight
-                                                break
-                                                case "Light":
-                                                weight = Font.Light
-                                                break
-                                                case "Regular":
-                                                weight = Font.Normal
-                                                break
-                                                case "Medium":
-                                                weight = Font.Medium
-                                                break
-                                                case "Demi Bold":
-                                                weight = Font.DemiBold
-                                                break
-                                                case "Bold":
-                                                weight = Font.Bold
-                                                break
-                                                case "Extra Bold":
-                                                weight = Font.ExtraBold
-                                                break
-                                                case "Black":
-                                                weight = Font.Black
-                                                break
-                                                default:
-                                                weight = Font.Normal
-                                                break
-                                            }
-                                            SettingsData.set("fontWeight", weight)
-                                        }
+                            var weight;
+                            switch (value) {
+                            case "Thin":
+                                weight = Font.Thin;
+                                break;
+                            case "Extra Light":
+                                weight = Font.ExtraLight;
+                                break;
+                            case "Light":
+                                weight = Font.Light;
+                                break;
+                            case "Regular":
+                                weight = Font.Normal;
+                                break;
+                            case "Medium":
+                                weight = Font.Medium;
+                                break;
+                            case "Demi Bold":
+                                weight = Font.DemiBold;
+                                break;
+                            case "Bold":
+                                weight = Font.Bold;
+                                break;
+                            case "Extra Bold":
+                                weight = Font.ExtraBold;
+                                break;
+                            case "Black":
+                                weight = Font.Black;
+                                break;
+                            default:
+                                weight = Font.Normal;
+                                break;
+                            }
+                            SettingsData.set("fontWeight", weight);
+                        }
                     }
 
                     DankDropdown {
@@ -1119,20 +1071,20 @@ Item {
                         description: I18n.tr("Select monospace font for process list and technical displays")
                         currentValue: {
                             if (SettingsData.monoFontFamily === SettingsData.defaultMonoFontFamily)
-                                return "Default"
+                                return "Default";
 
-                            return SettingsData.monoFontFamily || "Default"
+                            return SettingsData.monoFontFamily || "Default";
                         }
                         enableFuzzySearch: true
                         popupWidthOffset: 100
                         maxPopupHeight: 400
                         options: cachedMonoFamilies
                         onValueChanged: value => {
-                                            if (value === "Default")
-                                            SettingsData.set("monoFontFamily", SettingsData.defaultMonoFontFamily)
-                                            else
-                                            SettingsData.set("monoFontFamily", value)
-                                        }
+                            if (value === "Default")
+                                SettingsData.set("monoFontFamily", SettingsData.defaultMonoFontFamily);
+                            else
+                                SettingsData.set("monoFontFamily", value);
+                        }
                     }
 
                     Rectangle {
@@ -1180,8 +1132,8 @@ Item {
                                 backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
-                                    var newScale = Math.max(1.0, SettingsData.fontScale - 0.05)
-                                    SettingsData.set("fontScale", newScale)
+                                    var newScale = Math.max(1.0, SettingsData.fontScale - 0.05);
+                                    SettingsData.set("fontScale", newScale);
                                 }
                             }
 
@@ -1190,15 +1142,12 @@ Item {
                                 height: 32
                                 radius: Theme.cornerRadius
                                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                                border.color: Qt.rgba(Theme.outline.r,
-                                                      Theme.outline.g,
-                                                      Theme.outline.b, 0.2)
+                                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                                 border.width: 0
 
                                 StyledText {
                                     anchors.centerIn: parent
-                                    text: (SettingsData.fontScale * 100).toFixed(
-                                              0) + "%"
+                                    text: (SettingsData.fontScale * 100).toFixed(0) + "%"
                                     font.pixelSize: Theme.fontSizeSmall
                                     font.weight: Font.Medium
                                     color: Theme.surfaceText
@@ -1213,9 +1162,8 @@ Item {
                                 backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                                 iconColor: Theme.surfaceText
                                 onClicked: {
-                                    var newScale = Math.min(2.0,
-                                                            SettingsData.fontScale + 0.05)
-                                    SettingsData.set("fontScale", newScale)
+                                    var newScale = Math.min(2.0, SettingsData.fontScale + 0.05);
+                                    SettingsData.set("fontScale", newScale);
                                 }
                             }
                         }
@@ -1228,8 +1176,7 @@ Item {
                 height: applicationsSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -1265,7 +1212,7 @@ Item {
                         description: I18n.tr("Sync dark mode with settings portals for system-wide theme hints")
                         checked: SettingsData.syncModeWithPortal
                         onToggled: checked => {
-                            return SettingsData.set("syncModeWithPortal", checked)
+                            return SettingsData.set("syncModeWithPortal", checked);
                         }
                     }
 
@@ -1275,7 +1222,7 @@ Item {
                         description: I18n.tr("Force terminal applications to always use dark color schemes")
                         checked: SettingsData.terminalsAlwaysDark
                         onToggled: checked => {
-                            return SettingsData.set("terminalsAlwaysDark", checked)
+                            return SettingsData.set("terminalsAlwaysDark", checked);
                         }
                     }
                 }
@@ -1285,10 +1232,8 @@ Item {
                 width: parent.width
                 height: warningText.implicitHeight + Theme.spacingM * 2
                 radius: Theme.cornerRadius
-                color: Qt.rgba(Theme.warning.r, Theme.warning.g,
-                               Theme.warning.b, 0.12)
-                border.color: Qt.rgba(Theme.warning.r, Theme.warning.g,
-                                      Theme.warning.b, 0.3)
+                color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.12)
+                border.color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.3)
                 border.width: 0
 
                 Row {
@@ -1320,8 +1265,7 @@ Item {
                 height: iconThemeSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -1353,13 +1297,11 @@ Item {
                             maxPopupHeight: 236
                             options: cachedIconThemes
                             onValueChanged: value => {
-                                                SettingsData.setIconTheme(value)
-                                                if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" &&
-                                                    Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" &&
-                                                    Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
-                                                    ToastService.showError("Missing Environment Variables", "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.")
-                                                }
-                                            }
+                                SettingsData.setIconTheme(value);
+                                if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                                    ToastService.showError("Missing Environment Variables", "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.");
+                                }
+                            }
                         }
                     }
                 }
@@ -1371,8 +1313,7 @@ Item {
                 height: systemThemingSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
                 visible: Theme.matugenAvailable
 
@@ -1500,25 +1441,24 @@ Item {
                     }
                 }
             }
-
         }
     }
 
     FileBrowserModal {
         id: fileBrowserModal
-        browserTitle: "Select Custom Theme"
+        browserTitle: I18n.tr("Select Custom Theme", "custom theme file browser title")
         filterExtensions: ["*.json"]
         showHiddenFiles: true
 
         function selectCustomTheme() {
-            shouldBeVisible = true
+            shouldBeVisible = true;
         }
 
-        onFileSelected: function(filePath) {
+        onFileSelected: function (filePath) {
             if (filePath.endsWith(".json")) {
-                SettingsData.set("customThemeFile", filePath)
-                Theme.switchTheme("custom")
-                close()
+                SettingsData.set("customThemeFile", filePath);
+                Theme.switchTheme("custom");
+                close();
             }
         }
     }

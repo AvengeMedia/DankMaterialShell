@@ -13,7 +13,7 @@ FocusScope {
     Rectangle {
         anchors.fill: parent
         anchors.leftMargin: Theme.spacingS
-        anchors.rightMargin: 0
+        anchors.rightMargin: (parentModal && parentModal.isCompactMode) ? Theme.spacingS : (32 + Theme.spacingS)
         anchors.bottomMargin: 0
         anchors.topMargin: 0
         color: "transparent"
@@ -30,15 +30,13 @@ FocusScope {
                 PersonalizationTab {
                     parentModal: root.parentModal
                 }
-
             }
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -49,15 +47,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: TimeWeatherTab {
-            }
+            sourceComponent: TimeWeatherTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -74,10 +70,9 @@ FocusScope {
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -88,15 +83,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: WidgetTweaksTab {
-            }
+            sourceComponent: WidgetTweaksTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -108,17 +101,14 @@ FocusScope {
             focus: active
 
             sourceComponent: Component {
-                DockTab {
-                }
-
+                DockTab {}
             }
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -129,15 +119,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: DisplaysTab {
-            }
+            sourceComponent: DisplaysTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -148,15 +136,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: LauncherTab {
-            }
+            sourceComponent: LauncherTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -167,15 +153,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: ThemeColorsTab {
-            }
+            sourceComponent: ThemeColorsTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -186,15 +170,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: PowerSettings {
-            }
+            sourceComponent: PowerSettings {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -211,10 +193,9 @@ FocusScope {
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
 
         Loader {
@@ -225,17 +206,13 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: AboutTab {
-            }
+            sourceComponent: AboutTab {}
 
             onActiveChanged: {
                 if (active && item) {
-                    Qt.callLater(() => item.forceActiveFocus())
+                    Qt.callLater(() => item.forceActiveFocus());
                 }
             }
-
         }
-
     }
-
 }

@@ -30,20 +30,9 @@ DankPopout {
 
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x;
-        triggerY = y;
-        triggerWidth = width;
-        triggerSection = section;
-        triggerScreen = screen;
-    }
-
     popupWidth: 360
     popupHeight: Math.min(Screen.height - 100, contentLoader.item ? contentLoader.item.implicitHeight : 260)
-    triggerX: Screen.width - 380 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing
     triggerWidth: 70
-    positioning: ""
     screen: triggerScreen
     shouldBeVisible: false
 

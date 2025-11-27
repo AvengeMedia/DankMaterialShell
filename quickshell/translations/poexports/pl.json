@@ -2,6 +2,12 @@
   "%1 characters": {
     "%1 characters": "%1 znaków"
   },
+  "%1 display(s)": {
+    "%1 display(s)": ""
+  },
+  "%1 widgets": {
+    "%1 widgets": ""
+  },
   "(Unnamed)": {
     "(Unnamed)": "(Bez nazwy)"
   },
@@ -46,6 +52,9 @@
   },
   "Add": {
     "Add": "Dodaj"
+  },
+  "Add Bar": {
+    "Add Bar": ""
   },
   "Add Widget": {
     "Add Widget": "Dodaj widżet"
@@ -227,6 +236,12 @@
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Zrównoważona paleta ze skupionymi akcentami (domyślnie)."
   },
+  "Bar Configurations": {
+    "Bar Configurations": ""
+  },
+  "Bar Transparency": {
+    "Bar Transparency": ""
+  },
   "Battery": {
     "Battery": "Bateria"
   },
@@ -326,17 +341,26 @@
   "Center Tiling": {
     "Center Tiling": "Płytki środkowe"
   },
+  "Change bar appearance": {
+    "Change bar appearance": ""
+  },
   "Changes:": {
     "Changes:": "Zmiany:"
   },
   "Check for system updates": {
     "Check for system updates": "Sprawdź aktualizacje systemu"
   },
+  "Choose Color": {
+    "Choose Color": ""
+  },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "Wybierz kolor logo launchera"
   },
   "Choose icon": {
     "Choose icon": "Wybierz ikonę"
+  },
+  "Choose the background color for widgets": {
+    "Choose the background color for widgets": ""
   },
   "Choose the border accent color": {
     "Choose the border accent color": "Wybierz kolor akcentu obramowania"
@@ -373,6 +397,9 @@
   },
   "Close": {
     "Close": "Zamknij"
+  },
+  "Close Overview on Launch": {
+    "Close Overview on Launch": ""
   },
   "Color Override": {
     "Color Override": "Nadpisanie koloru"
@@ -626,6 +653,9 @@
   "Dismiss": {
     "Dismiss": "Odrzuć"
   },
+  "Display Assignment": {
+    "Display Assignment": ""
+  },
   "Display Name Format": {
     "Display Name Format": "Format nazwy wyświetlanej"
   },
@@ -707,6 +737,9 @@
   "Enable Autoconnect": {
     "Enable Autoconnect": "Włącz automatyczne łączenie"
   },
+  "Enable Bar": {
+    "Enable Bar": ""
+  },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "Pokaż temperaturę GPU"
   },
@@ -765,7 +798,7 @@
     "Enter password for ": "Wprowadź hasło dla "
   },
   "Enter this passkey on ": {
-    "Enter this passkey on ": ""
+    "Enter this passkey on ": "Wprowadź ten klucz dostępu "
   },
   "Error": {
     "Error": "Błąd"
@@ -1001,6 +1034,9 @@
   "Individual Batteries": {
     "Individual Batteries": "Pojedyncze akumulatory"
   },
+  "Individual bar configuration": {
+    "Individual bar configuration": ""
+  },
   "Inhibit idle timeout when audio or video is playing": {
     "Inhibit idle timeout when audio or video is playing": "Blokuj limit czasu bezczynności podczas odtwarzania dźwięku lub obrazu"
   },
@@ -1028,8 +1064,14 @@
   "Jobs: ": {
     "Jobs: ": "Zadania: "
   },
+  "Keep Awake": {
+    "Keep Awake": ""
+  },
   "Keep Changes": {
     "Keep Changes": "Zachowaj zmiany"
+  },
+  "Keeping Awake": {
+    "Keeping Awake": ""
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Nazwa układu klawiatury"
@@ -1121,6 +1163,9 @@
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "Zarządzaj i konfiguruj wtyczki rozszerzające funkcjonalność DMS"
   },
+  "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": ""
+  },
   "Manual Coordinates": {
     "Manual Coordinates": "Ręczne współrzędne"
   },
@@ -1184,6 +1229,9 @@
   "Media Players (": {
     "Media Players (": "Odtwarzacze multimediów ("
   },
+  "Media Volume OSD": {
+    "Media Volume OSD": ""
+  },
   "Memory": {
     "Memory": "Pamięć"
   },
@@ -1198,6 +1246,9 @@
   },
   "Microphone Mute OSD": {
     "Microphone Mute OSD": "OSD Wyciszenia Mikrofonu"
+  },
+  "Middle Section": {
+    "Middle Section": ""
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Minimalna paleta zbudowana wokół jednego odcienia."
@@ -1670,6 +1721,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Zapisz plik notatnika"
   },
+  "Save password": {
+    "Save password": ""
+  },
   "Saved": {
     "Saved": "Zapisano"
   },
@@ -1828,6 +1882,9 @@
   },
   "Show on-screen display when idle inhibitor state changes": {
     "Show on-screen display when idle inhibitor state changes": "Wyświetlaj powiadomienie ekranowe przy zmianie stanu inhibitora bezczynności"
+  },
+  "Show on-screen display when media player volume changes": {
+    "Show on-screen display when media player volume changes": ""
   },
   "Show on-screen display when microphone is muted/unmuted": {
     "Show on-screen display when microphone is muted/unmuted": "Wyświetlaj powiadomienie ekranowe przy wyciszaniu/włączaniu mikrofonu"
@@ -2051,6 +2108,9 @@
   "Toggle top bar visibility manually (can be controlled via IPC)": {
     "Toggle top bar visibility manually (can be controlled via IPC)": "Ręczne przełączanie widoczności górnego paska (można kontrolować przez IPC)"
   },
+  "Toggle visibility of this bar configuration": {
+    "Toggle visibility of this bar configuration": ""
+  },
   "Tomorrow": {
     "Tomorrow": "Jutro"
   },
@@ -2240,11 +2300,20 @@
   "WiFi is off": {
     "WiFi is off": "WiFi jest wyłączone"
   },
+  "Widget Background Color": {
+    "Widget Background Color": ""
+  },
   "Widget Management": {
     "Widget Management": "Zarządzanie widżetami"
   },
+  "Widget Style": {
+    "Widget Style": ""
+  },
   "Widget Styling": {
     "Widget Styling": "Stylizacja widżetów"
+  },
+  "Widget Transparency": {
+    "Widget Transparency": ""
   },
   "Widgets": {
     "Widgets": "Widżety"
@@ -2279,6 +2348,12 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "Masz niezapisane zmiany. Zapisać przed otwarciem pliku?"
   },
+  "custom theme file browser title": {
+    "Select Custom Theme": ""
+  },
+  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
+    "Select Wallpaper": ""
+  },
   "events": {
     "events": "wydarzenia"
   },
@@ -2291,8 +2366,20 @@
   "official": {
     "official": "oficjalny"
   },
+  "profile image file browser title": {
+    "Select Profile Image": ""
+  },
+  "settings window title": {
+    "Settings": ""
+  },
+  "sysmon window title": {
+    "System Monitor": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "zaktualizuj dms dla integracji z NM."
+  },
+  "wallpaper directory file browser title": {
+    "Select Wallpaper Directory": ""
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• Instaluj tylko z zaufanych źródeł"

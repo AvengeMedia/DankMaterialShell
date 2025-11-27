@@ -386,6 +386,68 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  trigger-obs-update:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install OSC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osc
+          
+          mkdir -p ~/.config/osc
+          cat > ~/.config/osc/oscrc << EOF
+          [general]
+          apiurl = https://api.opensuse.org
+          
+          [https://api.opensuse.org]
+          user = ${{ secrets.OBS_USERNAME }}
+          pass = ${{ secrets.OBS_PASSWORD }}
+          EOF
+          chmod 600 ~/.config/osc/oscrc
+      
+      - name: Update OBS packages
+        run: |
+          VERSION="${{ github.ref_name }}"
+          cd distro
+          bash scripts/obs-upload.sh dms "Update to $VERSION"
+
+  trigger-ppa-update:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debhelper \
+            devscripts \
+            dput \
+            lftp \
+            build-essential \
+            fakeroot \
+            dpkg-dev
+      
+      - name: Configure GPG
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_KEY" | gpg --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> $GITHUB_ENV
+      
+      - name: Upload to PPA
+        run: |
+          VERSION="${{ github.ref_name }}"
+          cd distro/ubuntu/ppa
+          bash create-and-upload.sh ../dms dms questing
+
   copr-build:
     runs-on: ubuntu-latest
     needs: release

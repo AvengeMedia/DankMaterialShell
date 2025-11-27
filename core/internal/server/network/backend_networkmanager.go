@@ -30,12 +30,20 @@ const (
 	NmDeviceStateReasonNewActivation        = 60
 )
 
+type wifiDeviceInfo struct {
+	device    gonetworkmanager.Device
+	wireless  gonetworkmanager.DeviceWireless
+	name      string
+	hwAddress string
+}
+
 type NetworkManagerBackend struct {
 	nmConn         interface{}
 	ethernetDevice interface{}
 	wifiDevice     interface{}
 	settings       interface{}
 	wifiDev        interface{}
+	wifiDevices    map[string]*wifiDeviceInfo
 
 	dbusConn *dbus.Conn
 	signals  chan *dbus.Signal
@@ -71,8 +79,9 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 	}
 
 	backend := &NetworkManagerBackend{
-		nmConn:   nm,
-		stopChan: make(chan struct{}),
+		nmConn:      nm,
+		stopChan:    make(chan struct{}),
+		wifiDevices: make(map[string]*wifiDeviceInfo),
 		state: &BackendState{
 			Backend: "networkmanager",
 		},
@@ -114,25 +123,46 @@ func (b *NetworkManagerBackend) Initialize() error {
 			}
 
 		case gonetworkmanager.NmDeviceTypeWifi:
-			b.wifiDevice = dev
-			if w, err := gonetworkmanager.NewDeviceWireless(dev.GetPath()); err == nil {
-				b.wifiDev = w
-			}
-			wifiEnabled, err := nm.GetPropertyWirelessEnabled()
-			if err == nil {
-				b.stateMutex.Lock()
-				b.state.WiFiEnabled = wifiEnabled
-				b.stateMutex.Unlock()
-			}
-			if err := b.updateWiFiState(); err != nil {
+			iface, err := dev.GetPropertyInterface()
+			if err != nil {
 				continue
 			}
-			if wifiEnabled {
-				if _, err := b.updateWiFiNetworks(); err != nil {
-					log.Warnf("Failed to get initial networks: %v", err)
-				}
+			w, err := gonetworkmanager.NewDeviceWireless(dev.GetPath())
+			if err != nil {
+				continue
+			}
+			hwAddr, _ := w.GetPropertyHwAddress()
+
+			b.wifiDevices[iface] = &wifiDeviceInfo{
+				device:    dev,
+				wireless:  w,
+				name:      iface,
+				hwAddress: hwAddr,
+			}
+
+			if b.wifiDevice == nil {
+				b.wifiDevice = dev
+				b.wifiDev = w
 			}
 		}
+	}
+
+	wifiEnabled, err := nm.GetPropertyWirelessEnabled()
+	if err == nil {
+		b.stateMutex.Lock()
+		b.state.WiFiEnabled = wifiEnabled
+		b.stateMutex.Unlock()
+	}
+
+	if err := b.updateWiFiState(); err != nil {
+		log.Warnf("Failed to update WiFi state: %v", err)
+	}
+
+	if wifiEnabled {
+		if _, err := b.updateWiFiNetworks(); err != nil {
+			log.Warnf("Failed to get initial networks: %v", err)
+		}
+		b.updateAllWiFiDevices()
 	}
 
 	if err := b.updatePrimaryConnection(); err != nil {
@@ -165,6 +195,7 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
+	state.WiFiDevices = append([]WiFiDevice(nil), b.state.WiFiDevices...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
 	state.VPNProfiles = append([]VPNProfile(nil), b.state.VPNProfiles...)
 	state.VPNActive = append([]VPNActive(nil), b.state.VPNActive...)

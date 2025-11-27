@@ -11,8 +11,10 @@ BasePill {
     readonly property MprisPlayer activePlayer: MprisController.activePlayer
     readonly property bool playerAvailable: activePlayer !== null
     property bool compactMode: false
+    property var widgetData: null
     readonly property int textWidth: {
-        switch (SettingsData.mediaSize) {
+        const size = widgetData?.mediaSize !== undefined ? widgetData.mediaSize : SettingsData.mediaSize;
+        switch (size) {
         case 0:
             return 0;
         case 2:
@@ -37,6 +39,33 @@ BasePill {
         const audioVizHeight = 20;
         const playButtonHeight = 24;
         return audioVizHeight + Theme.spacingXS + playButtonHeight;
+    }
+
+    onWheel: function (wheelEvent) {
+        if (!activePlayer) {
+            wheelEvent.accepted = false;
+            return;
+        }
+
+        wheelEvent.accepted = true;
+
+        // If volume is not supported, return early to avoid error logs but accepting the scroll,
+        // to keep the consistency of not scrolling workspaces when scrolling in the media widget.
+        if (!activePlayer.volumeSupported) {
+            return;
+        }
+
+        const delta = wheelEvent.angleDelta.y;
+        const currentVolume = (activePlayer.volume * 100) || 0;
+
+        let newVolume;
+        if (delta > 0) {
+            newVolume = Math.min(100, currentVolume + 5);
+        } else {
+            newVolume = Math.max(0, currentVolume - 5);
+        }
+
+        activePlayer.volume = newVolume / 100;
     }
 
     content: Component {
@@ -72,20 +101,35 @@ BasePill {
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
 
-                AudioVisualization {
+                Item {
+                    width: 20
+                    height: 20
                     anchors.horizontalCenter: parent.horizontalCenter
+
+                    AudioVisualization {
+                        anchors.fill: parent
+                        visible: CavaService.cavaAvailable
+                    }
+
+                    DankIcon {
+                        anchors.fill: parent
+                        name: "music_note"
+                        size: 20
+                        color: Theme.primary
+                        visible: !CavaService.cavaAvailable
+                    }
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             if (root.popoutTarget && root.popoutTarget.setTriggerPosition) {
-                                const globalPos = parent.mapToGlobal(0, 0)
-                                const currentScreen = root.parentScreen || Screen
-                                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, parent.width)
-                                root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen)
+                                const globalPos = parent.mapToGlobal(0, 0);
+                                const currentScreen = root.parentScreen || Screen;
+                                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, parent.width);
+                                root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen);
                             }
-                            root.clicked()
+                            root.clicked();
                         }
                     }
                 }
@@ -111,14 +155,15 @@ BasePill {
                         enabled: root.playerAvailable
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
-                        onClicked: (mouse) => {
-                            if (!activePlayer) return
+                        onClicked: mouse => {
+                            if (!activePlayer)
+                                return;
                             if (mouse.button === Qt.LeftButton) {
-                                activePlayer.togglePlaying()
+                                activePlayer.togglePlaying();
                             } else if (mouse.button === Qt.MiddleButton) {
-                                activePlayer.previous()
+                                activePlayer.previous();
                             } else if (mouse.button === Qt.RightButton) {
-                                activePlayer.next()
+                                activePlayer.next();
                             }
                         }
                     }
@@ -135,35 +180,48 @@ BasePill {
                     id: mediaInfo
                     spacing: Theme.spacingXS
 
-                    AudioVisualization {
+                    Item {
+                        width: 20
+                        height: 20
                         anchors.verticalCenter: parent.verticalCenter
+
+                        AudioVisualization {
+                            anchors.fill: parent
+                            visible: CavaService.cavaAvailable
+                        }
+
+                        DankIcon {
+                            anchors.fill: parent
+                            name: "music_note"
+                            size: 20
+                            color: Theme.primary
+                            visible: !CavaService.cavaAvailable
+                        }
                     }
 
                     Rectangle {
                         id: textContainer
+                        readonly property string cachedIdentity: activePlayer ? (activePlayer.identity || "") : ""
+                        readonly property string lowerIdentity: cachedIdentity.toLowerCase()
+                        readonly property bool isWebMedia: lowerIdentity.includes("firefox") || lowerIdentity.includes("chrome") || lowerIdentity.includes("chromium") || lowerIdentity.includes("edge") || lowerIdentity.includes("safari")
+
                         property string displayText: {
                             if (!activePlayer || !activePlayer.trackTitle) {
                                 return "";
                             }
 
-                            let identity = activePlayer.identity || "";
-                            let isWebMedia = identity.toLowerCase().includes("firefox") || identity.toLowerCase().includes("chrome") || identity.toLowerCase().includes("chromium") || identity.toLowerCase().includes("edge") || identity.toLowerCase().includes("safari");
-                            let title = "";
-                            let subtitle = "";
-                            if (isWebMedia && activePlayer.trackTitle) {
-                                title = activePlayer.trackTitle;
-                                subtitle = activePlayer.trackArtist || identity;
-                            } else {
-                                title = activePlayer.trackTitle || "Unknown Track";
-                                subtitle = activePlayer.trackArtist || "";
-                            }
+                            const title = isWebMedia ? activePlayer.trackTitle : (activePlayer.trackTitle || "Unknown Track");
+                            const subtitle = isWebMedia ? (activePlayer.trackArtist || cachedIdentity) : (activePlayer.trackArtist || "");
                             return subtitle.length > 0 ? title + " • " + subtitle : title;
                         }
 
                         anchors.verticalCenter: parent.verticalCenter
                         width: textWidth
                         height: root.widgetThickness
-                        visible: SettingsData.mediaSize > 0
+                        visible: {
+                            const size = widgetData?.mediaSize !== undefined ? widgetData.mediaSize : SettingsData.mediaSize;
+                            return size > 0;
+                        }
                         clip: true
                         color: "transparent"
 
@@ -174,7 +232,7 @@ BasePill {
 
                             anchors.verticalCenter: parent.verticalCenter
                             text: textContainer.displayText
-                            font.pixelSize: Theme.barTextSize(root.barThickness)
+                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                             color: Theme.widgetTextColor
                             wrapMode: Text.NoWrap
                             x: needsScrolling ? -scrollOffset : 0
@@ -221,12 +279,12 @@ BasePill {
                             cursorShape: Qt.PointingHandCursor
                             onPressed: {
                                 if (root.popoutTarget && root.popoutTarget.setTriggerPosition) {
-                                    const globalPos = mapToGlobal(0, 0)
-                                    const currentScreen = root.parentScreen || Screen
-                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, root.width)
-                                    root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen)
+                                    const globalPos = mapToGlobal(0, 0);
+                                    const currentScreen = root.parentScreen || Screen;
+                                    const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, root.width);
+                                    root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen);
                                 }
-                                root.clicked()
+                                root.clicked();
                             }
                         }
                     }

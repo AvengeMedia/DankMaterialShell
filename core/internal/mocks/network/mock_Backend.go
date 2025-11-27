@@ -509,6 +509,52 @@ func (_c *MockBackend_DisconnectWiFi_Call) RunAndReturn(run func() error) *MockB
 	return _c
 }
 
+// DisconnectWiFiDevice provides a mock function with given fields: device
+func (_m *MockBackend) DisconnectWiFiDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectWiFiDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_DisconnectWiFiDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectWiFiDevice'
+type MockBackend_DisconnectWiFiDevice_Call struct {
+	*mock.Call
+}
+
+// DisconnectWiFiDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) DisconnectWiFiDevice(device interface{}) *MockBackend_DisconnectWiFiDevice_Call {
+	return &MockBackend_DisconnectWiFiDevice_Call{Call: _e.mock.On("DisconnectWiFiDevice", device)}
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) Run(run func(device string)) *MockBackend_DisconnectWiFiDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) Return(_a0 error) *MockBackend_DisconnectWiFiDevice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) RunAndReturn(run func(string) error) *MockBackend_DisconnectWiFiDevice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ForgetWiFiNetwork provides a mock function with given fields: ssid
 func (_m *MockBackend) ForgetWiFiNetwork(ssid string) error {
 	ret := _m.Called(ssid)
@@ -655,6 +701,53 @@ func (_c *MockBackend_GetPromptBroker_Call) Return(_a0 network.PromptBroker) *Mo
 }
 
 func (_c *MockBackend_GetPromptBroker_Call) RunAndReturn(run func() network.PromptBroker) *MockBackend_GetPromptBroker_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWiFiDevices provides a mock function with no fields
+func (_m *MockBackend) GetWiFiDevices() []network.WiFiDevice {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWiFiDevices")
+	}
+
+	var r0 []network.WiFiDevice
+	if rf, ok := ret.Get(0).(func() []network.WiFiDevice); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.WiFiDevice)
+		}
+	}
+
+	return r0
+}
+
+// MockBackend_GetWiFiDevices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWiFiDevices'
+type MockBackend_GetWiFiDevices_Call struct {
+	*mock.Call
+}
+
+// GetWiFiDevices is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetWiFiDevices() *MockBackend_GetWiFiDevices_Call {
+	return &MockBackend_GetWiFiDevices_Call{Call: _e.mock.On("GetWiFiDevices")}
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) Run(run func()) *MockBackend_GetWiFiDevices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) Return(_a0 []network.WiFiDevice) *MockBackend_GetWiFiDevices_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) RunAndReturn(run func() []network.WiFiDevice) *MockBackend_GetWiFiDevices_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1087,6 +1180,52 @@ func (_c *MockBackend_ScanWiFi_Call) Return(_a0 error) *MockBackend_ScanWiFi_Cal
 }
 
 func (_c *MockBackend_ScanWiFi_Call) RunAndReturn(run func() error) *MockBackend_ScanWiFi_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ScanWiFiDevice provides a mock function with given fields: device
+func (_m *MockBackend) ScanWiFiDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ScanWiFiDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_ScanWiFiDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ScanWiFiDevice'
+type MockBackend_ScanWiFiDevice_Call struct {
+	*mock.Call
+}
+
+// ScanWiFiDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) ScanWiFiDevice(device interface{}) *MockBackend_ScanWiFiDevice_Call {
+	return &MockBackend_ScanWiFiDevice_Call{Call: _e.mock.On("ScanWiFiDevice", device)}
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) Run(run func(device string)) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) Return(_a0 error) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) RunAndReturn(run func(string) error) *MockBackend_ScanWiFiDevice_Call {
 	_c.Call.Return(run)
 	return _c
 }

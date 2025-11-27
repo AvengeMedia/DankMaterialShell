@@ -240,11 +240,29 @@ def save_sync_state():
 
 def main():
     if len(sys.argv) < 2:
-        error("Usage: i18nsync.py [check|sync]")
+        error("Usage: i18nsync.py [check|sync|test]")
 
     command = sys.argv[1]
 
-    if command == "check":
+    if command == "test":
+        info("Running in test mode (no POEditor upload/download)")
+        extract_strings()
+
+        current_en = normalize_json(EN_JSON)
+        current_template = normalize_json(TEMPLATE_JSON)
+
+        success(f"✓ Extracted {len(current_en)} terms")
+
+        terms_with_context = sum(1 for entry in current_en if entry.get('context') and entry['context'] != entry['term'])
+        if terms_with_context > 0:
+            success(f"✓ Found {terms_with_context} terms with custom contexts")
+
+        info("\nFiles generated:")
+        info(f"  - {EN_JSON}")
+        info(f"  - {TEMPLATE_JSON}")
+
+        sys.exit(0)
+    elif command == "check":
         try:
             if check_sync_status():
                 error("i18n out of sync - run 'python3 scripts/i18nsync.py sync' first")

@@ -218,6 +218,11 @@ window-rule {
     geometry-corner-radius 12
     clip-to-geometry true
 }
+// Open dms windows as floating by default
+window-rule {
+    match app-id=r#"org.quickshell$"#
+    open-floating true
+}
 binds {
     // === System & Overview ===
     Mod+D { spawn "niri" "msg" "action" "toggle-overview"; }

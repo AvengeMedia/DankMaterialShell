@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -10,34 +9,36 @@ DankModal {
 
     layerNamespace: "dms:network-info-wired"
 
+    keepPopoutsOpen: true
+
     property bool networkWiredInfoModalVisible: false
     property string networkID: ""
     property var networkData: null
 
     function showNetworkInfo(id, data) {
-        networkID = id
-        networkData = data
-        networkWiredInfoModalVisible = true
-        open()
-        NetworkService.fetchWiredNetworkInfo(data.uuid)
+        networkID = id;
+        networkData = data;
+        networkWiredInfoModalVisible = true;
+        open();
+        NetworkService.fetchWiredNetworkInfo(data.uuid);
     }
 
     function hideDialog() {
-        networkWiredInfoModalVisible = false
-        close()
-        networkID = ""
-        networkData = null
+        networkWiredInfoModalVisible = false;
+        close();
+        networkID = "";
+        networkData = null;
     }
 
     visible: networkWiredInfoModalVisible
-    width: 600
-    height: 500
+    modalWidth: 600
+    modalHeight: 500
     enableShadow: true
     onBackgroundClicked: hideDialog()
     onVisibleChanged: {
         if (!visible) {
-            networkID = ""
-            networkData = null
+            networkID = "";
+            networkData = null;
         }
     }
 
@@ -71,7 +72,6 @@ DankModal {
                             width: parent.width
                             elide: Text.ElideRight
                         }
-
                     }
 
                     DankActionButton {
@@ -80,7 +80,6 @@ DankModal {
                         iconColor: Theme.surfaceText
                         onClicked: root.hideDialog()
                     }
-
                 }
 
                 Rectangle {
@@ -109,7 +108,6 @@ DankModal {
                             wrapMode: Text.WordWrap
                         }
                     }
-
                 }
 
                 Item {
@@ -148,17 +146,10 @@ DankModal {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }
