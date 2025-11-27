@@ -280,6 +280,7 @@ Item {
             "keyboard_layout_name": keyboardLayoutNameComponent,
             "vpn": vpnComponent,
             "notepadButton": notepadButtonComponent,
+            "powerButton": powerButtonComponent,
             "colorPicker": colorPickerComponent,
             "systemUpdate": systemUpdateComponent
         }
@@ -320,6 +321,7 @@ Item {
         "keyboardLayoutNameComponent": keyboardLayoutNameComponent,
         "vpnComponent": vpnComponent,
         "notepadButtonComponent": notepadButtonComponent,
+        "powerButtonComponent": powerButtonComponent,
         "colorPickerComponent": colorPickerComponent,
         "systemUpdateComponent": systemUpdateComponent
     })
@@ -964,6 +966,18 @@ Item {
         id: notepadButtonComponent
 
         NotepadButton {
+            widgetThickness: barWindow.widgetThickness
+            barThickness: barWindow.effectiveBarThickness
+            axis: barWindow.axis
+            section: topBarContent.getWidgetSection(parent) || "right"
+            parentScreen: barWindow.screen
+        }
+    }
+
+    Component {
+        id: powerButtonComponent
+
+        PowerButton {
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis

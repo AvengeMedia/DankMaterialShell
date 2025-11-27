@@ -193,6 +193,12 @@ Item {
             "icon": "assignment",
             "enabled": true
         }, {
+            "id": "powerButton",
+            "text": I18n.tr("Power"),
+            "description": I18n.tr("Display the power system menu"),
+            "icon": "power_settings_new",
+            "enabled": true
+        }, {
             "id": "colorPicker",
             "text": I18n.tr("Color Picker"),
             "description": I18n.tr("Quick access to color picker"),

@@ -300,6 +300,7 @@ Item {
             "keyboard_layout_name": "keyboardLayoutNameComponent",
             "vpn": "vpnComponent",
             "notepadButton": "notepadButtonComponent",
+            "powerButton": "powerButtonComponent",
             "colorPicker": "colorPickerComponent",
             "systemUpdate": "systemUpdateComponent"
         }

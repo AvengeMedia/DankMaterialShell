@@ -45,6 +45,11 @@ Item {
         "description": I18n.tr("Quick note-taking slideout panel"),
         "icon": "sticky_note_2"
     }, {
+        "id": "power",
+        "text": I18n.tr("Power"),
+        "description": I18n.tr("Display the power system menu"),
+        "icon": "power_settings_new"
+    }, {
         "id": "systemTray",
         "name": I18n.tr("System Tray"),
         "description": I18n.tr("System tray icons"),
