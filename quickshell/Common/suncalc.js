@@ -1,3 +1,4 @@
+.pragma library
 // Copyright (c) 2025, Vladimir Agafonkin
 // All rights reserved.
 //

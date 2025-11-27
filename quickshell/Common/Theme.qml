@@ -1004,6 +1004,19 @@ Singleton {
         return Qt.rgba(c.r, c.g, c.b, a);
     }
 
+    function blendAlpha(c, a) {
+        return Qt.rgba(c.r, c.g, c.b, c.a*a);
+    }
+
+    function blend(c1, c2, r) {
+        return Qt.rgba(
+            c1.r * (1-r) + c2.r * r,
+            c1.g * (1-r) + c2.g * r,
+            c1.b * (1-r) + c2.b * r,
+            c1.a * (1-r) + c2.a * r,
+        );
+    }
+
     function getFillMode(modeName) {
         switch (modeName) {
         case "Stretch":
