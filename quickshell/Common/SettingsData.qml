@@ -1392,7 +1392,7 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     property bool pluginSettingsFileExists: false
 
     IpcHandler {
-        function reveal(): string {
+        function show(): string {
             root.setShowDock(true);
             return "DOCK_SHOW_SUCCESS";
         }
@@ -1412,5 +1412,123 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
         }
 
         target: "dock"
+    }
+
+    IpcHandler {
+        function get(arg: string): string {
+            return JSON.stringify(root[arg])
+        }
+
+        function set(arg: string, value: string): string {
+
+            if (!(arg in root)) {
+                console.warn("Cannot set property, not found:", arg)
+                return "SETTINGS_SET_FAILURE"
+            }
+
+            const typeName = typeof root[arg]
+
+            try {
+                switch (typeName) {
+                case "boolean":
+                    if (value === "true" || value === "false") value = Boolean(value)
+                    else throw `${value} is not a Boolean`
+                    break
+                case "number":
+                    value = Number(value)
+                    if (isNaN(value)) throw `${value} is not a Number`
+                    break
+                case "string":
+                    value = String(value)
+                    break
+                case "object":
+                    // NOTE: Parsing lists is messed up upstream and not sure if we want
+                    // to make sure objects are well structured or just let people set
+                    // whatever they want but risking messed up settings.
+                    // Objects & Arrays are disabled for now
+                    // https://github.com/quickshell-mirror/quickshell/pull/22
+                    throw "Setting Objects and Arrays not supported"
+                default:
+                    throw "Unsupported type"
+                }
+
+                root[arg] = value
+                root.saveSettings()
+                return "SETTINGS_SET_SUCCESS"
+            } catch (e) {
+                console.warn("Failed to set property:", arg, "error:", e)
+                return "SETTINGS_SET_FAILURE"
+            }
+        }
+
+        target: "settings"
+    }
+
+    IpcHandler {
+        readonly property var barSelectors: ["id", "name", "index"]
+
+        function show(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {visible: true})
+            return "BAR_SHOW_SUCCESS";
+        }
+
+        function hide(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {visible: false})
+            return "BAR_HIDE_SUCCESS";
+        }
+
+        function toggle(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {visible: !barConfig.visible})
+            return root.showBar ? "BAR_SHOW_SUCCESS" : "BAR_HIDE_SUCCESS";
+        }
+
+        function status(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            return barConfig.visible ? "visible" : "hidden";
+        }
+
+        function autoHide(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {autoHide: true})
+            return "BAR_AUTO_HIDE_SUCCESS"
+        }
+
+        function manualHide(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {autoHide: false})
+            return "BAR_MANUAL_HIDE_SUCCESS"
+        }
+
+        function toggleAutoHide(selector: string, value: string): string {
+            if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
+            const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
+            const barConfig = barConfigs[index]
+            if (!barConfig) { return "BAR_NOT_FOUND" }
+            updateBarConfig(barConfig.id, {autoHide: !barConfig.autoHide})
+            return root.dankBarAutoHide ?  "BAR_MANUAL_HIDE_SUCCESS": "BAR_AUTO_HIDE_SUCCESS"
+        }
+
+        target: "bar"
     }
 }
