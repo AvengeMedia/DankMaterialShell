@@ -356,7 +356,7 @@ PanelWindow {
                     if (!root.desktopEntry?.actions || root.desktopEntry.actions.length === 0) {
                         return false
                     }
-                    return !root.hidePin || (!root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun)
+                    return !root.hidePin || (!root.isDmsWindow && root.desktopEntry && SessionService.nvidiaCommand)
                 }
                 width: parent.width
                 height: 1
@@ -405,10 +405,10 @@ PanelWindow {
 
             Rectangle {
                 visible: {
-                    const hasPrimeRun = !root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun
+                    const hasNvidia = !root.isDmsWindow && root.desktopEntry && SessionService.nvidiaCommand
                     const hasWindow = root.appData && (root.appData.type === "window" || (root.appData.type === "grouped" && root.appData.windowCount > 0))
                     const hasPinOption = !root.hidePin
-                    const hasContentAbove = hasPinOption || hasPrimeRun
+                    const hasContentAbove = hasPinOption || hasNvidia
                     return hasContentAbove && hasWindow
                 }
                 width: parent.width
@@ -417,11 +417,11 @@ PanelWindow {
             }
 
             Rectangle {
-                visible: !root.isDmsWindow && root.desktopEntry && SessionService.hasPrimeRun
+                visible: !root.isDmsWindow && root.desktopEntry && SessionService.nvidiaCommand
                 width: parent.width
                 height: 28
                 radius: Theme.cornerRadius
-                color: primeRunArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: nvidiaArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
 
                 StyledText {
                     anchors.left: parent.left
@@ -438,7 +438,7 @@ PanelWindow {
                 }
 
                 MouseArea {
-                    id: primeRunArea
+                    id: nvidiaArea
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor

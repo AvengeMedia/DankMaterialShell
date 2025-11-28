@@ -749,7 +749,7 @@ DankPopout {
             }
 
             Rectangle {
-                visible: SessionService.hasPrimeRun
+                visible: SessionService.nvidiaCommand
                 width: parent.width - Theme.spacingS * 2
                 height: 5
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -764,11 +764,11 @@ DankPopout {
             }
 
             Rectangle {
-                visible: SessionService.hasPrimeRun
+                visible: SessionService.nvidiaCommand
                 width: parent.width
                 height: 32
                 radius: Theme.cornerRadius
-                color: primeRunMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+                color: nvidiaMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
 
                 Row {
                     anchors.left: parent.left
@@ -794,7 +794,7 @@ DankPopout {
                 }
 
                 MouseArea {
-                    id: primeRunMouseArea
+                    id: nvidiaMouseArea
 
                     anchors.fill: parent
                     hoverEnabled: true

@@ -18,7 +18,7 @@ Singleton {
     property bool inhibitorAvailable: true
     property bool idleInhibited: false
     property string inhibitReason: "Keep system awake"
-    property bool hasPrimeRun: false
+    property string nvidiaCommand: ""
 
     readonly property bool nativeInhibitorAvailable: {
         try {
@@ -109,7 +109,23 @@ Singleton {
         command: ["which", "prime-run"]
 
         onExited: function (exitCode) {
-            hasPrimeRun = (exitCode === 0);
+            if (exitCode === 0) {
+                nvidiaCommand = "prime-run"
+            } else {
+                detectNvidiaOffloadProcess.running = true
+            }
+        }
+    }
+
+    Process {
+        id: detectNvidiaOffloadProcess
+        running: false
+        command: ["which", "nvidia-offload"]
+
+        onExited: function (exitCode) {
+            if (exitCode === 0) {
+                nvidiaCommand = "nvidia-offload"
+            }
         }
     }
 
@@ -145,10 +161,10 @@ Singleton {
         return /[;&|<>()$`\\"']/.test(prefix);
     }
 
-    function launchDesktopEntry(desktopEntry, usePrimeRun) {
+    function launchDesktopEntry(desktopEntry, useNvidia) {
         let cmd = desktopEntry.command;
-        if (usePrimeRun && hasPrimeRun) {
-            cmd = ["prime-run"].concat(cmd);
+        if (useNvidia && nvidiaCommand) {
+            cmd = [nvidiaCommand].concat(cmd);
         }
 
         const userPrefix = SettingsData.launchPrefix?.trim() || "";
@@ -176,10 +192,10 @@ Singleton {
         }
     }
 
-    function launchDesktopAction(desktopEntry, action, usePrimeRun) {
+    function launchDesktopAction(desktopEntry, action, useNvidia) {
         let cmd = action.command;
-        if (usePrimeRun && hasPrimeRun) {
-            cmd = ["prime-run"].concat(cmd);
+        if (useNvidia && nvidiaCommand) {
+            cmd = [nvidiaCommand].concat(cmd);
         }
 
         const userPrefix = SettingsData.launchPrefix?.trim() || "";

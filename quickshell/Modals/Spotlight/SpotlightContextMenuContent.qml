@@ -52,7 +52,7 @@ Item {
             action: launchCurrentApp
         });
 
-        if (SessionService.hasPrimeRun) {
+        if (SessionService.nvidiaCommand) {
             items.push({
                 type: "separator"
             });
@@ -60,7 +60,7 @@ Item {
                 type: "item",
                 icon: "memory",
                 text: I18n.tr("Launch on dGPU"),
-                action: launchWithPrime
+                action: launchWithNvidia
             });
         }
 
@@ -106,7 +106,7 @@ Item {
         hideRequested();
     }
 
-    function launchWithPrime() {
+    function launchWithNvidia() {
         if (desktopEntry) {
             SessionService.launchDesktopEntry(desktopEntry, true);
             if (appLauncher && currentApp) {
