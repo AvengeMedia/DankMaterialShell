@@ -235,6 +235,7 @@ Scope {
                         id: spotlightContent
                         anchors.fill: parent
                         anchors.margins: 0
+                        usePopupContextMenu: true
 
                         property var fakeParentModal: QtObject {
                             property bool spotlightOpen: spotlightContainer.visible

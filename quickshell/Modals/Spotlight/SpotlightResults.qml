@@ -8,13 +8,32 @@ Rectangle {
     id: resultsContainer
 
     property var appLauncher: null
-    property var contextMenu: null
+    
+    signal itemRightClicked(int index, var modelData, real mouseX, real mouseY)
 
     function resetScroll() {
         resultsList.contentY = 0
         if (gridLoader.item) {
             gridLoader.item.contentY = 0
         }
+    }
+
+    function getSelectedItemPosition() {
+        if (!appLauncher) return { x: 0, y: 0 };
+        
+        const selectedIndex = appLauncher.selectedIndex;
+        if (appLauncher.viewMode === "list") {
+            const itemY = selectedIndex * (resultsList.itemHeight + resultsList.itemSpacing) - resultsList.contentY;
+            return { x: resultsList.width / 2, y: itemY + resultsList.itemHeight / 2 };
+        } else if (gridLoader.item) {
+            const grid = gridLoader.item;
+            const row = Math.floor(selectedIndex / grid.actualColumns);
+            const col = selectedIndex % grid.actualColumns;
+            const itemX = col * grid.cellWidth + grid.leftMargin + grid.cellWidth / 2;
+            const itemY = row * grid.cellHeight - grid.contentY + grid.cellHeight / 2;
+            return { x: itemX, y: itemY };
+        }
+        return { x: 0, y: 0 };
     }
 
     radius: Theme.cornerRadius
@@ -67,9 +86,8 @@ Rectangle {
                            appLauncher.launchApp(modelData)
                        }
         onItemRightClicked: (index, modelData, mouseX, mouseY) => {
-                                if (contextMenu)
-                                contextMenu.show(mouseX, mouseY, modelData)
-                            }
+            resultsContainer.itemRightClicked(index, modelData, mouseX, mouseY);
+        }
         onKeyboardNavigationReset: () => {
                                        if (appLauncher)
                                        appLauncher.keyboardNavigationActive = false
@@ -87,8 +105,7 @@ Rectangle {
             iconUnicodeScale: 0.8
             onItemClicked: (idx, modelData) => resultsList.itemClicked(idx, modelData)
             onItemRightClicked: (idx, modelData, mouseX, mouseY) => {
-                const modalPos = resultsContainer.parent.mapFromItem(null, mouseX, mouseY)
-                resultsList.itemRightClicked(idx, modelData, modalPos.x, modalPos.y)
+                resultsList.itemRightClicked(idx, modelData, mouseX, mouseY)
             }
             onKeyboardNavigationReset: resultsList.keyboardNavigationReset
         }
@@ -103,6 +120,14 @@ Rectangle {
         anchors.margins: Theme.spacingS
         visible: appLauncher && appLauncher.viewMode === "grid"
         active: appLauncher && appLauncher.viewMode === "grid"
+        asynchronous: false
+        
+        onLoaded: {
+            if (item) {
+                item.appLauncher = Qt.binding(() => resultsContainer.appLauncher);
+            }
+        }
+        
         onWidthChanged: {
             if (visible && Math.abs(width - _lastWidth) > 1) {
                 _lastWidth = width
@@ -115,6 +140,8 @@ Rectangle {
         sourceComponent: Component {
             DankGridView {
                 id: resultsGrid
+
+                property var appLauncher: null
 
                 property int currentIndex: appLauncher ? appLauncher.selectedIndex : -1
                 property int columns: appLauncher ? appLauncher.gridColumns : 4
@@ -167,9 +194,8 @@ Rectangle {
                                    appLauncher.launchApp(modelData)
                                }
                 onItemRightClicked: (index, modelData, mouseX, mouseY) => {
-                                        if (contextMenu)
-                                        contextMenu.show(mouseX, mouseY, modelData)
-                                    }
+                    resultsContainer.itemRightClicked(index, modelData, mouseX, mouseY);
+                }
                 onKeyboardNavigationReset: () => {
                                                if (appLauncher)
                                                appLauncher.keyboardNavigationActive = false
@@ -188,8 +214,7 @@ Rectangle {
                     currentIndex: resultsGrid.currentIndex
                     onItemClicked: (idx, modelData) => resultsGrid.itemClicked(idx, modelData)
                     onItemRightClicked: (idx, modelData, mouseX, mouseY) => {
-                        const modalPos = resultsContainer.parent.mapFromItem(null, mouseX, mouseY)
-                        resultsGrid.itemRightClicked(idx, modelData, modalPos.x, modalPos.y)
+                        resultsGrid.itemRightClicked(idx, modelData, mouseX, mouseY)
                     }
                     onKeyboardNavigationReset: resultsGrid.keyboardNavigationReset
                 }

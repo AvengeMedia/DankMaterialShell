@@ -11,8 +11,10 @@ Item {
     property alias appLauncher: appLauncher
     property alias searchField: searchField
     property alias fileSearchController: fileSearchController
+    property alias resultsView: resultsView
     property var parentModal: null
     property string searchMode: "apps"
+    property bool usePopupContextMenu: false
 
     function resetScroll() {
         if (searchMode === "apps") {
@@ -146,6 +148,18 @@ Item {
                 fileSearchController.openSelected();
             }
             event.accepted = true;
+        } else if (event.key === Qt.Key_Menu) {
+            if (searchMode === "apps" && appLauncher.model.count > 0) {
+                const selectedApp = appLauncher.model.get(appLauncher.selectedIndex);
+                const menu = usePopupContextMenu ? popupContextMenu : layerContextMenuLoader.item;
+                
+                if (selectedApp && menu && resultsView) {
+                    const itemPos = resultsView.getSelectedItemPosition();
+                    const contentPos = resultsView.mapToItem(spotlightKeyHandler, itemPos.x, itemPos.y);
+                    menu.show(contentPos.x, contentPos.y, selectedApp, true);
+                }
+            }
+            event.accepted = true;
         }
     }
 
@@ -176,6 +190,52 @@ Item {
                 NiriService.toggleOverview();
             }
         }
+    }
+
+    
+    SpotlightContextMenuPopup {
+        id: popupContextMenu
+        
+        parent: spotlightKeyHandler
+        appLauncher: spotlightKeyHandler.appLauncher
+        parentHandler: spotlightKeyHandler
+        searchField: spotlightKeyHandler.searchField
+        visible: false
+        z: 1000
+    }
+    
+    MouseArea {
+        anchors.fill: parent
+        visible: usePopupContextMenu && popupContextMenu.visible
+        hoverEnabled: true
+        z: 999
+        onClicked: popupContextMenu.hide()
+    }
+    
+    Loader {
+        id: layerContextMenuLoader
+        active: !spotlightKeyHandler.usePopupContextMenu
+        asynchronous: false
+        sourceComponent: Component {
+            SpotlightContextMenu {
+                appLauncher: spotlightKeyHandler.appLauncher
+                parentHandler: spotlightKeyHandler
+                parentModal: spotlightKeyHandler.parentModal
+            }
+        }
+    }
+    
+    Connections {
+        target: parentModal
+        function onSpotlightOpenChanged() {
+            if (parentModal && !parentModal.spotlightOpen) {
+                if (layerContextMenuLoader.item) {
+                    layerContextMenuLoader.item.hide();
+                }
+                popupContextMenu.hide();
+            }
+        }
+        enabled: parentModal !== null
     }
 
     Column {
@@ -397,8 +457,22 @@ Item {
                 id: resultsView
                 anchors.fill: parent
                 appLauncher: spotlightKeyHandler.appLauncher
-                contextMenu: contextMenu
                 visible: searchMode === "apps"
+                
+                onItemRightClicked: (index, modelData, mouseX, mouseY) => {
+                    const menu = usePopupContextMenu ? popupContextMenu : layerContextMenuLoader.item;
+                    
+                    if (menu && menu.show) {
+                        const isPopup = menu.contentItem !== undefined;
+                        
+                        if (isPopup) {
+                            const localPos = popupContextMenu.parent.mapFromItem(null, mouseX, mouseY);
+                            menu.show(localPos.x, localPos.y, modelData);
+                        } else {
+                            menu.show(mouseX, mouseY, modelData, false);
+                        }
+                    }
+                }
             }
 
             FileSearchResults {
@@ -407,31 +481,6 @@ Item {
                 fileSearchController: spotlightKeyHandler.fileSearchController
                 visible: searchMode === "files"
             }
-        }
-    }
-
-    SpotlightContextMenu {
-        id: contextMenu
-
-        appLauncher: spotlightKeyHandler.appLauncher
-        parentHandler: spotlightKeyHandler
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        visible: contextMenu.visible
-        z: 999
-        onClicked: () => {
-            contextMenu.hide();
-        }
-
-        MouseArea {
-
-            x: contextMenu.x
-            y: contextMenu.y
-            width: contextMenu.width
-            height: contextMenu.height
-            onClicked: () => {}
         }
     }
 
