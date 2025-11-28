@@ -20,9 +20,8 @@
                 system: fn system nixpkgs.legacyPackages.${system}
             );
         buildDmsPkgs = pkgs: {
-            dmsCli = self.packages.${pkgs.stdenv.hostPlatform.system}.dmsCli;
+            inherit (self.packages.${pkgs.stdenv.hostPlatform.system}) dmsCli dankMaterialShell;
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
-            dankMaterialShell = self.packages.${pkgs.stdenv.hostPlatform.system}.dankMaterialShell;
         };
         mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
             imports = [
@@ -61,6 +60,15 @@
                         "-w"
                         "-X main.Version=${finalAttrs.version}"
                     ];
+
+                    nativeBuildInputs = [pkgs.installShellFiles];
+
+                    postInstall = ''
+                        installShellCompletion --cmd dms \
+                          --bash <($out/bin/dms completion bash) \
+                          --fish <($out/bin/dms completion fish ) \
+                          --zsh <($out/bin/dms completion zsh)
+                    '';
 
                     meta = {
                         description = "DankMaterialShell Command Line Interface";
