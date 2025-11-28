@@ -17,6 +17,9 @@ Item {
     property bool syncing: false
 
     function syncFrom(type) {
+        if (!dailyLoader.item || !hourlyLoader.item) { return }
+        const hourlyList = hourlyLoader.item
+        const dailyList = dailyLoader.item
         syncing = true
 
         try {
@@ -56,10 +59,11 @@ Item {
 
     property bool available: WeatherService.weather.available
     onAvailableChanged: {
-        if (available) {
-            dailyList.currentIndex = dailyList.initialIndex
-            hourlyList.currentIndex = hourlyList.initialIndex
-        }
+        if (!available || !dailyLoader.item || !hourlyLoader.item) { return }
+        const hourlyList = hourlyLoader.item
+        const dailyList = dailyLoader.item
+        dailyList.currentIndex = dailyList.initialIndex
+        hourlyList.currentIndex = hourlyList.initialIndex
     }
 
     Column {
@@ -832,105 +836,128 @@ Item {
             DankActionButton {
                 id: denseButton
                 anchors.verticalCenter: parent.verticalCenter
-                iconName: hourlyList.dense ? "tile_medium" : "tile_large"
+                visible: hourlyLoader.item !== null
+                iconName: hourlyLoader.item && hourlyLoader.item.dense
+                          ? "tile_medium"
+                          : "tile_large"
                 onClicked: {
-                    hourlyList.dense = !hourlyList.dense
+                    if (hourlyLoader.item)
+                        hourlyLoader.item.dense = !hourlyLoader.item.dense
                 }
             }
+
         }
 
-        ListView {
-            id: hourlyList
+        Item {
             width: parent.width
-            height: cardHeight + Theme.spacingXS
-            orientation: ListView.Horizontal
-            spacing: dense ? 2 : Theme.spacingS
-            clip: true
-            snapMode: ListView.SnapToItem
-            highlightRangeMode: ListView.StrictlyEnforceRange
-            highlightMoveDuration: 50
-            interactive: true
-            contentHeight: cardHeight
-            contentWidth: cardWidth
+            height: 100 + Theme.spacingXS
 
-            property var cardHeight: 100
-            property var cardWidth: ((hourlyList.width + hourlyList.spacing) / hourlyList.visibleCount) - hourlyList.spacing
-            property int initialIndex: (new Date()).getHours() + 1
-            property bool dense: true
-            property int visibleCount: 8
+            Component.onCompleted: hourlyLoader.active = true
 
-            model: (WeatherService.weather.hourlyForecast?.length ?? 0) + 2
-
-            delegate: WeatherForecastCard {
-                width: forecastData ? hourlyList.cardWidth : hourlyList.width
-                height: hourlyList.cardHeight
-                dense: hourlyList.dense
-                daily: false
-
-                date: {
-                    const d = new Date()
-                    d.setHours(index - 1)
-                    return d
-                }
-                forecastData: WeatherService.weather.hourlyForecast?.[index - 1]
+            Loader {
+                id: hourlyLoader
+                anchors.fill: parent
+                sourceComponent: hourlyComponent
+                active: false
+                asynchronous: true
             }
 
-            MouseArea {
-                width: hourlyList.width
-                height: hourlyList.cardHeight
-                hoverEnabled: true
-                acceptedButtons: Qt.AllButtons
+            Component {
+                id: hourlyComponent
+                ListView {
+                    id: hourlyList
+                    width: parent.width
+                    height: cardHeight + Theme.spacingXS
+                    orientation: ListView.Horizontal
+                    spacing: dense ? 2 : Theme.spacingS
+                    clip: true
+                    snapMode: ListView.SnapToItem
+                    highlightRangeMode: ListView.StrictlyEnforceRange
+                    highlightMoveDuration: 50
+                    interactive: true
+                    contentHeight: cardHeight
+                    contentWidth: cardWidth
 
-                onWheel: {
-                    if (wheel.modifiers & Qt.ShiftModifier) {
-                        // NOTE: this is a way to filter mouse scrolling from trackpad
-                        // it is not perfect, as when a trackpad scrolls a multiple of 120
-                        // in the y-axis and 0 in x-axis it will be treated like mouse
-                        if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
-                            const newIndex = hourlyList.currentIndex - Math.sign(wheel.angleDelta.y)
-                            if (newIndex < hourlyList.model && newIndex >= 0) {
-                                hourlyList.currentIndex = newIndex
-                                wheel.accepted = true
+                    property var cardHeight: 100
+                    property var cardWidth: ((hourlyList.width + hourlyList.spacing) / hourlyList.visibleCount) - hourlyList.spacing
+                    property int initialIndex: (new Date()).getHours() + 1
+                    property bool dense: true
+                    property int visibleCount: 8
+
+                    model: (WeatherService.weather.hourlyForecast?.length ?? 0) + 2
+
+                    delegate: WeatherForecastCard {
+                        width: forecastData ? hourlyList.cardWidth : hourlyList.width
+                        height: hourlyList.cardHeight
+                        dense: hourlyList.dense
+                        daily: false
+
+                        date: {
+                            const d = new Date()
+                            d.setHours(index - 1)
+                            return d
+                        }
+                        forecastData: WeatherService.weather.hourlyForecast?.[index - 1]
+                    }
+
+                    MouseArea {
+                        width: hourlyList.width
+                        height: hourlyList.cardHeight
+                        hoverEnabled: true
+                        acceptedButtons: Qt.AllButtons
+
+                        onWheel: {
+                            if (wheel.modifiers & Qt.ShiftModifier) {
+                                // NOTE: this is a way to filter mouse scrolling from trackpad
+                                // it is not perfect, as when a trackpad scrolls a multiple of 120
+                                // in the y-axis and 0 in x-axis it will be treated like mouse
+                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
+                                    const newIndex = hourlyList.currentIndex - Math.sign(wheel.angleDelta.y)
+                                    if (newIndex < hourlyList.model && newIndex >= 0) {
+                                        hourlyList.currentIndex = newIndex
+                                        wheel.accepted = true
+                                    }
+                                }
                             }
+                            wheel.accepted = false
                         }
                     }
-                    wheel.accepted = false
-                }
-            }
 
-            onCurrentIndexChanged: if (!syncing) root.syncFrom("hour")
+                    onCurrentIndexChanged: if (!syncing) root.syncFrom("hour")
 
-            Component.onCompleted: {
-                hourlyList.currentIndex = initialIndex
-            }
-
-            states: [
-                State {
-                    name: "denseState"
-                    when: hourlyList.dense
-                    PropertyChanges { target: hourlyList; visibleCount: 12 }
-                },
-                State {
-                    name: "normalState"
-                    when: !hourlyList.dense
-                    PropertyChanges { target: hourlyList; visibleCount: 6 }
-                }
-            ]
-
-            transitions: [
-                Transition {
-                    NumberAnimation {
-                        properties: "visibleCount"
-                        duration: 200
-                        easing.type: Easing.InOutQuad
+                    Component.onCompleted: {
+                        hourlyList.currentIndex = initialIndex
                     }
+
+                    states: [
+                        State {
+                            name: "denseState"
+                            when: hourlyList.dense
+                            PropertyChanges { target: hourlyList; visibleCount: 12 }
+                        },
+                        State {
+                            name: "normalState"
+                            when: !hourlyList.dense
+                            PropertyChanges { target: hourlyList; visibleCount: 6 }
+                        }
+                    ]
+
+                    transitions: [
+                        Transition {
+                            NumberAnimation {
+                                properties: "visibleCount"
+                                duration: 200
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    ]
+
+                    add: Transition {
+                        NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
+                    }
+
                 }
-            ]
-
-            add: Transition {
-                NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
             }
-
         }
 
         Row {
@@ -953,110 +980,119 @@ Item {
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
             }
-
-            DankActionButton {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: false
-                iconName: dailyList.dense ? "tile_medium" : "tile_large"
-                onClicked: {
-                    dailyList.dense = !dailyList.dense
-                }
-            }
         }
 
-        ListView {
-            id: dailyList
+        Item {
             width: parent.width
-            height: cardHeight + Theme.spacingXS
-            orientation: ListView.Horizontal
-            spacing: Theme.spacingS
-            clip: true
-            snapMode: ListView.SnapToItem
-            highlightRangeMode: ListView.StrictlyEnforceRange
-            highlightMoveDuration: 50
-            interactive: true
-            contentHeight: cardHeight
-            contentWidth: cardWidth
+            height: 100 + Theme.spacingXS
 
-            property var cardHeight: 100
-            property var cardWidth: ((dailyList.width + dailyList.spacing) / dailyList.visibleCount) - dailyList.spacing
-            property int initialIndex: 1
-            property bool dense: false
-            property int visibleCount: 7
+            Component.onCompleted: dailyLoader.active = true
 
-            model: (WeatherService.weather.forecast?.length ?? 0) + 2
-
-            delegate: WeatherForecastCard {
-                width: forecastData ? dailyList.cardWidth : dailyList.width
-                height: dailyList.cardHeight
-                dense: true
-                daily: true
-
-                date: {
-                    const date = new Date()
-                    date.setDate(date.getDate() + index - 1)
-                    return date
-                }
-                forecastData: WeatherService.weather.forecast?.[index - 1]
+            Loader {
+                id: dailyLoader
+                anchors.fill: parent
+                sourceComponent: dailyComponent
+                active: false
+                asynchronous: true
             }
 
-            MouseArea {
-                width: dailyList.width
-                height: dailyList.cardHeight
-                hoverEnabled: true
-                acceptedButtons: Qt.AllButtons
+            Component {
+                id: dailyComponent
+                ListView {
+                    id: dailyList
+                    width: parent.width
+                    height: cardHeight + Theme.spacingXS
+                    orientation: ListView.Horizontal
+                    spacing: Theme.spacingS
+                    clip: true
+                    snapMode: ListView.SnapToItem
+                    highlightRangeMode: ListView.StrictlyEnforceRange
+                    highlightMoveDuration: 50
+                    interactive: true
+                    contentHeight: cardHeight
+                    contentWidth: cardWidth
 
-                onWheel: {
-                    if (wheel.modifiers & Qt.ShiftModifier) {
-                        // NOTE: this is a way to filter mouse scrolling from trackpad
-                        // it is not perfect, as when a trackpad scrolls a multiple of 120
-                        // in the y-axis and 0 in x-axis it will be treated like mouse
-                        if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
-                            const newIndex = dailyList.currentIndex - Math.sign(wheel.angleDelta.y)
-                            if (newIndex < dailyList.model && newIndex >= 0) {
-                                dailyList.currentIndex = newIndex
-                                wheel.accepted = true
+                    property var cardHeight: 100
+                    property var cardWidth: ((dailyList.width + dailyList.spacing) / dailyList.visibleCount) - dailyList.spacing
+                    property int initialIndex: 1
+                    property bool dense: false
+                    property int visibleCount: 7
+
+                    model: (WeatherService.weather.forecast?.length ?? 0) + 2
+
+                    delegate: WeatherForecastCard {
+                        width: forecastData ? dailyList.cardWidth : dailyList.width
+                        height: dailyList.cardHeight
+                        dense: true
+                        daily: true
+
+                        date: {
+                            const date = new Date()
+                            date.setDate(date.getDate() + index - 1)
+                            return date
+                        }
+                        forecastData: WeatherService.weather.forecast?.[index - 1]
+                    }
+
+                    MouseArea {
+                        width: dailyList.width
+                        height: dailyList.cardHeight
+                        hoverEnabled: true
+                        acceptedButtons: Qt.AllButtons
+
+                        onWheel: {
+                            if (wheel.modifiers & Qt.ShiftModifier) {
+                                // NOTE: this is a way to filter mouse scrolling from trackpad
+                                // it is not perfect, as when a trackpad scrolls a multiple of 120
+                                // in the y-axis and 0 in x-axis it will be treated like mouse
+                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
+                                    const newIndex = dailyList.currentIndex - Math.sign(wheel.angleDelta.y)
+                                    if (newIndex < dailyList.model && newIndex >= 0) {
+                                        dailyList.currentIndex = newIndex
+                                        wheel.accepted = true
+                                    }
+
+                                }
                             }
-
+                            wheel.accepted = false
                         }
                     }
-                    wheel.accepted = false
-                }
-            }
 
-            onCurrentIndexChanged: if (!syncing) root.syncFrom("day")
+                    onCurrentIndexChanged: if (!syncing) root.syncFrom("day")
 
-            Component.onCompleted: {
-                dailyList.currentIndex = initialIndex
-            }
-
-            states: [
-                State {
-                    name: "denseState"
-                    when: dailyList.dense
-                    PropertyChanges { target: dailyList; visibleCount: 7 }
-                },
-                State {
-                    name: "normalState"
-                    when: !dailyList.dense
-                    PropertyChanges { target: dailyList; visibleCount: 7 }
-                }
-            ]
-
-            transitions: [
-                Transition {
-                    NumberAnimation {
-                        properties: "visibleCount"
-                        duration: 200
-                        easing.type: Easing.InOutQuad
+                    Component.onCompleted: {
+                        dailyList.currentIndex = initialIndex
                     }
+
+                    states: [
+                        State {
+                            name: "denseState"
+                            when: dailyList.dense
+                            PropertyChanges { target: dailyList; visibleCount: 7 }
+                        },
+                        State {
+                            name: "normalState"
+                            when: !dailyList.dense
+                            PropertyChanges { target: dailyList; visibleCount: 7 }
+                        }
+                    ]
+
+                    transitions: [
+                        Transition {
+                            NumberAnimation {
+                                properties: "visibleCount"
+                                duration: 200
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+                    ]
+
+                    add: Transition {
+                        NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
+                    }
+
                 }
-            ]
-
-            add: Transition {
-                NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
             }
-
         }
     }
 }
