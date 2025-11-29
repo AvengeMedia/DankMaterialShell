@@ -281,7 +281,7 @@ Item {
                                     keyboardNavigation = false;
                                     selectedMenuIndex = itemIndex;
                                 }
-                                onClicked: modelData.action
+                                onClicked: modelData.action()
                             }
                         }
                     }
