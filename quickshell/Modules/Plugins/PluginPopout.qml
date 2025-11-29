@@ -75,7 +75,7 @@ DankPopout {
                             }
                         }
                         if (root.contentHeight === 0 && item) {
-                            root.contentHeight = item.implicitHeight + Theme.spacingS * 2
+                            root.contentHeight = Qt.binding(() => item.implicitHeight + Theme.spacingS * 2)
                         }
                     }
                 }
