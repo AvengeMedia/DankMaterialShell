@@ -23,7 +23,7 @@ func NewAttributeEncoder(w io.Writer) *AttributeEncoder {
 
 // Encode encodes a attribute and its value to a io.Writer
 // the tag is determined by the AttributeTagMapping map
-func (e *AttributeEncoder) Encode(attribute string, value interface{}) error {
+func (e *AttributeEncoder) Encode(attribute string, value any) error {
 	tag, ok := AttributeTagMapping[attribute]
 	if !ok {
 		return fmt.Errorf("cannot get tag of attribute %s", attribute)
@@ -346,7 +346,7 @@ func (e *AttributeEncoder) writeNullByte() error {
 type Attribute struct {
 	Tag   int8
 	Name  string
-	Value interface{}
+	Value any
 }
 
 // Resolution defines the resolution attribute

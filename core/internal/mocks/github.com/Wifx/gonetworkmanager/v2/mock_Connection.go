@@ -359,7 +359,7 @@ type MockConnection_GetSecrets_Call struct {
 
 // GetSecrets is a helper method to define mock.On call
 //   - settingName string
-func (_e *MockConnection_Expecter) GetSecrets(settingName interface{}) *MockConnection_GetSecrets_Call {
+func (_e *MockConnection_Expecter) GetSecrets(settingName any) *MockConnection_GetSecrets_Call {
 	return &MockConnection_GetSecrets_Call{Call: _e.mock.On("GetSecrets", settingName)}
 }
 
@@ -564,7 +564,7 @@ type MockConnection_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - settings gonetworkmanager.ConnectionSettings
-func (_e *MockConnection_Expecter) Update(settings interface{}) *MockConnection_Update_Call {
+func (_e *MockConnection_Expecter) Update(settings any) *MockConnection_Update_Call {
 	return &MockConnection_Update_Call{Call: _e.mock.On("Update", settings)}
 }
 
@@ -610,7 +610,7 @@ type MockConnection_UpdateUnsaved_Call struct {
 
 // UpdateUnsaved is a helper method to define mock.On call
 //   - settings gonetworkmanager.ConnectionSettings
-func (_e *MockConnection_Expecter) UpdateUnsaved(settings interface{}) *MockConnection_UpdateUnsaved_Call {
+func (_e *MockConnection_Expecter) UpdateUnsaved(settings any) *MockConnection_UpdateUnsaved_Call {
 	return &MockConnection_UpdateUnsaved_Call{Call: _e.mock.On("UpdateUnsaved", settings)}
 }
 

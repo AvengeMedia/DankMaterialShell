@@ -45,12 +45,12 @@ type ethernetDeviceInfo struct {
 }
 
 type NetworkManagerBackend struct {
-	nmConn          interface{}
-	ethernetDevice  interface{}
+	nmConn          any
+	ethernetDevice  any
 	ethernetDevices map[string]*ethernetDeviceInfo
-	wifiDevice      interface{}
-	settings        interface{}
-	wifiDev         interface{}
+	wifiDevice      any
+	settings        any
+	wifiDev         any
 	wifiDevices     map[string]*wifiDeviceInfo
 
 	dbusConn *dbus.Conn

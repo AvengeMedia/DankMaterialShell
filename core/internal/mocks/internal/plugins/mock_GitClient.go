@@ -52,7 +52,7 @@ type MockGitClient_HasUpdates_Call struct {
 
 // HasUpdates is a helper method to define mock.On call
 //   - path string
-func (_e *MockGitClient_Expecter) HasUpdates(path interface{}) *MockGitClient_HasUpdates_Call {
+func (_e *MockGitClient_Expecter) HasUpdates(path any) *MockGitClient_HasUpdates_Call {
 	return &MockGitClient_HasUpdates_Call{Call: _e.mock.On("HasUpdates", path)}
 }
 
@@ -99,7 +99,7 @@ type MockGitClient_PlainClone_Call struct {
 // PlainClone is a helper method to define mock.On call
 //   - path string
 //   - url string
-func (_e *MockGitClient_Expecter) PlainClone(path interface{}, url interface{}) *MockGitClient_PlainClone_Call {
+func (_e *MockGitClient_Expecter) PlainClone(path any, url any) *MockGitClient_PlainClone_Call {
 	return &MockGitClient_PlainClone_Call{Call: _e.mock.On("PlainClone", path, url)}
 }
 
@@ -145,7 +145,7 @@ type MockGitClient_Pull_Call struct {
 
 // Pull is a helper method to define mock.On call
 //   - path string
-func (_e *MockGitClient_Expecter) Pull(path interface{}) *MockGitClient_Pull_Call {
+func (_e *MockGitClient_Expecter) Pull(path any) *MockGitClient_Pull_Call {
 	return &MockGitClient_Pull_Call{Call: _e.mock.On("Pull", path)}
 }
 

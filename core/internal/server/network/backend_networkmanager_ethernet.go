@@ -155,8 +155,8 @@ func (b *NetworkManagerBackend) ConnectEthernet() error {
 		}
 	}
 
-	settings := make(map[string]map[string]interface{})
-	settings["connection"] = map[string]interface{}{
+	settings := make(map[string]map[string]any)
+	settings["connection"] = map[string]any{
 		"id":   "Wired connection",
 		"type": "802-3-ethernet",
 	}

@@ -164,7 +164,7 @@ func (m *Manager) updateSessionState() error {
 		}
 	}
 	if v, ok := props["User"]; ok {
-		if userArr, ok := v.Value().([]interface{}); ok && len(userArr) >= 1 {
+		if userArr, ok := v.Value().([]any); ok && len(userArr) >= 1 {
 			if uid, ok := userArr[0].(uint32); ok {
 				m.state.User = uid
 			}
@@ -201,7 +201,7 @@ func (m *Manager) updateSessionState() error {
 		}
 	}
 	if v, ok := props["Seat"]; ok {
-		if seatArr, ok := v.Value().([]interface{}); ok && len(seatArr) >= 1 {
+		if seatArr, ok := v.Value().([]any); ok && len(seatArr) >= 1 {
 			if seatID, ok := seatArr[0].(string); ok {
 				m.state.Seat = seatID
 			}

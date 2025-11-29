@@ -66,7 +66,7 @@ func (b *IWDBackend) GetVPNConfig(uuidOrName string) (*VPNConfig, error) {
 	return nil, fmt.Errorf("VPN not supported by iwd backend")
 }
 
-func (b *IWDBackend) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+func (b *IWDBackend) UpdateVPNConfig(uuid string, updates map[string]any) error {
 	return fmt.Errorf("VPN not supported by iwd backend")
 }
 

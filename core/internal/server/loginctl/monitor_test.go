@@ -64,7 +64,7 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.login1.Manager.PrepareForSleep",
-			Body: []interface{}{true},
+			Body: []any{true},
 		}
 
 		manager.handleDBusSignal(sig)
@@ -85,7 +85,7 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.login1.Manager.PrepareForSleep",
-			Body: []interface{}{false},
+			Body: []any{false},
 		}
 
 		manager.handleDBusSignal(sig)
@@ -106,7 +106,7 @@ func TestManager_HandleDBusSignal_PrepareForSleep(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.login1.Manager.PrepareForSleep",
-			Body: []interface{}{},
+			Body: []any{},
 		}
 
 		manager.handleDBusSignal(sig)
@@ -129,7 +129,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.login1.Session",
 				map[string]dbus.Variant{
 					"Active": dbus.MakeVariant(true),
@@ -155,7 +155,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.login1.Session",
 				map[string]dbus.Variant{
 					"IdleHint": dbus.MakeVariant(true),
@@ -181,7 +181,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.login1.Session",
 				map[string]dbus.Variant{
 					"IdleSinceHint": dbus.MakeVariant(uint64(123456789)),
@@ -208,7 +208,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.login1.Session",
 				map[string]dbus.Variant{
 					"LockedHint": dbus.MakeVariant(true),
@@ -235,7 +235,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.SomeOtherInterface",
 				map[string]dbus.Variant{
 					"Active": dbus.MakeVariant(true),
@@ -259,7 +259,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{},
+			Body: []any{},
 		}
 
 		assert.NotPanics(t, func() {
@@ -279,7 +279,7 @@ func TestManager_HandlePropertiesChanged(t *testing.T) {
 
 		sig := &dbus.Signal{
 			Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-			Body: []interface{}{
+			Body: []any{
 				"org.freedesktop.login1.Session",
 				map[string]dbus.Variant{
 					"Active":   dbus.MakeVariant(true),

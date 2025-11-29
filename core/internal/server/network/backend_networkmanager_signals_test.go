@@ -17,7 +17,7 @@ func TestNetworkManagerBackend_HandleDBusSignal_NewConnection(t *testing.T) {
 
 	sig := &dbus.Signal{
 		Name: "org.freedesktop.NetworkManager.Settings.NewConnection",
-		Body: []interface{}{"/org/freedesktop/NetworkManager/Settings/1"},
+		Body: []any{"/org/freedesktop/NetworkManager/Settings/1"},
 	}
 
 	assert.NotPanics(t, func() {
@@ -33,7 +33,7 @@ func TestNetworkManagerBackend_HandleDBusSignal_ConnectionRemoved(t *testing.T) 
 
 	sig := &dbus.Signal{
 		Name: "org.freedesktop.NetworkManager.Settings.ConnectionRemoved",
-		Body: []interface{}{"/org/freedesktop/NetworkManager/Settings/1"},
+		Body: []any{"/org/freedesktop/NetworkManager/Settings/1"},
 	}
 
 	assert.NotPanics(t, func() {
@@ -49,7 +49,7 @@ func TestNetworkManagerBackend_HandleDBusSignal_InvalidBody(t *testing.T) {
 
 	sig := &dbus.Signal{
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-		Body: []interface{}{"only-one-element"},
+		Body: []any{"only-one-element"},
 	}
 
 	assert.NotPanics(t, func() {
@@ -65,7 +65,7 @@ func TestNetworkManagerBackend_HandleDBusSignal_InvalidInterface(t *testing.T) {
 
 	sig := &dbus.Signal{
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-		Body: []interface{}{123, map[string]dbus.Variant{}},
+		Body: []any{123, map[string]dbus.Variant{}},
 	}
 
 	assert.NotPanics(t, func() {
@@ -81,7 +81,7 @@ func TestNetworkManagerBackend_HandleDBusSignal_InvalidChanges(t *testing.T) {
 
 	sig := &dbus.Signal{
 		Name: "org.freedesktop.DBus.Properties.PropertiesChanged",
-		Body: []interface{}{dbusNMInterface, "not-a-map"},
+		Body: []any{dbusNMInterface, "not-a-map"},
 	}
 
 	assert.NotPanics(t, func() {
@@ -137,7 +137,7 @@ func TestNetworkManagerBackend_HandleNetworkManagerChange_ActiveConnections(t *t
 	mockNM.EXPECT().GetPropertyPrimaryConnection().Return(nil, nil).Maybe()
 
 	changes := map[string]dbus.Variant{
-		"ActiveConnections": dbus.MakeVariant([]interface{}{}),
+		"ActiveConnections": dbus.MakeVariant([]any{}),
 	}
 
 	assert.NotPanics(t, func() {
@@ -200,7 +200,7 @@ func TestNetworkManagerBackend_HandleWiFiChange_AccessPoints(t *testing.T) {
 	assert.NoError(t, err)
 
 	changes := map[string]dbus.Variant{
-		"AccessPoints": dbus.MakeVariant([]interface{}{}),
+		"AccessPoints": dbus.MakeVariant([]any{}),
 	}
 
 	assert.NotPanics(t, func() {

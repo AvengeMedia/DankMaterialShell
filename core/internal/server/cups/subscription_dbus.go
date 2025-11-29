@@ -83,7 +83,7 @@ func (sm *DBusSubscriptionManager) createDBusSubscription() (int, error) {
 	req.OperationAttributes[ipp.AttributePrinterURI] = fmt.Sprintf("%s/", sm.baseURL)
 	req.OperationAttributes[ipp.AttributeRequestingUserName] = "dms"
 
-	req.SubscriptionAttributes = map[string]interface{}{
+	req.SubscriptionAttributes = map[string]any{
 		"notify-events": []string{
 			"printer-state-changed",
 			"printer-added",

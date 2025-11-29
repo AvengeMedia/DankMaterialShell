@@ -56,7 +56,7 @@ func TestHandleRequest(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "evdev.getState",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		HandleRequest(conn, req, m)
@@ -85,7 +85,7 @@ func TestHandleRequest(t *testing.T) {
 		req := Request{
 			ID:     456,
 			Method: "evdev.unknownMethod",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		HandleRequest(conn, req, m)
@@ -114,7 +114,7 @@ func TestHandleGetState(t *testing.T) {
 	req := Request{
 		ID:     789,
 		Method: "evdev.getState",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	handleGetState(conn, req, m)

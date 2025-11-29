@@ -57,7 +57,7 @@ type MockSettings_AddConnection_Call struct {
 
 // AddConnection is a helper method to define mock.On call
 //   - settings gonetworkmanager.ConnectionSettings
-func (_e *MockSettings_Expecter) AddConnection(settings interface{}) *MockSettings_AddConnection_Call {
+func (_e *MockSettings_Expecter) AddConnection(settings any) *MockSettings_AddConnection_Call {
 	return &MockSettings_AddConnection_Call{Call: _e.mock.On("AddConnection", settings)}
 }
 
@@ -115,7 +115,7 @@ type MockSettings_AddConnectionUnsaved_Call struct {
 
 // AddConnectionUnsaved is a helper method to define mock.On call
 //   - settings gonetworkmanager.ConnectionSettings
-func (_e *MockSettings_Expecter) AddConnectionUnsaved(settings interface{}) *MockSettings_AddConnectionUnsaved_Call {
+func (_e *MockSettings_Expecter) AddConnectionUnsaved(settings any) *MockSettings_AddConnectionUnsaved_Call {
 	return &MockSettings_AddConnectionUnsaved_Call{Call: _e.mock.On("AddConnectionUnsaved", settings)}
 }
 
@@ -173,7 +173,7 @@ type MockSettings_GetConnectionByUUID_Call struct {
 
 // GetConnectionByUUID is a helper method to define mock.On call
 //   - uuid string
-func (_e *MockSettings_Expecter) GetConnectionByUUID(uuid interface{}) *MockSettings_GetConnectionByUUID_Call {
+func (_e *MockSettings_Expecter) GetConnectionByUUID(uuid any) *MockSettings_GetConnectionByUUID_Call {
 	return &MockSettings_GetConnectionByUUID_Call{Call: _e.mock.On("GetConnectionByUUID", uuid)}
 }
 
@@ -431,7 +431,7 @@ type MockSettings_SaveHostname_Call struct {
 
 // SaveHostname is a helper method to define mock.On call
 //   - hostname string
-func (_e *MockSettings_Expecter) SaveHostname(hostname interface{}) *MockSettings_SaveHostname_Call {
+func (_e *MockSettings_Expecter) SaveHostname(hostname any) *MockSettings_SaveHostname_Call {
 	return &MockSettings_SaveHostname_Call{Call: _e.mock.On("SaveHostname", hostname)}
 }
 
