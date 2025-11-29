@@ -406,6 +406,74 @@ Item {
         }
     }
 
+    BrowserPickerModal {
+        id: browserPickerModal
+    }
+
+    AppPickerModal {
+        id: filePickerModal
+        title: I18n.tr("Open with...")
+
+        function shellEscape(str) {
+            return "'" + str.replace(/'/g, "'\\''") + "'"
+        }
+
+        onApplicationSelected: (app, filePath) => {
+            if (!app) return
+
+            let cmd = app.exec || ""
+            const escapedPath = shellEscape(filePath)
+            const escapedUri = shellEscape("file://" + filePath)
+
+            let hasField = false
+            if (cmd.includes("%f")) { cmd = cmd.replace("%f", escapedPath); hasField = true }
+            else if (cmd.includes("%F")) { cmd = cmd.replace("%F", escapedPath); hasField = true }
+            else if (cmd.includes("%u")) { cmd = cmd.replace("%u", escapedUri); hasField = true }
+            else if (cmd.includes("%U")) { cmd = cmd.replace("%U", escapedUri); hasField = true }
+
+            cmd = cmd.replace(/%[ikc]/g, "")
+
+            if (!hasField) {
+                cmd += " " + escapedPath
+            }
+
+            console.log("FilePicker: Launching", cmd)
+
+            Quickshell.execDetached({
+                command: ["sh", "-c", cmd]
+            })
+        }
+    }
+
+    Connections {
+        target: DMSService
+        function onOpenUrlRequested(url) {
+            browserPickerModal.url = url
+            browserPickerModal.open()
+        }
+
+        function onAppPickerRequested(data) {
+            console.log("DMSShell: App picker requested with data:", JSON.stringify(data))
+
+            if (!data || !data.target) {
+                console.warn("DMSShell: Invalid app picker request data")
+                return
+            }
+
+            filePickerModal.targetData = data.target
+            filePickerModal.targetDataLabel = data.requestType || "file"
+
+            if (data.categories && data.categories.length > 0) {
+                filePickerModal.categoryFilter = data.categories
+            } else {
+                filePickerModal.categoryFilter = []
+            }
+
+            filePickerModal.usageHistoryKey = "filePickerUsageHistory"
+            filePickerModal.open()
+        }
+    }
+
     DankColorPickerModal {
         id: colorPickerModal
 

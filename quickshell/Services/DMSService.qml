@@ -50,10 +50,12 @@ Singleton {
     signal extWorkspaceStateUpdate(var data)
     signal wlrOutputStateUpdate(var data)
     signal evdevStateUpdate(var data)
+    signal openUrlRequested(string url)
+    signal appPickerRequested(var data)
 
     property bool capsLockState: false
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "gamma", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "gamma", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -269,7 +271,7 @@ Singleton {
 
     function removeSubscription(service) {
         if (activeSubscriptions.includes("all")) {
-            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace"]
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace", "browser"]
             const filtered = allServices.filter(s => s !== service)
             subscribe(filtered)
         } else {
@@ -291,7 +293,7 @@ Singleton {
             excludeServices = [excludeServices]
         }
 
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "cups", "dwl", "brightness", "extworkspace"]
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "cups", "dwl", "brightness", "extworkspace", "browser"]
         const filtered = allServices.filter(s => !excludeServices.includes(s))
         subscribe(filtered)
     }
@@ -357,6 +359,16 @@ Singleton {
                 capsLockState = data.capsLock
             }
             evdevStateUpdate(data)
+        } else if (service === "browser.open_requested") {
+            if (data.target) {
+                if (data.requestType === "url" || !data.requestType) {
+                    openUrlRequested(data.target)
+                } else {
+                    appPickerRequested(data)
+                }
+            } else if (data.url) {
+                openUrlRequested(data.url)
+            }
         }
     }
 

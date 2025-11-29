@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
@@ -52,6 +53,7 @@ var loginctlManager *loginctl.Manager
 var freedesktopManager *freedesktop.Manager
 var waylandManager *wayland.Manager
 var bluezManager *bluez.Manager
+var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
 var dwlManager *dwl.Manager
 var extWorkspaceManager *extworkspace.Manager
@@ -83,6 +85,21 @@ func getSocketDir() string {
 
 func GetSocketPath() string {
 	return filepath.Join(getSocketDir(), fmt.Sprintf("danklinux-%d.sock", os.Getpid()))
+}
+
+func FindSocket() (string, error) {
+	dir := getSocketDir()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), "danklinux-") && strings.HasSuffix(entry.Name(), ".sock") {
+			return filepath.Join(dir, entry.Name()), nil
+		}
+	}
+	return "", fmt.Errorf("no dms socket found")
 }
 
 func cleanupStaleSockets() {
@@ -195,6 +212,13 @@ func InitializeBluezManager() error {
 	bluezManager = manager
 
 	log.Info("Bluez manager initialized")
+	return nil
+}
+
+func InitializeAppPickerManager() error {
+	manager := apppicker.NewManager()
+	appPickerManager = manager
+	log.Info("AppPicker manager initialized")
 	return nil
 }
 
@@ -355,6 +379,10 @@ func getCapabilities() Capabilities {
 		caps = append(caps, "bluetooth")
 	}
 
+	if appPickerManager != nil {
+		caps = append(caps, "browser")
+	}
+
 	if cupsManager != nil {
 		caps = append(caps, "cups")
 	}
@@ -403,6 +431,10 @@ func getServerInfo() ServerInfo {
 
 	if bluezManager != nil {
 		caps = append(caps, "bluetooth")
+	}
+
+	if appPickerManager != nil {
+		caps = append(caps, "browser")
 	}
 
 	if cupsManager != nil {
@@ -721,6 +753,31 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 		}()
 	}
 
+	if shouldSubscribe("browser") && appPickerManager != nil {
+		wg.Add(1)
+		appPickerChan := appPickerManager.Subscribe(clientID + "-browser")
+		go func() {
+			defer wg.Done()
+			defer appPickerManager.Unsubscribe(clientID + "-browser")
+
+			for {
+				select {
+				case event, ok := <-appPickerChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "browser.open_requested", Data: event}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
 	if shouldSubscribe("cups") {
 		cupsSubscribers.Store(clientID+"-cups", true)
 		count := cupsSubscriberCount.Add(1)
@@ -1015,6 +1072,9 @@ func cleanupManagers() {
 	if bluezManager != nil {
 		bluezManager.Close()
 	}
+	if appPickerManager != nil {
+		appPickerManager.Close()
+	}
 	if cupsManager != nil {
 		cupsManager.Close()
 	}
@@ -1252,6 +1312,8 @@ func Start(printDocs bool) error {
 			notifyCapabilityChange()
 		}
 	}()
+
+	InitializeAppPickerManager()
 
 	if err := InitializeDwlManager(); err != nil {
 		log.Debugf("DWL manager unavailable: %v", err)

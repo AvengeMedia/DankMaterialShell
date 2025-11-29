@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=DMS Application Picker
+Comment=Select an application to open links and files
+Exec=dms open %u
+Icon=danklogo
+Terminal=false
+NoDisplay=true
+MimeType=x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/file;text/html;
+Categories=Utility;

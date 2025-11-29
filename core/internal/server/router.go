@@ -5,6 +5,7 @@ import (
 	"net"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
@@ -93,6 +94,20 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			Params: req.Params,
 		}
 		bluez.HandleRequest(conn, bluezReq, bluezManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "browser.") || strings.HasPrefix(req.Method, "apppicker.") {
+		if appPickerManager == nil {
+			models.RespondError(conn, req.ID, "apppicker manager not initialized")
+			return
+		}
+		appPickerReq := apppicker.Request{
+			ID:     req.ID,
+			Method: req.Method,
+			Params: req.Params,
+		}
+		apppicker.HandleRequest(conn, appPickerReq, appPickerManager)
 		return
 	}
 
