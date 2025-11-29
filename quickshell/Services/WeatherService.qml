@@ -6,12 +6,14 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Common
+import '../Common/suncalc.js' as SunCalc
 
 Singleton {
     id: root
 
     property int refCount: 0
 
+    property var selectedDate: new Date()
     property var weather: ({
                                "available": false,
                                "loading": true,
@@ -118,19 +120,19 @@ Singleton {
     function getWeatherCondition(code) {
         const conditions = {
             "0": "Clear",
-            "1": "Clear", 
+            "1": "Clear",
             "2": "Partly cloudy",
             "3": "Overcast",
             "45": "Fog",
             "48": "Fog",
             "51": "Drizzle",
-            "53": "Drizzle", 
+            "53": "Drizzle",
             "55": "Drizzle",
             "56": "Freezing drizzle",
             "57": "Freezing drizzle",
             "61": "Light rain",
             "63": "Rain",
-            "65": "Heavy rain", 
+            "65": "Heavy rain",
             "66": "Light rain",
             "67": "Heavy rain",
             "71": "Light snow",
@@ -149,6 +151,214 @@ Singleton {
         return conditions[String(code)] || "Unknown"
     }
 
+
+    property var moonWeatherIcons: ({
+                                       "0":  "",
+                                       "1":  "",
+                                       "2":  "",
+                                       "3":  "",
+                                       "4":  "",
+                                       "5":  "",
+                                       "6":  "",
+                                       "7":  "",
+                                       "8":  "",
+                                       "9":  "",
+                                       "10": "",
+                                       "11": "",
+                                       "12": "",
+                                       "13": "",
+                                       "14": "",
+                                       "15": "",
+                                       "16": "",
+                                       "17": "",
+                                       "18": "",
+                                       "19": "",
+                                       "20": "",
+                                       "21": "",
+                                       "22": "",
+                                       "23": "",
+                                       "24": "",
+                                       "25": "",
+                                       "26": "",
+                                       "27": "",
+                                   })
+
+    property var moonMaterialIcons: ({
+                                        "0":  "󰽤",
+                                        "1":  "󰽧",
+                                        "2":  "󰽡",
+                                        "3":  "󰽦",
+                                        "4":  "󰽢",
+                                        "5":  "󰽨",
+                                        "6":  "󰽣",
+                                        "7":  "󰽥",
+                                    })
+
+    function getMoonPhase(date) {
+        const icons = moonWeatherIcons // more icons in this set but thinner outline than material icons
+        // const icons = moonMaterialIcons
+        const iconCount = Object.keys(icons).length
+        const moon = SunCalc.getMoonIllumination(date)
+        const index = ((Math.floor(moon.phase * iconCount + 0.5) % iconCount) + iconCount) % iconCount
+
+        return icons[index]
+    }
+
+    function getMoonAngle(date) {
+        if (!location) { return }
+        const pos = SunCalc.getMoonPosition(date, location.latitude, location.longitude)
+        return pos.parralacticAngle
+    }
+
+    function getLocation() {
+        return location
+    }
+
+    function getSunDeclination(date) {
+        return SunCalc.sunCoords(SunCalc.toDays(date)).dec*180/Math.PI
+    }
+
+    function getSunTimes(date) {
+        if (!location) { return null }
+        return SunCalc.getTimes(date, location.latitude, location.longitude, location.elevation)
+    }
+
+    function getEcliptic(date, points = 60) {
+        if (!location) { return null }
+        const lat = location.latitude
+        const lon = location.longitude
+        const times = SunCalc.getTimes(date, lat, lon);
+        const solarNoon = times.solarNoon;
+
+        const eclipticPoints = [];
+
+        const sunIsNorth = getSunDeclination(date) > lat
+        const transitAzimuth = sunIsNorth ? 0 : Math.PI
+
+        for (let i = 0; i <= points; i++) {
+            const t = new Date(solarNoon.getTime() + (i/points) * 24 * 60 * 60 * 1000);
+            const pos = SunCalc.getPosition(t, lat, lon);
+
+            let h = (((pos.azimuth - transitAzimuth) / (2*Math.PI)) + 1) % 1
+            h = Math.max(0, Math.min(1, h))
+            let v = Math.sin(pos.altitude)
+            v = Math.max(-1, Math.min(1, v))
+
+            eclipticPoints.push({ h, v });
+        }
+
+        const sortedEntries = eclipticPoints.sort((a, b) => a.h - b.h);
+        return sortedEntries
+    }
+
+    function getCurrentSunTime(date) {
+        const times = getSunTimes(date)
+        if (!times) { return }
+        const dateObj = new Date(date)
+
+        const periods = [
+            { name: I18n.tr("Dawn (Astronomical Twilight)"), start: new Date(times.nightEnd),      end: new Date(times.nauticalDawn) },
+            { name: I18n.tr("Dawn (Nautical Twilight)"),     start: new Date(times.nauticalDawn),  end: new Date(times.dawn) },
+            { name: I18n.tr("Dawn (Civil Twilight)"),        start: new Date(times.dawn),          end: new Date(times.sunrise) },
+            { name: I18n.tr("Sunrise"),                      start: new Date(times.sunrise),       end: new Date(times.sunriseEnd) },
+            { name: I18n.tr("Golden Hour"),                  start: new Date(times.sunriseEnd),    end: new Date(times.goldenHourEnd) },
+            { name: I18n.tr("Morning"),                      start: new Date(times.goldenHourEnd), end: new Date(times.solarNoon) },
+            { name: I18n.tr("Afternoon"),                    start: new Date(times.solarNoon),     end: new Date(times.goldenHour) },
+            { name: I18n.tr("Golden Hour"),                  start: new Date(times.goldenHour),    end: new Date(times.sunsetStart) },
+            { name: I18n.tr("Sunset"),                       start: new Date(times.sunsetStart),   end: new Date(times.sunset) },
+            { name: I18n.tr("Dusk (Civil Twighlight)"),      start: new Date(times.sunset),        end: new Date(times.dusk) },
+            { name: I18n.tr("Dusk (Nautical Twilight)"),     start: new Date(times.dusk),          end: new Date(times.nauticalDusk) },
+            { name: I18n.tr("Dusk (Astronomical Twilight)"), start: new Date(times.nauticalDusk),  end: new Date(times.night) },
+        ]
+
+        const sunrise = new Date(times.nightEnd)
+        const sunset = new Date(times.night)
+        const dayPercent = dateObj > sunrise && dateObj < sunset ? (dateObj - sunrise) / (sunset - sunrise) : 0
+
+        for (let i = 0; i < periods.length; i++) {
+            const { name, start, end } = periods[i]
+            if (dateObj >= start && dateObj < end) {
+                const percent = (dateObj - start) / (end - start)
+                return { period: name, periodIndex: i, periodPercent: Math.min(Math.max(percent, 0), 1), dayPercent: dayPercent }
+            }
+        }
+
+        return { period: I18n.tr("Night"), periodIndex: 0, periodPercent: 0, dayPercent: dayPercent }
+    }
+
+    function getSkyArcPosition(date, isSun) {
+        if (!location) { return null }
+        const lat = location.latitude
+        const lon = location.longitude
+
+        const pos = isSun
+          ? SunCalc.getPosition(date, lat, lon)
+          : SunCalc.getMoonPosition(date, lat, lon)
+
+        const sunIsNorth = getSunDeclination(date) > lat
+        const transitAzimuth = sunIsNorth ? 0 : Math.PI
+
+        let h = (((pos.azimuth - transitAzimuth) / (2*Math.PI)) + 1) % 1
+        h = Math.max(0, Math.min(1, h))
+        // let v = pos.altitude / (Math.PI/2)
+        let v = Math.sin(pos.altitude)
+        v = Math.max(-1, Math.min(1, v))
+
+        return { h, v }
+    }
+
+    function formatTemp(celcius, includeUnits=true, unitsShort=true) {
+        if (celcius == null) { return null }
+        const value = SettingsData.useFahrenheit ? Math.round(celcius * (9/5) + 32) : celcius
+        const unit = unitsShort ? "°" : (SettingsData.useFahrenheit ? "°F" : "°C")
+        return includeUnits ? value + unit : value
+    }
+
+    function formatSpeed(kmh, includeUnits=true) {
+        if (kmh == null) { return null }
+        const value = SettingsData.useFahrenheit ? Math.round(kmh * 0.621371) : kmh
+        const unit = SettingsData.useFahrenheit ? "mph" : "km/h"
+        return includeUnits ? value + " " + unit : value
+    }
+
+    function formatPressure(hpa, includeUnits=true) {
+        if (hpa == null) { return null }
+        const value = SettingsData.useFahrenheit ? (hpa * 0.02953).toFixed(2) : hpa
+        const unit = SettingsData.useFahrenheit ? "inHg" : "hPa"
+        return includeUnits ? value + " " + unit : value
+    }
+
+    function formatPercent(percent, includeUnits=true) {
+        if (percent == null) { return null }
+        const value = percent
+        const unit = "%"
+        return includeUnits ? value + unit : value
+    }
+
+    function formatVisibility(distance) {
+        if (distance == null) { return null }
+        var value;
+        var unit;
+        if (SettingsData.useFahrenheit) {
+            value = (distance / 1609.344).toFixed(1)
+            unit = "mi"
+            if (value < 1) {
+                value = Math.round(value * 5280 / 50) * 50
+                unit = "ft"
+            }
+        } else {
+            value = distance
+            unit = "m"
+            if (value > 1000) {
+                value = (value / 1000).toFixed(1)
+                unit = "km"
+            }
+
+        }
+
+        return value + " " + unit
+    }
+
     function formatTime(isoString) {
         if (!isoString) return "--"
 
@@ -159,6 +369,18 @@ Singleton {
         } catch (e) {
             return "--"
         }
+    }
+
+    function calendarDayDifference(date1, date2) {
+        const d1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
+        const d2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
+        return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+    }
+
+    function calendarHourDifference(date1, date2) {
+        const d1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate(), date1.getHours());
+        const d2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate(), date2.getHours());
+        return Math.floor((d2 - d1) / (1000 * 60 * 60));
     }
 
     function formatForecastDay(isoString, index) {
@@ -186,6 +408,7 @@ Singleton {
             "longitude=" + location.longitude,
             "current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,surface_pressure,wind_speed_10m",
             "daily=sunrise,sunset,temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max",
+            "hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m,apparent_temperature,relative_humidity_2m,surface_pressure,visibility,cloud_cover",
             "timezone=auto",
             "forecast_days=7"
         ]
@@ -426,7 +649,8 @@ Singleton {
                         city: result.name,
                         country: result.country,
                         latitude: result.latitude,
-                        longitude: result.longitude
+                        longitude: result.longitude,
+                        elevation: data.elevation
                     }
 
                     fetchWeather()
@@ -458,26 +682,54 @@ Singleton {
                 try {
                     const data = JSON.parse(raw)
 
-                    if (!data.current || !data.daily) {
+                    if (!data.current || !data.daily || !data.hourly) {
                         throw new Error("Required weather data fields missing")
                     }
 
-                    const current = data.current
+                    const hourly = data.hourly
+                    const hourly_forecast = []
+                    if (hourly.time && hourly.time.length > 0) {
+                        for (let i = 0; i < hourly.time.length; i++) {
+                            const tempMinC = hourly.temperature_2m_min?.[i] || 0
+                            const tempMaxC = hourly.temperature_2m_max?.[i] || 0
+                            const tempMinF = tempMinC * 9/5 + 32
+                            const tempMaxF = tempMaxC * 9/5 + 32
+
+                            const tempC = hourly.temperature_2m?.[i] || 0
+                            const tempF = tempC * 9/5 + 32
+                            const feelsLikeC = hourly.apparent_temperature?.[i] || tempC
+                            const feelsLikeF = feelsLikeC * 9/5 + 32
+
+                            const sunrise = new Date(data.daily.sunrise?.[Math.floor(i/24)])
+                            const sunset = new Date(data.daily.sunset?.[Math.floor(i/24)])
+                            const time = new Date(hourly.time[i])
+                            const isDay = sunrise < time && time < sunset
+
+                            hourly_forecast.push({
+                                "time": formatTime(hourly.time[i]),
+                                "temp": Math.round(tempC),
+                                "tempF": Math.round(tempF),
+                                "feelsLike": Math.round(feelsLikeC),
+                                "feelsLikeF": Math.round(feelsLikeF),
+                                "wCode": hourly.weather_code?.[i] || 0,
+                                "humidity": Math.round(hourly.relative_humidity_2m?.[i] || 0),
+                                "wind": Math.round(hourly.wind_speed_10m?.[i] || 0),
+                                "pressure": Math.round(hourly.surface_pressure?.[i] || 0),
+                                "precipitationProbability": Math.round(hourly.precipitation_probability_max?.[0] || 0),
+                                "visibility": Math.round(hourly.visibility?.[i] || 0),
+                                "isDay": isDay
+                            })
+                        }
+                    }
+
                     const daily = data.daily
-                    const currentUnits = data.current_units || {}
-
-                    const tempC = current.temperature_2m || 0
-                    const tempF = (tempC * 9/5 + 32)
-                    const feelsLikeC = current.apparent_temperature || tempC
-                    const feelsLikeF = (feelsLikeC * 9/5 + 32)
-
                     const forecast = []
                     if (daily.time && daily.time.length > 0) {
-                        for (let i = 0; i < Math.min(daily.time.length, 7); i++) {
+                        for (let i = 0; i < daily.time.length; i++) {
                             const tempMinC = daily.temperature_2m_min?.[i] || 0
                             const tempMaxC = daily.temperature_2m_max?.[i] || 0
-                            const tempMinF = (tempMinC * 9/5 + 32)
-                            const tempMaxF = (tempMaxC * 9/5 + 32)
+                            const tempMinF = tempMinC * 9/5 + 32
+                            const tempMaxF = tempMaxC * 9/5 + 32
 
                             forecast.push({
                                 "day": formatForecastDay(daily.time[i], i),
@@ -492,6 +744,14 @@ Singleton {
                             })
                         }
                     }
+
+                    const current = data.current
+                    const currentUnits = data.current_units || {}
+
+                    const tempC = current.temperature_2m || 0
+                    const tempF = tempC * 9/5 + 32
+                    const feelsLikeC = current.apparent_temperature || tempC
+                    const feelsLikeF = feelsLikeC * 9/5 + 32
 
                     root.weather = {
                         "available": true,
@@ -511,12 +771,9 @@ Singleton {
                         "pressure": Math.round(current.surface_pressure || 0),
                         "precipitationProbability": Math.round(daily.precipitation_probability_max?.[0] || 0),
                         "isDay": Boolean(current.is_day),
-                        "forecast": forecast
+                        "forecast": forecast,
+                        "hourlyForecast": hourly_forecast
                     }
-
-                    const displayTemp = SettingsData.useFahrenheit ? root.weather.tempF : root.weather.temp
-                    const unit = SettingsData.useFahrenheit ? "°F" : "°C"
-
                     root.handleWeatherSuccess()
                 } catch (e) {
                     root.handleWeatherFailure()
