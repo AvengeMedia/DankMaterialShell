@@ -462,12 +462,12 @@ Item {
                 onItemRightClicked: (index, modelData, mouseX, mouseY) => {
                     const menu = usePopupContextMenu ? popupContextMenu : layerContextMenuLoader.item;
                     
-                    if (menu && menu.show) {
+                    if (menu?.show) {
                         const isPopup = menu.contentItem !== undefined;
                         
                         if (isPopup) {
                             const localPos = popupContextMenu.parent.mapFromItem(null, mouseX, mouseY);
-                            menu.show(localPos.x, localPos.y, modelData);
+                            menu.show(localPos.x, localPos.y, modelData, false);
                         } else {
                             menu.show(mouseX, mouseY, modelData, false);
                         }

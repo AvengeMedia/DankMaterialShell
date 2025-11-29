@@ -108,7 +108,7 @@ Rectangle {
             }
         }
         onPressAndHold: mouse => {
-            if (mouse.button === Qt.RightButton && !root.isPlugin) {
+            if (!root.isPlugin) {
                 const globalPos = mapToItem(null, mouse.x, mouse.y)
                 root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y)
             }

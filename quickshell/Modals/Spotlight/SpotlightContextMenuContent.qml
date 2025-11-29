@@ -281,9 +281,6 @@ Item {
                                     keyboardNavigation = false;
                                     selectedMenuIndex = itemIndex;
                                 }
-                                onExited: {
-                                    keyboardNavigation = true;
-                                }
                                 onClicked: modelData.action
                             }
                         }
