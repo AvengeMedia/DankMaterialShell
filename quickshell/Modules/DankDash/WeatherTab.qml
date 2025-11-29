@@ -1,12 +1,9 @@
 import QtQuick
 import QtQuick.Effects
-import QtQuick.Layouts
 import QtQuick.Shapes
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
-import qs.Modules
 import qs.Modules.DankBar.Widgets
 
 Item {
@@ -17,54 +14,41 @@ Item {
     property bool syncing: false
 
     function syncFrom(type) {
-        if (!dailyLoader.item || !hourlyLoader.item) { return }
-        const hourlyList = hourlyLoader.item
-        const dailyList = dailyLoader.item
-        syncing = true
+        if (!dailyLoader.item || !hourlyLoader.item) {
+            return;
+        }
+        const hourlyList = hourlyLoader.item;
+        const dailyList = dailyLoader.item;
+        syncing = true;
 
         try {
             if (type === "hour") {
-                const date = new Date()
-                date.setHours(hourlyList.currentIndex - 1)
-                dateStepper.currentDate = date
+                const date = new Date();
+                date.setHours(hourlyList.currentIndex - 1);
+                dateStepper.currentDate = date;
 
-                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1,
-                    WeatherService.calendarDayDifference((new Date()), date) + 1
-                ))
+                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1, WeatherService.calendarDayDifference((new Date()), date) + 1));
             } else if (type === "day") {
-                const date = new Date(dateStepper.currentDate)
-                date.setMonth((new Date()).getMonth())
-                date.setDate((new Date()).getDate() + dailyList.currentIndex - 1)
-                dateStepper.currentDate = date
+                const date = new Date(dateStepper.currentDate);
+                date.setMonth((new Date()).getMonth());
+                date.setDate((new Date()).getDate() + dailyList.currentIndex - 1);
+                dateStepper.currentDate = date;
 
-                const hourIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1,
-                    WeatherService.calendarHourDifference((new Date()), date) + (new Date).getHours() + 1
-                ))
-                hourlyList.currentIndex = hourIndex
+                const hourIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date).getHours() + 1));
+                hourlyList.currentIndex = hourIndex;
             } else if (type === "date") {
-                const date = dateStepper.currentDate
-                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1,
-                    WeatherService.calendarDayDifference((new Date()), date) + 1
-                ))
-                hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1,
-                    WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours() + 1,
-                ))
+                const date = dateStepper.currentDate;
+                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1, WeatherService.calendarDayDifference((new Date()), date) + 1));
+                hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours() + 1));
             }
         } catch (e) {
-            console.warn("Weather Date Sync Error:", e)
+            console.warn("Weather Date Sync Error:", e);
         }
 
-        syncing = false
+        syncing = false;
     }
 
     property bool available: WeatherService.weather.available
-    onAvailableChanged: {
-        if (!available || !dailyLoader.item || !hourlyLoader.item) { return }
-        const hourlyList = hourlyLoader.item
-        const dailyList = dailyLoader.item
-        dailyList.currentIndex = dailyList.initialIndex
-        hourlyList.currentIndex = hourlyList.initialIndex
-    }
 
     Column {
         anchors.centerIn: parent
@@ -77,7 +61,6 @@ Item {
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.5)
             anchors.horizontalCenter: parent.horizontalCenter
         }
-
 
         Row {
             width: refreshButtonTwo.width + refreshText.width
@@ -115,24 +98,24 @@ Item {
                         interval: 1000
                         repeat: false
                         onTriggered: {
-                            const p = refreshButtonMouseAreaTwo.mapToItem(null, parent.width / 2, parent.height + Theme.spacingXS)
-                            refreshButtonTooltipTwo.show(I18n.tr("Refresh Weather"), p.x, p.y, null)
+                            const p = refreshButtonMouseAreaTwo.mapToItem(null, parent.width / 2, parent.height + Theme.spacingXS);
+                            refreshButtonTooltipTwo.show(I18n.tr("Refresh Weather"), p.x, p.y, null);
                         }
                     }
 
                     onEntered: {
-                        hoverDelayTwo.restart()
+                        hoverDelayTwo.restart();
                     }
 
                     onExited: {
-                        hoverDelayTwo.stop()
-                        refreshButtonTooltipTwo.hide()
+                        hoverDelayTwo.stop();
+                        refreshButtonTooltipTwo.hide();
                     }
 
                     onClicked: {
-                        refreshButtonTwo.isRefreshing = true
-                        WeatherService.forceRefresh()
-                        refreshTimerTwo.restart()
+                        refreshButtonTwo.isRefreshing = true;
+                        WeatherService.forceRefresh();
+                        refreshTimerTwo.restart();
                     }
                 }
 
@@ -234,7 +217,7 @@ Item {
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
                                         if (WeatherService.weather.available) {
-                                            SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit)
+                                            SettingsData.set("useFahrenheit", !SettingsData.useFahrenheit);
                                         }
                                     }
                                     enabled: WeatherService.weather.available
@@ -318,22 +301,22 @@ Item {
 
                     readonly property var changeDate: (magnitudeIndex, sign) => {
                         switch (magnitudeIndex) {
-                            case 0:
-                                break
-                            case 1:
-                                var newDate = new Date(dateStepper.currentDate)
-                                newDate.setMonth(dateStepper.currentDate.getMonth() + sign*1)
-                                dateStepper.currentDate = newDate
-                                break
-                            case 2:
-                                dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign*24*3600*1000)
-                                break
-                            case 3:
-                                dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign*3600*1000)
-                                break
-                            case 4:
-                                dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign*5*60*1000)
-                                break
+                        case 0:
+                            break;
+                        case 1:
+                            var newDate = new Date(dateStepper.currentDate);
+                            newDate.setMonth(dateStepper.currentDate.getMonth() + sign * 1);
+                            dateStepper.currentDate = newDate;
+                            break;
+                        case 2:
+                            dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign * 24 * 3600 * 1000);
+                            break;
+                        case 3:
+                            dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign * 3600 * 1000);
+                            break;
+                        case 4:
+                            dateStepper.currentDate = new Date(dateStepper.currentDate.getTime() + sign * 5 * 60 * 1000);
+                            break;
                         }
                     }
                     readonly property var splitDate: Qt.formatDateTime(dateStepper.currentDate, "yyyy.MM.dd.hh.mm.AP").split('.')
@@ -343,7 +326,7 @@ Item {
                         anchors.fill: parent
                         anchors.verticalCenter: parent.verticalCenter
                         readonly property var space: Theme.spacingXS
-                        width: yearStepper.width + monthStepper.width + dayStepper.width + hourStepper.width + minuteStepper.width + suffix.width + 10.5*space + 2*dateStepperInnerPadding.width
+                        width: yearStepper.width + monthStepper.width + dayStepper.width + hourStepper.width + minuteStepper.width + suffix.width + 10.5 * space + 2 * dateStepperInnerPadding.width
 
                         Item {
                             id: dateStepperInnerPadding
@@ -384,7 +367,7 @@ Item {
                             id: hourStepper
                             width: implicitWidth
                             anchors.left: dayStepper.right
-                            anchors.leftMargin: 1.5*parent.space
+                            anchors.leftMargin: 1.5 * parent.space
                             text: dateStepper.splitDate[3]
                             onIncrement: () => dateStepper.changeDate(3, +1)
                             onDecrement: () => dateStepper.changeDate(3, -1)
@@ -434,14 +417,14 @@ Item {
                             id: suffix
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: minuteStepper.right
-                            anchors.leftMargin: 2*parent.space
+                            anchors.leftMargin: 2 * parent.space
                             StyledText {
                                 isMonospace: true
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: dateStepper.splitDate[5]
                                 font.pixelSize: Theme.fontSizeSmall
-                                x: -Theme.fontSizeSmall/2
-                                y: -Theme.fontSizeSmall/2
+                                x: -Theme.fontSizeSmall / 2
+                                y: -Theme.fontSizeSmall / 2
                             }
                         }
                         DankActionButton {
@@ -453,11 +436,14 @@ Item {
                             iconSize: 12
                             buttonSize: 20
                             iconName: "replay"
-                            onClicked: { dateStepper.currentDate = new Date() }
+                            onClicked: {
+                                dateStepper.currentDate = new Date();
+                            }
                         }
                     }
 
-                    onCurrentDateChanged: if (!syncing) root.syncFrom("date")
+                    onCurrentDateChanged: if (!syncing)
+                        root.syncFrom("date")
                 }
             }
 
@@ -471,51 +457,49 @@ Item {
                 property var sunTime: WeatherService.getCurrentSunTime(dateStepper.currentDate)
                 property var periodIndex: sunTime?.periodIndex
                 property var periodPercent: sunTime?.periodPercent
-                property var blackColor: Theme.blend(Theme.surface, Qt.rgba(0,0,0,255), 0.2)
+                property var blackColor: Theme.blend(Theme.surface, Qt.rgba(0, 0, 0, 255), 0.2)
                 property var redColor: Theme.secondary
                 property var blueColor: Theme.primary
                 function blackBlue(r) {
-                    return Theme.blend(blackColor, blueColor, r)
+                    return Theme.blend(blackColor, blueColor, r);
                 }
                 property var topColor: {
-                    const colorMap = [
-                        blackColor,                             // "night"
-                        Theme.withAlpha(blackBlue(0.0), 0.8),   // "astronomicalTwilight"
-                        Theme.withAlpha(blackBlue(0.2), 0.7),   // "nauticalTwilight"
-                        Theme.withAlpha(blackBlue(0.5), 0.6),   // "civilTwilight"
-                        Theme.withAlpha(blackBlue(0.7), 0.6),   // "sunrise"
-                        Theme.withAlpha(blackBlue(0.9), 0.6),   // "goldenHourMorning"
-                        Theme.withAlpha(blackBlue(1.0), 0.6),   // "daytime"
-                        Theme.withAlpha(blackBlue(0.9), 0.6),   // "afternoon"
-                        Theme.withAlpha(blackBlue(0.7), 0.6),   // "goldenHourEvening"
-                        Theme.withAlpha(blackBlue(0.5), 0.6),   // "sunset"
-                        Theme.withAlpha(blackBlue(0.2), 0.7),   // "civilTwilight"
-                        Theme.withAlpha(blackBlue(0.0), 0.8),   // "nauticalTwilightEvening"
-                        blackColor,                             // "astronomicalTwilightEvening"
-                        blackColor,                             // "night"
-                    ]
-                    const index = periodIndex ?? 0
-                    return Theme.blend(colorMap[index], colorMap[index + 1], periodPercent ?? 0)
+                    const colorMap = [blackColor                             // "night"
+                        , Theme.withAlpha(blackBlue(0.0), 0.8)   // "astronomicalTwilight"
+                        , Theme.withAlpha(blackBlue(0.2), 0.7)   // "nauticalTwilight"
+                        , Theme.withAlpha(blackBlue(0.5), 0.6)   // "civilTwilight"
+                        , Theme.withAlpha(blackBlue(0.7), 0.6)   // "sunrise"
+                        , Theme.withAlpha(blackBlue(0.9), 0.6)   // "goldenHourMorning"
+                        , Theme.withAlpha(blackBlue(1.0), 0.6)   // "daytime"
+                        , Theme.withAlpha(blackBlue(0.9), 0.6)   // "afternoon"
+                        , Theme.withAlpha(blackBlue(0.7), 0.6)   // "goldenHourEvening"
+                        , Theme.withAlpha(blackBlue(0.5), 0.6)   // "sunset"
+                        , Theme.withAlpha(blackBlue(0.2), 0.7)   // "civilTwilight"
+                        , Theme.withAlpha(blackBlue(0.0), 0.8)   // "nauticalTwilightEvening"
+                        , blackColor                             // "astronomicalTwilightEvening"
+                        , blackColor                             // "night"
+                        ,];
+                    const index = periodIndex ?? 0;
+                    return Theme.blend(colorMap[index], colorMap[index + 1], periodPercent ?? 0);
                 }
                 property var sunColor: {
-                    const colorMap = [
-                        Theme.withAlpha(redColor, 0.05),   // "night"
-                        Theme.withAlpha(redColor, 0.1),    // "astronomicalTwilight"
-                        Theme.withAlpha(redColor, 0.3),    // "nauticalTwilight"
-                        Theme.withAlpha(redColor, 0.4),    // "civilTwilight"
-                        Theme.withAlpha(redColor, 0.5),    // "sunrise"
-                        Theme.withAlpha(blueColor, 0.2),   // "goldenHourMorning"
-                        Theme.withAlpha(blueColor, 0.0),   // "daytime"
-                        Theme.withAlpha(blueColor, 0.2),   // "afternoon"
-                        Theme.withAlpha(redColor, 0.5),    // "goldenHourEvening"
-                        Theme.withAlpha(redColor, 0.4),    // "sunset"
-                        Theme.withAlpha(redColor, 0.3),    // "civilTwilight"
-                        Theme.withAlpha(redColor, 0.1),    // "nauticalTwilightEvening"
-                        Theme.withAlpha(redColor, 0.05),   // "astronomicalTwilightEvening"
-                        Theme.withAlpha(redColor, 0.0),    // "night"
-                    ]
-                    const index = periodIndex ?? 0
-                    return Theme.blend(colorMap[index], colorMap[index + 1], periodPercent ?? 0)
+                    const colorMap = [Theme.withAlpha(redColor, 0.05)   // "night"
+                        , Theme.withAlpha(redColor, 0.1)    // "astronomicalTwilight"
+                        , Theme.withAlpha(redColor, 0.3)    // "nauticalTwilight"
+                        , Theme.withAlpha(redColor, 0.4)    // "civilTwilight"
+                        , Theme.withAlpha(redColor, 0.5)    // "sunrise"
+                        , Theme.withAlpha(blueColor, 0.2)   // "goldenHourMorning"
+                        , Theme.withAlpha(blueColor, 0.0)   // "daytime"
+                        , Theme.withAlpha(blueColor, 0.2)   // "afternoon"
+                        , Theme.withAlpha(redColor, 0.5)    // "goldenHourEvening"
+                        , Theme.withAlpha(redColor, 0.4)    // "sunset"
+                        , Theme.withAlpha(redColor, 0.3)    // "civilTwilight"
+                        , Theme.withAlpha(redColor, 0.1)    // "nauticalTwilightEvening"
+                        , Theme.withAlpha(redColor, 0.05)   // "astronomicalTwilightEvening"
+                        , Theme.withAlpha(redColor, 0.0)    // "night"
+                        ,];
+                    const index = periodIndex ?? 0;
+                    return Theme.blend(colorMap[index], colorMap[index + 1], periodPercent ?? 0);
                 }
 
                 color: "transparent"
@@ -525,21 +509,42 @@ Item {
                     opacity: skyBox.backgroundOpacity
 
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: Theme.withAlpha(skyBox.blackColor, 0.0) }
-                        GradientStop { position: 0.05; color: skyBox.topColor }
-                        GradientStop { position: 0.3; color: skyBox.topColor }
-                        GradientStop { position: 0.5; color: skyBox.topColor }
-                        GradientStop { position: 0.501; color: skyBox.blackColor }
-                        GradientStop { position: 0.9; color: skyBox.blackColor }
-                        GradientStop { position: 1.0; color: Theme.withAlpha(skyBox.blackColor, 0.0) }
+                        GradientStop {
+                            position: 0.0
+                            color: Theme.withAlpha(skyBox.blackColor, 0.0)
+                        }
+                        GradientStop {
+                            position: 0.05
+                            color: skyBox.topColor
+                        }
+                        GradientStop {
+                            position: 0.3
+                            color: skyBox.topColor
+                        }
+                        GradientStop {
+                            position: 0.5
+                            color: skyBox.topColor
+                        }
+                        GradientStop {
+                            position: 0.501
+                            color: skyBox.blackColor
+                        }
+                        GradientStop {
+                            position: 0.9
+                            color: skyBox.blackColor
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: Theme.withAlpha(skyBox.blackColor, 0.0)
+                        }
                     }
                 }
 
                 property var currentDate: dateStepper.currentDate
                 property var hMargin: 0
                 property var vMargin: Theme.spacingM
-                property var effectiveHeight: skyBox.height - 2*vMargin
-                property var effectiveWidth: skyBox.width - 2*hMargin
+                property var effectiveHeight: skyBox.height - 2 * vMargin
+                property var effectiveWidth: skyBox.width - 2 * hMargin
 
                 StyledText {
                     text: parent.sunTime?.period ?? ""
@@ -554,29 +559,50 @@ Item {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    height: parent.height/2
+                    height: parent.height / 2
                     opacity: skyBox.backgroundOpacity
 
                     ShapePath {
                         strokeColor: "transparent"
                         fillGradient: RadialGradient {
-                            centerX: skyBox.hMargin + sun.x + sun.width/2
+                            centerX: skyBox.hMargin + sun.x + sun.width / 2
                             centerY: skyBox.vMargin + sun.y + 30
                             centerRadius: {
-                                const a = Math.abs((skyBox.sunTime?.dayPercent ?? 0) - 0.5)
-                                const out = 200 * (0.5 - a*a)
-                                return out
+                                const a = Math.abs((skyBox.sunTime?.dayPercent ?? 0) - 0.5);
+                                const out = 200 * (0.5 - a * a);
+                                return out;
                             }
-                            focalX: skyBox.hMargin + sun.x + sun.width/2
+                            focalX: skyBox.hMargin + sun.x + sun.width / 2
                             focalY: skyBox.vMargin + sun.y
-                            GradientStop { position: 0; color: skyBox.sunColor }
-                            GradientStop { position: 0.3; color: Theme.blendAlpha(skyBox.sunColor, 0.5) }
-                            GradientStop { position: 1; color: "transparent" }
+                            GradientStop {
+                                position: 0
+                                color: skyBox.sunColor
+                            }
+                            GradientStop {
+                                position: 0.3
+                                color: Theme.blendAlpha(skyBox.sunColor, 0.5)
+                            }
+                            GradientStop {
+                                position: 1
+                                color: "transparent"
+                            }
                         }
-                        PathLine { x: 0; y: 0 }
-                        PathLine { x: skyShape.width; y: 0 }
-                        PathLine { x: skyShape.width; y: skyShape.height }
-                        PathLine { x: 0; y: skyShape.height }
+                        PathLine {
+                            x: 0
+                            y: 0
+                        }
+                        PathLine {
+                            x: skyShape.width
+                            y: 0
+                        }
+                        PathLine {
+                            x: skyShape.width
+                            y: skyShape.height
+                        }
+                        PathLine {
+                            x: 0
+                            y: skyShape.height
+                        }
                     }
 
                     ShapePath {
@@ -586,19 +612,42 @@ Item {
                             centerY: sun.y
                             centerRadius: 500
                             focalX: centerX
-                            focalY: centerY + 0.99*(centerRadius - focalRadius)
+                            focalY: centerY + 0.99 * (centerRadius - focalRadius)
                             focalRadius: 10
-                            GradientStop { position: 0; color: skyBox.sunColor }
-                            GradientStop { position: 0.45; color: skyBox.sunColor }
-                            GradientStop { position: 0.55; color: "transparent" }
-                            GradientStop { position: 1; color: "transparent" }
+                            GradientStop {
+                                position: 0
+                                color: skyBox.sunColor
+                            }
+                            GradientStop {
+                                position: 0.45
+                                color: skyBox.sunColor
+                            }
+                            GradientStop {
+                                position: 0.55
+                                color: "transparent"
+                            }
+                            GradientStop {
+                                position: 1
+                                color: "transparent"
+                            }
                         }
-                        PathLine { x: 0; y: 0 }
-                        PathLine { x: skyShape.width; y: 0 }
-                        PathLine { x: skyShape.width; y: skyShape.height }
-                        PathLine { x: 0; y: skyShape.height }
+                        PathLine {
+                            x: 0
+                            y: 0
+                        }
+                        PathLine {
+                            x: skyShape.width
+                            y: 0
+                        }
+                        PathLine {
+                            x: skyShape.width
+                            y: skyShape.height
+                        }
+                        PathLine {
+                            x: 0
+                            y: skyShape.height
+                        }
                     }
-
                 }
 
                 Canvas {
@@ -607,26 +656,26 @@ Item {
                     property var points: WeatherService.getEcliptic(dateStepper.currentDate)
 
                     function getX(index) {
-                        return points[index].h * skyBox.effectiveWidth + skyBox.hMargin
+                        return points[index].h * skyBox.effectiveWidth + skyBox.hMargin;
                     }
                     function getY(index) {
-                        return points[index].v * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 + skyBox.vMargin
+                        return points[index].v * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 + skyBox.vMargin;
                     }
 
                     onPointsChanged: requestPaint()
 
                     onPaint: {
-                        var ctx = getContext("2d")
-                        ctx.clearRect(0, 0, width, height)
-                        if (!points || points.length === 0) return
-
-                        ctx.beginPath()
-                        ctx.moveTo(getX(0), getY(0))
+                        var ctx = getContext("2d");
+                        ctx.clearRect(0, 0, width, height);
+                        if (!points || points.length === 0)
+                            return;
+                        ctx.beginPath();
+                        ctx.moveTo(getX(0), getY(0));
                         for (var i = 1; i < points.length; i++) {
-                            ctx.lineTo(getX(i), getY(i))
+                            ctx.lineTo(getX(i), getY(i));
                         }
-                        ctx.strokeStyle = Theme.withAlpha(Theme.outline, 0.2)
-                        ctx.stroke()
+                        ctx.strokeStyle = Theme.withAlpha(Theme.outline, 0.2);
+                        ctx.stroke();
                     }
                 }
 
@@ -640,8 +689,8 @@ Item {
                     text: skyBox.solarNoonIsSouth ? "S" : "N"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primary
-                    x: skyBox.width/2 - middle.width/2
-                    y: skyBox.height/2 - middle.height/2
+                    x: skyBox.width / 2 - middle.width / 2
+                    y: skyBox.height / 2 - middle.height / 2
                 }
 
                 StyledText {
@@ -649,8 +698,8 @@ Item {
                     text: skyBox.solarNoonIsSouth ? "E" : "W"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primary
-                    x: skyBox.width/4 - left.width/2
-                    y: skyBox.height/2 - left.height/2
+                    x: skyBox.width / 4 - left.width / 2
+                    y: skyBox.height / 2 - left.height / 2
                 }
 
                 StyledText {
@@ -658,11 +707,12 @@ Item {
                     text: skyBox.solarNoonIsSouth ? "W" : "E"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.primary
-                    x: 3*skyBox.width/4 - right.width/2
-                    y: skyBox.height/2 - right.height/2
+                    x: 3 * skyBox.width / 4 - right.width / 2
+                    y: skyBox.height / 2 - right.height / 2
                 }
 
-                Rectangle { // Rightmost Line
+                Rectangle {
+                    // Rightmost Line
                     height: 1
                     anchors.leftMargin: Theme.spacingS
                     anchors.rightMargin: Theme.spacingS
@@ -672,7 +722,8 @@ Item {
                     color: Theme.outline
                 }
 
-                Rectangle { // Middle Right Line
+                Rectangle {
+                    // Middle Right Line
                     height: 1
                     anchors.leftMargin: Theme.spacingS
                     anchors.rightMargin: Theme.spacingS
@@ -682,7 +733,8 @@ Item {
                     color: Theme.outline
                 }
 
-                Rectangle { // Middle Left Line
+                Rectangle {
+                    // Middle Left Line
                     height: 1
                     anchors.leftMargin: Theme.spacingS
                     anchors.rightMargin: Theme.spacingS
@@ -692,7 +744,8 @@ Item {
                     color: Theme.outline
                 }
 
-                Rectangle { // Leftmost Line
+                Rectangle {
+                    // Leftmost Line
                     height: 1
                     anchors.leftMargin: Theme.spacingS
                     anchors.rightMargin: Theme.spacingS
@@ -711,8 +764,8 @@ Item {
                     visible: !!pos
 
                     property var pos: WeatherService.getSkyArcPosition(skyBox.currentDate, false)
-                    x: (pos?.h ?? 0) * skyBox.effectiveWidth - (moonPhase.width/2) + skyBox.hMargin
-                    y: (pos?.v ?? 0) * -(skyBox.effectiveHeight/2) + skyBox.effectiveHeight/2 - (moonPhase.height/2) + skyBox.vMargin
+                    x: (pos?.h ?? 0) * skyBox.effectiveWidth - (moonPhase.width / 2) + skyBox.hMargin
+                    y: (pos?.v ?? 0) * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 - (moonPhase.height / 2) + skyBox.vMargin
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
@@ -733,8 +786,8 @@ Item {
                     visible: !!pos
 
                     property var pos: WeatherService.getSkyArcPosition(skyBox.currentDate, true)
-                    x: (pos?.h ?? 0) * skyBox.effectiveWidth - (sun.width/2) + skyBox.hMargin
-                    y: (pos?.v ?? 0) * -(skyBox.effectiveHeight/2) + skyBox.effectiveHeight/2 - (sun.height/2) + skyBox.vMargin
+                    x: (pos?.h ?? 0) * skyBox.effectiveWidth - (sun.width / 2) + skyBox.hMargin
+                    y: (pos?.v ?? 0) * -(skyBox.effectiveHeight / 2) + skyBox.effectiveHeight / 2 - (sun.height / 2) + skyBox.vMargin
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
@@ -771,24 +824,24 @@ Item {
                         interval: 1000
                         repeat: false
                         onTriggered: {
-                            const p = refreshButtonMouseArea.mapToItem(null, parent.width / 2, parent.height + Theme.spacingXS)
-                            refreshButtonTooltip.show(I18n.tr("Refresh Weather"), p.x, p.y, null)
+                            const p = refreshButtonMouseArea.mapToItem(null, parent.width / 2, parent.height + Theme.spacingXS);
+                            refreshButtonTooltip.show(I18n.tr("Refresh Weather"), p.x, p.y, null);
                         }
                     }
 
                     onEntered: {
-                        hoverDelay.restart()
+                        hoverDelay.restart();
                     }
 
                     onExited: {
-                        hoverDelay.stop()
-                        refreshButtonTooltip.hide()
+                        hoverDelay.stop();
+                        refreshButtonTooltip.hide();
                     }
 
                     onClicked: {
-                        refreshButton.isRefreshing = true
-                        WeatherService.forceRefresh()
-                        refreshTimer.restart()
+                        refreshButton.isRefreshing = true;
+                        WeatherService.forceRefresh();
+                        refreshTimer.restart();
                     }
                 }
 
@@ -828,7 +881,7 @@ Item {
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - denseButton.width - hourlyHeader.width - 2*parent.spacing
+                width: parent.width - denseButton.width - hourlyHeader.width - 2 * parent.spacing
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
             }
@@ -837,29 +890,29 @@ Item {
                 id: denseButton
                 anchors.verticalCenter: parent.verticalCenter
                 visible: hourlyLoader.item !== null
-                iconName: hourlyLoader.item && hourlyLoader.item.dense
-                          ? "tile_medium"
-                          : "tile_large"
-                onClicked: {
-                    if (hourlyLoader.item)
-                        hourlyLoader.item.dense = !hourlyLoader.item.dense
-                }
+                iconName: SessionData.weatherHourlyDetailed ? "tile_large" : "tile_medium"
+                onClicked: SessionData.setWeatherHourlyDetailed(!SessionData.weatherHourlyDetailed)
             }
-
         }
 
         Item {
             width: parent.width
             height: 100 + Theme.spacingXS
 
-            Component.onCompleted: hourlyLoader.active = true
-
             Loader {
                 id: hourlyLoader
                 anchors.fill: parent
                 sourceComponent: hourlyComponent
-                active: false
+                active: root.visible && root.available
                 asynchronous: true
+                opacity: 0
+                onLoaded: {
+                    root.syncing = true;
+                    item.currentIndex = item.initialIndex;
+                    item.positionViewAtIndex(item.initialIndex, ListView.SnapPosition);
+                    root.syncing = false;
+                    opacity = 1;
+                }
             }
 
             Component {
@@ -869,11 +922,11 @@ Item {
                     width: parent.width
                     height: cardHeight + Theme.spacingXS
                     orientation: ListView.Horizontal
-                    spacing: dense ? 2 : Theme.spacingS
+                    spacing: Theme.spacingS
                     clip: true
                     snapMode: ListView.SnapToItem
                     highlightRangeMode: ListView.StrictlyEnforceRange
-                    highlightMoveDuration: 50
+                    highlightMoveDuration: 0
                     interactive: true
                     contentHeight: cardHeight
                     contentWidth: cardWidth
@@ -881,7 +934,7 @@ Item {
                     property var cardHeight: 100
                     property var cardWidth: ((hourlyList.width + hourlyList.spacing) / hourlyList.visibleCount) - hourlyList.spacing
                     property int initialIndex: (new Date()).getHours() + 1
-                    property bool dense: true
+                    property bool dense: !SessionData.weatherHourlyDetailed
                     property int visibleCount: 8
 
                     model: (WeatherService.weather.hourlyForecast?.length ?? 0) + 2
@@ -893,52 +946,32 @@ Item {
                         daily: false
 
                         date: {
-                            const d = new Date()
-                            d.setHours(index - 1)
-                            return d
+                            const d = new Date();
+                            d.setHours(index - 1);
+                            return d;
                         }
                         forecastData: WeatherService.weather.hourlyForecast?.[index - 1]
                     }
 
-                    MouseArea {
-                        width: hourlyList.width
-                        height: hourlyList.cardHeight
-                        hoverEnabled: true
-                        acceptedButtons: Qt.AllButtons
-
-                        onWheel: {
-                            if (wheel.modifiers & Qt.ShiftModifier) {
-                                // NOTE: this is a way to filter mouse scrolling from trackpad
-                                // it is not perfect, as when a trackpad scrolls a multiple of 120
-                                // in the y-axis and 0 in x-axis it will be treated like mouse
-                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
-                                    const newIndex = hourlyList.currentIndex - Math.sign(wheel.angleDelta.y)
-                                    if (newIndex < hourlyList.model && newIndex >= 0) {
-                                        hourlyList.currentIndex = newIndex
-                                        wheel.accepted = true
-                                    }
-                                }
-                            }
-                            wheel.accepted = false
-                        }
-                    }
-
-                    onCurrentIndexChanged: if (!syncing) root.syncFrom("hour")
-
-                    Component.onCompleted: {
-                        hourlyList.currentIndex = initialIndex
-                    }
+                    onCurrentIndexChanged: if (!syncing)
+                        root.syncFrom("hour")
 
                     states: [
                         State {
                             name: "denseState"
                             when: hourlyList.dense
-                            PropertyChanges { target: hourlyList; visibleCount: 12 }
+                            PropertyChanges {
+                                target: hourlyList
+                                visibleCount: 10
+                            }
                         },
                         State {
                             name: "normalState"
                             when: !hourlyList.dense
-                            PropertyChanges { target: hourlyList; visibleCount: 6 }
+                            PropertyChanges {
+                                target: hourlyList
+                                visibleCount: 5
+                            }
                         }
                     ]
 
@@ -946,16 +979,11 @@ Item {
                         Transition {
                             NumberAnimation {
                                 properties: "visibleCount"
-                                duration: 200
-                                easing.type: Easing.InOutQuad
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
                             }
                         }
                     ]
-
-                    add: Transition {
-                        NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
-                    }
-
                 }
             }
         }
@@ -976,7 +1004,7 @@ Item {
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - denseButton.width - dailyHeader.width - 2*parent.spacing
+                width: parent.width - denseButton.width - dailyHeader.width - 2 * parent.spacing
                 height: 1
                 color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.1)
             }
@@ -986,14 +1014,20 @@ Item {
             width: parent.width
             height: 100 + Theme.spacingXS
 
-            Component.onCompleted: dailyLoader.active = true
-
             Loader {
                 id: dailyLoader
                 anchors.fill: parent
                 sourceComponent: dailyComponent
-                active: false
+                active: root.visible && root.available
                 asynchronous: true
+                opacity: 0
+                onLoaded: {
+                    root.syncing = true;
+                    item.currentIndex = item.initialIndex;
+                    item.positionViewAtIndex(item.initialIndex, ListView.SnapPosition);
+                    root.syncing = false;
+                    opacity = 1;
+                }
             }
 
             Component {
@@ -1007,7 +1041,7 @@ Item {
                     clip: true
                     snapMode: ListView.SnapToItem
                     highlightRangeMode: ListView.StrictlyEnforceRange
-                    highlightMoveDuration: 50
+                    highlightMoveDuration: 0
                     interactive: true
                     contentHeight: cardHeight
                     contentWidth: cardWidth
@@ -1027,70 +1061,15 @@ Item {
                         daily: true
 
                         date: {
-                            const date = new Date()
-                            date.setDate(date.getDate() + index - 1)
-                            return date
+                            const date = new Date();
+                            date.setDate(date.getDate() + index - 1);
+                            return date;
                         }
                         forecastData: WeatherService.weather.forecast?.[index - 1]
                     }
 
-                    MouseArea {
-                        width: dailyList.width
-                        height: dailyList.cardHeight
-                        hoverEnabled: true
-                        acceptedButtons: Qt.AllButtons
-
-                        onWheel: {
-                            if (wheel.modifiers & Qt.ShiftModifier) {
-                                // NOTE: this is a way to filter mouse scrolling from trackpad
-                                // it is not perfect, as when a trackpad scrolls a multiple of 120
-                                // in the y-axis and 0 in x-axis it will be treated like mouse
-                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
-                                    const newIndex = dailyList.currentIndex - Math.sign(wheel.angleDelta.y)
-                                    if (newIndex < dailyList.model && newIndex >= 0) {
-                                        dailyList.currentIndex = newIndex
-                                        wheel.accepted = true
-                                    }
-
-                                }
-                            }
-                            wheel.accepted = false
-                        }
-                    }
-
-                    onCurrentIndexChanged: if (!syncing) root.syncFrom("day")
-
-                    Component.onCompleted: {
-                        dailyList.currentIndex = initialIndex
-                    }
-
-                    states: [
-                        State {
-                            name: "denseState"
-                            when: dailyList.dense
-                            PropertyChanges { target: dailyList; visibleCount: 7 }
-                        },
-                        State {
-                            name: "normalState"
-                            when: !dailyList.dense
-                            PropertyChanges { target: dailyList; visibleCount: 7 }
-                        }
-                    ]
-
-                    transitions: [
-                        Transition {
-                            NumberAnimation {
-                                properties: "visibleCount"
-                                duration: 200
-                                easing.type: Easing.InOutQuad
-                            }
-                        }
-                    ]
-
-                    add: Transition {
-                        NumberAnimation { properties: "x"; duration: 150; easing.type: Easing.InOutQuad }
-                    }
-
+                    onCurrentIndexChanged: if (!syncing)
+                        root.syncFrom("day")
                 }
             }
         }
