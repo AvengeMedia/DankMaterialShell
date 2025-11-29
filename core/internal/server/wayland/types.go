@@ -47,7 +47,7 @@ type Manager struct {
 	display             *wlclient.Display
 	ctx                 *wlclient.Context
 	registry            *wlclient.Registry
-	gammaControl        interface{}
+	gammaControl        any
 	availableOutputs    []*wlclient.Output
 	outputRegNames      syncmap.Map[uint32, uint32]
 	outputs             syncmap.Map[uint32, *outputState]
@@ -83,7 +83,7 @@ type outputState struct {
 	name         string
 	registryName uint32
 	output       *wlclient.Output
-	gammaControl interface{}
+	gammaControl any
 	rampSize     uint32
 	failed       bool
 	isVirtual    bool

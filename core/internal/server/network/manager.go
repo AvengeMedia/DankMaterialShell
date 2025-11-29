@@ -554,7 +554,7 @@ func (m *Manager) GetVPNConfig(uuidOrName string) (*VPNConfig, error) {
 	return m.backend.GetVPNConfig(uuidOrName)
 }
 
-func (m *Manager) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+func (m *Manager) UpdateVPNConfig(uuid string, updates map[string]any) error {
 	return m.backend.UpdateVPNConfig(uuid, updates)
 }
 

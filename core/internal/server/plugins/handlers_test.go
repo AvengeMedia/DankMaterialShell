@@ -17,7 +17,7 @@ func TestHandleList(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.list",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleList(conn, req)
@@ -30,7 +30,7 @@ func TestHandleListInstalled(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.listInstalled",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleListInstalled(conn, req)
@@ -47,7 +47,7 @@ func TestHandleInstallMissingName(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.install",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleInstall(conn, req)
@@ -70,7 +70,7 @@ func TestHandleInstallInvalidName(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.install",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"name": 123,
 		},
 	}
@@ -94,7 +94,7 @@ func TestHandleUninstallMissingName(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.uninstall",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleUninstall(conn, req)
@@ -116,7 +116,7 @@ func TestHandleUpdateMissingName(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.update",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleUpdate(conn, req)
@@ -138,7 +138,7 @@ func TestHandleSearchMissingQuery(t *testing.T) {
 	req := models.Request{
 		ID:     123,
 		Method: "plugins.search",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	HandleSearch(conn, req)

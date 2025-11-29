@@ -555,19 +555,19 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 			req.SSID, req.Interactive)
 	}
 
-	settings := make(map[string]map[string]interface{})
+	settings := make(map[string]map[string]any)
 
-	settings["connection"] = map[string]interface{}{
+	settings["connection"] = map[string]any{
 		"id":          req.SSID,
 		"type":        "802-11-wireless",
 		"autoconnect": true,
 	}
 
-	settings["ipv4"] = map[string]interface{}{"method": "auto"}
-	settings["ipv6"] = map[string]interface{}{"method": "auto"}
+	settings["ipv4"] = map[string]any{"method": "auto"}
+	settings["ipv6"] = map[string]any{"method": "auto"}
 
 	if secured {
-		settings["802-11-wireless"] = map[string]interface{}{
+		settings["802-11-wireless"] = map[string]any{
 			"ssid":     []byte(req.SSID),
 			"mode":     "infrastructure",
 			"security": "802-11-wireless-security",
@@ -575,7 +575,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 
 		switch {
 		case isEnterprise || req.Username != "":
-			settings["802-11-wireless-security"] = map[string]interface{}{
+			settings["802-11-wireless-security"] = map[string]any{
 				"key-mgmt": "wpa-eap",
 			}
 
@@ -594,7 +594,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 				useSystemCACerts = *req.UseSystemCACerts
 			}
 
-			x := map[string]interface{}{
+			x := map[string]any{
 				"eap":             []string{eapMethod},
 				"system-ca-certs": useSystemCACerts,
 				"password-flags":  uint32(0),
@@ -634,7 +634,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 				eapMethod, phase2Auth, req.Username, req.Interactive, useSystemCACerts, req.DomainSuffixMatch)
 
 		case isPsk:
-			sec := map[string]interface{}{
+			sec := map[string]any{
 				"key-mgmt":  "wpa-psk",
 				"psk-flags": uint32(0),
 			}
@@ -644,7 +644,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 			settings["802-11-wireless-security"] = sec
 
 		case isSae:
-			sec := map[string]interface{}{
+			sec := map[string]any{
 				"key-mgmt":  "sae",
 				"pmf":       int32(3),
 				"psk-flags": uint32(0),
@@ -658,7 +658,7 @@ func (b *NetworkManagerBackend) createAndConnectWiFiOnDevice(req ConnectionReque
 			return fmt.Errorf("secured network but not SAE/PSK/802.1X (rsn=0x%x wpa=0x%x)", rsnFlags, wpaFlags)
 		}
 	} else {
-		settings["802-11-wireless"] = map[string]interface{}{
+		settings["802-11-wireless"] = map[string]any{
 			"ssid": []byte(req.SSID),
 			"mode": "infrastructure",
 		}

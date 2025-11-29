@@ -589,7 +589,7 @@ func (b *NetworkManagerBackend) ClearVPNCredentials(uuidOrName string) error {
 					vpnSettings["password-flags"] = uint32(1)
 				}
 
-				settings["vpn-secrets"] = make(map[string]interface{})
+				settings["vpn-secrets"] = make(map[string]any)
 			}
 
 			if err := conn.Update(settings); err != nil {
@@ -1057,7 +1057,7 @@ func (b *NetworkManagerBackend) GetVPNConfig(uuidOrName string) (*VPNConfig, err
 	return nil, fmt.Errorf("VPN connection not found: %s", uuidOrName)
 }
 
-func (b *NetworkManagerBackend) UpdateVPNConfig(connUUID string, updates map[string]interface{}) error {
+func (b *NetworkManagerBackend) UpdateVPNConfig(connUUID string, updates map[string]any) error {
 	s := b.settings
 	if s == nil {
 		var err error
@@ -1103,7 +1103,7 @@ func (b *NetworkManagerBackend) UpdateVPNConfig(connUUID string, updates map[str
 			connMeta["autoconnect"] = autoconnect
 		}
 
-		if data, ok := updates["data"].(map[string]interface{}); ok {
+		if data, ok := updates["data"].(map[string]any); ok {
 			if vpnSettings, ok := settings["vpn"]; ok {
 				existingData, _ := vpnSettings["data"].(map[string]string)
 				if existingData == nil {
@@ -1185,7 +1185,7 @@ func (b *NetworkManagerBackend) SetVPNCredentials(connUUID string, username stri
 
 		vpnSettings, ok := settings["vpn"]
 		if !ok {
-			vpnSettings = make(map[string]interface{})
+			vpnSettings = make(map[string]any)
 			settings["vpn"] = vpnSettings
 		}
 

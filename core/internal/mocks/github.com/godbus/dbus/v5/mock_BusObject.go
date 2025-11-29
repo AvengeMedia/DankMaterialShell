@@ -24,11 +24,11 @@ func (_m *MockBusObject) EXPECT() *MockBusObject_Expecter {
 
 // AddMatchSignal provides a mock function with given fields: iface, member, options
 func (_m *MockBusObject) AddMatchSignal(iface string, member string, options ...dbus.MatchOption) *dbus.Call {
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, iface, member)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
@@ -58,9 +58,9 @@ type MockBusObject_AddMatchSignal_Call struct {
 //   - iface string
 //   - member string
 //   - options ...dbus.MatchOption
-func (_e *MockBusObject_Expecter) AddMatchSignal(iface interface{}, member interface{}, options ...interface{}) *MockBusObject_AddMatchSignal_Call {
+func (_e *MockBusObject_Expecter) AddMatchSignal(iface any, member any, options ...any) *MockBusObject_AddMatchSignal_Call {
 	return &MockBusObject_AddMatchSignal_Call{Call: _e.mock.On("AddMatchSignal",
-		append([]interface{}{iface, member}, options...)...)}
+		append([]any{iface, member}, options...)...)}
 }
 
 func (_c *MockBusObject_AddMatchSignal_Call) Run(run func(iface string, member string, options ...dbus.MatchOption)) *MockBusObject_AddMatchSignal_Call {
@@ -87,8 +87,8 @@ func (_c *MockBusObject_AddMatchSignal_Call) RunAndReturn(run func(string, strin
 }
 
 // Call provides a mock function with given fields: method, flags, args
-func (_m *MockBusObject) Call(method string, flags dbus.Flags, args ...interface{}) *dbus.Call {
-	var _ca []interface{}
+func (_m *MockBusObject) Call(method string, flags dbus.Flags, args ...any) *dbus.Call {
+	var _ca []any
 	_ca = append(_ca, method, flags)
 	_ca = append(_ca, args...)
 	ret := _m.Called(_ca...)
@@ -98,7 +98,7 @@ func (_m *MockBusObject) Call(method string, flags dbus.Flags, args ...interface
 	}
 
 	var r0 *dbus.Call
-	if rf, ok := ret.Get(0).(func(string, dbus.Flags, ...interface{}) *dbus.Call); ok {
+	if rf, ok := ret.Get(0).(func(string, dbus.Flags, ...any) *dbus.Call); ok {
 		r0 = rf(method, flags, args...)
 	} else {
 		if ret.Get(0) != nil {
@@ -117,18 +117,18 @@ type MockBusObject_Call_Call struct {
 // Call is a helper method to define mock.On call
 //   - method string
 //   - flags dbus.Flags
-//   - args ...interface{}
-func (_e *MockBusObject_Expecter) Call(method interface{}, flags interface{}, args ...interface{}) *MockBusObject_Call_Call {
+//   - args ...any
+func (_e *MockBusObject_Expecter) Call(method any, flags any, args ...any) *MockBusObject_Call_Call {
 	return &MockBusObject_Call_Call{Call: _e.mock.On("Call",
-		append([]interface{}{method, flags}, args...)...)}
+		append([]any{method, flags}, args...)...)}
 }
 
-func (_c *MockBusObject_Call_Call) Run(run func(method string, flags dbus.Flags, args ...interface{})) *MockBusObject_Call_Call {
+func (_c *MockBusObject_Call_Call) Run(run func(method string, flags dbus.Flags, args ...any)) *MockBusObject_Call_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]interface{}, len(args)-2)
+		variadicArgs := make([]any, len(args)-2)
 		for i, a := range args[2:] {
 			if a != nil {
-				variadicArgs[i] = a.(interface{})
+				variadicArgs[i] = a.(any)
 			}
 		}
 		run(args[0].(string), args[1].(dbus.Flags), variadicArgs...)
@@ -141,14 +141,14 @@ func (_c *MockBusObject_Call_Call) Return(_a0 *dbus.Call) *MockBusObject_Call_Ca
 	return _c
 }
 
-func (_c *MockBusObject_Call_Call) RunAndReturn(run func(string, dbus.Flags, ...interface{}) *dbus.Call) *MockBusObject_Call_Call {
+func (_c *MockBusObject_Call_Call) RunAndReturn(run func(string, dbus.Flags, ...any) *dbus.Call) *MockBusObject_Call_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // CallWithContext provides a mock function with given fields: ctx, method, flags, args
-func (_m *MockBusObject) CallWithContext(ctx context.Context, method string, flags dbus.Flags, args ...interface{}) *dbus.Call {
-	var _ca []interface{}
+func (_m *MockBusObject) CallWithContext(ctx context.Context, method string, flags dbus.Flags, args ...any) *dbus.Call {
+	var _ca []any
 	_ca = append(_ca, ctx, method, flags)
 	_ca = append(_ca, args...)
 	ret := _m.Called(_ca...)
@@ -158,7 +158,7 @@ func (_m *MockBusObject) CallWithContext(ctx context.Context, method string, fla
 	}
 
 	var r0 *dbus.Call
-	if rf, ok := ret.Get(0).(func(context.Context, string, dbus.Flags, ...interface{}) *dbus.Call); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, dbus.Flags, ...any) *dbus.Call); ok {
 		r0 = rf(ctx, method, flags, args...)
 	} else {
 		if ret.Get(0) != nil {
@@ -178,18 +178,18 @@ type MockBusObject_CallWithContext_Call struct {
 //   - ctx context.Context
 //   - method string
 //   - flags dbus.Flags
-//   - args ...interface{}
-func (_e *MockBusObject_Expecter) CallWithContext(ctx interface{}, method interface{}, flags interface{}, args ...interface{}) *MockBusObject_CallWithContext_Call {
+//   - args ...any
+func (_e *MockBusObject_Expecter) CallWithContext(ctx any, method any, flags any, args ...any) *MockBusObject_CallWithContext_Call {
 	return &MockBusObject_CallWithContext_Call{Call: _e.mock.On("CallWithContext",
-		append([]interface{}{ctx, method, flags}, args...)...)}
+		append([]any{ctx, method, flags}, args...)...)}
 }
 
-func (_c *MockBusObject_CallWithContext_Call) Run(run func(ctx context.Context, method string, flags dbus.Flags, args ...interface{})) *MockBusObject_CallWithContext_Call {
+func (_c *MockBusObject_CallWithContext_Call) Run(run func(ctx context.Context, method string, flags dbus.Flags, args ...any)) *MockBusObject_CallWithContext_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]interface{}, len(args)-3)
+		variadicArgs := make([]any, len(args)-3)
 		for i, a := range args[3:] {
 			if a != nil {
-				variadicArgs[i] = a.(interface{})
+				variadicArgs[i] = a.(any)
 			}
 		}
 		run(args[0].(context.Context), args[1].(string), args[2].(dbus.Flags), variadicArgs...)
@@ -202,7 +202,7 @@ func (_c *MockBusObject_CallWithContext_Call) Return(_a0 *dbus.Call) *MockBusObj
 	return _c
 }
 
-func (_c *MockBusObject_CallWithContext_Call) RunAndReturn(run func(context.Context, string, dbus.Flags, ...interface{}) *dbus.Call) *MockBusObject_CallWithContext_Call {
+func (_c *MockBusObject_CallWithContext_Call) RunAndReturn(run func(context.Context, string, dbus.Flags, ...any) *dbus.Call) *MockBusObject_CallWithContext_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -287,7 +287,7 @@ type MockBusObject_GetProperty_Call struct {
 
 // GetProperty is a helper method to define mock.On call
 //   - p string
-func (_e *MockBusObject_Expecter) GetProperty(p interface{}) *MockBusObject_GetProperty_Call {
+func (_e *MockBusObject_Expecter) GetProperty(p any) *MockBusObject_GetProperty_Call {
 	return &MockBusObject_GetProperty_Call{Call: _e.mock.On("GetProperty", p)}
 }
 
@@ -309,8 +309,8 @@ func (_c *MockBusObject_GetProperty_Call) RunAndReturn(run func(string) (dbus.Va
 }
 
 // Go provides a mock function with given fields: method, flags, ch, args
-func (_m *MockBusObject) Go(method string, flags dbus.Flags, ch chan *dbus.Call, args ...interface{}) *dbus.Call {
-	var _ca []interface{}
+func (_m *MockBusObject) Go(method string, flags dbus.Flags, ch chan *dbus.Call, args ...any) *dbus.Call {
+	var _ca []any
 	_ca = append(_ca, method, flags, ch)
 	_ca = append(_ca, args...)
 	ret := _m.Called(_ca...)
@@ -320,7 +320,7 @@ func (_m *MockBusObject) Go(method string, flags dbus.Flags, ch chan *dbus.Call,
 	}
 
 	var r0 *dbus.Call
-	if rf, ok := ret.Get(0).(func(string, dbus.Flags, chan *dbus.Call, ...interface{}) *dbus.Call); ok {
+	if rf, ok := ret.Get(0).(func(string, dbus.Flags, chan *dbus.Call, ...any) *dbus.Call); ok {
 		r0 = rf(method, flags, ch, args...)
 	} else {
 		if ret.Get(0) != nil {
@@ -340,18 +340,18 @@ type MockBusObject_Go_Call struct {
 //   - method string
 //   - flags dbus.Flags
 //   - ch chan *dbus.Call
-//   - args ...interface{}
-func (_e *MockBusObject_Expecter) Go(method interface{}, flags interface{}, ch interface{}, args ...interface{}) *MockBusObject_Go_Call {
+//   - args ...any
+func (_e *MockBusObject_Expecter) Go(method any, flags any, ch any, args ...any) *MockBusObject_Go_Call {
 	return &MockBusObject_Go_Call{Call: _e.mock.On("Go",
-		append([]interface{}{method, flags, ch}, args...)...)}
+		append([]any{method, flags, ch}, args...)...)}
 }
 
-func (_c *MockBusObject_Go_Call) Run(run func(method string, flags dbus.Flags, ch chan *dbus.Call, args ...interface{})) *MockBusObject_Go_Call {
+func (_c *MockBusObject_Go_Call) Run(run func(method string, flags dbus.Flags, ch chan *dbus.Call, args ...any)) *MockBusObject_Go_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]interface{}, len(args)-3)
+		variadicArgs := make([]any, len(args)-3)
 		for i, a := range args[3:] {
 			if a != nil {
-				variadicArgs[i] = a.(interface{})
+				variadicArgs[i] = a.(any)
 			}
 		}
 		run(args[0].(string), args[1].(dbus.Flags), args[2].(chan *dbus.Call), variadicArgs...)
@@ -364,14 +364,14 @@ func (_c *MockBusObject_Go_Call) Return(_a0 *dbus.Call) *MockBusObject_Go_Call {
 	return _c
 }
 
-func (_c *MockBusObject_Go_Call) RunAndReturn(run func(string, dbus.Flags, chan *dbus.Call, ...interface{}) *dbus.Call) *MockBusObject_Go_Call {
+func (_c *MockBusObject_Go_Call) RunAndReturn(run func(string, dbus.Flags, chan *dbus.Call, ...any) *dbus.Call) *MockBusObject_Go_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GoWithContext provides a mock function with given fields: ctx, method, flags, ch, args
-func (_m *MockBusObject) GoWithContext(ctx context.Context, method string, flags dbus.Flags, ch chan *dbus.Call, args ...interface{}) *dbus.Call {
-	var _ca []interface{}
+func (_m *MockBusObject) GoWithContext(ctx context.Context, method string, flags dbus.Flags, ch chan *dbus.Call, args ...any) *dbus.Call {
+	var _ca []any
 	_ca = append(_ca, ctx, method, flags, ch)
 	_ca = append(_ca, args...)
 	ret := _m.Called(_ca...)
@@ -381,7 +381,7 @@ func (_m *MockBusObject) GoWithContext(ctx context.Context, method string, flags
 	}
 
 	var r0 *dbus.Call
-	if rf, ok := ret.Get(0).(func(context.Context, string, dbus.Flags, chan *dbus.Call, ...interface{}) *dbus.Call); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, dbus.Flags, chan *dbus.Call, ...any) *dbus.Call); ok {
 		r0 = rf(ctx, method, flags, ch, args...)
 	} else {
 		if ret.Get(0) != nil {
@@ -402,18 +402,18 @@ type MockBusObject_GoWithContext_Call struct {
 //   - method string
 //   - flags dbus.Flags
 //   - ch chan *dbus.Call
-//   - args ...interface{}
-func (_e *MockBusObject_Expecter) GoWithContext(ctx interface{}, method interface{}, flags interface{}, ch interface{}, args ...interface{}) *MockBusObject_GoWithContext_Call {
+//   - args ...any
+func (_e *MockBusObject_Expecter) GoWithContext(ctx any, method any, flags any, ch any, args ...any) *MockBusObject_GoWithContext_Call {
 	return &MockBusObject_GoWithContext_Call{Call: _e.mock.On("GoWithContext",
-		append([]interface{}{ctx, method, flags, ch}, args...)...)}
+		append([]any{ctx, method, flags, ch}, args...)...)}
 }
 
-func (_c *MockBusObject_GoWithContext_Call) Run(run func(ctx context.Context, method string, flags dbus.Flags, ch chan *dbus.Call, args ...interface{})) *MockBusObject_GoWithContext_Call {
+func (_c *MockBusObject_GoWithContext_Call) Run(run func(ctx context.Context, method string, flags dbus.Flags, ch chan *dbus.Call, args ...any)) *MockBusObject_GoWithContext_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		variadicArgs := make([]interface{}, len(args)-4)
+		variadicArgs := make([]any, len(args)-4)
 		for i, a := range args[4:] {
 			if a != nil {
-				variadicArgs[i] = a.(interface{})
+				variadicArgs[i] = a.(any)
 			}
 		}
 		run(args[0].(context.Context), args[1].(string), args[2].(dbus.Flags), args[3].(chan *dbus.Call), variadicArgs...)
@@ -426,7 +426,7 @@ func (_c *MockBusObject_GoWithContext_Call) Return(_a0 *dbus.Call) *MockBusObjec
 	return _c
 }
 
-func (_c *MockBusObject_GoWithContext_Call) RunAndReturn(run func(context.Context, string, dbus.Flags, chan *dbus.Call, ...interface{}) *dbus.Call) *MockBusObject_GoWithContext_Call {
+func (_c *MockBusObject_GoWithContext_Call) RunAndReturn(run func(context.Context, string, dbus.Flags, chan *dbus.Call, ...any) *dbus.Call) *MockBusObject_GoWithContext_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -478,11 +478,11 @@ func (_c *MockBusObject_Path_Call) RunAndReturn(run func() dbus.ObjectPath) *Moc
 
 // RemoveMatchSignal provides a mock function with given fields: iface, member, options
 func (_m *MockBusObject) RemoveMatchSignal(iface string, member string, options ...dbus.MatchOption) *dbus.Call {
-	_va := make([]interface{}, len(options))
+	_va := make([]any, len(options))
 	for _i := range options {
 		_va[_i] = options[_i]
 	}
-	var _ca []interface{}
+	var _ca []any
 	_ca = append(_ca, iface, member)
 	_ca = append(_ca, _va...)
 	ret := _m.Called(_ca...)
@@ -512,9 +512,9 @@ type MockBusObject_RemoveMatchSignal_Call struct {
 //   - iface string
 //   - member string
 //   - options ...dbus.MatchOption
-func (_e *MockBusObject_Expecter) RemoveMatchSignal(iface interface{}, member interface{}, options ...interface{}) *MockBusObject_RemoveMatchSignal_Call {
+func (_e *MockBusObject_Expecter) RemoveMatchSignal(iface any, member any, options ...any) *MockBusObject_RemoveMatchSignal_Call {
 	return &MockBusObject_RemoveMatchSignal_Call{Call: _e.mock.On("RemoveMatchSignal",
-		append([]interface{}{iface, member}, options...)...)}
+		append([]any{iface, member}, options...)...)}
 }
 
 func (_c *MockBusObject_RemoveMatchSignal_Call) Run(run func(iface string, member string, options ...dbus.MatchOption)) *MockBusObject_RemoveMatchSignal_Call {
@@ -541,7 +541,7 @@ func (_c *MockBusObject_RemoveMatchSignal_Call) RunAndReturn(run func(string, st
 }
 
 // SetProperty provides a mock function with given fields: p, v
-func (_m *MockBusObject) SetProperty(p string, v interface{}) error {
+func (_m *MockBusObject) SetProperty(p string, v any) error {
 	ret := _m.Called(p, v)
 
 	if len(ret) == 0 {
@@ -549,7 +549,7 @@ func (_m *MockBusObject) SetProperty(p string, v interface{}) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, interface{}) error); ok {
+	if rf, ok := ret.Get(0).(func(string, any) error); ok {
 		r0 = rf(p, v)
 	} else {
 		r0 = ret.Error(0)
@@ -565,14 +565,14 @@ type MockBusObject_SetProperty_Call struct {
 
 // SetProperty is a helper method to define mock.On call
 //   - p string
-//   - v interface{}
-func (_e *MockBusObject_Expecter) SetProperty(p interface{}, v interface{}) *MockBusObject_SetProperty_Call {
+//   - v any
+func (_e *MockBusObject_Expecter) SetProperty(p any, v any) *MockBusObject_SetProperty_Call {
 	return &MockBusObject_SetProperty_Call{Call: _e.mock.On("SetProperty", p, v)}
 }
 
-func (_c *MockBusObject_SetProperty_Call) Run(run func(p string, v interface{})) *MockBusObject_SetProperty_Call {
+func (_c *MockBusObject_SetProperty_Call) Run(run func(p string, v any)) *MockBusObject_SetProperty_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(interface{}))
+		run(args[0].(string), args[1].(any))
 	})
 	return _c
 }
@@ -582,13 +582,13 @@ func (_c *MockBusObject_SetProperty_Call) Return(_a0 error) *MockBusObject_SetPr
 	return _c
 }
 
-func (_c *MockBusObject_SetProperty_Call) RunAndReturn(run func(string, interface{}) error) *MockBusObject_SetProperty_Call {
+func (_c *MockBusObject_SetProperty_Call) RunAndReturn(run func(string, any) error) *MockBusObject_SetProperty_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // StoreProperty provides a mock function with given fields: p, value
-func (_m *MockBusObject) StoreProperty(p string, value interface{}) error {
+func (_m *MockBusObject) StoreProperty(p string, value any) error {
 	ret := _m.Called(p, value)
 
 	if len(ret) == 0 {
@@ -596,7 +596,7 @@ func (_m *MockBusObject) StoreProperty(p string, value interface{}) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, interface{}) error); ok {
+	if rf, ok := ret.Get(0).(func(string, any) error); ok {
 		r0 = rf(p, value)
 	} else {
 		r0 = ret.Error(0)
@@ -612,14 +612,14 @@ type MockBusObject_StoreProperty_Call struct {
 
 // StoreProperty is a helper method to define mock.On call
 //   - p string
-//   - value interface{}
-func (_e *MockBusObject_Expecter) StoreProperty(p interface{}, value interface{}) *MockBusObject_StoreProperty_Call {
+//   - value any
+func (_e *MockBusObject_Expecter) StoreProperty(p any, value any) *MockBusObject_StoreProperty_Call {
 	return &MockBusObject_StoreProperty_Call{Call: _e.mock.On("StoreProperty", p, value)}
 }
 
-func (_c *MockBusObject_StoreProperty_Call) Run(run func(p string, value interface{})) *MockBusObject_StoreProperty_Call {
+func (_c *MockBusObject_StoreProperty_Call) Run(run func(p string, value any)) *MockBusObject_StoreProperty_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(interface{}))
+		run(args[0].(string), args[1].(any))
 	})
 	return _c
 }
@@ -629,7 +629,7 @@ func (_c *MockBusObject_StoreProperty_Call) Return(_a0 error) *MockBusObject_Sto
 	return _c
 }
 
-func (_c *MockBusObject_StoreProperty_Call) RunAndReturn(run func(string, interface{}) error) *MockBusObject_StoreProperty_Call {
+func (_c *MockBusObject_StoreProperty_Call) RunAndReturn(run func(string, any) error) *MockBusObject_StoreProperty_Call {
 	_c.Call.Return(run)
 	return _c
 }

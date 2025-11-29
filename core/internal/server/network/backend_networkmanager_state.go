@@ -114,7 +114,7 @@ func (b *NetworkManagerBackend) getDeviceStateReason(dev gonetworkmanager.Device
 		return 0
 	}
 
-	if stateReasonStruct, ok := variant.Value().([]interface{}); ok && len(stateReasonStruct) >= 2 {
+	if stateReasonStruct, ok := variant.Value().([]any); ok && len(stateReasonStruct) >= 2 {
 		if reason, ok := stateReasonStruct[1].(uint32); ok {
 			return reason
 		}

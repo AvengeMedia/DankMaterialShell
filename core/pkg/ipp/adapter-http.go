@@ -102,7 +102,7 @@ func (h *HttpAdapter) SendRequest(url string, req *Request, additionalResponseDa
 	return ippResp, nil
 }
 
-func (h *HttpAdapter) GetHttpUri(namespace string, object interface{}) string {
+func (h *HttpAdapter) GetHttpUri(namespace string, object any) string {
 	proto := "http"
 	if h.useTLS {
 		proto = "https"

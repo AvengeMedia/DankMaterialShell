@@ -94,14 +94,14 @@ func (m *Manager) setConnectionMetrics(connType string, metric uint32) error {
 		if connMeta, ok := connSettings["connection"]; ok {
 			if cType, ok := connMeta["type"].(string); ok && cType == connType {
 				if connSettings["ipv4"] == nil {
-					connSettings["ipv4"] = make(map[string]interface{})
+					connSettings["ipv4"] = make(map[string]any)
 				}
 				if ipv4Map := connSettings["ipv4"]; ipv4Map != nil {
 					ipv4Map["route-metric"] = int64(metric)
 				}
 
 				if connSettings["ipv6"] == nil {
-					connSettings["ipv6"] = make(map[string]interface{})
+					connSettings["ipv6"] = make(map[string]any)
 				}
 				if ipv6Map := connSettings["ipv6"]; ipv6Map != nil {
 					ipv6Map["route-metric"] = int64(metric)

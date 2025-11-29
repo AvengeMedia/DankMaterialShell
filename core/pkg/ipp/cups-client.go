@@ -316,7 +316,7 @@ func (c *CUPSClient) PrintTestPage(printer string) (int, error) {
 			Size:     testPage.Len(),
 			MimeType: MimeTypePostscript,
 		},
-	}, printer, map[string]interface{}{
+	}, printer, map[string]any{
 		AttributeJobName: "Test Page",
 	})
 }

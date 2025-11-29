@@ -259,7 +259,7 @@ type MockEvdevDevice_State_Call struct {
 
 // State is a helper method to define mock.On call
 //   - t go_evdev.EvType
-func (_e *MockEvdevDevice_Expecter) State(t interface{}) *MockEvdevDevice_State_Call {
+func (_e *MockEvdevDevice_Expecter) State(t any) *MockEvdevDevice_State_Call {
 	return &MockEvdevDevice_State_Call{Call: _e.mock.On("State", t)}
 }
 
@@ -285,7 +285,8 @@ func (_c *MockEvdevDevice_State_Call) RunAndReturn(run func(go_evdev.EvType) (go
 func NewMockEvdevDevice(t interface {
 	mock.TestingT
 	Cleanup(func())
-}) *MockEvdevDevice {
+},
+) *MockEvdevDevice {
 	mock := &MockEvdevDevice{}
 	mock.Mock.Test(t)
 

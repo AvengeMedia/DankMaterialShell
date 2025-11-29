@@ -266,7 +266,7 @@ func TestHandleSetIdleHint(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "loginctl.setIdleHint",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetIdleHint(conn, req, manager)
@@ -294,7 +294,7 @@ func TestHandleSetIdleHint(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "loginctl.setIdleHint",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"idle": true,
 			},
 		}
@@ -327,7 +327,7 @@ func TestHandleSetIdleHint(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "loginctl.setIdleHint",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"idle": false,
 			},
 		}

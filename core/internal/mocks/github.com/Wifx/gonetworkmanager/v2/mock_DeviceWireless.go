@@ -2021,7 +2021,7 @@ type MockDeviceWireless_Reapply_Call struct {
 //   - connection gonetworkmanager.Connection
 //   - versionId uint64
 //   - flags uint32
-func (_e *MockDeviceWireless_Expecter) Reapply(connection interface{}, versionId interface{}, flags interface{}) *MockDeviceWireless_Reapply_Call {
+func (_e *MockDeviceWireless_Expecter) Reapply(connection any, versionId any, flags any) *MockDeviceWireless_Reapply_Call {
 	return &MockDeviceWireless_Reapply_Call{Call: _e.mock.On("Reapply", connection, versionId, flags)}
 }
 
@@ -2112,7 +2112,7 @@ type MockDeviceWireless_SetPropertyAutoConnect_Call struct {
 
 // SetPropertyAutoConnect is a helper method to define mock.On call
 //   - _a0 bool
-func (_e *MockDeviceWireless_Expecter) SetPropertyAutoConnect(_a0 interface{}) *MockDeviceWireless_SetPropertyAutoConnect_Call {
+func (_e *MockDeviceWireless_Expecter) SetPropertyAutoConnect(_a0 any) *MockDeviceWireless_SetPropertyAutoConnect_Call {
 	return &MockDeviceWireless_SetPropertyAutoConnect_Call{Call: _e.mock.On("SetPropertyAutoConnect", _a0)}
 }
 
@@ -2158,7 +2158,7 @@ type MockDeviceWireless_SetPropertyManaged_Call struct {
 
 // SetPropertyManaged is a helper method to define mock.On call
 //   - _a0 bool
-func (_e *MockDeviceWireless_Expecter) SetPropertyManaged(_a0 interface{}) *MockDeviceWireless_SetPropertyManaged_Call {
+func (_e *MockDeviceWireless_Expecter) SetPropertyManaged(_a0 any) *MockDeviceWireless_SetPropertyManaged_Call {
 	return &MockDeviceWireless_SetPropertyManaged_Call{Call: _e.mock.On("SetPropertyManaged", _a0)}
 }
 
@@ -2205,7 +2205,7 @@ type MockDeviceWireless_SubscribeState_Call struct {
 // SubscribeState is a helper method to define mock.On call
 //   - receiver chan gonetworkmanager.DeviceStateChange
 //   - exit chan struct{}
-func (_e *MockDeviceWireless_Expecter) SubscribeState(receiver interface{}, exit interface{}) *MockDeviceWireless_SubscribeState_Call {
+func (_e *MockDeviceWireless_Expecter) SubscribeState(receiver any, exit any) *MockDeviceWireless_SubscribeState_Call {
 	return &MockDeviceWireless_SubscribeState_Call{Call: _e.mock.On("SubscribeState", receiver, exit)}
 }
 

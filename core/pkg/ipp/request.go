@@ -14,10 +14,10 @@ type Request struct {
 	Operation int16
 	RequestId int32
 
-	OperationAttributes    map[string]interface{}
-	JobAttributes          map[string]interface{}
-	PrinterAttributes      map[string]interface{}
-	SubscriptionAttributes map[string]interface{} // Added for subscription operations
+	OperationAttributes    map[string]any
+	JobAttributes          map[string]any
+	PrinterAttributes      map[string]any
+	SubscriptionAttributes map[string]any // Added for subscription operations
 
 	File     io.Reader
 	FileSize int
@@ -30,10 +30,10 @@ func NewRequest(op int16, reqID int32) *Request {
 		ProtocolVersionMinor:   ProtocolVersionMinor,
 		Operation:              op,
 		RequestId:              reqID,
-		OperationAttributes:    make(map[string]interface{}),
-		JobAttributes:          make(map[string]interface{}),
-		PrinterAttributes:      make(map[string]interface{}),
-		SubscriptionAttributes: make(map[string]interface{}),
+		OperationAttributes:    make(map[string]any),
+		JobAttributes:          make(map[string]any),
+		PrinterAttributes:      make(map[string]any),
+		SubscriptionAttributes: make(map[string]any),
 		File:                   nil,
 		FileSize:               -1,
 	}
@@ -65,7 +65,7 @@ func (r *Request) Encode() ([]byte, error) {
 	}
 
 	if r.OperationAttributes == nil {
-		r.OperationAttributes = make(map[string]interface{}, 2)
+		r.OperationAttributes = make(map[string]any, 2)
 	}
 
 	if _, found := r.OperationAttributes[AttributeCharset]; !found {
@@ -232,7 +232,7 @@ func (d *RequestDecoder) Decode(data io.Writer) (*Request, error) {
 
 		if startByte == TagOperation {
 			if req.OperationAttributes == nil {
-				req.OperationAttributes = make(map[string]interface{})
+				req.OperationAttributes = make(map[string]any)
 			}
 
 			tag = TagOperation
@@ -242,7 +242,7 @@ func (d *RequestDecoder) Decode(data io.Writer) (*Request, error) {
 
 		if startByte == TagJob {
 			if req.JobAttributes == nil {
-				req.JobAttributes = make(map[string]interface{})
+				req.JobAttributes = make(map[string]any)
 			}
 			tag = TagJob
 			tagSet = true
@@ -250,7 +250,7 @@ func (d *RequestDecoder) Decode(data io.Writer) (*Request, error) {
 
 		if startByte == TagPrinter {
 			if req.PrinterAttributes == nil {
-				req.PrinterAttributes = make(map[string]interface{})
+				req.PrinterAttributes = make(map[string]any)
 			}
 			tag = TagPrinter
 			tagSet = true
@@ -287,7 +287,7 @@ func (d *RequestDecoder) Decode(data io.Writer) (*Request, error) {
 	return req, nil
 }
 
-func appendAttributeToRequest(req *Request, tag int8, name string, value interface{}) {
+func appendAttributeToRequest(req *Request, tag int8, name string, value any) {
 	switch tag {
 	case TagOperation:
 		req.OperationAttributes[name] = value
