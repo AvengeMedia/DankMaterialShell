@@ -723,13 +723,6 @@ Singleton {
                     }
 
                     const daily = data.daily
-                    const currentUnits = data.current_units || {}
-
-                    const tempC = current.temperature_2m || 0
-                    const tempF = (tempC * 9/5 + 32)
-                    const feelsLikeC = current.apparent_temperature || tempC
-                    const feelsLikeF = (feelsLikeC * 9/5 + 32)
-
                     const forecast = []
                     if (daily.time && daily.time.length > 0) {
                         for (let i = 0; i < daily.time.length; i++) {

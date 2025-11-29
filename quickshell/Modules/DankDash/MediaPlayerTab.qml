@@ -79,11 +79,16 @@ Item {
     }
 
     onActivePlayerChanged: {
+        if (!activePlayer) {
+            isSwitching = false;
+            _switchHold = false;
+            return;
+        }
         isSwitching = true;
         _switchHold = true;
         paletteReady = false;
         _switchHoldTimer.restart();
-        if (activePlayer && activePlayer.trackArtUrl) {
+        if (activePlayer.trackArtUrl) {
             loadArtwork(activePlayer.trackArtUrl);
         }
     }

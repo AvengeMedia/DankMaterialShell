@@ -1,10 +1,7 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
-import QtQuick.Layouts
 
 Rectangle {
     id: root
@@ -17,9 +14,9 @@ Rectangle {
 
     readonly property bool isCurrent: {
         if (daily) {
-            date ? WeatherService.calendarDayDifference(new Date(), date) === 0 : false
+            date ? WeatherService.calendarDayDifference(new Date(), date) === 0 : false;
         } else {
-            date ? WeatherService.calendarHourDifference(new Date(), date) === 0 : false
+            date ? WeatherService.calendarHourDifference(new Date(), date) === 0 : false;
         }
     }
 
@@ -52,30 +49,34 @@ Rectangle {
 
     readonly property var values: daily ? [] : [
         {
-        //     'name': "Temperature",
-        //     'text': root.tempText,
-        //     'icon': "thermometer"
-        // }, {
-        //     'name': "Feels Like",
-        //     'text': root.feelsLikeText,
-        //     'icon': "thermostat"
-        // }, {
+            //     'name': "Temperature",
+            //     'text': root.tempText,
+            //     'icon': "thermometer"
+            // }, {
+            //     'name': "Feels Like",
+            //     'text': root.feelsLikeText,
+            //     'icon': "thermostat"
+            // }, {
             'name': I18n.tr("Humidity"),
             'text': root.humidityText,
             'icon': "humidity_low"
-        }, {
+        },
+        {
             'name': I18n.tr("Wind Speed"),
             'text': root.windText,
             'icon': "air"
-        }, {
+        },
+        {
             'name': I18n.tr("Pressure"),
             'text': root.pressureText,
             'icon': "speed"
-        }, {
+        },
+        {
             'name': I18n.tr("Precipitation Chance"),
             'text': root.precipitationText,
             'icon': "rainy"
-        }, {
+        },
+        {
             'name': I18n.tr("Visibility"),
             'text': root.visibilityText,
             'icon': "wb_sunny"
@@ -129,9 +130,7 @@ Rectangle {
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: !root.daily
                 }
-
             }
-
 
             Column {
                 id: detailsColumn
@@ -155,8 +154,8 @@ Rectangle {
                     Transition {
                         NumberAnimation {
                             properties: "opacity,width"
-                            duration: 200
-                            easing.type: Easing.InOutQuad
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
                         }
                     }
                 ]

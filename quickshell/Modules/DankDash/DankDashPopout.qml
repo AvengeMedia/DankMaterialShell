@@ -226,8 +226,8 @@ DankPopout {
                     return;
                 }
 
-                if (root.currentTabIndex === 2 && wallpaperTab.handleKeyEvent) {
-                    if (wallpaperTab.handleKeyEvent(event)) {
+                if (root.currentTabIndex === 2 && wallpaperLoader.item?.handleKeyEvent) {
+                    if (wallpaperLoader.item.handleKeyEvent(event)) {
                         event.accepted = true;
                         return;
                     }
@@ -301,7 +301,7 @@ DankPopout {
                         let settingsIndex = SettingsData.weatherEnabled ? 4 : 3;
                         if (index === settingsIndex) {
                             dashVisible = false;
-                            PopoutService.openSettings();
+                            settingsModal.show();
                         }
                     }
                 }
@@ -316,71 +316,84 @@ DankPopout {
                     width: parent.width
                     implicitHeight: {
                         if (currentIndex === 0)
-                            return overviewTab.implicitHeight;
+                            return overviewLoader.item?.implicitHeight ?? 410;
                         if (currentIndex === 1)
-                            return mediaTab.implicitHeight;
+                            return mediaLoader.item?.implicitHeight ?? 410;
                         if (currentIndex === 2)
-                            return wallpaperTab.implicitHeight;
+                            return wallpaperLoader.item?.implicitHeight ?? 410;
                         if (SettingsData.weatherEnabled && currentIndex === 3)
-                            return weatherTab.implicitHeight;
-                        return overviewTab.implicitHeight;
+                            return weatherLoader.item?.implicitHeight ?? 410;
+                        return 410;
                     }
                     currentIndex: root.currentTabIndex
 
-                    OverviewTab {
-                        id: overviewTab
-
-                        onCloseDash: {
-                            root.dashVisible = false;
-                        }
-
-                        onSwitchToWeatherTab: {
-                            if (SettingsData.weatherEnabled) {
-                                tabBar.currentIndex = 3;
-                                tabBar.tabClicked(3);
+                    Loader {
+                        id: overviewLoader
+                        active: root.currentTabIndex === 0
+                        sourceComponent: Component {
+                            OverviewTab {
+                                onCloseDash: root.dashVisible = false
+                                onSwitchToWeatherTab: {
+                                    if (SettingsData.weatherEnabled) {
+                                        tabBar.currentIndex = 3;
+                                        tabBar.tabClicked(3);
+                                    }
+                                }
+                                onSwitchToMediaTab: {
+                                    tabBar.currentIndex = 1;
+                                    tabBar.tabClicked(1);
+                                }
                             }
                         }
+                    }
 
-                        onSwitchToMediaTab: {
-                            tabBar.currentIndex = 1;
-                            tabBar.tabClicked(1);
+                    Loader {
+                        id: mediaLoader
+                        active: root.currentTabIndex === 1
+                        sourceComponent: Component {
+                            MediaPlayerTab {
+                                targetScreen: root.screen
+                                popoutX: root.alignedX
+                                popoutY: root.alignedY
+                                popoutWidth: root.alignedWidth
+                                popoutHeight: root.alignedHeight
+                                contentOffsetY: Theme.spacingM + 48 + Theme.spacingS + Theme.spacingXS
+                                Component.onCompleted: root.__mediaTabRef = this
+                                onShowVolumeDropdown: (pos, screen, rightEdge, player, players) => {
+                                    root.__showVolumeDropdown(pos, rightEdge, player, players);
+                                }
+                                onShowAudioDevicesDropdown: (pos, screen, rightEdge) => {
+                                    root.__showAudioDevicesDropdown(pos, rightEdge);
+                                }
+                                onShowPlayersDropdown: (pos, screen, rightEdge, player, players) => {
+                                    root.__showPlayersDropdown(pos, rightEdge, player, players);
+                                }
+                                onHideDropdowns: root.__hideDropdowns()
+                                onVolumeButtonExited: root.__startCloseTimer()
+                            }
                         }
                     }
 
-                    MediaPlayerTab {
-                        id: mediaTab
-                        targetScreen: root.screen
-                        popoutX: root.alignedX
-                        popoutY: root.alignedY
-                        popoutWidth: root.alignedWidth
-                        popoutHeight: root.alignedHeight
-                        contentOffsetY: Theme.spacingM + 48 + Theme.spacingS + Theme.spacingXS
-                        Component.onCompleted: root.__mediaTabRef = this
-                        onShowVolumeDropdown: (pos, screen, rightEdge, player, players) => {
-                            root.__showVolumeDropdown(pos, rightEdge, player, players);
-                        }
-                        onShowAudioDevicesDropdown: (pos, screen, rightEdge) => {
-                            root.__showAudioDevicesDropdown(pos, rightEdge);
-                        }
-                        onShowPlayersDropdown: (pos, screen, rightEdge, player, players) => {
-                            root.__showPlayersDropdown(pos, rightEdge, player, players);
-                        }
-                        onHideDropdowns: root.__hideDropdowns()
-                        onVolumeButtonExited: root.__startCloseTimer()
-                    }
-
-                    WallpaperTab {
-                        id: wallpaperTab
+                    Loader {
+                        id: wallpaperLoader
                         active: root.currentTabIndex === 2
-                        tabBarItem: tabBar
-                        keyForwardTarget: mainContainer
-                        targetScreen: root.screen
-                        parentPopout: root
+                        sourceComponent: Component {
+                            WallpaperTab {
+                                active: true
+                                tabBarItem: tabBar
+                                keyForwardTarget: mainContainer
+                                targetScreen: root.triggerScreen
+                                parentPopout: root
+                            }
+                        }
                     }
 
-                    WeatherTab {
-                        id: weatherTab
-                        visible: SettingsData.weatherEnabled && root.currentTabIndex === 3
+                    Loader {
+                        id: weatherLoader
+                        active: SettingsData.weatherEnabled && root.currentTabIndex === 3
+                        sourceComponent: Component {
+                            WeatherTab {}
+                        }
                     }
                 }
             }
