@@ -13,10 +13,10 @@ import (
 type Logger struct{ *cblog.Logger }
 
 // Printf routes goose/info-style logs through Infof.
-func (l *Logger) Printf(format string, v ...interface{}) { l.Infof(format, v...) }
+func (l *Logger) Printf(format string, v ...any) { l.Infof(format, v...) }
 
 // Fatalf keeps goose’s contract of exiting the program.
-func (l *Logger) Fatalf(format string, v ...interface{}) { l.Logger.Fatalf(format, v...) }
+func (l *Logger) Fatalf(format string, v ...any) { l.Logger.Fatalf(format, v...) }
 
 var (
 	logger     *Logger
@@ -104,13 +104,13 @@ func GetLogger() *Logger {
 
 // * Convenience wrappers
 
-func Debug(msg interface{}, keyvals ...interface{}) { GetLogger().Logger.Debug(msg, keyvals...) }
-func Debugf(format string, v ...interface{})        { GetLogger().Logger.Debugf(format, v...) }
-func Info(msg interface{}, keyvals ...interface{})  { GetLogger().Logger.Info(msg, keyvals...) }
-func Infof(format string, v ...interface{})         { GetLogger().Logger.Infof(format, v...) }
-func Warn(msg interface{}, keyvals ...interface{})  { GetLogger().Logger.Warn(msg, keyvals...) }
-func Warnf(format string, v ...interface{})         { GetLogger().Logger.Warnf(format, v...) }
-func Error(msg interface{}, keyvals ...interface{}) { GetLogger().Logger.Error(msg, keyvals...) }
-func Errorf(format string, v ...interface{})        { GetLogger().Logger.Errorf(format, v...) }
-func Fatal(msg interface{}, keyvals ...interface{}) { GetLogger().Logger.Fatal(msg, keyvals...) }
-func Fatalf(format string, v ...interface{})        { GetLogger().Logger.Fatalf(format, v...) }
+func Debug(msg any, keyvals ...any)  { GetLogger().Logger.Debug(msg, keyvals...) }
+func Debugf(format string, v ...any) { GetLogger().Logger.Debugf(format, v...) }
+func Info(msg any, keyvals ...any)   { GetLogger().Logger.Info(msg, keyvals...) }
+func Infof(format string, v ...any)  { GetLogger().Logger.Infof(format, v...) }
+func Warn(msg any, keyvals ...any)   { GetLogger().Logger.Warn(msg, keyvals...) }
+func Warnf(format string, v ...any)  { GetLogger().Logger.Warnf(format, v...) }
+func Error(msg any, keyvals ...any)  { GetLogger().Logger.Error(msg, keyvals...) }
+func Errorf(format string, v ...any) { GetLogger().Logger.Errorf(format, v...) }
+func Fatal(msg any, keyvals ...any)  { GetLogger().Logger.Fatal(msg, keyvals...) }
+func Fatalf(format string, v ...any) { GetLogger().Logger.Fatalf(format, v...) }

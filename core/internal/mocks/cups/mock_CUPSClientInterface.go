@@ -141,7 +141,7 @@ type MockCUPSClientInterface_CancelAllJob_Call struct {
 // CancelAllJob is a helper method to define mock.On call
 //   - printer string
 //   - purge bool
-func (_e *MockCUPSClientInterface_Expecter) CancelAllJob(printer interface{}, purge interface{}) *MockCUPSClientInterface_CancelAllJob_Call {
+func (_e *MockCUPSClientInterface_Expecter) CancelAllJob(printer any, purge any) *MockCUPSClientInterface_CancelAllJob_Call {
 	return &MockCUPSClientInterface_CancelAllJob_Call{Call: _e.mock.On("CancelAllJob", printer, purge)}
 }
 
@@ -188,7 +188,7 @@ type MockCUPSClientInterface_CancelJob_Call struct {
 // CancelJob is a helper method to define mock.On call
 //   - jobID int
 //   - purge bool
-func (_e *MockCUPSClientInterface_Expecter) CancelJob(jobID interface{}, purge interface{}) *MockCUPSClientInterface_CancelJob_Call {
+func (_e *MockCUPSClientInterface_Expecter) CancelJob(jobID any, purge any) *MockCUPSClientInterface_CancelJob_Call {
 	return &MockCUPSClientInterface_CancelJob_Call{Call: _e.mock.On("CancelJob", jobID, purge)}
 }
 
@@ -558,7 +558,7 @@ type MockCUPSClientInterface_GetJobs_Call struct {
 //   - firstJobId int
 //   - limit int
 //   - attributes []string
-func (_e *MockCUPSClientInterface_Expecter) GetJobs(printer interface{}, class interface{}, whichJobs interface{}, myJobs interface{}, firstJobId interface{}, limit interface{}, attributes interface{}) *MockCUPSClientInterface_GetJobs_Call {
+func (_e *MockCUPSClientInterface_Expecter) GetJobs(printer any, class any, whichJobs any, myJobs any, firstJobId any, limit any, attributes any) *MockCUPSClientInterface_GetJobs_Call {
 	return &MockCUPSClientInterface_GetJobs_Call{Call: _e.mock.On("GetJobs", printer, class, whichJobs, myJobs, firstJobId, limit, attributes)}
 }
 
@@ -673,7 +673,7 @@ type MockCUPSClientInterface_GetPrinters_Call struct {
 
 // GetPrinters is a helper method to define mock.On call
 //   - attributes []string
-func (_e *MockCUPSClientInterface_Expecter) GetPrinters(attributes interface{}) *MockCUPSClientInterface_GetPrinters_Call {
+func (_e *MockCUPSClientInterface_Expecter) GetPrinters(attributes any) *MockCUPSClientInterface_GetPrinters_Call {
 	return &MockCUPSClientInterface_GetPrinters_Call{Call: _e.mock.On("GetPrinters", attributes)}
 }
 
@@ -813,7 +813,7 @@ type MockCUPSClientInterface_PausePrinter_Call struct {
 
 // PausePrinter is a helper method to define mock.On call
 //   - printer string
-func (_e *MockCUPSClientInterface_Expecter) PausePrinter(printer interface{}) *MockCUPSClientInterface_PausePrinter_Call {
+func (_e *MockCUPSClientInterface_Expecter) PausePrinter(printer any) *MockCUPSClientInterface_PausePrinter_Call {
 	return &MockCUPSClientInterface_PausePrinter_Call{Call: _e.mock.On("PausePrinter", printer)}
 }
 
@@ -1009,7 +1009,7 @@ type MockCUPSClientInterface_ResumePrinter_Call struct {
 
 // ResumePrinter is a helper method to define mock.On call
 //   - printer string
-func (_e *MockCUPSClientInterface_Expecter) ResumePrinter(printer interface{}) *MockCUPSClientInterface_ResumePrinter_Call {
+func (_e *MockCUPSClientInterface_Expecter) ResumePrinter(printer any) *MockCUPSClientInterface_ResumePrinter_Call {
 	return &MockCUPSClientInterface_ResumePrinter_Call{Call: _e.mock.On("ResumePrinter", printer)}
 }
 
@@ -1069,7 +1069,7 @@ type MockCUPSClientInterface_SendRequest_Call struct {
 //   - url string
 //   - req *ipp.Request
 //   - additionalResponseData io.Writer
-func (_e *MockCUPSClientInterface_Expecter) SendRequest(url interface{}, req interface{}, additionalResponseData interface{}) *MockCUPSClientInterface_SendRequest_Call {
+func (_e *MockCUPSClientInterface_Expecter) SendRequest(url any, req any, additionalResponseData any) *MockCUPSClientInterface_SendRequest_Call {
 	return &MockCUPSClientInterface_SendRequest_Call{Call: _e.mock.On("SendRequest", url, req, additionalResponseData)}
 }
 

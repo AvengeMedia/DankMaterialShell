@@ -61,7 +61,7 @@ type MockNetworkManager_ActivateConnection_Call struct {
 //   - connection gonetworkmanager.Connection
 //   - device gonetworkmanager.Device
 //   - specificObject *dbus.Object
-func (_e *MockNetworkManager_Expecter) ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) *MockNetworkManager_ActivateConnection_Call {
+func (_e *MockNetworkManager_Expecter) ActivateConnection(connection any, device any, specificObject any) *MockNetworkManager_ActivateConnection_Call {
 	return &MockNetworkManager_ActivateConnection_Call{Call: _e.mock.On("ActivateConnection", connection, device, specificObject)}
 }
 
@@ -121,7 +121,7 @@ type MockNetworkManager_ActivateWirelessConnection_Call struct {
 //   - connection gonetworkmanager.Connection
 //   - device gonetworkmanager.Device
 //   - accessPoint gonetworkmanager.AccessPoint
-func (_e *MockNetworkManager_Expecter) ActivateWirelessConnection(connection interface{}, device interface{}, accessPoint interface{}) *MockNetworkManager_ActivateWirelessConnection_Call {
+func (_e *MockNetworkManager_Expecter) ActivateWirelessConnection(connection any, device any, accessPoint any) *MockNetworkManager_ActivateWirelessConnection_Call {
 	return &MockNetworkManager_ActivateWirelessConnection_Call{Call: _e.mock.On("ActivateWirelessConnection", connection, device, accessPoint)}
 }
 
@@ -143,7 +143,7 @@ func (_c *MockNetworkManager_ActivateWirelessConnection_Call) RunAndReturn(run f
 }
 
 // AddAndActivateConnection provides a mock function with given fields: connection, device
-func (_m *MockNetworkManager) AddAndActivateConnection(connection map[string]map[string]interface{}, device gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error) {
+func (_m *MockNetworkManager) AddAndActivateConnection(connection map[string]map[string]any, device gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error) {
 	ret := _m.Called(connection, device)
 
 	if len(ret) == 0 {
@@ -152,10 +152,10 @@ func (_m *MockNetworkManager) AddAndActivateConnection(connection map[string]map
 
 	var r0 gonetworkmanager.ActiveConnection
 	var r1 error
-	if rf, ok := ret.Get(0).(func(map[string]map[string]interface{}, gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error)); ok {
+	if rf, ok := ret.Get(0).(func(map[string]map[string]any, gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error)); ok {
 		return rf(connection, device)
 	}
-	if rf, ok := ret.Get(0).(func(map[string]map[string]interface{}, gonetworkmanager.Device) gonetworkmanager.ActiveConnection); ok {
+	if rf, ok := ret.Get(0).(func(map[string]map[string]any, gonetworkmanager.Device) gonetworkmanager.ActiveConnection); ok {
 		r0 = rf(connection, device)
 	} else {
 		if ret.Get(0) != nil {
@@ -163,7 +163,7 @@ func (_m *MockNetworkManager) AddAndActivateConnection(connection map[string]map
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(map[string]map[string]interface{}, gonetworkmanager.Device) error); ok {
+	if rf, ok := ret.Get(1).(func(map[string]map[string]any, gonetworkmanager.Device) error); ok {
 		r1 = rf(connection, device)
 	} else {
 		r1 = ret.Error(1)
@@ -178,15 +178,15 @@ type MockNetworkManager_AddAndActivateConnection_Call struct {
 }
 
 // AddAndActivateConnection is a helper method to define mock.On call
-//   - connection map[string]map[string]interface{}
+//   - connection map[string]map[string]any
 //   - device gonetworkmanager.Device
-func (_e *MockNetworkManager_Expecter) AddAndActivateConnection(connection interface{}, device interface{}) *MockNetworkManager_AddAndActivateConnection_Call {
+func (_e *MockNetworkManager_Expecter) AddAndActivateConnection(connection any, device any) *MockNetworkManager_AddAndActivateConnection_Call {
 	return &MockNetworkManager_AddAndActivateConnection_Call{Call: _e.mock.On("AddAndActivateConnection", connection, device)}
 }
 
-func (_c *MockNetworkManager_AddAndActivateConnection_Call) Run(run func(connection map[string]map[string]interface{}, device gonetworkmanager.Device)) *MockNetworkManager_AddAndActivateConnection_Call {
+func (_c *MockNetworkManager_AddAndActivateConnection_Call) Run(run func(connection map[string]map[string]any, device gonetworkmanager.Device)) *MockNetworkManager_AddAndActivateConnection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(map[string]map[string]interface{}), args[1].(gonetworkmanager.Device))
+		run(args[0].(map[string]map[string]any), args[1].(gonetworkmanager.Device))
 	})
 	return _c
 }
@@ -196,13 +196,13 @@ func (_c *MockNetworkManager_AddAndActivateConnection_Call) Return(_a0 gonetwork
 	return _c
 }
 
-func (_c *MockNetworkManager_AddAndActivateConnection_Call) RunAndReturn(run func(map[string]map[string]interface{}, gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error)) *MockNetworkManager_AddAndActivateConnection_Call {
+func (_c *MockNetworkManager_AddAndActivateConnection_Call) RunAndReturn(run func(map[string]map[string]any, gonetworkmanager.Device) (gonetworkmanager.ActiveConnection, error)) *MockNetworkManager_AddAndActivateConnection_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // AddAndActivateWirelessConnection provides a mock function with given fields: connection, device, accessPoint
-func (_m *MockNetworkManager) AddAndActivateWirelessConnection(connection map[string]map[string]interface{}, device gonetworkmanager.Device, accessPoint gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error) {
+func (_m *MockNetworkManager) AddAndActivateWirelessConnection(connection map[string]map[string]any, device gonetworkmanager.Device, accessPoint gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error) {
 	ret := _m.Called(connection, device, accessPoint)
 
 	if len(ret) == 0 {
@@ -211,10 +211,10 @@ func (_m *MockNetworkManager) AddAndActivateWirelessConnection(connection map[st
 
 	var r0 gonetworkmanager.ActiveConnection
 	var r1 error
-	if rf, ok := ret.Get(0).(func(map[string]map[string]interface{}, gonetworkmanager.Device, gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error)); ok {
+	if rf, ok := ret.Get(0).(func(map[string]map[string]any, gonetworkmanager.Device, gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error)); ok {
 		return rf(connection, device, accessPoint)
 	}
-	if rf, ok := ret.Get(0).(func(map[string]map[string]interface{}, gonetworkmanager.Device, gonetworkmanager.AccessPoint) gonetworkmanager.ActiveConnection); ok {
+	if rf, ok := ret.Get(0).(func(map[string]map[string]any, gonetworkmanager.Device, gonetworkmanager.AccessPoint) gonetworkmanager.ActiveConnection); ok {
 		r0 = rf(connection, device, accessPoint)
 	} else {
 		if ret.Get(0) != nil {
@@ -222,7 +222,7 @@ func (_m *MockNetworkManager) AddAndActivateWirelessConnection(connection map[st
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(map[string]map[string]interface{}, gonetworkmanager.Device, gonetworkmanager.AccessPoint) error); ok {
+	if rf, ok := ret.Get(1).(func(map[string]map[string]any, gonetworkmanager.Device, gonetworkmanager.AccessPoint) error); ok {
 		r1 = rf(connection, device, accessPoint)
 	} else {
 		r1 = ret.Error(1)
@@ -237,16 +237,16 @@ type MockNetworkManager_AddAndActivateWirelessConnection_Call struct {
 }
 
 // AddAndActivateWirelessConnection is a helper method to define mock.On call
-//   - connection map[string]map[string]interface{}
+//   - connection map[string]map[string]any
 //   - device gonetworkmanager.Device
 //   - accessPoint gonetworkmanager.AccessPoint
-func (_e *MockNetworkManager_Expecter) AddAndActivateWirelessConnection(connection interface{}, device interface{}, accessPoint interface{}) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
+func (_e *MockNetworkManager_Expecter) AddAndActivateWirelessConnection(connection any, device any, accessPoint any) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
 	return &MockNetworkManager_AddAndActivateWirelessConnection_Call{Call: _e.mock.On("AddAndActivateWirelessConnection", connection, device, accessPoint)}
 }
 
-func (_c *MockNetworkManager_AddAndActivateWirelessConnection_Call) Run(run func(connection map[string]map[string]interface{}, device gonetworkmanager.Device, accessPoint gonetworkmanager.AccessPoint)) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
+func (_c *MockNetworkManager_AddAndActivateWirelessConnection_Call) Run(run func(connection map[string]map[string]any, device gonetworkmanager.Device, accessPoint gonetworkmanager.AccessPoint)) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(map[string]map[string]interface{}), args[1].(gonetworkmanager.Device), args[2].(gonetworkmanager.AccessPoint))
+		run(args[0].(map[string]map[string]any), args[1].(gonetworkmanager.Device), args[2].(gonetworkmanager.AccessPoint))
 	})
 	return _c
 }
@@ -256,7 +256,7 @@ func (_c *MockNetworkManager_AddAndActivateWirelessConnection_Call) Return(_a0 g
 	return _c
 }
 
-func (_c *MockNetworkManager_AddAndActivateWirelessConnection_Call) RunAndReturn(run func(map[string]map[string]interface{}, gonetworkmanager.Device, gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error)) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
+func (_c *MockNetworkManager_AddAndActivateWirelessConnection_Call) RunAndReturn(run func(map[string]map[string]any, gonetworkmanager.Device, gonetworkmanager.AccessPoint) (gonetworkmanager.ActiveConnection, error)) *MockNetworkManager_AddAndActivateWirelessConnection_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -332,7 +332,7 @@ type MockNetworkManager_CheckpointAdjustRollbackTimeout_Call struct {
 // CheckpointAdjustRollbackTimeout is a helper method to define mock.On call
 //   - checkpoint gonetworkmanager.Checkpoint
 //   - addTimeout uint32
-func (_e *MockNetworkManager_Expecter) CheckpointAdjustRollbackTimeout(checkpoint interface{}, addTimeout interface{}) *MockNetworkManager_CheckpointAdjustRollbackTimeout_Call {
+func (_e *MockNetworkManager_Expecter) CheckpointAdjustRollbackTimeout(checkpoint any, addTimeout any) *MockNetworkManager_CheckpointAdjustRollbackTimeout_Call {
 	return &MockNetworkManager_CheckpointAdjustRollbackTimeout_Call{Call: _e.mock.On("CheckpointAdjustRollbackTimeout", checkpoint, addTimeout)}
 }
 
@@ -392,7 +392,7 @@ type MockNetworkManager_CheckpointCreate_Call struct {
 //   - devices []gonetworkmanager.Device
 //   - rollbackTimeout uint32
 //   - flags uint32
-func (_e *MockNetworkManager_Expecter) CheckpointCreate(devices interface{}, rollbackTimeout interface{}, flags interface{}) *MockNetworkManager_CheckpointCreate_Call {
+func (_e *MockNetworkManager_Expecter) CheckpointCreate(devices any, rollbackTimeout any, flags any) *MockNetworkManager_CheckpointCreate_Call {
 	return &MockNetworkManager_CheckpointCreate_Call{Call: _e.mock.On("CheckpointCreate", devices, rollbackTimeout, flags)}
 }
 
@@ -438,7 +438,7 @@ type MockNetworkManager_CheckpointDestroy_Call struct {
 
 // CheckpointDestroy is a helper method to define mock.On call
 //   - checkpoint gonetworkmanager.Checkpoint
-func (_e *MockNetworkManager_Expecter) CheckpointDestroy(checkpoint interface{}) *MockNetworkManager_CheckpointDestroy_Call {
+func (_e *MockNetworkManager_Expecter) CheckpointDestroy(checkpoint any) *MockNetworkManager_CheckpointDestroy_Call {
 	return &MockNetworkManager_CheckpointDestroy_Call{Call: _e.mock.On("CheckpointDestroy", checkpoint)}
 }
 
@@ -496,7 +496,7 @@ type MockNetworkManager_CheckpointRollback_Call struct {
 
 // CheckpointRollback is a helper method to define mock.On call
 //   - checkpoint gonetworkmanager.Checkpoint
-func (_e *MockNetworkManager_Expecter) CheckpointRollback(checkpoint interface{}) *MockNetworkManager_CheckpointRollback_Call {
+func (_e *MockNetworkManager_Expecter) CheckpointRollback(checkpoint any) *MockNetworkManager_CheckpointRollback_Call {
 	return &MockNetworkManager_CheckpointRollback_Call{Call: _e.mock.On("CheckpointRollback", checkpoint)}
 }
 
@@ -542,7 +542,7 @@ type MockNetworkManager_DeactivateConnection_Call struct {
 
 // DeactivateConnection is a helper method to define mock.On call
 //   - connection gonetworkmanager.ActiveConnection
-func (_e *MockNetworkManager_Expecter) DeactivateConnection(connection interface{}) *MockNetworkManager_DeactivateConnection_Call {
+func (_e *MockNetworkManager_Expecter) DeactivateConnection(connection any) *MockNetworkManager_DeactivateConnection_Call {
 	return &MockNetworkManager_DeactivateConnection_Call{Call: _e.mock.On("DeactivateConnection", connection)}
 }
 
@@ -588,7 +588,7 @@ type MockNetworkManager_Enable_Call struct {
 
 // Enable is a helper method to define mock.On call
 //   - enableNDisable bool
-func (_e *MockNetworkManager_Expecter) Enable(enableNDisable interface{}) *MockNetworkManager_Enable_Call {
+func (_e *MockNetworkManager_Expecter) Enable(enableNDisable any) *MockNetworkManager_Enable_Call {
 	return &MockNetworkManager_Enable_Call{Call: _e.mock.On("Enable", enableNDisable)}
 }
 
@@ -703,7 +703,7 @@ type MockNetworkManager_GetDeviceByIpIface_Call struct {
 
 // GetDeviceByIpIface is a helper method to define mock.On call
 //   - interfaceId string
-func (_e *MockNetworkManager_Expecter) GetDeviceByIpIface(interfaceId interface{}) *MockNetworkManager_GetDeviceByIpIface_Call {
+func (_e *MockNetworkManager_Expecter) GetDeviceByIpIface(interfaceId any) *MockNetworkManager_GetDeviceByIpIface_Call {
 	return &MockNetworkManager_GetDeviceByIpIface_Call{Call: _e.mock.On("GetDeviceByIpIface", interfaceId)}
 }
 
@@ -2087,7 +2087,7 @@ type MockNetworkManager_Reload_Call struct {
 
 // Reload is a helper method to define mock.On call
 //   - flags uint32
-func (_e *MockNetworkManager_Expecter) Reload(flags interface{}) *MockNetworkManager_Reload_Call {
+func (_e *MockNetworkManager_Expecter) Reload(flags any) *MockNetworkManager_Reload_Call {
 	return &MockNetworkManager_Reload_Call{Call: _e.mock.On("Reload", flags)}
 }
 
@@ -2133,7 +2133,7 @@ type MockNetworkManager_SetPropertyWirelessEnabled_Call struct {
 
 // SetPropertyWirelessEnabled is a helper method to define mock.On call
 //   - _a0 bool
-func (_e *MockNetworkManager_Expecter) SetPropertyWirelessEnabled(_a0 interface{}) *MockNetworkManager_SetPropertyWirelessEnabled_Call {
+func (_e *MockNetworkManager_Expecter) SetPropertyWirelessEnabled(_a0 any) *MockNetworkManager_SetPropertyWirelessEnabled_Call {
 	return &MockNetworkManager_SetPropertyWirelessEnabled_Call{Call: _e.mock.On("SetPropertyWirelessEnabled", _a0)}
 }
 
@@ -2179,7 +2179,7 @@ type MockNetworkManager_Sleep_Call struct {
 
 // Sleep is a helper method to define mock.On call
 //   - sleepNWake bool
-func (_e *MockNetworkManager_Expecter) Sleep(sleepNWake interface{}) *MockNetworkManager_Sleep_Call {
+func (_e *MockNetworkManager_Expecter) Sleep(sleepNWake any) *MockNetworkManager_Sleep_Call {
 	return &MockNetworkManager_Sleep_Call{Call: _e.mock.On("Sleep", sleepNWake)}
 }
 

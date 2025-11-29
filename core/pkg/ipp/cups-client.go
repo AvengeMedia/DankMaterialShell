@@ -307,7 +307,7 @@ func (c *CUPSClient) PrintTestPage(printer string, testPageData io.Reader, size 
 		Name:     "Test Page",
 		Size:     size,
 		MimeType: MimeTypePDF,
-	}, printer, map[string]interface{}{
+	}, printer, map[string]any{
 		AttributeJobName: "Test Page",
 	})
 }

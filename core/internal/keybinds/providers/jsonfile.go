@@ -44,7 +44,7 @@ func (j *JSONFileProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var rawData map[string]interface{}
+	var rawData map[string]any
 	if err := json.Unmarshal(data, &rawData); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w", err)
 	}
@@ -63,9 +63,9 @@ func (j *JSONFileProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	}
 
 	switch binds := bindsRaw.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for category, categoryBindsRaw := range binds {
-			categoryBindsList, ok := categoryBindsRaw.([]interface{})
+			categoryBindsList, ok := categoryBindsRaw.([]any)
 			if !ok {
 				continue
 			}
@@ -79,7 +79,7 @@ func (j *JSONFileProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 			categorizedBinds[category] = keybindsList
 		}
 
-	case []interface{}:
+	case []any:
 		flatBindsJSON, _ := json.Marshal(binds)
 		var flatBinds []struct {
 			Key         string `json:"key"`

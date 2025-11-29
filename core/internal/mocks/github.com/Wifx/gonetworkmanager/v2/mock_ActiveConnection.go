@@ -989,7 +989,7 @@ type MockActiveConnection_SubscribeState_Call struct {
 // SubscribeState is a helper method to define mock.On call
 //   - receiver chan gonetworkmanager.StateChange
 //   - exit chan struct{}
-func (_e *MockActiveConnection_Expecter) SubscribeState(receiver interface{}, exit interface{}) *MockActiveConnection_SubscribeState_Call {
+func (_e *MockActiveConnection_Expecter) SubscribeState(receiver any, exit any) *MockActiveConnection_SubscribeState_Call {
 	return &MockActiveConnection_SubscribeState_Call{Call: _e.mock.On("SubscribeState", receiver, exit)}
 }
 

@@ -10,9 +10,9 @@ import (
 )
 
 type Request struct {
-	ID     int                    `json:"id,omitempty"`
-	Method string                 `json:"method"`
-	Params map[string]interface{} `json:"params,omitempty"`
+	ID     int            `json:"id,omitempty"`
+	Method string         `json:"method"`
+	Params map[string]any `json:"params,omitempty"`
 }
 
 type SuccessResult struct {
@@ -97,7 +97,7 @@ func handleCredentialsSubmit(conn net.Conn, req Request, manager *Manager) {
 		return
 	}
 
-	secretsRaw, ok := req.Params["secrets"].(map[string]interface{})
+	secretsRaw, ok := req.Params["secrets"].(map[string]any)
 	if !ok {
 		log.Warnf("handleCredentialsSubmit: missing or invalid secrets parameter")
 		models.RespondError(conn, req.ID, "missing or invalid 'secrets' parameter")
@@ -603,7 +603,7 @@ func handleUpdateVPNConfig(conn net.Conn, req Request, manager *Manager) {
 		return
 	}
 
-	updates := make(map[string]interface{})
+	updates := make(map[string]any)
 
 	if name, ok := req.Params["name"].(string); ok {
 		updates["name"] = name
@@ -611,7 +611,7 @@ func handleUpdateVPNConfig(conn net.Conn, req Request, manager *Manager) {
 	if autoconnect, ok := req.Params["autoconnect"].(bool); ok {
 		updates["autoconnect"] = autoconnect
 	}
-	if data, ok := req.Params["data"].(map[string]interface{}); ok {
+	if data, ok := req.Params["data"].(map[string]any); ok {
 		updates["data"] = data
 	}
 

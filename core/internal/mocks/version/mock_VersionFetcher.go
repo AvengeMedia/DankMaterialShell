@@ -52,7 +52,7 @@ type MockVersionFetcher_GetCurrentVersion_Call struct {
 
 // GetCurrentVersion is a helper method to define mock.On call
 //   - dmsPath string
-func (_e *MockVersionFetcher_Expecter) GetCurrentVersion(dmsPath interface{}) *MockVersionFetcher_GetCurrentVersion_Call {
+func (_e *MockVersionFetcher_Expecter) GetCurrentVersion(dmsPath any) *MockVersionFetcher_GetCurrentVersion_Call {
 	return &MockVersionFetcher_GetCurrentVersion_Call{Call: _e.mock.On("GetCurrentVersion", dmsPath)}
 }
 
@@ -108,7 +108,7 @@ type MockVersionFetcher_GetLatestVersion_Call struct {
 
 // GetLatestVersion is a helper method to define mock.On call
 //   - dmsPath string
-func (_e *MockVersionFetcher_Expecter) GetLatestVersion(dmsPath interface{}) *MockVersionFetcher_GetLatestVersion_Call {
+func (_e *MockVersionFetcher_Expecter) GetLatestVersion(dmsPath any) *MockVersionFetcher_GetLatestVersion_Call {
 	return &MockVersionFetcher_GetLatestVersion_Call{Call: _e.mock.On("GetLatestVersion", dmsPath)}
 }
 

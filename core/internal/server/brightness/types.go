@@ -34,9 +34,9 @@ type DeviceUpdate struct {
 }
 
 type Request struct {
-	ID     interface{}            `json:"id"`
-	Method string                 `json:"method"`
-	Params map[string]interface{} `json:"params"`
+	ID     any            `json:"id"`
+	Method string         `json:"method"`
+	Params map[string]any `json:"params"`
 }
 
 type Manager struct {

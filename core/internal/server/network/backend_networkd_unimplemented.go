@@ -66,7 +66,7 @@ func (b *SystemdNetworkdBackend) GetVPNConfig(uuidOrName string) (*VPNConfig, er
 	return nil, fmt.Errorf("VPN not supported by networkd backend")
 }
 
-func (b *SystemdNetworkdBackend) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+func (b *SystemdNetworkdBackend) UpdateVPNConfig(uuid string, updates map[string]any) error {
 	return fmt.Errorf("VPN not supported by networkd backend")
 }
 

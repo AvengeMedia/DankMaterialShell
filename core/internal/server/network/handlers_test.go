@@ -128,7 +128,7 @@ func TestHandleConnectWiFi(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "network.wifi.connect",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleConnectWiFi(conn, req, manager)
@@ -152,7 +152,7 @@ func TestHandleSetPreference(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "network.preference.set",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetPreference(conn, req, manager)
@@ -176,7 +176,7 @@ func TestHandleGetNetworkInfo(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "network.info",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleGetNetworkInfo(conn, req, manager)

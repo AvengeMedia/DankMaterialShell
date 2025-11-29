@@ -8,9 +8,9 @@ import (
 )
 
 type Request struct {
-	ID     int                    `json:"id,omitempty"`
-	Method string                 `json:"method"`
-	Params map[string]interface{} `json:"params,omitempty"`
+	ID     int            `json:"id,omitempty"`
+	Method string         `json:"method"`
+	Params map[string]any `json:"params,omitempty"`
 }
 
 type SuccessResult struct {

@@ -93,7 +93,7 @@ type MockDBusConn_Object_Call struct {
 // Object is a helper method to define mock.On call
 //   - dest string
 //   - path dbus.ObjectPath
-func (_e *MockDBusConn_Expecter) Object(dest interface{}, path interface{}) *MockDBusConn_Object_Call {
+func (_e *MockDBusConn_Expecter) Object(dest any, path any) *MockDBusConn_Object_Call {
 	return &MockDBusConn_Object_Call{Call: _e.mock.On("Object", dest, path)}
 }
 
@@ -119,7 +119,8 @@ func (_c *MockDBusConn_Object_Call) RunAndReturn(run func(string, dbus.ObjectPat
 func NewMockDBusConn(t interface {
 	mock.TestingT
 	Cleanup(func())
-}) *MockDBusConn {
+},
+) *MockDBusConn {
 	mock := &MockDBusConn{}
 	mock.Mock.Test(t)
 

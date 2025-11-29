@@ -46,8 +46,8 @@ type ServerInfo struct {
 }
 
 type ServiceEvent struct {
-	Service string      `json:"service"`
-	Data    interface{} `json:"data"`
+	Service string `json:"service"`
+	Data    any    `json:"data"`
 }
 
 var networkManager *network.Manager
@@ -453,7 +453,7 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 	clientID := fmt.Sprintf("meta-client-%p", conn)
 
 	var services []string
-	if servicesParam, ok := req.Params["services"].([]interface{}); ok {
+	if servicesParam, ok := req.Params["services"].([]any); ok {
 		for _, s := range servicesParam {
 			if str, ok := s.(string); ok {
 				services = append(services, str)

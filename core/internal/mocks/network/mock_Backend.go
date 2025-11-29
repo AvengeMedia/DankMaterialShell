@@ -45,7 +45,7 @@ type MockBackend_ActivateWiredConnection_Call struct {
 
 // ActivateWiredConnection is a helper method to define mock.On call
 //   - uuid string
-func (_e *MockBackend_Expecter) ActivateWiredConnection(uuid interface{}) *MockBackend_ActivateWiredConnection_Call {
+func (_e *MockBackend_Expecter) ActivateWiredConnection(uuid any) *MockBackend_ActivateWiredConnection_Call {
 	return &MockBackend_ActivateWiredConnection_Call{Call: _e.mock.On("ActivateWiredConnection", uuid)}
 }
 
@@ -91,7 +91,7 @@ type MockBackend_CancelCredentials_Call struct {
 
 // CancelCredentials is a helper method to define mock.On call
 //   - token string
-func (_e *MockBackend_Expecter) CancelCredentials(token interface{}) *MockBackend_CancelCredentials_Call {
+func (_e *MockBackend_Expecter) CancelCredentials(token any) *MockBackend_CancelCredentials_Call {
 	return &MockBackend_CancelCredentials_Call{Call: _e.mock.On("CancelCredentials", token)}
 }
 
@@ -137,7 +137,7 @@ type MockBackend_ClearVPNCredentials_Call struct {
 
 // ClearVPNCredentials is a helper method to define mock.On call
 //   - uuidOrName string
-func (_e *MockBackend_Expecter) ClearVPNCredentials(uuidOrName interface{}) *MockBackend_ClearVPNCredentials_Call {
+func (_e *MockBackend_Expecter) ClearVPNCredentials(uuidOrName any) *MockBackend_ClearVPNCredentials_Call {
 	return &MockBackend_ClearVPNCredentials_Call{Call: _e.mock.On("ClearVPNCredentials", uuidOrName)}
 }
 
@@ -261,7 +261,7 @@ type MockBackend_ConnectVPN_Call struct {
 // ConnectVPN is a helper method to define mock.On call
 //   - uuidOrName string
 //   - singleActive bool
-func (_e *MockBackend_Expecter) ConnectVPN(uuidOrName interface{}, singleActive interface{}) *MockBackend_ConnectVPN_Call {
+func (_e *MockBackend_Expecter) ConnectVPN(uuidOrName any, singleActive any) *MockBackend_ConnectVPN_Call {
 	return &MockBackend_ConnectVPN_Call{Call: _e.mock.On("ConnectVPN", uuidOrName, singleActive)}
 }
 
@@ -307,7 +307,7 @@ type MockBackend_ConnectWiFi_Call struct {
 
 // ConnectWiFi is a helper method to define mock.On call
 //   - req network.ConnectionRequest
-func (_e *MockBackend_Expecter) ConnectWiFi(req interface{}) *MockBackend_ConnectWiFi_Call {
+func (_e *MockBackend_Expecter) ConnectWiFi(req any) *MockBackend_ConnectWiFi_Call {
 	return &MockBackend_ConnectWiFi_Call{Call: _e.mock.On("ConnectWiFi", req)}
 }
 
@@ -353,7 +353,7 @@ type MockBackend_DeleteVPN_Call struct {
 
 // DeleteVPN is a helper method to define mock.On call
 //   - uuidOrName string
-func (_e *MockBackend_Expecter) DeleteVPN(uuidOrName interface{}) *MockBackend_DeleteVPN_Call {
+func (_e *MockBackend_Expecter) DeleteVPN(uuidOrName any) *MockBackend_DeleteVPN_Call {
 	return &MockBackend_DeleteVPN_Call{Call: _e.mock.On("DeleteVPN", uuidOrName)}
 }
 
@@ -489,7 +489,7 @@ type MockBackend_DisconnectEthernetDevice_Call struct {
 
 // DisconnectEthernetDevice is a helper method to define mock.On call
 //   - device string
-func (_e *MockBackend_Expecter) DisconnectEthernetDevice(device interface{}) *MockBackend_DisconnectEthernetDevice_Call {
+func (_e *MockBackend_Expecter) DisconnectEthernetDevice(device any) *MockBackend_DisconnectEthernetDevice_Call {
 	return &MockBackend_DisconnectEthernetDevice_Call{Call: _e.mock.On("DisconnectEthernetDevice", device)}
 }
 
@@ -535,7 +535,7 @@ type MockBackend_DisconnectVPN_Call struct {
 
 // DisconnectVPN is a helper method to define mock.On call
 //   - uuidOrName string
-func (_e *MockBackend_Expecter) DisconnectVPN(uuidOrName interface{}) *MockBackend_DisconnectVPN_Call {
+func (_e *MockBackend_Expecter) DisconnectVPN(uuidOrName any) *MockBackend_DisconnectVPN_Call {
 	return &MockBackend_DisconnectVPN_Call{Call: _e.mock.On("DisconnectVPN", uuidOrName)}
 }
 
@@ -626,7 +626,7 @@ type MockBackend_DisconnectWiFiDevice_Call struct {
 
 // DisconnectWiFiDevice is a helper method to define mock.On call
 //   - device string
-func (_e *MockBackend_Expecter) DisconnectWiFiDevice(device interface{}) *MockBackend_DisconnectWiFiDevice_Call {
+func (_e *MockBackend_Expecter) DisconnectWiFiDevice(device any) *MockBackend_DisconnectWiFiDevice_Call {
 	return &MockBackend_DisconnectWiFiDevice_Call{Call: _e.mock.On("DisconnectWiFiDevice", device)}
 }
 
@@ -672,7 +672,7 @@ type MockBackend_ForgetWiFiNetwork_Call struct {
 
 // ForgetWiFiNetwork is a helper method to define mock.On call
 //   - ssid string
-func (_e *MockBackend_Expecter) ForgetWiFiNetwork(ssid interface{}) *MockBackend_ForgetWiFiNetwork_Call {
+func (_e *MockBackend_Expecter) ForgetWiFiNetwork(ssid any) *MockBackend_ForgetWiFiNetwork_Call {
 	return &MockBackend_ForgetWiFiNetwork_Call{Call: _e.mock.On("ForgetWiFiNetwork", ssid)}
 }
 
@@ -881,7 +881,7 @@ type MockBackend_GetVPNConfig_Call struct {
 
 // GetVPNConfig is a helper method to define mock.On call
 //   - uuidOrName string
-func (_e *MockBackend_Expecter) GetVPNConfig(uuidOrName interface{}) *MockBackend_GetVPNConfig_Call {
+func (_e *MockBackend_Expecter) GetVPNConfig(uuidOrName any) *MockBackend_GetVPNConfig_Call {
 	return &MockBackend_GetVPNConfig_Call{Call: _e.mock.On("GetVPNConfig", uuidOrName)}
 }
 
@@ -1041,7 +1041,7 @@ type MockBackend_GetWiFiNetworkDetails_Call struct {
 
 // GetWiFiNetworkDetails is a helper method to define mock.On call
 //   - ssid string
-func (_e *MockBackend_Expecter) GetWiFiNetworkDetails(ssid interface{}) *MockBackend_GetWiFiNetworkDetails_Call {
+func (_e *MockBackend_Expecter) GetWiFiNetworkDetails(ssid any) *MockBackend_GetWiFiNetworkDetails_Call {
 	return &MockBackend_GetWiFiNetworkDetails_Call{Call: _e.mock.On("GetWiFiNetworkDetails", ssid)}
 }
 
@@ -1156,7 +1156,7 @@ type MockBackend_GetWiredNetworkDetails_Call struct {
 
 // GetWiredNetworkDetails is a helper method to define mock.On call
 //   - uuid string
-func (_e *MockBackend_Expecter) GetWiredNetworkDetails(uuid interface{}) *MockBackend_GetWiredNetworkDetails_Call {
+func (_e *MockBackend_Expecter) GetWiredNetworkDetails(uuid any) *MockBackend_GetWiredNetworkDetails_Call {
 	return &MockBackend_GetWiredNetworkDetails_Call{Call: _e.mock.On("GetWiredNetworkDetails", uuid)}
 }
 
@@ -1215,7 +1215,7 @@ type MockBackend_ImportVPN_Call struct {
 // ImportVPN is a helper method to define mock.On call
 //   - filePath string
 //   - name string
-func (_e *MockBackend_Expecter) ImportVPN(filePath interface{}, name interface{}) *MockBackend_ImportVPN_Call {
+func (_e *MockBackend_Expecter) ImportVPN(filePath any, name any) *MockBackend_ImportVPN_Call {
 	return &MockBackend_ImportVPN_Call{Call: _e.mock.On("ImportVPN", filePath, name)}
 }
 
@@ -1522,7 +1522,7 @@ type MockBackend_ScanWiFiDevice_Call struct {
 
 // ScanWiFiDevice is a helper method to define mock.On call
 //   - device string
-func (_e *MockBackend_Expecter) ScanWiFiDevice(device interface{}) *MockBackend_ScanWiFiDevice_Call {
+func (_e *MockBackend_Expecter) ScanWiFiDevice(device any) *MockBackend_ScanWiFiDevice_Call {
 	return &MockBackend_ScanWiFiDevice_Call{Call: _e.mock.On("ScanWiFiDevice", device)}
 }
 
@@ -1568,7 +1568,7 @@ type MockBackend_SetPromptBroker_Call struct {
 
 // SetPromptBroker is a helper method to define mock.On call
 //   - broker network.PromptBroker
-func (_e *MockBackend_Expecter) SetPromptBroker(broker interface{}) *MockBackend_SetPromptBroker_Call {
+func (_e *MockBackend_Expecter) SetPromptBroker(broker any) *MockBackend_SetPromptBroker_Call {
 	return &MockBackend_SetPromptBroker_Call{Call: _e.mock.On("SetPromptBroker", broker)}
 }
 
@@ -1617,7 +1617,7 @@ type MockBackend_SetVPNCredentials_Call struct {
 //   - username string
 //   - password string
 //   - save bool
-func (_e *MockBackend_Expecter) SetVPNCredentials(uuid interface{}, username interface{}, password interface{}, save interface{}) *MockBackend_SetVPNCredentials_Call {
+func (_e *MockBackend_Expecter) SetVPNCredentials(uuid any, username any, password any, save any) *MockBackend_SetVPNCredentials_Call {
 	return &MockBackend_SetVPNCredentials_Call{Call: _e.mock.On("SetVPNCredentials", uuid, username, password, save)}
 }
 
@@ -1664,7 +1664,7 @@ type MockBackend_SetWiFiAutoconnect_Call struct {
 // SetWiFiAutoconnect is a helper method to define mock.On call
 //   - ssid string
 //   - autoconnect bool
-func (_e *MockBackend_Expecter) SetWiFiAutoconnect(ssid interface{}, autoconnect interface{}) *MockBackend_SetWiFiAutoconnect_Call {
+func (_e *MockBackend_Expecter) SetWiFiAutoconnect(ssid any, autoconnect any) *MockBackend_SetWiFiAutoconnect_Call {
 	return &MockBackend_SetWiFiAutoconnect_Call{Call: _e.mock.On("SetWiFiAutoconnect", ssid, autoconnect)}
 }
 
@@ -1710,7 +1710,7 @@ type MockBackend_SetWiFiEnabled_Call struct {
 
 // SetWiFiEnabled is a helper method to define mock.On call
 //   - enabled bool
-func (_e *MockBackend_Expecter) SetWiFiEnabled(enabled interface{}) *MockBackend_SetWiFiEnabled_Call {
+func (_e *MockBackend_Expecter) SetWiFiEnabled(enabled any) *MockBackend_SetWiFiEnabled_Call {
 	return &MockBackend_SetWiFiEnabled_Call{Call: _e.mock.On("SetWiFiEnabled", enabled)}
 }
 
@@ -1756,7 +1756,7 @@ type MockBackend_StartMonitoring_Call struct {
 
 // StartMonitoring is a helper method to define mock.On call
 //   - onStateChange func()
-func (_e *MockBackend_Expecter) StartMonitoring(onStateChange interface{}) *MockBackend_StartMonitoring_Call {
+func (_e *MockBackend_Expecter) StartMonitoring(onStateChange any) *MockBackend_StartMonitoring_Call {
 	return &MockBackend_StartMonitoring_Call{Call: _e.mock.On("StartMonitoring", onStateChange)}
 }
 
@@ -1836,7 +1836,7 @@ type MockBackend_SubmitCredentials_Call struct {
 //   - token string
 //   - secrets map[string]string
 //   - save bool
-func (_e *MockBackend_Expecter) SubmitCredentials(token interface{}, secrets interface{}, save interface{}) *MockBackend_SubmitCredentials_Call {
+func (_e *MockBackend_Expecter) SubmitCredentials(token any, secrets any, save any) *MockBackend_SubmitCredentials_Call {
 	return &MockBackend_SubmitCredentials_Call{Call: _e.mock.On("SubmitCredentials", token, secrets, save)}
 }
 
@@ -1858,7 +1858,7 @@ func (_c *MockBackend_SubmitCredentials_Call) RunAndReturn(run func(string, map[
 }
 
 // UpdateVPNConfig provides a mock function with given fields: uuid, updates
-func (_m *MockBackend) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+func (_m *MockBackend) UpdateVPNConfig(uuid string, updates map[string]any) error {
 	ret := _m.Called(uuid, updates)
 
 	if len(ret) == 0 {
@@ -1866,7 +1866,7 @@ func (_m *MockBackend) UpdateVPNConfig(uuid string, updates map[string]interface
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, map[string]interface{}) error); ok {
+	if rf, ok := ret.Get(0).(func(string, map[string]any) error); ok {
 		r0 = rf(uuid, updates)
 	} else {
 		r0 = ret.Error(0)
@@ -1882,14 +1882,14 @@ type MockBackend_UpdateVPNConfig_Call struct {
 
 // UpdateVPNConfig is a helper method to define mock.On call
 //   - uuid string
-//   - updates map[string]interface{}
-func (_e *MockBackend_Expecter) UpdateVPNConfig(uuid interface{}, updates interface{}) *MockBackend_UpdateVPNConfig_Call {
+//   - updates map[string]any
+func (_e *MockBackend_Expecter) UpdateVPNConfig(uuid any, updates any) *MockBackend_UpdateVPNConfig_Call {
 	return &MockBackend_UpdateVPNConfig_Call{Call: _e.mock.On("UpdateVPNConfig", uuid, updates)}
 }
 
-func (_c *MockBackend_UpdateVPNConfig_Call) Run(run func(uuid string, updates map[string]interface{})) *MockBackend_UpdateVPNConfig_Call {
+func (_c *MockBackend_UpdateVPNConfig_Call) Run(run func(uuid string, updates map[string]any)) *MockBackend_UpdateVPNConfig_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string), args[1].(map[string]interface{}))
+		run(args[0].(string), args[1].(map[string]any))
 	})
 	return _c
 }
@@ -1899,7 +1899,7 @@ func (_c *MockBackend_UpdateVPNConfig_Call) Return(_a0 error) *MockBackend_Updat
 	return _c
 }
 
-func (_c *MockBackend_UpdateVPNConfig_Call) RunAndReturn(run func(string, map[string]interface{}) error) *MockBackend_UpdateVPNConfig_Call {
+func (_c *MockBackend_UpdateVPNConfig_Call) RunAndReturn(run func(string, map[string]any) error) *MockBackend_UpdateVPNConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }

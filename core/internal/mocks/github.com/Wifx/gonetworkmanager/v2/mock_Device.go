@@ -1463,7 +1463,7 @@ type MockDevice_Reapply_Call struct {
 //   - connection gonetworkmanager.Connection
 //   - versionId uint64
 //   - flags uint32
-func (_e *MockDevice_Expecter) Reapply(connection interface{}, versionId interface{}, flags interface{}) *MockDevice_Reapply_Call {
+func (_e *MockDevice_Expecter) Reapply(connection any, versionId any, flags any) *MockDevice_Reapply_Call {
 	return &MockDevice_Reapply_Call{Call: _e.mock.On("Reapply", connection, versionId, flags)}
 }
 
@@ -1509,7 +1509,7 @@ type MockDevice_SetPropertyAutoConnect_Call struct {
 
 // SetPropertyAutoConnect is a helper method to define mock.On call
 //   - _a0 bool
-func (_e *MockDevice_Expecter) SetPropertyAutoConnect(_a0 interface{}) *MockDevice_SetPropertyAutoConnect_Call {
+func (_e *MockDevice_Expecter) SetPropertyAutoConnect(_a0 any) *MockDevice_SetPropertyAutoConnect_Call {
 	return &MockDevice_SetPropertyAutoConnect_Call{Call: _e.mock.On("SetPropertyAutoConnect", _a0)}
 }
 
@@ -1555,7 +1555,7 @@ type MockDevice_SetPropertyManaged_Call struct {
 
 // SetPropertyManaged is a helper method to define mock.On call
 //   - _a0 bool
-func (_e *MockDevice_Expecter) SetPropertyManaged(_a0 interface{}) *MockDevice_SetPropertyManaged_Call {
+func (_e *MockDevice_Expecter) SetPropertyManaged(_a0 any) *MockDevice_SetPropertyManaged_Call {
 	return &MockDevice_SetPropertyManaged_Call{Call: _e.mock.On("SetPropertyManaged", _a0)}
 }
 
@@ -1602,7 +1602,7 @@ type MockDevice_SubscribeState_Call struct {
 // SubscribeState is a helper method to define mock.On call
 //   - receiver chan gonetworkmanager.DeviceStateChange
 //   - exit chan struct{}
-func (_e *MockDevice_Expecter) SubscribeState(receiver interface{}, exit interface{}) *MockDevice_SubscribeState_Call {
+func (_e *MockDevice_Expecter) SubscribeState(receiver any, exit any) *MockDevice_SubscribeState_Call {
 	return &MockDevice_SubscribeState_Call{Call: _e.mock.On("SubscribeState", receiver, exit)}
 }
 

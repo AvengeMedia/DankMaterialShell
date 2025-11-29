@@ -35,7 +35,7 @@ type Backend interface {
 	ListVPNPlugins() ([]VPNPlugin, error)
 	ImportVPN(filePath string, name string) (*VPNImportResult, error)
 	GetVPNConfig(uuidOrName string) (*VPNConfig, error)
-	UpdateVPNConfig(uuid string, updates map[string]interface{}) error
+	UpdateVPNConfig(uuid string, updates map[string]any) error
 	SetVPNCredentials(uuid string, username string, password string, save bool) error
 	DeleteVPN(uuidOrName string) error
 

@@ -196,7 +196,7 @@ func (b *HybridIwdNetworkdBackend) GetVPNConfig(uuidOrName string) (*VPNConfig, 
 	return nil, fmt.Errorf("VPN not supported in hybrid mode")
 }
 
-func (b *HybridIwdNetworkdBackend) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+func (b *HybridIwdNetworkdBackend) UpdateVPNConfig(uuid string, updates map[string]any) error {
 	return fmt.Errorf("VPN not supported in hybrid mode")
 }
 

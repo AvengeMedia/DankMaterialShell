@@ -62,7 +62,7 @@ func (sm *SubscriptionManager) createSubscription() (int, error) {
 	req.OperationAttributes[ipp.AttributeRequestingUserName] = "dms"
 
 	// Subscription attributes go in SubscriptionAttributes (subscription-attributes-tag in IPP)
-	req.SubscriptionAttributes = map[string]interface{}{
+	req.SubscriptionAttributes = map[string]any{
 		"notify-events": []string{
 			"printer-state-changed",
 			"printer-added",

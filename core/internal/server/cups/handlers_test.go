@@ -75,7 +75,7 @@ func TestHandleGetPrinters_Error(t *testing.T) {
 
 	handleGetPrinters(conn, req, m)
 
-	var resp models.Response[interface{}]
+	var resp models.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -103,7 +103,7 @@ func TestHandleGetJobs(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.getJobs",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"printerName": "printer1",
 		},
 	}
@@ -130,12 +130,12 @@ func TestHandleGetJobs_MissingParam(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.getJobs",
-		Params: map[string]interface{}{},
+		Params: map[string]any{},
 	}
 
 	handleGetJobs(conn, req, m)
 
-	var resp models.Response[interface{}]
+	var resp models.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
@@ -155,7 +155,7 @@ func TestHandlePausePrinter(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.pausePrinter",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"printerName": "printer1",
 		},
 	}
@@ -182,7 +182,7 @@ func TestHandleResumePrinter(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.resumePrinter",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"printerName": "printer1",
 		},
 	}
@@ -209,7 +209,7 @@ func TestHandleCancelJob(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.cancelJob",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"jobID": float64(1),
 		},
 	}
@@ -236,7 +236,7 @@ func TestHandlePurgeJobs(t *testing.T) {
 	req := Request{
 		ID:     1,
 		Method: "cups.purgeJobs",
-		Params: map[string]interface{}{
+		Params: map[string]any{
 			"printerName": "printer1",
 		},
 	}
@@ -267,7 +267,7 @@ func TestHandleRequest_UnknownMethod(t *testing.T) {
 
 	HandleRequest(conn, req, m)
 
-	var resp models.Response[interface{}]
+	var resp models.Response[any]
 	err := json.NewDecoder(buf).Decode(&resp)
 	assert.NoError(t, err)
 	assert.Nil(t, resp.Result)
