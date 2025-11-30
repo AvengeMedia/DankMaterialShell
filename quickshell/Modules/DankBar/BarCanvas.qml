@@ -31,6 +31,25 @@ Item {
     readonly property string mainPath: generatePathForPosition(width, height)
     readonly property string borderFullPath: generateBorderFullPath(width, height)
     readonly property string borderEdgePath: generateBorderEdgePath(width, height)
+    property bool mainPathCorrectShape: false
+    property bool borderFullPathCorrectShape: false
+    property bool borderEdgePathCorrectShape: false
+
+    onMainPathChanged: {
+        if (width > 0 && height > 0){
+            root:mainPathCorrectShape = true;
+        }
+    }
+    onBorderFullPathChanged: {
+        if (width > 0 && height > 0){
+            root:borderFullPathCorrectShape = true;
+        }
+    }
+    onBorderEdgePathChanged: {
+        if (width > 0 && height > 0){
+            root:borderEdgePathCorrectShape = true;
+        }
+    }
 
     MouseArea {
         anchors.fill: parent
@@ -51,27 +70,31 @@ Item {
         }
     }
 
-    Shape {
+
+    Loader {
         id: barShape
         anchors.fill: parent
-        preferredRendererType: Shape.CurveRenderer
+        active: mainPathCorrectShape
+        sourceComponent: Shape {
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
 
-        ShapePath {
-            fillColor: barWindow._bgColor
-            strokeColor: "transparent"
-            strokeWidth: 0
+            ShapePath {
+                fillColor: barWindow._bgColor
+                strokeColor: "transparent"
+                strokeWidth: 0
 
-            PathSvg {
-                path: root.mainPath
+                PathSvg {
+                    path: root.mainPath
+                }
             }
         }
     }
 
-    Shape {
+   Loader {
         id: barBorder
         anchors.fill: parent
-        visible: barConfig?.borderEnabled ?? false
-        preferredRendererType: Shape.CurveRenderer
+        active: borderFullPathCorrectShape && borderEdgePathCorrectShape
 
         readonly property real borderThickness: Math.max(1, barConfig?.borderThickness ?? 1)
         readonly property real inset: showFullBorder ? Math.ceil(borderThickness / 2) : borderThickness / 2
@@ -79,16 +102,22 @@ Item {
         readonly property color baseColor: (borderColorKey === "surfaceText") ? Theme.surfaceText : (borderColorKey === "primary") ? Theme.primary : Theme.secondary
         readonly property color borderColor: Theme.withAlpha(baseColor, barConfig?.borderOpacity ?? 1.0)
         readonly property bool showFullBorder: (barConfig?.spacing ?? 4) > 0
+        sourceComponent: Shape {
+            id: barBorderShape
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            visible: barConfig?.borderEnabled ?? false
 
-        ShapePath {
-            fillColor: "transparent"
-            strokeColor: barBorder.borderColor
-            strokeWidth: barBorder.borderThickness
-            joinStyle: ShapePath.RoundJoin
-            capStyle: ShapePath.FlatCap
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: barBorder.borderColor
+                strokeWidth: barBorder.borderThickness
+                joinStyle: ShapePath.RoundJoin
+                capStyle: ShapePath.FlatCap
 
-            PathSvg {
-                path: barBorder.showFullBorder ? root.borderFullPath : root.borderEdgePath
+                PathSvg {
+                    path: barBorder.showFullBorder ? root.borderFullPath : root.borderEdgePath
+                }
             }
         }
     }
