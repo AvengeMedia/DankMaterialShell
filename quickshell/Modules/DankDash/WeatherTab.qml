@@ -14,9 +14,8 @@ Item {
     property bool syncing: false
 
     function syncFrom(type) {
-        if (!dailyLoader.item || !hourlyLoader.item) {
+        if (!dailyLoader.item || !hourlyLoader.item)
             return;
-        }
         const hourlyList = hourlyLoader.item;
         const dailyList = dailyLoader.item;
         syncing = true;
@@ -24,22 +23,22 @@ Item {
         try {
             if (type === "hour") {
                 const date = new Date();
-                date.setHours(hourlyList.currentIndex - 1);
+                date.setHours(hourlyList.currentIndex);
                 dateStepper.currentDate = date;
 
-                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1, WeatherService.calendarDayDifference((new Date()), date) + 1));
+                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 1) - 1, WeatherService.calendarDayDifference((new Date()), date)));
             } else if (type === "day") {
                 const date = new Date(dateStepper.currentDate);
                 date.setMonth((new Date()).getMonth());
-                date.setDate((new Date()).getDate() + dailyList.currentIndex - 1);
+                date.setDate((new Date()).getDate() + dailyList.currentIndex);
                 dateStepper.currentDate = date;
 
-                const hourIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date).getHours() + 1));
+                const hourIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 1) - 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date).getHours()));
                 hourlyList.currentIndex = hourIndex;
             } else if (type === "date") {
                 const date = dateStepper.currentDate;
-                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 0) + 1, WeatherService.calendarDayDifference((new Date()), date) + 1));
-                hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 0) + 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours() + 1));
+                dailyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.forecast?.length ?? 1) - 1, WeatherService.calendarDayDifference((new Date()), date)));
+                hourlyList.currentIndex = Math.max(0, Math.min((WeatherService.weather.hourlyForecast?.length ?? 1) - 1, WeatherService.calendarHourDifference((new Date()), date) + (new Date()).getHours()));
             }
         } catch (e) {
             console.warn("Weather Date Sync Error:", e);
@@ -933,24 +932,24 @@ Item {
 
                     property var cardHeight: 100
                     property var cardWidth: ((hourlyList.width + hourlyList.spacing) / hourlyList.visibleCount) - hourlyList.spacing
-                    property int initialIndex: (new Date()).getHours() + 1
+                    property int initialIndex: (new Date()).getHours()
                     property bool dense: !SessionData.weatherHourlyDetailed
                     property int visibleCount: 8
 
-                    model: (WeatherService.weather.hourlyForecast?.length ?? 0) + 2
+                    model: WeatherService.weather.hourlyForecast?.length ?? 0
 
                     delegate: WeatherForecastCard {
-                        width: forecastData ? hourlyList.cardWidth : hourlyList.width
+                        width: hourlyList.cardWidth
                         height: hourlyList.cardHeight
                         dense: hourlyList.dense
                         daily: false
 
                         date: {
                             const d = new Date();
-                            d.setHours(index - 1);
+                            d.setHours(index);
                             return d;
                         }
-                        forecastData: WeatherService.weather.hourlyForecast?.[index - 1]
+                        forecastData: WeatherService.weather.hourlyForecast?.[index]
                     }
 
                     onCurrentIndexChanged: if (!syncing)
@@ -984,6 +983,23 @@ Item {
                             }
                         }
                     ]
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onWheel: wheel => {
+                            if (wheel.modifiers & Qt.ShiftModifier) {
+                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
+                                    const newIndex = hourlyList.currentIndex - Math.sign(wheel.angleDelta.y);
+                                    if (newIndex < hourlyList.model && newIndex >= 0) {
+                                        hourlyList.currentIndex = newIndex;
+                                        wheel.accepted = true;
+                                        return;
+                                    }
+                                }
+                            }
+                            wheel.accepted = false;
+                        }
+                    }
                 }
             }
         }
@@ -1048,28 +1064,45 @@ Item {
 
                     property var cardHeight: 100
                     property var cardWidth: ((dailyList.width + dailyList.spacing) / dailyList.visibleCount) - dailyList.spacing
-                    property int initialIndex: 1
+                    property int initialIndex: 0
                     property bool dense: false
                     property int visibleCount: 7
 
-                    model: (WeatherService.weather.forecast?.length ?? 0) + 2
+                    model: WeatherService.weather.forecast?.length ?? 0
 
                     delegate: WeatherForecastCard {
-                        width: forecastData ? dailyList.cardWidth : dailyList.width
+                        width: dailyList.cardWidth
                         height: dailyList.cardHeight
                         dense: true
                         daily: true
 
                         date: {
                             const date = new Date();
-                            date.setDate(date.getDate() + index - 1);
+                            date.setDate(date.getDate() + index);
                             return date;
                         }
-                        forecastData: WeatherService.weather.forecast?.[index - 1]
+                        forecastData: WeatherService.weather.forecast?.[index]
                     }
 
                     onCurrentIndexChanged: if (!syncing)
                         root.syncFrom("day")
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onWheel: wheel => {
+                            if (wheel.modifiers & Qt.ShiftModifier) {
+                                if (wheel.angleDelta.y % 120 == 0 && wheel.angleDelta.x == 0) {
+                                    const newIndex = dailyList.currentIndex - Math.sign(wheel.angleDelta.y);
+                                    if (newIndex < dailyList.model && newIndex >= 0) {
+                                        dailyList.currentIndex = newIndex;
+                                        wheel.accepted = true;
+                                        return;
+                                    }
+                                }
+                            }
+                            wheel.accepted = false;
+                        }
+                    }
                 }
             }
         }
