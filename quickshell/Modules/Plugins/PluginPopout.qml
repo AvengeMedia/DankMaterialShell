@@ -74,7 +74,7 @@ DankPopout {
                                 root.close()
                             }
                         }
-                        if (root.contentHeight === 0 && item) {
+                        if (item) {
                             root.contentHeight = Qt.binding(() => item.implicitHeight + Theme.spacingS * 2)
                         }
                     }
