@@ -37,7 +37,12 @@ DankPopout {
     screen: triggerScreen
     shouldBeVisible: false
 
-    onBackgroundClicked: close()
+    onBackgroundClicked: {
+        if (processContextMenu.visible) {
+            processContextMenu.close();
+        }
+        close();
+    }
 
     Ref {
         service: DgopService
@@ -63,6 +68,7 @@ DankPopout {
                 if (processListPopout.shouldBeVisible) {
                     forceActiveFocus();
                 }
+                processContextMenu.parent = processListContent;
             }
             Keys.onPressed: (event) => {
                 if (event.key === Qt.Key_Escape) {
