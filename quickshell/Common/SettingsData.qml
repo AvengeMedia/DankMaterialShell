@@ -1442,7 +1442,7 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     }
 
     IpcHandler {
-        function show(): string {
+        function reveal(): string {
             root.setShowDock(true);
             return "DOCK_SHOW_SUCCESS";
         }
@@ -1467,7 +1467,7 @@ rm -rf '${home}'/.cache/icon-cache '${home}'/.cache/thumbnails 2>/dev/null || tr
     IpcHandler {
         readonly property var barSelectors: ["id", "name", "index"]
 
-        function show(selector: string, value: string): string {
+        function reveal(selector: string, value: string): string {
             if (!barSelectors.includes(selector)) { return "BAR_INVALID_SELECTOR" }
             const index = selector == "index" ? value : barConfigs.findIndex((bar)=> bar[selector] == value)
             const barConfig = barConfigs[index]
