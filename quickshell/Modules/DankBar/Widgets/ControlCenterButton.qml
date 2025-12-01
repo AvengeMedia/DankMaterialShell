@@ -117,7 +117,7 @@ BasePill {
         if (!AudioService.sink?.audio)
             return;
         const currentVolume = AudioService.sink.audio.volume * 100;
-        const newVolume = delta > 0 ? Math.min(100, currentVolume + 5) : Math.max(0, currentVolume - 5);
+        const newVolume = delta > 0 ? Math.min(SettingsData.maxSystemVolume, currentVolume + 5) : Math.max(0, currentVolume - 5);
         AudioService.sink.audio.muted = false;
         AudioService.sink.audio.volume = newVolume / 100;
         AudioService.playVolumeChangeSoundIfEnabled();

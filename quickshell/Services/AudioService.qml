@@ -486,7 +486,7 @@ Singleton {
             return "No audio sink available";
         }
 
-        const clampedVolume = Math.max(0, Math.min(100, percentage));
+        const clampedVolume = Math.max(0, Math.min(SettingsData.maxSystemVolume, percentage));
         root.sink.audio.volume = clampedVolume / 100;
         return `Volume set to ${clampedVolume}%`;
     }
@@ -537,7 +537,7 @@ Singleton {
 
             const currentVolume = Math.round(root.sink.audio.volume * 100);
             const stepValue = parseInt(step || "5");
-            const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
+            const newVolume = Math.max(0, Math.min(SettingsData.maxSystemVolume, currentVolume + stepValue));
 
             root.sink.audio.volume = newVolume / 100;
             return `Volume increased to ${newVolume}%`;
@@ -554,7 +554,7 @@ Singleton {
 
             const currentVolume = Math.round(root.sink.audio.volume * 100);
             const stepValue = parseInt(step || "5");
-            const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
+            const newVolume = Math.max(0, Math.min(SettingsData.maxSystemVolume, currentVolume - stepValue));
 
             root.sink.audio.volume = newVolume / 100;
             return `Volume decreased to ${newVolume}%`;

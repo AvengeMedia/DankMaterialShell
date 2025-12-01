@@ -203,11 +203,12 @@ Item {
         if (!volumeAvailable)
             return;
         const current = Math.round(currentVolume * 100);
-        const newVolume = Math.min(100, Math.max(0, current + step));
 
         if (usePlayerVolume) {
+            const newVolume = Math.min(SettingsData.maxMediaVolume, Math.max(0, current + step));
             activePlayer.volume = newVolume / 100;
         } else if (AudioService.sink?.audio) {
+            const newVolume = Math.min(SettingsData.maxSystemVolume, Math.max(0, current + step));
             AudioService.sink.audio.volume = newVolume / 100;
         }
     }
@@ -809,11 +810,12 @@ Item {
                 onWheel: wheelEvent => {
                     const delta = wheelEvent.angleDelta.y;
                     const current = (currentVolume * 100) || 0;
-                    const newVolume = delta > 0 ? Math.min(100, current + 5) : Math.max(0, current - 5);
 
                     if (usePlayerVolume) {
+                        const newVolume = delta > 0 ? Math.min(SettingsData.maxMediaVolume, current + 5) : Math.max(0, current - 5);
                         activePlayer.volume = newVolume / 100;
                     } else if (AudioService.sink?.audio) {
+                        const newVolume = delta > 0 ? Math.min(SettingsData.maxSystemVolume, current + 5) : Math.max(0, current - 5);
                         AudioService.sink.audio.volume = newVolume / 100;
                     }
                     wheelEvent.accepted = true;

@@ -224,6 +224,9 @@ var SPEC = {
     screenPreferences: { def: {} },
     showOnLastDisplay: { def: {} },
 
+    maxSystemVolume: { def: 100 },
+    maxMediaVolume: { def: 100 },
+
     barConfigs: { def: [{
         id: "default",
         name: "Main Bar",

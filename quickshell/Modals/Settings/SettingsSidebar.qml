@@ -65,19 +65,24 @@ Rectangle {
             "tabIndex": 9
         },
         {
+            "text": I18n.tr("Audio"),
+            "icon": "headphones",
+            "tabIndex": 10
+        },
+        {
             "text": I18n.tr("Power & Security"),
             "icon": "power",
-            "tabIndex": 10
+            "tabIndex": 11
         },
         {
             "text": I18n.tr("Plugins"),
             "icon": "extension",
-            "tabIndex": 11
+            "tabIndex": 12
         },
         {
             "text": I18n.tr("About"),
             "icon": "info",
-            "tabIndex": 12
+            "tabIndex": 13
         }
     ]
     readonly property var sidebarItems: allSidebarItems.filter(item => {

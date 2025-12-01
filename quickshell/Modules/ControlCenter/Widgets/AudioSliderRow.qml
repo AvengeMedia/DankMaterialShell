@@ -62,8 +62,9 @@ Row {
         width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
         enabled: defaultSink !== null
         minimum: 0
-        maximum: 100
-        value: defaultSink ? Math.min(100, Math.round(defaultSink.audio.volume * 100)) : 0
+        maximum: SettingsData.maxSystemVolume
+        reference: 100
+        value: defaultSink ? Math.min(SettingsData.maxSystemVolume, Math.round(defaultSink.audio.volume * 100)) : 0
         showValue: true
         unit: "%"
         valueOverride: actualVolumePercent
