@@ -54,7 +54,7 @@ Item {
         height: 180
         x: isRightEdge ? anchorPos.x : anchorPos.x - width
         y: anchorPos.y - height / 2
-        radius: Theme.cornerRadius * 2
+        radius: Theme.cornerRadius
         color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95)
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
         border.width: 1
@@ -89,94 +89,67 @@ Item {
             shadowOpacity: 0.7
         }
 
-        MouseArea {
-            anchors.fill: parent
-            anchors.margins: -12
-            hoverEnabled: true
-            onEntered: volumeAreaEntered()
-            onExited: volumeAreaExited()
-        }
-
         Item {
             anchors.fill: parent
             anchors.margins: Theme.spacingS
 
-            Item {
-                id: volumeSlider
-                width: parent.width * 0.5
-                height: parent.height - Theme.spacingXL * 2
-                anchors.top: parent.top
-                anchors.topMargin: Theme.spacingS
-                anchors.horizontalCenter: parent.horizontalCenter
+            property int gap: Theme.spacingS
 
-                Rectangle {
-                    width: parent.width
-                    height: parent.height
-                    anchors.centerIn: parent
-                    color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                    radius: Theme.cornerRadius
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: volumeAvailable ? (Math.min(1.0, currentVolume) * parent.height) : 0
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: Theme.primary
-                    bottomLeftRadius: Theme.cornerRadius
-                    bottomRightRadius: Theme.cornerRadius
-                }
-
-                Rectangle {
-                    width: parent.width + 8
-                    height: 8
-                    radius: Theme.cornerRadius
-                    y: {
-                        const ratio = volumeAvailable ? Math.min(1.0, currentVolume) : 0;
-                        const travel = parent.height - height;
-                        return Math.max(0, Math.min(travel, travel * (1 - ratio)));
-                    }
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: Theme.primary
-                    border.width: 3
-                    border.color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1.0)
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    anchors.margins: -12
-                    enabled: volumeAvailable
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    preventStealing: true
-
-                    onEntered: volumeAreaEntered()
-                    onExited: volumeAreaExited()
-                    onPressed: mouse => updateVolume(mouse)
-                    onPositionChanged: mouse => {
-                        if (pressed)
-                            updateVolume(mouse);
-                    }
-                    onClicked: mouse => updateVolume(mouse)
-
-                    function updateVolume(mouse) {
-                        if (!volumeAvailable)
-                            return;
-                        const ratio = 1.0 - (mouse.y / height);
-                        const volume = Math.max(0, Math.min(1, ratio));
-                        root.volumeChanged(volume);
-                    }
+            HoverHandler {
+                id: hover
+                onHoveredChanged: {
+                    if (hover.hovered) volumeAreaEntered()
+                    else volumeAreaExited()
                 }
             }
 
-            StyledText {
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottomMargin: Theme.spacingL
-                text: volumeAvailable ? Math.round(currentVolume * 100) + "%" : "0%"
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceText
-                font.weight: Font.Medium
+            DankSlider {
+                id: volumeSlider
+
+                readonly property real actualVolumePercent: AudioService.sink && AudioService.sink.audio ? Math.round(AudioService.sink.audio.volume * 100) : 0
+                readonly property real displayPercent: actualVolumePercent
+
+                width: parent.width
+                height: parent.height
+                anchors.verticalCenter: parent.verticalCenter
+                orientation: DankSlider.Vertical
+                minimum: 0
+                maximum: SettingsData.maxSystemVolume
+                reference: 100
+                enabled: AudioService.sink && AudioService.sink.audio
+                showValue: true
+                unit: "%"
+                thumbOutlineColor: Theme.surfaceContainer
+                valueOverride: displayPercent
+                alwaysShowValue: SettingsData.osdAlwaysShowValue
+
+                Component.onCompleted: {
+                    if (AudioService.sink && AudioService.sink.audio) {
+                        value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100))
+                    }
+                }
+
+                onSliderValueChanged: newValue => {
+                                          if (AudioService.sink && AudioService.sink.audio) {
+                                              AudioService.suppressOSD = true
+                                              AudioService.sink.audio.volume = newValue / 100
+                                              AudioService.suppressOSD = false
+                                          }
+                                      }
+
+                onContainsMouseChanged: {
+                    setChildHovered(containsMouse || muteButton.containsMouse)
+                }
+
+                Connections {
+                    target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
+
+                    function onVolumeChanged() {
+                        if (volumeSlider && !volumeSlider.pressed) {
+                            volumeSlider.value = Math.min(SettingsData.maxSystemVolume, Math.round(AudioService.sink.audio.volume * 100))
+                        }
+                    }
+                }
             }
         }
     }

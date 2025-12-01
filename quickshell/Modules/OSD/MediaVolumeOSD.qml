@@ -105,18 +105,25 @@ DankOSD {
             DankSlider {
                 id: volumeSlider
 
+                orientation: DankSlider.Horizontal
                 width: parent.width - Theme.iconSize - parent.gap * 3
                 height: 40
                 x: parent.gap * 2 + Theme.iconSize
                 anchors.verticalCenter: parent.verticalCenter
                 minimum: 0
-                maximum: 100
+                maximum: SettingsData.maxMediaVolume
+                reference: 100
                 enabled: volumeSupported
                 showValue: true
                 unit: "%"
                 thumbOutlineColor: Theme.surfaceContainer
                 valueOverride: currentVolume
                 alwaysShowValue: SettingsData.osdAlwaysShowValue
+                tooltipPlacement: [
+                    SettingsData.Position.Top,
+                    SettingsData.Position.TopCenter,
+                    SettingsData.Position.Left,
+                ].includes(SettingsData.osdPosition) ? DankSlider.After : DankSlider.Before
 
                 Component.onCompleted: {
                     value = currentVolume;
@@ -162,111 +169,60 @@ DankOSD {
                     anchors.centerIn: parent
                     name: getVolumeIcon(player?.volume ?? 0)
                     size: Theme.iconSize
-                    color: muteButtonVert.containsMouse ? Theme.primary : Theme.surfaceText
+                    color: muteButton.containsMouse ? Theme.primary : Theme.surfaceText
                 }
 
                 MouseArea {
-                    id: muteButtonVert
+                    id: muteButton
 
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: toggleMute()
                     onContainsMouseChanged: {
-                        setChildHovered(containsMouse || vertSliderArea.containsMouse);
+                        setChildHovered(containsMouse || volumeSlider.containsMouse);
                     }
                 }
             }
 
-            Item {
-                id: vertSlider
+
+            DankSlider {
+                id: volumeSlider
+
+                orientation: DankSlider.Vertical
                 width: 12
                 height: parent.height - Theme.iconSize - gap * 3 - 24
-                anchors.horizontalCenter: parent.horizontalCenter
                 y: gap * 2 + Theme.iconSize
+                anchors.horizontalCenter: parent.horizontalCenter
+                minimum: 0
+                maximum: SettingsData.maxMediaVolume
+                reference: 100
+                enabled: volumeSupported
+                showValue: true
+                unit: "%"
+                thumbOutlineColor: Theme.surfaceContainer
+                valueOverride: currentVolume
+                alwaysShowValue: SettingsData.osdAlwaysShowValue
+                tooltipPlacement: SettingsData.osdPosition === SettingsData.Position.RightCenter ? DankSlider.Before : DankSlider.After
 
-                property bool dragging: false
-                property int value: currentVolume
-
-                Rectangle {
-                    id: vertTrack
-                    width: parent.width
-                    height: parent.height
-                    anchors.centerIn: parent
-                    color: Theme.outline
-                    radius: Theme.cornerRadius
+                Component.onCompleted: {
+                    value = currentVolume;
                 }
 
-                Rectangle {
-                    id: vertFill
-                    width: parent.width
-                    height: (vertSlider.value / 100) * parent.height
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: Theme.primary
-                    radius: Theme.cornerRadius
+                onSliderValueChanged: newValue => {
+                    setVolume(newValue);
                 }
 
-                Rectangle {
-                    id: vertHandle
-                    width: 24
-                    height: 8
-                    radius: Theme.cornerRadius
-                    y: {
-                        const ratio = vertSlider.value / 100;
-                        const travel = parent.height - height;
-                        return Math.max(0, Math.min(travel, travel * (1 - ratio)));
-                    }
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: Theme.primary
-                    border.width: 3
-                    border.color: Theme.surfaceContainer
-                }
-
-                MouseArea {
-                    id: vertSliderArea
-                    anchors.fill: parent
-                    anchors.margins: -12
-                    enabled: volumeSupported
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || muteButtonVert.containsMouse);
-                    }
-
-                    onPressed: mouse => {
-                        vertSlider.dragging = true;
-                        updateVolume(mouse);
-                    }
-
-                    onReleased: {
-                        vertSlider.dragging = false;
-                    }
-
-                    onPositionChanged: mouse => {
-                        if (pressed) {
-                            updateVolume(mouse);
-                        }
-                    }
-
-                    onClicked: mouse => {
-                        updateVolume(mouse);
-                    }
-
-                    function updateVolume(mouse) {
-                        const ratio = 1.0 - (mouse.y / height);
-                        const volume = Math.max(0, Math.min(100, Math.round(ratio * 100)));
-                        setVolume(volume);
-                    }
+                onContainsMouseChanged: {
+                    setChildHovered(containsMouse || muteButton.containsMouse);
                 }
 
                 Connections {
                     target: player
 
                     function onVolumeChanged() {
-                        if (!vertSlider.dragging) {
-                            vertSlider.value = currentVolume;
+                        if (volumeSlider && !volumeSlider.pressed) {
+                            volumeSlider.value = currentVolume;
                         }
                     }
                 }
@@ -276,7 +232,7 @@ DankOSD {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottomMargin: gap
-                text: vertSlider.value + "%"
+                text: volumeSlider.value + "%"
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
                 visible: SettingsData.osdAlwaysShowValue

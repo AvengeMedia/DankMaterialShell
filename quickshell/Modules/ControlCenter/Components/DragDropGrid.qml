@@ -452,7 +452,7 @@ Column {
                     let currentVolume = AudioService.sink.audio.volume * 100;
                     let newVolume;
                     if (delta > 0)
-                        newVolume = Math.min(100, currentVolume + 5);
+                        newVolume = Math.min(SettingsData.maxSystemVolume, currentVolume + 5);
                     else
                         newVolume = Math.max(0, currentVolume - 5);
                     AudioService.sink.audio.muted = false;

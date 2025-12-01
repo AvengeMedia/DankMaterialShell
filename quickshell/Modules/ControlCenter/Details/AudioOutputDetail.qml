@@ -97,8 +97,9 @@ Rectangle {
             width: parent.width - (Theme.iconSize + Theme.spacingS * 2)
             enabled: AudioService.sink && AudioService.sink.audio
             minimum: 0
-            maximum: 100
-            value: AudioService.sink && AudioService.sink.audio ? Math.min(100, Math.round(AudioService.sink.audio.volume * 100)) : 0
+            maximum: SettingsData.maxSystemVolume
+            reference: 100
+            value: AudioService.sink && AudioService.sink.audio ? Math.min(SettingsData.maxSystemVolume, Math.round(AudioService.sink.audio.volume * 100)) : 0
             showValue: true
             unit: "%"
             valueOverride: actualVolumePercent
@@ -438,8 +439,9 @@ Rectangle {
                                 width: 100
                                 enabled: modelData !== null
                                 minimum: 0
-                                maximum: 100
-                                value: modelData ? Math.min(100, Math.round(modelData.audio.volume * 100)) : 0
+                                maximum: SettingsData.maxMediaVolume
+                                reference: 100
+                                value: modelData ? Math.min(SettingsData.maxMediaVolume, Math.round(modelData.audio.volume * 100)) : 0
                                 showValue: true
                                 unit: "%"
                                 valueOverride: actualVolumePercent

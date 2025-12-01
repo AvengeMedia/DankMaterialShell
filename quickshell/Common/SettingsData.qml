@@ -328,6 +328,9 @@ Singleton {
     property var screenPreferences: ({})
     property var showOnLastDisplay: ({})
 
+    property int maxSystemVolume: 100
+    property int maxMediaVolume: 100
+
     property var barConfigs: [
         {
             id: "default",
