@@ -96,6 +96,7 @@ Item {
                         value: SettingsData.maxSystemVolume
                         minimum: 0
                         maximum: 200
+                        reference: 100
                         unit: "%"
                         showValue: true
                         wheelEnabled: false
@@ -186,6 +187,7 @@ Item {
                         value: SettingsData.maxMediaVolume
                         minimum: 0
                         maximum: 200
+                        reference: 100
                         unit: "%"
                         showValue: true
                         wheelEnabled: false
