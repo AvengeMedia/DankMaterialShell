@@ -301,7 +301,7 @@ DankPopout {
                         let settingsIndex = SettingsData.weatherEnabled ? 4 : 3;
                         if (index === settingsIndex) {
                             dashVisible = false;
-                            settingsModal.show();
+                            PopoutService.openSettings();
                         }
                     }
                 }
