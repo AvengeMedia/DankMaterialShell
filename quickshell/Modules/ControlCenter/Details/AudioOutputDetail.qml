@@ -355,10 +355,10 @@ Rectangle {
 
                             StyledText {
                                 text: {
-                                    const mediaName = modelData && modelData.properties ? (modelData.properties["media.name"] || "") : "";
-                                    const max = 30;
-                                    const truncated = mediaName.length > max ? mediaName.substring(0, max) + "..." : mediaName;
-                                    return AudioService.displayName(modelData) + (truncated ? ": " + truncated : "");
+                                    const modelDataMediaName = modelData && modelData.properties ? (modelData.properties["media.name"] || "") : "";
+                                    const mediaName = AudioService.displayName(modelData) + ": " + modelDataMediaName;
+                                    const max = 35;
+                                    return mediaName.length > max ? mediaName.substring(0, max) + "..." : mediaName;
                                 }
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceText
