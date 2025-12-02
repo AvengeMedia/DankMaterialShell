@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -12,42 +12,42 @@ cd "$REPO_ROOT"
 STAGED_CORE_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '^core/' || true)
 
 if [[ -n "$STAGED_CORE_FILES" ]]; then
-    echo "Go files staged in core/, running CI checks..."
-    cd "$REPO_ROOT/core"
+  echo "Go files staged in core/, running CI checks..."
+  cd "$REPO_ROOT/core"
 
-    # Format check
-    echo "  Checking gofmt..."
-    UNFORMATTED=$(gofmt -s -l . 2>/dev/null || true)
-    if [[ -n "$UNFORMATTED" ]]; then
-        echo "The following files are not formatted:"
-        echo "$UNFORMATTED"
-        echo ""
-        echo "Run: cd core && gofmt -s -w ."
-        exit 1
-    fi
+  # Format check
+  echo "  Checking gofmt..."
+  UNFORMATTED=$(gofmt -s -l . 2>/dev/null || true)
+  if [[ -n "$UNFORMATTED" ]]; then
+    echo "The following files are not formatted:"
+    echo "$UNFORMATTED"
+    echo ""
+    echo "Run: cd core && gofmt -s -w ."
+    exit 1
+  fi
 
-    # golangci-lint
-    if command -v golangci-lint &>/dev/null; then
-        echo "  Running golangci-lint..."
-        golangci-lint run ./...
-    else
-        echo "  Warning: golangci-lint not installed, skipping lint"
-        echo "  Install: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
-    fi
+  # golangci-lint
+  if command -v golangci-lint &>/dev/null; then
+    echo "  Running golangci-lint..."
+    golangci-lint run ./...
+  else
+    echo "  Warning: golangci-lint not installed, skipping lint"
+    echo "  Install: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest"
+  fi
 
-    # Tests
-    echo "  Running tests..."
-    go test ./... > /dev/null
+  # Tests
+  echo "  Running tests..."
+  go test ./... >/dev/null
 
-    # Build checks
-    echo "  Building..."
-    mkdir -p bin
-    go build -buildvcs=false -o bin/dms ./cmd/dms
-    go build -buildvcs=false -o bin/dms-distro -tags distro_binary ./cmd/dms
-    go build -buildvcs=false -o bin/dankinstall ./cmd/dankinstall
+  # Build checks
+  echo "  Building..."
+  mkdir -p bin
+  go build -buildvcs=false -o bin/dms ./cmd/dms
+  go build -buildvcs=false -o bin/dms-distro -tags distro_binary ./cmd/dms
+  go build -buildvcs=false -o bin/dankinstall ./cmd/dankinstall
 
-    echo "All Go CI checks passed!"
-    cd "$REPO_ROOT"
+  echo "All Go CI checks passed!"
+  cd "$REPO_ROOT"
 fi
 
 # =============================================================================
