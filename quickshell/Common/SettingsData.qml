@@ -185,6 +185,7 @@ Singleton {
     property bool sortAppsAlphabetically: false
     property int appLauncherGridColumns: 4
     property bool spotlightCloseNiriOverview: true
+    property bool niriOverviewOverlayEnabled: true
 
     property string weatherLocation: "New York, NY"
     property string weatherCoordinates: "40.7128,-74.0060"

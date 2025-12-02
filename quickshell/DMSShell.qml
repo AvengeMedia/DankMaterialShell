@@ -710,7 +710,7 @@ Item {
 
     LazyLoader {
         id: niriOverviewOverlayLoader
-        active: CompositorService.isNiri
+        active: CompositorService.isNiri && SettingsData.niriOverviewOverlayEnabled
         component: NiriOverviewOverlay {
             id: niriOverviewOverlay
         }

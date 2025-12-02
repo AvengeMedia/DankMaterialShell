@@ -657,6 +657,69 @@ Item {
 
             StyledRect {
                 width: parent.width
+                height: niriOverlayEnabledSection.implicitHeight + Theme.spacingL * 2
+                radius: Theme.cornerRadius
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                border.width: 0
+                visible: CompositorService.isNiri
+
+                Column {
+                    id: niriOverlayEnabledSection
+
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingM
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "layers"
+                            size: Theme.iconSize
+                            color: Theme.primary
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Enable Overview Overlay")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item {
+                            width: parent.width - parent.children[0].width - parent.children[1].width - niriOverlayToggle.width - Theme.spacingM * 3
+                            height: 1
+                        }
+
+                        DankToggle {
+                            id: niriOverlayToggle
+
+                            width: 32
+                            height: 18
+                            checked: SettingsData.niriOverviewOverlayEnabled
+                            anchors.verticalCenter: parent.verticalCenter
+                            onToggled: checked => {
+                                SettingsData.set("niriOverviewOverlayEnabled", checked);
+                            }
+                        }
+                    }
+
+                    StyledText {
+                        width: parent.width
+                        text: I18n.tr("When enabled, shows the launcher overlay when typing in Niri overview mode. Disable this if you prefer to not have the launcher when typing on Niri overview or want to use other launcher in the overview.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                    }
+                }
+            }
+
+            StyledRect {
+                width: parent.width
                 height: recentlyUsedSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)

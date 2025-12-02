@@ -98,6 +98,7 @@ var SPEC = {
     sortAppsAlphabetically: { def: false },
     appLauncherGridColumns: { def: 4 },
     spotlightCloseNiriOverview: { def: true },
+    niriOverviewOverlayEnabled: { def: true },
 
     weatherLocation: { def: "New York, NY" },
     weatherCoordinates: { def: "40.7128,-74.0060" },
