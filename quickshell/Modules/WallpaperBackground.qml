@@ -384,11 +384,10 @@ Variants {
             property int physicalWidth: Math.round(modelData.width * screenScale)
             property int physicalHeight: Math.round(modelData.height * screenScale)
 
-            Rectangle {
+            Item {
                 id: currentWallpaperContainer
                 anchors.fill: parent
-                color: "transparent"
-                clip: true
+                clip: false
 
                 Image {
                     id: currentWallpaper
@@ -399,6 +398,11 @@ Variants {
                     smooth: true
                     cache: true
 
+                    anchors.left: root.effectiveScrolling && root.isVerticalScrolling ? parent.left : undefined
+                    anchors.right: root.effectiveScrolling && root.isVerticalScrolling ? parent.right : undefined
+                    anchors.top: root.effectiveScrolling && !root.isVerticalScrolling ? parent.top : undefined
+                    anchors.bottom: root.effectiveScrolling && !root.isVerticalScrolling ? parent.bottom : undefined
+
                     fillMode: root.effectiveScrolling ? Image.PreserveAspectFit : root.getFillMode(SettingsData.wallpaperFillMode)
 
                     sourceSize: {
@@ -439,34 +443,25 @@ Variants {
                     }
 
                     x: {
-                        if (!root.effectiveScrolling) return 0;
+                        if (!root.effectiveScrolling || root.isVerticalScrolling) return 0;
 
-                        if (root.isVerticalScrolling) {
-                            return 0;
-                        } else {
-                            const scrollRange = Math.max(0, width - parent.width);
-                            return -(scrollRange * root.currentScrollPercentage / 100.0);
-                        }
+                        const scrollRange = Math.max(0, width - parent.width);
+                        return -(scrollRange * root.currentScrollPercentage / 100.0);
                     }
 
                     y: {
-                        if (!root.effectiveScrolling) return 0;
+                        if (!root.effectiveScrolling || !root.isVerticalScrolling) return 0;
 
-                        if (root.isVerticalScrolling) {
-                            const scrollRange = Math.max(0, height - parent.height);
-                            return -(scrollRange * root.currentScrollPercentage / 100.0);
-                        } else {
-                            return 0;
-                        }
+                        const scrollRange = Math.max(0, height - parent.height);
+                        return -(scrollRange * root.currentScrollPercentage / 100.0);
                     }
                 }
             }
 
-            Rectangle {
+            Item {
                 id: nextWallpaperContainer
                 anchors.fill: parent
-                color: "transparent"
-                clip: true
+                clip: false
 
                 Image {
                     id: nextWallpaper
@@ -477,6 +472,11 @@ Variants {
                     smooth: true
                     cache: false
 
+                    anchors.left: root.effectiveScrolling && root.isVerticalScrolling ? parent.left : undefined
+                    anchors.right: root.effectiveScrolling && root.isVerticalScrolling ? parent.right : undefined
+                    anchors.top: root.effectiveScrolling && !root.isVerticalScrolling ? parent.top : undefined
+                    anchors.bottom: root.effectiveScrolling && !root.isVerticalScrolling ? parent.bottom : undefined
+
                     fillMode: root.effectiveScrolling ? Image.PreserveAspectFit : root.getFillMode(SettingsData.wallpaperFillMode)
 
                     sourceSize: {
@@ -517,25 +517,17 @@ Variants {
                     }
 
                     x: {
-                        if (!root.effectiveScrolling) return 0;
+                        if (!root.effectiveScrolling || root.isVerticalScrolling) return 0;
 
-                        if (root.isVerticalScrolling) {
-                            return 0;
-                        } else {
-                            const scrollRange = Math.max(0, width - parent.width / 2);
-                            return -(scrollRange * root.currentScrollPercentage / 100.0);
-                        }
+                        const scrollRange = Math.max(0, width - parent.width / 2);
+                        return -(scrollRange * root.currentScrollPercentage / 100.0);
                     }
 
                     y: {
-                        if (!root.effectiveScrolling) return 0;
+                        if (!root.effectiveScrolling || !root.isVerticalScrolling) return 0;
 
-                        if (root.isVerticalScrolling) {
-                            const scrollRange = Math.max(0, height - parent.height / 2);
-                            return -(scrollRange * root.currentScrollPercentage / 100.0);
-                        } else {
-                            return 0;
-                        }
+                        const scrollRange = Math.max(0, height - parent.height / 2);
+                        return -(scrollRange * root.currentScrollPercentage / 100.0);
                     }
 
                     onStatusChanged: {
