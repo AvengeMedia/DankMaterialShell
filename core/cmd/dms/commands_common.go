@@ -66,6 +66,10 @@ var ipcCmd = &cobra.Command{
 	Short:   "Send IPC commands to running DMS shell",
 	Long:    "Send IPC commands to running DMS shell (qs -c dms ipc <args>)",
 	PreRunE: findConfig,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		_ = findConfig(cmd, args)
+		return getShellIPCCompletions(args, toComplete), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		runShellIPCCommand(args)
 	},
