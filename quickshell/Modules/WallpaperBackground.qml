@@ -45,6 +45,15 @@ Variants {
             property string actualTransitionType: transitionType
             property bool isInitialized: false
 
+            property string scrollMode: SettingsData.wallpaperFillMode
+            property bool scrollingEnabled: scrollMode === "Scrolling"
+            property bool isVerticalScrolling: CompositorService.isNiri
+            property int currentWorkspaceIndex: 0
+            property int totalWorkspaces: 1
+            property real targetScrollPercentage: 0.0
+            property real currentScrollPercentage: 0.0
+            property bool effectiveScrolling: scrollingEnabled && totalWorkspaces > 1
+
             Connections {
                 target: SessionData
                 function onIsLightModeChanged() {
@@ -56,6 +65,27 @@ Variants {
                     }
                 }
             }
+
+            Connections {
+                target: NiriService
+                enabled: CompositorService.isNiri && root.scrollingEnabled
+
+                function onAllWorkspacesChanged() {
+                    root.updateWorkspaceData();
+                }
+            }
+
+            Connections {
+                target: CompositorService.isHyprland ? Hyprland : null
+                enabled: CompositorService.isHyprland && root.scrollingEnabled
+
+                function onRawEvent(event) {
+                    if (event.name === "workspace" || event.name === "workspacev2") {
+                        root.updateWorkspaceData();
+                    }
+                }
+            }
+
             onTransitionTypeChanged: {
                 if (transitionType === "random") {
                     if (SessionData.includedTransitions.length === 0) {
@@ -85,6 +115,8 @@ Variants {
 
             function getFillMode(modeName) {
                 switch (modeName) {
+                case "Scrolling":
+                    return Image.Pad;
                 case "Stretch":
                     return Image.Stretch;
                 case "Fit":
@@ -106,12 +138,145 @@ Variants {
                 }
             }
 
+            function updateWorkspaceData() {
+                if (!scrollingEnabled) return;
+
+                if (CompositorService.isNiri) {
+                    const outputWorkspaces = NiriService.allWorkspaces.filter(
+                        ws => ws.output === modelData.name
+                    );
+                    totalWorkspaces = outputWorkspaces.length;
+
+                    const activeWs = outputWorkspaces.find(ws => ws.is_active);
+                    currentWorkspaceIndex = activeWs ? activeWs.idx : 0;
+
+                    targetScrollPercentage = totalWorkspaces > 1
+                        ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0
+                        : 0.0;
+
+                    scrollAnimation.restart();
+                } else if (CompositorService.isHyprland) {
+                    const workspaces = Hyprland.workspaces?.values || [];
+                    const monitorWorkspaces = workspaces.filter(
+                        ws => ws.monitor?.name === modelData.name
+                    ).sort((a, b) => a.id - b.id);
+
+                    totalWorkspaces = monitorWorkspaces.length;
+                    const focusedId = Hyprland.focusedWorkspace?.id;
+                    currentWorkspaceIndex = monitorWorkspaces.findIndex(ws => ws.id === focusedId);
+
+                    if (currentWorkspaceIndex < 0) currentWorkspaceIndex = 0;
+
+                    targetScrollPercentage = totalWorkspaces > 1
+                        ? ((currentWorkspaceIndex - 1) / (totalWorkspaces - 1)) * 100.0
+                        : 0.0;
+
+                    scrollAnimation.restart();
+                }
+            }
+
+            QtObject {
+                id: springParams
+
+                property real dampingRatio: 1.0
+                property real stiffness: CompositorService.isNiri ? 1000.0 : 2000.0
+                property real epsilon: 0.0001
+
+                readonly property real mass: 1.0
+                readonly property real criticalDamping: 2.0 * Math.sqrt(mass * stiffness)
+                readonly property real damping: dampingRatio * criticalDamping
+            }
+
+            Timer {
+                id: scrollAnimation
+                interval: 16
+                repeat: true
+                running: false
+
+                property real startTime: 0
+                property real startValue: 0
+                property real targetValue: 0
+                property real initialVelocity: 0.0
+
+                function springOscillate(t, from, to) {
+                    const b = springParams.damping;
+                    const m = springParams.mass;
+                    const k = springParams.stiffness;
+                    const v0 = initialVelocity;
+
+                    const beta = b / (2.0 * m);
+                    const omega0 = Math.sqrt(k / m);
+                    const x0 = from - to;
+                    const envelope = Math.exp(-beta * t);
+
+                    const epsilonFloat32 = 1.1920929e-7;
+
+                    if (Math.abs(beta - omega0) <= epsilonFloat32) {
+                        return to + envelope * (x0 + (beta * x0 + v0) * t);
+                    } else if (beta < omega0) {
+                        const omega1 = Math.sqrt((omega0 * omega0) - (beta * beta));
+                        return to + envelope * (x0 * Math.cos(omega1 * t) + ((beta * x0 + v0) / omega1) * Math.sin(omega1 * t));
+                    } else {
+                        const omega2 = Math.sqrt((beta * beta) - (omega0 * omega0));
+                        return to + envelope * (x0 * Math.cosh(omega2 * t) + ((beta * x0 + v0) / omega2) * Math.sinh(omega2 * t));
+                    }
+                }
+
+                onTriggered: {
+                    const t = (Date.now() - startTime) / 1000.0;
+                    const value = springOscillate(t, startValue, targetValue);
+
+                    root.currentScrollPercentage = value;
+
+                    const settled = Math.abs(targetValue - value) < springParams.epsilon;
+
+                    if (settled) {
+                        root.currentScrollPercentage = targetValue;
+                        stop();
+                    }
+                }
+
+                function restart() {
+                    if (!root.effectiveScrolling) {
+                        stop();
+                        return;
+                    }
+
+                    startValue = root.currentScrollPercentage;
+                    targetValue = root.targetScrollPercentage;
+
+                    initialVelocity = 0.0;
+                    startTime = Date.now();
+                    running = true;
+                }
+            }
+
             Component.onCompleted: {
+                Math.cosh = Math.cosh || function(x) {
+                    return (Math.exp(x) + Math.exp(-x)) / 2;
+                };
+
+                Math.sinh = Math.sinh || function(x) {
+                    return (Math.exp(x) - Math.exp(-x)) / 2;
+                };
+
                 if (source) {
                     const formattedSource = source.startsWith("file://") ? source : "file://" + source;
                     setWallpaperImmediate(formattedSource);
                 }
                 isInitialized = true;
+
+                if (scrollingEnabled) {
+                    updateWorkspaceData();
+                }
+            }
+
+            onScrollingEnabledChanged: {
+                if (scrollingEnabled) {
+                    updateWorkspaceData();
+                } else {
+                    scrollAnimation.stop();
+                }
             }
 
             onSourceChanged: {
@@ -219,40 +384,170 @@ Variants {
             property int physicalWidth: Math.round(modelData.width * screenScale)
             property int physicalHeight: Math.round(modelData.height * screenScale)
 
-            Image {
-                id: currentWallpaper
+            Rectangle {
+                id: currentWallpaperContainer
                 anchors.fill: parent
-                visible: true
-                opacity: 1
-                layer.enabled: false
-                asynchronous: true
-                smooth: true
-                cache: true
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
-                fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
+                color: "transparent"
+                clip: true
+
+                Image {
+                    id: currentWallpaper
+                    visible: true
+                    opacity: 1
+                    layer.enabled: false
+                    asynchronous: true
+                    smooth: true
+                    cache: true
+
+                    fillMode: root.effectiveScrolling ? Image.PreserveAspectFit : root.getFillMode(SettingsData.wallpaperFillMode)
+
+                    sourceSize: {
+                        if (root.effectiveScrolling) {
+                            if (root.isVerticalScrolling) {
+                                return Qt.size(root.physicalWidth * 2, 0);
+                            } else {
+                                return Qt.size(0, root.physicalHeight * 2);
+                            }
+                        }
+                        return Qt.size(root.physicalWidth, root.physicalHeight);
+                    }
+
+                    width: {
+                        if (!root.effectiveScrolling) return undefined;
+
+                        if (root.isVerticalScrolling) {
+                            return parent.width;
+                        } else {
+                            if (implicitWidth > 0 && implicitHeight > 0) {
+                                return (parent.height / implicitHeight) * implicitWidth;
+                            }
+                            return parent.width * root.totalWorkspaces;
+                        }
+                    }
+
+                    height: {
+                        if (!root.effectiveScrolling) return undefined;
+
+                        if (root.isVerticalScrolling) {
+                            if (implicitWidth > 0 && implicitHeight > 0) {
+                                return (parent.width / implicitWidth) * implicitHeight;
+                            }
+                            return parent.height * root.totalWorkspaces;
+                        } else {
+                            return parent.height;
+                        }
+                    }
+
+                    x: {
+                        if (!root.effectiveScrolling) return 0;
+
+                        if (root.isVerticalScrolling) {
+                            return 0;
+                        } else {
+                            const scrollRange = Math.max(0, width - parent.width);
+                            return -(scrollRange * root.currentScrollPercentage / 100.0);
+                        }
+                    }
+
+                    y: {
+                        if (!root.effectiveScrolling) return 0;
+
+                        if (root.isVerticalScrolling) {
+                            const scrollRange = Math.max(0, height - parent.height);
+                            return -(scrollRange * root.currentScrollPercentage / 100.0);
+                        } else {
+                            return 0;
+                        }
+                    }
+                }
             }
 
-            Image {
-                id: nextWallpaper
+            Rectangle {
+                id: nextWallpaperContainer
                 anchors.fill: parent
-                visible: true
-                opacity: 0
-                layer.enabled: false
-                asynchronous: true
-                smooth: true
-                cache: false
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
-                fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
+                color: "transparent"
+                clip: true
 
-                onStatusChanged: {
-                    if (status !== Image.Ready)
-                        return;
-                    if (root.actualTransitionType === "none") {
-                        currentWallpaper.source = source;
-                        nextWallpaper.source = "";
-                        root.transitionProgress = 0.0;
-                    } else if (!root.transitioning) {
-                        root.startTransition();
+                Image {
+                    id: nextWallpaper
+                    visible: true
+                    opacity: 0
+                    layer.enabled: false
+                    asynchronous: true
+                    smooth: true
+                    cache: false
+
+                    fillMode: root.effectiveScrolling ? Image.PreserveAspectFit : root.getFillMode(SettingsData.wallpaperFillMode)
+
+                    sourceSize: {
+                        if (root.effectiveScrolling) {
+                            if (root.isVerticalScrolling) {
+                                return Qt.size(root.physicalWidth * 2, 0);
+                            } else {
+                                return Qt.size(0, root.physicalHeight * 2);
+                            }
+                        }
+                        return Qt.size(root.physicalWidth, root.physicalHeight);
+                    }
+
+                    width: {
+                        if (!root.effectiveScrolling) return undefined;
+
+                        if (root.isVerticalScrolling) {
+                            return parent.width;
+                        } else {
+                            if (implicitWidth > 0 && implicitHeight > 0) {
+                                return (parent.height / implicitHeight) * implicitWidth;
+                            }
+                            return parent.width * root.totalWorkspaces;
+                        }
+                    }
+
+                    height: {
+                        if (!root.effectiveScrolling) return undefined;
+
+                        if (root.isVerticalScrolling) {
+                            if (implicitWidth > 0 && implicitHeight > 0) {
+                                return (parent.width / implicitWidth) * implicitHeight;
+                            }
+                            return parent.height * root.totalWorkspaces;
+                        } else {
+                            return parent.height;
+                        }
+                    }
+
+                    x: {
+                        if (!root.effectiveScrolling) return 0;
+
+                        if (root.isVerticalScrolling) {
+                            return 0;
+                        } else {
+                            const scrollRange = Math.max(0, width - parent.width / 2);
+                            return -(scrollRange * root.currentScrollPercentage / 100.0);
+                        }
+                    }
+
+                    y: {
+                        if (!root.effectiveScrolling) return 0;
+
+                        if (root.isVerticalScrolling) {
+                            const scrollRange = Math.max(0, height - parent.height / 2);
+                            return -(scrollRange * root.currentScrollPercentage / 100.0);
+                        } else {
+                            return 0;
+                        }
+                    }
+
+                    onStatusChanged: {
+                        if (status !== Image.Ready)
+                            return;
+                        if (root.actualTransitionType === "none") {
+                            currentWallpaper.source = source;
+                            nextWallpaper.source = "";
+                            root.transitionProgress = 0.0;
+                        } else if (!root.transitioning) {
+                            root.startTransition();
+                        }
                     }
                 }
             }

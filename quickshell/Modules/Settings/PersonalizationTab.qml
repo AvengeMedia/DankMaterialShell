@@ -389,7 +389,7 @@ Item {
                         DankButtonGroup {
                             id: fillModeGroup
                             anchors.horizontalCenter: parent.horizontalCenter
-                            model: ["Stretch", "Fit", "Fill", "Tile", "Tile V", "Tile H", "Pad"]
+                            model: ["Scrolling", "Stretch", "Fit", "Fill", "Tile", "Tile V", "Tile H", "Pad"]
                             selectionMode: "single"
                             buttonHeight: 28
                             minButtonWidth: 48
@@ -398,12 +398,12 @@ Item {
                             textSize: Theme.fontSizeSmall
                             checkEnabled: false
                             currentIndex: {
-                                const modes = ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
+                                const modes = ["Scrolling", "Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
                                 return modes.indexOf(SettingsData.wallpaperFillMode);
                             }
                             onSelectionChanged: (index, selected) => {
                                 if (selected) {
-                                    const modes = ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
+                                    const modes = ["Scrolling", "Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
                                     SettingsData.set("wallpaperFillMode", modes[index]);
                                 }
                             }
@@ -411,7 +411,7 @@ Item {
                             Connections {
                                 target: SettingsData
                                 function onWallpaperFillModeChanged() {
-                                    const modes = ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
+                                    const modes = ["Scrolling", "Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
                                     fillModeGroup.currentIndex = modes.indexOf(SettingsData.wallpaperFillMode);
                                 }
                             }
@@ -420,7 +420,7 @@ Item {
                                 target: personalizationTab
                                 function onSelectedMonitorNameChanged() {
                                     Qt.callLater(() => {
-                                        const modes = ["Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
+                                        const modes = ["Scrolling", "Stretch", "Fit", "Fill", "Tile", "TileVertically", "TileHorizontally", "Pad"];
                                         fillModeGroup.currentIndex = modes.indexOf(SettingsData.wallpaperFillMode);
                                     });
                                 }
