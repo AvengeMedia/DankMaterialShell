@@ -175,6 +175,7 @@ Singleton {
     property bool keyboardLayoutNameCompactMode: false
     property bool runningAppsCurrentWorkspace: false
     property bool runningAppsGroupByApp: false
+    property string centeringMode: "index"
     property string clockDateFormat: ""
     property string lockDateFormat: ""
     property int mediaSize: 1
@@ -227,6 +228,7 @@ Singleton {
     onNotepadFontFamilyChanged: saveSettings()
     onNotepadFontSizeChanged: saveSettings()
     onNotepadShowLineNumbersChanged: saveSettings()
+    // onCenteringModeChanged: saveSettings()
     onNotepadTransparencyOverrideChanged: {
         if (notepadTransparencyOverride > 0) {
             notepadLastCustomTransparency = notepadTransparencyOverride;

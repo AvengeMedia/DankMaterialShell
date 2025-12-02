@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import qs.Common
 import qs.Widgets
 import qs.Services
@@ -34,7 +35,7 @@ Column {
     height: implicitHeight
     spacing: Theme.spacingM
 
-    Row {
+    RowLayout {
         width: parent.width
         spacing: Theme.spacingM
 
@@ -42,7 +43,7 @@ Column {
             name: root.titleIcon
             size: Theme.iconSize
             color: Theme.primary
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignVCenter
         }
 
         StyledText {
@@ -50,12 +51,54 @@ Column {
             font.pixelSize: Theme.fontSizeLarge
             font.weight: Font.Medium
             color: Theme.surfaceText
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignVCenter
         }
 
         Item {
-            width: parent.width - 60
             height: 1
+            Layout.fillWidth: true
+        }
+
+        RowLayout {
+            spacing: Theme.spacingXS
+            Layout.alignment: Qt.AlignVCenter
+            visible: root.sectionId === "center"
+
+            DankActionButton {
+                id: indexCenterButton
+                buttonSize: 28
+                iconName: "format_list_numbered"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
+                onClicked: {
+                    console.log("Centering mode changed to: index");
+                    SettingsData.set("centeringMode", "index");
+                }
+                onEntered: {
+                    sharedTooltip.show("Index Centering", indexCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
+
+            DankActionButton {
+                id: geometricCenterButton
+                buttonSize: 28
+                iconName: "center_focus_weak"
+                iconSize: 16
+                iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
+                onClicked: {
+                    console.log("Centering mode changed to: geometric");
+                    SettingsData.set("centeringMode", "geometric");
+                }
+                onEntered: {
+                    sharedTooltip.show("Geometric Centering", geometricCenterButton, 0, 0, "bottom");
+                }
+                onExited: {
+                    sharedTooltip.hide();
+                }
+            }
         }
     }
 

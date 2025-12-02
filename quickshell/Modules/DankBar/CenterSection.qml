@@ -30,6 +30,64 @@ Item {
     property real totalSize: 0
 
     function updateLayout() {
+        if (SettingsData.centeringMode === "geometric") {
+            applyGeometricLayout();
+        } else {
+            // Default to index layout or if value is not 'geometric'
+            applyIndexLayout();
+        }
+    }
+
+    function applyGeometricLayout() {
+        if ((isVertical ? height : width) <= 0 || !visible) {
+            return;
+        }
+
+        centerWidgets = [];
+        totalWidgets = 0;
+        totalSize = 0;
+
+        for (var i = 0; i < centerRepeater.count; i++) {
+            const item = centerRepeater.itemAt(i);
+            if (item && item.active && item.item && getWidgetVisible(item.widgetId)) {
+                centerWidgets.push(item.item);
+                totalWidgets++;
+                totalSize += isVertical ? item.item.height : item.item.width;
+            }
+        }
+
+        if (totalWidgets === 0) {
+            return;
+        }
+
+        if (totalWidgets > 1) {
+            totalSize += spacing * (totalWidgets - 1);
+        }
+
+        positionWidgetsGeometric();
+    }
+
+    function positionWidgetsGeometric() {
+        const parentLength = isVertical ? height : width;
+        const parentCenter = parentLength / 2;
+
+        let currentPos = parentCenter - (totalSize / 2);
+
+        centerWidgets.forEach(widget => {
+            if (isVertical) {
+                widget.anchors.verticalCenter = undefined;
+                widget.y = currentPos;
+            } else {
+                widget.anchors.horizontalCenter = undefined;
+                widget.x = currentPos;
+            }
+
+            const widgetSize = isVertical ? widget.height : widget.width;
+            currentPos += widgetSize + spacing;
+        });
+    }
+
+    function applyIndexLayout() {
         if ((isVertical ? height : width) <= 0 || !visible) {
             return;
         }
@@ -85,10 +143,10 @@ Item {
             totalSize += spacing * (totalWidgets - 1);
         }
 
-        positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget);
+        positionWidgetsByIndex(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget);
     }
 
-    function positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget) {
+    function positionWidgetsByIndex(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget) {
         const parentCenter = (isVertical ? height : width) / 2;
         const isOddConfigured = configuredWidgets % 2 === 1;
 
@@ -506,6 +564,13 @@ Item {
                     item.sourceComponent = root.getWidgetComponent(item.widgetId);
                 }
             }
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onCenteringModeChanged() {
+            layoutTimer.restart();
         }
     }
 }

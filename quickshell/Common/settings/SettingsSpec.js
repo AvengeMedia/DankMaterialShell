@@ -90,6 +90,7 @@ var SPEC = {
     keyboardLayoutNameCompactMode: { def: false },
     runningAppsCurrentWorkspace: { def: false },
     runningAppsGroupByApp: { def: false },
+    centeringMode: { def: "index" },
     clockDateFormat: { def: "" },
     lockDateFormat: { def: "" },
     mediaSize: { def: 1 },
