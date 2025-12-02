@@ -83,6 +83,7 @@ var SPEC = {
     dwlShowAllTags: { def: false },
     workspaceNameIcons: { def: {} },
     waveProgressEnabled: { def: true },
+    scrollTitleEnabled: {def: true},
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
     runningAppsCompactMode: { def: true },

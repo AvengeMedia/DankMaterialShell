@@ -232,7 +232,7 @@ BasePill {
 
                         StyledText {
                             id: mediaText
-                            property bool needsScrolling: implicitWidth > textContainer.width
+                            property bool needsScrolling: implicitWidth > textContainer.width && SettingsData.scrollTitleEnabled
                             property real scrollOffset: 0
 
                             anchors.verticalCenter: parent.verticalCenter

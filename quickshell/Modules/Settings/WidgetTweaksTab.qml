@@ -203,6 +203,15 @@ Item {
                             return SettingsData.set("waveProgressEnabled", checked);
                         }
                     }
+                    DankToggle {
+                        width: parent.width
+                        text: I18n.tr("Scroll song title")
+                        description: I18n.tr("Scroll title if it doesn't fit in widget")
+                        checked: SettingsData.scrollTitleEnabled
+                        onToggled: checked => {
+                            return SettingsData.set("scrollTitleEnabled", checked);
+                        }
+                    }
                 }
             }
 
