@@ -119,6 +119,12 @@ var pluginsInstallCmd = &cobra.Command{
 	Short: "Install a plugin by ID",
 	Long:  "Install a DMS plugin from the registry using its ID (e.g., 'myPlugin'). Plugin names with spaces are also supported for backward compatibility.",
 	Args:  cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getAvailablePluginIDs(), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := installPluginCLI(args[0]); err != nil {
 			log.Fatalf("Error installing plugin: %v", err)
@@ -131,6 +137,12 @@ var pluginsUninstallCmd = &cobra.Command{
 	Short: "Uninstall a plugin by ID",
 	Long:  "Uninstall a DMS plugin using its ID (e.g., 'myPlugin'). Plugin names with spaces are also supported for backward compatibility.",
 	Args:  cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getInstalledPluginIDs(), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := uninstallPluginCLI(args[0]); err != nil {
 			log.Fatalf("Error uninstalling plugin: %v", err)
@@ -301,6 +313,38 @@ func installPluginCLI(idOrName string) error {
 
 	fmt.Printf("Plugin installed successfully: %s\n", plugin.Name)
 	return nil
+}
+
+func getAvailablePluginIDs() []string {
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return nil
+	}
+
+	pluginList, err := registry.List()
+	if err != nil {
+		return nil
+	}
+
+	var ids []string
+	for _, p := range pluginList {
+		ids = append(ids, p.ID)
+	}
+	return ids
+}
+
+func getInstalledPluginIDs() []string {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return nil
+	}
+
+	installed, err := manager.ListInstalled()
+	if err != nil {
+		return nil
+	}
+
+	return installed
 }
 
 func uninstallPluginCLI(idOrName string) error {

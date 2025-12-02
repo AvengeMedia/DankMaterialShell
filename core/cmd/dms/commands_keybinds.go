@@ -30,7 +30,14 @@ var keybindsShowCmd = &cobra.Command{
 	Short: "Show keybinds for a provider",
 	Long:  "Display keybinds/cheatsheet for the specified provider",
 	Args:  cobra.ExactArgs(1),
-	Run:   runKeybindsShow,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		registry := keybinds.GetDefaultRegistry()
+		return registry.List(), cobra.ShellCompDirectiveNoFileComp
+	},
+	Run: runKeybindsShow,
 }
 
 func init() {

@@ -45,6 +45,9 @@ func init() {
 	openCmd.Flags().StringVar(&openMimeType, "mime", "", "MIME type for filtering applications")
 	openCmd.Flags().StringSliceVar(&openCategories, "category", []string{}, "Application categories to filter (e.g., WebBrowser, Office, Graphics)")
 	openCmd.Flags().StringVar(&openRequestType, "type", "url", "Request type (url, file, or custom)")
+	_ = openCmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"url", "file", "custom"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 // mimeTypeToCategories maps MIME types to desktop file categories

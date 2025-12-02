@@ -27,6 +27,9 @@ func init() {
 	dank16Cmd.Flags().Bool("wezterm", false, "Output in Wezterm terminal format")
 	dank16Cmd.Flags().String("background", "", "Custom background color")
 	dank16Cmd.Flags().String("contrast", "dps", "Contrast algorithm: dps (Delta Phi Star, default) or wcag")
+	_ = dank16Cmd.RegisterFlagCompletionFunc("contrast", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"dps", "wcag"}, cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 func runDank16(cmd *cobra.Command, args []string) {

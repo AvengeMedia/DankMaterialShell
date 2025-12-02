@@ -28,7 +28,14 @@ var brightnessSetCmd = &cobra.Command{
 	Short: "Set brightness for a device",
 	Long:  "Set brightness percentage (0-100) for a specific device",
 	Args:  cobra.ExactArgs(2),
-	Run:   runBrightnessSet,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		includeDDC, _ := cmd.Flags().GetBool("ddc")
+		return getBrightnessDevices(includeDDC), cobra.ShellCompDirectiveNoFileComp
+	},
+	Run: runBrightnessSet,
 }
 
 var brightnessGetCmd = &cobra.Command{
@@ -36,7 +43,14 @@ var brightnessGetCmd = &cobra.Command{
 	Short: "Get brightness for a device",
 	Long:  "Get current brightness percentage for a specific device",
 	Args:  cobra.ExactArgs(1),
-	Run:   runBrightnessGet,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		includeDDC, _ := cmd.Flags().GetBool("ddc")
+		return getBrightnessDevices(includeDDC), cobra.ShellCompDirectiveNoFileComp
+	},
+	Run: runBrightnessGet,
 }
 
 func init() {
@@ -105,9 +119,7 @@ Global Flags:
 	brightnessCmd.AddCommand(brightnessListCmd, brightnessSetCmd, brightnessGetCmd)
 }
 
-func runBrightnessList(cmd *cobra.Command, args []string) {
-	includeDDC, _ := cmd.Flags().GetBool("ddc")
-
+func getAllBrightnessDevices(includeDDC bool) []brightness.Device {
 	allDevices := []brightness.Device{}
 
 	sysfs, err := brightness.NewSysfsBackend()
@@ -137,6 +149,13 @@ func runBrightnessList(cmd *cobra.Command, args []string) {
 			ddc.Close()
 		}
 	}
+
+	return allDevices
+}
+
+func runBrightnessList(cmd *cobra.Command, args []string) {
+	includeDDC, _ := cmd.Flags().GetBool("ddc")
+	allDevices := getAllBrightnessDevices(includeDDC)
 
 	if len(allDevices) == 0 {
 		fmt.Println("No brightness devices found")
@@ -261,31 +280,20 @@ func runBrightnessSet(cmd *cobra.Command, args []string) {
 	log.Fatalf("Failed to set brightness for device: %s", deviceID)
 }
 
+func getBrightnessDevices(includeDDC bool) []string {
+	allDevices := getAllBrightnessDevices(includeDDC)
+
+	var deviceIDs []string
+	for _, device := range allDevices {
+		deviceIDs = append(deviceIDs, device.ID)
+	}
+	return deviceIDs
+}
+
 func runBrightnessGet(cmd *cobra.Command, args []string) {
 	deviceID := args[0]
 	includeDDC, _ := cmd.Flags().GetBool("ddc")
-
-	allDevices := []brightness.Device{}
-
-	sysfs, err := brightness.NewSysfsBackend()
-	if err == nil {
-		devices, err := sysfs.GetDevices()
-		if err == nil {
-			allDevices = append(allDevices, devices...)
-		}
-	}
-
-	if includeDDC {
-		ddc, err := brightness.NewDDCBackend()
-		if err == nil {
-			defer ddc.Close()
-			time.Sleep(100 * time.Millisecond)
-			devices, err := ddc.GetDevices()
-			if err == nil {
-				allDevices = append(allDevices, devices...)
-			}
-		}
-	}
+	allDevices := getAllBrightnessDevices(includeDDC)
 
 	for _, device := range allDevices {
 		if device.ID == deviceID {
