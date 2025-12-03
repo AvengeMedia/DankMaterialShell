@@ -72,6 +72,17 @@ Singleton {
             }
         }
 
+        const profileValue = BatteryService.isPluggedIn
+            ? SettingsData.acProfileName 
+            : SettingsData.batteryProfileName;
+
+        if (profileValue !== "") {
+            const targetProfile = parseInt(profileValue);
+            if (!isNaN(targetProfile) && PowerProfiles.profile !== targetProfile) {
+                PowerProfiles.profile = targetProfile;
+            }
+        }
+
         previousPluggedState = isPluggedIn;
     }
 

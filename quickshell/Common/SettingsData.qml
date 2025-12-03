@@ -248,10 +248,12 @@ Singleton {
     property int acLockTimeout: 0
     property int acSuspendTimeout: 0
     property int acSuspendBehavior: SettingsData.SuspendBehavior.Suspend
+    property string acProfileName: ""
     property int batteryMonitorTimeout: 0
     property int batteryLockTimeout: 0
     property int batterySuspendTimeout: 0
     property int batterySuspendBehavior: SettingsData.SuspendBehavior.Suspend
+    property string batteryProfileName: ""
     property bool lockBeforeSuspend: false
     property bool preventIdleForMedia: false
     property bool loginctlLockIntegration: true
