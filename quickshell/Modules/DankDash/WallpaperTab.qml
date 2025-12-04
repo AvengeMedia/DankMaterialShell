@@ -94,7 +94,7 @@ Item {
             return true;
         }
 
-        if (event.key === Qt.Key_Right) {
+        if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
             if (gridIndex + 1 < visibleCount) {
                 gridIndex++;
             } else if (currentPage < totalPages - 1) {
@@ -104,7 +104,7 @@ Item {
             return true;
         }
 
-        if (event.key === Qt.Key_Left) {
+        if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
             if (gridIndex > 0) {
                 gridIndex--;
             } else if (currentPage > 0) {
@@ -115,7 +115,7 @@ Item {
             return true;
         }
 
-        if (event.key === Qt.Key_Down) {
+        if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
             if (gridIndex + columns < visibleCount) {
                 gridIndex += columns;
             } else if (currentPage < totalPages - 1) {
@@ -125,7 +125,7 @@ Item {
             return true;
         }
 
-        if (event.key === Qt.Key_Up) {
+        if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
             if (gridIndex >= columns) {
                 gridIndex -= columns;
             } else if (currentPage > 0) {
