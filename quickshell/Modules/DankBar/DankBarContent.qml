@@ -471,6 +471,27 @@ Item {
     }
 
     Component {
+        id: powerButtonComponent
+
+        PowerButton {
+            id: powerButton
+            widgetThickness: barWindow.widgetThickness
+            barThickness: barWindow.effectiveBarThickness
+            axis: barWindow.axis
+            section: topBarContent.getWidgetSection(parent)
+            parentScreen: barWindow.screen
+            onClicked: {
+                if (powerMenuModalLoader) {
+                    powerMenuModalLoader.active = true
+                    if (powerMenuModalLoader.item) {
+                        powerMenuModalLoader.item.openCentered()
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
         id: launcherButtonComponent
 
         LauncherButton {
@@ -966,18 +987,6 @@ Item {
         id: notepadButtonComponent
 
         NotepadButton {
-            widgetThickness: barWindow.widgetThickness
-            barThickness: barWindow.effectiveBarThickness
-            axis: barWindow.axis
-            section: topBarContent.getWidgetSection(parent) || "right"
-            parentScreen: barWindow.screen
-        }
-    }
-
-    Component {
-        id: powerButtonComponent
-
-        PowerButton {
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis

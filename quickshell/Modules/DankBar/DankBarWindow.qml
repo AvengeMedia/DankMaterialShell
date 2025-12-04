@@ -374,6 +374,9 @@ PanelWindow {
                                  "loader": clipboardHistoryModalPopup,
                                  "prop": "visible"
                              }, {
+                                 "loader": powerMenuModalLoader,
+                                 "prop": "shouldBeVisible"
+                             }, {
                                  "loader": systemUpdateLoader,
                                  "prop": "shouldBeVisible"
                              }]
