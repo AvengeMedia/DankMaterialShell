@@ -25,6 +25,7 @@ Requires(post): /usr/sbin/useradd
 Requires(post): /usr/sbin/groupadd
 
 Recommends:     policycoreutils-python-utils
+Recommends:     setfacl
 Suggests:       niri
 Suggests:       hyprland
 Suggests:       sway
@@ -210,6 +211,15 @@ elif ! grep -q "dms-greeter" "$GREETD_CONFIG"; then
         CONFIG_STATUS="Updated existing config (backed up) with $COMPOSITOR ✓"
 fi
 
+# Set graphical.target as default
+CURRENT_TARGET=$(systemctl get-default 2>/dev/null || echo "unknown")
+if [ "$CURRENT_TARGET" != "graphical.target" ]; then
+	systemctl set-default graphical.target >/dev/null 2>&1 || true
+	TARGET_STATUS="Set to graphical.target (was: $CURRENT_TARGET) ✓"
+else
+	TARGET_STATUS="Already graphical.target ✓"
+fi
+
 # Only show banner on initial install
 if [ "$1" -eq 1 ]; then
 cat << 'EOF'
@@ -219,31 +229,30 @@ cat << 'EOF'
 =========================================================================
 
 Status:
+EOF
+echo "    ✓ Greetd config: $CONFIG_STATUS"
+echo "    ✓ Default target: $TARGET_STATUS"
+cat << 'EOF'
     ✓ Greeter user: Created
     ✓ Greeter directories: /var/cache/dms-greeter, /var/lib/greeter
     ✓ SELinux contexts: Applied
-EOF
-echo "    ✓ Greetd config: $CONFIG_STATUS"
-cat << 'EOF'
 
 Next steps:
 
-1. Disable any existing display managers (IMPORTANT):
-     sudo systemctl disable gdm sddm lightdm
+1. Enable the greeter:
+     dms greeter enable
+     (This will automatically disable gdm, sddm, or lightdm display managers,
+      set graphical.target, and enable greetd)
 
-2. Enable greetd service:
-     sudo systemctl enable greetd
-
-3. (Optional) Sync your theme with the greeter:
-     If you have DankMaterialShell (DMS) installed, you can sync with:
+2. Sync your theme with the greeter (optional):
+     If you have DankMaterialShell (DMS) installed, you can sync theming with:
      dms greeter sync
 
-     Check sync status: dms greeter status
-     Then logout/login to see your wallpaper on the greeter!
+3. Check your setup:
+     dms greeter status
 
-Ready to test? Reboot or run: sudo systemctl start greetd
-Documentation: /usr/share/doc/dms-greeter/README.md
-Website: https://danklinux.com/docs/dankgreeter/
+Ready to test? Run: sudo systemctl start greetd or simply log out/reboot your system
+Documentation: https://danklinux.com/docs/dankgreeter/
 =========================================================================
 
 EOF

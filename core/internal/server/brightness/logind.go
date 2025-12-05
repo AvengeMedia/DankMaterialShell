@@ -13,8 +13,7 @@ type DBusConn interface {
 }
 
 type LogindBackend struct {
-	conn     DBusConn
-	connOnce bool
+	conn DBusConn
 }
 
 func NewLogindBackend() (*LogindBackend, error) {

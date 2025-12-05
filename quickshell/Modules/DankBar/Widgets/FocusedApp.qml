@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -11,81 +12,99 @@ import qs.Widgets
 BasePill {
     id: root
 
-    property bool compactMode: SettingsData.focusedWindowCompactMode
+    property var widgetData: null
+    property bool compactMode: widgetData?.focusedWindowCompactMode !== undefined ? widgetData.focusedWindowCompactMode : SettingsData.focusedWindowCompactMode
     property int availableWidth: 400
     readonly property int maxNormalWidth: 456
     readonly property int maxCompactWidth: 288
     readonly property Toplevel activeWindow: ToplevelManager.activeToplevel
     property var activeDesktopEntry: null
     property bool isHovered: mouseArea.containsMouse
+    property bool isAutoHideBar: false
+
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVerticalOrientation) {
+            return 0;
+        }
+
+        if (isAutoHideBar) {
+            return 0;
+        }
+
+        if (parentScreen.y > 0) {
+            return barThickness + (barSpacing || 4);
+        }
+
+        return 0;
+    }
 
     Component.onCompleted: {
-        updateDesktopEntry()
+        updateDesktopEntry();
     }
 
     Connections {
         target: DesktopEntries
         function onApplicationsChanged() {
-            root.updateDesktopEntry()
+            root.updateDesktopEntry();
         }
     }
 
     Connections {
         target: root
         function onActiveWindowChanged() {
-            root.updateDesktopEntry()
+            root.updateDesktopEntry();
         }
     }
 
     function updateDesktopEntry() {
         if (activeWindow && activeWindow.appId) {
-            const moddedId = Paths.moddedAppId(activeWindow.appId)
-            activeDesktopEntry = DesktopEntries.heuristicLookup(moddedId)
+            const moddedId = Paths.moddedAppId(activeWindow.appId);
+            activeDesktopEntry = DesktopEntries.heuristicLookup(moddedId);
         } else {
-            activeDesktopEntry = null
+            activeDesktopEntry = null;
         }
     }
     readonly property bool hasWindowsOnCurrentWorkspace: {
         if (CompositorService.isNiri) {
-            let currentWorkspaceId = null
+            let currentWorkspaceId = null;
             for (var i = 0; i < NiriService.allWorkspaces.length; i++) {
-                const ws = NiriService.allWorkspaces[i]
+                const ws = NiriService.allWorkspaces[i];
                 if (ws.is_focused) {
-                    currentWorkspaceId = ws.id
-                    break
+                    currentWorkspaceId = ws.id;
+                    break;
                 }
             }
 
             if (!currentWorkspaceId) {
-                return false
+                return false;
             }
 
-            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId)
-            return workspaceWindows.length > 0 && activeWindow && activeWindow.title
+            const workspaceWindows = NiriService.windows.filter(w => w.workspace_id === currentWorkspaceId);
+            return workspaceWindows.length > 0 && activeWindow && activeWindow.title;
         }
 
         if (CompositorService.isHyprland) {
             if (!Hyprland.focusedWorkspace || !activeWindow || !activeWindow.title) {
-                return false
+                return false;
             }
 
             try {
-                if (!Hyprland.toplevels) return false
-                const hyprlandToplevels = Array.from(Hyprland.toplevels.values)
-                const activeHyprToplevel = hyprlandToplevels.find(t => t?.wayland === activeWindow)
+                if (!Hyprland.toplevels)
+                    return false;
+                const hyprlandToplevels = Array.from(Hyprland.toplevels.values);
+                const activeHyprToplevel = hyprlandToplevels.find(t => t?.wayland === activeWindow);
 
                 if (!activeHyprToplevel || !activeHyprToplevel.workspace) {
-                    return false
+                    return false;
                 }
 
-                return activeHyprToplevel.workspace.id === Hyprland.focusedWorkspace.id
+                return activeHyprToplevel.workspace.id === Hyprland.focusedWorkspace.id;
             } catch (e) {
-                console.error("FocusedApp: hasWindowsOnCurrentWorkspace error:", e)
-                return false
+                return false;
             }
         }
 
-        return activeWindow && activeWindow.title
+        return activeWindow && activeWindow.title;
     }
 
     width: hasWindowsOnCurrentWorkspace ? (isVerticalOrientation ? barThickness : visualWidth) : 0
@@ -95,10 +114,12 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: {
-                if (!root.hasWindowsOnCurrentWorkspace) return 0
-                if (root.isVerticalOrientation) return root.widgetThickness - root.horizontalPadding * 2
-                const baseWidth = contentRow.implicitWidth
-                return compactMode ? Math.min(baseWidth, maxCompactWidth - root.horizontalPadding * 2) : Math.min(baseWidth, maxNormalWidth - root.horizontalPadding * 2)
+                if (!root.hasWindowsOnCurrentWorkspace)
+                    return 0;
+                if (root.isVerticalOrientation)
+                    return root.widgetThickness - root.horizontalPadding * 2;
+                const baseWidth = contentRow.implicitWidth;
+                return compactMode ? Math.min(baseWidth, maxCompactWidth - root.horizontalPadding * 2) : Math.min(baseWidth, maxNormalWidth - root.horizontalPadding * 2);
             }
             implicitHeight: root.widgetThickness - root.horizontalPadding * 2
             clip: false
@@ -110,14 +131,21 @@ BasePill {
                 height: 18
                 visible: root.isVerticalOrientation && activeWindow && status === Image.Ready
                 source: {
-                    if (!activeWindow || !activeWindow.appId) return ""
-                    const moddedId = Paths.moddedAppId(activeWindow.appId)
-                    if (moddedId.toLowerCase().includes("steam_app")) return ""
-                    return Quickshell.iconPath(activeDesktopEntry?.icon, true)
+                    if (!activeWindow || !activeWindow.appId)
+                        return "";
+                    return Paths.getAppIcon(activeWindow.appId, activeDesktopEntry);
                 }
                 smooth: true
                 mipmap: true
                 asynchronous: true
+                layer.enabled: activeWindow && activeWindow.appId === "org.quickshell"
+                layer.smooth: true
+                layer.mipmap: true
+                layer.effect: MultiEffect {
+                    saturation: 0
+                    colorization: 1
+                    colorizationColor: Theme.primary
+                }
             }
 
             DankIcon {
@@ -126,26 +154,28 @@ BasePill {
                 name: "sports_esports"
                 color: Theme.widgetTextColor
                 visible: {
-                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId) return false
-                    const moddedId = Paths.moddedAppId(activeWindow.appId)
-                    return moddedId.toLowerCase().includes("steam_app")
+                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId)
+                        return false;
+                    const moddedId = Paths.moddedAppId(activeWindow.appId);
+                    return moddedId.toLowerCase().includes("steam_app");
                 }
             }
 
             Text {
                 anchors.centerIn: parent
                 visible: {
-                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId) return false
-                    if (appIcon.status === Image.Ready) return false
-                    const moddedId = Paths.moddedAppId(activeWindow.appId)
-                    return !moddedId.toLowerCase().includes("steam_app")
+                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId)
+                        return false;
+                    if (appIcon.status === Image.Ready)
+                        return false;
+                    const moddedId = Paths.moddedAppId(activeWindow.appId);
+                    return !moddedId.toLowerCase().includes("steam_app");
                 }
                 text: {
-                    if (!activeWindow || !activeWindow.appId) return "?"
-                    if (activeDesktopEntry && activeDesktopEntry.name) {
-                        return activeDesktopEntry.name.charAt(0).toUpperCase()
-                    }
-                    return activeWindow.appId.charAt(0).toUpperCase()
+                    if (!activeWindow || !activeWindow.appId)
+                        return "?";
+                    const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                    return appName.charAt(0).toUpperCase();
                 }
                 font.pixelSize: 10
                 color: Theme.widgetTextColor
@@ -160,14 +190,11 @@ BasePill {
                 StyledText {
                     id: appText
                     text: {
-                        if (!activeWindow || !activeWindow.appId) {
+                        if (!activeWindow || !activeWindow.appId)
                             return "";
-                        }
-
-                        const desktopEntry = DesktopEntries.heuristicLookup(activeWindow.appId);
-                        return desktopEntry && desktopEntry.name ? desktopEntry.name : activeWindow.appId;
+                        return Paths.getAppName(activeWindow.appId, activeDesktopEntry);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
@@ -178,7 +205,7 @@ BasePill {
 
                 StyledText {
                     text: "•"
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.outlineButton
                     anchors.verticalCenter: parent.verticalCenter
                     visible: !compactMode && appText.text && titleText.text
@@ -203,7 +230,7 @@ BasePill {
 
                         return title;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
@@ -222,29 +249,31 @@ BasePill {
         acceptedButtons: Qt.NoButton
         onEntered: {
             if (root.isVerticalOrientation && activeWindow && activeWindow.appId && root.parentScreen) {
-                tooltipLoader.active = true
+                tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2)
-                    const currentScreen = root.parentScreen
-                    const screenX = currentScreen ? currentScreen.x : 0
-                    const screenY = currentScreen ? currentScreen.y : 0
-                    const relativeY = globalPos.y - screenY
-                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
+                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const currentScreen = root.parentScreen;
+                    const screenX = currentScreen ? currentScreen.x : 0;
+                    const screenY = currentScreen ? currentScreen.y : 0;
+                    const relativeY = globalPos.y - screenY;
+                    // Add minTooltipY offset to account for top bar
+                    const adjustedY = relativeY + root.minTooltipY;
+                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + (barConfig?.spacing ?? 4) + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - (barConfig?.spacing ?? 4) - Theme.spacingXS);
 
-                    const appName = activeDesktopEntry && activeDesktopEntry.name ? activeDesktopEntry.name : activeWindow.appId
-                    const title = activeWindow.title || ""
-                    const tooltipText = appName + (title ? " • " + title : "")
+                    const appName = Paths.getAppName(activeWindow.appId, activeDesktopEntry);
+                    const title = activeWindow.title || "";
+                    const tooltipText = appName + (title ? " • " + title : "");
 
-                    const isLeft = root.axis?.edge === "left"
-                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, relativeY, currentScreen, isLeft, !isLeft)
+                    const isLeft = root.axis?.edge === "left";
+                    tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }
         onExited: {
             if (tooltipLoader.item) {
-                tooltipLoader.item.hide()
+                tooltipLoader.item.hide();
             }
-            tooltipLoader.active = false
+            tooltipLoader.active = false;
         }
     }
 

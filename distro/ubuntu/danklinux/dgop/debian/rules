@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Extract version from debian/changelog
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+# Get upstream version (strip -1ppa1 suffix)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+
+# Detect architecture for downloading correct binary
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+# Map Debian arch to GitHub release arch names
+ifeq ($(DEB_HOST_ARCH),amd64)
+    GITHUB_ARCH := amd64
+else ifeq ($(DEB_HOST_ARCH),arm64)
+    GITHUB_ARCH := arm64
+else
+    $(error Unsupported architecture: $(DEB_HOST_ARCH))
+endif
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Binary is already included in source package (native format)
+	# Just verify it exists and is executable
+	test -f dgop || (echo "ERROR: dgop binary not found!" && exit 1)
+	chmod +x dgop
+
+override_dh_auto_install:
+	# Install binary
+	install -Dm755 dgop debian/dgop/usr/bin/dgop
+
+override_dh_auto_clean:
+	# Don't delete dgop binary - it's part of the source package (native format)
+	rm -f dgop.gz
+	dh_auto_clean

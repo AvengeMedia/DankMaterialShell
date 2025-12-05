@@ -137,80 +137,55 @@ PanelWindow {
         right: getRightMargin()
     }
 
+    function getBarInfo() {
+        if (!screen) return { topBar: 0, bottomBar: 0, leftBar: 0, rightBar: 0 }
+        return SettingsData.getAdjacentBarInfo(screen, SettingsData.notificationPopupPosition, {
+            id: "notification-popup",
+            screenPreferences: [screen.name],
+            autoHide: false
+        })
+    }
+
     function getTopMargin() {
         const popupPos = SettingsData.notificationPopupPosition
-        const barPos = SettingsData.dankBarPosition
         const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left
-
         if (!isTop) return 0
 
-        const effectiveBarThickness = Math.max(26 + SettingsData.dankBarInnerPadding * 0.6 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-        const exclusiveZone = effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
-
-        let base = Theme.popupDistance
-        if (barPos === SettingsData.Position.Top) {
-            base = exclusiveZone
-        }
-
+        const barInfo = getBarInfo()
+        const base = barInfo.topBar > 0 ? barInfo.topBar : Theme.popupDistance
         return base + screenY
     }
 
     function getBottomMargin() {
         const popupPos = SettingsData.notificationPopupPosition
-        const barPos = SettingsData.dankBarPosition
         const isBottom = popupPos === SettingsData.Position.Bottom || popupPos === SettingsData.Position.Right
-
         if (!isBottom) return 0
 
-        const effectiveBarThickness = Math.max(26 + SettingsData.dankBarInnerPadding * 0.6 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-        const exclusiveZone = effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
-
-        let base = Theme.popupDistance
-        if (barPos === SettingsData.Position.Bottom) {
-            base = exclusiveZone
-        }
-
+        const barInfo = getBarInfo()
+        const base = barInfo.bottomBar > 0 ? barInfo.bottomBar : Theme.popupDistance
         return base + screenY
     }
 
     function getLeftMargin() {
-        if (isTopCenter) {
-            return (screen.width - implicitWidth) / 2
-        }
+        if (isTopCenter) return (screen.width - implicitWidth) / 2
 
         const popupPos = SettingsData.notificationPopupPosition
-        const barPos = SettingsData.dankBarPosition
         const isLeft = popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom
-
         if (!isLeft) return 0
 
-        const effectiveBarThickness = Math.max(26 + SettingsData.dankBarInnerPadding * 0.6 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-        const exclusiveZone = effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
-
-        if (barPos === SettingsData.Position.Left) {
-            return exclusiveZone
-        }
-
-        return Theme.popupDistance
+        const barInfo = getBarInfo()
+        return barInfo.leftBar > 0 ? barInfo.leftBar : Theme.popupDistance
     }
 
     function getRightMargin() {
         if (isTopCenter) return 0
 
         const popupPos = SettingsData.notificationPopupPosition
-        const barPos = SettingsData.dankBarPosition
         const isRight = popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Right
-
         if (!isRight) return 0
 
-        const effectiveBarThickness = Math.max(26 + SettingsData.dankBarInnerPadding * 0.6 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-        const exclusiveZone = effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap
-
-        if (barPos === SettingsData.Position.Right) {
-            return exclusiveZone
-        }
-
-        return Theme.popupDistance
+        const barInfo = getBarInfo()
+        return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance
     }
 
     readonly property real dpr: CompositorService.getScreenScale(win.screen)
@@ -241,14 +216,15 @@ PanelWindow {
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
+            readonly property int blurMax: 64
+
             layer.effect: MultiEffect {
                 id: shadowFx
                 autoPaddingEnabled: true
                 shadowEnabled: true
                 blurEnabled: false
                 maskEnabled: false
-                property int blurMax: 64
-                shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / blurMax))
+                shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1 + (2 * content.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
                 shadowColor: {
                     const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest

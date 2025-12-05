@@ -17,14 +17,14 @@ DankOSD {
         target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
 
         function onVolumeChanged() {
-            if (!AudioService.suppressOSD && SettingsData.osdVolumeEnabled) {
-                root.show()
+            if (SettingsData.osdVolumeEnabled) {
+                root.show();
             }
         }
 
         function onMutedChanged() {
-            if (!AudioService.suppressOSD && SettingsData.osdVolumeEnabled) {
-                root.show()
+            if (SettingsData.osdVolumeEnabled) {
+                root.show();
             }
         }
     }
@@ -34,7 +34,7 @@ DankOSD {
 
         function onSinkChanged() {
             if (root.shouldBeVisible && SettingsData.osdVolumeEnabled) {
-                root.show()
+                root.show();
             }
         }
     }
@@ -76,10 +76,10 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        AudioService.toggleMute()
+                        AudioService.toggleMute();
                     }
                     onContainsMouseChanged: {
-                        setChildHovered(containsMouse || volumeSlider.containsMouse)
+                        setChildHovered(containsMouse || volumeSlider.containsMouse);
                     }
                 }
             }
@@ -105,21 +105,20 @@ DankOSD {
 
                 Component.onCompleted: {
                     if (AudioService.sink && AudioService.sink.audio) {
-                        value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100))
+                        value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
                     }
                 }
 
                 onSliderValueChanged: newValue => {
-                                          if (AudioService.sink && AudioService.sink.audio) {
-                                              AudioService.suppressOSD = true
-                                              AudioService.sink.audio.volume = newValue / 100
-                                              AudioService.suppressOSD = false
-                                              resetHideTimer()
-                                          }
-                                      }
+                    if (AudioService.sink && AudioService.sink.audio) {
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.sink.audio.volume = newValue / 100;
+                        resetHideTimer();
+                    }
+                }
 
                 onContainsMouseChanged: {
-                    setChildHovered(containsMouse || muteButton.containsMouse)
+                    setChildHovered(containsMouse || muteButton.containsMouse);
                 }
 
                 Connections {
@@ -127,7 +126,7 @@ DankOSD {
 
                     function onVolumeChanged() {
                         if (volumeSlider && !volumeSlider.pressed) {
-                            volumeSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100))
+                            volumeSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
                         }
                     }
                 }
@@ -164,10 +163,10 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {
-                        AudioService.toggleMute()
+                        AudioService.toggleMute();
                     }
                     onContainsMouseChanged: {
-                        setChildHovered(containsMouse || vertSliderArea.containsMouse)
+                        setChildHovered(containsMouse || vertSliderArea.containsMouse);
                     }
                 }
             }
@@ -207,9 +206,9 @@ DankOSD {
                     height: 8
                     radius: Theme.cornerRadius
                     y: {
-                        const ratio = vertSlider.value / 100
-                        const travel = parent.height - height
-                        return Math.max(0, Math.min(travel, travel * (1 - ratio)))
+                        const ratio = vertSlider.value / 100;
+                        const travel = parent.height - height;
+                        return Math.max(0, Math.min(travel, travel * (1 - ratio)));
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: Theme.primary
@@ -226,36 +225,35 @@ DankOSD {
                     cursorShape: Qt.PointingHandCursor
 
                     onContainsMouseChanged: {
-                        setChildHovered(containsMouse || muteButtonVert.containsMouse)
+                        setChildHovered(containsMouse || muteButtonVert.containsMouse);
                     }
 
                     onPressed: mouse => {
-                        vertSlider.dragging = true
-                        updateVolume(mouse)
+                        vertSlider.dragging = true;
+                        updateVolume(mouse);
                     }
 
                     onReleased: {
-                        vertSlider.dragging = false
+                        vertSlider.dragging = false;
                     }
 
                     onPositionChanged: mouse => {
                         if (pressed) {
-                            updateVolume(mouse)
+                            updateVolume(mouse);
                         }
                     }
 
                     onClicked: mouse => {
-                        updateVolume(mouse)
+                        updateVolume(mouse);
                     }
 
                     function updateVolume(mouse) {
                         if (AudioService.sink && AudioService.sink.audio) {
-                            const ratio = 1.0 - (mouse.y / height)
-                            const volume = Math.max(0, Math.min(100, Math.round(ratio * 100)))
-                            AudioService.suppressOSD = true
-                            AudioService.sink.audio.volume = volume / 100
-                            AudioService.suppressOSD = false
-                            resetHideTimer()
+                            const ratio = 1.0 - (mouse.y / height);
+                            const volume = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+                            SessionData.suppressOSDTemporarily();
+                            AudioService.sink.audio.volume = volume / 100;
+                            resetHideTimer();
                         }
                     }
                 }
@@ -265,7 +263,7 @@ DankOSD {
 
                     function onVolumeChanged() {
                         if (!vertSlider.dragging) {
-                            vertSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100))
+                            vertSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
                         }
                     }
                 }
@@ -286,9 +284,9 @@ DankOSD {
     onOsdShown: {
         if (AudioService.sink && AudioService.sink.audio && contentLoader.item && contentLoader.item.item) {
             if (!useVertical) {
-                const slider = contentLoader.item.item.children[0].children[1]
+                const slider = contentLoader.item.item.children[0].children[1];
                 if (slider && slider.value !== undefined) {
-                    slider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100))
+                    slider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
                 }
             }
         }

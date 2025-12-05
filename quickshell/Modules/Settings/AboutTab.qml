@@ -1,10 +1,9 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Item {
     id: aboutTab
@@ -16,50 +15,70 @@ Item {
     property bool isLabwc: CompositorService.isLabwc
 
     property string compositorName: {
-        if (isHyprland) return "hyprland"
-        if (isSway) return "sway"
-        if (isDwl) return "mangowc"
-        if (isLabwc) return "labwc"
-        return "niri"
+        if (isHyprland)
+            return "hyprland";
+        if (isSway)
+            return "sway";
+        if (isDwl)
+            return "mangowc";
+        if (isLabwc)
+            return "labwc";
+        return "niri";
     }
 
     property string compositorLogo: {
-        if (isHyprland) return "/assets/hyprland.svg"
-        if (isSway) return "/assets/sway.svg"
-        if (isDwl) return "/assets/mango.png"
-        if (isLabwc) return "/assets/labwc.png"
-        return "/assets/niri.svg"
+        if (isHyprland)
+            return "/assets/hyprland.svg";
+        if (isSway)
+            return "/assets/sway.svg";
+        if (isDwl)
+            return "/assets/mango.png";
+        if (isLabwc)
+            return "/assets/labwc.png";
+        return "/assets/niri.svg";
     }
 
     property string compositorUrl: {
-        if (isHyprland) return "https://hypr.land"
-        if (isSway) return "https://swaywm.org"
-        if (isDwl) return "https://github.com/DreamMaoMao/mangowc"
-        if (isLabwc) return "https://labwc.github.io/"
-        return "https://github.com/YaLTeR/niri"
+        if (isHyprland)
+            return "https://hypr.land";
+        if (isSway)
+            return "https://swaywm.org";
+        if (isDwl)
+            return "https://github.com/DreamMaoMao/mangowc";
+        if (isLabwc)
+            return "https://labwc.github.io/";
+        return "https://github.com/YaLTeR/niri";
     }
 
     property string compositorTooltip: {
-        if (isHyprland) return "Hyprland Website"
-        if (isSway) return "Sway Website"
-        if (isDwl) return "mangowc GitHub"
-        if (isLabwc) return "LabWC Website"
-        return "niri GitHub"
+        if (isHyprland)
+            return "Hyprland Website";
+        if (isSway)
+            return "Sway Website";
+        if (isDwl)
+            return "mangowc GitHub";
+        if (isLabwc)
+            return "LabWC Website";
+        return "niri GitHub";
     }
 
     property string dmsDiscordUrl: "https://discord.gg/ppWTpKmPgT"
     property string dmsDiscordTooltip: "niri/dms Discord"
 
     property string compositorDiscordUrl: {
-        if (isHyprland) return "https://discord.com/invite/hQ9XvMUjjr"
-        if (isDwl) return "https://discord.gg/CPjbDxesh5"
-        return ""
+        if (isHyprland)
+            return "https://discord.com/invite/hQ9XvMUjjr";
+        if (isDwl)
+            return "https://discord.gg/CPjbDxesh5";
+        return "";
     }
 
     property string compositorDiscordTooltip: {
-        if (isHyprland) return "Hyprland Discord Server"
-        if (isDwl) return "mangowc Discord Server"
-        return ""
+        if (isHyprland)
+            return "Hyprland Discord Server";
+        if (isDwl)
+            return "mangowc Discord Server";
+        return "";
     }
 
     property string redditUrl: "https://reddit.com/r/niri"
@@ -76,13 +95,14 @@ Item {
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             // ASCII Art Header
@@ -91,8 +111,7 @@ Item {
                 height: asciiSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -104,13 +123,17 @@ Item {
 
                     Row {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        spacing: Theme.spacingL
+                        spacing: parent.width < 350 ? Theme.spacingM : Theme.spacingL
+
+                        property bool compactLogo: parent.width < 400
+                        property bool hideLogo: parent.width < 280
 
                         Image {
                             id: logoImage
 
+                            visible: !parent.hideLogo
                             anchors.verticalCenter: parent.verticalCenter
-                            width: 120
+                            width: parent.compactLogo ? 80 : 120
                             height: width * (569.94629 / 506.50931)
                             fillMode: Image.PreserveAspectFit
                             smooth: true
@@ -130,7 +153,7 @@ Item {
                         Text {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "DANK LINUX"
-                            font.pixelSize: 48
+                            font.pixelSize: parent.compactLogo ? 32 : 48
                             font.weight: Font.Bold
                             font.family: interFont.name
                             color: Theme.surfaceText
@@ -144,7 +167,32 @@ Item {
                     }
 
                     StyledText {
-                        text: SystemUpdateService.shellVersion ? `dms ${SystemUpdateService.shellVersion}` : "dms"
+                        text: {
+                            if (!SystemUpdateService.shellVersion)
+                                return "dms";
+
+                            let version = SystemUpdateService.shellVersion;
+
+                            // Debian/Ubuntu/OpenSUSE git format: 0.6.2+git2264.c5c5ce84
+                            let match = version.match(/^([\d.]+)\+git(\d+)\./);
+                            if (match) {
+                                return `dms (git) v${match[1]}-${match[2]}`;
+                            }
+
+                            // Fedora COPR git format: 0.0.git.2267.d430cae9
+                            match = version.match(/^[\d.]+\.git\.(\d+)\./);
+                            if (match) {
+                                return `dms (git) v0.6.2-${match[1]}`;
+                            }
+
+                            // Stable release format: 0.6.2
+                            match = version.match(/^([\d.]+)$/);
+                            if (match) {
+                                return `dms v${match[1]}`;
+                            }
+
+                            return `dms ${version}`;
+                        }
                         font.pixelSize: Theme.fontSizeXLarge
                         font.weight: Font.Bold
                         color: Theme.surfaceText
@@ -152,25 +200,101 @@ Item {
                         width: parent.width
                     }
 
+                    Row {
+                        id: resourceButtonsRow
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: Theme.spacingS
+
+                        property bool compactMode: parent.width < 400
+
+                        DankButton {
+                            id: docsButton
+                            text: resourceButtonsRow.compactMode ? "" : I18n.tr("Docs")
+                            iconName: "menu_book"
+                            iconSize: 18
+                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            textColor: Theme.surfaceText
+                            onClicked: Qt.openUrlExternally("https://danklinux.com/docs")
+                            onHoveredChanged: {
+                                if (hovered)
+                                    resourceTooltip.show(resourceButtonsRow.compactMode ? I18n.tr("Docs") + " - danklinux.com/docs" : "danklinux.com/docs", docsButton, 0, 0, "bottom");
+                                else
+                                    resourceTooltip.hide();
+                            }
+                        }
+
+                        DankButton {
+                            id: pluginsButton
+                            text: resourceButtonsRow.compactMode ? "" : I18n.tr("Plugins")
+                            iconName: "extension"
+                            iconSize: 18
+                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            textColor: Theme.surfaceText
+                            onClicked: Qt.openUrlExternally("https://plugins.danklinux.com")
+                            onHoveredChanged: {
+                                if (hovered)
+                                    resourceTooltip.show(resourceButtonsRow.compactMode ? I18n.tr("Plugins") + " - plugins.danklinux.com" : "plugins.danklinux.com", pluginsButton, 0, 0, "bottom");
+                                else
+                                    resourceTooltip.hide();
+                            }
+                        }
+
+                        DankButton {
+                            id: githubButton
+                            text: resourceButtonsRow.compactMode ? "" : I18n.tr("GitHub")
+                            iconName: "code"
+                            iconSize: 18
+                            backgroundColor: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.08)
+                            textColor: Theme.surfaceText
+                            onClicked: Qt.openUrlExternally("https://github.com/AvengeMedia/DankMaterialShell")
+                            onHoveredChanged: {
+                                if (hovered)
+                                    resourceTooltip.show(resourceButtonsRow.compactMode ? "GitHub - AvengeMedia/DankMaterialShell" : "github.com/AvengeMedia/DankMaterialShell", githubButton, 0, 0, "bottom");
+                                else
+                                    resourceTooltip.hide();
+                            }
+                        }
+
+                        DankButton {
+                            id: kofiButton
+                            text: resourceButtonsRow.compactMode ? "" : I18n.tr("Ko-fi")
+                            iconName: "favorite"
+                            iconSize: 18
+                            backgroundColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                            textColor: Theme.primary
+                            onClicked: Qt.openUrlExternally("https://ko-fi.com/danklinux")
+                            onHoveredChanged: {
+                                if (hovered)
+                                    resourceTooltip.show(resourceButtonsRow.compactMode ? I18n.tr("Ko-fi") + " - ko-fi.com/danklinux" : "ko-fi.com/danklinux", kofiButton, 0, 0, "bottom");
+                                else
+                                    resourceTooltip.hide();
+                            }
+                        }
+                    }
+
+                    DankTooltipV2 {
+                        id: resourceTooltip
+                    }
+
                     Item {
                         id: communityIcons
                         anchors.horizontalCenter: parent.horizontalCenter
                         height: 24
                         width: {
-                            let baseWidth = compositorButton.width + dmsDiscordButton.width + Theme.spacingM
+                            let baseWidth = compositorButton.width + dmsDiscordButton.width + Theme.spacingM;
                             if (showMatrix) {
-                                baseWidth += matrixButton.width + 4
+                                baseWidth += matrixButton.width + 4;
                             }
                             if (showIrc) {
-                                baseWidth += ircButton.width + Theme.spacingM
+                                baseWidth += ircButton.width + Theme.spacingM;
                             }
                             if (showCompositorDiscord) {
-                                baseWidth += compositorDiscordButton.width + Theme.spacingM
+                                baseWidth += compositorDiscordButton.width + Theme.spacingM;
                             }
                             if (showReddit) {
-                                baseWidth += redditButton.width + Theme.spacingM
+                                baseWidth += redditButton.width + Theme.spacingM;
                             }
-                            return baseWidth
+                            return baseWidth;
                         }
 
                         Item {
@@ -186,10 +310,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + compositorLogo
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + compositorLogo
                                 sourceSize: Qt.size(24, 24)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -217,10 +338,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/matrix-logo-white.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/matrix-logo-white.svg"
                                 sourceSize: Qt.size(28, 18)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -238,8 +356,7 @@ Item {
                                 hoverEnabled: true
                                 onEntered: parent.hovered = true
                                 onExited: parent.hovered = false
-                                onClicked: Qt.openUrlExternally(
-                                               "https://matrix.to/#/#niri:matrix.org")
+                                onClicked: Qt.openUrlExternally("https://matrix.to/#/#niri:matrix.org")
                             }
                         }
 
@@ -276,9 +393,11 @@ Item {
                             width: 20
                             height: 20
                             x: {
-                                if (showMatrix) return matrixButton.x + matrixButton.width + Theme.spacingM
-                                if (showIrc) return ircButton.x + ircButton.width + Theme.spacingM
-                                return compositorButton.x + compositorButton.width + Theme.spacingM
+                                if (showMatrix)
+                                    return matrixButton.x + matrixButton.width + Theme.spacingM;
+                                if (showIrc)
+                                    return ircButton.x + ircButton.width + Theme.spacingM;
+                                return compositorButton.x + compositorButton.width + Theme.spacingM;
                             }
                             anchors.verticalCenter: parent.verticalCenter
 
@@ -287,10 +406,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/discord.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/discord.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -319,10 +435,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/discord.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/discord.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -351,10 +464,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: Qt.resolvedUrl(".").toString().replace(
-                                            "file://", "").replace(
-                                            "/Modules/Settings/",
-                                            "") + "/assets/reddit.svg"
+                                source: Qt.resolvedUrl(".").toString().replace("file://", "").replace("/Modules/Settings/", "") + "/assets/reddit.svg"
                                 sourceSize: Qt.size(20, 20)
                                 smooth: true
                                 fillMode: Image.PreserveAspectFit
@@ -373,15 +483,13 @@ Item {
                 }
             }
 
-
             // Project Information
             StyledRect {
                 width: parent.width
                 height: projectSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
@@ -434,16 +542,16 @@ Item {
             }
 
             StyledRect {
+                visible: DMSService.isConnected
                 width: parent.width
-                height: techSection.implicitHeight + Theme.spacingL * 2
+                height: backendSection.implicitHeight + Theme.spacingL * 2
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
+                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
                 border.width: 0
 
                 Column {
-                    id: techSection
+                    id: backendSection
 
                     anchors.fill: parent
                     anchors.margins: Theme.spacingL
@@ -454,201 +562,154 @@ Item {
                         spacing: Theme.spacingM
 
                         DankIcon {
-                            name: "code"
+                            name: "dns"
                             size: Theme.iconSize
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         StyledText {
-                            text: I18n.tr("Resources")
+                            text: I18n.tr("Backend")
                             font.pixelSize: Theme.fontSizeLarge
                             font.weight: Font.Medium
                             color: Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
-
-                    Grid {
-                        width: parent.width
-                        columns: 2
-                        columnSpacing: Theme.spacingL
-                        rowSpacing: Theme.spacingS
-
-                        StyledText {
-                            text: I18n.tr("Website:")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-
-                        StyledText {
-                            text: `<a href="https://danklinux.com" style="text-decoration:none; color:${Theme.primary};">danklinux.com</a>`
-                            linkColor: Theme.primary
-                            textFormat: Text.RichText
-                            onLinkActivated: url => Qt.openUrlExternally(url)
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                acceptedButtons: Qt.NoButton
-                                propagateComposedEvents: true
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Plugins:")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-
-                        StyledText {
-                            text: `<a href="https://plugins.danklinux.com" style="text-decoration:none; color:${Theme.primary};">plugins.danklinux.com</a>`
-                            linkColor: Theme.primary
-                            textFormat: Text.RichText
-                            onLinkActivated: url => Qt.openUrlExternally(url)
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceVariantText
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                acceptedButtons: Qt.NoButton
-                                propagateComposedEvents: true
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Github:")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-
-                        Row {
-                            spacing: 4
-
-                            StyledText {
-                                text: `<a href="https://github.com/AvengeMedia/DankMaterialShell" style="text-decoration:none; color:${Theme.primary};">DankMaterialShell</a>`
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                linkColor: Theme.primary
-                                textFormat: Text.RichText
-                                onLinkActivated: url => Qt.openUrlExternally(url)
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    acceptedButtons: Qt.NoButton
-                                    propagateComposedEvents: true
-                                }
-                            }
-
-                            StyledText {
-                                text: I18n.tr("- Support Us With a Star ⭐")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        StyledText {
-                            text: I18n.tr("System Monitoring:")
-                            font.pixelSize: Theme.fontSizeMedium
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                        }
-
-                        Row {
-                            spacing: 4
-
-                            StyledText {
-                                text: `<a href="https://github.com/AvengeMedia/dgop" style="text-decoration:none; color:${Theme.primary};">dgop</a>`
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                linkColor: Theme.primary
-                                textFormat: Text.RichText
-                                onLinkActivated: url => Qt.openUrlExternally(url)
-                                anchors.verticalCenter: parent.verticalCenter
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                    acceptedButtons: Qt.NoButton
-                                    propagateComposedEvents: true
-                                }
-                            }
-
-                            StyledText {
-                                text: I18n.tr("- Stateless System Monitoring")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceVariantText
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Support Section
-            StyledRect {
-                width: parent.width
-                height: supportSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
-
-                Row {
-                    id: supportSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
 
                     Row {
-                        spacing: Theme.spacingM
-                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingL
 
-                        DankIcon {
-                            name: "volunteer_activism"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
+                        Column {
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("Version")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                            }
+
+                            StyledText {
+                                text: DMSService.cliVersion || "—"
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                            }
                         }
+
+                        Rectangle {
+                            width: 1
+                            height: 32
+                            color: Theme.outlineVariant
+                        }
+
+                        Column {
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("API")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                            }
+
+                            StyledText {
+                                text: `v${DMSService.apiVersion}`
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.surfaceText
+                            }
+                        }
+
+                        Rectangle {
+                            width: 1
+                            height: 32
+                            color: Theme.outlineVariant
+                        }
+
+                        Column {
+                            spacing: 2
+
+                            StyledText {
+                                text: I18n.tr("Status")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceVariantText
+                            }
+
+                            Row {
+                                spacing: 4
+
+                                Rectangle {
+                                    width: 8
+                                    height: 8
+                                    radius: 4
+                                    color: Theme.success
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Connected")
+                                    font.pixelSize: Theme.fontSizeMedium
+                                    font.weight: Font.Medium
+                                    color: Theme.surfaceText
+                                }
+                            }
+                        }
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+                        visible: DMSService.capabilities.length > 0
 
                         StyledText {
-                            text: I18n.tr("Support Development")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                            text: I18n.tr("Capabilities")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
                         }
-                    }
 
-                    Item {
-                        width: parent.width - parent.spacing - kofiButton.width - supportSection.children[0].width
-                        height: 1
-                    }
+                        Flow {
+                            width: parent.width
+                            spacing: 6
 
-                    DankButton {
-                        id: kofiButton
-                        text: I18n.tr("Donate on Ko-fi")
-                        iconName: "favorite"
-                        iconSize: 20
-                        backgroundColor: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08)
-                        textColor: Theme.primary
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: Qt.openUrlExternally("https://ko-fi.com/danklinux")
+                            Repeater {
+                                model: DMSService.capabilities
+
+                                Rectangle {
+                                    width: capText.implicitWidth + 16
+                                    height: 26
+                                    radius: 13
+                                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+
+                                    StyledText {
+                                        id: capText
+                                        anchors.centerIn: parent
+                                        text: modelData
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.primary
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
 
+            StyledText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: `<a href="https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE" style="text-decoration:none; color:${Theme.surfaceVariantText};">MIT License</a>`
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceVariantText
+                textFormat: Text.RichText
+                wrapMode: Text.NoWrap
+                onLinkActivated: url => Qt.openUrlExternally(url)
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    acceptedButtons: Qt.NoButton
+                    propagateComposedEvents: true
+                }
+            }
         }
     }
 
@@ -659,13 +720,19 @@ Item {
         z: 1000
 
         property var hoveredButton: {
-            if (compositorButton.hovered) return compositorButton
-            if (matrixButton.visible && matrixButton.hovered) return matrixButton
-            if (ircButton.visible && ircButton.hovered) return ircButton
-            if (dmsDiscordButton.hovered) return dmsDiscordButton
-            if (compositorDiscordButton.visible && compositorDiscordButton.hovered) return compositorDiscordButton
-            if (redditButton.visible && redditButton.hovered) return redditButton
-            return null
+            if (compositorButton.hovered)
+                return compositorButton;
+            if (matrixButton.visible && matrixButton.hovered)
+                return matrixButton;
+            if (ircButton.visible && ircButton.hovered)
+                return ircButton;
+            if (dmsDiscordButton.hovered)
+                return dmsDiscordButton;
+            if (compositorDiscordButton.visible && compositorDiscordButton.hovered)
+                return compositorDiscordButton;
+            if (redditButton.visible && redditButton.hovered)
+                return redditButton;
+            return null;
         }
 
         property string tooltipText: hoveredButton ? hoveredButton.tooltipText : ""

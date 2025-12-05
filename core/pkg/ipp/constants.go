@@ -288,6 +288,7 @@ const (
 // useful mime types for ipp
 const (
 	MimeTypePostscript  = "application/postscript"
+	MimeTypePDF         = "application/pdf"
 	MimeTypeOctetStream = "application/octet-stream"
 )
 

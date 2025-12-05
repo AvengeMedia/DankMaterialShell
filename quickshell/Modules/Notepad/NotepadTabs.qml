@@ -1,10 +1,9 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
-
-pragma ComponentBehavior: Bound
 
 Column {
     id: root
@@ -14,15 +13,16 @@ Column {
 
     signal tabSwitched(int tabIndex)
     signal tabClosed(int tabIndex)
-    signal newTabRequested()
+    signal newTabRequested
 
     function hasUnsavedChangesForTab(tab) {
-        if (!tab) return false
+        if (!tab)
+            return false;
 
         if (tab.id === currentTab?.id) {
-            return root.parent?.hasUnsavedChanges ? root.parent.hasUnsavedChanges() : false
+            return root.parent?.hasUnsavedChanges ? root.parent.hasUnsavedChanges() : false;
         }
-        return false
+        return false;
     }
 
     spacing: Theme.spacingXS
@@ -53,11 +53,11 @@ Column {
                         readonly property bool isActive: NotepadStorageService.currentTabIndex === index
                         readonly property bool isHovered: tabMouseArea.containsMouse && !closeMouseArea.containsMouse
                         readonly property real calculatedWidth: {
-                            const textWidth = tabText.paintedWidth || 100
-                            const closeButtonWidth = NotepadStorageService.tabs.length > 1 ? 20 : 0
-                            const spacing = Theme.spacingXS
-                            const padding = Theme.spacingM * 2
-                            return Math.max(120, Math.min(200, textWidth + closeButtonWidth + spacing + padding))
+                            const textWidth = tabText.paintedWidth || 100;
+                            const closeButtonWidth = NotepadStorageService.tabs.length > 1 ? 20 : 0;
+                            const spacing = Theme.spacingXS;
+                            const padding = Theme.spacingM * 2;
+                            return Math.max(120, Math.min(200, textWidth + closeButtonWidth + spacing + padding));
                         }
 
                         width: calculatedWidth
@@ -85,11 +85,11 @@ Column {
                             StyledText {
                                 id: tabText
                                 text: {
-                                    var prefix = ""
+                                    var prefix = "";
                                     if (hasUnsavedChangesForTab(modelData)) {
-                                        prefix = "● "
+                                        prefix = "● ";
                                     }
-                                    return prefix + (modelData.title || "Untitled")
+                                    return prefix + (modelData.title || "Untitled");
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: isActive ? Theme.primary : Theme.surfaceText
@@ -123,7 +123,7 @@ Column {
                                     z: 100
 
                                     onClicked: {
-                                        root.tabClosed(index)
+                                        root.tabClosed(index);
                                     }
                                 }
                             }

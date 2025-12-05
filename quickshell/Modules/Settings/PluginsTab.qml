@@ -1,8 +1,5 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
 import qs.Common
-import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
@@ -14,19 +11,25 @@ FocusScope {
     property var parentModal: null
     property var installedPluginsData: ({})
     property bool isReloading: false
+    property alias sharedTooltip: sharedTooltip
 
     focus: true
+
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
 
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
 
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
             StyledRect {
@@ -126,7 +129,7 @@ FocusScope {
                             iconName: "store"
                             enabled: DMSService.dmsAvailable
                             onClicked: {
-                                pluginBrowserModal.show()
+                                pluginBrowser.show();
                             }
                         }
 
@@ -134,12 +137,12 @@ FocusScope {
                             text: I18n.tr("Scan")
                             iconName: "refresh"
                             onClicked: {
-                                pluginsTab.isRefreshingPlugins = true
-                                PluginService.scanPlugins()
+                                pluginsTab.isRefreshingPlugins = true;
+                                PluginService.scanPlugins();
                                 if (DMSService.dmsAvailable) {
-                                    DMSService.listInstalled()
+                                    DMSService.listInstalled();
                                 }
-                                pluginsTab.refreshPluginList()
+                                pluginsTab.refreshPluginList();
                             }
                         }
 
@@ -147,8 +150,8 @@ FocusScope {
                             text: I18n.tr("Create Dir")
                             iconName: "create_new_folder"
                             onClicked: {
-                                PluginService.createPluginDirectory()
-                                ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory)
+                                PluginService.createPluginDirectory();
+                                ToastService.showInfo("Created plugin directory: " + PluginService.pluginDirectory);
                             }
                         }
                     }
@@ -220,21 +223,23 @@ FocusScope {
 
                         Repeater {
                             id: pluginRepeater
-                            model: PluginService.getAvailablePlugins()
+                            model: PluginService.availablePluginsList
 
                             PluginListItem {
                                 pluginData: modelData
                                 expandedPluginId: pluginsTab.expandedPluginId
                                 hasUpdate: {
-                                    if (DMSService.apiVersion < 8) return false
-                                    return pluginsTab.installedPluginsData[pluginId] || pluginsTab.installedPluginsData[pluginName] || false
+                                    if (DMSService.apiVersion < 8)
+                                        return false;
+                                    return pluginsTab.installedPluginsData[pluginId] || pluginsTab.installedPluginsData[pluginName] || false;
                                 }
                                 isReloading: pluginsTab.isReloading
+                                sharedTooltip: pluginsTab.sharedTooltip
                                 onExpandedPluginIdChanged: {
-                                    pluginsTab.expandedPluginId = expandedPluginId
+                                    pluginsTab.expandedPluginId = expandedPluginId;
                                 }
                                 onIsReloadingChanged: {
-                                    pluginsTab.isReloading = isReloading
+                                    pluginsTab.isReloading = isReloading;
                                 }
                             }
                         }
@@ -254,74 +259,68 @@ FocusScope {
     }
 
     function refreshPluginList() {
-        Qt.callLater(() => {
-            var plugins = PluginService.getAvailablePlugins()
-            pluginRepeater.model = null
-            pluginRepeater.model = plugins
-            pluginsTab.isRefreshingPlugins = false
-        })
+        pluginsTab.isRefreshingPlugins = false;
     }
 
     Connections {
         target: PluginService
         function onPluginLoaded() {
-            refreshPluginList()
+            refreshPluginList();
             if (isReloading) {
-                isReloading = false
+                isReloading = false;
             }
         }
         function onPluginUnloaded() {
-            refreshPluginList()
+            refreshPluginList();
             if (!isReloading && pluginsTab.expandedPluginId !== "" && !PluginService.isPluginLoaded(pluginsTab.expandedPluginId)) {
-                pluginsTab.expandedPluginId = ""
+                pluginsTab.expandedPluginId = "";
             }
         }
         function onPluginListUpdated() {
             if (DMSService.apiVersion >= 8) {
-                DMSService.listInstalled()
+                DMSService.listInstalled();
             }
-            refreshPluginList()
+            refreshPluginList();
         }
     }
 
     Connections {
         target: DMSService
         function onPluginsListReceived(plugins) {
-            pluginBrowserModal.isLoading = false
-            pluginBrowserModal.allPlugins = plugins
-            pluginBrowserModal.updateFilteredPlugins()
+            pluginBrowser.isLoading = false;
+            pluginBrowser.allPlugins = plugins;
+            pluginBrowser.updateFilteredPlugins();
         }
         function onInstalledPluginsReceived(plugins) {
-            var pluginMap = {}
+            var pluginMap = {};
             for (var i = 0; i < plugins.length; i++) {
-                var plugin = plugins[i]
-                var hasUpdate = plugin.hasUpdate || false
+                var plugin = plugins[i];
+                var hasUpdate = plugin.hasUpdate || false;
                 if (plugin.id) {
-                    pluginMap[plugin.id] = hasUpdate
+                    pluginMap[plugin.id] = hasUpdate;
                 }
                 if (plugin.name) {
-                    pluginMap[plugin.name] = hasUpdate
+                    pluginMap[plugin.name] = hasUpdate;
                 }
             }
-            installedPluginsData = pluginMap
-            Qt.callLater(refreshPluginList)
+            installedPluginsData = pluginMap;
+            Qt.callLater(refreshPluginList);
         }
         function onOperationSuccess(message) {
-            ToastService.showInfo(message)
+            ToastService.showInfo(message);
         }
         function onOperationError(error) {
-            ToastService.showError(error)
+            ToastService.showError(error);
         }
     }
 
     Component.onCompleted: {
-        pluginBrowserModal.parentModal = pluginsTab.parentModal
-        if (DMSService.dmsAvailable && DMSService.apiVersion >= 8) {
-            DMSService.listInstalled()
-        }
+        pluginBrowser.parentModal = pluginsTab.parentModal;
+        if (DMSService.dmsAvailable && DMSService.apiVersion >= 8)
+            DMSService.listInstalled();
     }
 
     PluginBrowser {
-        id: pluginBrowserModal
+        id: pluginBrowser
     }
 }

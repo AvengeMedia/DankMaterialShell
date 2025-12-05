@@ -138,6 +138,7 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	}
 
 	var wiredConns []WiredConnection
+	var ethernetDevices []EthernetDevice
 	for name, link := range b.links {
 		if b.isVirtualInterface(name) || strings.HasPrefix(name, "wlan") || strings.HasPrefix(name, "wlp") {
 			continue
@@ -151,6 +152,37 @@ func (b *SystemdNetworkdBackend) updateState() error {
 			Type:     "ethernet",
 			IsActive: active,
 		})
+
+		var ip string
+		var hwAddr string
+		if iface, err := net.InterfaceByName(name); err == nil {
+			hwAddr = iface.HardwareAddr.String()
+			if addrs := b.getAddresses(name); len(addrs) > 0 {
+				ip = addrs[0]
+			}
+		}
+
+		stateStr := "disconnected"
+		switch link.opState {
+		case "routable":
+			stateStr = "routable"
+		case "carrier":
+			stateStr = "carrier"
+		case "degraded":
+			stateStr = "degraded"
+		case "no-carrier":
+			stateStr = "no-carrier"
+		case "off":
+			stateStr = "off"
+		}
+
+		ethernetDevices = append(ethernetDevices, EthernetDevice{
+			Name:      name,
+			HwAddress: hwAddr,
+			State:     stateStr,
+			Connected: active,
+			IP:        ip,
+		})
 	}
 
 	b.stateMutex.Lock()
@@ -162,6 +194,7 @@ func (b *SystemdNetworkdBackend) updateState() error {
 	b.state.WiFiConnected = false
 	b.state.WiFiIP = ""
 	b.state.WiredConnections = wiredConns
+	b.state.EthernetDevices = ethernetDevices
 
 	if wiredIface != nil {
 		b.state.EthernetDevice = wiredIface.name

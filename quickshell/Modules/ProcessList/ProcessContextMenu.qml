@@ -12,26 +12,26 @@ Popup {
     property var processData: null
 
     function show(x, y) {
-        if (!processContextMenu.parent && typeof Overlay !== "undefined" && Overlay.overlay) {
-            processContextMenu.parent = Overlay.overlay;
-        }
-
-        const menuWidth = 180;
-        const menuHeight = menuColumn.implicitHeight + Theme.spacingS * 2;
-        const screenWidth = Screen.width;
-        const screenHeight = Screen.height;
         let finalX = x;
         let finalY = y;
-        if (x + menuWidth > screenWidth - 20) {
-            finalX = x - menuWidth;
+
+        if (processContextMenu.parent) {
+            const parentWidth = processContextMenu.parent.width;
+            const parentHeight = processContextMenu.parent.height;
+            const menuWidth = processContextMenu.width;
+            const menuHeight = processContextMenu.height;
+
+            if (finalX + menuWidth > parentWidth) {
+                finalX = Math.max(0, parentWidth - menuWidth);
+            }
+
+            if (finalY + menuHeight > parentHeight) {
+                finalY = Math.max(0, parentHeight - menuHeight);
+            }
         }
 
-        if (y + menuHeight > screenHeight - 20) {
-            finalY = y - menuHeight;
-        }
-
-        processContextMenu.x = Math.max(20, finalX);
-        processContextMenu.y = Math.max(20, finalY);
+        processContextMenu.x = finalX;
+        processContextMenu.y = finalY;
         open();
     }
 

@@ -18,7 +18,7 @@ in {
 
         systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
             description = "DankMaterialShell";
-            path = [cfg.quickshell.package];
+            path = lib.mkForce [];
 
             partOf = ["graphical-session.target"];
             after = ["graphical-session.target"];
@@ -31,6 +31,6 @@ in {
             };
         };
 
-        environment.systemPackages = [cfg.quickshell.package] ++ common.packages;
+        environment.systemPackages = [cfg.quickshell.package dmsPkgs.dankMaterialShell] ++ common.packages;
     };
 }

@@ -1,18 +1,57 @@
 {
+  "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
+    "%1 DMS bind(s) may be overridden by config binds that come after the include.": ""
+  },
+  "%1 adapter(s), none connected": {
+    "%1 adapter(s), none connected": "%1 bağdaştırıcı, hiçbiri bağlı değil"
+  },
   "%1 characters": {
     "%1 characters": "%1 karakter"
+  },
+  "%1 class(es)": {
+    "%1 class(es)": "%1 sınıf"
+  },
+  "%1 connected": {
+    "%1 connected": "%1 bağlı"
+  },
+  "%1 display(s)": {
+    "%1 display(s)": "%1 ekran"
+  },
+  "%1 job(s)": {
+    "%1 job(s)": "%1 iş"
+  },
+  "%1 printer(s)": {
+    "%1 printer(s)": "%1 yazıcı"
+  },
+  "%1 widgets": {
+    "%1 widgets": "%1 widget"
   },
   "(Unnamed)": {
     "(Unnamed)": "(İsimsiz)"
   },
-  "- Stateless System Monitoring": {
-    "- Stateless System Monitoring": "- Durumsuz Sistem İzleme"
-  },
-  "- Support Us With a Star ⭐": {
-    "- Support Us With a Star ⭐": "- Bir yıldızla bize destek olun ⭐"
+  "0 = square corners": {
+    "0 = square corners": ""
   },
   "1 event": {
     "1 event": "1 etkinlik"
+  },
+  "1 minute": {
+    "1 minute": ""
+  },
+  "1 second": {
+    "1 second": ""
+  },
+  "10 minutes": {
+    "10 minutes": ""
+  },
+  "10 seconds": {
+    "10 seconds": ""
+  },
+  "15 seconds": {
+    "15 seconds": ""
+  },
+  "2 minutes": {
+    "2 minutes": ""
   },
   "24-Hour Format": {
     "24-Hour Format": "24-Saat Biçimi"
@@ -20,17 +59,41 @@
   "24-hour format": {
     "24-hour format": "24-saat biçimi"
   },
+  "3 seconds": {
+    "3 seconds": ""
+  },
+  "30 seconds": {
+    "30 seconds": ""
+  },
   "3rd party": {
     "3rd party": "Üçüncü taraf"
   },
-  "7-Day Forecast": {
-    "7-Day Forecast": "7 Günlük Tahmin"
+  "5 minutes": {
+    "5 minutes": ""
+  },
+  "5 seconds": {
+    "5 seconds": ""
+  },
+  "8 seconds": {
+    "8 seconds": ""
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Bu isimde bir dosya zaten var. Üzerine yazmak istiyor musunuz?"
   },
+  "API": {
+    "API": "API"
+  },
+  "Aborted": {
+    "Aborted": "Durduruldu"
+  },
   "About": {
     "About": "Hakkında"
+  },
+  "Accept Jobs": {
+    "Accept Jobs": "İşleri Kabul Et"
+  },
+  "Accepting": {
+    "Accepting": "Kabul ediliyor"
   },
   "Access clipboard history": {
     "Access clipboard history": "Pano geçmişine eriş"
@@ -41,26 +104,59 @@
   "Access to system controls and settings": {
     "Access to system controls and settings": "Sistem kontrolleri ve ayarlara eriş"
   },
+  "Action": {
+    "Action": "Eylem"
+  },
   "Actions": {
     "Actions": "Eylemler"
+  },
+  "Activate": {
+    "Activate": "Etkinleştir"
+  },
+  "Active": {
+    "Active": "Etkin"
+  },
+  "Active Lock Screen Monitor": {
+    "Active Lock Screen Monitor": ""
+  },
+  "Active: ": {
+    "Active: ": "Etkin: "
+  },
+  "Active: None": {
+    "Active: None": "Etkin: Hiçbiri"
+  },
+  "Adapters": {
+    "Adapters": "Bağdaştırıcılar"
   },
   "Add": {
     "Add": "Ekle"
   },
+  "Add Bar": {
+    "Add Bar": "Bar Ekle"
+  },
+  "Add Printer": {
+    "Add Printer": "Yazıcı Ekle"
+  },
   "Add Widget": {
     "Add Widget": "Widget Ekle"
   },
-  "Add Widget to ": {
-    "Add Widget to ": "Şuraya Widget ekle:"
+  "Add Widget to %1 Section": {
+    "Add Widget to %1 Section": "%1 Bölümüne Widget Ekle"
   },
-  "Add a VPN in NetworkManager": {
-    "Add a VPN in NetworkManager": "NetworkManager'da VPN ekle"
+  "Add a border around the dock": {
+    "Add a border around the dock": "Dock etrafına kenarlık ekle"
   },
   "Adjust the number of columns in grid view mode.": {
     "Adjust the number of columns in grid view mode.": "Izgara görünümü modunda sütun sayısını ayarla"
   },
+  "Afternoon": {
+    "Afternoon": "Öğleden Sonra"
+  },
   "All": {
     "All": "Tümü"
+  },
+  "All Monitors": {
+    "All Monitors": ""
   },
   "All day": {
     "All day": "Tüm gün"
@@ -71,8 +167,8 @@
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Geri • F1/I: Dosya bilgisi • F10: Yardım • Esc: Kapat"
   },
-  "Always Show OSD Percentage": {
-    "Always Show OSD Percentage": "OSD Yüzdesini Her Zaman Göster"
+  "Always Show Percentage": {
+    "Always Show Percentage": ""
   },
   "Always on icons": {
     "Always on icons": "Her zaman açık simgeler"
@@ -82,6 +178,9 @@
   },
   "Animation Speed": {
     "Animation Speed": "Animasyon Hızı"
+  },
+  "Anonymous Identity": {
+    "Anonymous Identity": "Anonim Kimlik"
   },
   "Anonymous Identity (optional)": {
     "Anonymous Identity (optional)": "Anonim Kimlik (isteğe bağlı)"
@@ -110,20 +209,8 @@
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Uygulamalar önce kullanım sıklığına göre, daha sonra son kullanılana göre ve en son alfabetik olarak sıralanır."
   },
-  "Are you sure you want to hibernate the system?": {
-    "Are you sure you want to hibernate the system?": "Sistemi hazırda bekletme moduna almak istediğinizden emin misiniz?"
-  },
-  "Are you sure you want to log out?": {
-    "Are you sure you want to log out?": "Çıkış yapmak istediğinizden emin misiniz?"
-  },
-  "Are you sure you want to power off the system?": {
-    "Are you sure you want to power off the system?": "Sistemi kapatmak istediğinizden emin misiniz?"
-  },
-  "Are you sure you want to reboot the system?": {
-    "Are you sure you want to reboot the system?": "Sistemi yeniden başlatmak istediğinizden emin misiniz?"
-  },
-  "Are you sure you want to suspend the system?": {
-    "Are you sure you want to suspend the system?": "Sistemi askıya almak istediğinizden emin misiniz?"
+  "Audio": {
+    "Audio": "Ses"
   },
   "Audio Codec": {
     "Audio Codec": "Ses Codec'i"
@@ -134,14 +221,20 @@
   "Audio Devices": {
     "Audio Devices": "Ses Aygıtları"
   },
-  "Audio Icon": {
-    "Audio Icon": "Ses Simgesi"
-  },
   "Audio Output Devices (": {
     "Audio Output Devices (": "Ses Çıkış Aygıtları ("
   },
+  "Auth": {
+    "Auth": "Kimlik"
+  },
+  "Auth Type": {
+    "Auth Type": "Kimlik Türü"
+  },
   "Authenticate": {
     "Authenticate": "Kimlik Doğrula"
+  },
+  "Authentication": {
+    "Authentication": "Kimlik Doğrulama"
   },
   "Authentication Required": {
     "Authentication Required": "Kimlik Doğrulama Gerekli"
@@ -158,6 +251,9 @@
   "Authorize service for ": {
     "Authorize service for ": "Şunun için servisi yetkilendir: "
   },
+  "Auto": {
+    "Auto": "Oto"
+  },
   "Auto Location": {
     "Auto Location": "Otomatik Konum"
   },
@@ -172,6 +268,9 @@
   },
   "Auto-saving...": {
     "Auto-saving...": "Otomatik kaydetme..."
+  },
+  "Autoconnect": {
+    "Autoconnect": "Otomatik Bağlan"
   },
   "Autoconnect disabled": {
     "Autoconnect disabled": "Otomatik bağlanma devre dışı"
@@ -197,9 +296,6 @@
   "Automatically determine your location using your IP address": {
     "Automatically determine your location using your IP address": "IP adresinizi kullanarak konumunuzu otomatik olarak belirleyin"
   },
-  "Automatically extract colors from wallpaper": {
-    "Automatically extract colors from wallpaper": "Duvar kağıdından renkleri otomatik olarak çıkarın"
-  },
   "Automatically hide the top bar to expand screen real estate": {
     "Automatically hide the top bar to expand screen real estate": "Ekran alanını genişletmek için üst çubuğu otomatik olarak gizle"
   },
@@ -215,17 +311,32 @@
   "Available Layouts": {
     "Available Layouts": "Mevcut Düzenler"
   },
+  "Available Networks": {
+    "Available Networks": "Kullanılabilir Ağlar"
+  },
   "Available Plugins": {
     "Available Plugins": "Kullanılabilir Eklentiler"
   },
   "Available Screens (": {
     "Available Screens (": "Kullanılabilir Ekranlar ("
   },
+  "BSSID": {
+    "BSSID": "BSSID"
+  },
   "Back": {
     "Back": "Geri"
   },
+  "Backend": {
+    "Backend": "Arka Uç"
+  },
   "Balanced palette with focused accents (default).": {
     "Balanced palette with focused accents (default).": "Odaklanmış vurgularla dengeli palet (varsayılan)."
+  },
+  "Bar Configurations": {
+    "Bar Configurations": "Bar Ayarları"
+  },
+  "Bar Transparency": {
+    "Bar Transparency": "Bar Opaklığı"
   },
   "Battery": {
     "Battery": "Batarya"
@@ -233,11 +344,20 @@
   "Battery level and power management": {
     "Battery level and power management": "Batarya seviyesi ve güç yönetimi"
   },
+  "Behavior": {
+    "Behavior": ""
+  },
   "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "Kilit ekranını loginctl'den gelen dbus sinyallerine bağlayın. Harici bir kilit ekranı kullanıyorsanız devre dışı bırakın"
   },
-  "Bluetooth Icon": {
-    "Bluetooth Icon": "Bluetooth Simgesi"
+  "Binds Include Missing": {
+    "Binds Include Missing": "Bağlantı dahili yok"
+  },
+  "Binds include added": {
+    "Binds include added": "Bağlantı dahili eklendi"
+  },
+  "Bluetooth": {
+    "Bluetooth": "Bluetooth"
   },
   "Bluetooth Settings": {
     "Bluetooth Settings": "Bluetooth Ayarları"
@@ -305,14 +425,26 @@
   "CUPS Missing Filter Warning": {
     "CUPS Missing Filter Warning": "CUPS Eksik Filtre Uyarısı"
   },
+  "CUPS Print Server": {
+    "CUPS Print Server": "CUPS Yazıcı Sunucusu"
+  },
   "Camera": {
     "Camera": "Kamera"
   },
   "Cancel": {
     "Cancel": "İptal"
   },
+  "Canceled": {
+    "Canceled": "İptal Edildi"
+  },
+  "Capabilities": {
+    "Capabilities": "Yetenekler"
+  },
   "Capacity": {
     "Capacity": "Kapasite"
+  },
+  "Caps Lock": {
+    "Caps Lock": ""
   },
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "Caps Lock Göstergesi"
@@ -326,11 +458,23 @@
   "Center Tiling": {
     "Center Tiling": "Merkez Döşeme"
   },
+  "Certificate Password": {
+    "Certificate Password": "Sertifika Parolası"
+  },
+  "Change bar appearance": {
+    "Change bar appearance": "Bar görünümünü değiştir"
+  },
   "Changes:": {
     "Changes:": "Değişiklikler:"
   },
+  "Channel": {
+    "Channel": "Kanal"
+  },
   "Check for system updates": {
     "Check for system updates": "Sistem güncellemelerini kontrol et"
+  },
+  "Choose Color": {
+    "Choose Color": "Renk Seç"
   },
   "Choose Launcher Logo Color": {
     "Choose Launcher Logo Color": "Başlatıcı Logo Rengini Seçin"
@@ -338,17 +482,29 @@
   "Choose icon": {
     "Choose icon": "Simge seçin"
   },
+  "Choose the background color for widgets": {
+    "Choose the background color for widgets": "Widgetlar için arkaplan rengini seç"
+  },
   "Choose the border accent color": {
     "Choose the border accent color": "Kenarlık vurgu rengini seç"
   },
   "Choose the logo displayed on the launcher button in DankBar": {
     "Choose the logo displayed on the launcher button in DankBar": "DankBar'daki başlatıcı düğmesinde görüntülenen logoyu seçin"
   },
+  "Choose the widget outline accent color": {
+    "Choose the widget outline accent color": "Widget çerçeve vurgu rengini seçin"
+  },
   "Choose where notification popups appear on screen": {
     "Choose where notification popups appear on screen": "Bildirim açılır pencerelerinin ekranda nerede görüneceğini seçin"
   },
   "Choose where on-screen displays appear on screen": {
     "Choose where on-screen displays appear on screen": "Ekran gösterimlerinin ekranda nerede gösterileceğini seç"
+  },
+  "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
+    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": ""
+  },
+  "Cipher": {
+    "Cipher": "Şifre"
   },
   "Clear": {
     "Clear": "Temizle"
@@ -358,6 +514,18 @@
   },
   "Clear All History?": {
     "Clear All History?": "Tüm Geçmişi Temizle?"
+  },
+  "Clear All Jobs": {
+    "Clear All Jobs": "Tüm İşleri Temizle"
+  },
+  "Click Import to add a .ovpn or .conf": {
+    "Click Import to add a .ovpn or .conf": ".ovpn veya .conf dosyası eklemek için İçe Aktar'ı tıklayın."
+  },
+  "Click any shortcut to edit. Changes save to dms/binds.kdl": {
+    "Click any shortcut to edit. Changes save to dms/binds.kdl": "Düzenlemek için herhangi bir kısayola tıklayın. Değişiklikler dms/binds.kdl dosyasına kaydedilir."
+  },
+  "Click to capture": {
+    "Click to capture": "Yakalamak için tıkla"
   },
   "Clipboard History": {
     "Clipboard History": "Pano Geçmişi"
@@ -374,11 +542,23 @@
   "Close": {
     "Close": "Kapat"
   },
+  "Close Overview on Launch": {
+    "Close Overview on Launch": "Başlatmada Genel Görünümü Kapat"
+  },
+  "Color": {
+    "Color": ""
+  },
+  "Color Mode": {
+    "Color Mode": ""
+  },
   "Color Override": {
     "Color Override": "Renk Değiştirme"
   },
   "Color Picker": {
     "Color Picker": "Renk Seçici"
+  },
+  "Color displayed on monitors without the lock screen": {
+    "Color displayed on monitors without the lock screen": ""
   },
   "Color temperature for day time": {
     "Color temperature for day time": "Gündüz için renk sıcaklığı"
@@ -388,6 +568,9 @@
   },
   "Colorful mix of bright contrasting accents.": {
     "Colorful mix of bright contrasting accents.": "Parlak kontrastlı vurguların renkli karışımı."
+  },
+  "Command": {
+    "Command": "Komut"
   },
   "Command or script to run instead of the standard hibernate procedure": {
     "Command or script to run instead of the standard hibernate procedure": "Standart hazırda bekleme prosedürü yerine çalıştırılacak komut veya komut dosyası"
@@ -413,11 +596,20 @@
   "Compact Mode": {
     "Compact Mode": "Kompakt Mod"
   },
+  "Completed": {
+    "Completed": "Tamamlandı"
+  },
   "Compositor": {
     "Compositor": "Kompozitör"
   },
+  "Config action: %1": {
+    "Config action: %1": ""
+  },
   "Configuration activated": {
     "Configuration activated": "Yapılandırma aktifleştirildi"
+  },
+  "Configure a new printer": {
+    "Configure a new printer": "Yeni bir yazıcı yapılandır"
   },
   "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "Adlandırılmış çalışma alanları için simgeleri yapılandırın. Her ikisi de etkinleştirildiğinde simgeler sayılara göre önceliklidir."
@@ -434,6 +626,9 @@
   "Confirm passkey for ": {
     "Confirm passkey for ": "Şunun için şifreyi onayla: "
   },
+  "Conflicts with: %1": {
+    "Conflicts with: %1": "Şununla çakışıyor: %1"
+  },
   "Connect": {
     "Connect": "Bağlan"
   },
@@ -442,6 +637,9 @@
   },
   "Connect to Wi-Fi": {
     "Connect to Wi-Fi": "Wi-Fi'ye Bağlan"
+  },
+  "Connected": {
+    "Connected": "Bağlı"
   },
   "Connected Displays": {
     "Connected Displays": "Bağlı Ekranlar"
@@ -457,6 +655,9 @@
   },
   "Control currently playing media": {
     "Control currently playing media": "Şu anda oynatılan medyayı kontrol et"
+  },
+  "Controls opacity of all popouts, modals, and their content layers": {
+    "Controls opacity of all popouts, modals, and their content layers": ""
   },
   "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": {
     "Controls opacity of all popouts, modals, and their content layers (DankDash, Settings, App Drawer, Control Center, etc.)": "Tüm açılır pencerelerin, modal pencerelerin ve bunların içerik katmanlarının (DankDash, Ayarlar, Uygulama Çekmecesi, Kontrol Merkezi vb.) opaklığını kontrol eder"
@@ -479,17 +680,26 @@
   "Copy Process Name": {
     "Copy Process Name": "Süreç Adını Kopyala"
   },
-  "Corner Radius (0 = square corners)": {
-    "Corner Radius (0 = square corners)": "Köşe Yarıçapı (0 = kare köşeler)"
+  "Corner Radius": {
+    "Corner Radius": ""
   },
   "Corner Radius Override": {
     "Corner Radius Override": "Köşe Yarıçapı Değiştirme"
+  },
+  "Corners & Background": {
+    "Corners & Background": ""
   },
   "Cover Open": {
     "Cover Open": "Kapak Açık"
   },
   "Create Dir": {
     "Create Dir": "Dizin Oluştur"
+  },
+  "Create Printer": {
+    "Create Printer": "Yazıcı Oluştur"
+  },
+  "Creating...": {
+    "Creating...": "Oluşturuluyor..."
   },
   "Critical Priority": {
     "Critical Priority": "Kritik Öncelik"
@@ -509,11 +719,32 @@
   "Custom": {
     "Custom": "Özel"
   },
+  "Custom Duration": {
+    "Custom Duration": ""
+  },
+  "Custom Hibernate Command": {
+    "Custom Hibernate Command": ""
+  },
   "Custom Location": {
     "Custom Location": "Özel Konum"
   },
+  "Custom Lock Command": {
+    "Custom Lock Command": ""
+  },
+  "Custom Logout Command": {
+    "Custom Logout Command": ""
+  },
   "Custom Power Actions": {
     "Custom Power Actions": "Özel Güç Eylemleri"
+  },
+  "Custom Power Off Command": {
+    "Custom Power Off Command": ""
+  },
+  "Custom Reboot Command": {
+    "Custom Reboot Command": ""
+  },
+  "Custom Suspend Command": {
+    "Custom Suspend Command": ""
   },
   "Custom Transparency": {
     "Custom Transparency": "Özel Şeffaflık"
@@ -536,11 +767,17 @@
   "DMS out of date": {
     "DMS out of date": "DMS güncel değil"
   },
+  "DMS shell actions (launcher, clipboard, etc.)": {
+    "DMS shell actions (launcher, clipboard, etc.)": "DMS kabuk eylemleri (başlatıcı, pano, vb.)"
+  },
   "DMS_SOCKET not available": {
     "DMS_SOCKET not available": "DMS_SOCKET kullanılamıyor"
   },
   "DWL service not available": {
     "DWL service not available": "DWL hizmeti kullanılamıyor"
+  },
+  "Daily Forecast": {
+    "Daily Forecast": "Günlük Hava Tahmini"
   },
   "Daily at:": {
     "Daily at:": "Her gün saat:"
@@ -551,17 +788,14 @@
   "Dank Bar": {
     "Dank Bar": "Dank Bar"
   },
-  "Dank Bar Transparency": {
-    "Dank Bar Transparency": "Dank Bar Şeffaflığı"
-  },
-  "Dank Bar Widget Transparency": {
-    "Dank Bar Widget Transparency": "Dank Bar Widget Şeffaflığı"
-  },
   "DankBar Font Scale": {
     "DankBar Font Scale": "DankBar Yazı Tipi Ölçeği"
   },
   "DankSearch not available": {
     "DankSearch not available": "DankSearch kullanılamıyor"
+  },
+  "DankShell & System Icons (requires restart)": {
+    "DankShell & System Icons (requires restart)": ""
   },
   "Dark Mode": {
     "Dark Mode": "Karanlık Mod"
@@ -571,6 +805,15 @@
   },
   "Date Format": {
     "Date Format": "Tarih Biçimi"
+  },
+  "Dawn (Astronomical Twilight)": {
+    "Dawn (Astronomical Twilight)": "Şafak (Astronomik Alacakaranlık)"
+  },
+  "Dawn (Civil Twilight)": {
+    "Dawn (Civil Twilight)": "Şafak (Sivil Alacakaranlık)"
+  },
+  "Dawn (Nautical Twilight)": {
+    "Dawn (Nautical Twilight)": "Şafak (Denizci Şafağı)"
   },
   "Day Temperature": {
     "Day Temperature": "Gündüz Sıcaklığı"
@@ -590,8 +833,23 @@
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: Temizle • Shift+Del: Tümünü Temizle • 1-9: Eylemler • F10: Yardım • Esc: Kapat"
   },
+  "Delete": {
+    "Delete": "Sil"
+  },
+  "Delete Class": {
+    "Delete Class": "Sınıf Sil"
+  },
+  "Delete Printer": {
+    "Delete Printer": "Yazıcı Sil"
+  },
+  "Delete VPN": {
+    "Delete VPN": "VPN'i Sil"
+  },
   "Derives colors that closely match the underlying image.": {
     "Derives colors that closely match the underlying image.": "Altta yatan görüntüye çok yakın renkler türetir"
+  },
+  "Description": {
+    "Description": "Tanım"
   },
   "Desktop background images": {
     "Desktop background images": "Masaüstü arkaplan resimleri"
@@ -614,6 +872,9 @@
   "Disconnect": {
     "Disconnect": "Bağlantıyı Kes"
   },
+  "Disconnected": {
+    "Disconnected": "Bağlantı Kesildi"
+  },
   "Disconnected from WiFi": {
     "Disconnected from WiFi": "WiFi bağlantısı kesildi"
   },
@@ -626,11 +887,14 @@
   "Dismiss": {
     "Dismiss": "Reddet"
   },
+  "Display Assignment": {
+    "Display Assignment": "Ekran Ataması"
+  },
   "Display Name Format": {
     "Display Name Format": "Ekran İsim Formatı"
   },
-  "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": {
-    "Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen": "Ekranın üst, alt, sol veya sağ kenarına yerleştirilebilen, sabitlenmiş ve çalışan uygulamaları içeren bir dock görüntüleyin."
+  "Display a dock with pinned and running applications": {
+    "Display a dock with pinned and running applications": ""
   },
   "Display all priorities over fullscreen apps": {
     "Display all priorities over fullscreen apps": "Tam ekran uygulamaların üzerinde tüm öncelikleri göster"
@@ -644,14 +908,20 @@
   "Display currently focused application title": {
     "Display currently focused application title": "Şu anda odaklanmış uygulamanın başlığını göster"
   },
+  "Display only workspaces that contain windows": {
+    "Display only workspaces that contain windows": "Yalnızca pencere içeren çalışma alanlarını göster"
+  },
   "Display power menu actions in a grid instead of a list": {
     "Display power menu actions in a grid instead of a list": "Güç menüsü eylemlerini liste yerine ızgara şeklinde göster"
+  },
+  "Display seconds in the clock": {
+    "Display seconds in the clock": ""
   },
   "Display settings for ": {
     "Display settings for ": "Ekran ayarları: "
   },
-  "Display volume and brightness percentage values by default in OSD popups": {
-    "Display volume and brightness percentage values by default in OSD popups": "OSD açılır pencerelerinde varsayılan olarak ses seviyesi ve parlaklık yüzdelik değerlerini göster"
+  "Display volume and brightness percentage values in OSD popups": {
+    "Display volume and brightness percentage values in OSD popups": ""
   },
   "Displays": {
     "Displays": "Ekranlar"
@@ -668,11 +938,20 @@
   "Dock": {
     "Dock": "Dock"
   },
+  "Dock & Launcher": {
+    "Dock & Launcher": ""
+  },
   "Dock Position": {
     "Dock Position": "Dock Konumu"
   },
   "Dock Transparency": {
     "Dock Transparency": "Dock Şeffaflığı"
+  },
+  "Dock Visibility": {
+    "Dock Visibility": ""
+  },
+  "Docs": {
+    "Docs": ""
   },
   "Domain (optional)": {
     "Domain (optional)": "Etki alanı (isteğe bağlı)"
@@ -686,14 +965,26 @@
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
     "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "Widget'ları sürükleyerek bölümler içinde yeniden sıralayın. Göz simgesini kullanarak widget'ları gizleyin/gösterin (aralıkları korur) veya X simgesini kullanarak tamamen kaldırın."
   },
+  "Driver": {
+    "Driver": "Sürücü"
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "Duvar kağıdını bulanıklık ile çoğalt"
   },
   "Duration": {
     "Duration": "Süre"
   },
-  "Dynamic Theming": {
-    "Dynamic Theming": "Dinamik Tema"
+  "Dusk (Astronomical Twilight)": {
+    "Dusk (Astronomical Twilight)": "Alacakaranlık (Astronomik Alacakaranlık)"
+  },
+  "Dusk (Civil Twighlight)": {
+    "Dusk (Civil Twighlight)": "Alacakaranlık (Sivil Alacakaranlık)"
+  },
+  "Dusk (Nautical Twilight)": {
+    "Dusk (Nautical Twilight)": "Alacakaranlık (Denizci Alacakaranlığı)"
+  },
+  "Edge Spacing": {
+    "Edge Spacing": ""
   },
   "Edge Spacing (0 = edge-to-edge)": {
     "Edge Spacing (0 = edge-to-edge)": "Kenar Aralığı (0 = kenardan kenara)"
@@ -707,8 +998,20 @@
   "Enable Autoconnect": {
     "Enable Autoconnect": "Otomatik Bağlanmayı Etkinleştir"
   },
+  "Enable Bar": {
+    "Enable Bar": "Barı Etkinleştir"
+  },
+  "Enable Border": {
+    "Enable Border": ""
+  },
+  "Enable Do Not Disturb": {
+    "Enable Do Not Disturb": ""
+  },
   "Enable GPU Temperature": {
     "Enable GPU Temperature": "GPU Sıcaklığını Etkinleştir"
+  },
+  "Enable Overview Overlay": {
+    "Enable Overview Overlay": "Genel Görünüm Katmanını Etkinleştir"
   },
   "Enable System Sounds": {
     "Enable System Sounds": "Sistem Seslerini Etkinleştir"
@@ -718,6 +1021,9 @@
   },
   "Enable WiFi": {
     "Enable WiFi": "WiFi Etkinleştir"
+  },
+  "Enable Widget Outline": {
+    "Enable Widget Outline": ""
   },
   "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
     "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "Kompozitör tarafından hedeflenebilir bulanıklık katmanını etkinleştir (isim alanı: dms:blurwallpaper). Manuel Niri yapılandırması gerektirir."
@@ -765,10 +1071,16 @@
     "Enter password for ": "Parolayı girin "
   },
   "Enter this passkey on ": {
-    "Enter this passkey on ": ""
+    "Enter this passkey on ": "Bu şifreyi şuraya gir: "
+  },
+  "Enterprise": {
+    "Enterprise": "Kurumsal"
   },
   "Error": {
     "Error": "Hata"
+  },
+  "Ethernet": {
+    "Ethernet": "Ethernet"
   },
   "Exclusive Zone Offset": {
     "Exclusive Zone Offset": "Özel Bölge Ofseti"
@@ -779,8 +1091,20 @@
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: Değiştir • F10: Yardım"
   },
+  "Fade grace period": {
+    "Fade grace period": "Solma Toleransı"
+  },
+  "Fade to lock screen": {
+    "Fade to lock screen": "Kilit Ekranı Solması"
+  },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Yapılandırma etkinleştirilemedi"
+  },
+  "Failed to add binds include": {
+    "Failed to add binds include": "Bağlantı dahili eklenemedi"
+  },
+  "Failed to add printer to class": {
+    "Failed to add printer to class": "Yazıcı sınıfa eklenemedi"
   },
   "Failed to cancel all jobs": {
     "Failed to cancel all jobs": "Tüm işler iptal edemedi"
@@ -794,6 +1118,21 @@
   "Failed to connect to ": {
     "Failed to connect to ": "Bağlanılamadı "
   },
+  "Failed to create printer": {
+    "Failed to create printer": "Yazıcı oluşturulamadı"
+  },
+  "Failed to delete VPN": {
+    "Failed to delete VPN": "VPN silinemedi"
+  },
+  "Failed to delete class": {
+    "Failed to delete class": "Sınıf silinemedi"
+  },
+  "Failed to delete printer": {
+    "Failed to delete printer": "Yazıcı silinemedi"
+  },
+  "Failed to disable job acceptance": {
+    "Failed to disable job acceptance": "İş kabulü devre dışı bırakılamadı"
+  },
   "Failed to disconnect VPN": {
     "Failed to disconnect VPN": "VPN bağlantısı kesilemedi"
   },
@@ -806,14 +1145,44 @@
   "Failed to enable WiFi": {
     "Failed to enable WiFi": "WiFi etkinleştirilemedi"
   },
+  "Failed to enable job acceptance": {
+    "Failed to enable job acceptance": "İş kabulü etkinleştirilemedi"
+  },
+  "Failed to hold job": {
+    "Failed to hold job": "İş bekletilemedi"
+  },
+  "Failed to import VPN": {
+    "Failed to import VPN": "VPN içe aktarılamadı"
+  },
+  "Failed to load VPN config": {
+    "Failed to load VPN config": "VPN ayarı yüklenemedi"
+  },
+  "Failed to move job": {
+    "Failed to move job": "İş taşınamadı"
+  },
   "Failed to pause printer": {
     "Failed to pause printer": "Yazıcıyı duraklatma başarısız"
+  },
+  "Failed to print test page": {
+    "Failed to print test page": "Test sayfası yazdırılamadı"
   },
   "Failed to remove device": {
     "Failed to remove device": "Cihaz kaldırılamadı"
   },
+  "Failed to remove keybind": {
+    "Failed to remove keybind": "Tuş kombinasyonu kaldırılamadı"
+  },
+  "Failed to remove printer from class": {
+    "Failed to remove printer from class": "Yazıcı sınıftan kaldırılamadı"
+  },
+  "Failed to restart job": {
+    "Failed to restart job": "İş yeniden başlatılamadı"
+  },
   "Failed to resume printer": {
     "Failed to resume printer": "Yazıcıyı devam ettirme başarısız"
+  },
+  "Failed to save keybind": {
+    "Failed to save keybind": "Tuş kombinasyonu kaydedilemedi"
   },
   "Failed to set profile image": {
     "Failed to set profile image": "Profil resmi ayarlanamadı"
@@ -824,11 +1193,26 @@
   "Failed to start connection to ": {
     "Failed to start connection to ": "Bağlantı başlatılamadı "
   },
+  "Failed to update VPN": {
+    "Failed to update VPN": "VPN güncellenemedi"
+  },
   "Failed to update autoconnect": {
     "Failed to update autoconnect": "Otomatik bağlanma güncellenemedi"
   },
+  "Failed to update description": {
+    "Failed to update description": "Tanım güncellenemedi"
+  },
+  "Failed to update location": {
+    "Failed to update location": "Konum güncellenemedi"
+  },
+  "Failed to update sharing": {
+    "Failed to update sharing": "Paylaşım güncellenemedi"
+  },
   "Feels Like": {
     "Feels Like": "Hissedilen"
+  },
+  "File": {
+    "File": "Dosya"
   },
   "File Already Exists": {
     "File Already Exists": "Dosya Zaten Mevcut"
@@ -836,11 +1220,26 @@
   "File Information": {
     "File Information": "Dosya Bilgisi"
   },
+  "Files": {
+    "Files": ""
+  },
   "Find in Text": {
     "Find in Text": "Metinde Bul"
   },
   "Find in note...": {
     "Find in note...": "Notta bul..."
+  },
+  "Fine-tune animation timing in milliseconds": {
+    "Fine-tune animation timing in milliseconds": ""
+  },
+  "First Time Setup": {
+    "First Time Setup": ""
+  },
+  "Fix Now": {
+    "Fix Now": "Şimdi Düzelt"
+  },
+  "Fixing...": {
+    "Fixing...": "Düzeltiliyor..."
   },
   "Focused Window": {
     "Focused Window": "Odaklanılmış Pencere"
@@ -866,6 +1265,12 @@
   "Force terminal applications to always use dark color schemes": {
     "Force terminal applications to always use dark color schemes": "Terminal uygulamalarının her zaman koyu renk şemalarını kullanmasını zorla"
   },
+  "Forecast Not Available": {
+    "Forecast Not Available": "Hava Tahmini Mevcut Değil"
+  },
+  "Forget": {
+    "Forget": "Unut"
+  },
   "Forget Device": {
     "Forget Device": "Aygıtı Unut"
   },
@@ -877,6 +1282,9 @@
   },
   "Format Legend": {
     "Format Legend": "Biçim Açıklaması"
+  },
+  "Frequency": {
+    "Frequency": "Frekans"
   },
   "Fun": {
     "Fun": "Eğlence"
@@ -899,8 +1307,14 @@
   "Gamma control not available. Requires DMS API v6+.": {
     "Gamma control not available. Requires DMS API v6+.": "Gama kontrolü mevcut değil. DMS API V6+ gerekir."
   },
+  "GitHub": {
+    "GitHub": ""
+  },
   "Github:": {
     "Github:": "Github:"
+  },
+  "Golden Hour": {
+    "Golden Hour": "Altın Saat"
   },
   "Good": {
     "Good": "İyi"
@@ -910,6 +1324,9 @@
   },
   "Goth Corners": {
     "Goth Corners": "Gotik Köşeler"
+  },
+  "Gradually fade the screen before locking with a configurable grace period": {
+    "Gradually fade the screen before locking with a configurable grace period": "Yapılandırılabilir bir bekleme süresi ile kilitlemeden önce ekranı kademeli olarak karartın"
   },
   "Graphics": {
     "Graphics": "Grafik"
@@ -935,11 +1352,17 @@
   "Height to Edge Gap (Exclusive Zone)": {
     "Height to Edge Gap (Exclusive Zone)": "Kenar Boşluğu Yüksekliği (Özel Bölge)"
   },
+  "Held": {
+    "Held": "Bekletildi"
+  },
   "Hex": {
     "Hex": "Hex"
   },
   "Hibernate": {
     "Hibernate": "Hazırda Beklet"
+  },
+  "Hide Delay": {
+    "Hide Delay": ""
   },
   "Hide Delay (ms)": {
     "Hide Delay (ms)": "Gizleme Gecikmesi (ms)"
@@ -953,8 +1376,29 @@
   "High-fidelity palette that preserves source hues.": {
     "High-fidelity palette that preserves source hues.": "Kaynak tonları koruyan yüksek sadakatli palet"
   },
+  "Hold Duration": {
+    "Hold Duration": "Tutma Süresi"
+  },
+  "Hold longer to confirm": {
+    "Hold longer to confirm": "Onaylamak için daha uzun süre basılı tutun"
+  },
+  "Hold to Confirm Power Actions": {
+    "Hold to Confirm Power Actions": "Güç Eylemlerini Onaylamak İçin Basılı Tutun"
+  },
+  "Hold to confirm (%1s)": {
+    "Hold to confirm (%1s)": "Onaylamak için basılı tutun (%1s)"
+  },
+  "Hotkey overlay title (optional)": {
+    "Hotkey overlay title (optional)": "Kısayol katmanı başlığı (opsiyonel)"
+  },
   "Hour": {
     "Hour": "Saat"
+  },
+  "Hourly Forecast": {
+    "Hourly Forecast": "Saatlik Hava Tahmini"
+  },
+  "How long to hold the button to confirm the action": {
+    "How long to hold the button to confirm the action": ""
   },
   "How often to change wallpaper": {
     "How often to change wallpaper": "Duvar kağıdı değiştirme sıklığı"
@@ -964,6 +1408,12 @@
   },
   "I Understand": {
     "I Understand": "Anladım"
+  },
+  "IP": {
+    "IP": "IP"
+  },
+  "IP Address:": {
+    "IP Address:": "IP Adresi:"
   },
   "Icon Size": {
     "Icon Size": "Simge Boyutu"
@@ -989,6 +1439,15 @@
   "Image": {
     "Image": "Resim"
   },
+  "Import": {
+    "Import": "İçe Aktar"
+  },
+  "Import VPN": {
+    "Import VPN": "VPN'i İçe Aktar"
+  },
+  "Inactive Monitor Color": {
+    "Inactive Monitor Color": ""
+  },
   "Include Transitions": {
     "Include Transitions": "Geçişleri Dahil Et"
   },
@@ -1001,6 +1460,9 @@
   "Individual Batteries": {
     "Individual Batteries": "Tekil Piller"
   },
+  "Individual bar configuration": {
+    "Individual bar configuration": "Bireysel bar yapılandırması"
+  },
   "Inhibit idle timeout when audio or video is playing": {
     "Inhibit idle timeout when audio or video is playing": "Ses veya video oynatılırken boşta kalma süresini engelle"
   },
@@ -1009,6 +1471,9 @@
   },
   "Install plugins from the DMS plugin registry": {
     "Install plugins from the DMS plugin registry": "DMS eklenti deposundan eklentiler yükle"
+  },
+  "Interface:": {
+    "Interface:": "Arayüz:"
   },
   "Interlock Open": {
     "Interlock Open": "Kilit Açık"
@@ -1028,14 +1493,32 @@
   "Jobs: ": {
     "Jobs: ": "İşler:"
   },
+  "Keep Awake": {
+    "Keep Awake": "Uyanık Tut"
+  },
   "Keep Changes": {
     "Keep Changes": "Değişiklikleri Tut"
+  },
+  "Keeping Awake": {
+    "Keeping Awake": "Uyanık Tutuluyor"
+  },
+  "Key": {
+    "Key": "Tuş"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "Klavye Düzeni Adı"
   },
+  "Keyboard Shortcuts": {
+    "Keyboard Shortcuts": "Klavye Kısayolları"
+  },
+  "Keys": {
+    "Keys": "Tuşlar"
+  },
   "Kill Process": {
     "Kill Process": "Süreci Öldür"
+  },
+  "Ko-fi": {
+    "Ko-fi": ""
   },
   "Last launched %1": {
     "Last launched %1": "Son başlatma %1"
@@ -1088,8 +1571,20 @@
   "Lively palette with saturated accents.": {
     "Lively palette with saturated accents.": "Doygun vurgularla canlı renk paleti."
   },
+  "Loading keybinds...": {
+    "Loading keybinds...": "Tuş kombinasyonları yükleniyor..."
+  },
   "Loading plugins...": {
     "Loading plugins...": "Eklentiler yükleniyor..."
+  },
+  "Loading...": {
+    "Loading...": "Yükleniyor..."
+  },
+  "Local": {
+    "Local": "Yerel"
+  },
+  "Location": {
+    "Location": "Konum"
   },
   "Location Search": {
     "Location Search": "Konum Arama"
@@ -1100,6 +1595,9 @@
   "Lock Screen": {
     "Lock Screen": "Kilit Ekranı"
   },
+  "Lock Screen Display": {
+    "Lock Screen Display": ""
+  },
   "Lock Screen Format": {
     "Lock Screen Format": "Kilit Ekranı Biçimi"
   },
@@ -1108,6 +1606,9 @@
   },
   "Log Out": {
     "Log Out": "Çıkış"
+  },
+  "Long": {
+    "Long": ""
   },
   "Long Text": {
     "Long Text": "Uzun Metin"
@@ -1118,8 +1619,17 @@
   "Low Priority": {
     "Low Priority": "Düşük Öncelik"
   },
+  "MAC": {
+    "MAC": "MAC"
+  },
+  "MTU": {
+    "MTU": "MTU"
+  },
   "Manage and configure plugins for extending DMS functionality": {
     "Manage and configure plugins for extending DMS functionality": "DMS işlevselliğini genişletmek için eklentileri yönetin ve yapılandırın"
+  },
+  "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "4 adede kadar bağımsız bar yapılandırmasını yönetin. Her barın kendi konumu, widget'ları, stili ve ekran ataması vardır."
   },
   "Manual Coordinates": {
     "Manual Coordinates": "Manuel Koordinatlar"
@@ -1178,11 +1688,23 @@
   "Media Needed": {
     "Media Needed": "Kağıt Gerekli"
   },
+  "Media Player": {
+    "Media Player": ""
+  },
   "Media Player Settings": {
     "Media Player Settings": "Medya Oynatıcı Ayarları"
   },
   "Media Players (": {
     "Media Players (": "Medya Oynatıcıları ("
+  },
+  "Media Volume": {
+    "Media Volume": ""
+  },
+  "Media Volume OSD": {
+    "Media Volume OSD": "Medya Ses OSD"
+  },
+  "Medium": {
+    "Medium": ""
   },
   "Memory": {
     "Memory": "Bellek"
@@ -1196,14 +1718,23 @@
   "Microphone": {
     "Microphone": "Mikrofon"
   },
+  "Microphone Mute": {
+    "Microphone Mute": ""
+  },
   "Microphone Mute OSD": {
     "Microphone Mute OSD": "Mikrofon Sessiz OSD"
+  },
+  "Middle Section": {
+    "Middle Section": "Orta Bölüm"
   },
   "Minimal palette built around a single hue.": {
     "Minimal palette built around a single hue.": "Tek bir renk tonu etrafında oluşturulmuş minimal palet."
   },
   "Minute": {
     "Minute": "Dakika"
+  },
+  "Mode": {
+    "Mode": "Mod"
   },
   "Mode:": {
     "Mode:": "Mod:"
@@ -1225,6 +1756,9 @@
   },
   "Monospace Font": {
     "Monospace Font": "Sabit Aralıklı Yazı Tipi"
+  },
+  "Morning": {
+    "Morning": "Sabah"
   },
   "Mount": {
     "Mount": "Bağlı"
@@ -1265,11 +1799,23 @@
   "Network Speed Monitor": {
     "Network Speed Monitor": "Ağ Hız Monitörü"
   },
+  "Network Status": {
+    "Network Status": "Ağ Durumu"
+  },
   "Network download and upload speed display": {
     "Network download and upload speed display": "Ağ indirme ve yükleme hız gösterimi"
   },
+  "Never": {
+    "Never": ""
+  },
   "New": {
     "New": "Yeni"
+  },
+  "New Key": {
+    "New Key": "Yeni Tuş"
+  },
+  "New Keybind": {
+    "New Keybind": "Yeni Tuş Kombinasyonu"
   },
   "New Notification": {
     "New Notification": "Yeni Bildirim"
@@ -1277,11 +1823,23 @@
   "New York, NY": {
     "New York, NY": "New York, NY"
   },
+  "Night": {
+    "Night": "Gece"
+  },
   "Night Mode": {
     "Night Mode": "Gece Modu"
   },
   "Night Temperature": {
     "Night Temperature": "Gece Sıcaklığı"
+  },
+  "Niri Integration": {
+    "Niri Integration": ""
+  },
+  "Niri compositor actions (focus, move, etc.)": {
+    "Niri compositor actions (focus, move, etc.)": "Niri kompozitör (focus, move, vb.)"
+  },
+  "No": {
+    "No": "Hayır"
   },
   "No Active Players": {
     "No Active Players": "Aktif Oynatıcı Yok"
@@ -1295,20 +1853,41 @@
   "No Media": {
     "No Media": "Medya Yok"
   },
+  "No VPN profiles": {
+    "No VPN profiles": "VPN profili yok"
+  },
   "No VPN profiles found": {
     "No VPN profiles found": "VPN profilleri bulunamadı"
   },
   "No Weather Data Available": {
     "No Weather Data Available": "Hava Durumu Verileri Mevcut Değil"
   },
+  "No action": {
+    "No action": "Eylem yok"
+  },
+  "No adapters": {
+    "No adapters": "Bağdaştırıcı yok"
+  },
+  "No changes": {
+    "No changes": "Değişiklik yok"
+  },
   "No clipboard entries found": {
     "No clipboard entries found": "Pano girişleri bulunamadı"
+  },
+  "No devices found": {
+    "No devices found": "Aygıt bulunamadı"
+  },
+  "No drivers found": {
+    "No drivers found": "Sürücü bulunamadı"
   },
   "No files found": {
     "No files found": "Dosya bulunamadı"
   },
   "No items added yet": {
     "No items added yet": "Henüz eklenen öğe yok"
+  },
+  "No keybinds found": {
+    "No keybinds found": "Tuş kombinasyonu bulunamadı"
   },
   "No matches": {
     "No matches": "Eşleşme yok"
@@ -1322,11 +1901,23 @@
   "No printer found": {
     "No printer found": "Yazıcı Bulunamadı"
   },
+  "No printers configured": {
+    "No printers configured": "Hiçbir yazıcı ayarlanmadı"
+  },
+  "No printers found": {
+    "No printers found": "Hiçbir yazıcı bulunmadı"
+  },
   "None": {
     "None": "Hiçbiri"
   },
+  "Normal Font": {
+    "Normal Font": ""
+  },
   "Normal Priority": {
     "Normal Priority": "Normal Öncelik"
+  },
+  "Not connected": {
+    "Not connected": "Bağlı değil"
   },
   "Notepad": {
     "Notepad": "Not Defteri"
@@ -1400,8 +1991,26 @@
   "Open search bar to find text": {
     "Open search bar to find text": "Metin bulmak için arama çubuğunu aç"
   },
+  "Open with...": {
+    "Open with...": "... ile aç"
+  },
+  "Optional description": {
+    "Optional description": "Opsiyonel tanım"
+  },
+  "Optional location": {
+    "Optional location": "Opsiyonel konum"
+  },
   "Other": {
     "Other": "Diğer"
+  },
+  "Outline Color": {
+    "Outline Color": "Çerçeve Rengi"
+  },
+  "Outline Opacity": {
+    "Outline Opacity": "Çerçeve Opaklığı"
+  },
+  "Outline Thickness": {
+    "Outline Thickness": "Çerçeve Kalınlığı"
   },
   "Output Area Almost Full": {
     "Output Area Almost Full": "Çıkış Alanı Neredeyse Dolu"
@@ -1412,11 +2021,26 @@
   "Output Tray Missing": {
     "Output Tray Missing": "Çıktı Tepsisi Yok"
   },
+  "Overridden by config": {
+    "Overridden by config": ""
+  },
+  "Override": {
+    "Override": "Geçersiz Kıl"
+  },
+  "Overrides": {
+    "Overrides": "Geçersiz Kılınanlar"
+  },
   "Overview": {
     "Overview": "Genel Görünüm"
   },
+  "Overview of your network connections": {
+    "Overview of your network connections": "Ağ bağlantılarınızın genel görünümü"
+  },
   "Overwrite": {
     "Overwrite": "Üstüne Yaz"
+  },
+  "PIN": {
+    "PIN": "PİN"
   },
   "Padding": {
     "Padding": "Dolgu"
@@ -1441,6 +2065,9 @@
   },
   "Paused": {
     "Paused": "Duraklatıldı"
+  },
+  "Pending": {
+    "Pending": "Beklemede"
   },
   "Per-Mode Wallpapers": {
     "Per-Mode Wallpapers": "Moda Özel Duvar Kağıtları"
@@ -1481,6 +2108,9 @@
   "Play sounds for system events": {
     "Play sounds for system events": "Sistem etkinlikleri için ses çal"
   },
+  "Playback": {
+    "Playback": "Oynatma"
+  },
   "Plugged In": {
     "Plugged In": "Bağlandı"
   },
@@ -1511,8 +2141,14 @@
   "Position: ": {
     "Position: ": "Pozisyon: "
   },
+  "Possible Override Conflicts": {
+    "Possible Override Conflicts": ""
+  },
   "Power & Security": {
     "Power & Security": "Güç & Güvenlik"
+  },
+  "Power & Sleep": {
+    "Power & Sleep": ""
   },
   "Power Action Confirmation": {
     "Power Action Confirmation": "Güç Eylemi Onayı"
@@ -1526,11 +2162,26 @@
   "Power Options": {
     "Power Options": "Güç Ayarları"
   },
+  "Power Profile": {
+    "Power Profile": ""
+  },
   "Power Profile Degradation": {
     "Power Profile Degradation": "Güç Profili Dejenerasyonu"
   },
   "Power Profile OSD": {
     "Power Profile OSD": "Güç Profili OSD"
+  },
+  "Power source": {
+    "Power source": ""
+  },
+  "Precipitation Chance": {
+    "Precipitation Chance": "Yağış Olasılığı"
+  },
+  "Preference": {
+    "Preference": "Tercih"
+  },
+  "Press key...": {
+    "Press key...": "Tuşa bas..."
   },
   "Pressure": {
     "Pressure": "Basınç"
@@ -1547,6 +2198,21 @@
   "Print Server not available": {
     "Print Server not available": "Yazıcı Sunucusu Kullanılamıyor"
   },
+  "Printer": {
+    "Printer": "Yazıcı"
+  },
+  "Printer Classes": {
+    "Printer Classes": "Yazıcı Sınıfları"
+  },
+  "Printer created successfully": {
+    "Printer created successfully": "Yazıcı başarıyla oluşturuldu"
+  },
+  "Printer deleted": {
+    "Printer deleted": "Yazıcı silindi"
+  },
+  "Printer name (no spaces)": {
+    "Printer name (no spaces)": "Yazıcı adı (boşluksuz)"
+  },
   "Printers": {
     "Printers": "Yazıcılar"
   },
@@ -1555,6 +2221,9 @@
   },
   "Privacy Indicator": {
     "Privacy Indicator": "Gizlilik Göstergesi"
+  },
+  "Private Key Password": {
+    "Private Key Password": "Özel Anahtar Parolası"
   },
   "Process": {
     "Process": "Süreç"
@@ -1567,6 +2236,9 @@
   },
   "Profile image is too large. Please use a smaller image.": {
     "Profile image is too large. Please use a smaller image.": "Profil resmi çok büyük. Lütfen daha küçük bir resim kullanın."
+  },
+  "Protocol": {
+    "Protocol": "Protokol"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Uygulama başlatıcısına hızlı erişim"
@@ -1586,6 +2258,9 @@
   "Rain Chance": {
     "Rain Chance": "Yağış İhtimali"
   },
+  "Rate": {
+    "Rate": "Oran"
+  },
   "Reason": {
     "Reason": "Sebep"
   },
@@ -1598,8 +2273,17 @@
   "Recently Used Apps": {
     "Recently Used Apps": "Son Kullanılan Uygulamalar"
   },
+  "Recommended available": {
+    "Recommended available": "Önerilen mevcut"
+  },
   "Refresh": {
     "Refresh": "Yenile"
+  },
+  "Refresh Weather": {
+    "Refresh Weather": "Hava Durumunu Yenile"
+  },
+  "Reject Jobs": {
+    "Reject Jobs": "İşleri Reddet"
   },
   "Reload Plugin": {
     "Reload Plugin": "Eklentiyi Yeniden Yükle"
@@ -1612,6 +2296,9 @@
   },
   "Request confirmation on power off, restart, suspend, hibernate and logout actions": {
     "Request confirmation on power off, restart, suspend, hibernate and logout actions": "Kapatma, yeniden başlatma, askıya alma, hazırda bekletme ve oturumu kapatma işlemlerinde onay iste"
+  },
+  "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
+    "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Güç kapatma, yeniden başlatma, askıya alma, hazırda bekletme ve oturumu kapatma işlemlerini onaylamak için düğmeyi/tuşu basılı tutmak gerekir"
   },
   "Requires DWL compositor": {
     "Requires DWL compositor": "DWL kompozitör gerektirir"
@@ -1655,6 +2342,12 @@
   "Run User Templates": {
     "Run User Templates": "Kullanıcı Şablonlarını Çalıştır"
   },
+  "Run a program (e.g., firefox, kitty)": {
+    "Run a program (e.g., firefox, kitty)": "Program çalıştır (örn. firefox, kitty)"
+  },
+  "Run a shell command (e.g., notify-send)": {
+    "Run a shell command (e.g., notify-send)": "Shell komutu çalıştır (örn. notify-send)"
+  },
   "Running Apps": {
     "Running Apps": "Çalışan Uygulamalar"
   },
@@ -1670,8 +2363,14 @@
   "Save Notepad File": {
     "Save Notepad File": "Not Defteri Dosyasını Kaydet"
   },
+  "Save password": {
+    "Save password": "Parolayı kaydet"
+  },
   "Saved": {
     "Saved": "Kaydedildi"
+  },
+  "Saved Configurations": {
+    "Saved Configurations": "Kaydedilen Yapılandırmalar"
   },
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "DankBar yazı tipi boyutlarını bağımsız olarak ölçeklendir"
@@ -1679,14 +2378,23 @@
   "Scale all font sizes": {
     "Scale all font sizes": "Tüm yazı tipi boyutlarını ölçeklendir"
   },
+  "Scale all font sizes throughout the shell": {
+    "Scale all font sizes throughout the shell": ""
+  },
   "Scan": {
     "Scan": "Tara"
+  },
+  "Scanning...": {
+    "Scanning...": "Taranıyor..."
   },
   "Science": {
     "Science": "Bilim"
   },
   "Screen sharing": {
     "Screen sharing": "Ekran paylaşımı"
+  },
+  "Scroll song title": {
+    "Scroll song title": "Şarkı başlığını kaydır"
   },
   "Scrolling": {
     "Scrolling": "Kaydırma"
@@ -1700,14 +2408,32 @@
   "Search for a location...": {
     "Search for a location...": "Bir konum ara..."
   },
+  "Search keybinds...": {
+    "Search keybinds...": "Tuş kombinasyonları ara..."
+  },
   "Search plugins...": {
     "Search plugins...": "Eklentileri ara..."
+  },
+  "Search widgets...": {
+    "Search widgets...": "Widget ara..."
   },
   "Search...": {
     "Search...": "Ara..."
   },
   "Searching...": {
     "Searching...": "Arıyor..."
+  },
+  "Secured": {
+    "Secured": "Güvenli"
+  },
+  "Security": {
+    "Security": "Güvenlik"
+  },
+  "Select Application": {
+    "Select Application": "Uygulama Seç"
+  },
+  "Select Bar": {
+    "Select Bar": ""
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Başlatıcı Logosu Seç"
@@ -1721,11 +2447,23 @@
   "Select a widget to add to the ": {
     "Select a widget to add to the ": "Eklemek için widget seçin: "
   },
+  "Select a widget to add. You can add multiple instances of the same widget if needed.": {
+    "Select a widget to add. You can add multiple instances of the same widget if needed.": "Eklemek için bir widget seçin. Gerekirse aynı widget'ın birden fazla örneğini ekleyebilirsiniz."
+  },
   "Select an image file...": {
     "Select an image file...": "Bir resim dosyası seçin..."
   },
+  "Select device...": {
+    "Select device...": "Aygıt seç..."
+  },
+  "Select driver...": {
+    "Select driver...": "Sürücü seç..."
+  },
   "Select font weight": {
     "Select font weight": "Yazı tipi ağırlığını seçin"
+  },
+  "Select font weight for UI text": {
+    "Select font weight for UI text": ""
   },
   "Select monitor to configure wallpaper": {
     "Select monitor to configure wallpaper": "Duvar kağıdını ayarlamak için monitör seçin"
@@ -1739,11 +2477,17 @@
   "Select system sound theme": {
     "Select system sound theme": "Sistem ses temasını seç"
   },
+  "Select the font family for UI text": {
+    "Select the font family for UI text": ""
+  },
   "Select the palette algorithm used for wallpaper-based colors": {
     "Select the palette algorithm used for wallpaper-based colors": "Duvar kağıdı tabanlı renkler için kullanılan palet algoritmasını seçin"
   },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "Rastgele seçime dahil edilecek geçişleri seçin"
+  },
+  "Select...": {
+    "Select...": "Seç..."
   },
   "Selected image file not found.": {
     "Selected image file not found.": "Seçilen resim dosyası bulunamadı."
@@ -1751,17 +2495,35 @@
   "Separator": {
     "Separator": "Ayraç"
   },
+  "Server": {
+    "Server": "Sunucu"
+  },
   "Set different wallpapers for each connected monitor": {
     "Set different wallpapers for each connected monitor": "Bağlı her monitör için farklı duvar kağıtları ayarlayın"
   },
   "Set different wallpapers for light and dark mode": {
     "Set different wallpapers for light and dark mode": "Karanlık ve aydınlık mod için farklı duvar kağıtları ayarlayın"
   },
+  "Set key and action to save": {
+    "Set key and action to save": "Kaydetmek için tuş ve eylem ayarlayın"
+  },
   "Settings": {
     "Settings": "Ayarlar"
   },
+  "Setup": {
+    "Setup": ""
+  },
+  "Shell": {
+    "Shell": "Shell"
+  },
   "Shift+Del: Clear All • Esc: Close": {
     "Shift+Del: Clear All • Esc: Close": "Shift+Del: Tümünü Temizle • Esc: Kapat"
+  },
+  "Short": {
+    "Short": ""
+  },
+  "Shortcuts": {
+    "Shortcuts": "Kısayollar"
   },
   "Show All Tags": {
     "Show All Tags": "Tüm Etiketleri Göster"
@@ -1784,6 +2546,9 @@
   "Show Log Out": {
     "Show Log Out": "Çıkışı Göster"
   },
+  "Show Occupied Workspaces Only": {
+    "Show Occupied Workspaces Only": "Sadece Dolu Çalışma Alanlarını Göster"
+  },
   "Show Power Actions": {
     "Show Power Actions": "Güç Eylemlerini Göster"
   },
@@ -1795,6 +2560,9 @@
   },
   "Show Restart DMS": {
     "Show Restart DMS": "DMS'yi Yeniden Başlatı Göster"
+  },
+  "Show Seconds": {
+    "Show Seconds": ""
   },
   "Show Suspend": {
     "Show Suspend": "Askıya Alı Göster"
@@ -1828,6 +2596,9 @@
   },
   "Show on-screen display when idle inhibitor state changes": {
     "Show on-screen display when idle inhibitor state changes": "Boşta kalma engelleyici durumu değiştiğinde ekran gösterimi göster"
+  },
+  "Show on-screen display when media player volume changes": {
+    "Show on-screen display when media player volume changes": "Medya oynatıcının ses seviyesi değiştiğinde ekran üstü görüntü göster"
   },
   "Show on-screen display when microphone is muted/unmuted": {
     "Show on-screen display when microphone is muted/unmuted": "Mikrofon sessize alındığında/sessizden çıkarıldığında ekran gösterimi göster"
@@ -1874,23 +2645,41 @@
   "Shutdown": {
     "Shutdown": "Kapat"
   },
+  "Signal": {
+    "Signal": "Sinyal"
+  },
+  "Signal:": {
+    "Signal:": "Sinyal:"
+  },
   "Size": {
     "Size": "Boyut"
   },
   "Size Offset": {
     "Size Offset": "Boyut Ofseti"
   },
+  "Sizing": {
+    "Sizing": ""
+  },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Alfabetik Olarak Sırala"
   },
+  "Sorting & Layout": {
+    "Sorting & Layout": ""
+  },
   "Sound Theme": {
     "Sound Theme": "Ses Teması"
+  },
+  "Sounds": {
+    "Sounds": ""
   },
   "Spacer": {
     "Spacer": "Boşluklandırıcı"
   },
   "Spacing": {
     "Spacing": "Boşluk"
+  },
+  "Speed": {
+    "Speed": "Hız"
   },
   "Spool Area Full": {
     "Spool Area Full": "Aktarım Alanı Dolu"
@@ -1903,6 +2692,9 @@
   },
   "Start typing your notes here...": {
     "Start typing your notes here...": "Notunuzu buraya yazmaya başlayın..."
+  },
+  "State": {
+    "State": "Durum"
   },
   "Status": {
     "Status": "Durum"
@@ -1919,8 +2711,17 @@
   "Storage & Disks": {
     "Storage & Disks": "Depolama & Diskler"
   },
+  "Sunrise": {
+    "Sunrise": "Gündoğumu"
+  },
+  "Sunset": {
+    "Sunset": "Günbatımı"
+  },
   "Support Development": {
     "Support Development": "Gelişimi Destekle"
+  },
+  "Suppress notification popups while enabled": {
+    "Suppress notification popups while enabled": ""
   },
   "Surface": {
     "Surface": "Yüzey"
@@ -1961,6 +2762,9 @@
   "System Monitoring:": {
     "System Monitoring:": "Sistem İzleme:"
   },
+  "System Sounds": {
+    "System Sounds": ""
+  },
   "System Tray": {
     "System Tray": "Sistem Tepsisi"
   },
@@ -1979,6 +2783,9 @@
   "System notification area icons": {
     "System notification area icons": "Sistem bildirim alanı simgeleri"
   },
+  "System sounds are not available. Install canberra-gtk-play for sound support.": {
+    "System sounds are not available. Install canberra-gtk-play for sound support.": ""
+  },
   "System toast notifications": {
     "System toast notifications": "Sistem anlık bildirimleri"
   },
@@ -1996,6 +2803,12 @@
   },
   "Terminals - Always use Dark Theme": {
     "Terminals - Always use Dark Theme": "Terminaller - Her zaman Karanlı Tema kullan"
+  },
+  "Test Page": {
+    "Test Page": "Test Sayfası"
+  },
+  "Test page sent to printer": {
+    "Test page sent to printer": "Test Sayfası yazıcıya gönderildi"
   },
   "Text": {
     "Text": "Metin"
@@ -2021,6 +2834,9 @@
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "Üçüncü taraf eklentiler topluluk tarafından oluşturulmuştur ve DankMaterialShell tarafından resmi olarak desteklenmemektedir.\\n\\nBu eklentiler güvenlik ve gizlilik riskleri oluşturabilir - kendi sorumluluğunuzda yükleyin."
   },
+  "This bind is overridden by config.kdl": {
+    "This bind is overridden by config.kdl": ""
+  },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "Bu widget, dizüstü bilgisayarlarda pil ömrünü önemli ölçüde etkileyebilen GPU güç kapatma durumlarını önler. Hibrit grafik kartına sahip dizüstü bilgisayarlarda kullanılması önerilmez."
   },
@@ -2033,14 +2849,32 @@
   "Time & Weather": {
     "Time & Weather": "Zaman & Hava Durumu"
   },
+  "Time Format": {
+    "Time Format": ""
+  },
   "Timed Out": {
     "Timed Out": "Zaman Aşımı"
+  },
+  "Timeout for critical priority notifications": {
+    "Timeout for critical priority notifications": ""
+  },
+  "Timeout for low priority notifications": {
+    "Timeout for low priority notifications": ""
+  },
+  "Timeout for normal priority notifications": {
+    "Timeout for normal priority notifications": ""
+  },
+  "Title": {
+    "Title": "Başlık"
   },
   "To Full": {
     "To Full": "Dolmasına"
   },
   "To update, run the following command:": {
     "To update, run the following command:": "Güncellemek için aşağıdaki komutu çalıştırın:"
+  },
+  "To use this DMS bind, remove or change the keybind in your config.kdl": {
+    "To use this DMS bind, remove or change the keybind in your config.kdl": ""
   },
   "Toast Messages": {
     "Toast Messages": "Anlık Bildirimler"
@@ -2050,6 +2884,12 @@
   },
   "Toggle top bar visibility manually (can be controlled via IPC)": {
     "Toggle top bar visibility manually (can be controlled via IPC)": "Üst çubuğun görünürlüğünü manuel olarak değiştirin (IPC ile kontrol edilebilir)"
+  },
+  "Toggle visibility of this bar configuration": {
+    "Toggle visibility of this bar configuration": "Bu bar yapılandırmasının görünürlüğünü değiştir"
+  },
+  "Toggling...": {
+    "Toggling...": "Geçiş yapılıyor..."
   },
   "Tomorrow": {
     "Tomorrow": "Yarın"
@@ -2069,14 +2909,35 @@
   "Top Section": {
     "Top Section": "Üst Bölüm"
   },
+  "Total Jobs": {
+    "Total Jobs": "Toplam İşler"
+  },
   "Transition Effect": {
     "Transition Effect": "Geçiş Efekti"
+  },
+  "Transparency": {
+    "Transparency": ""
   },
   "Turn off monitors after": {
     "Turn off monitors after": "Şu zaman sonra monitörleri kapat"
   },
+  "Type": {
+    "Type": "Tip"
+  },
+  "Typography": {
+    "Typography": ""
+  },
+  "Typography & Motion": {
+    "Typography & Motion": ""
+  },
+  "Unavailable": {
+    "Unavailable": "Mevcut Değil"
+  },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Eklentiyi Kaldır"
+  },
+  "Unknown": {
+    "Unknown": "Bilinmeyen"
   },
   "Unpin from Dock": {
     "Unpin from Dock": "Dock'tan Sabitlemeyi Kaldır"
@@ -2165,11 +3026,26 @@
   "VPN Connections": {
     "VPN Connections": "VPN Bağlantıları"
   },
+  "VPN Password": {
+    "VPN Password": "VPN Parolası"
+  },
+  "VPN configuration updated": {
+    "VPN configuration updated": "VPN ayarı güncellendi"
+  },
+  "VPN deleted": {
+    "VPN deleted": "VPN silindi"
+  },
+  "VPN imported: ": {
+    "VPN imported: ": "VPN içe aktarıldı: "
+  },
   "VPN status and quick connect": {
     "VPN status and quick connect": "VPN durumu ve hızlı bağlanma"
   },
   "VRR: ": {
     "VRR: ": "VRR: "
+  },
+  "Version": {
+    "Version": "Sürüm"
   },
   "Vertical Deck": {
     "Vertical Deck": "Dikey Deck"
@@ -2195,6 +3071,9 @@
   "Visual effect used when wallpaper changes": {
     "Visual effect used when wallpaper changes": "Duvar kağıdı değiştiğinde kullanılan görsel efekt"
   },
+  "Volume": {
+    "Volume": ""
+  },
   "Volume Changed": {
     "Volume Changed": "Ses Seviyesi Değişti"
   },
@@ -2203,6 +3082,9 @@
   },
   "Volume, brightness, and other system OSDs": {
     "Volume, brightness, and other system OSDs": "Ses, parlaklık ve diğer sistem ekran üstü gösterimleri"
+  },
+  "WPA/WPA2": {
+    "WPA/WPA2": "WPA/WPA2"
   },
   "Wallpaper": {
     "Wallpaper": "Duvar Kağıdı"
@@ -2231,6 +3113,18 @@
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "Etkinleştirildiğinde, uygulamalar alfabetik olarak sıralanır. Devre dışı bırakıldığında, uygulamalar kullanım sıklığına göre sıralanır."
   },
+  "When enabled, shows the launcher overlay when typing in Niri overview mode. Disable this if you prefer to not have the launcher when typing on Niri overview or want to use other launcher in the overview.": {
+    "When enabled, shows the launcher overlay when typing in Niri overview mode. Disable this if you prefer to not have the launcher when typing on Niri overview or want to use other launcher in the overview.": "Etkinleştirildiğinde, Niri genel görünümünde yazarken başlatıcı katmanını gösterir. Niri genel görünümünde yazarken başlatıcının olmasını tercih etmiyorsanız veya genel görünümde başka bir başlatıcı kullanmak istiyorsanız bunu devre dışı bırakın."
+  },
+  "Wi-Fi Password": {
+    "Wi-Fi Password": "Wi-Fi Parolası"
+  },
+  "WiFi": {
+    "WiFi": "WiFi"
+  },
+  "WiFi Device": {
+    "WiFi Device": "WiFi Aygıtı"
+  },
   "WiFi disabled": {
     "WiFi disabled": "WiFi devre dışı"
   },
@@ -2240,17 +3134,32 @@
   "WiFi is off": {
     "WiFi is off": "WiFi kapalı"
   },
+  "Widget Background Color": {
+    "Widget Background Color": "Widget Arkaplan Rengi"
+  },
   "Widget Management": {
     "Widget Management": "Widget Yönetimi"
   },
+  "Widget Outline": {
+    "Widget Outline": "Widget Çerçevesi"
+  },
+  "Widget Style": {
+    "Widget Style": "Widget Stili"
+  },
   "Widget Styling": {
     "Widget Styling": "Widget Stili"
+  },
+  "Widget Transparency": {
+    "Widget Transparency": "Widget Opaklığı"
   },
   "Widgets": {
     "Widgets": "Widgetlar"
   },
   "Wind": {
     "Wind": "Rüzgar"
+  },
+  "Wind Speed": {
+    "Wind Speed": "Rüzgar hızı"
   },
   "Workspace": {
     "Workspace": "Çalışma Alanı"
@@ -2267,6 +3176,15 @@
   "Workspace Switcher": {
     "Workspace Switcher": "Çalışma Alanı Değiştirici"
   },
+  "Workspaces": {
+    "Workspaces": ""
+  },
+  "Workspaces & Widgets": {
+    "Workspaces & Widgets": ""
+  },
+  "Yes": {
+    "Yes": "Evet"
+  },
   "You have unsaved changes. Save before closing this tab?": {
     "You have unsaved changes. Save before closing this tab?": "Kaydedilmemiş değişiklikleriniz var. Sekmeyi kapatmadan önce kaydedelim mi?"
   },
@@ -2279,8 +3197,35 @@
   "You have unsaved changes. Save before opening a file?": {
     "You have unsaved changes. Save before opening a file?": "Kaydedilmemiş değişiklikleriniz var. Yeni dosya açmadan önce kaydedelim mi?"
   },
+  "apps": {
+    "apps": ""
+  },
+  "custom theme file browser title": {
+    "Select Custom Theme": "Özel Tema Seç"
+  },
+  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
+    "Select Wallpaper": "Duvar Kağıdı Seç"
+  },
+  "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
+    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": ""
+  },
+  "dms/binds.kdl is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
+    "dms/binds.kdl is not included in config.kdl. Custom keybinds will not work until this is fixed.": "dms/binds.kdl, config.kdl dosyasına dahil değildir. Bu sorun giderilene kadar özel tuş atamaları çalışmayacaktır."
+  },
+  "dms/binds.kdl is now included in config.kdl": {
+    "dms/binds.kdl is now included in config.kdl": "dms/binds.kdl artık config.kdl dosyasına dahil edilmiştir."
+  },
+  "e.g., firefox, kitty --title foo": {
+    "e.g., firefox, kitty --title foo": "örn. firefox, kitty --title foo"
+  },
+  "e.g., focus-workspace 3, resize-column -10": {
+    "e.g., focus-workspace 3, resize-column -10": "örn. focus-workspace 3, resize-column -10"
+  },
   "events": {
     "events": "etkinlikler"
+  },
+  "files": {
+    "files": ""
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl kullanılabilir değil - kilit entegrasyonu DMS soket bağlantısı gerektirir"
@@ -2288,11 +3233,38 @@
   "matugen not detected - dynamic theming unavailable": {
     "matugen not detected - dynamic theming unavailable": "matugen tespit edilemedi - dinamik tema kullanılamıyor"
   },
+  "minutes": {
+    "minutes": ""
+  },
   "official": {
     "official": "resmi"
   },
+  "profile image file browser title": {
+    "Select Profile Image": "Profil Resmi Seç"
+  },
+  "seconds": {
+    "seconds": ""
+  },
+  "settings window title": {
+    "Settings": "Ayarlar"
+  },
+  "sysmon window title": {
+    "System Monitor": "Sistem Monitörü"
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "NM entegrasyonu için dms'yi güncelle"
+  },
+  "wallpaper directory file browser title": {
+    "Select Wallpaper Directory": "Duvar Kağıdı Dizinini Seç"
+  },
+  "wallpaper settings disable description": {
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": ""
+  },
+  "wallpaper settings disable toggle": {
+    "Disable Built-in Wallpapers": ""
+  },
+  "wallpaper settings external management": {
+    "External Wallpaper Management": ""
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• Yalnızca güvenilir kaynaklardan yükle"

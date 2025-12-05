@@ -105,14 +105,19 @@ type MenuItem struct {
 
 func NewModel(version string) Model {
 	detector, _ := NewDetector()
-	dependencies := detector.GetInstalledComponents()
+	var dependencies []DependencyInfo
+	var hyprlandInstalled, niriInstalled bool
+	var err error
+	if detector != nil {
+		dependencies = detector.GetInstalledComponents()
 
-	// Use the proper detection method for both window managers
-	hyprlandInstalled, niriInstalled, err := detector.GetWindowManagerStatus()
-	if err != nil {
-		// Fallback to false if detection fails
-		hyprlandInstalled = false
-		niriInstalled = false
+		// Use the proper detection method for both window managers
+		hyprlandInstalled, niriInstalled, err = detector.GetWindowManagerStatus()
+		if err != nil {
+			// Fallback to false if detection fails
+			hyprlandInstalled = false
+			niriInstalled = false
+		}
 	}
 
 	updateToggles := make(map[string]bool)

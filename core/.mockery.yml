@@ -28,21 +28,31 @@ packages:
       outpkg: mocks_brightness
     interfaces:
       DBusConn:
-  github.com/AvengeMedia/danklinux/internal/server/network:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/network:
     config:
       dir: "internal/mocks/network"
       outpkg: mocks_network
     interfaces:
       Backend:
-  github.com/AvengeMedia/danklinux/internal/server/cups:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups:
     config:
       dir: "internal/mocks/cups"
       outpkg: mocks_cups
     interfaces:
       CUPSClientInterface:
+      PkHelper:
+        config:
+          dir: "internal/mocks/cups_pkhelper"
+          outpkg: mocks_cups_pkhelper
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev:
     config:
       dir: "internal/mocks/evdev"
       outpkg: mocks_evdev
     interfaces:
       EvdevDevice:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/version:
+    config:
+      dir: "internal/mocks/version"
+      outpkg: mocks_version
+    interfaces:
+      VersionFetcher:

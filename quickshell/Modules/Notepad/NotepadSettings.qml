@@ -1,10 +1,7 @@
-import QtQuick
-import QtQuick.Controls
-import qs.Common
-import qs.Services
-import qs.Widgets
-
 pragma ComponentBehavior: Bound
+import QtQuick
+import qs.Common
+import qs.Widgets
 
 Item {
     id: root
@@ -14,60 +11,54 @@ Item {
     property var cachedMonoFamilies: []
     property bool fontsEnumerated: false
 
-    signal settingsRequested()
-    signal findRequested()
+    signal settingsRequested
+    signal findRequested
 
     function enumerateFonts() {
-        var fonts = ["Default"]
-        var availableFonts = Qt.fontFamilies()
-        var rootFamilies = []
-        var seenFamilies = new Set()
+        var fonts = ["Default"];
+        var availableFonts = Qt.fontFamilies();
+        var rootFamilies = [];
+        var seenFamilies = new Set();
         for (var i = 0; i < availableFonts.length; i++) {
-            var fontName = availableFonts[i]
+            var fontName = availableFonts[i];
             if (fontName.startsWith("."))
-                continue
-
-            if (fontName === SettingsData.defaultFontFamily)
-                continue
-
-            var rootName = fontName.replace(/ (Thin|Extra Light|Light|Regular|Medium|Semi Bold|Demi Bold|Bold|Extra Bold|Black|Heavy)$/i, "").replace(/ (Italic|Oblique|Condensed|Extended|Narrow|Wide)$/i,
-                                                                                                                                                  "").replace(/ (UI|Display|Text|Mono|Sans|Serif)$/i, function (match, suffix) {
-                                                                                                                                                      return match
-                                                                                                                                                  }).trim()
+                continue;
+            if (fontName === Theme.defaultFontFamily)
+                continue;
+            var rootName = fontName.replace(/ (Thin|Extra Light|Light|Regular|Medium|Semi Bold|Demi Bold|Bold|Extra Bold|Black|Heavy)$/i, "").replace(/ (Italic|Oblique|Condensed|Extended|Narrow|Wide)$/i, "").replace(/ (UI|Display|Text|Mono|Sans|Serif)$/i, function (match, suffix) {
+                return match;
+            }).trim();
             if (!seenFamilies.has(rootName) && rootName !== "") {
-                seenFamilies.add(rootName)
-                rootFamilies.push(rootName)
+                seenFamilies.add(rootName);
+                rootFamilies.push(rootName);
             }
         }
-        cachedFontFamilies = fonts.concat(rootFamilies.sort())
-        var monoFonts = ["Default"]
-        var monoFamilies = []
-        var seenMonoFamilies = new Set()
+        cachedFontFamilies = fonts.concat(rootFamilies.sort());
+        var monoFonts = ["Default"];
+        var monoFamilies = [];
+        var seenMonoFamilies = new Set();
         for (var j = 0; j < availableFonts.length; j++) {
-            var fontName2 = availableFonts[j]
+            var fontName2 = availableFonts[j];
             if (fontName2.startsWith("."))
-                continue
-
+                continue;
             if (fontName2 === SettingsData.defaultMonoFontFamily)
-                continue
-
-            var lowerName = fontName2.toLowerCase()
-            if (lowerName.includes("mono") || lowerName.includes("code") || lowerName.includes("console") || lowerName.includes("terminal") || lowerName.includes("courier") || lowerName.includes("dejavu sans mono") || lowerName.includes(
-                        "jetbrains") || lowerName.includes("fira") || lowerName.includes("hack") || lowerName.includes("source code") || lowerName.includes("ubuntu mono") || lowerName.includes("cascadia")) {
-                var rootName2 = fontName2.replace(/ (Thin|Extra Light|Light|Regular|Medium|Semi Bold|Demi Bold|Bold|Extra Bold|Black|Heavy)$/i, "").replace(/ (Italic|Oblique|Condensed|Extended|Narrow|Wide)$/i, "").trim()
+                continue;
+            var lowerName = fontName2.toLowerCase();
+            if (lowerName.includes("mono") || lowerName.includes("code") || lowerName.includes("console") || lowerName.includes("terminal") || lowerName.includes("courier") || lowerName.includes("dejavu sans mono") || lowerName.includes("jetbrains") || lowerName.includes("fira") || lowerName.includes("hack") || lowerName.includes("source code") || lowerName.includes("ubuntu mono") || lowerName.includes("cascadia")) {
+                var rootName2 = fontName2.replace(/ (Thin|Extra Light|Light|Regular|Medium|Semi Bold|Demi Bold|Bold|Extra Bold|Black|Heavy)$/i, "").replace(/ (Italic|Oblique|Condensed|Extended|Narrow|Wide)$/i, "").trim();
                 if (!seenMonoFamilies.has(rootName2) && rootName2 !== "") {
-                    seenMonoFamilies.add(rootName2)
-                    monoFamilies.push(rootName2)
+                    seenMonoFamilies.add(rootName2);
+                    monoFamilies.push(rootName2);
                 }
             }
         }
-        cachedMonoFamilies = monoFonts.concat(monoFamilies.sort())
-        fontsEnumerated = true
+        cachedMonoFamilies = monoFonts.concat(monoFamilies.sort());
+        fontsEnumerated = true;
     }
 
     Component.onCompleted: {
         if (!fontsEnumerated) {
-            enumerateFonts()
+            enumerateFonts();
         }
     }
 
@@ -140,7 +131,7 @@ Item {
                 description: "Toggle fonts"
                 checked: SettingsData.notepadUseMonospace
                 onToggled: checked => {
-                    SettingsData.notepadUseMonospace = checked
+                    SettingsData.notepadUseMonospace = checked;
                 }
             }
 
@@ -152,7 +143,7 @@ Item {
                 description: "Display line numbers in editor"
                 checked: SettingsData.notepadShowLineNumbers
                 onToggled: checked => {
-                    SettingsData.notepadShowLineNumbers = checked
+                    SettingsData.notepadShowLineNumbers = checked;
                 }
             }
 
@@ -214,23 +205,23 @@ Item {
 
                 DankDropdown {
                     id: fontDropdown
-                    anchors.left: parent.left 
+                    anchors.left: parent.left
                     anchors.leftMargin: -Theme.spacingM
                     width: parent.width + Theme.spacingM
                     text: I18n.tr("Font Family")
                     options: cachedFontFamilies
                     currentValue: {
                         if (!SettingsData.notepadFontFamily || SettingsData.notepadFontFamily === "")
-                            return "Default (Global)"
+                            return "Default (Global)";
                         else
-                            return SettingsData.notepadFontFamily
+                            return SettingsData.notepadFontFamily;
                     }
                     enableFuzzySearch: true
                     onValueChanged: value => {
                         if (value && (value.startsWith("Default") || value === "Default (Global)")) {
-                            SettingsData.notepadFontFamily = ""
+                            SettingsData.notepadFontFamily = "";
                         } else {
-                            SettingsData.notepadFontFamily = value
+                            SettingsData.notepadFontFamily = value;
                         }
                     }
                 }
@@ -278,8 +269,8 @@ Item {
                             backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
                             iconColor: Theme.surfaceText
                             onClicked: {
-                                var newSize = Math.max(8, SettingsData.notepadFontSize - 1)
-                                SettingsData.notepadFontSize = newSize
+                                var newSize = Math.max(8, SettingsData.notepadFontSize - 1);
+                                SettingsData.notepadFontSize = newSize;
                             }
                         }
 
@@ -308,8 +299,8 @@ Item {
                             backgroundColor: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
                             iconColor: Theme.surfaceText
                             onClicked: {
-                                var newSize = Math.min(48, SettingsData.notepadFontSize + 1)
-                                SettingsData.notepadFontSize = newSize
+                                var newSize = Math.min(48, SettingsData.notepadFontSize + 1);
+                                SettingsData.notepadFontSize = newSize;
                             }
                         }
                     }
@@ -335,9 +326,9 @@ Item {
                         checked: SettingsData.notepadTransparencyOverride >= 0
                         onToggled: checked => {
                             if (checked) {
-                                SettingsData.notepadTransparencyOverride = SettingsData.notepadLastCustomTransparency
+                                SettingsData.notepadTransparencyOverride = SettingsData.notepadLastCustomTransparency;
                             } else {
-                                SettingsData.notepadTransparencyOverride = -1
+                                SettingsData.notepadTransparencyOverride = -1;
                             }
                         }
                     }
@@ -356,7 +347,7 @@ Item {
                         wheelEnabled: false
                         onSliderValueChanged: newValue => {
                             if (SettingsData.notepadTransparencyOverride >= 0) {
-                                SettingsData.notepadTransparencyOverride = newValue / 100
+                                SettingsData.notepadTransparencyOverride = newValue / 100;
                             }
                         }
                     }
@@ -365,9 +356,7 @@ Item {
 
             StyledText {
                 width: parent.width
-                text: SettingsData.notepadUseMonospace ?
-                    "Using global monospace font from Settings → Personalization" :
-                    "Global fonts can be configured in Settings → Personalization"
+                text: SettingsData.notepadUseMonospace ? "Using global monospace font from Settings → Personalization" : "Global fonts can be configured in Settings → Personalization"
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceTextMedium
                 wrapMode: Text.WordWrap

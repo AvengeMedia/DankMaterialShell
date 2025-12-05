@@ -109,6 +109,7 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.EthernetDevice = backendState.EthernetDevice
 	m.state.EthernetConnected = backendState.EthernetConnected
 	m.state.EthernetConnectionUuid = backendState.EthernetConnectionUuid
+	m.state.EthernetDevices = backendState.EthernetDevices
 	m.state.WiFiIP = backendState.WiFiIP
 	m.state.WiFiDevice = backendState.WiFiDevice
 	m.state.WiFiConnected = backendState.WiFiConnected
@@ -117,11 +118,13 @@ func (m *Manager) syncStateFromBackend() error {
 	m.state.WiFiBSSID = backendState.WiFiBSSID
 	m.state.WiFiSignal = backendState.WiFiSignal
 	m.state.WiFiNetworks = backendState.WiFiNetworks
+	m.state.WiFiDevices = backendState.WiFiDevices
 	m.state.WiredConnections = backendState.WiredConnections
 	m.state.VPNProfiles = backendState.VPNProfiles
 	m.state.VPNActive = backendState.VPNActive
 	m.state.IsConnecting = backendState.IsConnecting
 	m.state.ConnectingSSID = backendState.ConnectingSSID
+	m.state.ConnectingDevice = backendState.ConnectingDevice
 	m.state.LastError = backendState.LastError
 	m.stateMutex.Unlock()
 
@@ -151,7 +154,9 @@ func (m *Manager) snapshotState() NetworkState {
 	defer m.stateMutex.RUnlock()
 	s := *m.state
 	s.WiFiNetworks = append([]WiFiNetwork(nil), m.state.WiFiNetworks...)
+	s.WiFiDevices = append([]WiFiDevice(nil), m.state.WiFiDevices...)
 	s.WiredConnections = append([]WiredConnection(nil), m.state.WiredConnections...)
+	s.EthernetDevices = append([]EthernetDevice(nil), m.state.EthernetDevices...)
 	s.VPNProfiles = append([]VPNProfile(nil), m.state.VPNProfiles...)
 	s.VPNActive = append([]VPNActive(nil), m.state.VPNActive...)
 	return s
@@ -204,7 +209,13 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 	if len(old.WiFiNetworks) != len(new.WiFiNetworks) {
 		return true
 	}
+	if len(old.WiFiDevices) != len(new.WiFiDevices) {
+		return true
+	}
 	if len(old.WiredConnections) != len(new.WiredConnections) {
+		return true
+	}
+	if len(old.EthernetDevices) != len(new.EthernetDevices) {
 		return true
 	}
 
@@ -232,6 +243,23 @@ func stateChangedMeaningfully(old, new *NetworkState) bool {
 			return true
 		}
 		if oldNet.IsActive != newNet.IsActive {
+			return true
+		}
+	}
+
+	for i := range old.EthernetDevices {
+		oldDev := &old.EthernetDevices[i]
+		newDev := &new.EthernetDevices[i]
+		if oldDev.Name != newDev.Name {
+			return true
+		}
+		if oldDev.Connected != newDev.Connected {
+			return true
+		}
+		if oldDev.State != newDev.State {
+			return true
+		}
+		if oldDev.IP != newDev.IP {
 			return true
 		}
 	}
@@ -474,6 +502,18 @@ func (m *Manager) DisconnectEthernet() error {
 	return m.backend.DisconnectEthernet()
 }
 
+func (m *Manager) DisconnectEthernetDevice(device string) error {
+	return m.backend.DisconnectEthernetDevice(device)
+}
+
+func (m *Manager) GetEthernetDevices() []EthernetDevice {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	devices := make([]EthernetDevice, len(m.state.EthernetDevices))
+	copy(devices, m.state.EthernetDevices)
+	return devices
+}
+
 func (m *Manager) activateConnection(uuid string) error {
 	return m.backend.ActivateWiredConnection(uuid)
 }
@@ -502,6 +542,46 @@ func (m *Manager) ClearVPNCredentials(uuidOrName string) error {
 	return m.backend.ClearVPNCredentials(uuidOrName)
 }
 
+func (m *Manager) ListVPNPlugins() ([]VPNPlugin, error) {
+	return m.backend.ListVPNPlugins()
+}
+
+func (m *Manager) ImportVPN(filePath string, name string) (*VPNImportResult, error) {
+	return m.backend.ImportVPN(filePath, name)
+}
+
+func (m *Manager) GetVPNConfig(uuidOrName string) (*VPNConfig, error) {
+	return m.backend.GetVPNConfig(uuidOrName)
+}
+
+func (m *Manager) UpdateVPNConfig(uuid string, updates map[string]any) error {
+	return m.backend.UpdateVPNConfig(uuid, updates)
+}
+
+func (m *Manager) DeleteVPN(uuidOrName string) error {
+	return m.backend.DeleteVPN(uuidOrName)
+}
+
+func (m *Manager) SetVPNCredentials(uuid, username, password string, save bool) error {
+	return m.backend.SetVPNCredentials(uuid, username, password, save)
+}
+
 func (m *Manager) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 	return m.backend.SetWiFiAutoconnect(ssid, autoconnect)
+}
+
+func (m *Manager) GetWiFiDevices() []WiFiDevice {
+	m.stateMutex.RLock()
+	defer m.stateMutex.RUnlock()
+	devices := make([]WiFiDevice, len(m.state.WiFiDevices))
+	copy(devices, m.state.WiFiDevices)
+	return devices
+}
+
+func (m *Manager) ScanWiFiDevice(device string) error {
+	return m.backend.ScanWiFiDevice(device)
+}
+
+func (m *Manager) DisconnectWiFiDevice(device string) error {
+	return m.backend.DisconnectWiFiDevice(device)
 }

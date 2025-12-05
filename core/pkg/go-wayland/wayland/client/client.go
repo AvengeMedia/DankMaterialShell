@@ -82,7 +82,6 @@ func (i *Display) Sync() (*Callback, error) {
 	PutUint32(_reqBuf[l:l+4], uint32(_reqBufLen<<16|opcode&0x0000ffff))
 	l += 4
 	PutUint32(_reqBuf[l:l+4], callback.ID())
-	l += 4
 	err := i.Context().WriteMsg(_reqBuf[:], nil)
 	return callback, err
 }
@@ -109,7 +108,6 @@ func (i *Display) GetRegistry() (*Registry, error) {
 	PutUint32(_reqBuf[l:l+4], uint32(_reqBufLen<<16|opcode&0x0000ffff))
 	l += 4
 	PutUint32(_reqBuf[l:l+4], registry.ID())
-	l += 4
 	err := i.Context().WriteMsg(_reqBuf[:], nil)
 	return registry, err
 }
@@ -223,7 +221,6 @@ func (i *Display) Dispatch(opcode uint32, fd int, data []byte) {
 		messageLen := PaddedLen(int(Uint32(data[l : l+4])))
 		l += 4
 		e.Message = String(data[l : l+messageLen])
-		l += messageLen
 
 		i.errorHandler(e)
 	case 1:

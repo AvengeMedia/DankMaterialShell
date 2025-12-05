@@ -1,0 +1,36 @@
+{
+  "$schema": "vscode://schemas/color-theme",
+  "name": "Dynamic Base16 DankShell",
+  "colors": {
+    "editor.background": "#1a1a2e",
+    "editor.foreground": "#e4e4e7",
+    "editorLineNumber.foreground": "#71717a",
+    "editorLineNumber.activeForeground": "#e4e4e7",
+    "editorCursor.foreground": "#a78bfa",
+    "editor.selectionBackground": "#4c1d95",
+    "activityBar.background": "#1a1a2e",
+    "activityBar.foreground": "#e4e4e7",
+    "activityBarBadge.background": "#a78bfa",
+    "activityBarBadge.foreground": "#1a1a2e",
+    "sideBar.background": "#1a1a2e",
+    "sideBar.foreground": "#e4e4e7",
+    "statusBar.background": "#1a1a2e",
+    "statusBar.foreground": "#e4e4e7",
+    "titleBar.activeBackground": "#1a1a2e",
+    "titleBar.activeForeground": "#e4e4e7"
+  },
+  "tokenColors": [
+    {
+      "scope": ["comment"],
+      "settings": { "foreground": "#71717a", "fontStyle": "italic" }
+    },
+    {
+      "scope": ["keyword"],
+      "settings": { "foreground": "#a78bfa" }
+    },
+    {
+      "scope": ["string"],
+      "settings": { "foreground": "#34d399" }
+    }
+  ]
+}

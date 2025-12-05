@@ -2,16 +2,16 @@
 // Separated from Theme.qml to keep that file clean
 
 const CatppuccinMocha = {
-    surface: "#313244",
+    surface: "#181825",
     surfaceText: "#cdd6f4",
-    surfaceVariant: "#313244",
+    surfaceVariant: "#1e1e2e",
     surfaceVariantText: "#a6adc8",
-    background: "#1e1e2e",
+    background: "#181825",
     backgroundText: "#cdd6f4",
     outline: "#6c7086",
-    surfaceContainer: "#45475a",
-    surfaceContainerHigh: "#585b70",
-    surfaceContainerHighest: "#6c7086"
+    surfaceContainer: "#1e1e2e",
+    surfaceContainerHigh: "#313244",
+    surfaceContainerHighest: "#45475a"
 }
 
 const CatppuccinLatte = {

@@ -1,0 +1,55 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Extract version from debian/changelog
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+# Get upstream version (strip -1ppa1 suffix)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+BASE_VERSION := $(shell echo $(UPSTREAM_VERSION) | sed 's/ppa[0-9]*$$//' | sed 's/+git.*//')
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# All files are included in source package
+	test -f dms-greeter-source.tar.gz || (echo "ERROR: dms-greeter-source.tar.gz not found!" && exit 1)
+	
+	# Extract source tarball
+	tar -xzf dms-greeter-source.tar.gz
+	# Find the extracted directory
+	SOURCE_DIR=$$(find . -maxdepth 1 -type d -name "DankMaterialShell*" | head -n1); \
+	if [ -n "$$SOURCE_DIR" ]; then \
+		ln -sf $$SOURCE_DIR DankMaterialShell-$(BASE_VERSION); \
+	fi
+
+override_dh_auto_install:
+	# Install greeter files to shared data location
+	mkdir -p debian/dms-greeter/usr/share/quickshell/dms-greeter
+	cp -r DankMaterialShell-$(BASE_VERSION)/quickshell/* debian/dms-greeter/usr/share/quickshell/dms-greeter/
+	
+	# Install launcher script
+	install -Dm755 DankMaterialShell-$(BASE_VERSION)/quickshell/Modules/Greetd/assets/dms-greeter \
+		debian/dms-greeter/usr/bin/dms-greeter
+	
+	# Install documentation
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/quickshell/Modules/Greetd/README.md \
+		debian/dms-greeter/usr/share/doc/dms-greeter/README.md
+	
+	# Install LICENSE file
+	install -Dm644 DankMaterialShell-$(BASE_VERSION)/LICENSE \
+		debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE
+	
+	# Create cache directory structure (will be created by postinst)
+	mkdir -p debian/dms-greeter/var/cache/dms-greeter
+	
+	# Remove build and development files
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/core
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/distro
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/.git*
+	rm -f debian/dms-greeter/usr/share/quickshell/dms-greeter/.gitignore
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/.github
+
+override_dh_auto_clean:
+	rm -rf DankMaterialShell-*
+	dh_auto_clean

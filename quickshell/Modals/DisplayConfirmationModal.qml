@@ -1,7 +1,6 @@
 import QtQuick
 import qs.Common
 import qs.Modals.Common
-import qs.Services
 import qs.Widgets
 
 DankModal {
@@ -15,8 +14,8 @@ DankModal {
 
     shouldBeVisible: false
     allowStacking: true
-    width: 420
-    height: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 200
+    modalWidth: 420
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 200
 
     Timer {
         id: countdownTimer
@@ -24,20 +23,20 @@ DankModal {
         repeat: true
         running: root.shouldBeVisible
         onTriggered: {
-            countdown--
+            countdown--;
             if (countdown <= 0) {
-                revert()
+                revert();
             }
         }
     }
 
     onOpened: {
-        countdown = 15
-        countdownTimer.start()
+        countdown = 15;
+        countdownTimer.start();
     }
 
     onClosed: {
-        countdownTimer.stop()
+        countdownTimer.stop();
     }
 
     onBackgroundClicked: revert
@@ -51,13 +50,13 @@ DankModal {
             implicitHeight: mainColumn.implicitHeight
 
             Keys.onEscapePressed: event => {
-                revert()
-                event.accepted = true
+                revert();
+                event.accepted = true;
             }
 
             Keys.onReturnPressed: event => {
-                confirm()
-                event.accepted = true
+                confirm();
+                event.accepted = true;
             }
 
             Column {
@@ -235,12 +234,12 @@ DankModal {
     }
 
     function confirm() {
-        displaysTab.confirmChanges()
-        close()
+        displaysTab.confirmChanges();
+        close();
     }
 
     function revert() {
-        displaysTab.revertChanges()
-        close()
+        displaysTab.revertChanges();
+        close();
     }
 }

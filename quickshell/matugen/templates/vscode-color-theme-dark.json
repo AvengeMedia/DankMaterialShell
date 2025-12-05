@@ -97,6 +97,22 @@
 
     "terminal.background": "{{colors.background.dark.hex}}",
     "terminal.foreground": "{{colors.on_surface.dark.hex}}",
+    "terminal.ansiBlack": "{{dank16.color0.hex}}",
+    "terminal.ansiRed": "{{dank16.color1.hex}}",
+    "terminal.ansiGreen": "{{dank16.color2.hex}}",
+    "terminal.ansiYellow": "{{dank16.color3.hex}}",
+    "terminal.ansiBlue": "{{dank16.color4.hex}}",
+    "terminal.ansiMagenta": "{{dank16.color5.hex}}",
+    "terminal.ansiCyan": "{{dank16.color6.hex}}",
+    "terminal.ansiWhite": "{{dank16.color7.hex}}",
+    "terminal.ansiBrightBlack": "{{dank16.color8.hex}}",
+    "terminal.ansiBrightRed": "{{dank16.color9.hex}}",
+    "terminal.ansiBrightGreen": "{{dank16.color10.hex}}",
+    "terminal.ansiBrightYellow": "{{dank16.color11.hex}}",
+    "terminal.ansiBrightBlue": "{{dank16.color12.hex}}",
+    "terminal.ansiBrightMagenta": "{{dank16.color13.hex}}",
+    "terminal.ansiBrightCyan": "{{dank16.color14.hex}}",
+    "terminal.ansiBrightWhite": "{{dank16.color15.hex}}",
 
     "gitDecoration.modifiedResourceForeground": "{{colors.primary.dark.hex}}",
     "gitDecoration.addedResourceForeground": "{{colors.primary.dark.hex}}",
@@ -158,19 +174,6 @@
   },
 
   "tokenColors": [
-    {
-      "scope": ["comment", "punctuation.definition.comment"],
-      "settings": {
-        "foreground": "{{colors.outline.dark.hex}}",
-        "fontStyle": "italic"
-      }
-    },
-    {
-      "scope": ["keyword", "storage.type", "storage.modifier"],
-      "settings": {
-        "foreground": "{{colors.primary.dark.hex}}"
-      }
-    },
     {
       "scope": ["variable", "meta.object-literal.key"],
       "settings": {
@@ -263,53 +266,166 @@
       "settings": {
         "foreground": "{{colors.secondary.dark.hex}}"
       }
+    },
+    {
+      "scope": ["comment", "punctuation.definition.comment"],
+      "settings": {
+        "foreground": "{{dank16.color8.hex}}"
+      }
+    },
+    {
+      "scope": "keyword",
+      "settings": {
+        "foreground": "{{dank16.color5.hex}}"
+      }
+    },
+    {
+      "scope": "storage.type",
+      "settings": {
+        "foreground": "{{dank16.color13.hex}}"
+      }
+    },
+    {
+      "scope": "storage.modifier",
+      "settings": {
+        "foreground": "{{dank16.color5.hex}}"
+      }
+    },
+    {
+      "scope": "variable",
+      "settings": {
+        "foreground": "{{dank16.color15.hex}}"
+      }
+    },
+    {
+      "scope": "variable.parameter",
+      "settings": {
+        "foreground": "{{dank16.color7.hex}}"
+      }
+    },
+    {
+      "scope": ["meta.object-literal.key", "meta.property.object", "variable.other.property"],
+      "settings": {
+        "foreground": "{{dank16.color4.hex}}"
+      }
+    },
+    {
+      "scope": "constant.other.symbol",
+      "settings": {
+        "foreground": "{{dank16.color12.hex}}"
+      }
+    },
+    {
+      "scope": ["constant.numeric", "constant.language"],
+      "settings": {
+        "foreground": "{{dank16.color12.hex}}"
+      }
+    },
+    {
+      "scope": "constant.character",
+      "settings": {
+        "foreground": "{{dank16.color3.hex}}"
+      }
+    },
+    {
+      "scope": ["entity.name.type", "entity.name.class"],
+      "settings": {
+        "foreground": "{{dank16.color12.hex}}"
+      }
+    },
+    {
+      "scope": "support.type",
+      "settings": {
+        "foreground": "{{dank16.color13.hex}}"
+      }
+    },
+    {
+      "scope": ["entity.name.function", "support.function"],
+      "settings": {
+        "foreground": "{{dank16.color2.hex}}"
+      }
+    },
+    {
+      "scope": ["support.class", "support.variable"],
+      "settings": {
+        "foreground": "{{dank16.color15.hex}}"
+      }
+    },
+    {
+      "scope": "variable.language",
+      "settings": {
+        "foreground": "{{dank16.color12.hex}}"
+      }
+    },
+    {
+      "scope": "entity.name.tag.yaml",
+      "settings": {
+        "foreground": "{{dank16.color12.hex}}"
+      }
+    },
+    {
+      "scope": ["string.unquoted.plain.out.yaml", "string.unquoted.yaml"],
+      "settings": {
+        "foreground": "{{dank16.color15.hex}}"
+      }
+    },
+    {
+      "scope": "string",
+      "settings": {
+        "foreground": "{{dank16.color3.hex}}"
+      }
     }
   ],
 
   "semanticHighlighting": true,
   "semanticTokenColors": {
+    "variable": {
+      "foreground": "{{dank16.color15.hex}}"
+    },
     "variable.readonly": {
-      "foreground": "{{colors.tertiary.dark.hex}}"
+      "foreground": "{{dank16.color12.hex}}"
     },
     "property": {
-      "foreground": "{{colors.on_surface.dark.hex}}"
+      "foreground": "{{dank16.color4.hex}}"
     },
     "function": {
-      "foreground": "{{colors.primary.dark.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
     },
     "method": {
-      "foreground": "{{colors.primary.dark.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
     },
     "type": {
-      "foreground": "{{colors.tertiary.dark.hex}}"
+      "foreground": "{{dank16.color12.hex}}"
     },
     "class": {
-      "foreground": "{{colors.tertiary.dark.hex}}"
+      "foreground": "{{dank16.color12.hex}}"
+    },
+    "typeParameter": {
+      "foreground": "{{dank16.color13.hex}}"
     },
     "enumMember": {
-      "foreground": "{{colors.tertiary.dark.hex}}"
+      "foreground": "{{dank16.color12.hex}}"
     },
     "string": {
-      "foreground": "{{colors.secondary.dark.hex}}"
+      "foreground": "{{dank16.color3.hex}}"
     },
     "number": {
-      "foreground": "{{colors.tertiary.dark.hex}}"
+      "foreground": "{{dank16.color12.hex}}"
     },
     "comment": {
-      "foreground": "{{colors.outline.dark.hex}}",
-      "fontStyle": "italic"
+      "foreground": "{{dank16.color8.hex}}"
     },
     "keyword": {
-      "foreground": "{{colors.primary.dark.hex}}"
+      "foreground": "{{dank16.color5.hex}}"
     },
     "operator": {
-      "foreground": "{{colors.on_surface.dark.hex}}"
+      "foreground": "{{dank16.color15.hex}}"
     },
     "parameter": {
-      "foreground": "{{colors.on_surface.dark.hex}}"
+      "foreground": "{{dank16.color7.hex}}"
     },
     "namespace": {
-      "foreground": "{{colors.secondary.dark.hex}}"
+      "foreground": "{{dank16.color15.hex}}"
     }
   }
 }

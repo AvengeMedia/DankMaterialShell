@@ -1,765 +1,250 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Item {
-    id: dockTab
+    id: root
 
     DankFlickable {
         anchors.fill: parent
         clip: true
-        contentHeight: mainColumn.height
+        contentHeight: mainColumn.height + Theme.spacingXL
         contentWidth: width
 
         Column {
             id: mainColumn
-            width: parent.width
+            width: Math.min(550, parent.width - Theme.spacingL * 2)
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Theme.spacingXL
 
-            // Dock Position
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: dockPositionSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "swap_vert"
+                title: I18n.tr("Dock Position")
 
-                Column {
-                    id: dockPositionSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "swap_vert"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Position")
+                    model: ["Top", "Bottom", "Left", "Right"]
+                    currentIndex: {
+                        switch (SettingsData.dockPosition) {
+                        case SettingsData.Position.Top:
+                            return 0;
+                        case SettingsData.Position.Bottom:
+                            return 1;
+                        case SettingsData.Position.Left:
+                            return 2;
+                        case SettingsData.Position.Right:
+                            return 3;
+                        default:
+                            return 1;
                         }
-
-                        StyledText {
-                            id: positionText
-                            text: I18n.tr("Dock Position")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - positionText.width - positionButtonGroup.width - Theme.spacingM * 2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankButtonGroup {
-                            id: positionButtonGroup
-                            anchors.verticalCenter: parent.verticalCenter
-                            model: ["Top", "Bottom", "Left", "Right"]
-                            currentIndex: {
-                                switch (SettingsData.dockPosition) {
-                                    case SettingsData.Position.Top: return 0
-                                    case SettingsData.Position.Bottom: return 1
-                                    case SettingsData.Position.Left: return 2
-                                    case SettingsData.Position.Right: return 3
-                                    default: return 1
-                                }
-                            }
-                            onSelectionChanged: (index, selected) => {
-                                if (selected) {
-                                    switch (index) {
-                                        case 0: SettingsData.setDockPosition(SettingsData.Position.Top); break
-                                        case 1: SettingsData.setDockPosition(SettingsData.Position.Bottom); break
-                                        case 2: SettingsData.setDockPosition(SettingsData.Position.Left); break
-                                        case 3: SettingsData.setDockPosition(SettingsData.Position.Right); break
-                                    }
-                                }
-                            }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        switch (index) {
+                        case 0:
+                            SettingsData.setDockPosition(SettingsData.Position.Top);
+                            break;
+                        case 1:
+                            SettingsData.setDockPosition(SettingsData.Position.Bottom);
+                            break;
+                        case 2:
+                            SettingsData.setDockPosition(SettingsData.Position.Left);
+                            break;
+                        case 3:
+                            SettingsData.setDockPosition(SettingsData.Position.Right);
+                            break;
                         }
                     }
                 }
             }
 
-            // Dock Visibility Section
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: dockVisibilitySection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "dock_to_bottom"
+                title: I18n.tr("Dock Visibility")
 
-                Column {
-                    id: dockVisibilitySection
+                SettingsToggleRow {
+                    text: I18n.tr("Show Dock")
+                    description: I18n.tr("Display a dock with pinned and running applications")
+                    checked: SettingsData.showDock
+                    onToggled: checked => SettingsData.setShowDock(checked)
+                }
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
+                SettingsToggleRow {
+                    text: I18n.tr("Auto-hide Dock")
+                    description: I18n.tr("Hide the dock when not in use and reveal it when hovering near the dock area")
+                    checked: SettingsData.dockAutoHide
+                    visible: SettingsData.showDock
+                    onToggled: checked => SettingsData.set("dockAutoHide", checked)
+                }
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
+                SettingsToggleRow {
+                    text: I18n.tr("Show on Overview")
+                    description: I18n.tr("Always show the dock when niri's overview is open")
+                    checked: SettingsData.dockOpenOnOverview
+                    visible: CompositorService.isNiri
+                    onToggled: checked => SettingsData.set("dockOpenOnOverview", checked)
+                }
+            }
 
-                        DankIcon {
-                            name: "dock_to_bottom"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
+            SettingsCard {
+                width: parent.width
+                iconName: "apps"
+                title: I18n.tr("Behavior")
 
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - enableToggle.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
+                SettingsToggleRow {
+                    text: I18n.tr("Group by App")
+                    description: I18n.tr("Group multiple windows of the same app together with a window count indicator")
+                    checked: SettingsData.dockGroupByApp
+                    onToggled: checked => SettingsData.set("dockGroupByApp", checked)
+                }
 
-                            StyledText {
-                                text: I18n.tr("Show Dock")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Display a dock with pinned and running applications that can be positioned at the top, bottom, left, or right edge of the screen")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                                width: parent.width
-                            }
-                        }
-
-                        DankToggle {
-                            id: enableToggle
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.showDock
-                            onToggled: checked => {
-                                           SettingsData.setShowDock(checked)
-                                       }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                        visible: SettingsData.showDock
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: SettingsData.showDock
-                        opacity: visible ? 1 : 0
-
-                        DankIcon {
-                            name: "visibility_off"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - autoHideToggle.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("Auto-hide Dock")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Hide the dock when not in use and reveal it when hovering near the dock area")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                                width: parent.width
-                            }
-                        }
-
-                        DankToggle {
-                            id: autoHideToggle
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.dockAutoHide
-                            onToggled: checked => {
-                                           SettingsData.set("dockAutoHide", checked)
-                                       }
-                        }
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.mediumDuration
-                                easing.type: Theme.emphasizedEasing
-                            }
-                        }
-                    }
-
-                    Rectangle {
-                        width: parent.width
-                        height: 1
-                        color: Theme.outline
-                        opacity: 0.2
-                        visible: CompositorService.isNiri
-                    }
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-                        visible: CompositorService.isNiri
-
-                        DankIcon {
-                            name: "fullscreen"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - overviewToggle.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("Show on Overview")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Always show the dock when niri's overview is open")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                                width: parent.width
-                            }
-                        }
-
-                        DankToggle {
-                            id: overviewToggle
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.dockOpenOnOverview
-                            onToggled: checked => {
-                                           SettingsData.set("dockOpenOnOverview", checked)
-                                       }
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Indicator Style")
+                    model: ["Circle", "Line"]
+                    currentIndex: SettingsData.dockIndicatorStyle === "circle" ? 0 : 1
+                    onSelectionChanged: (index, selected) => {
+                        if (selected) {
+                            SettingsData.set("dockIndicatorStyle", index === 0 ? "circle" : "line");
                         }
                     }
                 }
             }
 
-            // Group by App
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: groupByAppSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "photo_size_select_large"
+                title: I18n.tr("Sizing")
 
-                Column {
-                    id: groupByAppSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "apps"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - Theme.iconSize - Theme.spacingM
-                                   - groupByAppToggle.width - Theme.spacingM
-                            spacing: Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                text: I18n.tr("Group by App")
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.weight: Font.Medium
-                                color: Theme.surfaceText
-                            }
-
-                            StyledText {
-                                text: I18n.tr("Group multiple windows of the same app together with a window count indicator")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceVariantText
-                                wrapMode: Text.WordWrap
-                                width: parent.width
-                            }
-                        }
-
-                        DankToggle {
-                            id: groupByAppToggle
-
-                            anchors.verticalCenter: parent.verticalCenter
-                            checked: SettingsData.dockGroupByApp
-                            onToggled: checked => {
-                                           SettingsData.set("dockGroupByApp", checked)
-                                       }
-                        }
-                    }
+                SettingsSliderRow {
+                    text: I18n.tr("Icon Size")
+                    value: SettingsData.dockIconSize
+                    minimum: 24
+                    maximum: 96
+                    defaultValue: 48
+                    onSliderValueChanged: newValue => SettingsData.set("dockIconSize", newValue)
                 }
             }
 
-            // Indicator Style Section
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: indicatorStyleSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "space_bar"
+                title: I18n.tr("Spacing")
 
-                Column {
-                    id: indicatorStyleSection
+                SettingsSliderRow {
+                    text: I18n.tr("Padding")
+                    value: SettingsData.dockSpacing
+                    minimum: 0
+                    maximum: 32
+                    defaultValue: 8
+                    onSliderValueChanged: newValue => SettingsData.set("dockSpacing", newValue)
+                }
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
+                SettingsSliderRow {
+                    text: I18n.tr("Exclusive Zone Offset")
+                    value: SettingsData.dockBottomGap
+                    minimum: -100
+                    maximum: 100
+                    defaultValue: 0
+                    onSliderValueChanged: newValue => SettingsData.set("dockBottomGap", newValue)
+                }
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "fiber_manual_record"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            id: indicatorStyleText
-                            text: I18n.tr("Indicator Style")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - indicatorStyleText.width - indicatorStyleButtonGroup.width - Theme.spacingM * 2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankButtonGroup {
-                            id: indicatorStyleButtonGroup
-                            anchors.verticalCenter: parent.verticalCenter
-                            model: ["Circle", "Line"]
-                            currentIndex: SettingsData.dockIndicatorStyle === "circle" ? 0 : 1
-                            onSelectionChanged: (index, selected) => {
-                                if (selected) {
-                                    SettingsData.set("dockIndicatorStyle", index === 0 ? "circle" : "line")
-                                }
-                            }
-                        }
-                    }
+                SettingsSliderRow {
+                    text: I18n.tr("Margin")
+                    value: SettingsData.dockMargin
+                    minimum: 0
+                    maximum: 100
+                    defaultValue: 0
+                    onSliderValueChanged: newValue => SettingsData.set("dockMargin", newValue)
                 }
             }
 
-            // Icon Size Section
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: iconSizeSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "opacity"
+                title: I18n.tr("Transparency")
 
-                Column {
-                    id: iconSizeSection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "photo_size_select_large"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            id: iconSizeText
-                            text: I18n.tr("Icon Size")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - iconSizeText.width - resetIconSizeBtn.width - Theme.spacingM * 2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankActionButton {
-                            id: resetIconSizeBtn
-                            buttonSize: 20
-                            iconName: "refresh"
-                            iconSize: 12
-                            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            iconColor: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: {
-                                SettingsData.set("dockIconSize", 48)
-                            }
-                        }
-                    }
-
-                    DankSlider {
-                        width: parent.width
-                        height: 24
-                        value: SettingsData.dockIconSize
-                        minimum: 24
-                        maximum: 96
-                        unit: ""
-                        showValue: true
-                        wheelEnabled: false
-                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        onSliderValueChanged: newValue => {
-                                                  SettingsData.set("dockIconSize", newValue)
-                                              }
-                    }
+                SettingsSliderRow {
+                    text: I18n.tr("Dock Transparency")
+                    value: Math.round(SettingsData.dockTransparency * 100)
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 85
+                    onSliderValueChanged: newValue => SettingsData.set("dockTransparency", newValue / 100)
                 }
             }
 
-            // Dock Spacing Section
-            StyledRect {
+            SettingsCard {
                 width: parent.width
-                height: dockSpacingSection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                iconName: "border_style"
+                title: I18n.tr("Border")
 
-                Column {
-                    id: dockSpacingSection
+                SettingsToggleRow {
+                    text: I18n.tr("Border")
+                    description: I18n.tr("Add a border around the dock")
+                    checked: SettingsData.dockBorderEnabled
+                    onToggled: checked => SettingsData.set("dockBorderEnabled", checked)
+                }
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "space_bar"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Spacing")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
+                SettingsButtonGroupRow {
+                    text: I18n.tr("Border Color")
+                    description: I18n.tr("Choose the border accent color")
+                    visible: SettingsData.dockBorderEnabled
+                    model: ["Surface", "Secondary", "Primary"]
+                    currentIndex: {
+                        switch (SettingsData.dockBorderColor) {
+                        case "surfaceText":
+                            return 0;
+                        case "secondary":
+                            return 1;
+                        case "primary":
+                            return 2;
+                        default:
+                            return 0;
                         }
                     }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-
-                            StyledText {
-                                text: I18n.tr("Padding")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item {
-                                width: parent.width - paddingText.implicitWidth - resetPaddingBtn.width - Theme.spacingS - Theme.spacingM
-                                height: 1
-
-                                StyledText {
-                                    id: paddingText
-                                    visible: false
-                                    text: I18n.tr("Padding")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                }
-                            }
-
-                            DankActionButton {
-                                id: resetPaddingBtn
-                                buttonSize: 20
-                                iconName: "refresh"
-                                iconSize: 12
-                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                                iconColor: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: {
-                                    SettingsData.set("dockSpacing", 8)
-                                }
-                            }
-
-                            Item {
-                                width: Theme.spacingS
-                                height: 1
-                            }
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: SettingsData.dockSpacing
-                            minimum: 0
-                            maximum: 32
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockSpacing",
-                                                          newValue)
-                                                  }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-
-                            StyledText {
-                                text: I18n.tr("Exclusive Zone Offset")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item {
-                                width: parent.width - exclusiveZoneText.implicitWidth - resetExclusiveZoneBtn.width - Theme.spacingS - Theme.spacingM
-                                height: 1
-
-                                StyledText {
-                                    id: exclusiveZoneText
-                                    visible: false
-                                    text: I18n.tr("Exclusive Zone Offset")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                }
-                            }
-
-                            DankActionButton {
-                                id: resetExclusiveZoneBtn
-                                buttonSize: 20
-                                iconName: "refresh"
-                                iconSize: 12
-                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                                iconColor: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: {
-                                    SettingsData.set("dockBottomGap", 0)
-                                }
-                            }
-
-                            Item {
-                                width: Theme.spacingS
-                                height: 1
-                            }
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: SettingsData.dockBottomGap
-                            minimum: -100
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockBottomGap",
-                                                          newValue)
-                                                  }
-                        }
-                    }
-
-                    Column {
-                        width: parent.width
-                        spacing: Theme.spacingS
-
-                        Row {
-                            width: parent.width
-                            spacing: Theme.spacingS
-
-                            StyledText {
-                                text: I18n.tr("Margin")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Item {
-                                width: parent.width - marginText.implicitWidth - resetMarginBtn.width - Theme.spacingS - Theme.spacingM
-                                height: 1
-
-                                StyledText {
-                                    id: marginText
-                                    visible: false
-                                    text: I18n.tr("Margin")
-                                    font.pixelSize: Theme.fontSizeSmall
-                                }
-                            }
-
-                            DankActionButton {
-                                id: resetMarginBtn
-                                buttonSize: 20
-                                iconName: "refresh"
-                                iconSize: 12
-                                backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                                iconColor: Theme.surfaceText
-                                anchors.verticalCenter: parent.verticalCenter
-                                onClicked: {
-                                    SettingsData.set("dockMargin", 0)
-                                }
-                            }
-
-                            Item {
-                                width: Theme.spacingS
-                                height: 1
-                            }
-                        }
-
-                        DankSlider {
-                            width: parent.width
-                            height: 24
-                            value: SettingsData.dockMargin
-                            minimum: 0
-                            maximum: 100
-                            unit: ""
-                            showValue: true
-                            wheelEnabled: false
-                            thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            onSliderValueChanged: newValue => {
-                                                      SettingsData.set("dockMargin", newValue)
-                                                  }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        switch (index) {
+                        case 0:
+                            SettingsData.set("dockBorderColor", "surfaceText");
+                            break;
+                        case 1:
+                            SettingsData.set("dockBorderColor", "secondary");
+                            break;
+                        case 2:
+                            SettingsData.set("dockBorderColor", "primary");
+                            break;
                         }
                     }
                 }
-            }
 
-            // Dock Transparency Section
-            StyledRect {
-                width: parent.width
-                height: transparencySection.implicitHeight + Theme.spacingL * 2
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                                      Theme.outline.b, 0.2)
-                border.width: 0
+                SettingsSliderRow {
+                    text: I18n.tr("Border Opacity")
+                    visible: SettingsData.dockBorderEnabled
+                    value: SettingsData.dockBorderOpacity * 100
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => SettingsData.set("dockBorderOpacity", newValue / 100)
+                }
 
-                Column {
-                    id: transparencySection
-
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingL
-                    spacing: Theme.spacingM
-
-                    Row {
-                        width: parent.width
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "opacity"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            id: transparencyText
-                            text: I18n.tr("Dock Transparency")
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.weight: Font.Medium
-                            color: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Item {
-                            width: parent.width - Theme.iconSize - Theme.spacingM - transparencyText.width - resetTransparencyBtn.width - Theme.spacingM * 2
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        DankActionButton {
-                            id: resetTransparencyBtn
-                            buttonSize: 20
-                            iconName: "refresh"
-                            iconSize: 12
-                            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            iconColor: Theme.surfaceText
-                            anchors.verticalCenter: parent.verticalCenter
-                            onClicked: {
-                                SettingsData.set("dockTransparency", 0.85)
-                            }
-                        }
-                    }
-
-                    DankSlider {
-                        width: parent.width
-                        height: 32
-                        value: Math.round(SettingsData.dockTransparency * 100)
-                        minimum: 0
-                        maximum: 100
-                        unit: "%"
-                        showValue: true
-                        wheelEnabled: false
-                        thumbOutlineColor: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                        onSliderValueChanged: newValue => {
-                                                  SettingsData.set("dockTransparency",
-                                                      newValue / 100)
-                                              }
-                    }
+                SettingsSliderRow {
+                    text: I18n.tr("Border Thickness")
+                    visible: SettingsData.dockBorderEnabled
+                    value: SettingsData.dockBorderThickness
+                    minimum: 1
+                    maximum: 10
+                    unit: "px"
+                    defaultValue: 1
+                    onSliderValueChanged: newValue => SettingsData.set("dockBorderThickness", newValue)
                 }
             }
         }

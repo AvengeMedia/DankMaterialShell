@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -11,14 +10,15 @@ StyledRect {
     property string expandedPluginId: ""
     property bool hasUpdate: false
     property bool isReloading: false
+    property var sharedTooltip: null
 
     property string pluginId: pluginData ? pluginData.id : ""
     property string pluginDirectoryName: {
         if (pluginData && pluginData.pluginDirectory) {
-            var path = pluginData.pluginDirectory
-            return path.substring(path.lastIndexOf('/') + 1)
+            var path = pluginData.pluginDirectory;
+            return path.substring(path.lastIndexOf('/') + 1);
         }
-        return pluginId
+        return pluginId;
     }
     property string pluginName: pluginData ? (pluginData.name || pluginData.id) : ""
     property string pluginVersion: pluginData ? (pluginData.version || "1.0.0") : ""
@@ -29,6 +29,10 @@ StyledRect {
     property var pluginPermissions: pluginData ? (pluginData.permissions || []) : []
     property bool hasSettings: pluginData && pluginData.settings !== undefined && pluginData.settings !== ""
     property bool isExpanded: expandedPluginId === pluginId
+    property bool isLoaded: {
+        PluginService.loadedPlugins;
+        return PluginService.loadedPlugins[pluginId] !== undefined;
+    }
 
     width: parent.width
     height: pluginItemColumn.implicitHeight + Theme.spacingM * 2 + settingsContainer.height
@@ -44,7 +48,7 @@ StyledRect {
         cursorShape: root.hasSettings ? Qt.PointingHandCursor : Qt.ArrowCursor
         enabled: root.hasSettings
         onClicked: {
-            root.expandedPluginId = root.expandedPluginId === root.pluginId ? "" : root.pluginId
+            root.expandedPluginId = root.expandedPluginId === root.pluginId ? "" : root.pluginId;
         }
     }
 
@@ -64,7 +68,7 @@ StyledRect {
             DankIcon {
                 name: root.pluginIcon
                 size: Theme.iconSize
-                color: PluginService.isPluginLoaded(root.pluginId) ? Theme.primary : Theme.surfaceVariantText
+                color: root.isLoaded ? Theme.primary : Theme.surfaceVariantText
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -112,7 +116,7 @@ StyledRect {
                     height: 28
                     radius: 14
                     color: updateArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
-                    visible: DMSService.dmsAvailable && PluginService.isPluginLoaded(root.pluginId) && root.hasUpdate
+                    visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -127,32 +131,26 @@ StyledRect {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            const currentPluginName = root.pluginName
-                            const currentPluginId = root.pluginId
+                            const currentPluginName = root.pluginName;
+                            const currentPluginId = root.pluginId;
                             DMSService.update(currentPluginName, response => {
                                 if (response.error) {
-                                    ToastService.showError("Update failed: " + response.error)
-                                } else {
-                                    ToastService.showInfo("Plugin updated: " + currentPluginName)
-                                    PluginService.forceRescanPlugin(currentPluginId)
-                                    if (DMSService.apiVersion >= 8) {
-                                        DMSService.listInstalled()
-                                    }
+                                    ToastService.showError("Update failed: " + response.error);
+                                    return;
                                 }
-                            })
+                                ToastService.showInfo("Plugin updated: " + currentPluginName);
+                                PluginService.forceRescanPlugin(currentPluginId);
+                                if (DMSService.apiVersion >= 8)
+                                    DMSService.listInstalled();
+                            });
                         }
                         onEntered: {
-                            tooltipLoader.active = true
-                            if (tooltipLoader.item) {
-                                const p = mapToItem(null, width / 2, 0)
-                                tooltipLoader.item.show(I18n.tr("Update Plugin"), p.x, p.y - 40, null)
-                            }
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.show(I18n.tr("Update Plugin"), parent, 0, 0, "top");
                         }
                         onExited: {
-                            if (tooltipLoader.item) {
-                                tooltipLoader.item.hide()
-                            }
-                            tooltipLoader.active = false
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.hide();
                         }
                     }
                 }
@@ -177,31 +175,25 @@ StyledRect {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            const currentPluginName = root.pluginName
+                            const currentPluginName = root.pluginName;
                             DMSService.uninstall(currentPluginName, response => {
                                 if (response.error) {
-                                    ToastService.showError("Uninstall failed: " + response.error)
-                                } else {
-                                    ToastService.showInfo("Plugin uninstalled: " + currentPluginName)
-                                    PluginService.scanPlugins()
-                                    if (root.isExpanded) {
-                                        root.expandedPluginId = ""
-                                    }
+                                    ToastService.showError("Uninstall failed: " + response.error);
+                                    return;
                                 }
-                            })
+                                ToastService.showInfo("Plugin uninstalled: " + currentPluginName);
+                                PluginService.scanPlugins();
+                                if (root.isExpanded)
+                                    root.expandedPluginId = "";
+                            });
                         }
                         onEntered: {
-                            tooltipLoader.active = true
-                            if (tooltipLoader.item) {
-                                const p = mapToItem(null, width / 2, 0)
-                                tooltipLoader.item.show(I18n.tr("Uninstall Plugin"), p.x, p.y - 40, null)
-                            }
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.show(I18n.tr("Uninstall Plugin"), parent, 0, 0, "top");
                         }
                         onExited: {
-                            if (tooltipLoader.item) {
-                                tooltipLoader.item.hide()
-                            }
-                            tooltipLoader.active = false
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.hide();
                         }
                     }
                 }
@@ -211,7 +203,7 @@ StyledRect {
                     height: 28
                     radius: 14
                     color: reloadArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
-                    visible: PluginService.isPluginLoaded(root.pluginId)
+                    visible: root.isLoaded
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -226,28 +218,23 @@ StyledRect {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            const currentPluginId = root.pluginId
-                            const currentPluginName = root.pluginName
-                            root.isReloading = true
+                            const currentPluginId = root.pluginId;
+                            const currentPluginName = root.pluginName;
+                            root.isReloading = true;
                             if (PluginService.reloadPlugin(currentPluginId)) {
-                                ToastService.showInfo("Plugin reloaded: " + currentPluginName)
-                            } else {
-                                ToastService.showError("Failed to reload plugin: " + currentPluginName)
-                                root.isReloading = false
+                                ToastService.showInfo("Plugin reloaded: " + currentPluginName);
+                                return;
                             }
+                            ToastService.showError("Failed to reload plugin: " + currentPluginName);
+                            root.isReloading = false;
                         }
                         onEntered: {
-                            tooltipLoader.active = true
-                            if (tooltipLoader.item) {
-                                const p = mapToItem(null, width / 2, 0)
-                                tooltipLoader.item.show(I18n.tr("Reload Plugin"), p.x, p.y - 40, null)
-                            }
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.show(I18n.tr("Reload Plugin"), parent, 0, 0, "top");
                         }
                         onExited: {
-                            if (tooltipLoader.item) {
-                                tooltipLoader.item.hide()
-                            }
-                            tooltipLoader.active = false
+                            if (root.sharedTooltip)
+                                root.sharedTooltip.hide();
                         }
                     }
                 }
@@ -255,29 +242,26 @@ StyledRect {
                 DankToggle {
                     id: pluginToggle
                     anchors.verticalCenter: parent.verticalCenter
-                    checked: PluginService.isPluginLoaded(root.pluginId)
+                    checked: root.isLoaded
                     onToggled: isChecked => {
-                        const currentPluginId = root.pluginId
-                        const currentPluginName = root.pluginName
+                        const currentPluginId = root.pluginId;
+                        const currentPluginName = root.pluginName;
 
                         if (isChecked) {
                             if (PluginService.enablePlugin(currentPluginId)) {
-                                ToastService.showInfo("Plugin enabled: " + currentPluginName)
-                            } else {
-                                ToastService.showError("Failed to enable plugin: " + currentPluginName)
-                                checked = false
+                                ToastService.showInfo("Plugin enabled: " + currentPluginName);
+                                return;
                             }
-                        } else {
-                            if (PluginService.disablePlugin(currentPluginId)) {
-                                ToastService.showInfo("Plugin disabled: " + currentPluginName)
-                                if (root.isExpanded) {
-                                    root.expandedPluginId = ""
-                                }
-                            } else {
-                                ToastService.showError("Failed to disable plugin: " + currentPluginName)
-                                checked = true
-                            }
+                            ToastService.showError("Failed to enable plugin: " + currentPluginName);
+                            return;
                         }
+                        if (PluginService.disablePlugin(currentPluginId)) {
+                            ToastService.showInfo("Plugin disabled: " + currentPluginName);
+                            if (root.isExpanded)
+                                root.expandedPluginId = "";
+                            return;
+                        }
+                        ToastService.showError("Failed to disable plugin: " + currentPluginName);
                     }
                 }
             }
@@ -330,7 +314,7 @@ StyledRect {
         focus: root.isExpanded && root.hasSettings
 
         Keys.onPressed: event => {
-            event.accepted = true
+            event.accepted = true;
         }
 
         Rectangle {
@@ -345,52 +329,42 @@ StyledRect {
             id: settingsLoader
             anchors.fill: parent
             anchors.margins: Theme.spacingL
-            active: root.isExpanded && root.hasSettings && PluginService.isPluginLoaded(root.pluginId)
+            active: root.isExpanded && root.hasSettings && root.isLoaded
             asynchronous: false
 
             source: {
                 if (active && root.pluginSettingsPath) {
-                    var path = root.pluginSettingsPath
+                    var path = root.pluginSettingsPath;
                     if (!path.startsWith("file://")) {
-                        path = "file://" + path
+                        path = "file://" + path;
                     }
-                    return path
+                    return path;
                 }
-                return ""
+                return "";
             }
 
             onLoaded: {
                 if (item && typeof PluginService !== "undefined") {
-                    item.pluginService = PluginService
+                    item.pluginService = PluginService;
                 }
                 if (item && typeof PopoutService !== "undefined" && "popoutService" in item) {
-                    item.popoutService = PopoutService
+                    item.popoutService = PopoutService;
                 }
                 if (item) {
                     Qt.callLater(() => {
-                        settingsContainer.focus = true
-                        item.forceActiveFocus()
-                    })
+                        settingsContainer.focus = true;
+                        item.forceActiveFocus();
+                    });
                 }
             }
         }
 
         StyledText {
             anchors.centerIn: parent
-            text: !PluginService.isPluginLoaded(root.pluginId) ?
-                  "Enable plugin to access settings" :
-                  (settingsLoader.status === Loader.Error ?
-                   "Failed to load settings" :
-                   "No configurable settings")
+            text: !root.isLoaded ? "Enable plugin to access settings" : (settingsLoader.status === Loader.Error ? "Failed to load settings" : "No configurable settings")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceVariantText
             visible: root.isExpanded && (!settingsLoader.active || settingsLoader.status === Loader.Error)
         }
-    }
-
-    Loader {
-        id: tooltipLoader
-        active: false
-        sourceComponent: DankTooltip {}
     }
 }

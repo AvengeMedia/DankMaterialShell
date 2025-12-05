@@ -105,9 +105,19 @@ Rectangle {
         onClicked: mouse => {
             if (mouse.button === Qt.LeftButton) {
                 root.itemClicked(root.index, root.model)
-            } else if (mouse.button === Qt.RightButton && !root.isPlugin) {
+            }
+        }
+        onPressAndHold: mouse => {
+            if (!root.isPlugin) {
                 const globalPos = mapToItem(null, mouse.x, mouse.y)
                 root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y)
+            }
+        }
+        onPressed: mouse => {
+            if (mouse.button === Qt.RightButton && !root.isPlugin) {
+                const globalPos = mapToItem(null, mouse.x, mouse.y)
+                root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y)
+                mouse.accepted = true
             }
         }
     }

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -69,7 +68,7 @@ DankFlickable {
                         }
 
                         StyledText {
-                            text: `${UserInfoService.uptime} • Boot: ${DgopService.bootTime}`
+                            text: `${DgopService.uptime} • Boot: ${DgopService.bootTime}`
                             font.pixelSize: Theme.fontSizeSmall
                             font.family: SettingsData.monoFontFamily
                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
@@ -83,9 +82,7 @@ DankFlickable {
                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
                             verticalAlignment: Text.AlignVCenter
                         }
-
                     }
-
                 }
 
                 Rectangle {
@@ -134,7 +131,6 @@ DankFlickable {
                                     color: Theme.primary
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
-
                             }
 
                             StyledText {
@@ -181,9 +177,7 @@ DankFlickable {
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                             }
-
                         }
-
                     }
 
                     Rectangle {
@@ -275,7 +269,6 @@ DankFlickable {
                                     color: Theme.secondary
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
-
                             }
 
                             StyledText {
@@ -365,22 +358,16 @@ DankFlickable {
                                 elide: Text.ElideRight
                                 verticalAlignment: Text.AlignVCenter
                             }
-
                         }
 
                         Behavior on color {
                             ColorAnimation {
                                 duration: Theme.shortDuration
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
 
         Rectangle {
@@ -418,7 +405,6 @@ DankFlickable {
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                     }
-
                 }
 
                 Column {
@@ -495,7 +481,6 @@ DankFlickable {
                             elide: Text.ElideRight
                             verticalAlignment: Text.AlignVCenter
                         }
-
                     }
 
                     Repeater {
@@ -596,19 +581,11 @@ DankFlickable {
                                     anchors.verticalCenter: parent.verticalCenter
                                     verticalAlignment: Text.AlignVCenter
                                 }
-
                             }
-
                         }
-
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

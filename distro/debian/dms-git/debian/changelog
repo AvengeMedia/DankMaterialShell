@@ -1,0 +1,12 @@
+dms-git (0.6.2+git2264.c5c5ce84) nightly; urgency=medium
+
+  * Add VERSION file creation to all distro packages
+  * Fix Fedora COPR to pass VERSION/COMMIT to make dist
+  * Fix obs-upload.sh auto-increment to preserve git hash and add ppa suffix
+  * Fix debian/rules to use source at root level (native format)
+  * Remove incorrect dms-git-source subdirectory references
+  * Build dms binary from source for true git version strings
+  * Match Fedora COPR git build behavior
+  * Add golang-go and make as build dependencies
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Tue, 03 Dec 2025 01:50:00 +0000

@@ -1,0 +1,3 @@
+# Include files that are normally excluded by .gitignore
+# These are needed for the build process on Launchpad (which has no internet access)
+tar-ignore = !dms-greeter-source.tar.gz

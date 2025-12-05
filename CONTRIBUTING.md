@@ -2,28 +2,50 @@
 
 Contributions are welcome and encouraged.
 
-## Formatting
+To contribute fork this repository, make your changes, and open a pull request.
 
-The preferred tool for formatting files is [qmlfmt](https://github.com/jesperhh/qmlfmt) (also available on aur as qmlfmt-git). It actually kinda sucks, but `qmlformat` doesn't work with null safe operators and ternarys and pragma statements and a bunch of other things that are supported.
+## Setup
 
-We need some consistent style, so this at least gives the same formatter that Qt Creator uses.
+Enable pre-commit hooks to catch CI failures before pushing:
 
-You can configure it to format on save in vscode by configuring the "custom local formatters" extension then adding this to settings json.
-
-```json
-  "customLocalFormatters.formatters": [
-    {
-      "command": "sh -c \"qmlfmt -t 4 -i 4 -b 250 | sed 's/pragma ComponentBehavior$/pragma ComponentBehavior: Bound/g'\"",
-      "languages": ["qml"]
-    }
-  ],
-  "[qml]": {
-    "editor.defaultFormatter": "jkillian.custom-local-formatters",
-    "editor.formatOnSave": true
-  },
+```bash
+git config core.hooksPath .githooks
 ```
 
-Sometimes it just breaks code though. Like turning `"_\""` into `"_""`, so you may not want to do formatOnSave.
+## VSCode Setup
+
+This is a monorepo, the easiest thing to do is to open an editor in either `quickshell`, `core`, or both depending on which part of the project you are working on.
+
+### QML (`quickshell` directory)
+
+1. Install the [QML Extension](https://doc.qt.io/vscodeext/)
+2. Configure `ctrl+shift+p` -> user preferences (json) with qmlls path
+
+```json
+{
+  "qt-qml.doNotAskForQmllsDownload": true,
+  "qt-qml.qmlls.customExePath": "/usr/lib/qt6/bin/qmlls"
+}
+```
+
+3. Create empty `.qmlls.ini` file in `quickshell/` directory
+
+```bash
+cd quickshell
+touch .qmlls.ini
+```
+
+4. Restart dms to generate the `.qmlls.ini` file
+
+5. Make your changes, test, and open a pull request.
+
+### GO (`core` directory)
+
+1. Install the [Go Extension](https://code.visualstudio.com/docs/languages/go)
+2. Ensure code is formatted with `make fmt`
+3. Add appropriate test coverage and ensure tests pass with `make test`
+4. Run `go mod tidy`
+5. Open pull request
 
 ## Pull request
 

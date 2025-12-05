@@ -78,7 +78,7 @@ func NewManager(display *wlclient.Display, config Config) (*Manager, error) {
 			log.Info("Gamma control enabled at startup, initializing controls")
 			gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
 			if err := func() error {
-				var outputs []*wlclient.Output = m.availableOutputs
+				outputs := m.availableOutputs
 				return m.setupOutputControls(outputs, gammaMgr)
 			}(); err != nil {
 				log.Errorf("Failed to initialize gamma controls: %v", err)
@@ -573,6 +573,7 @@ func (m *Manager) transitionWorker() {
 
 			log.Debugf("Starting smooth transition: %dK -> %dK over %v", currentTemp, targetTemp, dur)
 
+		stepLoop:
 			for i := 0; i <= steps; i++ {
 				select {
 				case newTarget := <-m.transitionChan:
@@ -580,7 +581,7 @@ func (m *Manager) transitionWorker() {
 					m.targetTemp = newTarget
 					m.transitionMutex.Unlock()
 					log.Debugf("Transition %dK -> %dK aborted (newer transition started)", currentTemp, targetTemp)
-					break
+					break stepLoop
 				default:
 				}
 
@@ -607,41 +608,6 @@ func (m *Manager) transitionWorker() {
 
 			if finalTarget == targetTemp {
 				log.Debugf("Transition complete: now at %dK", targetTemp)
-
-				m.configMutex.RLock()
-				enabled := m.config.Enabled
-				identityTemp := m.config.HighTemp
-				m.configMutex.RUnlock()
-
-				if !enabled && targetTemp == identityTemp && m.controlsInitialized {
-					m.post(func() {
-						log.Info("Destroying gamma controls after transition to identity")
-						m.outputs.Range(func(id uint32, out *outputState) bool {
-							if out.gammaControl != nil {
-								control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
-								control.Destroy()
-								log.Debugf("Destroyed gamma control for output %d", id)
-							}
-							return true
-						})
-						m.outputs.Range(func(key uint32, value *outputState) bool {
-							m.outputs.Delete(key)
-							return true
-						})
-						m.controlsInitialized = false
-
-						m.transitionMutex.Lock()
-						m.currentTemp = identityTemp
-						m.targetTemp = identityTemp
-						m.transitionMutex.Unlock()
-
-						if _, err := m.display.Sync(); err != nil {
-							log.Warnf("Failed to sync Wayland display after destroying controls: %v", err)
-						}
-
-						log.Info("All gamma controls destroyed")
-					})
-				}
 			}
 		}
 	}
@@ -1249,7 +1215,7 @@ func (m *Manager) SetEnabled(enabled bool) {
 				log.Info("Creating gamma controls")
 				gammaMgr := m.gammaControl.(*wlr_gamma_control.ZwlrGammaControlManagerV1)
 				if err := func() error {
-					var outputs []*wlclient.Output = m.availableOutputs
+					outputs := m.availableOutputs
 					return m.setupOutputControls(outputs, gammaMgr)
 				}(); err != nil {
 					log.Errorf("Failed to create gamma controls: %v", err)
@@ -1262,46 +1228,33 @@ func (m *Manager) SetEnabled(enabled bool) {
 		}
 	} else {
 		if m.controlsInitialized {
-			m.configMutex.RLock()
-			identityTemp := m.config.HighTemp
-			m.configMutex.RUnlock()
-
-			m.transitionMutex.RLock()
-			currentTemp := m.currentTemp
-			m.transitionMutex.RUnlock()
-
-			if currentTemp == identityTemp {
-				m.post(func() {
-					log.Infof("Already at %dK, destroying gamma controls immediately", identityTemp)
-					m.outputs.Range(func(id uint32, out *outputState) bool {
-						if out.gammaControl != nil {
-							control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
-							control.Destroy()
-							log.Debugf("Destroyed gamma control for output %d", id)
-						}
-						return true
-					})
-					m.outputs.Range(func(key uint32, value *outputState) bool {
-						m.outputs.Delete(key)
-						return true
-					})
-					m.controlsInitialized = false
-
-					m.transitionMutex.Lock()
-					m.currentTemp = identityTemp
-					m.targetTemp = identityTemp
-					m.transitionMutex.Unlock()
-
-					if _, err := m.display.Sync(); err != nil {
-						log.Warnf("Failed to sync Wayland display after destroying controls: %v", err)
+			m.post(func() {
+				log.Info("Disabling gamma, destroying controls immediately")
+				m.outputs.Range(func(id uint32, out *outputState) bool {
+					if out.gammaControl != nil {
+						control := out.gammaControl.(*wlr_gamma_control.ZwlrGammaControlV1)
+						control.Destroy()
+						log.Debugf("Destroyed gamma control for output %d", id)
 					}
-
-					log.Info("All gamma controls destroyed")
+					return true
 				})
-			} else {
-				log.Infof("Disabling: transitioning to %dK before destroying controls", identityTemp)
-				m.startTransition(identityTemp)
-			}
+				m.outputs.Range(func(key uint32, value *outputState) bool {
+					m.outputs.Delete(key)
+					return true
+				})
+				m.controlsInitialized = false
+
+				m.configMutex.RLock()
+				identityTemp := m.config.HighTemp
+				m.configMutex.RUnlock()
+
+				m.transitionMutex.Lock()
+				m.currentTemp = identityTemp
+				m.targetTemp = identityTemp
+				m.transitionMutex.Unlock()
+
+				log.Info("All gamma controls destroyed")
+			})
 		}
 	}
 }

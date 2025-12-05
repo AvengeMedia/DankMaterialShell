@@ -37,6 +37,9 @@ func init() {
 	Register("garuda", "#cba6f7", FamilyArch, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewArchDistribution(config, logChan)
 	})
+	Register("artix", "#1793D1", FamilyArch, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewArchDistribution(config, logChan)
+	})
 }
 
 type ArchDistribution struct {

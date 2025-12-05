@@ -77,7 +77,7 @@ func (d *DiscoveryConfig) FindJSONFiles() ([]string, error) {
 func expandPath(path string) (string, error) {
 	expandedPath := os.ExpandEnv(path)
 
-	if filepath.HasPrefix(expandedPath, "~") {
+	if strings.HasPrefix(expandedPath, "~") {
 		home, err := os.UserHomeDir()
 		if err != nil {
 			return "", err

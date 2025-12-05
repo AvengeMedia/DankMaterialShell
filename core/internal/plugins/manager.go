@@ -93,7 +93,7 @@ func (m *Manager) Install(plugin Plugin) error {
 
 		if !repoExists {
 			if err := m.gitClient.PlainClone(repoPath, plugin.Repo); err != nil {
-				m.fs.RemoveAll(repoPath)
+				m.fs.RemoveAll(repoPath) //nolint:errcheck
 				return fmt.Errorf("failed to clone repository: %w", err)
 			}
 		} else {
@@ -130,7 +130,7 @@ func (m *Manager) Install(plugin Plugin) error {
 		}
 	} else {
 		if err := m.gitClient.PlainClone(pluginPath, plugin.Repo); err != nil {
-			m.fs.RemoveAll(pluginPath)
+			m.fs.RemoveAll(pluginPath) //nolint:errcheck
 			return fmt.Errorf("failed to clone plugin: %w", err)
 		}
 	}

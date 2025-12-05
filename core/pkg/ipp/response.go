@@ -114,7 +114,7 @@ func (r *Response) Encode() ([]byte, error) {
 					continue
 				}
 
-				values := make([]interface{}, len(attr))
+				values := make([]any, len(attr))
 				for i, v := range attr {
 					values[i] = v.Value
 				}
@@ -143,7 +143,7 @@ func (r *Response) Encode() ([]byte, error) {
 					continue
 				}
 
-				values := make([]interface{}, len(attr))
+				values := make([]any, len(attr))
 				for i, v := range attr {
 					values[i] = v.Value
 				}
@@ -199,7 +199,7 @@ func encodeOperationAttribute(enc *AttributeEncoder, name string, attr []Attribu
 		return nil
 	}
 
-	values := make([]interface{}, len(attr))
+	values := make([]any, len(attr))
 	for i, v := range attr {
 		values[i] = v.Value
 	}

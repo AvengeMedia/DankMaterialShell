@@ -1,0 +1,5 @@
+recent-windows {
+    highlight {
+        corner-radius 12
+    }
+}

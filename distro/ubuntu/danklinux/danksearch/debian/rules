@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+# Detect architecture for selecting correct binary
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+# Map Debian arch to binary filename
+ifeq ($(DEB_HOST_ARCH),amd64)
+    BINARY_FILE := dsearch-amd64
+else ifeq ($(DEB_HOST_ARCH),arm64)
+    BINARY_FILE := dsearch-arm64
+else
+    $(error Unsupported architecture: $(DEB_HOST_ARCH))
+endif
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Binary is already included in source package (native format)
+	# Downloaded by build-source.sh before upload
+	# Just verify it exists and is executable
+	test -f $(BINARY_FILE) || (echo "ERROR: $(BINARY_FILE) not found!" && exit 1)
+	chmod +x $(BINARY_FILE)
+
+override_dh_auto_install:
+	# Install binary as danksearch
+	install -Dm755 $(BINARY_FILE) debian/danksearch/usr/bin/danksearch
+
+override_dh_auto_clean:
+	# Don't delete binaries - they're part of the source package (native format)
+	dh_auto_clean

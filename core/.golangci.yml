@@ -1,0 +1,105 @@
+version: "2"
+
+linters:
+  enable:
+    - revive
+
+  settings:
+    revive:
+      rules:
+        - name: use-any
+          severity: error
+    errcheck:
+      check-type-assertions: false
+      check-blank: false
+      exclude-functions:
+        # Cleanup/destroy operations
+        - (io.Closer).Close
+        - (*os.File).Close
+        - (net.Conn).Close
+        - (*net.Conn).Close
+        # Signal handling
+        - (*os.Process).Signal
+        - (*os.Process).Kill
+        # DBus cleanup
+        - (*github.com/godbus/dbus/v5.Conn).RemoveMatchSignal
+        - (*github.com/godbus/dbus/v5.Conn).RemoveSignal
+        # Encoding to network connections (if conn is bad, nothing we can do)
+        - (*encoding/json.Encoder).Encode
+        - (net.Conn).Write
+        # Command execution where failure is expected/ignored
+        - (*os/exec.Cmd).Run
+        - (*os/exec.Cmd).Start
+        # Flush operations
+        - (*bufio.Writer).Flush
+        # Scanning user input
+        - fmt.Scanln
+        - fmt.Scanf
+        # Parse operations where default value is acceptable
+        - fmt.Sscanf
+        # Flag operations
+        - (*github.com/spf13/pflag.FlagSet).MarkHidden
+        # Binary encoding to buffer (can't fail for basic types)
+        - binary.Write
+        # File operations in cleanup paths
+        - os.Rename
+        - os.Remove
+        - os.RemoveAll
+        - (*os.File).WriteString
+        # Stdout/stderr writes (can't meaningfully handle failure)
+        - fmt.Fprintln
+        - fmt.Fprintf
+        - fmt.Fprint
+        # Writing to pipes (if pipe is bad, nothing we can do)
+        - (*io.PipeWriter).Write
+        - (*os.File).Write
+
+  exclusions:
+    rules:
+      # Exclude generated mocks from all linters
+      - path: internal/mocks/
+        linters:
+          - errcheck
+          - govet
+          - unused
+          - ineffassign
+          - staticcheck
+          - gosimple
+          - revive
+      - path: _test\.go
+        linters:
+          - errcheck
+          - govet
+          - unused
+          - ineffassign
+          - staticcheck
+          - gosimple
+      # Exclude cleanup/teardown method calls from errcheck
+      - linters:
+          - errcheck
+        text: "Error return value of `.+\\.(Destroy|Release|Stop|Close|Roundtrip|Store)` is not checked"
+      # Exclude internal state update methods that are best-effort
+      - linters:
+          - errcheck
+        text: "Error return value of `[mb]\\.\\w*(update|initialize|recreate|acquire|enumerate|list|List|Ensure|refresh|Lock)\\w*` is not checked"
+      # Exclude SetMode on wayland power controls (best-effort)
+      - linters:
+          - errcheck
+        text: "Error return value of `.+\\.SetMode` is not checked"
+      # Exclude AddMatchSignal which is best-effort monitoring setup
+      - linters:
+          - errcheck
+        text: "Error return value of `.+\\.AddMatchSignal` is not checked"
+      # Exclude wayland pkg from errcheck and ineffassign (generated code patterns)
+      - linters:
+          - errcheck
+          - ineffassign
+        path: pkg/go-wayland/
+      # Exclude proto pkg from ineffassign (generated protocol code)
+      - linters:
+          - ineffassign
+        path: internal/proto/
+      # binary.Write to bytes.Buffer can't fail
+      - linters:
+          - errcheck
+        text: "Error return value of `binary\\.Write` is not checked"

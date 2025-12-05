@@ -50,13 +50,22 @@ PanelWindow {
 
     margins {
         left: {
-            if (alignLeft) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX)))
-            if (alignRight) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX - implicitWidth)))
-            return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.width ?? Screen.width) - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)))
+            const screenWidth = targetScreen?.width ?? Screen.width
+            if (alignLeft) {
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX)))
+            } else if (alignRight) {
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth)))
+            } else {
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenWidth - implicitWidth - Theme.spacingS, targetX - implicitWidth / 2)))
+            }
         }
         top: {
-            if (alignLeft || alignRight) return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.height ?? Screen.height) - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)))
-            return Math.round(Math.max(Theme.spacingS, Math.min((targetScreen?.height ?? Screen.height) - implicitHeight - Theme.spacingS, targetY)))
+            const screenHeight = targetScreen?.height ?? Screen.height
+            if (alignLeft || alignRight) {
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY - implicitHeight / 2)))
+            } else {
+                return Math.round(Math.max(Theme.spacingS, Math.min(screenHeight - implicitHeight - Theme.spacingS, targetY)))
+            }
         }
     }
 

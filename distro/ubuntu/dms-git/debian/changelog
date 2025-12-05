@@ -1,0 +1,8 @@
+dms-git (0.6.2+git2264.c5c5ce84) questing; urgency=medium
+
+  * Add VERSION file creation to all distro packages
+  * Fix Fedora COPR to pass VERSION/COMMIT to make dist
+  * Fix obs-upload.sh auto-increment to preserve git hash and add ppa suffix
+  * Git snapshot (commit 2264: c5c5ce84)
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Tue, 03 Dec 2025 01:50:00 +0000

@@ -1,5 +1,4 @@
 import QtQuick
-import Quickshell.Services.UPower
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -11,7 +10,22 @@ BasePill {
     property bool batteryPopupVisible: false
     property var popoutTarget: null
 
-    signal toggleBatteryPopup()
+    readonly property int barPosition: {
+        switch (axis?.edge) {
+        case "top":
+            return 0;
+        case "bottom":
+            return 1;
+        case "left":
+            return 2;
+        case "right":
+            return 3;
+        default:
+            return 0;
+        }
+    }
+
+    signal toggleBatteryPopup
 
     visible: true
 
@@ -31,25 +45,25 @@ BasePill {
                     size: Theme.barIconSize(battery.barThickness)
                     color: {
                         if (!BatteryService.batteryAvailable) {
-                            return Theme.widgetIconColor
+                            return Theme.widgetIconColor;
                         }
 
                         if (BatteryService.isLowBattery && !BatteryService.isCharging) {
-                            return Theme.error
+                            return Theme.error;
                         }
 
                         if (BatteryService.isCharging || BatteryService.isPluggedIn) {
-                            return Theme.primary
+                            return Theme.primary;
                         }
 
-                        return Theme.widgetIconColor
+                        return Theme.widgetIconColor;
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 StyledText {
                     text: BatteryService.batteryLevel.toString()
-                    font.pixelSize: Theme.barTextSize(battery.barThickness)
+                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: BatteryService.batteryAvailable
@@ -60,7 +74,7 @@ BasePill {
                 id: batteryContent
                 visible: !battery.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: SettingsData.dankBarNoBackground ? 1 : 2
+                spacing: (barConfig?.noBackground ?? false) ? 1 : 2
 
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
@@ -85,7 +99,7 @@ BasePill {
 
                 StyledText {
                     text: `${BatteryService.batteryLevel}%`
-                    font.pixelSize: Theme.barTextSize(battery.barThickness)
+                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: BatteryService.batteryAvailable
@@ -102,13 +116,7 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = battery.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, battery.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            toggleBatteryPopup()
+            toggleBatteryPopup();
         }
     }
 }

@@ -54,6 +54,7 @@ func (m *Manager) initSysfs() {
 		m.sysfsBackend = sysfs
 		m.sysfsReady = true
 		m.updateState()
+		m.initUdev()
 		return
 	}
 
@@ -65,6 +66,11 @@ func (m *Manager) initSysfs() {
 	m.sysfsBackend = sysfs
 	m.sysfsReady = true
 	m.updateState()
+	m.initUdev()
+}
+
+func (m *Manager) initUdev() {
+	m.udevMonitor = NewUdevMonitor(m)
 }
 
 func (m *Manager) initDDC() {

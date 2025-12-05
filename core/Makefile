@@ -10,16 +10,19 @@ GO=go
 GOFLAGS=-ldflags="-s -w"
 
 # Version and build info
-VERSION=$(shell git describe --tags --always 2>/dev/null || echo "dev")
-BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
-COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BASE_VERSION=$(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+COMMIT_COUNT=$(shell git rev-list --count HEAD 2>/dev/null || echo "0")
+COMMIT_HASH=$(shell git rev-parse --short=8 HEAD 2>/dev/null || echo "unknown")
+VERSION?=$(BASE_VERSION)+git$(COMMIT_COUNT).$(COMMIT_HASH)
+BUILD_TIME?=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
+COMMIT?=$(COMMIT_HASH)
 
 BUILD_LDFLAGS=-ldflags='-s -w -X main.Version=$(VERSION) -X main.buildTime=$(BUILD_TIME) -X main.commit=$(COMMIT)'
 
 # Architecture to build for dist target (amd64, arm64, or all)
 ARCH ?= all
 
-.PHONY: all build dankinstall dist clean install install-all install-dankinstall uninstall uninstall-all uninstall-dankinstall install-config uninstall-config test fmt vet deps help
+.PHONY: all build dankinstall dist clean install install-all install-dankinstall uninstall uninstall-all uninstall-dankinstall install-config uninstall-config test fmt vet deps print-version help
 
 # Default target
 all: build
@@ -131,6 +134,9 @@ version: check-go
 	@echo "Version: $(VERSION)"
 	@echo "Build Time: $(BUILD_TIME)"
 	@echo "Commit: $(COMMIT)"
+
+print-version:
+	@echo "$(VERSION)"
 
 help:
 	@echo "Available targets:"

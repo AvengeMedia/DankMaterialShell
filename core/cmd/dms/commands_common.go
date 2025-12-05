@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"regexp"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -66,6 +68,10 @@ var ipcCmd = &cobra.Command{
 	Short:   "Send IPC commands to running DMS shell",
 	Long:    "Send IPC commands to running DMS shell (qs -c dms ipc <args>)",
 	PreRunE: findConfig,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		_ = findConfig(cmd, args)
+		return getShellIPCCompletions(args, toComplete), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		runShellIPCCommand(args)
 	},
@@ -115,6 +121,12 @@ var pluginsInstallCmd = &cobra.Command{
 	Short: "Install a plugin by ID",
 	Long:  "Install a DMS plugin from the registry using its ID (e.g., 'myPlugin'). Plugin names with spaces are also supported for backward compatibility.",
 	Args:  cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getAvailablePluginIDs(), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := installPluginCLI(args[0]); err != nil {
 			log.Fatalf("Error installing plugin: %v", err)
@@ -127,6 +139,12 @@ var pluginsUninstallCmd = &cobra.Command{
 	Short: "Uninstall a plugin by ID",
 	Long:  "Uninstall a DMS plugin using its ID (e.g., 'myPlugin'). Plugin names with spaces are also supported for backward compatibility.",
 	Args:  cobra.ExactArgs(1),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getInstalledPluginIDs(), cobra.ShellCompDirectiveNoFileComp
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := uninstallPluginCLI(args[0]); err != nil {
 			log.Fatalf("Error uninstalling plugin: %v", err)
@@ -136,10 +154,59 @@ var pluginsUninstallCmd = &cobra.Command{
 
 func runVersion(cmd *cobra.Command, args []string) {
 	printASCII()
-	fmt.Printf("%s\n", Version)
+	fmt.Printf("%s\n", formatVersion(Version))
+}
+
+// Git builds: dms (git) v0.6.2-XXXX
+// Stable releases: dms v0.6.2
+func formatVersion(version string) string {
+	// Arch/Debian/Ubuntu/OpenSUSE git format: 0.6.2+git2264.c5c5ce84
+	re := regexp.MustCompile(`^([\d.]+)\+git(\d+)\.`)
+	if matches := re.FindStringSubmatch(version); matches != nil {
+		return fmt.Sprintf("dms (git) v%s-%s", matches[1], matches[2])
+	}
+
+	// Fedora COPR git format: 0.0.git.2267.d430cae9
+	re = regexp.MustCompile(`^[\d.]+\.git\.(\d+)\.`)
+	if matches := re.FindStringSubmatch(version); matches != nil {
+		baseVersion := getBaseVersion()
+		return fmt.Sprintf("dms (git) v%s-%s", baseVersion, matches[1])
+	}
+
+	// Stable release format: 0.6.2
+	re = regexp.MustCompile(`^([\d.]+)$`)
+	if matches := re.FindStringSubmatch(version); matches != nil {
+		return fmt.Sprintf("dms v%s", matches[1])
+	}
+
+	return fmt.Sprintf("dms %s", version)
+}
+
+func getBaseVersion() string {
+	paths := []string{
+		"/usr/share/quickshell/dms/VERSION",
+		"/usr/local/share/quickshell/dms/VERSION",
+		"/etc/xdg/quickshell/dms/VERSION",
+	}
+
+	for _, path := range paths {
+		if content, err := os.ReadFile(path); err == nil {
+			ver := strings.TrimSpace(string(content))
+			ver = strings.TrimPrefix(ver, "v")
+			if re := regexp.MustCompile(`^([\d.]+)`); re.MatchString(ver) {
+				if matches := re.FindStringSubmatch(ver); matches != nil {
+					return matches[1]
+				}
+			}
+		}
+	}
+
+	// Fallback
+	return "0.6.2"
 }
 
 func startDebugServer() error {
+	server.CLIVersion = Version
 	return server.Start(true)
 }
 
@@ -298,6 +365,38 @@ func installPluginCLI(idOrName string) error {
 	return nil
 }
 
+func getAvailablePluginIDs() []string {
+	registry, err := plugins.NewRegistry()
+	if err != nil {
+		return nil
+	}
+
+	pluginList, err := registry.List()
+	if err != nil {
+		return nil
+	}
+
+	var ids []string
+	for _, p := range pluginList {
+		ids = append(ids, p.ID)
+	}
+	return ids
+}
+
+func getInstalledPluginIDs() []string {
+	manager, err := plugins.NewManager()
+	if err != nil {
+		return nil
+	}
+
+	installed, err := manager.ListInstalled()
+	if err != nil {
+		return nil
+	}
+
+	return installed
+}
+
 func uninstallPluginCLI(idOrName string) error {
 	manager, err := plugins.NewManager()
 	if err != nil {
@@ -372,5 +471,6 @@ func getCommonCommands() []*cobra.Command {
 		keybindsCmd,
 		greeterCmd,
 		setupCmd,
+		colorCmd,
 	}
 }

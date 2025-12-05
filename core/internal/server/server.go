@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/apppicker"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/bluez"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/cups"
@@ -31,7 +32,9 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
 
-const APIVersion = 19
+const APIVersion = 22
+
+var CLIVersion = "dev"
 
 type Capabilities struct {
 	Capabilities []string `json:"capabilities"`
@@ -39,12 +42,13 @@ type Capabilities struct {
 
 type ServerInfo struct {
 	APIVersion   int      `json:"apiVersion"`
+	CLIVersion   string   `json:"cliVersion,omitempty"`
 	Capabilities []string `json:"capabilities"`
 }
 
 type ServiceEvent struct {
-	Service string      `json:"service"`
-	Data    interface{} `json:"data"`
+	Service string `json:"service"`
+	Data    any    `json:"data"`
 }
 
 var networkManager *network.Manager
@@ -52,6 +56,7 @@ var loginctlManager *loginctl.Manager
 var freedesktopManager *freedesktop.Manager
 var waylandManager *wayland.Manager
 var bluezManager *bluez.Manager
+var appPickerManager *apppicker.Manager
 var cupsManager *cups.Manager
 var dwlManager *dwl.Manager
 var extWorkspaceManager *extworkspace.Manager
@@ -83,6 +88,21 @@ func getSocketDir() string {
 
 func GetSocketPath() string {
 	return filepath.Join(getSocketDir(), fmt.Sprintf("danklinux-%d.sock", os.Getpid()))
+}
+
+func FindSocket() (string, error) {
+	dir := getSocketDir()
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), "danklinux-") && strings.HasSuffix(entry.Name(), ".sock") {
+			return filepath.Join(dir, entry.Name()), nil
+		}
+	}
+	return "", fmt.Errorf("no dms socket found")
 }
 
 func cleanupStaleSockets() {
@@ -195,6 +215,13 @@ func InitializeBluezManager() error {
 	bluezManager = manager
 
 	log.Info("Bluez manager initialized")
+	return nil
+}
+
+func InitializeAppPickerManager() error {
+	manager := apppicker.NewManager()
+	appPickerManager = manager
+	log.Info("AppPicker manager initialized")
 	return nil
 }
 
@@ -316,7 +343,6 @@ func handleConnection(conn net.Conn) {
 	capsData, _ := json.Marshal(caps)
 	conn.Write(capsData)
 	conn.Write([]byte("\n"))
-
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -353,6 +379,10 @@ func getCapabilities() Capabilities {
 
 	if bluezManager != nil {
 		caps = append(caps, "bluetooth")
+	}
+
+	if appPickerManager != nil {
+		caps = append(caps, "browser")
 	}
 
 	if cupsManager != nil {
@@ -405,6 +435,10 @@ func getServerInfo() ServerInfo {
 		caps = append(caps, "bluetooth")
 	}
 
+	if appPickerManager != nil {
+		caps = append(caps, "browser")
+	}
+
 	if cupsManager != nil {
 		caps = append(caps, "cups")
 	}
@@ -431,6 +465,7 @@ func getServerInfo() ServerInfo {
 
 	return ServerInfo{
 		APIVersion:   APIVersion,
+		CLIVersion:   CLIVersion,
 		Capabilities: caps,
 	}
 }
@@ -450,7 +485,7 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 	clientID := fmt.Sprintf("meta-client-%p", conn)
 
 	var services []string
-	if servicesParam, ok := req.Params["services"].([]interface{}); ok {
+	if servicesParam, ok := req.Params["services"].([]any); ok {
 		for _, s := range servicesParam {
 			if str, ok := s.(string); ok {
 				services = append(services, str)
@@ -711,6 +746,31 @@ func handleSubscribe(conn net.Conn, req models.Request) {
 					}
 					select {
 					case eventChan <- ServiceEvent{Service: "bluetooth.pairing", Data: prompt}:
+					case <-stopChan:
+						return
+					}
+				case <-stopChan:
+					return
+				}
+			}
+		}()
+	}
+
+	if shouldSubscribe("browser") && appPickerManager != nil {
+		wg.Add(1)
+		appPickerChan := appPickerManager.Subscribe(clientID + "-browser")
+		go func() {
+			defer wg.Done()
+			defer appPickerManager.Unsubscribe(clientID + "-browser")
+
+			for {
+				select {
+				case event, ok := <-appPickerChan:
+					if !ok {
+						return
+					}
+					select {
+					case eventChan <- ServiceEvent{Service: "browser.open_requested", Data: event}:
 					case <-stopChan:
 						return
 					}
@@ -1015,6 +1075,9 @@ func cleanupManagers() {
 	if bluezManager != nil {
 		bluezManager.Close()
 	}
+	if appPickerManager != nil {
+		appPickerManager.Close()
+	}
 	if cupsManager != nil {
 		cupsManager.Close()
 	}
@@ -1071,10 +1134,10 @@ func Start(printDocs bool) error {
 		log.Info(" plugins.search              - Search plugins (params: query, category?, compositor?, capability?)")
 		log.Info("Network:")
 		log.Info(" network.getState            - Get current network state")
-		log.Info(" network.wifi.scan           - Scan for WiFi networks")
+		log.Info(" network.wifi.scan           - Scan for WiFi networks (params: device?)")
 		log.Info(" network.wifi.networks       - Get WiFi network list")
-		log.Info(" network.wifi.connect        - Connect to WiFi (params: ssid, password?, username?)")
-		log.Info(" network.wifi.disconnect     - Disconnect WiFi")
+		log.Info(" network.wifi.connect        - Connect to WiFi (params: ssid, password?, username?, device?, eapMethod?, phase2Auth?, caCertPath?, clientCertPath?, privateKeyPath?, useSystemCACerts?)")
+		log.Info(" network.wifi.disconnect     - Disconnect WiFi (params: device?)")
 		log.Info(" network.wifi.forget         - Forget network (params: ssid)")
 		log.Info(" network.wifi.toggle         - Toggle WiFi radio")
 		log.Info(" network.wifi.enable         - Enable WiFi")
@@ -1089,6 +1152,11 @@ func Start(printDocs bool) error {
 		log.Info(" network.vpn.disconnect      - Disconnect VPN (params: uuidOrName|name|uuid)")
 		log.Info(" network.vpn.disconnectAll   - Disconnect all VPNs")
 		log.Info(" network.vpn.clearCredentials - Clear saved VPN credentials (params: uuidOrName|name|uuid)")
+		log.Info(" network.vpn.plugins         - List available VPN plugins")
+		log.Info(" network.vpn.import          - Import VPN from file (params: file|path, name?)")
+		log.Info(" network.vpn.getConfig       - Get VPN configuration (params: uuid|name|uuidOrName)")
+		log.Info(" network.vpn.updateConfig    - Update VPN configuration (params: uuid, name?, autoconnect?, data?)")
+		log.Info(" network.vpn.delete          - Delete VPN connection (params: uuid|name|uuidOrName)")
 		log.Info(" network.preference.set      - Set preference (params: preference [auto|wifi|ethernet])")
 		log.Info(" network.info                - Get network info (params: ssid)")
 		log.Info(" network.credentials.submit  - Submit credentials for prompt (params: token, secrets, save?)")
@@ -1248,6 +1316,10 @@ func Start(printDocs bool) error {
 		}
 	}()
 
+	if err := InitializeAppPickerManager(); err != nil {
+		log.Debugf("AppPicker manager unavailable: %v", err)
+	}
+
 	if err := InitializeDwlManager(); err != nil {
 		log.Debugf("DWL manager unavailable: %v", err)
 	}
@@ -1274,7 +1346,7 @@ func Start(printDocs bool) error {
 	if wlContext != nil {
 		go func() {
 			err := <-wlContext.FatalError()
-			fatalErrChan <- fmt.Errorf("Wayland context fatal error: %w", err)
+			fatalErrChan <- fmt.Errorf("wayland context fatal error: %w", err)
 		}()
 	}
 

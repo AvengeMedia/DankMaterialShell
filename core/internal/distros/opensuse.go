@@ -82,7 +82,6 @@ func (o *OpenSUSEDistribution) DetectDependenciesWithTerminal(ctx context.Contex
 	// Base detections (common across distros)
 	dependencies = append(dependencies, o.detectMatugen())
 	dependencies = append(dependencies, o.detectDgop())
-	dependencies = append(dependencies, o.detectHyprpicker())
 	dependencies = append(dependencies, o.detectClipboardTools()...)
 
 	return dependencies, nil
@@ -138,13 +137,12 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		"mate-polkit":            {Name: "mate-polkit", Repository: RepoTypeSystem},
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
 		"cliphist":               {Name: "cliphist", Repository: RepoTypeSystem},
-		"hyprpicker":             {Name: "hyprpicker", Repository: RepoTypeSystem},
 
-		// Manual builds
-		"dms (DankMaterialShell)": {Name: "dms", Repository: RepoTypeManual, BuildFunc: "installDankMaterialShell"},
-		"dgop":                    {Name: "dgop", Repository: RepoTypeManual, BuildFunc: "installDgop"},
-		"quickshell":              {Name: "quickshell", Repository: RepoTypeManual, BuildFunc: "installQuickshell"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeManual, BuildFunc: "installMatugen"},
+		// DMS packages from OBS
+		"dms (DankMaterialShell)": o.getDmsMapping(variants["dms (DankMaterialShell)"]),
+		"quickshell":              o.getQuickshellMapping(variants["quickshell"]),
+		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
+		"dgop":                    {Name: "dgop", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 	}
 
 	switch wm {
@@ -156,11 +154,41 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		packages["grimblast"] = PackageMapping{Name: "grimblast", Repository: RepoTypeManual, BuildFunc: "installGrimblast"}
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
 	case deps.WindowManagerNiri:
-		packages["niri"] = PackageMapping{Name: "niri", Repository: RepoTypeSystem}
-		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
+		// Niri stable has native package support on openSUSE
+		niriVariant := variants["niri"]
+		packages["niri"] = o.getNiriMapping(niriVariant)
+		packages["xwayland-satellite"] = o.getXwaylandSatelliteMapping(niriVariant)
 	}
 
 	return packages
+}
+
+func (o *OpenSUSEDistribution) getDmsMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "dms-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:dms-git"}
+	}
+	return PackageMapping{Name: "dms", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:dms"}
+}
+
+func (o *OpenSUSEDistribution) getQuickshellMapping(variant deps.PackageVariant) PackageMapping {
+	if forceQuickshellGit || variant == deps.VariantGit {
+		return PackageMapping{Name: "quickshell-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
+	}
+	return PackageMapping{Name: "quickshell", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
+}
+
+func (o *OpenSUSEDistribution) getNiriMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "niri-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
+	}
+	return PackageMapping{Name: "niri", Repository: RepoTypeSystem}
+}
+
+func (o *OpenSUSEDistribution) getXwaylandSatelliteMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "xwayland-satellite-git", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"}
+	}
+	return PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeSystem}
 }
 
 func (o *OpenSUSEDistribution) detectXwaylandSatellite() deps.Dependency {
@@ -294,9 +322,23 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		return fmt.Errorf("failed to install prerequisites: %w", err)
 	}
 
-	systemPkgs, manualPkgs, variantMap := o.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
+	systemPkgs, obsPkgs, manualPkgs, variantMap := o.categorizePackages(dependencies, wm, reinstallFlags, disabledFlags)
 
-	// Phase 2: System Packages (Zypper)
+	// Enable OBS repositories
+	if len(obsPkgs) > 0 {
+		progressChan <- InstallProgressMsg{
+			Phase:      PhaseSystemPackages,
+			Progress:   0.15,
+			Step:       "Enabling OBS repositories...",
+			IsComplete: false,
+			LogOutput:  "Setting up OBS repositories for additional packages",
+		}
+		if err := o.enableOBSRepos(ctx, obsPkgs, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to enable OBS repositories: %w", err)
+		}
+	}
+
+	// Phase 3: System Packages (Zypper)
 	if len(systemPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
 			Phase:      PhaseSystemPackages,
@@ -311,7 +353,22 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		}
 	}
 
-	// Phase 3: Manual Builds
+	// OBS Packages
+	obsPkgNames := o.extractPackageNames(obsPkgs)
+	if len(obsPkgNames) > 0 {
+		progressChan <- InstallProgressMsg{
+			Phase:      PhaseAURPackages,
+			Progress:   0.65,
+			Step:       fmt.Sprintf("Installing %d OBS packages...", len(obsPkgNames)),
+			IsComplete: false,
+			LogOutput:  fmt.Sprintf("Installing OBS packages: %s", strings.Join(obsPkgNames, ", ")),
+		}
+		if err := o.installZypperPackages(ctx, obsPkgNames, sudoPassword, progressChan); err != nil {
+			return fmt.Errorf("failed to install OBS packages: %w", err)
+		}
+	}
+
+	// Manual Builds
 	if len(manualPkgs) > 0 {
 		progressChan <- InstallProgressMsg{
 			Phase:      PhaseSystemPackages,
@@ -325,7 +382,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		}
 	}
 
-	// Phase 4: Configuration
+	// Configuration
 	progressChan <- InstallProgressMsg{
 		Phase:      PhaseConfiguration,
 		Progress:   0.90,
@@ -334,7 +391,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		LogOutput:  "Starting post-installation configuration...",
 	}
 
-	// Phase 5: Complete
+	// Complete
 	progressChan <- InstallProgressMsg{
 		Phase:      PhaseComplete,
 		Progress:   1.0,
@@ -346,8 +403,9 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 	return nil
 }
 
-func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []string, map[string]deps.PackageVariant) {
+func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency, wm deps.WindowManager, reinstallFlags map[string]bool, disabledFlags map[string]bool) ([]string, []PackageMapping, []string, map[string]deps.PackageVariant) {
 	systemPkgs := []string{}
+	obsPkgs := []PackageMapping{}
 	manualPkgs := []string{}
 
 	variantMap := make(map[string]deps.PackageVariant)
@@ -375,12 +433,80 @@ func (o *OpenSUSEDistribution) categorizePackages(dependencies []deps.Dependency
 		switch pkgInfo.Repository {
 		case RepoTypeSystem:
 			systemPkgs = append(systemPkgs, pkgInfo.Name)
+		case RepoTypeOBS:
+			obsPkgs = append(obsPkgs, pkgInfo)
 		case RepoTypeManual:
 			manualPkgs = append(manualPkgs, dep.Name)
 		}
 	}
 
-	return systemPkgs, manualPkgs, variantMap
+	return systemPkgs, obsPkgs, manualPkgs, variantMap
+}
+
+func (o *OpenSUSEDistribution) extractPackageNames(packages []PackageMapping) []string {
+	names := make([]string, len(packages))
+	for i, pkg := range packages {
+		names[i] = pkg.Name
+	}
+	return names
+}
+
+func (o *OpenSUSEDistribution) enableOBSRepos(ctx context.Context, obsPkgs []PackageMapping, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
+	enabledRepos := make(map[string]bool)
+
+	for _, pkg := range obsPkgs {
+		if pkg.RepoURL != "" && !enabledRepos[pkg.RepoURL] {
+			o.log(fmt.Sprintf("Enabling OBS repository: %s", pkg.RepoURL))
+
+			// RepoURL format: "home:AvengeMedia:danklinux"
+			repoPath := strings.ReplaceAll(pkg.RepoURL, ":", ":/")
+			repoName := strings.ReplaceAll(pkg.RepoURL, ":", "-")
+			repoURL := fmt.Sprintf("https://download.opensuse.org/repositories/%s/openSUSE_Tumbleweed/%s.repo",
+				repoPath, pkg.RepoURL)
+
+			checkCmd := exec.CommandContext(ctx, "zypper", "repos", repoName)
+			if checkCmd.Run() == nil {
+				o.log(fmt.Sprintf("OBS repo %s already exists, skipping", pkg.RepoURL))
+				enabledRepos[pkg.RepoURL] = true
+				continue
+			}
+
+			progressChan <- InstallProgressMsg{
+				Phase:       PhaseSystemPackages,
+				Progress:    0.20,
+				Step:        fmt.Sprintf("Enabling OBS repo %s...", pkg.RepoURL),
+				NeedsSudo:   true,
+				CommandInfo: fmt.Sprintf("sudo zypper addrepo %s", repoURL),
+			}
+
+			cmd := ExecSudoCommand(ctx, sudoPassword,
+				fmt.Sprintf("zypper addrepo -f %s", repoURL))
+			if err := o.runWithProgress(cmd, progressChan, PhaseSystemPackages, 0.20, 0.22); err != nil {
+				return fmt.Errorf("failed to enable OBS repo %s: %w", pkg.RepoURL, err)
+			}
+
+			enabledRepos[pkg.RepoURL] = true
+			o.log(fmt.Sprintf("OBS repo %s enabled successfully", pkg.RepoURL))
+		}
+	}
+
+	// Refresh repositories with GPG auto-import
+	if len(enabledRepos) > 0 {
+		progressChan <- InstallProgressMsg{
+			Phase:       PhaseSystemPackages,
+			Progress:    0.25,
+			Step:        "Refreshing repositories...",
+			NeedsSudo:   true,
+			CommandInfo: "sudo zypper --gpg-auto-import-keys refresh",
+		}
+
+		refreshCmd := ExecSudoCommand(ctx, sudoPassword, "zypper --gpg-auto-import-keys refresh")
+		if err := o.runWithProgress(refreshCmd, progressChan, PhaseSystemPackages, 0.25, 0.27); err != nil {
+			return fmt.Errorf("failed to refresh repositories: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (o *OpenSUSEDistribution) installZypperPackages(ctx context.Context, packages []string, sudoPassword string, progressChan chan<- InstallProgressMsg) error {

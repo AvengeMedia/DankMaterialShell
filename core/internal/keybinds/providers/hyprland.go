@@ -87,20 +87,22 @@ func (h *HyprlandProvider) categorizeByDispatcher(dispatcher string) string {
 
 func (h *HyprlandProvider) convertKeybind(kb *HyprlandKeyBinding, subcategory string) keybinds.Keybind {
 	key := h.formatKey(kb)
+	rawAction := h.formatRawAction(kb.Dispatcher, kb.Params)
 	desc := kb.Comment
 
 	if desc == "" {
-		desc = h.generateDescription(kb.Dispatcher, kb.Params)
+		desc = rawAction
 	}
 
 	return keybinds.Keybind{
 		Key:         key,
 		Description: desc,
+		Action:      rawAction,
 		Subcategory: subcategory,
 	}
 }
 
-func (h *HyprlandProvider) generateDescription(dispatcher, params string) string {
+func (h *HyprlandProvider) formatRawAction(dispatcher, params string) string {
 	if params != "" {
 		return dispatcher + " " + params
 	}

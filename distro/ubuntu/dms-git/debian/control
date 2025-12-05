@@ -1,0 +1,51 @@
+Source: dms-git
+Section: x11
+Priority: optional
+Maintainer: Avenge Media <AvengeMedia.US@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               golang-go (>= 2:1.22~)
+Standards-Version: 4.6.2
+Homepage: https://github.com/AvengeMedia/DankMaterialShell
+Vcs-Browser: https://github.com/AvengeMedia/DankMaterialShell
+Vcs-Git: https://github.com/AvengeMedia/DankMaterialShell.git
+
+Package: dms-git
+Architecture: amd64
+Depends: ${misc:Depends},
+         quickshell-git | quickshell,
+         accountsservice,
+         cava,
+         cliphist,
+         danksearch,
+         dgop,
+         matugen,
+         qml6-module-qtcore,
+         qml6-module-qtmultimedia,
+         qml6-module-qtqml,
+         qml6-module-qtquick,
+         qml6-module-qtquick-controls,
+         qml6-module-qtquick-dialogs,
+         qml6-module-qtquick-effects,
+         qml6-module-qtquick-layouts,
+         qml6-module-qtquick-templates,
+         qml6-module-qtquick-window,
+         qt6ct,
+         wl-clipboard
+Provides: dms
+Conflicts: dms
+Replaces: dms
+Description: DankMaterialShell - Modern Wayland Desktop Shell (git nightly)
+ DMS (DankMaterialShell) is a feature-rich desktop shell built on
+ Quickshell, providing a modern and customizable user interface for
+ Wayland compositors like niri, hyprland, and sway.
+ .
+ This is the nightly/git version built from the latest master branch.
+ .
+ Features include:
+  - Material Design inspired UI
+  - Customizable themes and appearance
+  - Built-in application launcher
+  - System tray and notifications
+  - Network and Bluetooth management
+  - Audio controls
+  - Systemd integration

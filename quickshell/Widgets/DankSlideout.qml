@@ -115,16 +115,17 @@ PanelWindow {
             layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.smooth: false
             layer.textureSize: Qt.size(width * root.dpr, height * root.dpr)
+            opacity: customTransparency >= 0 ? customTransparency : SettingsData.popupTransparency
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             width: parent.width
             x: Theme.snap(slideContainer.slideOffset, root.dpr)
 
-            DankRectangle {
+            Rectangle {
                 anchors.fill: parent
-                color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b,
-                               customTransparency >= 0 ? customTransparency : SettingsData.popupTransparency)
+                color: Theme.surfaceContainer
+                radius: Theme.cornerRadius
             }
 
             Column {

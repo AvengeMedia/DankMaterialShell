@@ -64,7 +64,7 @@ func (l *FileLogger) writeToFile(message string) {
 	redacted := l.redactPassword(message)
 	timestamp := time.Now().Format("15:04:05.000")
 
-	l.writer.WriteString(fmt.Sprintf("[%s] %s\n", timestamp, redacted))
+	fmt.Fprintf(l.writer, "[%s] %s\n", timestamp, redacted)
 	l.writer.Flush()
 }
 
@@ -93,7 +93,7 @@ func (l *FileLogger) Close() error {
 	defer l.mu.Unlock()
 
 	footer := fmt.Sprintf("\n=== DankInstall Log End ===\nCompleted: %s\n", time.Now().Format(time.RFC3339))
-	l.writer.WriteString(footer)
+	l.writer.WriteString(footer) //nolint:errcheck
 	l.writer.Flush()
 
 	if err := l.file.Sync(); err != nil {

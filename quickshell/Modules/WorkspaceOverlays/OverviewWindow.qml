@@ -13,19 +13,21 @@ Item {
     property var availableWorkspaceWidth
     property var availableWorkspaceHeight
     property bool restrictToWorkspace: true
+    property real monitorDpr: 1
 
     readonly property var windowData: toplevel?.lastIpcObject || null
     readonly property var monitorObj: toplevel?.monitor
     readonly property var monitorData: monitorObj?.lastIpcObject || null
+    readonly property real effectiveScale: root.scale / root.monitorDpr
 
-    property real initX: Math.max(((windowData?.at?.[0] ?? 0) - (monitorData?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * root.scale, 0) + xOffset
-    property real initY: Math.max(((windowData?.at?.[1] ?? 0) - (monitorData?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * root.scale, 0) + yOffset
+    property real initX: Math.max(((windowData?.at?.[0] ?? 0) - (monitorData?.x ?? 0) - (monitorData?.reserved?.[0] ?? 0)) * effectiveScale, 0) + xOffset
+    property real initY: Math.max(((windowData?.at?.[1] ?? 0) - (monitorData?.y ?? 0) - (monitorData?.reserved?.[1] ?? 0)) * effectiveScale, 0) + yOffset
     property real xOffset: 0
     property real yOffset: 0
     property int widgetMonitorId: 0
 
-    property var targetWindowWidth: (windowData?.size?.[0] ?? 100) * scale
-    property var targetWindowHeight: (windowData?.size?.[1] ?? 100) * scale
+    property var targetWindowWidth: (windowData?.size?.[0] ?? 100) * effectiveScale
+    property var targetWindowHeight: (windowData?.size?.[1] ?? 100) * effectiveScale
     property bool hovered: false
     property bool pressed: false
 
@@ -37,8 +39,8 @@ Item {
 
     x: initX
     y: initY
-    width: Math.min((windowData?.size?.[0] ?? 100) * root.scale, availableWorkspaceWidth)
-    height: Math.min((windowData?.size?.[1] ?? 100) * root.scale, availableWorkspaceHeight)
+    width: Math.min((windowData?.size?.[0] ?? 100) * effectiveScale, availableWorkspaceWidth)
+    height: Math.min((windowData?.size?.[1] ?? 100) * effectiveScale, availableWorkspaceHeight)
     opacity: (monitorObj?.id ?? -1) == widgetMonitorId ? 1 : 0.4
 
     Rectangle {

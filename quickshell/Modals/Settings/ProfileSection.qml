@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -81,7 +80,6 @@ Rectangle {
                                 }
                             }
                         }
-
                     }
 
                     Rectangle {
@@ -105,11 +103,8 @@ Rectangle {
                                 return PortalService.setProfileImage("");
                             }
                         }
-
                     }
-
                 }
-
             }
 
             MouseArea {
@@ -121,7 +116,6 @@ Rectangle {
                 propagateComposedEvents: true
                 acceptedButtons: Qt.NoButton
             }
-
         }
 
         Column {
@@ -145,9 +139,6 @@ Rectangle {
                 elide: Text.ElideRight
                 width: parent.width
             }
-
         }
-
     }
-
 }

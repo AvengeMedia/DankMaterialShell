@@ -1,20 +1,11 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import qs.Common
-import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-DankModal {
+FloatingWindow {
     id: root
-
-    layerNamespace: "dms:wifi-password"
-
-    HyprlandFocusGrab {
-        windows: [root]
-        active: CompositorService.isHyprland && root.shouldHaveFocus
-    }
 
     property string wifiPasswordSSID: ""
     property string wifiPasswordInput: ""
@@ -34,410 +25,485 @@ DankModal {
     property string connectionName: ""
     property string vpnServiceType: ""
     property string connectionType: ""
+    property var fieldsInfo: []
+    property var secretValues: ({})
+
+    property int calculatedHeight: {
+        if (fieldsInfo.length > 0)
+            return 180 + (fieldsInfo.length * 60);
+        if (requiresEnterprise)
+            return 430;
+        if (isVpnPrompt)
+            return 260;
+        return 230;
+    }
+
+    function focusFirstField() {
+        if (fieldsInfo.length > 0) {
+            if (dynamicFieldsRepeater.count > 0) {
+                const firstItem = dynamicFieldsRepeater.itemAt(0);
+                if (firstItem)
+                    firstItem.children[0].forceActiveFocus();
+            }
+            return;
+        }
+        if (requiresEnterprise && !isVpnPrompt) {
+            usernameInput.forceActiveFocus();
+            return;
+        }
+        passwordInput.forceActiveFocus();
+    }
 
     function show(ssid) {
-        wifiPasswordSSID = ssid
-        wifiPasswordInput = ""
-        wifiUsernameInput = ""
-        wifiAnonymousIdentityInput = ""
-        wifiDomainInput = ""
-        isPromptMode = false
-        promptToken = ""
-        promptReason = ""
-        promptFields = []
-        promptSetting = ""
-        isVpnPrompt = false
-        connectionName = ""
-        vpnServiceType = ""
-        connectionType = ""
+        wifiPasswordSSID = ssid;
+        wifiPasswordInput = "";
+        wifiUsernameInput = "";
+        wifiAnonymousIdentityInput = "";
+        wifiDomainInput = "";
+        isPromptMode = false;
+        promptToken = "";
+        promptReason = "";
+        promptFields = [];
+        promptSetting = "";
+        isVpnPrompt = false;
+        connectionName = "";
+        vpnServiceType = "";
+        connectionType = "";
+        fieldsInfo = [];
+        secretValues = {};
 
-        const network = NetworkService.wifiNetworks.find(n => n.ssid === ssid)
-        requiresEnterprise = network?.enterprise || false
+        const network = NetworkService.wifiNetworks.find(n => n.ssid === ssid);
+        requiresEnterprise = network?.enterprise || false;
 
-        open()
-        Qt.callLater(() => {
-                         if (contentLoader.item) {
-                             if (requiresEnterprise && contentLoader.item.usernameInput) {
-                                 contentLoader.item.usernameInput.forceActiveFocus()
-                             } else if (contentLoader.item.passwordInput) {
-                                 contentLoader.item.passwordInput.forceActiveFocus()
-                             }
-                         }
-                     })
+        visible = true;
+        Qt.callLater(focusFirstField);
     }
 
-    function showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService) {
-        isPromptMode = true
-        promptToken = token
-        promptReason = reason
-        promptFields = fields || []
-        promptSetting = setting || "802-11-wireless-security"
-        connectionType = connType || "802-11-wireless"
-        connectionName = connName || ssid || ""
-        vpnServiceType = vpnService || ""
+    function showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fInfo) {
+        isPromptMode = true;
+        promptToken = token;
+        promptReason = reason;
+        promptFields = fields || [];
+        promptSetting = setting || "802-11-wireless-security";
+        connectionType = connType || "802-11-wireless";
+        connectionName = connName || ssid || "";
+        vpnServiceType = vpnService || "";
+        fieldsInfo = fInfo || [];
+        secretValues = {};
 
-        isVpnPrompt = (connectionType === "vpn" || connectionType === "wireguard")
-        wifiPasswordSSID = isVpnPrompt ? connectionName : ssid
+        isVpnPrompt = (connectionType === "vpn" || connectionType === "wireguard");
+        wifiPasswordSSID = isVpnPrompt ? connectionName : ssid;
 
-        requiresEnterprise = setting === "802-1x"
+        requiresEnterprise = setting === "802-1x";
 
-        if (reason === "wrong-password") {
-            wifiPasswordInput = ""
-            wifiUsernameInput = ""
-        } else {
-            wifiPasswordInput = ""
-            wifiUsernameInput = ""
-            wifiAnonymousIdentityInput = ""
-            wifiDomainInput = ""
+        wifiPasswordInput = "";
+        wifiUsernameInput = "";
+        wifiAnonymousIdentityInput = "";
+        wifiDomainInput = "";
+
+        visible = true;
+        Qt.callLater(() => {
+            if (reason === "wrong-password" && fieldsInfo.length === 0) {
+                passwordInput.text = "";
+            }
+            focusFirstField();
+        });
+    }
+
+    function hide() {
+        visible = false;
+    }
+
+    function getFieldLabel(fieldName) {
+        switch (fieldName) {
+        case "username":
+        case "identity":
+            return I18n.tr("Username");
+        case "password":
+            return I18n.tr("Password");
+        case "cert-pass":
+        case "certpass":
+            return I18n.tr("Certificate Password");
+        case "private-key-password":
+            return I18n.tr("Private Key Password");
+        case "pin":
+            return I18n.tr("PIN");
+        case "psk":
+            return I18n.tr("Password");
+        case "anonymous-identity":
+            return I18n.tr("Anonymous Identity");
+        default:
+            return fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace(/-/g, " ");
+        }
+    }
+
+    function submitCredentialsAndClose() {
+        if (fieldsInfo.length > 0) {
+            NetworkService.submitCredentials(promptToken, secretValues, savePasswordCheckbox.checked);
+            hide();
+            secretValues = {};
+            return;
         }
 
-        open()
-        Qt.callLater(() => {
-                         if (contentLoader.item) {
-                             if (reason === "wrong-password" && contentLoader.item.passwordInput) {
-                                 contentLoader.item.passwordInput.text = ""
-                                 contentLoader.item.passwordInput.forceActiveFocus()
-                             } else if (requiresEnterprise && contentLoader.item.usernameInput) {
-                                 contentLoader.item.usernameInput.forceActiveFocus()
-                             } else if (contentLoader.item.passwordInput) {
-                                 contentLoader.item.passwordInput.forceActiveFocus()
-                             }
-                         }
-                     })
+        if (isPromptMode) {
+            const secrets = {};
+            if (isVpnPrompt) {
+                if (passwordInput.text)
+                    secrets["password"] = passwordInput.text;
+            } else if (promptSetting === "802-11-wireless-security") {
+                secrets["psk"] = passwordInput.text;
+            } else if (promptSetting === "802-1x") {
+                if (usernameInput.text)
+                    secrets["identity"] = usernameInput.text;
+                if (passwordInput.text)
+                    secrets["password"] = passwordInput.text;
+                if (wifiAnonymousIdentityInput)
+                    secrets["anonymous-identity"] = wifiAnonymousIdentityInput;
+            }
+            NetworkService.submitCredentials(promptToken, secrets, savePasswordCheckbox.checked);
+        } else {
+            const username = requiresEnterprise ? usernameInput.text : "";
+            NetworkService.connectToWifi(wifiPasswordSSID, passwordInput.text, username, wifiAnonymousIdentityInput, wifiDomainInput);
+        }
+
+        hide();
+        wifiPasswordInput = "";
+        wifiUsernameInput = "";
+        wifiAnonymousIdentityInput = "";
+        wifiDomainInput = "";
+        passwordInput.text = "";
+        if (requiresEnterprise)
+            usernameInput.text = "";
     }
 
-    shouldBeVisible: false
-    width: 420
-    height: requiresEnterprise ? 430 : 230
-    onShouldBeVisibleChanged: () => {
-                                  if (!shouldBeVisible) {
-                                      wifiPasswordInput = ""
-                                      wifiUsernameInput = ""
-                                      wifiAnonymousIdentityInput = ""
-                                      wifiDomainInput = ""
-                                  }
-                              }
-    onOpened: {
-        Qt.callLater(() => {
-                         if (contentLoader.item) {
-                             if (requiresEnterprise && contentLoader.item.usernameInput) {
-                                 contentLoader.item.usernameInput.forceActiveFocus()
-                             } else if (contentLoader.item.passwordInput) {
-                                 contentLoader.item.passwordInput.forceActiveFocus()
-                             }
-                         }
-                     })
+    function clearAndClose() {
+        if (isPromptMode)
+            NetworkService.cancelCredentials(promptToken);
+        hide();
+        wifiPasswordInput = "";
+        wifiUsernameInput = "";
+        wifiAnonymousIdentityInput = "";
+        wifiDomainInput = "";
+        secretValues = {};
     }
-    onBackgroundClicked: () => {
-                             if (isPromptMode) {
-                                 NetworkService.cancelCredentials(promptToken)
-                             }
-                             close()
-                             wifiPasswordInput = ""
-                             wifiUsernameInput = ""
-                             wifiAnonymousIdentityInput = ""
-                             wifiDomainInput = ""
-                         }
+
+    objectName: "wifiPasswordModal"
+    title: isVpnPrompt ? I18n.tr("VPN Password") : I18n.tr("Wi-Fi Password")
+    minimumSize: Qt.size(420, calculatedHeight)
+    maximumSize: Qt.size(420, calculatedHeight)
+    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    visible: false
+
+    onVisibleChanged: {
+        if (visible) {
+            Qt.callLater(focusFirstField);
+            return;
+        }
+        wifiPasswordInput = "";
+        wifiUsernameInput = "";
+        wifiAnonymousIdentityInput = "";
+        wifiDomainInput = "";
+        secretValues = {};
+        passwordInput.text = "";
+        usernameInput.text = "";
+        anonInput.text = "";
+        domainMatchInput.text = "";
+        for (let i = 0; i < dynamicFieldsRepeater.count; i++) {
+            const item = dynamicFieldsRepeater.itemAt(i);
+            if (item?.children[0])
+                item.children[0].text = "";
+        }
+    }
 
     Connections {
         target: NetworkService
 
         function onPasswordDialogShouldReopenChanged() {
-            if (NetworkService.passwordDialogShouldReopen && NetworkService.connectingSSID !== "") {
-                wifiPasswordSSID = NetworkService.connectingSSID
-                wifiPasswordInput = ""
-                open()
-                NetworkService.passwordDialogShouldReopen = false
-            }
+            if (!NetworkService.passwordDialogShouldReopen || NetworkService.connectingSSID === "")
+                return;
+            wifiPasswordSSID = NetworkService.connectingSSID;
+            wifiPasswordInput = "";
+            visible = true;
+            NetworkService.passwordDialogShouldReopen = false;
         }
     }
 
-    content: Component {
-        FocusScope {
-            id: wifiContent
+    FocusScope {
+        id: contentFocusScope
 
-            property alias usernameInput: usernameInput
-            property alias passwordInput: passwordInput
+        anchors.fill: parent
+        focus: true
 
-            anchors.fill: parent
-            focus: true
-            Keys.onEscapePressed: event => {
-                                      if (isPromptMode) {
-                                          NetworkService.cancelCredentials(promptToken)
-                                      }
-                                      close()
-                                      wifiPasswordInput = ""
-                                      wifiUsernameInput = ""
-                                      wifiAnonymousIdentityInput = ""
-                                      wifiDomainInput = ""
-                                      event.accepted = true
-                                  }
+        Keys.onEscapePressed: event => {
+            clearAndClose();
+            event.accepted = true;
+        }
 
-            Column {
-                anchors.centerIn: parent
-                width: parent.width - Theme.spacingM * 2
-                spacing: Theme.spacingM
+        Column {
+            id: contentCol
+            anchors.centerIn: parent
+            width: parent.width - Theme.spacingM * 2
+            spacing: Theme.spacingM
 
-                Row {
-                    width: parent.width
+            Row {
+                width: contentCol.width
+
+                Column {
+                    width: parent.width - 40
+                    spacing: Theme.spacingXS
+
+                    StyledText {
+                        text: isVpnPrompt ? I18n.tr("Connect to VPN") : I18n.tr("Connect to Wi-Fi")
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.surfaceText
+                        font.weight: Font.Medium
+                    }
 
                     Column {
-                        width: parent.width - 40
+                        width: parent.width
                         spacing: Theme.spacingXS
 
                         StyledText {
                             text: {
-                                if (isVpnPrompt) {
-                                    return I18n.tr("Connect to VPN")
-                                }
-                                return I18n.tr("Connect to Wi-Fi")
+                                if (fieldsInfo.length > 0)
+                                    return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
+                                if (isVpnPrompt)
+                                    return I18n.tr("Enter password for ") + wifiPasswordSSID;
+                                const prefix = requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ");
+                                return prefix + wifiPasswordSSID;
                             }
-                            font.pixelSize: Theme.fontSizeLarge
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                        }
-
-                        Column {
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceTextMedium
                             width: parent.width
-                            spacing: Theme.spacingXS
-
-                            StyledText {
-                                text: {
-                                    if (isVpnPrompt) {
-                                        return I18n.tr("Enter password for ") + wifiPasswordSSID
-                                    }
-                                    const prefix = requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ")
-                                    return prefix + wifiPasswordSSID
-                                }
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceTextMedium
-                                width: parent.width
-                                elide: Text.ElideRight
-                            }
-
-                            StyledText {
-                                visible: isPromptMode && promptReason === "wrong-password"
-                                text: I18n.tr("Incorrect password")
-                                font.pixelSize: Theme.fontSizeSmall
-                                color: Theme.error
-                                width: parent.width
-                            }
-                        }
-                    }
-
-                    DankActionButton {
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: () => {
-                                       if (isPromptMode) {
-                                           NetworkService.cancelCredentials(promptToken)
-                                       }
-                                       close()
-                                       wifiPasswordInput = ""
-                                       wifiUsernameInput = ""
-                                       wifiAnonymousIdentityInput = ""
-                                       wifiDomainInput = ""
-                                   }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
-                    border.color: usernameInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: usernameInput.activeFocus ? 2 : 1
-                    visible: requiresEnterprise && !isVpnPrompt
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: () => {
-                                       usernameInput.forceActiveFocus()
-                                   }
-                    }
-
-                    DankTextField {
-                        id: usernameInput
-
-                        anchors.fill: parent
-                        font.pixelSize: Theme.fontSizeMedium
-                        textColor: Theme.surfaceText
-                        text: wifiUsernameInput
-                        placeholderText: I18n.tr("Username")
-                        backgroundColor: "transparent"
-                        enabled: root.shouldBeVisible
-                        onTextEdited: () => {
-                                          wifiUsernameInput = text
-                                      }
-                        onAccepted: () => {
-                                        if (passwordInput) {
-                                            passwordInput.forceActiveFocus()
-                                        }
-                                    }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
-                    border.color: passwordInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: passwordInput.activeFocus ? 2 : 1
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: () => {
-                                       passwordInput.forceActiveFocus()
-                                   }
-                    }
-
-                    DankTextField {
-                        id: passwordInput
-
-                        anchors.fill: parent
-                        font.pixelSize: Theme.fontSizeMedium
-                        textColor: Theme.surfaceText
-                        text: wifiPasswordInput
-                        echoMode: showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password
-                        placeholderText: (requiresEnterprise && !isVpnPrompt) ? I18n.tr("Password") : ""
-                        backgroundColor: "transparent"
-                        focus: !requiresEnterprise
-                        enabled: root.shouldBeVisible
-                        onTextEdited: () => {
-                                          wifiPasswordInput = text
-                                      }
-                        onAccepted: () => {
-                                        if (isPromptMode) {
-                                            const secrets = {}
-                                            if (isVpnPrompt) {
-                                                if (passwordInput.text) secrets["password"] = passwordInput.text
-                                            } else if (promptSetting === "802-11-wireless-security") {
-                                                secrets["psk"] = passwordInput.text
-                                            } else if (promptSetting === "802-1x") {
-                                                if (usernameInput.text) secrets["identity"] = usernameInput.text
-                                                if (passwordInput.text) secrets["password"] = passwordInput.text
-                                                if (wifiAnonymousIdentityInput) secrets["anonymous-identity"] = wifiAnonymousIdentityInput
-                                            }
-                                            NetworkService.submitCredentials(promptToken, secrets, true)
-                                        } else {
-                                            const username = requiresEnterprise ? usernameInput.text : ""
-                                            NetworkService.connectToWifi(
-                                                wifiPasswordSSID,
-                                                passwordInput.text,
-                                                username,
-                                                wifiAnonymousIdentityInput,
-                                                wifiDomainInput
-                                            )
-                                        }
-                                        close()
-                                        wifiPasswordInput = ""
-                                        wifiUsernameInput = ""
-                                        wifiAnonymousIdentityInput = ""
-                                        wifiDomainInput = ""
-                                        passwordInput.text = ""
-                                        if (requiresEnterprise) usernameInput.text = ""
-                                    }
-                        Component.onCompleted: () => {
-                                                   if (root.shouldBeVisible && !requiresEnterprise)
-                                                   focusDelayTimer.start()
-                                               }
-
-                        Timer {
-                            id: focusDelayTimer
-
-                            interval: 100
-                            repeat: false
-                            onTriggered: () => {
-                                             if (root.shouldBeVisible) {
-                                                 if (requiresEnterprise && usernameInput) {
-                                                     usernameInput.forceActiveFocus()
-                                                 } else {
-                                                     passwordInput.forceActiveFocus()
-                                                 }
-                                             }
-                                         }
+                            elide: Text.ElideRight
                         }
 
-                        Connections {
-                            target: root
-
-                            function onShouldBeVisibleChanged() {
-                                if (root.shouldBeVisible)
-                                    focusDelayTimer.start()
-                            }
+                        StyledText {
+                            visible: isPromptMode && promptReason === "wrong-password"
+                            text: I18n.tr("Incorrect password")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.error
+                            width: parent.width
                         }
                     }
                 }
 
-                Rectangle {
-                    visible: requiresEnterprise && !isVpnPrompt
-                    width: parent.width
+                DankActionButton {
+                    iconName: "close"
+                    iconSize: Theme.iconSize - 4
+                    iconColor: Theme.surfaceText
+                    onClicked: clearAndClose()
+                }
+            }
+
+            Repeater {
+                id: dynamicFieldsRepeater
+                model: fieldsInfo
+
+                delegate: Rectangle {
+                    required property var modelData
+                    required property int index
+
+                    width: contentCol.width
                     height: 50
                     radius: Theme.cornerRadius
                     color: Theme.surfaceHover
-                    border.color: anonInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: anonInput.activeFocus ? 2 : 1
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: () => {
-                                       anonInput.forceActiveFocus()
-                                   }
-                    }
+                    border.color: fieldInput.activeFocus ? Theme.primary : Theme.outlineStrong
+                    border.width: fieldInput.activeFocus ? 2 : 1
 
                     DankTextField {
-                        id: anonInput
-
+                        id: fieldInput
                         anchors.fill: parent
                         font.pixelSize: Theme.fontSizeMedium
                         textColor: Theme.surfaceText
-                        text: wifiAnonymousIdentityInput
-                        placeholderText: I18n.tr("Anonymous Identity (optional)")
+                        echoMode: modelData.isSecret ? TextInput.Password : TextInput.Normal
+                        placeholderText: getFieldLabel(modelData.name)
                         backgroundColor: "transparent"
-                        enabled: root.shouldBeVisible
-                        onTextEdited: () => {
-                                          wifiAnonymousIdentityInput = text
-                                      }
+                        enabled: root.visible
+
+                        Keys.onTabPressed: event => {
+                            if (index < fieldsInfo.length - 1) {
+                                const nextItem = dynamicFieldsRepeater.itemAt(index + 1);
+                                if (nextItem)
+                                    nextItem.children[0].forceActiveFocus();
+                            } else {
+                                const firstItem = dynamicFieldsRepeater.itemAt(0);
+                                if (firstItem)
+                                    firstItem.children[0].forceActiveFocus();
+                            }
+                            event.accepted = true;
+                        }
+
+                        Keys.onBacktabPressed: event => {
+                            if (index > 0) {
+                                const prevItem = dynamicFieldsRepeater.itemAt(index - 1);
+                                if (prevItem)
+                                    prevItem.children[0].forceActiveFocus();
+                            } else {
+                                const lastItem = dynamicFieldsRepeater.itemAt(fieldsInfo.length - 1);
+                                if (lastItem)
+                                    lastItem.children[0].forceActiveFocus();
+                            }
+                            event.accepted = true;
+                        }
+
+                        onTextEdited: {
+                            let updated = Object.assign({}, root.secretValues);
+                            updated[modelData.name] = text;
+                            root.secretValues = updated;
+                        }
+
+                        onAccepted: {
+                            if (index < fieldsInfo.length - 1) {
+                                const nextItem = dynamicFieldsRepeater.itemAt(index + 1);
+                                if (nextItem)
+                                    nextItem.children[0].forceActiveFocus();
+                                return;
+                            }
+                            submitCredentialsAndClose();
+                        }
                     }
                 }
+            }
 
-                Rectangle {
-                    visible: requiresEnterprise && !isVpnPrompt
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
-                    border.color: domainMatchInput.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: domainMatchInput.activeFocus ? 2 : 1
+            Rectangle {
+                width: parent.width
+                height: 50
+                radius: Theme.cornerRadius
+                color: Theme.surfaceHover
+                border.color: usernameInput.activeFocus ? Theme.primary : Theme.outlineStrong
+                border.width: usernameInput.activeFocus ? 2 : 1
+                visible: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: () => {
-                                       domainMatchInput.forceActiveFocus()
-                                   }
-                    }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: usernameInput.forceActiveFocus()
+                }
 
-                    DankTextField {
-                        id: domainMatchInput
+                DankTextField {
+                    id: usernameInput
 
-                        anchors.fill: parent
-                        font.pixelSize: Theme.fontSizeMedium
-                        textColor: Theme.surfaceText
-                        text: wifiDomainInput
-                        placeholderText: I18n.tr("Domain (optional)")
-                        backgroundColor: "transparent"
-                        enabled: root.shouldBeVisible
-                        onTextEdited: () => {
-                                          wifiDomainInput = text
-                                      }
+                    anchors.fill: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    textColor: Theme.surfaceText
+                    text: wifiUsernameInput
+                    placeholderText: I18n.tr("Username")
+                    backgroundColor: "transparent"
+                    enabled: root.visible
+                    keyNavigationTab: passwordInput
+                    keyNavigationBacktab: domainMatchInput
+                    onTextEdited: wifiUsernameInput = text
+                    onAccepted: passwordInput.forceActiveFocus()
+                }
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 50
+                radius: Theme.cornerRadius
+                color: Theme.surfaceHover
+                border.color: passwordInput.activeFocus ? Theme.primary : Theme.outlineStrong
+                border.width: passwordInput.activeFocus ? 2 : 1
+                visible: fieldsInfo.length === 0
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: passwordInput.forceActiveFocus()
+                }
+
+                DankTextField {
+                    id: passwordInput
+
+                    anchors.fill: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    textColor: Theme.surfaceText
+                    text: wifiPasswordInput
+                    echoMode: showPasswordCheckbox.checked ? TextInput.Normal : TextInput.Password
+                    placeholderText: (requiresEnterprise && !isVpnPrompt) ? I18n.tr("Password") : ""
+                    backgroundColor: "transparent"
+                    enabled: root.visible
+                    keyNavigationTab: (requiresEnterprise && !isVpnPrompt) ? anonInput : null
+                    keyNavigationBacktab: (requiresEnterprise && !isVpnPrompt) ? usernameInput : null
+                    onTextEdited: wifiPasswordInput = text
+                    onAccepted: {
+                        if (requiresEnterprise && !isVpnPrompt) {
+                            anonInput.forceActiveFocus();
+                            return;
+                        }
+                        submitCredentialsAndClose();
                     }
                 }
+            }
+
+            Rectangle {
+                visible: requiresEnterprise && !isVpnPrompt
+                width: parent.width
+                height: 50
+                radius: Theme.cornerRadius
+                color: Theme.surfaceHover
+                border.color: anonInput.activeFocus ? Theme.primary : Theme.outlineStrong
+                border.width: anonInput.activeFocus ? 2 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: anonInput.forceActiveFocus()
+                }
+
+                DankTextField {
+                    id: anonInput
+
+                    anchors.fill: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    textColor: Theme.surfaceText
+                    text: wifiAnonymousIdentityInput
+                    placeholderText: I18n.tr("Anonymous Identity (optional)")
+                    backgroundColor: "transparent"
+                    enabled: root.visible
+                    keyNavigationTab: domainMatchInput
+                    keyNavigationBacktab: passwordInput
+                    onTextEdited: wifiAnonymousIdentityInput = text
+                    onAccepted: domainMatchInput.forceActiveFocus()
+                }
+            }
+
+            Rectangle {
+                visible: requiresEnterprise && !isVpnPrompt
+                width: parent.width
+                height: 50
+                radius: Theme.cornerRadius
+                color: Theme.surfaceHover
+                border.color: domainMatchInput.activeFocus ? Theme.primary : Theme.outlineStrong
+                border.width: domainMatchInput.activeFocus ? 2 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: domainMatchInput.forceActiveFocus()
+                }
+
+                DankTextField {
+                    id: domainMatchInput
+
+                    anchors.fill: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    textColor: Theme.surfaceText
+                    text: wifiDomainInput
+                    placeholderText: I18n.tr("Domain (optional)")
+                    backgroundColor: "transparent"
+                    enabled: root.visible
+                    keyNavigationTab: usernameInput
+                    keyNavigationBacktab: anonInput
+                    onTextEdited: wifiDomainInput = text
+                    onAccepted: submitCredentialsAndClose()
+                }
+            }
+
+            Column {
+                spacing: Theme.spacingS
+                width: parent.width
 
                 Row {
                     spacing: Theme.spacingS
+                    visible: fieldsInfo.length === 0
 
                     Rectangle {
                         id: showPasswordCheckbox
@@ -463,9 +529,7 @@ DankModal {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: () => {
-                                           showPasswordCheckbox.checked = !showPasswordCheckbox.checked
-                                       }
+                            onClicked: showPasswordCheckbox.checked = !showPasswordCheckbox.checked
                         }
                     }
 
@@ -477,120 +541,126 @@ DankModal {
                     }
                 }
 
-                Item {
-                    width: parent.width
-                    height: 40
+                Row {
+                    spacing: Theme.spacingS
+                    visible: isVpnPrompt || fieldsInfo.length > 0
 
-                    Row {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingM
+                    Rectangle {
+                        id: savePasswordCheckbox
 
-                        Rectangle {
-                            width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
-                            border.color: Theme.surfaceVariantAlpha
-                            border.width: 1
+                        property bool checked: false
 
-                            StyledText {
-                                id: cancelText
+                        width: 20
+                        height: 20
+                        radius: 4
+                        color: checked ? Theme.primary : "transparent"
+                        border.color: checked ? Theme.primary : Theme.outlineButton
+                        border.width: 2
 
-                                anchors.centerIn: parent
-                                text: I18n.tr("Cancel")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                id: cancelArea
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: () => {
-                                               if (isPromptMode) {
-                                                   NetworkService.cancelCredentials(promptToken)
-                                               }
-                                               close()
-                                               wifiPasswordInput = ""
-                                               wifiUsernameInput = ""
-                                               wifiAnonymousIdentityInput = ""
-                                               wifiDomainInput = ""
-                                           }
-                            }
+                        DankIcon {
+                            anchors.centerIn: parent
+                            name: "check"
+                            size: 12
+                            color: Theme.background
+                            visible: parent.checked
                         }
 
-                        Rectangle {
-                            width: Math.max(80, connectText.contentWidth + Theme.spacingM * 2)
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                            enabled: {
-                                if (isVpnPrompt) {
-                                    return passwordInput.text.length > 0
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: savePasswordCheckbox.checked = !savePasswordCheckbox.checked
+                        }
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Save password")
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: 40
+
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
+
+                    Rectangle {
+                        width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
+                        height: 36
+                        radius: Theme.cornerRadius
+                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                        border.color: Theme.surfaceVariantAlpha
+                        border.width: 1
+
+                        StyledText {
+                            id: cancelText
+                            anchors.centerIn: parent
+                            text: I18n.tr("Cancel")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
+                        }
+
+                        MouseArea {
+                            id: cancelArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: clearAndClose()
+                        }
+                    }
+
+                    Rectangle {
+                        width: Math.max(80, connectText.contentWidth + Theme.spacingM * 2)
+                        height: 36
+                        radius: Theme.cornerRadius
+                        color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
+                        enabled: {
+                            if (fieldsInfo.length > 0) {
+                                for (let i = 0; i < fieldsInfo.length; i++) {
+                                    if (!fieldsInfo[i].isSecret)
+                                        continue;
+                                    const fieldName = fieldsInfo[i].name;
+                                    if (!secretValues[fieldName] || secretValues[fieldName].length === 0)
+                                        return false;
                                 }
-                                return requiresEnterprise ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0
+                                return true;
                             }
-                            opacity: enabled ? 1 : 0.5
+                            if (isVpnPrompt)
+                                return passwordInput.text.length > 0;
+                            return requiresEnterprise ? (usernameInput.text.length > 0 && passwordInput.text.length > 0) : passwordInput.text.length > 0;
+                        }
+                        opacity: enabled ? 1 : 0.5
 
-                            StyledText {
-                                id: connectText
+                        StyledText {
+                            id: connectText
+                            anchors.centerIn: parent
+                            text: I18n.tr("Connect")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.background
+                            font.weight: Font.Medium
+                        }
 
-                                anchors.centerIn: parent
-                                text: I18n.tr("Connect")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.background
-                                font.weight: Font.Medium
-                            }
+                        MouseArea {
+                            id: connectArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            enabled: parent.enabled
+                            onClicked: submitCredentialsAndClose()
+                        }
 
-                            MouseArea {
-                                id: connectArea
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                enabled: parent.enabled
-                                onClicked: () => {
-                                               if (isPromptMode) {
-                                                   const secrets = {}
-                                                   if (isVpnPrompt) {
-                                                       if (passwordInput.text) secrets["password"] = passwordInput.text
-                                                   } else if (promptSetting === "802-11-wireless-security") {
-                                                       secrets["psk"] = passwordInput.text
-                                                   } else if (promptSetting === "802-1x") {
-                                                       if (usernameInput.text) secrets["identity"] = usernameInput.text
-                                                       if (passwordInput.text) secrets["password"] = passwordInput.text
-                                                       if (wifiAnonymousIdentityInput) secrets["anonymous-identity"] = wifiAnonymousIdentityInput
-                                                   }
-                                                   NetworkService.submitCredentials(promptToken, secrets, true)
-                                               } else {
-                                                   const username = requiresEnterprise ? usernameInput.text : ""
-                                                   NetworkService.connectToWifi(
-                                                       wifiPasswordSSID,
-                                                       passwordInput.text,
-                                                       username,
-                                                       wifiAnonymousIdentityInput,
-                                                       wifiDomainInput
-                                                   )
-                                               }
-                                               close()
-                                               wifiPasswordInput = ""
-                                               wifiUsernameInput = ""
-                                               wifiAnonymousIdentityInput = ""
-                                               wifiDomainInput = ""
-                                               passwordInput.text = ""
-                                               if (requiresEnterprise) usernameInput.text = ""
-                                           }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
                             }
                         }
                     }

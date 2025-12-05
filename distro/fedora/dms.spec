@@ -33,7 +33,6 @@ Requires:       dgop
 Recommends:     cava
 Recommends:     cliphist
 Recommends:     danksearch
-Recommends:     hyprpicker
 Recommends:     matugen
 Recommends:     quickshell-git
 Recommends:     wl-clipboard
@@ -97,12 +96,15 @@ gunzip -c %{_builddir}/dgop.gz > %{_builddir}/dgop
 chmod +x %{_builddir}/dgop
 
 %build
-# Build DMS CLI from source (core/ subdirectory in monorepo)
+# Build DMS CLI from source (core/subdirectory)
+VERSION="%{version}"
+COMMIT=$(echo "%{version}" | grep -oP '[a-f0-9]{7,}' | head -n1 || echo "unknown")
+
 cd core
-make dist
+make dist VERSION="$VERSION" COMMIT="$COMMIT"
 
 %install
-# Install dms-cli binary (built from source) - use architecture-specific path
+# Install dms-cli binary (built from source)
 case "%{_arch}" in
   x86_64)
     DMS_BINARY="dms-linux-amd64"
@@ -129,10 +131,13 @@ core/bin/${DMS_BINARY} completion fish > %{buildroot}%{_datadir}/fish/vendor_com
 # Install dgop binary
 install -Dm755 %{_builddir}/dgop %{buildroot}%{_bindir}/dgop
 
-# Install systemd user service (from quickshell/ subdirectory)
-install -Dm644 quickshell/assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
+# Install systemd user service
+install -Dm644 assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
 
-# Install shell files to shared data location (from quickshell/ subdirectory)
+install -Dm644 assets/dms-open.desktop %{buildroot}%{_datadir}/applications/dms-open.desktop
+install -Dm644 assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
+
+# Install shell files to shared data location
 install -dm755 %{buildroot}%{_datadir}/quickshell/dms
 cp -r quickshell/* %{buildroot}%{_datadir}/quickshell/dms/
 
@@ -142,14 +147,9 @@ rm -f %{buildroot}%{_datadir}/quickshell/dms/.gitignore
 rm -rf %{buildroot}%{_datadir}/quickshell/dms/.github
 rm -rf %{buildroot}%{_datadir}/quickshell/dms/distro
 
+echo "%{version}" > %{buildroot}%{_datadir}/quickshell/dms/VERSION
+
 %posttrans
-# Clean up old installation path from previous versions (only if empty)
-if [ -d "%{_sysconfdir}/xdg/quickshell/dms" ]; then
-    # Remove directories only if empty (preserves any user-added files)
-    rmdir "%{_sysconfdir}/xdg/quickshell/dms" 2>/dev/null || true
-    rmdir "%{_sysconfdir}/xdg/quickshell" 2>/dev/null || true
-    rmdir "%{_sysconfdir}/xdg" 2>/dev/null || true
-fi
 
 # Restart DMS for active users after upgrade
 if [ "$1" -ge 2 ]; then
@@ -162,6 +162,8 @@ fi
 %doc quickshell/README.md
 %{_datadir}/quickshell/dms/
 %{_userunitdir}/dms.service
+%{_datadir}/applications/dms-open.desktop
+%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
 
 %files -n dms-cli
 %{_bindir}/dms

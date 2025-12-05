@@ -82,7 +82,6 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	// Base detections (common across distros)
 	dependencies = append(dependencies, u.detectMatugen())
 	dependencies = append(dependencies, u.detectDgop())
-	dependencies = append(dependencies, u.detectHyprpicker())
 	dependencies = append(dependencies, u.detectClipboardTools()...)
 
 	return dependencies, nil
@@ -151,6 +150,10 @@ func (u *UbuntuDistribution) packageInstalled(pkg string) bool {
 }
 
 func (u *UbuntuDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
+	return u.GetPackageMappingWithVariants(wm, make(map[string]deps.PackageVariant))
+}
+
+func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, variants map[string]deps.PackageVariant) map[string]PackageMapping {
 	packages := map[string]PackageMapping{
 		// Standard APT packages
 		"git":                    {Name: "git", Repository: RepoTypeSystem},
@@ -160,16 +163,16 @@ func (u *UbuntuDistribution) GetPackageMapping(wm deps.WindowManager) map[string
 		"xdg-desktop-portal-gtk": {Name: "xdg-desktop-portal-gtk", Repository: RepoTypeSystem},
 		"mate-polkit":            {Name: "mate-polkit", Repository: RepoTypeSystem},
 		"accountsservice":        {Name: "accountsservice", Repository: RepoTypeSystem},
-		"hyprpicker":             {Name: "hyprpicker", Repository: RepoTypePPA, RepoURL: "ppa:cppiber/hyprland"},
 
-		// Manual builds (niri and quickshell likely not available in Ubuntu repos or PPAs)
-		"dms (DankMaterialShell)": {Name: "dms", Repository: RepoTypeManual, BuildFunc: "installDankMaterialShell"},
-		"niri":                    {Name: "niri", Repository: RepoTypeManual, BuildFunc: "installNiri"},
-		"quickshell":              {Name: "quickshell", Repository: RepoTypeManual, BuildFunc: "installQuickshell"},
-		"ghostty":                 {Name: "ghostty", Repository: RepoTypeManual, BuildFunc: "installGhostty"},
-		"matugen":                 {Name: "matugen", Repository: RepoTypeManual, BuildFunc: "installMatugen"},
-		"dgop":                    {Name: "dgop", Repository: RepoTypeManual, BuildFunc: "installDgop"},
-		"cliphist":                {Name: "cliphist", Repository: RepoTypeManual, BuildFunc: "installCliphist"},
+		// DMS packages from PPAs
+		"dms (DankMaterialShell)": u.getDmsMapping(variants["dms (DankMaterialShell)"]),
+		"quickshell":              u.getQuickshellMapping(variants["quickshell"]),
+		"matugen":                 {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"dgop":                    {Name: "dgop", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+		"cliphist":                {Name: "cliphist", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
+
+		// Keep ghostty as manual (no PPA available)
+		"ghostty": {Name: "ghostty", Repository: RepoTypeManual, BuildFunc: "installGhostty"},
 	}
 
 	switch wm {
@@ -182,11 +185,40 @@ func (u *UbuntuDistribution) GetPackageMapping(wm deps.WindowManager) map[string
 		packages["grimblast"] = PackageMapping{Name: "grimblast", Repository: RepoTypeManual, BuildFunc: "installGrimblast"}
 		packages["jq"] = PackageMapping{Name: "jq", Repository: RepoTypeSystem}
 	case deps.WindowManagerNiri:
-		packages["niri"] = PackageMapping{Name: "niri", Repository: RepoTypeManual, BuildFunc: "installNiri"}
-		packages["xwayland-satellite"] = PackageMapping{Name: "xwayland-satellite", Repository: RepoTypeManual, BuildFunc: "installXwaylandSatellite"}
+		niriVariant := variants["niri"]
+		packages["niri"] = u.getNiriMapping(niriVariant)
+		packages["xwayland-satellite"] = u.getXwaylandSatelliteMapping(niriVariant)
 	}
 
 	return packages
+}
+
+func (u *UbuntuDistribution) getDmsMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "dms-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/dms-git"}
+	}
+	return PackageMapping{Name: "dms", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/dms"}
+}
+
+func (u *UbuntuDistribution) getQuickshellMapping(variant deps.PackageVariant) PackageMapping {
+	if forceQuickshellGit || variant == deps.VariantGit {
+		return PackageMapping{Name: "quickshell-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
+	}
+	return PackageMapping{Name: "quickshell", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
+}
+
+func (u *UbuntuDistribution) getNiriMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "niri-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
+	}
+	return PackageMapping{Name: "niri", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
+}
+
+func (u *UbuntuDistribution) getXwaylandSatelliteMapping(variant deps.PackageVariant) PackageMapping {
+	if variant == deps.VariantGit {
+		return PackageMapping{Name: "xwayland-satellite-git", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
+	}
+	return PackageMapping{Name: "xwayland-satellite", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"}
 }
 
 func (u *UbuntuDistribution) InstallPrerequisites(ctx context.Context, sudoPassword string, progressChan chan<- InstallProgressMsg) error {
@@ -365,7 +397,7 @@ func (u *UbuntuDistribution) categorizePackages(dependencies []deps.Dependency, 
 		variantMap[dep.Name] = dep.Variant
 	}
 
-	packageMap := u.GetPackageMapping(wm)
+	packageMap := u.GetPackageMappingWithVariants(wm, variantMap)
 
 	for _, dep := range dependencies {
 		if disabledFlags[dep.Name] {

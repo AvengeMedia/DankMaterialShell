@@ -1,0 +1,27 @@
+Source: dgop
+Section: utils
+Priority: optional
+Maintainer: Avenge Media <AvengeMedia.US@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               wget,
+               gzip
+Standards-Version: 4.6.2
+Homepage: https://github.com/AvengeMedia/dgop
+Vcs-Browser: https://github.com/AvengeMedia/dgop
+Vcs-Git: https://github.com/AvengeMedia/dgop.git
+
+Package: dgop
+Architecture: amd64 arm64
+Depends: ${misc:Depends}
+Description: Stateless CPU/GPU monitor for DankMaterialShell
+ DGOP is a stateless system monitoring tool that provides CPU, GPU,
+ memory, and network statistics. Designed for integration with
+ DankMaterialShell but can be used standalone.
+ .
+ Features:
+  - CPU usage monitoring
+  - GPU usage and temperature (NVIDIA, AMD)
+  - Memory and swap statistics
+  - Network traffic monitoring
+  - Zero-state design (no background processes)
+  - JSON output for easy integration

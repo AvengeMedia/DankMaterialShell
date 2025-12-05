@@ -2,7 +2,6 @@ import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
@@ -13,6 +12,7 @@ Item {
     required property var panelWindow
     required property bool overviewOpen
     readonly property HyprlandMonitor monitor: Hyprland.monitorFor(panelWindow.screen)
+    readonly property real dpr: CompositorService.getScreenScale(panelWindow.screen)
     readonly property int workspacesShown: SettingsData.overviewRows * SettingsData.overviewColumns
 
     readonly property var allWorkspaces: Hyprland.workspaces?.values || []
@@ -77,6 +77,9 @@ Item {
     readonly property int maxWorkspaceId: displayedWorkspaceIds.length > 0 ? displayedWorkspaceIds[displayedWorkspaceIds.length - 1] : workspacesShown
     readonly property int displayWorkspaceCount: displayedWorkspaceIds.length
 
+    readonly property int effectiveColumns: SettingsData.overviewColumns
+    readonly property int effectiveRows: Math.max(SettingsData.overviewRows, Math.ceil(displayWorkspaceCount / effectiveColumns))
+
     function getWorkspaceMonitorName(workspaceId) {
         if (!allWorkspaces || !workspaceId) return ""
         try {
@@ -103,8 +106,10 @@ Item {
     property real scale: SettingsData.overviewScale
     property color activeBorderColor: Theme.primary
 
-    property real workspaceImplicitWidth: ((monitor.width / monitor.scale) * root.scale)
-    property real workspaceImplicitHeight: ((monitor.height / monitor.scale) * root.scale)
+    readonly property real monitorPhysicalWidth: panelWindow.screen ? (panelWindow.screen.width / root.dpr) : (monitor?.width ?? 1920)
+    readonly property real monitorPhysicalHeight: panelWindow.screen ? (panelWindow.screen.height / root.dpr) : (monitor?.height ?? 1080)
+    property real workspaceImplicitWidth: monitorPhysicalWidth * root.scale
+    property real workspaceImplicitHeight: monitorPhysicalHeight * root.scale
 
     property int workspaceZ: 0
     property int windowZ: 1
@@ -162,18 +167,18 @@ Item {
             spacing: workspaceSpacing
 
             Repeater {
-                model: SettingsData.overviewRows
+                model: root.effectiveRows
                 delegate: RowLayout {
                     id: row
                     property int rowIndex: index
                     spacing: workspaceSpacing
 
                     Repeater {
-                        model: SettingsData.overviewColumns
+                        model: root.effectiveColumns
                         Rectangle {
                             id: workspace
                             property int colIndex: index
-                            property int workspaceIndex: rowIndex * SettingsData.overviewColumns + colIndex
+                            property int workspaceIndex: rowIndex * root.effectiveColumns + colIndex
                             property int workspaceValue: (root.displayedWorkspaceIds && workspaceIndex < root.displayedWorkspaceIds.length) ? root.displayedWorkspaceIds[workspaceIndex] : -1
                             property bool workspaceExists: (root.allWorkspaceIds && workspaceValue > 0) ? root.allWorkspaceIds.includes(workspaceValue) : false
                             property var workspaceObj: (workspaceExists && Hyprland.workspaces?.values) ? Hyprland.workspaces.values.find(ws => ws?.id === workspaceValue) : null
@@ -292,11 +297,12 @@ Item {
                     }
 
                     readonly property int workspaceIndex: getWorkspaceIndex()
-                    readonly property int workspaceColIndex: workspaceIndex % SettingsData.overviewColumns
-                    readonly property int workspaceRowIndex: Math.floor(workspaceIndex / SettingsData.overviewColumns)
+                    readonly property int workspaceColIndex: workspaceIndex % root.effectiveColumns
+                    readonly property int workspaceRowIndex: Math.floor(workspaceIndex / root.effectiveColumns)
 
                     toplevel: modelData
                     scale: root.scale
+                    monitorDpr: root.dpr
                     availableWorkspaceWidth: root.workspaceImplicitWidth
                     availableWorkspaceHeight: root.workspaceImplicitHeight
                     widgetMonitorId: root.monitor.id
@@ -376,7 +382,7 @@ Item {
             z: root.monitorLabelZ
 
             Repeater {
-                model: SettingsData.overviewRows
+                model: root.effectiveRows
                 delegate: Item {
                     id: labelRow
                     property int rowIndex: index
@@ -385,11 +391,11 @@ Item {
                     height: root.workspaceImplicitHeight
 
                     Repeater {
-                        model: SettingsData.overviewColumns
+                        model: root.effectiveColumns
                         delegate: Item {
                             id: labelItem
                             property int colIndex: index
-                            property int workspaceIndex: labelRow.rowIndex * SettingsData.overviewColumns + colIndex
+                            property int workspaceIndex: labelRow.rowIndex * root.effectiveColumns + colIndex
                             property int workspaceValue: (root.displayedWorkspaceIds && workspaceIndex < root.displayedWorkspaceIds.length) ? root.displayedWorkspaceIds[workspaceIndex] : -1
                             property bool workspaceExists: (root.allWorkspaceIds && workspaceValue > 0) ? root.allWorkspaceIds.includes(workspaceValue) : false
                             property string workspaceMonitorName: (workspaceValue > 0) ? root.getWorkspaceMonitorName(workspaceValue) : ""

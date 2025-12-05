@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -11,71 +10,90 @@ BasePill {
     property var widgetData: null
     property string mountPath: (widgetData && widgetData.mountPath !== undefined) ? widgetData.mountPath : "/"
     property bool isHovered: mouseArea.containsMouse
+    property bool isAutoHideBar: false
 
     property var selectedMount: {
         if (!DgopService.diskMounts || DgopService.diskMounts.length === 0) {
-            return null
+            return null;
         }
 
-        const currentMountPath = root.mountPath || "/"
+        const currentMountPath = root.mountPath || "/";
 
         for (let i = 0; i < DgopService.diskMounts.length; i++) {
             if (DgopService.diskMounts[i].mount === currentMountPath) {
-                return DgopService.diskMounts[i]
+                return DgopService.diskMounts[i];
             }
         }
 
         for (let i = 0; i < DgopService.diskMounts.length; i++) {
             if (DgopService.diskMounts[i].mount === "/") {
-                return DgopService.diskMounts[i]
+                return DgopService.diskMounts[i];
             }
         }
 
-        return DgopService.diskMounts[0] || null
+        return DgopService.diskMounts[0] || null;
     }
 
     property real diskUsagePercent: {
         if (!selectedMount || !selectedMount.percent) {
-            return 0
+            return 0;
         }
-        const percentStr = selectedMount.percent.replace("%", "")
-        return parseFloat(percentStr) || 0
+        const percentStr = selectedMount.percent.replace("%", "");
+        return parseFloat(percentStr) || 0;
     }
 
     Component.onCompleted: {
-        DgopService.addRef(["diskmounts"])
+        DgopService.addRef(["diskmounts"]);
     }
     Component.onDestruction: {
-        DgopService.removeRef(["diskmounts"])
+        DgopService.removeRef(["diskmounts"]);
+    }
+
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVerticalOrientation) {
+            return 0;
+        }
+
+        if (isAutoHideBar) {
+            return 0;
+        }
+
+        if (parentScreen.y > 0) {
+            const spacing = barConfig?.spacing ?? 4;
+            const offset = barThickness + spacing;
+            return offset;
+        }
+
+        return 0;
     }
 
     Connections {
         function onWidgetDataChanged() {
             root.mountPath = Qt.binding(() => {
-                return (root.widgetData && root.widgetData.mountPath !== undefined) ? root.widgetData.mountPath : "/"
-            })
+                return (root.widgetData && root.widgetData.mountPath !== undefined) ? root.widgetData.mountPath : "/";
+            });
 
             root.selectedMount = Qt.binding(() => {
                 if (!DgopService.diskMounts || DgopService.diskMounts.length === 0) {
-                    return null
+                    return null;
                 }
 
-                const currentMountPath = root.mountPath || "/"
+                const currentMountPath = root.mountPath || "/";
 
                 for (let i = 0; i < DgopService.diskMounts.length; i++) {
                     if (DgopService.diskMounts[i].mount === currentMountPath) {
-                        return DgopService.diskMounts[i]
+                        return DgopService.diskMounts[i];
                     }
                 }
 
                 for (let i = 0; i < DgopService.diskMounts.length; i++) {
                     if (DgopService.diskMounts[i].mount === "/") {
-                        return DgopService.diskMounts[i]
+                        return DgopService.diskMounts[i];
                     }
                 }
 
-                return DgopService.diskMounts[0] || null
-            })
+                return DgopService.diskMounts[0] || null;
+            });
         }
 
         target: SettingsData
@@ -97,12 +115,12 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness)
                     color: {
                         if (root.diskUsagePercent > 90) {
-                            return Theme.tempDanger
+                            return Theme.tempDanger;
                         }
                         if (root.diskUsagePercent > 75) {
-                            return Theme.tempWarning
+                            return Theme.tempWarning;
                         }
-                        return Theme.surfaceText
+                        return Theme.surfaceText;
                     }
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -110,11 +128,11 @@ BasePill {
                 StyledText {
                     text: {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
-                            return "--"
+                            return "--";
                         }
-                        return root.diskUsagePercent.toFixed(0)
+                        return root.diskUsagePercent.toFixed(0);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -131,12 +149,12 @@ BasePill {
                     size: Theme.barIconSize(root.barThickness)
                     color: {
                         if (root.diskUsagePercent > 90) {
-                            return Theme.tempDanger
+                            return Theme.tempDanger;
                         }
                         if (root.diskUsagePercent > 75) {
-                            return Theme.tempWarning
+                            return Theme.tempWarning;
                         }
-                        return Theme.surfaceText
+                        return Theme.surfaceText;
                     }
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -144,11 +162,11 @@ BasePill {
                 StyledText {
                     text: {
                         if (!root.selectedMount) {
-                            return "--"
+                            return "--";
                         }
-                        return root.selectedMount.mount
+                        return root.selectedMount.mount;
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
@@ -158,11 +176,11 @@ BasePill {
                 StyledText {
                     text: {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
-                            return "--%"
+                            return "--%";
                         }
-                        return root.diskUsagePercent.toFixed(0) + "%"
+                        return root.diskUsagePercent.toFixed(0) + "%";
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     horizontalAlignment: Text.AlignLeft
@@ -170,7 +188,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: diskBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         text: "100%"
                     }
 
@@ -200,24 +218,25 @@ BasePill {
         hoverEnabled: root.isVerticalOrientation
         onEntered: {
             if (root.isVerticalOrientation && root.selectedMount) {
-                tooltipLoader.active = true
+                tooltipLoader.active = true;
                 if (tooltipLoader.item) {
-                    const globalPos = mapToGlobal(width / 2, height / 2)
-                    const currentScreen = root.parentScreen || Screen
-                    const screenX = currentScreen ? currentScreen.x : 0
-                    const screenY = currentScreen ? currentScreen.y : 0
-                    const relativeY = globalPos.y - screenY
-                    const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (currentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
-                    const isLeft = root.axis?.edge === "left"
-                    tooltipLoader.item.show(root.selectedMount.mount, screenX + tooltipX, relativeY, currentScreen, isLeft, !isLeft)
+                    const globalPos = mapToGlobal(width / 2, height / 2);
+                    const currentScreen = root.parentScreen || Screen;
+                    const screenX = currentScreen ? currentScreen.x : 0;
+                    const screenY = currentScreen ? currentScreen.y : 0;
+                    const relativeY = globalPos.y - screenY;
+                    const adjustedY = relativeY + root.minTooltipY;
+                    const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (currentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS);
+                    const isLeft = root.axis?.edge === "left";
+                    tooltipLoader.item.show(root.selectedMount.mount, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft);
                 }
             }
         }
         onExited: {
             if (tooltipLoader.item) {
-                tooltipLoader.item.hide()
+                tooltipLoader.item.hide();
             }
-            tooltipLoader.active = false
+            tooltipLoader.active = false;
         }
     }
 }

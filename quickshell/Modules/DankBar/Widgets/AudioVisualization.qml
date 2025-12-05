@@ -20,19 +20,50 @@ Item {
             Ref {
                 service: CavaService
             }
-
         }
-
     }
+
+    readonly property real maxBarHeight: Theme.iconSize - 2
+    readonly property real minBarHeight: 3
+    readonly property real heightRange: maxBarHeight - minBarHeight
+    property var barHeights: [minBarHeight, minBarHeight, minBarHeight, minBarHeight, minBarHeight, minBarHeight]
 
     Timer {
         id: fallbackTimer
 
         running: !CavaService.cavaAvailable && isPlaying
-        interval: 256
+        interval: 500
         repeat: true
         onTriggered: {
-            CavaService.values = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25];
+            CavaService.values = [Math.random() * 20 + 5, Math.random() * 25 + 8, Math.random() * 22 + 6, Math.random() * 20 + 5, Math.random() * 22 + 6, Math.random() * 25 + 8];
+        }
+    }
+
+    Connections {
+        target: CavaService
+        function onValuesChanged() {
+            if (!root.isPlaying) {
+                root.barHeights = [root.minBarHeight, root.minBarHeight, root.minBarHeight, root.minBarHeight, root.minBarHeight, root.minBarHeight];
+                return;
+            }
+
+            const newHeights = [];
+            for (let i = 0; i < 6; i++) {
+                if (CavaService.values.length <= i) {
+                    newHeights.push(root.minBarHeight);
+                    continue;
+                }
+
+                const rawLevel = CavaService.values[i];
+                if (rawLevel <= 0) {
+                    newHeights.push(root.minBarHeight);
+                } else if (rawLevel >= 100) {
+                    newHeights.push(root.maxBarHeight);
+                } else {
+                    newHeights.push(root.minBarHeight + Math.sqrt(rawLevel * 0.01) * root.heightRange);
+                }
+            }
+            root.barHeights = newHeights;
         }
     }
 
@@ -45,33 +76,19 @@ Item {
 
             Rectangle {
                 width: 2
-                height: {
-                    if (root.isPlaying && CavaService.values.length > index) {
-                        const rawLevel = CavaService.values[index] || 0;
-                        const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100;
-                        const maxHeight = Theme.iconSize - 2;
-                        const minHeight = 3;
-                        return minHeight + (scaledLevel / 100) * (maxHeight - minHeight);
-                    }
-                    return 3;
-                }
+                height: root.barHeights[index]
                 radius: 1.5
                 color: Theme.primary
                 anchors.verticalCenter: parent.verticalCenter
 
                 Behavior on height {
+                    enabled: root.isPlaying && !CavaService.cavaAvailable
                     NumberAnimation {
-                        duration: Anims.durShort
-                        easing.type: Easing.BezierSpline
-                        easing.bezierCurve: Anims.standardDecel
+                        duration: 100
+                        easing.type: Easing.Linear
                     }
-
                 }
-
             }
-
         }
-
     }
-
 }

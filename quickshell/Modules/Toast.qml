@@ -2,8 +2,6 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
-import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -22,13 +20,13 @@ PanelWindow {
         target: ToastService
         function onToastVisibleChanged() {
             if (ToastService.toastVisible) {
-                shouldBeVisible = true
-                visible = true
+                shouldBeVisible = true;
+                visible = true;
             } else {
                 // Freeze the width before starting exit animation
-                frozenWidth = toast.width
-                shouldBeVisible = false
-                closeTimer.restart()
+                frozenWidth = toast.width;
+                shouldBeVisible = false;
+                closeTimer.restart();
             }
         }
     }
@@ -38,7 +36,7 @@ PanelWindow {
         interval: Theme.mediumDuration + 50
         onTriggered: {
             if (!shouldBeVisible) {
-                visible = false
+                visible = false;
             }
         }
     }
@@ -65,24 +63,24 @@ PanelWindow {
         Connections {
             target: ToastService
             function onResetToastState() {
-                toast.expanded = false
+                toast.expanded = false;
             }
         }
 
         width: shouldBeVisible ? Math.min(900, messageText.implicitWidth + statusIcon.width + Theme.spacingM + (ToastService.hasDetails ? (expandButton.width + closeButton.width + 4) : (ToastService.currentLevel === ToastService.levelError ? closeButton.width + Theme.spacingS : 0)) + Theme.spacingL * 2 + Theme.spacingM * 2) : frozenWidth
         height: toastContent.height + Theme.spacingL * 2
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Theme.barHeight - 4 + SettingsData.dankBarSpacing + 2
+        y: Theme.barHeight - 4 + (SettingsData.barConfigs[0]?.spacing ?? 4) + 2
         color: {
             switch (ToastService.currentLevel) {
             case ToastService.levelError:
-                return Theme.error
+                return Theme.error;
             case ToastService.levelWarn:
-                return Theme.warning
+                return Theme.warning;
             case ToastService.levelInfo:
-                return Theme.surfaceContainer
+                return Theme.surfaceContainer;
             default:
-                return Theme.surfaceContainer
+                return Theme.surfaceContainer;
             }
         }
         radius: Theme.cornerRadius
@@ -109,13 +107,13 @@ PanelWindow {
                     name: {
                         switch (ToastService.currentLevel) {
                         case ToastService.levelError:
-                            return "error"
+                            return "error";
                         case ToastService.levelWarn:
-                            return "warning"
+                            return "warning";
                         case ToastService.levelInfo:
-                            return "info"
+                            return "info";
                         default:
-                            return "info"
+                            return "info";
                         }
                     }
                     size: Theme.iconSize
@@ -123,9 +121,9 @@ PanelWindow {
                         switch (ToastService.currentLevel) {
                         case ToastService.levelError:
                         case ToastService.levelWarn:
-                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                         default:
-                            return Theme.surfaceText
+                            return Theme.surfaceText;
                         }
                     }
                     anchors.left: parent.left
@@ -140,9 +138,9 @@ PanelWindow {
                         switch (ToastService.currentLevel) {
                         case ToastService.levelError:
                         case ToastService.levelWarn:
-                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                         default:
-                            return Theme.surfaceText
+                            return Theme.surfaceText;
                         }
                     }
                     font.weight: Font.Medium
@@ -163,9 +161,9 @@ PanelWindow {
                         switch (ToastService.currentLevel) {
                         case ToastService.levelError:
                         case ToastService.levelWarn:
-                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                         default:
-                            return Theme.surfaceText
+                            return Theme.surfaceText;
                         }
                     }
                     buttonSize: Theme.iconSize + 8
@@ -175,11 +173,11 @@ PanelWindow {
                     visible: ToastService.hasDetails
 
                     onClicked: {
-                        toast.expanded = !toast.expanded
+                        toast.expanded = !toast.expanded;
                         if (toast.expanded) {
-                            ToastService.stopTimer()
+                            ToastService.stopTimer();
                         } else {
-                            ToastService.restartTimer()
+                            ToastService.restartTimer();
                         }
                     }
                 }
@@ -192,9 +190,9 @@ PanelWindow {
                         switch (ToastService.currentLevel) {
                         case ToastService.levelError:
                         case ToastService.levelWarn:
-                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                            return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                         default:
-                            return Theme.surfaceText
+                            return Theme.surfaceText;
                         }
                     }
                     buttonSize: Theme.iconSize + 8
@@ -203,7 +201,7 @@ PanelWindow {
                     visible: ToastService.hasDetails || ToastService.currentLevel === ToastService.levelError
 
                     onClicked: {
-                        ToastService.hideToast()
+                        ToastService.hideToast();
                     }
                 }
             }
@@ -211,7 +209,7 @@ PanelWindow {
             Rectangle {
                 width: parent.width
                 height: detailsColumn.height + Theme.spacingS * 2
-                color: Qt.rgba(0, 0, 0, 0.2)
+                color: ToastService.currentDetails.length > 0 ? Qt.rgba(0, 0, 0, 0.2) : "transparent"
                 radius: Theme.cornerRadius / 2
                 visible: toast.expanded && ToastService.hasDetails
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -232,9 +230,9 @@ PanelWindow {
                             switch (ToastService.currentLevel) {
                             case ToastService.levelError:
                             case ToastService.levelWarn:
-                                return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                                return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                             default:
-                                return Theme.surfaceText
+                                return Theme.surfaceText;
                             }
                         }
                         visible: ToastService.currentDetails.length > 0
@@ -259,9 +257,9 @@ PanelWindow {
                                 switch (ToastService.currentLevel) {
                                 case ToastService.levelError:
                                 case ToastService.levelWarn:
-                                    return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                                    return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                                 default:
-                                    return Theme.surfaceText
+                                    return Theme.surfaceText;
                                 }
                             }
                             isMonospace: true
@@ -281,9 +279,9 @@ PanelWindow {
                                 switch (ToastService.currentLevel) {
                                 case ToastService.levelError:
                                 case ToastService.levelWarn:
-                                    return SessionData.isLightMode ? Theme.surfaceText : Theme.background
+                                    return SessionData.isLightMode ? Theme.surfaceText : Theme.background;
                                 default:
-                                    return Theme.surfaceText
+                                    return Theme.surfaceText;
                                 }
                             }
                             buttonSize: Theme.iconSizeSmall + 8
@@ -295,9 +293,9 @@ PanelWindow {
                             property bool showTooltip: false
 
                             onClicked: {
-                                Quickshell.execDetached(["wl-copy", ToastService.currentCommand])
-                                showTooltip = true
-                                tooltipTimer.start()
+                                Quickshell.execDetached(["wl-copy", ToastService.currentCommand]);
+                                showTooltip = true;
+                                tooltipTimer.start();
                             }
 
                             Timer {
@@ -345,7 +343,6 @@ PanelWindow {
             shadowColor: Qt.rgba(0, 0, 0, 0.3)
             shadowOpacity: 0.3
         }
-
 
         Behavior on opacity {
             NumberAnimation {

@@ -10,7 +10,9 @@ StyledRect {
     property color iconColor: Theme.surfaceText
     property color backgroundColor: "transparent"
     property bool circular: true
+    property bool enabled: true
     property int buttonSize: 32
+    property var tooltipText: null
 
     signal clicked
     signal entered
@@ -29,10 +31,12 @@ StyledRect {
     }
 
     StateLayer {
+        disabled: !root.enabled
         stateColor: Theme.primary
         cornerRadius: root.radius
         onClicked: root.clicked()
         onEntered: root.entered()
         onExited: root.exited()
+        tooltipText: root.tooltipText
     }
 }

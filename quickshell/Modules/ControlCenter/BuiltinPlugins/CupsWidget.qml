@@ -1,6 +1,5 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -17,20 +16,18 @@ PluginComponent {
     ccWidgetPrimaryText: I18n.tr("Printers")
     ccWidgetSecondaryText: {
         if (CupsService.cupsAvailable && CupsService.getPrintersNum() > 0) {
-            return I18n.tr("Printers: ") + CupsService.getPrintersNum() + " - " + I18n.tr("Jobs: ") + CupsService.getTotalJobsNum()
+            return I18n.tr("Printers: ") + CupsService.getPrintersNum() + " - " + I18n.tr("Jobs: ") + CupsService.getTotalJobsNum();
         } else {
             if (!CupsService.cupsAvailable) {
-                return I18n.tr("Print Server not available")
+                return I18n.tr("Print Server not available");
             } else {
-                return I18n.tr("No printer found")
+                return I18n.tr("No printer found");
             }
         }
     }
     ccWidgetIsActive: CupsService.cupsAvailable && CupsService.getTotalJobsNum() > 0
 
-    onCcWidgetToggled: {
-
-    }
+    onCcWidgetToggled: {}
 
     ccDetailContent: Component {
         Rectangle {
@@ -38,6 +35,21 @@ PluginComponent {
             implicitHeight: detailColumn.implicitHeight + Theme.spacingM * 2
             radius: Theme.cornerRadius
             color: Theme.surfaceContainerHigh
+
+            DankActionButton {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: Theme.spacingS
+                anchors.rightMargin: Theme.spacingS
+                iconName: "settings"
+                buttonSize: 24
+                iconSize: 14
+                iconColor: Theme.surfaceVariantText
+                onClicked: {
+                    PopoutService.closeControlCenter();
+                    PopoutService.openSettingsWithTab("printers");
+                }
+            }
 
             Column {
                 visible: !CupsService.cupsAvailable || CupsService.getPrintersNum() == 0
@@ -58,7 +70,7 @@ PluginComponent {
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
-            
+
             Column {
                 id: detailColumn
                 anchors.fill: parent
@@ -78,12 +90,12 @@ PluginComponent {
                         Layout.maximumWidth: parent.width - 180
                         description: ""
                         currentValue: {
-                            CupsService.getSelectedPrinter()
+                            CupsService.getSelectedPrinter();
                         }
                         options: CupsService.getPrintersNames()
                         onValueChanged: value => {
-                                            CupsService.setSelectedPrinter(value)
-                                        }
+                            CupsService.setSelectedPrinter(value);
+                        }
                     }
 
                     Column {
@@ -135,11 +147,11 @@ PluginComponent {
                                     cursorShape: Qt.PointingHandCursor
                                     enabled: true
                                     onClicked: {
-                                        const selected = CupsService.getSelectedPrinter()
+                                        const selected = CupsService.getSelectedPrinter();
                                         if (CupsService.getCurrentPrinterState() === "stopped") {
-                                            CupsService.resumePrinter(selected)
+                                            CupsService.resumePrinter(selected);
                                         } else {
-                                            CupsService.pausePrinter(selected)
+                                            CupsService.pausePrinter(selected);
                                         }
                                     }
                                 }
@@ -180,8 +192,8 @@ PluginComponent {
                                     cursorShape: Qt.PointingHandCursor
                                     enabled: true
                                     onClicked: {
-                                        const selected = CupsService.getSelectedPrinter()
-                                        CupsService.purgeJobs(selected)
+                                        const selected = CupsService.getSelectedPrinter();
+                                        CupsService.purgeJobs(selected);
                                     }
                                 }
                             }
@@ -275,8 +287,8 @@ PluginComponent {
 
                                         StyledText {
                                             text: {
-                                                var date = new Date(modelData.timeCreated)
-                                                return date.toLocaleString(Qt.locale(), Locale.ShortFormat)
+                                                var date = new Date(modelData.timeCreated);
+                                                return date.toLocaleString(Qt.locale(), Locale.ShortFormat);
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceTextMedium
@@ -296,7 +308,7 @@ PluginComponent {
                                     iconName: "delete"
                                     buttonSize: 36
                                     onClicked: {
-                                        CupsService.cancelJob(CupsService.getSelectedPrinter(), modelData.id)
+                                        CupsService.cancelJob(CupsService.getSelectedPrinter(), modelData.id);
                                     }
                                 }
                             }

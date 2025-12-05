@@ -1,123 +1,97 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Io
 import qs.Common
-import qs.Modals.Common
 import qs.Modals.FileBrowser
-import qs.Modules.Settings
 import qs.Services
 import qs.Widgets
 
-DankModal {
+FloatingWindow {
     id: settingsModal
 
-    layerNamespace: "dms:settings"
-
-    HyprlandFocusGrab {
-        windows: [settingsModal]
-        active: CompositorService.isHyprland && settingsModal.shouldHaveFocus
-    }
-
-    property Component settingsContent
     property alias profileBrowser: profileBrowser
+    property alias wallpaperBrowser: wallpaperBrowser
+    property alias sidebar: sidebar
     property int currentTabIndex: 0
+    property bool shouldHaveFocus: visible
+    property bool allowFocusOverride: false
+    property alias shouldBeVisible: settingsModal.visible
+    property bool isCompactMode: width < 700
+    property bool menuVisible: !isCompactMode
+    property bool enableAnimations: true
 
-    signal closingModal()
+    signal closingModal
 
     function show() {
-        open();
+        visible = true;
     }
 
     function hide() {
-        close();
+        visible = false;
     }
 
     function toggle() {
-        if (shouldBeVisible) {
-            hide();
-        } else {
-            show();
-        }
+        visible = !visible;
+    }
+
+    function showWithTab(tabIndex: int) {
+        if (tabIndex >= 0)
+            currentTabIndex = tabIndex;
+        visible = true;
+    }
+
+    function showWithTabName(tabName: string) {
+        var idx = sidebar.resolveTabIndex(tabName);
+        if (idx >= 0)
+            currentTabIndex = idx;
+        visible = true;
+    }
+
+    function resolveTabIndex(tabName: string): int {
+        return sidebar.resolveTabIndex(tabName);
+    }
+
+    function toggleMenu() {
+        enableAnimations = true;
+        menuVisible = !menuVisible;
     }
 
     objectName: "settingsModal"
-    width: Math.min(800, screenWidth * 0.9)
-    height: Math.min(800, screenHeight * 0.85)
-    backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    title: I18n.tr("Settings", "settings window title")
+    minimumSize: Qt.size(500, 400)
+    implicitWidth: 800
+    implicitHeight: 940
+    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     visible: false
-    onBackgroundClicked: () => {
-        return hide();
-    }
-    content: settingsContent
-    onOpened: () => {
+
+    onIsCompactModeChanged: {
+        enableAnimations = false;
+        if (!isCompactMode) {
+            menuVisible = true;
+        }
         Qt.callLater(() => {
-            modalFocusScope.forceActiveFocus()
-            if (contentLoader.item) {
-                contentLoader.item.forceActiveFocus()
-            }
-        })
+            enableAnimations = true;
+        });
     }
 
     onVisibleChanged: {
-        if (visible && shouldBeVisible) {
+        if (!visible) {
+            closingModal();
+        } else {
             Qt.callLater(() => {
-                modalFocusScope.forceActiveFocus()
-                if (contentLoader.item) {
-                    contentLoader.item.forceActiveFocus()
+                if (contentFocusScope) {
+                    contentFocusScope.forceActiveFocus();
                 }
-            })
-        }
-    }
-    modalFocusScope.Keys.onPressed: event => {
-        const tabCount = 11
-        if (event.key === Qt.Key_Down) {
-            currentTabIndex = (currentTabIndex + 1) % tabCount
-            event.accepted = true
-        } else if (event.key === Qt.Key_Up) {
-            currentTabIndex = (currentTabIndex - 1 + tabCount) % tabCount
-            event.accepted = true
-        } else if (event.key === Qt.Key_Tab && !event.modifiers) {
-            currentTabIndex = (currentTabIndex + 1) % tabCount
-            event.accepted = true
-        } else if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && event.modifiers & Qt.ShiftModifier)) {
-            currentTabIndex = (currentTabIndex - 1 + tabCount) % tabCount
-            event.accepted = true
+            });
         }
     }
 
-    IpcHandler {
-        function open(): string {
-            settingsModal.show();
-            return "SETTINGS_OPEN_SUCCESS";
-        }
-
-        function close(): string {
-            settingsModal.hide();
-            return "SETTINGS_CLOSE_SUCCESS";
-        }
-
-        function toggle(): string {
-            settingsModal.toggle();
-            return "SETTINGS_TOGGLE_SUCCESS";
-        }
-
-        target: "settings"
-    }
-
-    IpcHandler {
-        function browse(type: string) {
-            if (type === "wallpaper") {
-                wallpaperBrowser.allowStacking = false;
-                wallpaperBrowser.open();
-            } else if (type === "profile") {
-                profileBrowser.allowStacking = false;
-                profileBrowser.open();
+    Loader {
+        active: settingsModal.visible
+        sourceComponent: Component {
+            Ref {
+                service: CupsService
             }
         }
-
-        target: "file"
     }
 
     FileBrowserModal {
@@ -125,25 +99,17 @@ DankModal {
 
         allowStacking: true
         parentModal: settingsModal
-        browserTitle: "Select Profile Image"
+        browserTitle: I18n.tr("Select Profile Image", "profile image file browser title")
         browserIcon: "person"
         browserType: "profile"
         showHiddenFiles: true
         fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-        onFileSelected: (path) => {
+        onFileSelected: path => {
             PortalService.setProfileImage(path);
             close();
         }
         onDialogClosed: () => {
             allowStacking = true;
-            if (settingsModal.shouldBeVisible) {
-                Qt.callLater(() => {
-                    settingsModal.modalFocusScope.forceActiveFocus()
-                    if (settingsModal.contentLoader.item) {
-                        settingsModal.contentLoader.item.forceActiveFocus()
-                    }
-                })
-            }
         }
     }
 
@@ -152,116 +118,153 @@ DankModal {
 
         allowStacking: true
         parentModal: settingsModal
-        browserTitle: "Select Wallpaper"
+        browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
         browserIcon: "wallpaper"
         browserType: "wallpaper"
         showHiddenFiles: true
         fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-        onFileSelected: (path) => {
+        onFileSelected: path => {
             SessionData.setWallpaper(path);
             close();
         }
         onDialogClosed: () => {
             allowStacking = true;
-            if (settingsModal.shouldBeVisible) {
-                Qt.callLater(() => {
-                    settingsModal.modalFocusScope.forceActiveFocus()
-                    if (settingsModal.contentLoader.item) {
-                        settingsModal.contentLoader.item.forceActiveFocus()
-                    }
-                })
-            }
         }
     }
 
-    settingsContent: Component {
-        Item {
-            id: rootScope
-            anchors.fill: parent
+    FocusScope {
+        id: contentFocusScope
 
-            Keys.onEscapePressed: event => {
-                settingsModal.hide()
-                event.accepted = true
+        anchors.fill: parent
+        focus: true
+
+        Keys.onPressed: event => {
+            if (event.key === Qt.Key_Escape) {
+                hide();
+                event.accepted = true;
+                return;
             }
+            if (event.key === Qt.Key_Down || (event.key === Qt.Key_Tab && !event.modifiers)) {
+                sidebar.navigateNext();
+                event.accepted = true;
+                return;
+            }
+            if (event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && event.modifiers & Qt.ShiftModifier)) {
+                sidebar.navigatePrevious();
+                event.accepted = true;
+                return;
+            }
+        }
 
-            Column {
-                anchors.fill: parent
-                anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL
-                anchors.topMargin: Theme.spacingM
-                anchors.bottomMargin: Theme.spacingL
-                spacing: 0
+        Column {
+            anchors.fill: parent
+            spacing: 0
 
-                Item {
-                    width: parent.width
-                    height: 35
+            Item {
+                width: parent.width
+                height: 48
+                z: 10
 
-                    Row {
-                        anchors.left: parent.left
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingM
-
-                        DankIcon {
-                            name: "settings"
-                            size: Theme.iconSize
-                            color: Theme.primary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        StyledText {
-                            text: I18n.tr("Settings")
-                            font.pixelSize: Theme.fontSizeXLarge
-                            color: Theme.surfaceText
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                    }
-
-                    DankActionButton {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        circular: false
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 4
-                        iconColor: Theme.surfaceText
-                        onClicked: () => {
-                            return settingsModal.hide();
-                        }
-                    }
-
+                Rectangle {
+                    anchors.fill: parent
+                    color: Theme.surfaceContainer
+                    opacity: 0.5
                 }
 
                 Row {
-                    width: parent.width
-                    height: parent.height - 35
-                    spacing: 0
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
 
-                    SettingsSidebar {
-                        id: sidebar
-
-                        parentModal: settingsModal
-                        currentIndex: settingsModal.currentTabIndex
-                        onCurrentIndexChanged: {
-                            settingsModal.currentTabIndex = currentIndex
+                    DankActionButton {
+                        visible: settingsModal.isCompactMode
+                        circular: false
+                        iconName: "menu"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: () => {
+                            settingsModal.toggleMenu();
                         }
                     }
+
+                    DankIcon {
+                        name: "settings"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        text: I18n.tr("Settings")
+                        font.pixelSize: Theme.fontSizeXLarge
+                        color: Theme.surfaceText
+                        font.weight: Font.Medium
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                DankActionButton {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.top: parent.top
+                    anchors.topMargin: Theme.spacingM
+                    circular: false
+                    iconName: "close"
+                    iconSize: Theme.iconSize - 4
+                    iconColor: Theme.surfaceText
+                    onClicked: () => {
+                        settingsModal.hide();
+                    }
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: parent.height - 48
+                clip: true
+
+                SettingsSidebar {
+                    id: sidebar
+
+                    x: 0
+                    width: settingsModal.isCompactMode ? parent.width : 270
+                    visible: settingsModal.isCompactMode ? settingsModal.menuVisible : true
+                    parentModal: settingsModal
+                    currentIndex: settingsModal.currentTabIndex
+                    onCurrentIndexChanged: {
+                        settingsModal.currentTabIndex = currentIndex;
+                        if (settingsModal.isCompactMode) {
+                            settingsModal.enableAnimations = true;
+                            settingsModal.menuVisible = false;
+                        }
+                    }
+                }
+
+                Item {
+                    x: settingsModal.isCompactMode ? (settingsModal.menuVisible ? parent.width : 0) : sidebar.width
+                    width: settingsModal.isCompactMode ? parent.width : parent.width - sidebar.width
+                    height: parent.height
+                    clip: true
 
                     SettingsContent {
                         id: content
 
-                        width: parent.width - sidebar.width
-                        height: parent.height
+                        anchors.fill: parent
                         parentModal: settingsModal
                         currentIndex: settingsModal.currentTabIndex
                     }
 
+                    Behavior on x {
+                        enabled: settingsModal.enableAnimations
+                        NumberAnimation {
+                            duration: Theme.mediumDuration
+                            easing.bezierCurve: Theme.expressiveCurves.emphasizedDecel
+                        }
+                    }
                 }
-
             }
-
         }
-
     }
-
 }

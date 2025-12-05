@@ -3,12 +3,9 @@ import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Effects
-import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import qs.Common
 import qs.Modals.FileBrowser
-import qs.Services
 import qs.Widgets
 
 Item {
@@ -38,222 +35,228 @@ Item {
 
     function getCurrentWallpaper() {
         if (SessionData.perMonitorWallpaper && targetScreenName) {
-            return SessionData.getMonitorWallpaper(targetScreenName)
+            return SessionData.getMonitorWallpaper(targetScreenName);
         }
-        return SessionData.wallpaperPath
+        return SessionData.wallpaperPath;
     }
 
     function setCurrentWallpaper(path) {
         if (SessionData.perMonitorWallpaper && targetScreenName) {
-            SessionData.setMonitorWallpaper(targetScreenName, path)
+            SessionData.setMonitorWallpaper(targetScreenName, path);
         } else {
-            SessionData.setWallpaper(path)
+            SessionData.setWallpaper(path);
         }
     }
 
     onCurrentPageChanged: {
         if (currentPage !== lastPage) {
-            enableAnimation = false
-            lastPage = currentPage
+            enableAnimation = false;
+            lastPage = currentPage;
         }
-        updateSelectedFileName()
+        updateSelectedFileName();
     }
 
     onGridIndexChanged: {
-        updateSelectedFileName()
+        updateSelectedFileName();
     }
 
     onVisibleChanged: {
         if (visible && active) {
-            setInitialSelection()
+            setInitialSelection();
         }
     }
 
     Component.onCompleted: {
-        loadWallpaperDirectory()
+        loadWallpaperDirectory();
     }
 
     onActiveChanged: {
         if (active && visible) {
-            setInitialSelection()
+            setInitialSelection();
         }
     }
 
     function handleKeyEvent(event) {
-        const columns = 4
-        const currentCol = gridIndex % columns
-        const visibleCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage)
+        const columns = 4;
+        const currentCol = gridIndex % columns;
+        const visibleCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
 
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
             if (gridIndex >= 0 && gridIndex < visibleCount) {
-                const absoluteIndex = currentPage * itemsPerPage + gridIndex
+                const absoluteIndex = currentPage * itemsPerPage + gridIndex;
                 if (absoluteIndex < wallpaperFolderModel.count) {
-                    const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath")
+                    const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath");
                     if (filePath) {
-                        setCurrentWallpaper(filePath.toString().replace(/^file:\/\//, ''))
+                        setCurrentWallpaper(filePath.toString().replace(/^file:\/\//, ''));
                     }
                 }
             }
-            return true
+            return true;
         }
 
-        if (event.key === Qt.Key_Right) {
+        if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
             if (gridIndex + 1 < visibleCount) {
-                gridIndex++
+                gridIndex++;
             } else if (currentPage < totalPages - 1) {
-                gridIndex = 0
-                currentPage++
+                gridIndex = 0;
+                currentPage++;
             }
-            return true
+            return true;
         }
 
-        if (event.key === Qt.Key_Left) {
+        if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
             if (gridIndex > 0) {
-                gridIndex--
+                gridIndex--;
             } else if (currentPage > 0) {
-                currentPage--
-                const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage)
-                gridIndex = prevPageCount - 1
+                currentPage--;
+                const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+                gridIndex = prevPageCount - 1;
             }
-            return true
+            return true;
         }
 
-        if (event.key === Qt.Key_Down) {
+        if (event.key === Qt.Key_Down || event.key === Qt.Key_J) {
             if (gridIndex + columns < visibleCount) {
-                gridIndex += columns
+                gridIndex += columns;
             } else if (currentPage < totalPages - 1) {
-                gridIndex = currentCol
-                currentPage++
+                gridIndex = currentCol;
+                currentPage++;
             }
-            return true
+            return true;
         }
 
-        if (event.key === Qt.Key_Up) {
+        if (event.key === Qt.Key_Up || event.key === Qt.Key_K) {
             if (gridIndex >= columns) {
-                gridIndex -= columns
+                gridIndex -= columns;
             } else if (currentPage > 0) {
-                currentPage--
-                const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage)
-                const prevPageRows = Math.ceil(prevPageCount / columns)
-                gridIndex = (prevPageRows - 1) * columns + currentCol
-                gridIndex = Math.min(gridIndex, prevPageCount - 1)
+                currentPage--;
+                const prevPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+                const prevPageRows = Math.ceil(prevPageCount / columns);
+                gridIndex = (prevPageRows - 1) * columns + currentCol;
+                gridIndex = Math.min(gridIndex, prevPageCount - 1);
             }
-            return true
+            return true;
         }
 
         if (event.key === Qt.Key_PageUp && currentPage > 0) {
-            gridIndex = 0
-            currentPage--
-            return true
+            gridIndex = 0;
+            currentPage--;
+            return true;
         }
 
         if (event.key === Qt.Key_PageDown && currentPage < totalPages - 1) {
-            gridIndex = 0
-            currentPage++
-            return true
+            gridIndex = 0;
+            currentPage++;
+            return true;
         }
 
         if (event.key === Qt.Key_Home && event.modifiers & Qt.ControlModifier) {
-            gridIndex = 0
-            currentPage = 0
-            return true
+            gridIndex = 0;
+            currentPage = 0;
+            return true;
         }
 
         if (event.key === Qt.Key_End && event.modifiers & Qt.ControlModifier) {
-            currentPage = totalPages - 1
-            const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage)
-            gridIndex = Math.max(0, lastPageCount - 1)
-            return true
+            currentPage = totalPages - 1;
+            const lastPageCount = Math.min(itemsPerPage, wallpaperFolderModel.count - currentPage * itemsPerPage);
+            gridIndex = Math.max(0, lastPageCount - 1);
+            return true;
         }
 
-        return false
+        return false;
     }
 
     function setInitialSelection() {
-        const currentWallpaper = getCurrentWallpaper()
+        const currentWallpaper = getCurrentWallpaper();
         if (!currentWallpaper || wallpaperFolderModel.count === 0) {
-            gridIndex = 0
-            updateSelectedFileName()
+            gridIndex = 0;
+            updateSelectedFileName();
             Qt.callLater(() => {
-                             enableAnimation = true
-                         })
-            return
+                enableAnimation = true;
+            });
+            return;
         }
 
         for (var i = 0; i < wallpaperFolderModel.count; i++) {
-            const filePath = wallpaperFolderModel.get(i, "filePath")
+            const filePath = wallpaperFolderModel.get(i, "filePath");
             if (filePath && filePath.toString().replace(/^file:\/\//, '') === currentWallpaper) {
-                const targetPage = Math.floor(i / itemsPerPage)
-                const targetIndex = i % itemsPerPage
-                currentPage = targetPage
-                gridIndex = targetIndex
-                updateSelectedFileName()
+                const targetPage = Math.floor(i / itemsPerPage);
+                const targetIndex = i % itemsPerPage;
+                currentPage = targetPage;
+                gridIndex = targetIndex;
+                updateSelectedFileName();
                 Qt.callLater(() => {
-                                 enableAnimation = true
-                             })
-                return
+                    enableAnimation = true;
+                });
+                return;
             }
         }
-        gridIndex = 0
-        updateSelectedFileName()
+        gridIndex = 0;
+        updateSelectedFileName();
         Qt.callLater(() => {
-                         enableAnimation = true
-                     })
+            enableAnimation = true;
+        });
     }
 
     function loadWallpaperDirectory() {
-        const currentWallpaper = getCurrentWallpaper()
+        const currentWallpaper = getCurrentWallpaper();
 
         if (!currentWallpaper || currentWallpaper.startsWith("#")) {
             if (CacheData.wallpaperLastPath && CacheData.wallpaperLastPath !== "") {
-                wallpaperDir = CacheData.wallpaperLastPath
+                wallpaperDir = CacheData.wallpaperLastPath;
             } else {
-                wallpaperDir = ""
+                wallpaperDir = "";
             }
-            return
+            return;
         }
 
-        wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'))
+        wallpaperDir = currentWallpaper.substring(0, currentWallpaper.lastIndexOf('/'));
     }
 
     function updateSelectedFileName() {
         if (wallpaperFolderModel.count === 0) {
-            selectedFileName = ""
-            return
+            selectedFileName = "";
+            return;
         }
 
-        const absoluteIndex = currentPage * itemsPerPage + gridIndex
+        const absoluteIndex = currentPage * itemsPerPage + gridIndex;
         if (absoluteIndex < wallpaperFolderModel.count) {
-            const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath")
+            const filePath = wallpaperFolderModel.get(absoluteIndex, "filePath");
             if (filePath) {
-                const pathStr = filePath.toString().replace(/^file:\/\//, '')
-                selectedFileName = pathStr.substring(pathStr.lastIndexOf('/') + 1)
-                return
+                const pathStr = filePath.toString().replace(/^file:\/\//, '');
+                selectedFileName = pathStr.substring(pathStr.lastIndexOf('/') + 1);
+                return;
             }
         }
-        selectedFileName = ""
+        selectedFileName = "";
     }
 
     Connections {
         target: SessionData
         function onWallpaperPathChanged() {
-            loadWallpaperDirectory()
+            loadWallpaperDirectory();
             if (visible && active) {
-                setInitialSelection()
+                setInitialSelection();
             }
         }
         function onMonitorWallpapersChanged() {
-            loadWallpaperDirectory()
+            loadWallpaperDirectory();
             if (visible && active) {
-                setInitialSelection()
+                setInitialSelection();
+            }
+        }
+        function onPerMonitorWallpaperChanged() {
+            loadWallpaperDirectory();
+            if (visible && active) {
+                setInitialSelection();
             }
         }
     }
 
     onTargetScreenNameChanged: {
-        loadWallpaperDirectory()
+        loadWallpaperDirectory();
         if (visible && active) {
-            setInitialSelection()
+            setInitialSelection();
         }
     }
 
@@ -262,17 +265,17 @@ Item {
         function onCountChanged() {
             if (wallpaperFolderModel.status === FolderListModel.Ready) {
                 if (visible && active) {
-                    setInitialSelection()
+                    setInitialSelection();
                 }
-                updateSelectedFileName()
+                updateSelectedFileName();
             }
         }
         function onStatusChanged() {
             if (wallpaperFolderModel.status === FolderListModel.Ready && wallpaperFolderModel.count > 0) {
                 if (visible && active) {
-                    setInitialSelection()
+                    setInitialSelection();
                 }
-                updateSelectedFileName()
+                updateSelectedFileName();
             }
         }
     }
@@ -290,51 +293,27 @@ Item {
         folder: wallpaperDir ? "file://" + wallpaperDir : ""
     }
 
-    Loader {
-        id: wallpaperBrowserLoader
-        active: false
-        asynchronous: true
+    FileBrowserSurfaceModal {
+        id: wallpaperBrowser
 
-        onActiveChanged: {
-            if (active && parentPopout) {
-                parentPopout.WlrLayershell.keyboardFocus = WlrKeyboardFocus.None
+        browserTitle: I18n.tr("Select Wallpaper Directory", "wallpaper directory file browser title")
+        browserIcon: "folder_open"
+        browserType: "wallpaper"
+        showHiddenFiles: false
+        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
+        parentPopout: root.parentPopout
+
+        onFileSelected: path => {
+            const cleanPath = path.replace(/^file:\/\//, '');
+            setCurrentWallpaper(cleanPath);
+
+            const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/'));
+            if (dirPath) {
+                wallpaperDir = dirPath;
+                CacheData.wallpaperLastPath = dirPath;
+                CacheData.saveCache();
             }
-        }
-
-        sourceComponent: FileBrowserModal {
-            Component.onCompleted: {
-                open()
-            }
-            browserTitle: "Select Wallpaper Directory"
-            browserIcon: "folder_open"
-            browserType: "wallpaper"
-            showHiddenFiles: false
-            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-            allowStacking: true
-
-            onFileSelected: path => {
-                                const cleanPath = path.replace(/^file:\/\//, '')
-                                setCurrentWallpaper(cleanPath)
-
-                                const dirPath = cleanPath.substring(0, cleanPath.lastIndexOf('/'))
-                                if (dirPath) {
-                                    wallpaperDir = dirPath
-                                    CacheData.wallpaperLastPath = dirPath
-                                    CacheData.saveCache()
-                                }
-                                close()
-                            }
-
-            onDialogClosed: {
-                if (parentPopout) {
-                    if (CompositorService.isHyprland) {
-                        parentPopout.WlrLayershell.keyboardFocus = WlrKeyboardFocus.OnDemand
-                    } else {
-                        parentPopout.WlrLayershell.keyboardFocus = WlrKeyboardFocus.Exclusive
-                    }
-                }
-                Qt.callLater(() => wallpaperBrowserLoader.active = false)
-            }
+            close();
         }
     }
 
@@ -376,41 +355,41 @@ Item {
                 }
 
                 model: {
-                    const startIndex = currentPage * itemsPerPage
-                    const endIndex = Math.min(startIndex + itemsPerPage, wallpaperFolderModel.count)
-                    const items = []
+                    const startIndex = currentPage * itemsPerPage;
+                    const endIndex = Math.min(startIndex + itemsPerPage, wallpaperFolderModel.count);
+                    const items = [];
                     for (var i = startIndex; i < endIndex; i++) {
-                        const filePath = wallpaperFolderModel.get(i, "filePath")
+                        const filePath = wallpaperFolderModel.get(i, "filePath");
                         if (filePath) {
-                            items.push(filePath.toString().replace(/^file:\/\//, ''))
+                            items.push(filePath.toString().replace(/^file:\/\//, ''));
                         }
                     }
-                    return items
+                    return items;
                 }
 
                 onModelChanged: {
-                    const clampedIndex = model.length > 0 ? Math.min(Math.max(0, gridIndex), model.length - 1) : 0
+                    const clampedIndex = model.length > 0 ? Math.min(Math.max(0, gridIndex), model.length - 1) : 0;
                     if (gridIndex !== clampedIndex) {
-                        gridIndex = clampedIndex
+                        gridIndex = clampedIndex;
                     }
                 }
 
                 onCountChanged: {
                     if (count > 0) {
-                        const clampedIndex = Math.min(gridIndex, count - 1)
-                        currentIndex = clampedIndex
-                        positionViewAtIndex(clampedIndex, GridView.Contain)
+                        const clampedIndex = Math.min(gridIndex, count - 1);
+                        currentIndex = clampedIndex;
+                        positionViewAtIndex(clampedIndex, GridView.Contain);
                     }
-                    enableAnimation = true
+                    enableAnimation = true;
                 }
 
                 Connections {
                     target: root
                     function onGridIndexChanged() {
                         if (wallpaperGrid.count > 0) {
-                            wallpaperGrid.currentIndex = gridIndex
+                            wallpaperGrid.currentIndex = gridIndex;
                             if (!enableAnimation) {
-                                wallpaperGrid.positionViewAtIndex(gridIndex, GridView.Contain)
+                                wallpaperGrid.positionViewAtIndex(gridIndex, GridView.Contain);
                             }
                         }
                     }
@@ -487,9 +466,9 @@ Item {
                             cursorShape: Qt.PointingHandCursor
 
                             onClicked: {
-                                gridIndex = index
+                                gridIndex = index;
                                 if (modelData) {
-                                    setCurrentWallpaper(modelData)
+                                    setCurrentWallpaper(modelData);
                                 }
                             }
                         }
@@ -535,7 +514,7 @@ Item {
                         opacity: enabled ? 1.0 : 0.3
                         onClicked: {
                             if (currentPage > 0) {
-                                currentPage--
+                                currentPage--;
                             }
                         }
                     }
@@ -557,7 +536,7 @@ Item {
                         opacity: enabled ? 1.0 : 0.3
                         onClicked: {
                             if (currentPage < totalPages - 1) {
-                                currentPage++
+                                currentPage++;
                             }
                         }
                     }
@@ -570,7 +549,7 @@ Item {
                     iconSize: 20
                     buttonSize: 32
                     opacity: 0.7
-                    onClicked: wallpaperBrowserLoader.active = true
+                    onClicked: wallpaperBrowser.open()
                 }
             }
 

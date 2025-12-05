@@ -110,7 +110,6 @@ func (cd *ConfigDeployer) DeployConfigurationsSelectiveWithReinstalls(ctx contex
 	return results, nil
 }
 
-// deployNiriConfig handles Niri configuration deployment with backup and merging
 func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal) (DeploymentResult, error) {
 	result := DeploymentResult{
 		ConfigType: "Niri",
@@ -120,6 +119,12 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal) (DeploymentRe
 	configDir := filepath.Dir(result.Path)
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		result.Error = fmt.Errorf("failed to create config directory: %w", err)
+		return result, result.Error
+	}
+
+	dmsDir := filepath.Join(configDir, "dms")
+	if err := os.MkdirAll(dmsDir, 0755); err != nil {
+		result.Error = fmt.Errorf("failed to create dms directory: %w", err)
 		return result, result.Error
 	}
 
@@ -143,14 +148,12 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal) (DeploymentRe
 		cd.log(fmt.Sprintf("Backed up existing config to %s", result.BackupPath))
 	}
 
-	// Detect polkit agent path
 	polkitPath, err := cd.detectPolkitAgent()
 	if err != nil {
 		cd.log(fmt.Sprintf("Warning: Could not detect polkit agent: %v", err))
-		polkitPath = "/usr/lib/mate-polkit/polkit-mate-authentication-agent-1" // fallback
+		polkitPath = "/usr/lib/mate-polkit/polkit-mate-authentication-agent-1"
 	}
 
-	// Determine terminal command based on choice
 	var terminalCommand string
 	switch terminal {
 	case deps.TerminalGhostty:
@@ -160,13 +163,12 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal) (DeploymentRe
 	case deps.TerminalAlacritty:
 		terminalCommand = "alacritty"
 	default:
-		terminalCommand = "ghostty" // fallback to ghostty
+		terminalCommand = "ghostty"
 	}
 
 	newConfig := strings.ReplaceAll(NiriConfig, "{{POLKIT_AGENT_PATH}}", polkitPath)
 	newConfig = strings.ReplaceAll(newConfig, "{{TERMINAL_COMMAND}}", terminalCommand)
 
-	// If there was an existing config, merge the output sections
 	if existingConfig != "" {
 		mergedConfig, err := cd.mergeNiriOutputSections(newConfig, existingConfig)
 		if err != nil {
@@ -182,9 +184,36 @@ func (cd *ConfigDeployer) deployNiriConfig(terminal deps.Terminal) (DeploymentRe
 		return result, result.Error
 	}
 
+	if err := cd.deployNiriDmsConfigs(dmsDir, terminalCommand); err != nil {
+		result.Error = fmt.Errorf("failed to deploy dms configs: %w", err)
+		return result, result.Error
+	}
+
 	result.Deployed = true
 	cd.log("Successfully deployed Niri configuration")
 	return result, nil
+}
+
+func (cd *ConfigDeployer) deployNiriDmsConfigs(dmsDir, terminalCommand string) error {
+	configs := []struct {
+		name    string
+		content string
+	}{
+		{"colors.kdl", NiriColorsConfig},
+		{"layout.kdl", NiriLayoutConfig},
+		{"alttab.kdl", NiriAlttabConfig},
+		{"binds.kdl", strings.ReplaceAll(NiriBindsConfig, "{{TERMINAL_COMMAND}}", terminalCommand)},
+	}
+
+	for _, cfg := range configs {
+		path := filepath.Join(dmsDir, cfg.name)
+		if err := os.WriteFile(path, []byte(cfg.content), 0644); err != nil {
+			return fmt.Errorf("failed to write %s: %w", cfg.name, err)
+		}
+		cd.log(fmt.Sprintf("Deployed %s", cfg.name))
+	}
+
+	return nil
 }
 
 func (cd *ConfigDeployer) deployGhosttyConfig() ([]DeploymentResult, error) {

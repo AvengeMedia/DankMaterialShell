@@ -479,9 +479,10 @@ general {
 func TestNiriConfigStructure(t *testing.T) {
 	assert.Contains(t, NiriConfig, "input {")
 	assert.Contains(t, NiriConfig, "layout {")
-	assert.Contains(t, NiriConfig, "binds {")
 	assert.Contains(t, NiriConfig, "{{POLKIT_AGENT_PATH}}")
-	assert.Contains(t, NiriConfig, `spawn "{{TERMINAL_COMMAND}}"`)
+
+	assert.Contains(t, NiriBindsConfig, "binds {")
+	assert.Contains(t, NiriBindsConfig, `spawn "{{TERMINAL_COMMAND}}"`)
 }
 
 func TestHyprlandConfigStructure(t *testing.T) {

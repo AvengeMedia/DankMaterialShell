@@ -328,6 +328,52 @@ func (_c *MockBackend_ConnectWiFi_Call) RunAndReturn(run func(network.Connection
 	return _c
 }
 
+// DeleteVPN provides a mock function with given fields: uuidOrName
+func (_m *MockBackend) DeleteVPN(uuidOrName string) error {
+	ret := _m.Called(uuidOrName)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteVPN")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(uuidOrName)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_DeleteVPN_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteVPN'
+type MockBackend_DeleteVPN_Call struct {
+	*mock.Call
+}
+
+// DeleteVPN is a helper method to define mock.On call
+//   - uuidOrName string
+func (_e *MockBackend_Expecter) DeleteVPN(uuidOrName interface{}) *MockBackend_DeleteVPN_Call {
+	return &MockBackend_DeleteVPN_Call{Call: _e.mock.On("DeleteVPN", uuidOrName)}
+}
+
+func (_c *MockBackend_DeleteVPN_Call) Run(run func(uuidOrName string)) *MockBackend_DeleteVPN_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_DeleteVPN_Call) Return(_a0 error) *MockBackend_DeleteVPN_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_DeleteVPN_Call) RunAndReturn(run func(string) error) *MockBackend_DeleteVPN_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DisconnectAllVPN provides a mock function with no fields
 func (_m *MockBackend) DisconnectAllVPN() error {
 	ret := _m.Called()
@@ -414,6 +460,52 @@ func (_c *MockBackend_DisconnectEthernet_Call) Return(_a0 error) *MockBackend_Di
 }
 
 func (_c *MockBackend_DisconnectEthernet_Call) RunAndReturn(run func() error) *MockBackend_DisconnectEthernet_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DisconnectEthernetDevice provides a mock function with given fields: device
+func (_m *MockBackend) DisconnectEthernetDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectEthernetDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_DisconnectEthernetDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectEthernetDevice'
+type MockBackend_DisconnectEthernetDevice_Call struct {
+	*mock.Call
+}
+
+// DisconnectEthernetDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) DisconnectEthernetDevice(device interface{}) *MockBackend_DisconnectEthernetDevice_Call {
+	return &MockBackend_DisconnectEthernetDevice_Call{Call: _e.mock.On("DisconnectEthernetDevice", device)}
+}
+
+func (_c *MockBackend_DisconnectEthernetDevice_Call) Run(run func(device string)) *MockBackend_DisconnectEthernetDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_DisconnectEthernetDevice_Call) Return(_a0 error) *MockBackend_DisconnectEthernetDevice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_DisconnectEthernetDevice_Call) RunAndReturn(run func(string) error) *MockBackend_DisconnectEthernetDevice_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -505,6 +597,52 @@ func (_c *MockBackend_DisconnectWiFi_Call) Return(_a0 error) *MockBackend_Discon
 }
 
 func (_c *MockBackend_DisconnectWiFi_Call) RunAndReturn(run func() error) *MockBackend_DisconnectWiFi_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DisconnectWiFiDevice provides a mock function with given fields: device
+func (_m *MockBackend) DisconnectWiFiDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectWiFiDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_DisconnectWiFiDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectWiFiDevice'
+type MockBackend_DisconnectWiFiDevice_Call struct {
+	*mock.Call
+}
+
+// DisconnectWiFiDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) DisconnectWiFiDevice(device interface{}) *MockBackend_DisconnectWiFiDevice_Call {
+	return &MockBackend_DisconnectWiFiDevice_Call{Call: _e.mock.On("DisconnectWiFiDevice", device)}
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) Run(run func(device string)) *MockBackend_DisconnectWiFiDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) Return(_a0 error) *MockBackend_DisconnectWiFiDevice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_DisconnectWiFiDevice_Call) RunAndReturn(run func(string) error) *MockBackend_DisconnectWiFiDevice_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -612,6 +750,53 @@ func (_c *MockBackend_GetCurrentState_Call) RunAndReturn(run func() (*network.Ba
 	return _c
 }
 
+// GetEthernetDevices provides a mock function with no fields
+func (_m *MockBackend) GetEthernetDevices() []network.EthernetDevice {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetEthernetDevices")
+	}
+
+	var r0 []network.EthernetDevice
+	if rf, ok := ret.Get(0).(func() []network.EthernetDevice); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.EthernetDevice)
+		}
+	}
+
+	return r0
+}
+
+// MockBackend_GetEthernetDevices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetEthernetDevices'
+type MockBackend_GetEthernetDevices_Call struct {
+	*mock.Call
+}
+
+// GetEthernetDevices is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetEthernetDevices() *MockBackend_GetEthernetDevices_Call {
+	return &MockBackend_GetEthernetDevices_Call{Call: _e.mock.On("GetEthernetDevices")}
+}
+
+func (_c *MockBackend_GetEthernetDevices_Call) Run(run func()) *MockBackend_GetEthernetDevices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetEthernetDevices_Call) Return(_a0 []network.EthernetDevice) *MockBackend_GetEthernetDevices_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_GetEthernetDevices_Call) RunAndReturn(run func() []network.EthernetDevice) *MockBackend_GetEthernetDevices_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPromptBroker provides a mock function with no fields
 func (_m *MockBackend) GetPromptBroker() network.PromptBroker {
 	ret := _m.Called()
@@ -655,6 +840,111 @@ func (_c *MockBackend_GetPromptBroker_Call) Return(_a0 network.PromptBroker) *Mo
 }
 
 func (_c *MockBackend_GetPromptBroker_Call) RunAndReturn(run func() network.PromptBroker) *MockBackend_GetPromptBroker_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetVPNConfig provides a mock function with given fields: uuidOrName
+func (_m *MockBackend) GetVPNConfig(uuidOrName string) (*network.VPNConfig, error) {
+	ret := _m.Called(uuidOrName)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetVPNConfig")
+	}
+
+	var r0 *network.VPNConfig
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (*network.VPNConfig, error)); ok {
+		return rf(uuidOrName)
+	}
+	if rf, ok := ret.Get(0).(func(string) *network.VPNConfig); ok {
+		r0 = rf(uuidOrName)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*network.VPNConfig)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(uuidOrName)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockBackend_GetVPNConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetVPNConfig'
+type MockBackend_GetVPNConfig_Call struct {
+	*mock.Call
+}
+
+// GetVPNConfig is a helper method to define mock.On call
+//   - uuidOrName string
+func (_e *MockBackend_Expecter) GetVPNConfig(uuidOrName interface{}) *MockBackend_GetVPNConfig_Call {
+	return &MockBackend_GetVPNConfig_Call{Call: _e.mock.On("GetVPNConfig", uuidOrName)}
+}
+
+func (_c *MockBackend_GetVPNConfig_Call) Run(run func(uuidOrName string)) *MockBackend_GetVPNConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetVPNConfig_Call) Return(_a0 *network.VPNConfig, _a1 error) *MockBackend_GetVPNConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockBackend_GetVPNConfig_Call) RunAndReturn(run func(string) (*network.VPNConfig, error)) *MockBackend_GetVPNConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetWiFiDevices provides a mock function with no fields
+func (_m *MockBackend) GetWiFiDevices() []network.WiFiDevice {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWiFiDevices")
+	}
+
+	var r0 []network.WiFiDevice
+	if rf, ok := ret.Get(0).(func() []network.WiFiDevice); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.WiFiDevice)
+		}
+	}
+
+	return r0
+}
+
+// MockBackend_GetWiFiDevices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWiFiDevices'
+type MockBackend_GetWiFiDevices_Call struct {
+	*mock.Call
+}
+
+// GetWiFiDevices is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) GetWiFiDevices() *MockBackend_GetWiFiDevices_Call {
+	return &MockBackend_GetWiFiDevices_Call{Call: _e.mock.On("GetWiFiDevices")}
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) Run(run func()) *MockBackend_GetWiFiDevices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) Return(_a0 []network.WiFiDevice) *MockBackend_GetWiFiDevices_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiDevices_Call) RunAndReturn(run func() []network.WiFiDevice) *MockBackend_GetWiFiDevices_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -887,6 +1177,65 @@ func (_c *MockBackend_GetWiredNetworkDetails_Call) RunAndReturn(run func(string)
 	return _c
 }
 
+// ImportVPN provides a mock function with given fields: filePath, name
+func (_m *MockBackend) ImportVPN(filePath string, name string) (*network.VPNImportResult, error) {
+	ret := _m.Called(filePath, name)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ImportVPN")
+	}
+
+	var r0 *network.VPNImportResult
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (*network.VPNImportResult, error)); ok {
+		return rf(filePath, name)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) *network.VPNImportResult); ok {
+		r0 = rf(filePath, name)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*network.VPNImportResult)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(filePath, name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockBackend_ImportVPN_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ImportVPN'
+type MockBackend_ImportVPN_Call struct {
+	*mock.Call
+}
+
+// ImportVPN is a helper method to define mock.On call
+//   - filePath string
+//   - name string
+func (_e *MockBackend_Expecter) ImportVPN(filePath interface{}, name interface{}) *MockBackend_ImportVPN_Call {
+	return &MockBackend_ImportVPN_Call{Call: _e.mock.On("ImportVPN", filePath, name)}
+}
+
+func (_c *MockBackend_ImportVPN_Call) Run(run func(filePath string, name string)) *MockBackend_ImportVPN_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_ImportVPN_Call) Return(_a0 *network.VPNImportResult, _a1 error) *MockBackend_ImportVPN_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockBackend_ImportVPN_Call) RunAndReturn(run func(string, string) (*network.VPNImportResult, error)) *MockBackend_ImportVPN_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Initialize provides a mock function with no fields
 func (_m *MockBackend) Initialize() error {
 	ret := _m.Called()
@@ -985,6 +1334,63 @@ func (_c *MockBackend_ListActiveVPN_Call) Return(_a0 []network.VPNActive, _a1 er
 }
 
 func (_c *MockBackend_ListActiveVPN_Call) RunAndReturn(run func() ([]network.VPNActive, error)) *MockBackend_ListActiveVPN_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListVPNPlugins provides a mock function with no fields
+func (_m *MockBackend) ListVPNPlugins() ([]network.VPNPlugin, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListVPNPlugins")
+	}
+
+	var r0 []network.VPNPlugin
+	var r1 error
+	if rf, ok := ret.Get(0).(func() ([]network.VPNPlugin, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() []network.VPNPlugin); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]network.VPNPlugin)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockBackend_ListVPNPlugins_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListVPNPlugins'
+type MockBackend_ListVPNPlugins_Call struct {
+	*mock.Call
+}
+
+// ListVPNPlugins is a helper method to define mock.On call
+func (_e *MockBackend_Expecter) ListVPNPlugins() *MockBackend_ListVPNPlugins_Call {
+	return &MockBackend_ListVPNPlugins_Call{Call: _e.mock.On("ListVPNPlugins")}
+}
+
+func (_c *MockBackend_ListVPNPlugins_Call) Run(run func()) *MockBackend_ListVPNPlugins_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockBackend_ListVPNPlugins_Call) Return(_a0 []network.VPNPlugin, _a1 error) *MockBackend_ListVPNPlugins_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockBackend_ListVPNPlugins_Call) RunAndReturn(run func() ([]network.VPNPlugin, error)) *MockBackend_ListVPNPlugins_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1091,6 +1497,52 @@ func (_c *MockBackend_ScanWiFi_Call) RunAndReturn(run func() error) *MockBackend
 	return _c
 }
 
+// ScanWiFiDevice provides a mock function with given fields: device
+func (_m *MockBackend) ScanWiFiDevice(device string) error {
+	ret := _m.Called(device)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ScanWiFiDevice")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(device)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_ScanWiFiDevice_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ScanWiFiDevice'
+type MockBackend_ScanWiFiDevice_Call struct {
+	*mock.Call
+}
+
+// ScanWiFiDevice is a helper method to define mock.On call
+//   - device string
+func (_e *MockBackend_Expecter) ScanWiFiDevice(device interface{}) *MockBackend_ScanWiFiDevice_Call {
+	return &MockBackend_ScanWiFiDevice_Call{Call: _e.mock.On("ScanWiFiDevice", device)}
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) Run(run func(device string)) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) Return(_a0 error) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_ScanWiFiDevice_Call) RunAndReturn(run func(string) error) *MockBackend_ScanWiFiDevice_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SetPromptBroker provides a mock function with given fields: broker
 func (_m *MockBackend) SetPromptBroker(broker network.PromptBroker) error {
 	ret := _m.Called(broker)
@@ -1133,6 +1585,55 @@ func (_c *MockBackend_SetPromptBroker_Call) Return(_a0 error) *MockBackend_SetPr
 }
 
 func (_c *MockBackend_SetPromptBroker_Call) RunAndReturn(run func(network.PromptBroker) error) *MockBackend_SetPromptBroker_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetVPNCredentials provides a mock function with given fields: uuid, username, password, save
+func (_m *MockBackend) SetVPNCredentials(uuid string, username string, password string, save bool) error {
+	ret := _m.Called(uuid, username, password, save)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetVPNCredentials")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string, string, bool) error); ok {
+		r0 = rf(uuid, username, password, save)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_SetVPNCredentials_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetVPNCredentials'
+type MockBackend_SetVPNCredentials_Call struct {
+	*mock.Call
+}
+
+// SetVPNCredentials is a helper method to define mock.On call
+//   - uuid string
+//   - username string
+//   - password string
+//   - save bool
+func (_e *MockBackend_Expecter) SetVPNCredentials(uuid interface{}, username interface{}, password interface{}, save interface{}) *MockBackend_SetVPNCredentials_Call {
+	return &MockBackend_SetVPNCredentials_Call{Call: _e.mock.On("SetVPNCredentials", uuid, username, password, save)}
+}
+
+func (_c *MockBackend_SetVPNCredentials_Call) Run(run func(uuid string, username string, password string, save bool)) *MockBackend_SetVPNCredentials_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string), args[2].(string), args[3].(bool))
+	})
+	return _c
+}
+
+func (_c *MockBackend_SetVPNCredentials_Call) Return(_a0 error) *MockBackend_SetVPNCredentials_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_SetVPNCredentials_Call) RunAndReturn(run func(string, string, string, bool) error) *MockBackend_SetVPNCredentials_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1352,6 +1853,53 @@ func (_c *MockBackend_SubmitCredentials_Call) Return(_a0 error) *MockBackend_Sub
 }
 
 func (_c *MockBackend_SubmitCredentials_Call) RunAndReturn(run func(string, map[string]string, bool) error) *MockBackend_SubmitCredentials_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateVPNConfig provides a mock function with given fields: uuid, updates
+func (_m *MockBackend) UpdateVPNConfig(uuid string, updates map[string]interface{}) error {
+	ret := _m.Called(uuid, updates)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateVPNConfig")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, map[string]interface{}) error); ok {
+		r0 = rf(uuid, updates)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockBackend_UpdateVPNConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateVPNConfig'
+type MockBackend_UpdateVPNConfig_Call struct {
+	*mock.Call
+}
+
+// UpdateVPNConfig is a helper method to define mock.On call
+//   - uuid string
+//   - updates map[string]interface{}
+func (_e *MockBackend_Expecter) UpdateVPNConfig(uuid interface{}, updates interface{}) *MockBackend_UpdateVPNConfig_Call {
+	return &MockBackend_UpdateVPNConfig_Call{Call: _e.mock.On("UpdateVPNConfig", uuid, updates)}
+}
+
+func (_c *MockBackend_UpdateVPNConfig_Call) Run(run func(uuid string, updates map[string]interface{})) *MockBackend_UpdateVPNConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(map[string]interface{}))
+	})
+	return _c
+}
+
+func (_c *MockBackend_UpdateVPNConfig_Call) Return(_a0 error) *MockBackend_UpdateVPNConfig_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockBackend_UpdateVPNConfig_Call) RunAndReturn(run func(string, map[string]interface{}) error) *MockBackend_UpdateVPNConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }

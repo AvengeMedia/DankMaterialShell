@@ -101,10 +101,21 @@ func TestNetworkManagerBackend_ConnectWiFi_AlreadyConnected(t *testing.T) {
 
 	backend.wifiDevice = mockDeviceWireless
 	backend.wifiDev = mockDeviceWireless
+	backend.wifiDevices = map[string]*wifiDeviceInfo{
+		"wlan0": {
+			device:    nil,
+			wireless:  mockDeviceWireless,
+			name:      "wlan0",
+			hwAddress: "00:11:22:33:44:55",
+		},
+	}
+
+	mockDeviceWireless.EXPECT().GetPropertyInterface().Return("wlan0", nil)
 
 	backend.stateMutex.Lock()
 	backend.state.WiFiConnected = true
 	backend.state.WiFiSSID = "TestNetwork"
+	backend.state.WiFiDevice = "wlan0"
 	backend.stateMutex.Unlock()
 
 	req := ConnectionRequest{SSID: "TestNetwork", Password: "password"}

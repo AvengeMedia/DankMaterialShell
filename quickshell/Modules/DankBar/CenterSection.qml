@@ -1,6 +1,5 @@
 import QtQuick
 import qs.Common
-import qs.Services
 
 Item {
     id: root
@@ -13,309 +12,284 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
+    property var barConfig: null
     property bool overrideAxisLayout: false
     property bool forceVerticalLayout: false
 
     readonly property bool isVertical: overrideAxisLayout ? forceVerticalLayout : (axis?.isVertical ?? false)
-    readonly property real spacing: noBackground ? 2 : Theme.spacingXS
+    readonly property real widgetSpacing: {
+        const baseSpacing = noBackground ? 2 : Theme.spacingXS;
+        const outlineThickness = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+        return baseSpacing + (outlineThickness * 2);
+    }
 
     property var centerWidgets: []
     property int totalWidgets: 0
     property real totalSize: 0
 
     function updateLayout() {
-        if ((isVertical ? height : width) <= 0 || !visible) {
-            return
+        if (SettingsData.centeringMode === "geometric") {
+            applyGeometricLayout();
+        } else {
+            applyIndexLayout();
         }
-
-        centerWidgets = []
-        totalWidgets = 0
-        totalSize = 0
-
-        let configuredWidgets = 0
-        let configuredMiddleWidget = null
-        let configuredLeftWidget = null
-        let configuredRightWidget = null
-
-        for (var i = 0; i < centerRepeater.count; i++) {
-            const item = centerRepeater.itemAt(i)
-            if (item && getWidgetVisible(item.widgetId)) {
-                configuredWidgets++
-            }
-        }
-
-        const isOddConfigured = configuredWidgets % 2 === 1
-        const configuredMiddlePos = Math.floor(configuredWidgets / 2)
-        const configuredLeftPos = isOddConfigured ? -1 : ((configuredWidgets / 2) - 1)
-        const configuredRightPos = isOddConfigured ? -1 : (configuredWidgets / 2)
-        let currentConfigIndex = 0
-
-        for (var i = 0; i < centerRepeater.count; i++) {
-            const item = centerRepeater.itemAt(i)
-            if (item && getWidgetVisible(item.widgetId)) {
-                if (isOddConfigured && currentConfigIndex === configuredMiddlePos && item.active && item.item) {
-                    configuredMiddleWidget = item.item
-                }
-                if (!isOddConfigured && currentConfigIndex === configuredLeftPos && item.active && item.item) {
-                    configuredLeftWidget = item.item
-                }
-                if (!isOddConfigured && currentConfigIndex === configuredRightPos && item.active && item.item) {
-                    configuredRightWidget = item.item
-                }
-                if (item.active && item.item) {
-                    centerWidgets.push(item.item)
-                    totalWidgets++
-                    totalSize += isVertical ? item.item.height : item.item.width
-                }
-                currentConfigIndex++
-            }
-        }
-
-        if (totalWidgets === 0) {
-            return
-        }
-
-        if (totalWidgets > 1) {
-            totalSize += spacing * (totalWidgets - 1)
-        }
-
-        positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget)
     }
 
-    function positionWidgets(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget) {
-        const parentCenter = (isVertical ? height : width) / 2
-        const isOddConfigured = configuredWidgets % 2 === 1
+    function applyGeometricLayout() {
+        if ((isVertical ? height : width) <= 0 || !visible)
+            return;
+
+        centerWidgets = [];
+        totalWidgets = 0;
+        totalSize = 0;
+
+        for (var i = 0; i < centerRepeater.count; i++) {
+            const loader = centerRepeater.itemAt(i);
+            if (loader && loader.active && loader.item) {
+                centerWidgets.push(loader.item);
+                totalWidgets++;
+                totalSize += isVertical ? loader.item.height : loader.item.width;
+            }
+        }
+
+        if (totalWidgets === 0)
+            return;
+
+        if (totalWidgets > 1)
+            totalSize += widgetSpacing * (totalWidgets - 1);
+
+        positionWidgetsGeometric();
+    }
+
+    function positionWidgetsGeometric() {
+        const parentLength = isVertical ? height : width;
+        const parentCenter = parentLength / 2;
+        let currentPos = parentCenter - (totalSize / 2);
 
         centerWidgets.forEach(widget => {
             if (isVertical) {
-                widget.anchors.verticalCenter = undefined
+                widget.anchors.verticalCenter = undefined;
+                widget.y = currentPos;
             } else {
-                widget.anchors.horizontalCenter = undefined
+                widget.anchors.horizontalCenter = undefined;
+                widget.x = currentPos;
             }
-        })
+            const widgetSize = isVertical ? widget.height : widget.width;
+            currentPos += widgetSize + widgetSpacing;
+        });
+    }
+
+    function applyIndexLayout() {
+        if ((isVertical ? height : width) <= 0 || !visible)
+            return;
+
+        centerWidgets = [];
+        totalWidgets = 0;
+        totalSize = 0;
+
+        let configuredMiddleWidget = null;
+        let configuredLeftWidget = null;
+        let configuredRightWidget = null;
+
+        const configuredWidgets = centerRepeater.count;
+        const isOddConfigured = configuredWidgets % 2 === 1;
+        const configuredMiddlePos = Math.floor(configuredWidgets / 2);
+        const configuredLeftPos = isOddConfigured ? -1 : ((configuredWidgets / 2) - 1);
+        const configuredRightPos = isOddConfigured ? -1 : (configuredWidgets / 2);
+
+        for (var i = 0; i < centerRepeater.count; i++) {
+            const wrapper = centerRepeater.itemAt(i);
+            if (!wrapper)
+                continue;
+
+            if (isOddConfigured && i === configuredMiddlePos && wrapper.active && wrapper.item)
+                configuredMiddleWidget = wrapper.item;
+            if (!isOddConfigured && i === configuredLeftPos && wrapper.active && wrapper.item)
+                configuredLeftWidget = wrapper.item;
+            if (!isOddConfigured && i === configuredRightPos && wrapper.active && wrapper.item)
+                configuredRightWidget = wrapper.item;
+
+            if (wrapper.active && wrapper.item) {
+                centerWidgets.push(wrapper.item);
+                totalWidgets++;
+                totalSize += isVertical ? wrapper.item.height : wrapper.item.width;
+            }
+        }
+
+        if (totalWidgets === 0)
+            return;
+
+        if (totalWidgets > 1)
+            totalSize += widgetSpacing * (totalWidgets - 1);
+
+        positionWidgetsByIndex(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget);
+    }
+
+    function positionWidgetsByIndex(configuredWidgets, configuredMiddleWidget, configuredLeftWidget, configuredRightWidget) {
+        const parentCenter = (isVertical ? height : width) / 2;
+        const isOddConfigured = configuredWidgets % 2 === 1;
+
+        centerWidgets.forEach(widget => {
+            if (isVertical)
+                widget.anchors.verticalCenter = undefined;
+            else
+                widget.anchors.horizontalCenter = undefined;
+        });
 
         if (isOddConfigured && configuredMiddleWidget) {
-            const middleWidget = configuredMiddleWidget
-            const middleIndex = centerWidgets.indexOf(middleWidget)
-            const middleSize = isVertical ? middleWidget.height : middleWidget.width
+            const middleWidget = configuredMiddleWidget;
+            const middleIndex = centerWidgets.indexOf(middleWidget);
+            const middleSize = isVertical ? middleWidget.height : middleWidget.width;
 
-            if (isVertical) {
-                middleWidget.y = parentCenter - (middleSize / 2)
-            } else {
-                middleWidget.x = parentCenter - (middleSize / 2)
-            }
+            if (isVertical)
+                middleWidget.y = parentCenter - (middleSize / 2);
+            else
+                middleWidget.x = parentCenter - (middleSize / 2);
 
-            let currentPos = isVertical ? middleWidget.y : middleWidget.x
+            let currentPos = isVertical ? middleWidget.y : middleWidget.x;
             for (var i = middleIndex - 1; i >= 0; i--) {
-                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                currentPos -= (spacing + size)
-                if (isVertical) {
-                    centerWidgets[i].y = currentPos
-                } else {
-                    centerWidgets[i].x = currentPos
-                }
+                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                currentPos -= (widgetSpacing + size);
+                if (isVertical)
+                    centerWidgets[i].y = currentPos;
+                else
+                    centerWidgets[i].x = currentPos;
             }
 
-            currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize
+            currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize;
             for (var i = middleIndex + 1; i < totalWidgets; i++) {
-                currentPos += spacing
-                if (isVertical) {
-                    centerWidgets[i].y = currentPos
-                } else {
-                    centerWidgets[i].x = currentPos
-                }
-                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
+                currentPos += widgetSpacing;
+                if (isVertical)
+                    centerWidgets[i].y = currentPos;
+                else
+                    centerWidgets[i].x = currentPos;
+                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
             }
-        } else {
-            if (totalWidgets === 1) {
-                const widget = centerWidgets[0]
-                const size = isVertical ? widget.height : widget.width
-                if (isVertical) {
-                    widget.y = parentCenter - (size / 2)
-                } else {
-                    widget.x = parentCenter - (size / 2)
+            return;
+        }
+
+        if (totalWidgets === 1) {
+            const widget = centerWidgets[0];
+            const size = isVertical ? widget.height : widget.width;
+            if (isVertical)
+                widget.y = parentCenter - (size / 2);
+            else
+                widget.x = parentCenter - (size / 2);
+            return;
+        }
+
+        if (!configuredLeftWidget || !configuredRightWidget) {
+            if (totalWidgets % 2 === 1) {
+                const middleIndex = Math.floor(totalWidgets / 2);
+                const middleWidget = centerWidgets[middleIndex];
+
+                if (!middleWidget)
+                    return;
+
+                const middleSize = isVertical ? middleWidget.height : middleWidget.width;
+
+                if (isVertical)
+                    middleWidget.y = parentCenter - (middleSize / 2);
+                else
+                    middleWidget.x = parentCenter - (middleSize / 2);
+
+                let currentPos = isVertical ? middleWidget.y : middleWidget.x;
+                for (var i = middleIndex - 1; i >= 0; i--) {
+                    const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                    currentPos -= (widgetSpacing + size);
+                    if (isVertical)
+                        centerWidgets[i].y = currentPos;
+                    else
+                        centerWidgets[i].x = currentPos;
                 }
-                return
-            }
 
-            if (!configuredLeftWidget || !configuredRightWidget) {
-                if (totalWidgets % 2 === 1) {
-                    const middleIndex = Math.floor(totalWidgets / 2)
-                    const middleWidget = centerWidgets[middleIndex]
-
-                    if (!middleWidget) {
-                        return
-                    }
-
-                    const middleSize = isVertical ? middleWidget.height : middleWidget.width
-
-                    if (isVertical) {
-                        middleWidget.y = parentCenter - (middleSize / 2)
-                    } else {
-                        middleWidget.x = parentCenter - (middleSize / 2)
-                    }
-
-                    let currentPos = isVertical ? middleWidget.y : middleWidget.x
-                    for (var i = middleIndex - 1; i >= 0; i--) {
-                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                        currentPos -= (spacing + size)
-                        if (isVertical) {
-                            centerWidgets[i].y = currentPos
-                        } else {
-                            centerWidgets[i].x = currentPos
-                        }
-                    }
-
-                    currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize
-                    for (var i = middleIndex + 1; i < totalWidgets; i++) {
-                        currentPos += spacing
-                        if (isVertical) {
-                            centerWidgets[i].y = currentPos
-                        } else {
-                            centerWidgets[i].x = currentPos
-                        }
-                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                    }
-                } else {
-                    const leftIndex = (totalWidgets / 2) - 1
-                    const rightIndex = totalWidgets / 2
-                    const fallbackLeft = centerWidgets[leftIndex]
-                    const fallbackRight = centerWidgets[rightIndex]
-
-                    if (!fallbackLeft || !fallbackRight) {
-                        return
-                    }
-
-                    const halfSpacing = spacing / 2
-                    const leftSize = isVertical ? fallbackLeft.height : fallbackLeft.width
-
-                    if (isVertical) {
-                        fallbackLeft.y = parentCenter - halfSpacing - leftSize
-                        fallbackRight.y = parentCenter + halfSpacing
-                    } else {
-                        fallbackLeft.x = parentCenter - halfSpacing - leftSize
-                        fallbackRight.x = parentCenter + halfSpacing
-                    }
-
-                    let currentPos = isVertical ? fallbackLeft.y : fallbackLeft.x
-                    for (var i = leftIndex - 1; i >= 0; i--) {
-                        const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                        currentPos -= (spacing + size)
-                        if (isVertical) {
-                            centerWidgets[i].y = currentPos
-                        } else {
-                            centerWidgets[i].x = currentPos
-                        }
-                    }
-
-                    currentPos = (isVertical ? fallbackRight.y + fallbackRight.height : fallbackRight.x + fallbackRight.width)
-                    for (var i = rightIndex + 1; i < totalWidgets; i++) {
-                        currentPos += spacing
-                        if (isVertical) {
-                            centerWidgets[i].y = currentPos
-                        } else {
-                            centerWidgets[i].x = currentPos
-                        }
-                        currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                    }
+                currentPos = (isVertical ? middleWidget.y : middleWidget.x) + middleSize;
+                for (var i = middleIndex + 1; i < totalWidgets; i++) {
+                    currentPos += widgetSpacing;
+                    if (isVertical)
+                        centerWidgets[i].y = currentPos;
+                    else
+                        centerWidgets[i].x = currentPos;
+                    currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
                 }
-                return
-            }
-
-            const leftWidget = configuredLeftWidget
-            const rightWidget = configuredRightWidget
-            const leftIndex = centerWidgets.indexOf(leftWidget)
-            const rightIndex = centerWidgets.indexOf(rightWidget)
-            const halfSpacing = spacing / 2
-            const leftSize = isVertical ? leftWidget.height : leftWidget.width
-
-            if (isVertical) {
-                leftWidget.y = parentCenter - halfSpacing - leftSize
-                rightWidget.y = parentCenter + halfSpacing
             } else {
-                leftWidget.x = parentCenter - halfSpacing - leftSize
-                rightWidget.x = parentCenter + halfSpacing
-            }
+                const leftIndex = (totalWidgets / 2) - 1;
+                const rightIndex = totalWidgets / 2;
+                const fallbackLeft = centerWidgets[leftIndex];
+                const fallbackRight = centerWidgets[rightIndex];
 
-            let currentPos = isVertical ? leftWidget.y : leftWidget.x
-            for (var i = leftIndex - 1; i >= 0; i--) {
-                const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width
-                currentPos -= (spacing + size)
+                if (!fallbackLeft || !fallbackRight)
+                    return;
+
+                const halfSpacing = widgetSpacing / 2;
+                const leftSize = isVertical ? fallbackLeft.height : fallbackLeft.width;
+
                 if (isVertical) {
-                    centerWidgets[i].y = currentPos
+                    fallbackLeft.y = parentCenter - halfSpacing - leftSize;
+                    fallbackRight.y = parentCenter + halfSpacing;
                 } else {
-                    centerWidgets[i].x = currentPos
+                    fallbackLeft.x = parentCenter - halfSpacing - leftSize;
+                    fallbackRight.x = parentCenter + halfSpacing;
+                }
+
+                let currentPos = isVertical ? fallbackLeft.y : fallbackLeft.x;
+                for (var i = leftIndex - 1; i >= 0; i--) {
+                    const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+                    currentPos -= (widgetSpacing + size);
+                    if (isVertical)
+                        centerWidgets[i].y = currentPos;
+                    else
+                        centerWidgets[i].x = currentPos;
+                }
+
+                currentPos = (isVertical ? fallbackRight.y + fallbackRight.height : fallbackRight.x + fallbackRight.width);
+                for (var i = rightIndex + 1; i < totalWidgets; i++) {
+                    currentPos += widgetSpacing;
+                    if (isVertical)
+                        centerWidgets[i].y = currentPos;
+                    else
+                        centerWidgets[i].x = currentPos;
+                    currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
                 }
             }
-
-            currentPos = (isVertical ? rightWidget.y + rightWidget.height : rightWidget.x + rightWidget.width)
-            for (var i = rightIndex + 1; i < totalWidgets; i++) {
-                currentPos += spacing
-                if (isVertical) {
-                    centerWidgets[i].y = currentPos
-                } else {
-                    centerWidgets[i].x = currentPos
-                }
-                currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width
-            }
-        }
-    }
-
-    function getWidgetVisible(widgetId) {
-        const widgetVisibility = {
-            "cpuUsage": DgopService.dgopAvailable,
-            "memUsage": DgopService.dgopAvailable,
-            "cpuTemp": DgopService.dgopAvailable,
-            "gpuTemp": DgopService.dgopAvailable,
-            "network_speed_monitor": DgopService.dgopAvailable
-        }
-        return widgetVisibility[widgetId] ?? true
-    }
-
-    function getWidgetComponent(widgetId) {
-        // Build dynamic component map including plugins
-        let baseMap = {
-            "launcherButton": "launcherButtonComponent",
-            "workspaceSwitcher": "workspaceSwitcherComponent",
-            "focusedWindow": "focusedWindowComponent",
-            "runningApps": "runningAppsComponent",
-            "clock": "clockComponent",
-            "music": "mediaComponent",
-            "weather": "weatherComponent",
-            "systemTray": "systemTrayComponent",
-            "privacyIndicator": "privacyIndicatorComponent",
-            "clipboard": "clipboardComponent",
-            "cpuUsage": "cpuUsageComponent",
-            "memUsage": "memUsageComponent",
-            "diskUsage": "diskUsageComponent",
-            "cpuTemp": "cpuTempComponent",
-            "gpuTemp": "gpuTempComponent",
-            "notificationButton": "notificationButtonComponent",
-            "battery": "batteryComponent",
-            "controlCenterButton": "controlCenterButtonComponent",
-            "idleInhibitor": "idleInhibitorComponent",
-            "spacer": "spacerComponent",
-            "separator": "separatorComponent",
-            "network_speed_monitor": "networkComponent",
-            "keyboard_layout_name": "keyboardLayoutNameComponent",
-            "vpn": "vpnComponent",
-            "notepadButton": "notepadButtonComponent",
-            "powerButton": "powerButtonComponent",
-            "colorPicker": "colorPickerComponent",
-            "systemUpdate": "systemUpdateComponent"
+            return;
         }
 
-        // For built-in components, get from components property
-        const componentKey = baseMap[widgetId]
-        if (componentKey && root.components[componentKey]) {
-            return root.components[componentKey]
+        const leftWidget = configuredLeftWidget;
+        const rightWidget = configuredRightWidget;
+        const leftIndex = centerWidgets.indexOf(leftWidget);
+        const rightIndex = centerWidgets.indexOf(rightWidget);
+        const halfSpacing = widgetSpacing / 2;
+        const leftSize = isVertical ? leftWidget.height : leftWidget.width;
+
+        if (isVertical) {
+            leftWidget.y = parentCenter - halfSpacing - leftSize;
+            rightWidget.y = parentCenter + halfSpacing;
+        } else {
+            leftWidget.x = parentCenter - halfSpacing - leftSize;
+            rightWidget.x = parentCenter + halfSpacing;
         }
 
-        // For plugin components, get from PluginService
-        var parts = widgetId.split(":")
-        var pluginId = parts[0]
-        let pluginComponents = PluginService.getWidgetComponents()
-        return pluginComponents[pluginId] || null
+        let currentPos = isVertical ? leftWidget.y : leftWidget.x;
+        for (var i = leftIndex - 1; i >= 0; i--) {
+            const size = isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+            currentPos -= (widgetSpacing + size);
+            if (isVertical)
+                centerWidgets[i].y = currentPos;
+            else
+                centerWidgets[i].x = currentPos;
+        }
+
+        currentPos = (isVertical ? rightWidget.y + rightWidget.height : rightWidget.x + rightWidget.width);
+        for (var i = rightIndex + 1; i < totalWidgets; i++) {
+            currentPos += widgetSpacing;
+            if (isVertical)
+                centerWidgets[i].y = currentPos;
+            else
+                centerWidgets[i].x = currentPos;
+            currentPos += isVertical ? centerWidgets[i].height : centerWidgets[i].width;
+        }
     }
 
     height: parent.height
@@ -329,172 +303,79 @@ Item {
         onTriggered: root.updateLayout()
     }
 
-    Component.onCompleted: {
-        layoutTimer.restart()
-    }
+    Component.onCompleted: layoutTimer.restart()
 
     onWidthChanged: {
-        if (width > 0) {
-            layoutTimer.restart()
-        }
+        if (width > 0)
+            layoutTimer.restart();
     }
 
     onHeightChanged: {
-        if (height > 0) {
-            layoutTimer.restart()
-        }
+        if (height > 0)
+            layoutTimer.restart();
     }
 
     onVisibleChanged: {
-        if (visible && (isVertical ? height : width) > 0) {
-            layoutTimer.restart()
-        }
+        if (visible && (isVertical ? height : width) > 0)
+            layoutTimer.restart();
     }
 
     Repeater {
         id: centerRepeater
         model: root.widgetsModel
 
+        onCountChanged: layoutTimer.restart()
 
-        Loader {
-            property string widgetId: model.widgetId
-            property var widgetData: model
-            property int spacerSize: model.size || 20
+        Item {
+            property var itemData: modelData
+            readonly property real itemSpacing: root.widgetSpacing
 
-            anchors.verticalCenter: !root.isVertical ? parent.verticalCenter : undefined
-            anchors.horizontalCenter: root.isVertical ? parent.horizontalCenter : undefined
-            active: root.getWidgetVisible(model.widgetId) && (model.widgetId !== "music" || MprisController.activePlayer !== null)
-            sourceComponent: root.getWidgetComponent(model.widgetId)
-            opacity: (model.enabled !== false) ? 1 : 0
-            asynchronous: false
+            width: widgetLoader.item ? widgetLoader.item.width : 0
+            height: widgetLoader.item ? widgetLoader.item.height : 0
 
-            onLoaded: {
-                if (!item) {
-                    return
-                }
-                item.widthChanged.connect(() => layoutTimer.restart())
-                item.heightChanged.connect(() => layoutTimer.restart())
-                if (root.axis && "axis" in item) {
-                    item.axis = Qt.binding(() => root.axis)
-                }
-                if (root.axis && "isVertical" in item) {
-                    try {
-                        item.isVertical = Qt.binding(() => root.axis.isVertical)
-                    } catch (e) {
-                    }
-                }
+            readonly property bool active: widgetLoader.active
+            readonly property var item: widgetLoader.item
 
-                // Inject properties for plugin widgets
-                if ("section" in item) {
-                    item.section = root.section
-                }
-                if ("parentScreen" in item) {
-                    item.parentScreen = Qt.binding(() => root.parentScreen)
-                }
-                if ("widgetThickness" in item) {
-                    item.widgetThickness = Qt.binding(() => root.widgetThickness)
-                }
-                if ("barThickness" in item) {
-                    item.barThickness = Qt.binding(() => root.barThickness)
-                }
-                if ("sectionSpacing" in item) {
-                    item.sectionSpacing = Qt.binding(() => root.spacing)
+            WidgetHost {
+                id: widgetLoader
+
+                anchors.verticalCenter: !root.isVertical ? parent.verticalCenter : undefined
+                anchors.horizontalCenter: root.isVertical ? parent.horizontalCenter : undefined
+
+                widgetId: itemData.widgetId
+                widgetData: itemData
+                spacerSize: itemData.size || 20
+                components: root.components
+                isInColumn: root.isVertical
+                axis: root.axis
+                section: "center"
+                parentScreen: root.parentScreen
+                widgetThickness: root.widgetThickness
+                barThickness: root.barThickness
+                barSpacing: root.barSpacing
+                barConfig: root.barConfig
+                isFirst: index === 0
+                isLast: index === centerRepeater.count - 1
+                sectionSpacing: parent.itemSpacing
+                isLeftBarEdge: false
+                isRightBarEdge: false
+                isTopBarEdge: false
+                isBottomBarEdge: false
+
+                onContentItemReady: contentItem => {
+                    contentItem.widthChanged.connect(() => layoutTimer.restart());
+                    contentItem.heightChanged.connect(() => layoutTimer.restart());
                 }
 
-                if ("isFirst" in item) {
-                    item.isFirst = Qt.binding(() => {
-                        for (var i = 0; i < centerRepeater.count; i++) {
-                            const checkItem = centerRepeater.itemAt(i)
-                            if (checkItem && checkItem.active && checkItem.item) {
-                                return checkItem.item === item
-                            }
-                        }
-                        return false
-                    })
-                }
-
-                if ("isLast" in item) {
-                    item.isLast = Qt.binding(() => {
-                        for (var i = centerRepeater.count - 1; i >= 0; i--) {
-                            const checkItem = centerRepeater.itemAt(i)
-                            if (checkItem && checkItem.active && checkItem.item) {
-                                return checkItem.item === item
-                            }
-                        }
-                        return false
-                    })
-                }
-
-                if ("isLeftBarEdge" in item) {
-                    item.isLeftBarEdge = false
-                }
-                if ("isRightBarEdge" in item) {
-                    item.isRightBarEdge = false
-                }
-                if ("isTopBarEdge" in item) {
-                    item.isTopBarEdge = false
-                }
-                if ("isBottomBarEdge" in item) {
-                    item.isBottomBarEdge = false
-                }
-
-                if (item.pluginService !== undefined) {
-                    var parts = model.widgetId.split(":")
-                    var pluginId = parts[0]
-                    var variantId = parts.length > 1 ? parts[1] : null
-
-                    if (item.pluginId !== undefined) {
-                        item.pluginId = pluginId
-                    }
-                    if (item.variantId !== undefined) {
-                        item.variantId = variantId
-                    }
-                    if (item.variantData !== undefined && variantId) {
-                        item.variantData = PluginService.getPluginVariantData(pluginId, variantId)
-                    }
-                    item.pluginService = PluginService
-                }
-
-                if (item.popoutService !== undefined) {
-                    item.popoutService = PopoutService
-                }
-
-                layoutTimer.restart()
-            }
-
-            onActiveChanged: {
-                layoutTimer.restart()
+                onActiveChanged: layoutTimer.restart()
             }
         }
     }
 
     Connections {
-        target: widgetsModel
-        function onCountChanged() {
-            layoutTimer.restart()
-        }
-    }
-
-    // Listen for plugin changes and refresh components
-    Connections {
-        target: PluginService
-        function onPluginLoaded(pluginId) {
-            // Force refresh of component lookups
-            for (var i = 0; i < centerRepeater.count; i++) {
-                var item = centerRepeater.itemAt(i)
-                if (item && item.widgetId.startsWith(pluginId)) {
-                    item.sourceComponent = root.getWidgetComponent(item.widgetId)
-                }
-            }
-        }
-        function onPluginUnloaded(pluginId) {
-            // Force refresh of component lookups
-            for (var i = 0; i < centerRepeater.count; i++) {
-                var item = centerRepeater.itemAt(i)
-                if (item && item.widgetId.startsWith(pluginId)) {
-                    item.sourceComponent = root.getWidgetComponent(item.widgetId)
-                }
-            }
+        target: SettingsData
+        function onCenteringModeChanged() {
+            layoutTimer.restart();
         }
     }
 }

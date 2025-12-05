@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Hyprland
@@ -19,28 +18,32 @@ Item {
     property var parentScreen: null
     property real widgetThickness: 30
     property real barThickness: 48
+    property real barSpacing: 4
     property bool isAtBottom: false
-    readonly property real horizontalPadding: SettingsData.dankBarNoBackground ? 2 : Theme.spacingS
+    property var barConfig: null
+    property bool isAutoHideBar: false
+    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 2 : Theme.spacingS
     readonly property var hiddenTrayIds: {
-        const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || ""
-        return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : []
+        const envValue = Quickshell.env("DMS_HIDE_TRAYIDS") || "";
+        return envValue ? envValue.split(",").map(id => id.trim().toLowerCase()) : [];
     }
     readonly property var allTrayItems: {
         if (!hiddenTrayIds.length) {
-            return SystemTray.items.values
+            return SystemTray.items.values;
         }
         return SystemTray.items.values.filter(item => {
-            const itemId = item?.id || ""
-            return !hiddenTrayIds.includes(itemId.toLowerCase())
-        })
+            const itemId = item?.id || "";
+            return !hiddenTrayIds.includes(itemId.toLowerCase());
+        });
     }
     readonly property var mainBarItems: allTrayItems.filter(item => !SessionData.isHiddenTrayId(item?.id || ""))
     readonly property var hiddenBarItems: allTrayItems.filter(item => SessionData.isHiddenTrayId(item?.id || ""))
     readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
     readonly property int calculatedSize: {
-        if (allTrayItems.length === 0) return 0
-        const itemCount = mainBarItems.length + (hasHiddenItems ? 1 : 0)
-        return itemCount * 24 + horizontalPadding * 2
+        if (allTrayItems.length === 0)
+            return 0;
+        const itemCount = mainBarItems.length + (hasHiddenItems ? 1 : 0);
+        return itemCount * 24 + horizontalPadding * 2;
     }
     readonly property real visualWidth: isVertical ? widgetThickness : calculatedSize
     readonly property real visualHeight: isVertical ? calculatedSize : widgetThickness
@@ -49,36 +52,90 @@ Item {
     height: isVertical ? visualHeight : barThickness
     visible: allTrayItems.length > 0
 
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVertical) {
+            return 0;
+        }
+
+        if (isAutoHideBar) {
+            return 0;
+        }
+
+        if (parentScreen.y > 0) {
+            const estimatedTopBarHeight = barThickness + barSpacing;
+            return estimatedTopBarHeight;
+        }
+
+        return 0;
+    }
+
     property bool menuOpen: false
     property var currentTrayMenu: null
 
-    Component.onCompleted: {
-        if (!parentScreen) return
-        TrayMenuManager.register(parentScreen.name, root)
-    }
-
-    Component.onDestruction: {
-        if (!parentScreen) return
-        TrayMenuManager.unregister(parentScreen.name)
-    }
-
-    Rectangle {
+    Item {
         id: visualBackground
         width: root.visualWidth
         height: root.visualHeight
         anchors.centerIn: parent
-        radius: SettingsData.dankBarNoBackground ? 0 : Theme.cornerRadius
-        color: {
-            if (allTrayItems.length === 0) {
-                return "transparent";
-            }
 
-            if (SettingsData.dankBarNoBackground) {
-                return "transparent";
+        Rectangle {
+            id: outline
+            anchors.centerIn: parent
+            width: {
+                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+                return parent.width + borderWidth * 2;
             }
+            height: {
+                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
+                return parent.height + borderWidth * 2;
+            }
+            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
+            color: "transparent"
+            border.width: {
+                if (barConfig?.widgetOutlineEnabled ?? false) {
+                    return barConfig?.widgetOutlineThickness ?? 1;
+                }
+                return 0;
+            }
+            border.color: {
+                if (!(barConfig?.widgetOutlineEnabled ?? false)) {
+                    return "transparent";
+                }
+                const colorOption = barConfig?.widgetOutlineColor || "primary";
+                const opacity = barConfig?.widgetOutlineOpacity ?? 1.0;
+                switch (colorOption) {
+                case "surfaceText":
+                    return Theme.withAlpha(Theme.surfaceText, opacity);
+                case "secondary":
+                    return Theme.withAlpha(Theme.secondary, opacity);
+                case "primary":
+                    return Theme.withAlpha(Theme.primary, opacity);
+                default:
+                    return Theme.withAlpha(Theme.primary, opacity);
+                }
+            }
+        }
 
-            const baseColor = Theme.widgetBaseBackgroundColor;
-            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * Theme.widgetTransparency);
+        Rectangle {
+            id: background
+            anchors.fill: parent
+            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
+            color: {
+                if (allTrayItems.length === 0) {
+                    return "transparent";
+                }
+
+                if ((barConfig?.noBackground ?? false)) {
+                    return "transparent";
+                }
+
+                const baseColor = Theme.widgetBaseBackgroundColor;
+                const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
+                if (Theme.widgetBackgroundHasAlpha) {
+                    return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * transparency);
+                }
+                return Theme.withAlpha(baseColor, transparency);
+            }
         }
     }
 
@@ -154,11 +211,11 @@ Item {
                             anchors.centerIn: parent
                             visible: !iconImg.visible
                             text: {
-                                const itemId = trayItem?.id || ""
+                                const itemId = trayItem?.id || "";
                                 if (!itemId) {
-                                    return "?"
+                                    return "?";
                                 }
-                                return itemId.charAt(0).toUpperCase()
+                                return itemId.charAt(0).toUpperCase();
                             }
                             font.pixelSize: 10
                             color: Theme.widgetTextColor
@@ -172,18 +229,18 @@ Item {
                         hoverEnabled: true
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: (mouse) => {
-                            if (!delegateRoot.trayItem) return
-
+                        onClicked: mouse => {
+                            if (!delegateRoot.trayItem)
+                                return;
                             if (mouse.button === Qt.LeftButton && !delegateRoot.trayItem.onlyMenu) {
-                                delegateRoot.trayItem.activate()
-                                return
+                                delegateRoot.trayItem.activate();
+                                return;
                             }
 
-                            if (!delegateRoot.trayItem.hasMenu) return
-
-                            root.menuOpen = false
-                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
+                            if (!delegateRoot.trayItem.hasMenu)
+                                return;
+                            root.menuOpen = false;
+                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis);
                         }
                     }
                 }
@@ -287,11 +344,11 @@ Item {
                             anchors.centerIn: parent
                             visible: !iconImg.visible
                             text: {
-                                const itemId = trayItem?.id || ""
+                                const itemId = trayItem?.id || "";
                                 if (!itemId) {
-                                    return "?"
+                                    return "?";
                                 }
-                                return itemId.charAt(0).toUpperCase()
+                                return itemId.charAt(0).toUpperCase();
                             }
                             font.pixelSize: 10
                             color: Theme.widgetTextColor
@@ -305,18 +362,18 @@ Item {
                         hoverEnabled: true
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: (mouse) => {
-                            if (!delegateRoot.trayItem) return
-
+                        onClicked: mouse => {
+                            if (!delegateRoot.trayItem)
+                                return;
                             if (mouse.button === Qt.LeftButton && !delegateRoot.trayItem.onlyMenu) {
-                                delegateRoot.trayItem.activate()
-                                return
+                                delegateRoot.trayItem.activate();
+                                return;
                             }
 
-                            if (!delegateRoot.trayItem.hasMenu) return
-
-                            root.menuOpen = false
-                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis)
+                            if (!delegateRoot.trayItem.hasMenu)
+                                return;
+                            root.menuOpen = false;
+                            root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVertical, root.axis);
                         }
                     }
                 }
@@ -338,11 +395,11 @@ Item {
                     DankIcon {
                         anchors.centerIn: parent
                         name: {
-                            const edge = root.axis?.edge
+                            const edge = root.axis?.edge;
                             if (edge === "left") {
-                                return root.menuOpen ? "chevron_left" : "chevron_right"
+                                return root.menuOpen ? "chevron_left" : "chevron_right";
                             } else {
-                                return root.menuOpen ? "chevron_right" : "chevron_left"
+                                return root.menuOpen ? "chevron_right" : "chevron_left";
                             }
                         }
                         size: Theme.barIconSize(root.barThickness)
@@ -368,9 +425,11 @@ Item {
         WlrLayershell.layer: WlrLayershell.Top
         WlrLayershell.exclusiveZone: -1
         WlrLayershell.keyboardFocus: {
-            if (!root.menuOpen) return WlrKeyboardFocus.None
-            if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
-            return WlrKeyboardFocus.Exclusive
+            if (!root.menuOpen)
+                return WlrKeyboardFocus.None;
+            if (CompositorService.isHyprland)
+                return WlrKeyboardFocus.OnDemand;
+            return WlrKeyboardFocus.Exclusive;
         }
         WlrLayershell.namespace: "dms:tray-overflow-menu"
         color: "transparent"
@@ -380,6 +439,23 @@ Item {
             active: CompositorService.isHyprland && root.menuOpen
         }
 
+        Connections {
+            target: PopoutManager
+            function onPopoutOpening() {
+                root.menuOpen = false;
+            }
+        }
+
+        Component.onDestruction: {
+            if (root.parentScreen) {
+                TrayMenuManager.unregisterMenu(root.parentScreen.name);
+            }
+        }
+
+        function close() {
+            root.menuOpen = false;
+        }
+
         anchors {
             top: true
             left: true
@@ -387,71 +463,61 @@ Item {
             bottom: true
         }
 
-        readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale)
-            ? CompositorService.getScreenScale(overflowMenu.screen)
-            : (screen?.devicePixelRatio || 1)
+        readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale) ? CompositorService.getScreenScale(overflowMenu.screen) : (screen?.devicePixelRatio || 1)
         property point anchorPos: Qt.point(screen.width / 2, screen.height / 2)
 
-        readonly property var barBounds: {
-            if (!overflowMenu.screen) {
-                return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+        property var barBounds: {
+            if (!overflowMenu.screen || !root.barConfig) {
+                return {
+                    "x": 0,
+                    "y": 0,
+                    "width": 0,
+                    "height": 0,
+                    "wingSize": 0
+                };
             }
-            return SettingsData.getBarBounds(overflowMenu.screen, root.barThickness + SettingsData.dankBarSpacing)
+            const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+            return SettingsData.getBarBounds(overflowMenu.screen, root.barThickness + root.barSpacing, barPosition, root.barConfig);
         }
 
-        readonly property real barX: barBounds.x
-        readonly property real barY: barBounds.y
-        readonly property real barWidth: barBounds.width
-        readonly property real barHeight: barBounds.height
+        property real barX: barBounds.x
+        property real barY: barBounds.y
+        property real barWidth: barBounds.width
+        property real barHeight: barBounds.height
+
+        readonly property int barPosition: root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1))
+        readonly property var adjacentBarInfo: parentScreen ? SettingsData.getAdjacentBarInfo(parentScreen, barPosition, root.barConfig) : ({
+                "topBar": 0,
+                "bottomBar": 0,
+                "leftBar": 0,
+                "rightBar": 0
+            })
+        readonly property real effectiveBarSize: root.barThickness + root.barSpacing
 
         readonly property real maskX: {
-            switch (SettingsData.dankBarPosition) {
-            case SettingsData.Position.Left:
-                return barWidth > 0 ? barWidth : 0
-            case SettingsData.Position.Right:
-            case SettingsData.Position.Top:
-            case SettingsData.Position.Bottom:
-            default:
-                return 0
-            }
+            const triggeringBarX = (barPosition === 2) ? effectiveBarSize : 0;
+            const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
+            return Math.max(triggeringBarX, adjacentLeftBar);
         }
 
         readonly property real maskY: {
-            switch (SettingsData.dankBarPosition) {
-            case SettingsData.Position.Top:
-                return barHeight > 0 ? barHeight : 0
-            case SettingsData.Position.Bottom:
-            case SettingsData.Position.Left:
-            case SettingsData.Position.Right:
-            default:
-                return 0
-            }
+            const triggeringBarY = (barPosition === 0) ? effectiveBarSize : 0;
+            const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
+            return Math.max(triggeringBarY, adjacentTopBar);
         }
 
         readonly property real maskWidth: {
-            switch (SettingsData.dankBarPosition) {
-            case SettingsData.Position.Left:
-                return barWidth > 0 ? width - barWidth : width
-            case SettingsData.Position.Right:
-                return barWidth > 0 ? width - barWidth : width
-            case SettingsData.Position.Top:
-            case SettingsData.Position.Bottom:
-            default:
-                return width
-            }
+            const triggeringBarRight = (barPosition === 3) ? effectiveBarSize : 0;
+            const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
+            const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar);
+            return Math.max(100, width - maskX - rightExclusion);
         }
 
         readonly property real maskHeight: {
-            switch (SettingsData.dankBarPosition) {
-            case SettingsData.Position.Top:
-                return barHeight > 0 ? height - barHeight : height
-            case SettingsData.Position.Bottom:
-                return barHeight > 0 ? height - barHeight : height
-            case SettingsData.Position.Left:
-            case SettingsData.Position.Right:
-            default:
-                return height
-            }
+            const triggeringBarBottom = (barPosition === 1) ? effectiveBarSize : 0;
+            const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
+            const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar);
+            return Math.max(100, height - maskY - bottomExclusion);
         }
 
         mask: Region {
@@ -466,11 +532,16 @@ Item {
         onVisibleChanged: {
             if (visible) {
                 if (currentTrayMenu) {
-                    currentTrayMenu.showMenu = false
+                    currentTrayMenu.showMenu = false;
                 }
-                PopoutManager.closeAllPopouts()
-                ModalManager.closeAllModalsExcept(null)
-                updatePosition()
+                if (root.parentScreen) {
+                    TrayMenuManager.registerMenu(root.parentScreen.name, overflowMenu);
+                }
+                PopoutManager.closeAllPopouts();
+                ModalManager.closeAllModalsExcept(null);
+                updatePosition();
+            } else if (!visible && root.parentScreen) {
+                TrayMenuManager.unregisterMenu(root.parentScreen.name);
             }
         }
 
@@ -483,14 +554,13 @@ Item {
             enabled: root.menuOpen
             acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
             onClicked: mouse => {
-                const clickX = mouse.x + overflowMenu.maskX
-                const clickY = mouse.y + overflowMenu.maskY
-                const outsideContent = clickX < menuContainer.x || clickX > menuContainer.x + menuContainer.width ||
-                                       clickY < menuContainer.y || clickY > menuContainer.y + menuContainer.height
+                const clickX = mouse.x + overflowMenu.maskX;
+                const clickY = mouse.y + overflowMenu.maskY;
+                const outsideContent = clickX < menuContainer.x || clickX > menuContainer.x + menuContainer.width || clickY < menuContainer.y || clickY > menuContainer.y + menuContainer.height;
 
-                if (!outsideContent) return
-
-                root.menuOpen = false
+                if (!outsideContent)
+                    return;
+                root.menuOpen = false;
             }
         }
 
@@ -500,31 +570,25 @@ Item {
             focus: true
 
             Keys.onEscapePressed: {
-                root.menuOpen = false
+                root.menuOpen = false;
             }
         }
 
         function updatePosition() {
-            const globalPos = root.mapToGlobal(0, 0)
-            const screenX = screen.x || 0
-            const screenY = screen.y || 0
-            const relativeX = globalPos.x - screenX
-            const relativeY = globalPos.y - screenY
-
-            const widgetThickness = Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
-            const effectiveBarThickness = Math.max(widgetThickness + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
+            const globalPos = root.mapToGlobal(0, 0);
+            const screenX = screen.x || 0;
+            const screenY = screen.y || 0;
+            const relativeX = globalPos.x - screenX;
+            const relativeY = globalPos.y - screenY;
 
             if (root.isVertical) {
-                const edge = root.axis?.edge
-                let targetX = edge === "left"
-                    ? effectiveBarThickness + SettingsData.dankBarSpacing + Theme.popupDistance
-                    : screen.width - (effectiveBarThickness + SettingsData.dankBarSpacing + Theme.popupDistance)
-                anchorPos = Qt.point(targetX, relativeY + root.height / 2)
+                const edge = root.axis?.edge;
+                let targetX = edge === "left" ? root.barThickness + root.barSpacing + Theme.popupDistance : screen.width - (root.barThickness + root.barSpacing + Theme.popupDistance);
+                const adjustedY = relativeY + root.height / 2 + root.minTooltipY;
+                anchorPos = Qt.point(targetX, adjustedY);
             } else {
-                let targetY = root.isAtBottom
-                    ? screen.height - (effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap + Theme.popupDistance)
-                    : effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap + Theme.popupDistance
-                anchorPos = Qt.point(relativeX + root.width / 2, targetY)
+                let targetY = root.isAtBottom ? screen.height - (root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance) : root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance;
+                anchorPos = Qt.point(relativeX + root.width / 2, targetY);
             }
         }
 
@@ -533,19 +597,19 @@ Item {
             objectName: "overflowMenuContainer"
 
             readonly property real rawWidth: {
-                const itemCount = root.hiddenBarItems.length
-                const cols = Math.min(5, itemCount)
-                const itemSize = 28
-                const spacing = 2
-                return cols * itemSize + (cols - 1) * spacing + Theme.spacingS * 2
+                const itemCount = root.hiddenBarItems.length;
+                const cols = Math.min(5, itemCount);
+                const itemSize = 28;
+                const spacing = 2;
+                return cols * itemSize + (cols - 1) * spacing + Theme.spacingS * 2;
             }
             readonly property real rawHeight: {
-                const itemCount = root.hiddenBarItems.length
-                const cols = Math.min(5, itemCount)
-                const rows = Math.ceil(itemCount / cols)
-                const itemSize = 28
-                const spacing = 2
-                return rows * itemSize + (rows - 1) * spacing + Theme.spacingS * 2
+                const itemCount = root.hiddenBarItems.length;
+                const cols = Math.min(5, itemCount);
+                const rows = Math.ceil(itemCount / cols);
+                const itemSize = 28;
+                const spacing = 2;
+                return rows * itemSize + (rows - 1) * spacing + Theme.spacingS * 2;
             }
 
             readonly property real alignedWidth: Theme.px(rawWidth, overflowMenu.dpr)
@@ -555,39 +619,39 @@ Item {
             height: alignedHeight
 
             x: Theme.snap((() => {
-                if (root.isVertical) {
-                    const edge = root.axis?.edge
-                    if (edge === "left") {
-                        const targetX = overflowMenu.anchorPos.x
-                        return Math.min(overflowMenu.screen.width - alignedWidth - 10, targetX)
+                    if (root.isVertical) {
+                        const edge = root.axis?.edge;
+                        if (edge === "left") {
+                            const targetX = overflowMenu.anchorPos.x;
+                            return Math.min(overflowMenu.screen.width - alignedWidth - 10, targetX);
+                        } else {
+                            const targetX = overflowMenu.anchorPos.x - alignedWidth;
+                            return Math.max(10, targetX);
+                        }
                     } else {
-                        const targetX = overflowMenu.anchorPos.x - alignedWidth
-                        return Math.max(10, targetX)
+                        const left = 10;
+                        const right = overflowMenu.width - alignedWidth - 10;
+                        const want = overflowMenu.anchorPos.x - alignedWidth / 2;
+                        return Math.max(left, Math.min(right, want));
                     }
-                } else {
-                    const left = 10
-                    const right = overflowMenu.width - alignedWidth - 10
-                    const want = overflowMenu.anchorPos.x - alignedWidth / 2
-                    return Math.max(left, Math.min(right, want))
-                }
-            })(), overflowMenu.dpr)
+                })(), overflowMenu.dpr)
 
             y: Theme.snap((() => {
-                if (root.isVertical) {
-                    const top = 10
-                    const bottom = overflowMenu.height - alignedHeight - 10
-                    const want = overflowMenu.anchorPos.y - alignedHeight / 2
-                    return Math.max(top, Math.min(bottom, want))
-                } else {
-                    if (root.isAtBottom) {
-                        const targetY = overflowMenu.anchorPos.y - alignedHeight
-                        return Math.max(10, targetY)
+                    if (root.isVertical) {
+                        const top = Math.max(overflowMenu.barY, 10);
+                        const bottom = overflowMenu.height - alignedHeight - 10;
+                        const want = overflowMenu.anchorPos.y - alignedHeight / 2;
+                        return Math.max(top, Math.min(bottom, want));
                     } else {
-                        const targetY = overflowMenu.anchorPos.y
-                        return Math.min(overflowMenu.screen.height - alignedHeight - 10, targetY)
+                        if (root.isAtBottom) {
+                            const targetY = overflowMenu.anchorPos.y - alignedHeight;
+                            return Math.max(10, targetY);
+                        } else {
+                            const targetY = overflowMenu.anchorPos.y;
+                            return Math.min(overflowMenu.screen.height - alignedHeight - 10, targetY);
+                        }
                     }
-                }
-            })(), overflowMenu.dpr)
+                })(), overflowMenu.dpr)
 
             property real shadowBlurPx: 10
             property real shadowSpreadPx: 0
@@ -621,17 +685,18 @@ Item {
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
                 layer.samples: 4
 
+                readonly property int blurMax: 64
+
                 layer.effect: MultiEffect {
                     autoPaddingEnabled: true
                     shadowEnabled: true
                     blurEnabled: false
                     maskEnabled: false
-                    property int blurMax: 64
-                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / bgShadowLayer.blurMax))
                     shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
                     shadowColor: {
-                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
-                        return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha)
+                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
+                        return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
                     }
                 }
 
@@ -657,26 +722,28 @@ Item {
                     delegate: Rectangle {
                         property var trayItem: modelData
                         property string iconSource: {
-                            let icon = trayItem?.icon
+                            let icon = trayItem?.icon;
                             if (typeof icon === 'string' || icon instanceof String) {
-                                if (icon === "") return ""
+                                if (icon === "")
+                                    return "";
                                 if (icon.includes("?path=")) {
-                                    const split = icon.split("?path=")
-                                    if (split.length !== 2) return icon
-                                    const name = split[0]
-                                    const path = split[1]
-                                    let fileName = name.substring(name.lastIndexOf("/") + 1)
+                                    const split = icon.split("?path=");
+                                    if (split.length !== 2)
+                                        return icon;
+                                    const name = split[0];
+                                    const path = split[1];
+                                    let fileName = name.substring(name.lastIndexOf("/") + 1);
                                     if (fileName.startsWith("dropboxstatus")) {
-                                        fileName = `hicolor/16x16/status/${fileName}`
+                                        fileName = `hicolor/16x16/status/${fileName}`;
                                     }
-                                    return `file://${path}/${fileName}`
+                                    return `file://${path}/${fileName}`;
                                 }
                                 if (icon.startsWith("/") && !icon.startsWith("file://")) {
-                                    return `file://${icon}`
+                                    return `file://${icon}`;
                                 }
-                                return icon
+                                return icon;
                             }
-                            return ""
+                            return "";
                         }
 
                         width: 28
@@ -700,9 +767,10 @@ Item {
                             anchors.centerIn: parent
                             visible: !menuIconImg.visible
                             text: {
-                                const itemId = trayItem?.id || ""
-                                if (!itemId) return "?"
-                                return itemId.charAt(0).toUpperCase()
+                                const itemId = trayItem?.id || "";
+                                if (!itemId)
+                                    return "?";
+                                return itemId.charAt(0).toUpperCase();
                             }
                             font.pixelSize: 10
                             color: Theme.widgetTextColor
@@ -714,18 +782,18 @@ Item {
                             hoverEnabled: true
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: (mouse) => {
-                                if (!trayItem) return
-
+                            onClicked: mouse => {
+                                if (!trayItem)
+                                    return;
                                 if (mouse.button === Qt.LeftButton && !trayItem.onlyMenu) {
-                                    trayItem.activate()
-                                    root.menuOpen = false
-                                    return
+                                    trayItem.activate();
+                                    root.menuOpen = false;
+                                    return;
                                 }
 
-                                if (!trayItem.hasMenu) return
-
-                                root.showForTrayItem(trayItem, menuContainer, parentScreen, root.isAtBottom, root.isVertical, root.axis)
+                                if (!trayItem.hasMenu)
+                                    return;
+                                root.showForTrayItem(trayItem, menuContainer, parentScreen, root.isAtBottom, root.isVertical, root.axis);
                             }
                         }
                     }
@@ -749,48 +817,78 @@ Item {
             property bool showMenu: false
             property var menuHandle: null
 
-            ListModel { id: entryStack }
+            ListModel {
+                id: entryStack
+            }
             function topEntry() {
-                return entryStack.count ? entryStack.get(entryStack.count - 1).handle : null
+                return entryStack.count ? entryStack.get(entryStack.count - 1).handle : null;
             }
 
             function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj) {
-                trayItem = item
-                anchorItem = anchor
-                parentScreen = screen
-                isAtBottom = atBottom
-                isVertical = vertical
-                axis = axisObj
-                menuHandle = item?.menu
+                trayItem = item;
+                anchorItem = anchor;
+                parentScreen = screen;
+                isAtBottom = atBottom;
+                isVertical = vertical;
+                axis = axisObj;
+                menuHandle = item?.menu;
 
                 if (parentScreen) {
                     for (var i = 0; i < Quickshell.screens.length; i++) {
-                        const s = Quickshell.screens[i]
+                        const s = Quickshell.screens[i];
                         if (s === parentScreen) {
-                            menuWindow.screen = s
-                            break
+                            menuWindow.screen = s;
+                            break;
                         }
                     }
                 }
 
-                showMenu = true
+                showMenu = true;
             }
 
             function close() {
-                showMenu = false
+                showMenu = false;
+            }
+
+            Connections {
+                target: menuWindow
+                function onVisibleChanged() {
+                    if (menuWindow.visible && parentScreen) {
+                        TrayMenuManager.registerMenu(parentScreen.name, menuRoot);
+                    } else if (!menuWindow.visible && parentScreen) {
+                        TrayMenuManager.unregisterMenu(parentScreen.name);
+                    }
+                }
+            }
+
+            Component.onDestruction: {
+                if (parentScreen) {
+                    TrayMenuManager.unregisterMenu(parentScreen.name);
+                }
+            }
+
+            Connections {
+                target: PopoutManager
+                function onPopoutOpening() {
+                    menuRoot.close();
+                }
             }
 
             function closeWithAction() {
-                close()
+                close();
             }
 
             function showSubMenu(entry) {
-                if (!entry || !entry.hasChildren) return;
+                if (!entry || !entry.hasChildren)
+                    return;
 
-                entryStack.append({ handle: entry });
+                entryStack.append({
+                    handle: entry
+                });
 
                 const h = entry.menu || entry;
-                if (h && typeof h.updateLayout === "function") h.updateLayout();
+                if (h && typeof h.updateLayout === "function")
+                    h.updateLayout();
 
                 submenuHydrator.menu = h;
                 submenuHydrator.open();
@@ -798,7 +896,8 @@ Item {
             }
 
             function goBack() {
-                if (!entryStack.count) return;
+                if (!entryStack.count)
+                    return;
                 entryStack.remove(entryStack.count - 1);
             }
 
@@ -807,17 +906,18 @@ Item {
             color: "transparent"
 
             PanelWindow {
+                id: menuWindow
 
                 WlrLayershell.namespace: "dms:tray-menu-window"
-
-                id: menuWindow
                 visible: menuRoot.showMenu && (menuRoot.trayItem?.hasMenu ?? false)
                 WlrLayershell.layer: WlrLayershell.Top
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
-                    if (!menuRoot.showMenu) return WlrKeyboardFocus.None
-                    if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
-                    return WlrKeyboardFocus.Exclusive
+                    if (!menuRoot.showMenu)
+                        return WlrKeyboardFocus.None;
+                    if (CompositorService.isHyprland)
+                        return WlrKeyboardFocus.OnDemand;
+                    return WlrKeyboardFocus.Exclusive;
                 }
                 color: "transparent"
 
@@ -833,71 +933,61 @@ Item {
                     bottom: true
                 }
 
-                readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale)
-                    ? CompositorService.getScreenScale(menuWindow.screen)
-                    : (screen?.devicePixelRatio || 1)
+                readonly property real dpr: (typeof CompositorService !== "undefined" && CompositorService.getScreenScale) ? CompositorService.getScreenScale(menuWindow.screen) : (screen?.devicePixelRatio || 1)
                 property point anchorPos: Qt.point(screen.width / 2, screen.height / 2)
 
-                readonly property var barBounds: {
-                    if (!menuWindow.screen) {
-                        return { "x": 0, "y": 0, "width": 0, "height": 0, "wingSize": 0 }
+                property var barBounds: {
+                    if (!menuWindow.screen || !root.barConfig) {
+                        return {
+                            "x": 0,
+                            "y": 0,
+                            "width": 0,
+                            "height": 0,
+                            "wingSize": 0
+                        };
                     }
-                    return SettingsData.getBarBounds(menuWindow.screen, root.barThickness + SettingsData.dankBarSpacing)
+                    const barPosition = root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1));
+                    return SettingsData.getBarBounds(menuWindow.screen, root.barThickness + root.barSpacing, barPosition, root.barConfig);
                 }
 
-                readonly property real barX: barBounds.x
-                readonly property real barY: barBounds.y
-                readonly property real barWidth: barBounds.width
-                readonly property real barHeight: barBounds.height
+                property real barX: barBounds.x
+                property real barY: barBounds.y
+                property real barWidth: barBounds.width
+                property real barHeight: barBounds.height
+
+                readonly property int barPosition: root.axis?.edge === "left" ? 2 : (root.axis?.edge === "right" ? 3 : (root.axis?.edge === "top" ? 0 : 1))
+                readonly property var adjacentBarInfo: menuRoot.parentScreen ? SettingsData.getAdjacentBarInfo(menuRoot.parentScreen, barPosition, root.barConfig) : ({
+                        "topBar": 0,
+                        "bottomBar": 0,
+                        "leftBar": 0,
+                        "rightBar": 0
+                    })
+                readonly property real effectiveBarSize: root.barThickness + root.barSpacing
 
                 readonly property real maskX: {
-                    switch (SettingsData.dankBarPosition) {
-                    case SettingsData.Position.Left:
-                        return barWidth > 0 ? barWidth : 0
-                    case SettingsData.Position.Right:
-                    case SettingsData.Position.Top:
-                    case SettingsData.Position.Bottom:
-                    default:
-                        return 0
-                    }
+                    const triggeringBarX = (barPosition === 2) ? effectiveBarSize : 0;
+                    const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
+                    return Math.max(triggeringBarX, adjacentLeftBar);
                 }
 
                 readonly property real maskY: {
-                    switch (SettingsData.dankBarPosition) {
-                    case SettingsData.Position.Top:
-                        return barHeight > 0 ? barHeight : 0
-                    case SettingsData.Position.Bottom:
-                    case SettingsData.Position.Left:
-                    case SettingsData.Position.Right:
-                    default:
-                        return 0
-                    }
+                    const triggeringBarY = (barPosition === 0) ? effectiveBarSize : 0;
+                    const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
+                    return Math.max(triggeringBarY, adjacentTopBar);
                 }
 
                 readonly property real maskWidth: {
-                    switch (SettingsData.dankBarPosition) {
-                    case SettingsData.Position.Left:
-                        return barWidth > 0 ? width - barWidth : width
-                    case SettingsData.Position.Right:
-                        return barWidth > 0 ? width - barWidth : width
-                    case SettingsData.Position.Top:
-                    case SettingsData.Position.Bottom:
-                    default:
-                        return width
-                    }
+                    const triggeringBarRight = (barPosition === 3) ? effectiveBarSize : 0;
+                    const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
+                    const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar);
+                    return Math.max(100, width - maskX - rightExclusion);
                 }
 
                 readonly property real maskHeight: {
-                    switch (SettingsData.dankBarPosition) {
-                    case SettingsData.Position.Top:
-                        return barHeight > 0 ? height - barHeight : height
-                    case SettingsData.Position.Bottom:
-                        return barHeight > 0 ? height - barHeight : height
-                    case SettingsData.Position.Left:
-                    case SettingsData.Position.Right:
-                    default:
-                        return height
-                    }
+                    const triggeringBarBottom = (barPosition === 1) ? effectiveBarSize : 0;
+                    const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
+                    const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar);
+                    return Math.max(100, height - maskY - bottomExclusion);
                 }
 
                 mask: Region {
@@ -911,10 +1001,10 @@ Item {
 
                 onVisibleChanged: {
                     if (visible) {
-                        updatePosition()
-                        root.menuOpen = false
-                        PopoutManager.closeAllPopouts()
-                        ModalManager.closeAllModalsExcept(null)
+                        updatePosition();
+                        root.menuOpen = false;
+                        PopoutManager.closeAllPopouts();
+                        ModalManager.closeAllModalsExcept(null);
                     }
                 }
 
@@ -927,14 +1017,13 @@ Item {
                     enabled: menuRoot.showMenu
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: mouse => {
-                        const clickX = mouse.x + menuWindow.maskX
-                        const clickY = mouse.y + menuWindow.maskY
-                        const outsideContent = clickX < menuContainer.x || clickX > menuContainer.x + menuContainer.width ||
-                                               clickY < menuContainer.y || clickY > menuContainer.y + menuContainer.height
+                        const clickX = mouse.x + menuWindow.maskX;
+                        const clickY = mouse.y + menuWindow.maskY;
+                        const outsideContent = clickX < menuContainer.x || clickX > menuContainer.x + menuContainer.width || clickY < menuContainer.y || clickY > menuContainer.y + menuContainer.height;
 
-                        if (!outsideContent) return
-
-                        menuRoot.close()
+                        if (!outsideContent)
+                            return;
+                        menuRoot.close();
                     }
                 }
 
@@ -945,44 +1034,45 @@ Item {
 
                     Keys.onEscapePressed: {
                         if (entryStack.count > 0) {
-                            menuRoot.goBack()
+                            menuRoot.goBack();
                         } else {
-                            menuRoot.close()
+                            menuRoot.close();
                         }
                     }
                 }
 
                 function updatePosition() {
-                    const targetItem = (typeof menuRoot !== "undefined" && menuRoot.anchorItem) ? menuRoot.anchorItem : root
+                    const targetItem = (typeof menuRoot !== "undefined" && menuRoot.anchorItem) ? menuRoot.anchorItem : root;
 
-                    const isFromOverflowMenu = targetItem.objectName === "overflowMenuContainer"
+                    const isFromOverflowMenu = targetItem.objectName === "overflowMenuContainer";
 
-                    let relativeX, relativeY
                     if (isFromOverflowMenu) {
-                        relativeX = targetItem.x
-                        relativeY = targetItem.y
+                        if (menuRoot.isVertical) {
+                            const edge = menuRoot.axis?.edge;
+                            let targetX = edge === "left" ? root.barThickness + root.barSpacing + Theme.popupDistance : screen.width - (root.barThickness + root.barSpacing + Theme.popupDistance);
+                            const targetY = targetItem.y + targetItem.height / 2;
+                            anchorPos = Qt.point(targetX, targetY);
+                        } else {
+                            const targetX = targetItem.x + targetItem.width / 2;
+                            let targetY = menuRoot.isAtBottom ? screen.height - (root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance) : root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance;
+                            anchorPos = Qt.point(targetX, targetY);
+                        }
                     } else {
-                        const globalPos = targetItem.mapToGlobal(0, 0)
-                        const screenX = screen.x || 0
-                        const screenY = screen.y || 0
-                        relativeX = globalPos.x - screenX
-                        relativeY = globalPos.y - screenY
-                    }
+                        const globalPos = targetItem.mapToGlobal(0, 0);
+                        const screenX = screen.x || 0;
+                        const screenY = screen.y || 0;
+                        const relativeX = globalPos.x - screenX;
+                        const relativeY = globalPos.y - screenY;
 
-                    const widgetThickness = Math.max(20, 26 + SettingsData.dankBarInnerPadding * 0.6)
-                    const effectiveBarThickness = Math.max(widgetThickness + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding))
-
-                    if (root.isVertical) {
-                        const edge = root.axis?.edge
-                        let targetX = edge === "left"
-                            ? effectiveBarThickness + SettingsData.dankBarSpacing + Theme.popupDistance
-                            : screen.width - (effectiveBarThickness + SettingsData.dankBarSpacing + Theme.popupDistance)
-                        anchorPos = Qt.point(targetX, relativeY + targetItem.height / 2)
-                    } else {
-                        let targetY = root.isAtBottom
-                            ? screen.height - (effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap + Theme.popupDistance)
-                            : effectiveBarThickness + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap + Theme.popupDistance
-                        anchorPos = Qt.point(relativeX + targetItem.width / 2, targetY)
+                        if (menuRoot.isVertical) {
+                            const edge = menuRoot.axis?.edge;
+                            let targetX = edge === "left" ? root.barThickness + root.barSpacing + Theme.popupDistance : screen.width - (root.barThickness + root.barSpacing + Theme.popupDistance);
+                            const adjustedY = relativeY + targetItem.height / 2 + root.minTooltipY;
+                            anchorPos = Qt.point(targetX, adjustedY);
+                        } else {
+                            let targetY = menuRoot.isAtBottom ? screen.height - (root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance) : root.barThickness + root.barSpacing + (barConfig?.bottomGap ?? 0) + Theme.popupDistance;
+                            anchorPos = Qt.point(relativeX + targetItem.width / 2, targetY);
+                        }
                     }
                 }
 
@@ -999,39 +1089,39 @@ Item {
                     height: alignedHeight
 
                     x: Theme.snap((() => {
-                        if (menuRoot.isVertical) {
-                            const edge = menuRoot.axis?.edge
-                            if (edge === "left") {
-                                const targetX = menuWindow.anchorPos.x
-                                return Math.min(menuWindow.screen.width - alignedWidth - 10, targetX)
+                            if (menuRoot.isVertical) {
+                                const edge = menuRoot.axis?.edge;
+                                if (edge === "left") {
+                                    const targetX = menuWindow.anchorPos.x;
+                                    return Math.min(menuWindow.screen.width - alignedWidth - 10, targetX);
+                                } else {
+                                    const targetX = menuWindow.anchorPos.x - alignedWidth;
+                                    return Math.max(10, targetX);
+                                }
                             } else {
-                                const targetX = menuWindow.anchorPos.x - alignedWidth
-                                return Math.max(10, targetX)
+                                const left = 10;
+                                const right = menuWindow.width - alignedWidth - 10;
+                                const want = menuWindow.anchorPos.x - alignedWidth / 2;
+                                return Math.max(left, Math.min(right, want));
                             }
-                        } else {
-                            const left = 10
-                            const right = menuWindow.width - alignedWidth - 10
-                            const want = menuWindow.anchorPos.x - alignedWidth / 2
-                            return Math.max(left, Math.min(right, want))
-                        }
-                    })(), menuWindow.dpr)
+                        })(), menuWindow.dpr)
 
                     y: Theme.snap((() => {
-                        if (menuRoot.isVertical) {
-                            const top = 10
-                            const bottom = menuWindow.height - alignedHeight - 10
-                            const want = menuWindow.anchorPos.y - alignedHeight / 2
-                            return Math.max(top, Math.min(bottom, want))
-                        } else {
-                            if (menuRoot.isAtBottom) {
-                                const targetY = menuWindow.anchorPos.y - alignedHeight
-                                return Math.max(10, targetY)
+                            if (menuRoot.isVertical) {
+                                const top = Math.max(menuWindow.barY, 10);
+                                const bottom = menuWindow.height - alignedHeight - 10;
+                                const want = menuWindow.anchorPos.y - alignedHeight / 2;
+                                return Math.max(top, Math.min(bottom, want));
                             } else {
-                                const targetY = menuWindow.anchorPos.y
-                                return Math.min(menuWindow.screen.height - alignedHeight - 10, targetY)
+                                if (menuRoot.isAtBottom) {
+                                    const targetY = menuWindow.anchorPos.y - alignedHeight;
+                                    return Math.max(10, targetY);
+                                } else {
+                                    const targetY = menuWindow.anchorPos.y;
+                                    return Math.min(menuWindow.screen.height - alignedHeight - 10, targetY);
+                                }
                             }
-                        }
-                    })(), menuWindow.dpr)
+                        })(), menuWindow.dpr)
 
                     property real shadowBlurPx: 10
                     property real shadowSpreadPx: 0
@@ -1064,17 +1154,18 @@ Item {
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
+                        readonly property int blurMax: 64
+
                         layer.effect: MultiEffect {
                             autoPaddingEnabled: true
                             shadowEnabled: true
                             blurEnabled: false
                             maskEnabled: false
-                            property int blurMax: 64
-                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / blurMax))
+                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / menuBgShadowLayer.blurMax))
                             shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(menuBgShadowLayer.width, menuBgShadowLayer.height))
                             shadowColor: {
-                                const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest
-                                return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha)
+                                const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
+                                return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
                             }
                         }
 
@@ -1103,7 +1194,6 @@ Item {
                             return e ? (e.menu || e) : null;
                         }
                     }
-
 
                     Column {
                         id: menuColumn
@@ -1147,15 +1237,15 @@ Item {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    const itemId = menuRoot.trayItem?.id || ""
-                                    if (!itemId) return
-
+                                    const itemId = menuRoot.trayItem?.id || "";
+                                    if (!itemId)
+                                        return;
                                     if (SessionData.isHiddenTrayId(itemId)) {
-                                        SessionData.showTrayId(itemId)
+                                        SessionData.showTrayId(itemId);
                                     } else {
-                                        SessionData.hideTrayId(itemId)
+                                        SessionData.hideTrayId(itemId);
                                     }
-                                    menuRoot.closeWithAction()
+                                    menuRoot.closeWithAction();
                                 }
                             }
                         }
@@ -1212,10 +1302,7 @@ Item {
                         }
 
                         Repeater {
-                            model: entryStack.count
-                                   ? (subOpener.children ? subOpener.children
-                                                         : (menuRoot.topEntry()?.children || []))
-                                   : rootOpener.children
+                            model: entryStack.count ? (subOpener.children ? subOpener.children : (menuRoot.topEntry()?.children || [])) : rootOpener.children
 
                             Rectangle {
                                 property var menuEntry: modelData
@@ -1225,9 +1312,9 @@ Item {
                                 radius: 0
                                 color: {
                                     if (menuEntry?.isSeparator) {
-                                        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                                        return Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2);
                                     }
-                                    return itemArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0)
+                                    return itemArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceContainer, 0);
                                 }
 
                                 MouseArea {
@@ -1238,19 +1325,19 @@ Item {
                                     cursorShape: Qt.PointingHandCursor
 
                                     onClicked: {
-                                        if (!menuEntry || menuEntry.isSeparator) return
-
+                                        if (!menuEntry || menuEntry.isSeparator)
+                                            return;
                                         if (menuEntry.hasChildren) {
-                                            menuRoot.showSubMenu(menuEntry)
-                                            return
+                                            menuRoot.showSubMenu(menuEntry);
+                                            return;
                                         }
 
                                         if (typeof menuEntry.activate === "function") {
-                                            menuEntry.activate()
+                                            menuEntry.activate();
                                         } else if (typeof menuEntry.triggered === "function") {
-                                            menuEntry.triggered()
+                                            menuEntry.triggered();
                                         }
-                                        Qt.createQmlObject('import QtQuick; Timer { interval: 80; running: true; repeat: false; onTriggered: menuRoot.closeWithAction() }', menuRoot)
+                                        Qt.createQmlObject('import QtQuick; Timer { interval: 80; running: true; repeat: false; onTriggered: menuRoot.closeWithAction() }', menuRoot);
                                     }
                                 }
 
@@ -1340,18 +1427,20 @@ Item {
     }
 
     function showForTrayItem(item, anchor, screen, atBottom, vertical, axisObj) {
-        if (!screen) return
-
+        if (!screen)
+            return;
         if (currentTrayMenu) {
-            currentTrayMenu.showMenu = false
-            currentTrayMenu.destroy()
-            currentTrayMenu = null
+            currentTrayMenu.showMenu = false;
+            currentTrayMenu.destroy();
+            currentTrayMenu = null;
         }
 
-        currentTrayMenu = trayMenuComponent.createObject(null)
-        if (!currentTrayMenu) return
+        PopoutManager.closeAllPopouts();
+        ModalManager.closeAllModalsExcept(null);
 
-        currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj)
+        currentTrayMenu = trayMenuComponent.createObject(null);
+        if (!currentTrayMenu)
+            return;
+        currentTrayMenu.showForTrayItem(item, anchor, screen, atBottom, vertical ?? false, axisObj);
     }
-
 }

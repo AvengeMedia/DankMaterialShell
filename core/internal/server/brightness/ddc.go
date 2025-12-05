@@ -37,25 +37,18 @@ func NewDDCBackend() (*DDCBackend, error) {
 }
 
 func (b *DDCBackend) scanI2CDevices() error {
-	b.scanMutex.Lock()
-	lastScan := b.lastScan
-	b.scanMutex.Unlock()
+	return b.scanI2CDevicesInternal(false)
+}
 
-	if time.Since(lastScan) < b.scanInterval {
-		return nil
-	}
-
+func (b *DDCBackend) scanI2CDevicesInternal(force bool) error {
 	b.scanMutex.Lock()
 	defer b.scanMutex.Unlock()
 
-	if time.Since(b.lastScan) < b.scanInterval {
+	if !force && time.Since(b.lastScan) < b.scanInterval {
 		return nil
 	}
 
-	b.devices.Range(func(key string, value *ddcDevice) bool {
-		b.devices.Delete(key)
-		return true
-	})
+	activeBuses := make(map[int]bool)
 
 	for i := 0; i < 32; i++ {
 		busPath := fmt.Sprintf("/dev/i2c-%d", i)
@@ -68,16 +61,30 @@ func (b *DDCBackend) scanI2CDevices() error {
 			continue
 		}
 
+		activeBuses[i] = true
+		id := fmt.Sprintf("ddc:i2c-%d", i)
+
+		if _, exists := b.devices.Load(id); exists {
+			continue
+		}
+
 		dev, err := b.probeDDCDevice(i)
 		if err != nil || dev == nil {
 			continue
 		}
 
-		id := fmt.Sprintf("ddc:i2c-%d", i)
 		dev.id = id
 		b.devices.Store(id, dev)
 		log.Debugf("found DDC device on i2c-%d", i)
 	}
+
+	b.devices.Range(func(id string, dev *ddcDevice) bool {
+		if !activeBuses[dev.bus] {
+			b.devices.Delete(id)
+			log.Debugf("removed DDC device %s (bus no longer exists)", id)
+		}
+		return true
+	})
 
 	b.lastScan = time.Now()
 
@@ -98,7 +105,7 @@ func (b *DDCBackend) probeDDCDevice(bus int) (*ddcDevice, error) {
 	}
 
 	dummy := make([]byte, 32)
-	syscall.Read(fd, dummy)
+	syscall.Read(fd, dummy) //nolint:errcheck
 
 	writebuf := []byte{0x00}
 	n, err := syscall.Write(fd, writebuf)
@@ -188,6 +195,13 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 	_, ok := b.devices.Load(id)
 
 	if !ok {
+		if err := b.scanI2CDevicesInternal(true); err != nil {
+			log.Debugf("rescan failed for %s: %v", id, err)
+		}
+		_, ok = b.devices.Load(id)
+	}
+
+	if !ok {
 		return fmt.Errorf("device not found: %s", id)
 	}
 
@@ -233,6 +247,13 @@ func (b *DDCBackend) SetBrightnessWithExponent(id string, value int, exponential
 
 func (b *DDCBackend) setBrightnessImmediateWithExponent(id string, value int) error {
 	dev, ok := b.devices.Load(id)
+
+	if !ok {
+		if err := b.scanI2CDevicesInternal(true); err != nil {
+			log.Debugf("rescan failed for %s: %v", id, err)
+		}
+		dev, ok = b.devices.Load(id)
+	}
 
 	if !ok {
 		return fmt.Errorf("device not found: %s", id)

@@ -10,7 +10,12 @@ import qs.Modals
 Rectangle {
     id: root
 
-    implicitHeight: BluetoothService.adapter && BluetoothService.adapter.enabled ? headerRow.height + bluetoothContent.height + Theme.spacingM : headerRow.height
+    implicitHeight: {
+        if (height > 0) {
+            return height
+        }
+        return BluetoothService.adapter && BluetoothService.adapter.enabled ? headerRow.height + bluetoothContent.height + Theme.spacingM : headerRow.height
+    }
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)

@@ -8,16 +8,18 @@ Rectangle {
 
     property bool editMode: false
 
-    signal powerButtonClicked()
-    signal lockRequested()
-    signal editModeToggled()
-    signal settingsButtonClicked()
+    signal powerButtonClicked
+    signal lockRequested
+    signal editModeToggled
+    signal settingsButtonClicked
+
+    Component.onCompleted: DgopService.addRef("system")
+    Component.onDestruction: DgopService.removeRef("system")
 
     implicitHeight: 70
     radius: Theme.cornerRadius
     color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g,
-                          Theme.outline.b, 0.08)
+    border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
     border.width: 0
 
     Row {
@@ -34,12 +36,12 @@ Rectangle {
             height: 60
             imageSource: {
                 if (PortalService.profileImage === "")
-                    return ""
+                    return "";
 
                 if (PortalService.profileImage.startsWith("/"))
-                    return "file://" + PortalService.profileImage
+                    return "file://" + PortalService.profileImage;
 
-                return PortalService.profileImage
+                return PortalService.profileImage;
             }
             fallbackIcon: "person"
         }
@@ -49,14 +51,13 @@ Rectangle {
             spacing: 2
 
             Typography {
-                text: UserInfoService.fullName
-                      || UserInfoService.username || "User"
+                text: UserInfoService.fullName || UserInfoService.username || "User"
                 style: Typography.Style.Subtitle
                 color: Theme.surfaceText
             }
 
             Typography {
-                text: (UserInfoService.uptime || "Unknown")
+                text: DgopService.uptime || "Unknown"
                 style: Typography.Style.Caption
                 color: Theme.surfaceVariantText
             }
@@ -77,7 +78,7 @@ Rectangle {
             iconColor: Theme.surfaceText
             backgroundColor: "transparent"
             onClicked: {
-                root.lockRequested()
+                root.lockRequested();
             }
         }
 
@@ -97,8 +98,8 @@ Rectangle {
             iconColor: Theme.surfaceText
             backgroundColor: "transparent"
             onClicked: {
-                root.settingsButtonClicked()
-                settingsModal.show()
+                root.settingsButtonClicked();
+                PopoutService.focusOrToggleSettings();
             }
         }
 

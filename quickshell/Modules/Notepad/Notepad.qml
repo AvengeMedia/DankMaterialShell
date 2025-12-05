@@ -1,16 +1,11 @@
+pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Controls
-import QtCore
-import Quickshell
-import Quickshell.Wayland
 import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
 import qs.Services
 import qs.Widgets
-
-pragma ComponentBehavior: Bound
 
 Item {
     id: root
@@ -26,119 +21,119 @@ Item {
     property bool showSettingsMenu: false
     property string pendingSaveContent: ""
 
-    signal hideRequested()
+    signal hideRequested
 
     Ref {
         service: NotepadStorageService
     }
 
     function hasUnsavedChanges() {
-        return textEditor.hasUnsavedChanges()
+        return textEditor.hasUnsavedChanges();
     }
 
     function hasUnsavedTemporaryContent() {
-        return hasUnsavedChanges()
+        return hasUnsavedChanges();
     }
 
     function createNewTab() {
-        performCreateNewTab()
+        performCreateNewTab();
     }
 
     function performCreateNewTab() {
-        NotepadStorageService.createNewTab()
-        textEditor.text = ""
-        textEditor.lastSavedContent = ""
-        textEditor.contentLoaded = true
-        textEditor.textArea.forceActiveFocus()
+        NotepadStorageService.createNewTab();
+        textEditor.text = "";
+        textEditor.lastSavedContent = "";
+        textEditor.contentLoaded = true;
+        textEditor.textArea.forceActiveFocus();
     }
 
     function closeTab(tabIndex) {
         if (tabIndex === NotepadStorageService.currentTabIndex && hasUnsavedChanges()) {
-            root.pendingAction = "close_tab_" + tabIndex
-            root.confirmationDialogOpen = true
-            confirmationDialog.open()
+            root.pendingAction = "close_tab_" + tabIndex;
+            root.confirmationDialogOpen = true;
+            confirmationDialog.open();
         } else {
-            performCloseTab(tabIndex)
+            performCloseTab(tabIndex);
         }
     }
 
     function performCloseTab(tabIndex) {
-        NotepadStorageService.closeTab(tabIndex)
+        NotepadStorageService.closeTab(tabIndex);
         Qt.callLater(() => {
-            textEditor.loadCurrentTabContent()
-        })
+            textEditor.loadCurrentTabContent();
+        });
     }
 
     function switchToTab(tabIndex) {
-        if (tabIndex < 0 || tabIndex >= NotepadStorageService.tabs.length) return
-
+        if (tabIndex < 0 || tabIndex >= NotepadStorageService.tabs.length)
+            return;
         if (textEditor.contentLoaded) {
-            textEditor.autoSaveToSession()
+            textEditor.autoSaveToSession();
         }
 
-        NotepadStorageService.switchToTab(tabIndex)
+        NotepadStorageService.switchToTab(tabIndex);
         Qt.callLater(() => {
-            textEditor.loadCurrentTabContent()
+            textEditor.loadCurrentTabContent();
             if (currentTab) {
-                root.currentFileName = currentTab.fileName || ""
-                root.currentFileUrl = currentTab.fileUrl || ""
+                root.currentFileName = currentTab.fileName || "";
+                root.currentFileUrl = currentTab.fileUrl || "";
             }
-        })
+        });
     }
 
     function saveToFile(fileUrl) {
-        if (!currentTab) return
+        if (!currentTab)
+            return;
+        var content = textEditor.text;
+        var filePath = fileUrl.toString().replace(/^file:\/\//, '');
 
-        var content = textEditor.text
-        var filePath = fileUrl.toString().replace(/^file:\/\//, '')
-
-        saveFileView.path = ""
-        pendingSaveContent = content
-        saveFileView.path = filePath
+        saveFileView.path = "";
+        pendingSaveContent = content;
+        saveFileView.path = filePath;
 
         Qt.callLater(() => {
-            saveFileView.setText(pendingSaveContent)
-        })
+            saveFileView.setText(pendingSaveContent);
+        });
     }
 
     function loadFromFile(fileUrl) {
         if (hasUnsavedTemporaryContent()) {
-            root.pendingFileUrl = fileUrl
-            root.pendingAction = "load_file"
-            root.confirmationDialogOpen = true
-            confirmationDialog.open()
+            root.pendingFileUrl = fileUrl;
+            root.pendingAction = "load_file";
+            root.confirmationDialogOpen = true;
+            confirmationDialog.open();
         } else {
-            performLoadFromFile(fileUrl)
+            performLoadFromFile(fileUrl);
         }
     }
 
     function performLoadFromFile(fileUrl) {
-        const filePath = fileUrl.toString().replace(/^file:\/\//, '')
-        const fileName = filePath.split('/').pop()
+        const filePath = fileUrl.toString().replace(/^file:\/\//, '');
+        const fileName = filePath.split('/').pop();
 
-        loadFileView.path = ""
-        loadFileView.path = filePath
+        loadFileView.path = "";
+        loadFileView.path = filePath;
 
         if (loadFileView.waitForJob()) {
             Qt.callLater(() => {
-                var content = loadFileView.text()
+                var content = loadFileView.text();
                 if (currentTab && content !== undefined && content !== null) {
-                    textEditor.text = content
-                    textEditor.lastSavedContent = content
-                    textEditor.contentLoaded = true
-                    root.lastSavedFileContent = content
+                    textEditor.text = content;
+                    textEditor.lastSavedContent = content;
+                    textEditor.contentLoaded = true;
+                    root.lastSavedFileContent = content;
 
                     NotepadStorageService.updateTabMetadata(NotepadStorageService.currentTabIndex, {
                         title: fileName,
                         filePath: filePath,
                         isTemporary: false
-                    })
+                    });
 
-                    root.currentFileName = fileName
-                    root.currentFileUrl = fileUrl
-                    textEditor.saveCurrentTabContent()
+                    root.currentFileName = fileName;
+                    root.currentFileUrl = fileUrl;
+                    textEditor.saveCurrentTabContent();
                 }
-            })
+            });
         }
     }
 
@@ -151,16 +146,16 @@ Item {
             width: parent.width
             contentLoaded: textEditor.contentLoaded
 
-            onTabSwitched: (tabIndex) => {
-                switchToTab(tabIndex)
+            onTabSwitched: tabIndex => {
+                switchToTab(tabIndex);
             }
 
-            onTabClosed: (tabIndex) => {
-                closeTab(tabIndex)
+            onTabClosed: tabIndex => {
+                closeTab(tabIndex);
             }
 
             onNewTabRequested: {
-                createNewTab()
+                createNewTab();
             }
         }
 
@@ -171,41 +166,41 @@ Item {
 
             onSaveRequested: {
                 if (currentTab && !currentTab.isTemporary && currentTab.filePath) {
-                    var fileUrl = "file://" + currentTab.filePath
-                    saveToFile(fileUrl)
+                    var fileUrl = "file://" + currentTab.filePath;
+                    saveToFile(fileUrl);
                 } else {
-                    root.fileDialogOpen = true
-                    saveBrowser.open()
+                    root.fileDialogOpen = true;
+                    saveBrowser.open();
                 }
             }
 
             onOpenRequested: {
                 if (hasUnsavedChanges()) {
-                    root.pendingAction = "open"
-                    root.confirmationDialogOpen = true
-                    confirmationDialog.open()
+                    root.pendingAction = "open";
+                    root.confirmationDialogOpen = true;
+                    confirmationDialog.open();
                 } else {
-                    root.fileDialogOpen = true
-                    loadBrowser.open()
+                    root.fileDialogOpen = true;
+                    loadBrowser.open();
                 }
             }
 
             onNewRequested: {
                 if (hasUnsavedChanges()) {
-                    root.pendingAction = "new"
-                    root.confirmationDialogOpen = true
-                    confirmationDialog.open()
+                    root.pendingAction = "new";
+                    root.confirmationDialogOpen = true;
+                    confirmationDialog.open();
                 } else {
-                    createNewTab()
+                    createNewTab();
                 }
             }
 
             onEscapePressed: {
-                root.hideRequested()
+                root.hideRequested();
             }
 
             onSettingsRequested: {
-                showSettingsMenu = !showSettingsMenu
+                showSettingsMenu = !showSettingsMenu;
             }
         }
     }
@@ -216,8 +211,8 @@ Item {
         isVisible: showSettingsMenu
         onSettingsRequested: showSettingsMenu = !showSettingsMenu
         onFindRequested: {
-            showSettingsMenu = false
-            textEditor.showSearch()
+            showSettingsMenu = false;
+            textEditor.showSearch();
         }
     }
 
@@ -233,14 +228,14 @@ Item {
                 NotepadStorageService.updateTabMetadata(NotepadStorageService.currentTabIndex, {
                     hasUnsavedChanges: false,
                     lastSavedContent: pendingSaveContent
-                })
-                root.lastSavedFileContent = pendingSaveContent
-                pendingSaveContent = ""
+                });
+                root.lastSavedFileContent = pendingSaveContent;
+                pendingSaveContent = "";
             }
         }
 
-        onSaveFailed: (error) => {
-            pendingSaveContent = ""
+        onSaveFailed: error => {
+            pendingSaveContent = "";
         }
     }
 
@@ -251,8 +246,7 @@ Item {
         atomicWrites: true
         printErrors: true
 
-        onLoadFailed: (error) => {
-        }
+        onLoadFailed: error => {}
     }
 
     FileBrowserModal {
@@ -266,56 +260,51 @@ Item {
         saveMode: true
         defaultFileName: {
             if (currentTab && currentTab.title && currentTab.title !== "Untitled") {
-                return currentTab.title
+                return currentTab.title;
             } else if (currentTab && !currentTab.isTemporary && currentTab.filePath) {
-                return currentTab.filePath.split('/').pop()
+                return currentTab.filePath.split('/').pop();
             } else {
-                return "note.txt"
+                return "note.txt";
             }
         }
 
-        WlrLayershell.layer: WlrLayershell.Overlay
+        onFileSelected: path => {
+            root.fileDialogOpen = false;
+            const cleanPath = path.toString().replace(/^file:\/\//, '');
+            const fileName = cleanPath.split('/').pop();
+            const fileUrl = "file://" + cleanPath;
 
-        onFileSelected: (path) => {
-            root.fileDialogOpen = false
-            const cleanPath = path.toString().replace(/^file:\/\//, '')
-            const fileName = cleanPath.split('/').pop()
-            const fileUrl = "file://" + cleanPath
-
-            root.currentFileName = fileName
-            root.currentFileUrl = fileUrl
+            root.currentFileName = fileName;
+            root.currentFileUrl = fileUrl;
 
             if (currentTab) {
-                NotepadStorageService.saveTabAs(
-                    NotepadStorageService.currentTabIndex,
-                    cleanPath
-                )
+                NotepadStorageService.saveTabAs(NotepadStorageService.currentTabIndex, cleanPath);
             }
 
-            saveToFile(fileUrl)
+            saveToFile(fileUrl);
 
             if (root.pendingAction === "new") {
                 Qt.callLater(() => {
-                    createNewTab()
-                })
+                    createNewTab();
+                });
             } else if (root.pendingAction === "open") {
                 Qt.callLater(() => {
-                    root.fileDialogOpen = true
-                    loadBrowser.open()
-                })
+                    root.fileDialogOpen = true;
+                    loadBrowser.open();
+                });
             } else if (root.pendingAction.startsWith("close_tab_")) {
                 Qt.callLater(() => {
-                    var tabIndex = parseInt(root.pendingAction.split("_")[2])
-                    performCloseTab(tabIndex)
-                })
+                    var tabIndex = parseInt(root.pendingAction.split("_")[2]);
+                    performCloseTab(tabIndex);
+                });
             }
-            root.pendingAction = ""
+            root.pendingAction = "";
 
-            close()
+            close();
         }
 
         onDialogClosed: {
-            root.fileDialogOpen = false
+            root.fileDialogOpen = false;
         }
     }
 
@@ -328,23 +317,21 @@ Item {
         fileExtensions: ["*.txt", "*.md", "*.*"]
         allowStacking: true
 
-        WlrLayershell.layer: WlrLayershell.Overlay
+        onFileSelected: path => {
+            root.fileDialogOpen = false;
+            const cleanPath = path.toString().replace(/^file:\/\//, '');
+            const fileName = cleanPath.split('/').pop();
+            const fileUrl = "file://" + cleanPath;
 
-        onFileSelected: (path) => {
-            root.fileDialogOpen = false
-            const cleanPath = path.toString().replace(/^file:\/\//, '')
-            const fileName = cleanPath.split('/').pop()
-            const fileUrl = "file://" + cleanPath
+            root.currentFileName = fileName;
+            root.currentFileUrl = fileUrl;
 
-            root.currentFileName = fileName
-            root.currentFileUrl = fileUrl
-
-            loadFromFile(fileUrl)
-            close()
+            loadFromFile(fileUrl);
+            close();
         }
 
         onDialogClosed: {
-            root.fileDialogOpen = false
+            root.fileDialogOpen = false;
         }
     }
 
@@ -357,8 +344,8 @@ Item {
         allowStacking: true
 
         onBackgroundClicked: {
-            close()
-            root.confirmationDialogOpen = false
+            close();
+            root.confirmationDialogOpen = false;
         }
 
         content: Component {
@@ -367,9 +354,9 @@ Item {
                 focus: true
 
                 Keys.onEscapePressed: event => {
-                    confirmationDialog.close()
-                    root.confirmationDialogOpen = false
-                    event.accepted = true
+                    confirmationDialog.close();
+                    root.confirmationDialogOpen = false;
+                    event.accepted = true;
                 }
 
                 Column {
@@ -392,13 +379,7 @@ Item {
                             }
 
                             StyledText {
-                                text: root.pendingAction === "new" ?
-                                      I18n.tr("You have unsaved changes. Save before creating a new file?") :
-                                      root.pendingAction.startsWith("close_tab_") ?
-                                      I18n.tr("You have unsaved changes. Save before closing this tab?") :
-                                      root.pendingAction === "load_file" || root.pendingAction === "open" ?
-                                      I18n.tr("You have unsaved changes. Save before opening a file?") :
-                                      I18n.tr("You have unsaved changes. Save before continuing?")
+                                text: root.pendingAction === "new" ? I18n.tr("You have unsaved changes. Save before creating a new file?") : root.pendingAction.startsWith("close_tab_") ? I18n.tr("You have unsaved changes. Save before closing this tab?") : root.pendingAction === "load_file" || root.pendingAction === "open" ? I18n.tr("You have unsaved changes. Save before opening a file?") : I18n.tr("You have unsaved changes. Save before continuing?")
                                 font.pixelSize: Theme.fontSizeMedium
                                 color: Theme.surfaceTextMedium
                                 width: parent.width
@@ -411,8 +392,8 @@ Item {
                             iconSize: Theme.iconSize - 4
                             iconColor: Theme.surfaceText
                             onClicked: {
-                                confirmationDialog.close()
-                                root.confirmationDialogOpen = false
+                                confirmationDialog.close();
+                                root.confirmationDialogOpen = false;
                             }
                         }
                     }
@@ -449,21 +430,21 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        confirmationDialog.close()
-                                        root.confirmationDialogOpen = false
+                                        confirmationDialog.close();
+                                        root.confirmationDialogOpen = false;
                                         if (root.pendingAction === "new") {
-                                            createNewTab()
+                                            createNewTab();
                                         } else if (root.pendingAction === "open") {
-                                            root.fileDialogOpen = true
-                                            loadBrowser.open()
+                                            root.fileDialogOpen = true;
+                                            loadBrowser.open();
                                         } else if (root.pendingAction === "load_file") {
-                                            performLoadFromFile(root.pendingFileUrl)
+                                            performLoadFromFile(root.pendingFileUrl);
                                         } else if (root.pendingAction.startsWith("close_tab_")) {
-                                            var tabIndex = parseInt(root.pendingAction.split("_")[2])
-                                            performCloseTab(tabIndex)
+                                            var tabIndex = parseInt(root.pendingAction.split("_")[2]);
+                                            performCloseTab(tabIndex);
                                         }
-                                        root.pendingAction = ""
-                                        root.pendingFileUrl = ""
+                                        root.pendingAction = "";
+                                        root.pendingFileUrl = "";
                                     }
                                 }
                             }
@@ -489,10 +470,10 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
                                     onClicked: {
-                                        confirmationDialog.close()
-                                        root.confirmationDialogOpen = false
-                                        root.fileDialogOpen = true
-                                        saveBrowser.open()
+                                        confirmationDialog.close();
+                                        root.confirmationDialogOpen = false;
+                                        root.fileDialogOpen = true;
+                                        saveBrowser.open();
                                     }
                                 }
 
@@ -503,7 +484,6 @@ Item {
                                     }
                                 }
                             }
-
                         }
                     }
                 }

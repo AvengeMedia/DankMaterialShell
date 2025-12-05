@@ -22,6 +22,99 @@ func (_m *MockCUPSClientInterface) EXPECT() *MockCUPSClientInterface_Expecter {
 	return &MockCUPSClientInterface_Expecter{mock: &_m.Mock}
 }
 
+// AcceptJobs provides a mock function with given fields: printer
+func (_m *MockCUPSClientInterface) AcceptJobs(printer string) error {
+	ret := _m.Called(printer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AcceptJobs")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(printer)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_AcceptJobs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AcceptJobs'
+type MockCUPSClientInterface_AcceptJobs_Call struct {
+	*mock.Call
+}
+
+// AcceptJobs is a helper method to define mock.On call
+//   - printer string
+func (_e *MockCUPSClientInterface_Expecter) AcceptJobs(printer interface{}) *MockCUPSClientInterface_AcceptJobs_Call {
+	return &MockCUPSClientInterface_AcceptJobs_Call{Call: _e.mock.On("AcceptJobs", printer)}
+}
+
+func (_c *MockCUPSClientInterface_AcceptJobs_Call) Run(run func(printer string)) *MockCUPSClientInterface_AcceptJobs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_AcceptJobs_Call) Return(_a0 error) *MockCUPSClientInterface_AcceptJobs_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_AcceptJobs_Call) RunAndReturn(run func(string) error) *MockCUPSClientInterface_AcceptJobs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// AddPrinterToClass provides a mock function with given fields: class, printer
+func (_m *MockCUPSClientInterface) AddPrinterToClass(class string, printer string) error {
+	ret := _m.Called(class, printer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for AddPrinterToClass")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(class, printer)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_AddPrinterToClass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'AddPrinterToClass'
+type MockCUPSClientInterface_AddPrinterToClass_Call struct {
+	*mock.Call
+}
+
+// AddPrinterToClass is a helper method to define mock.On call
+//   - class string
+//   - printer string
+func (_e *MockCUPSClientInterface_Expecter) AddPrinterToClass(class interface{}, printer interface{}) *MockCUPSClientInterface_AddPrinterToClass_Call {
+	return &MockCUPSClientInterface_AddPrinterToClass_Call{Call: _e.mock.On("AddPrinterToClass", class, printer)}
+}
+
+func (_c *MockCUPSClientInterface_AddPrinterToClass_Call) Run(run func(class string, printer string)) *MockCUPSClientInterface_AddPrinterToClass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_AddPrinterToClass_Call) Return(_a0 error) *MockCUPSClientInterface_AddPrinterToClass_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_AddPrinterToClass_Call) RunAndReturn(run func(string, string) error) *MockCUPSClientInterface_AddPrinterToClass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CancelAllJob provides a mock function with given fields: printer, purge
 func (_m *MockCUPSClientInterface) CancelAllJob(printer string, purge bool) error {
 	ret := _m.Called(printer, purge)
@@ -116,6 +209,312 @@ func (_c *MockCUPSClientInterface_CancelJob_Call) RunAndReturn(run func(int, boo
 	return _c
 }
 
+// CreatePrinter provides a mock function with given fields: name, deviceURI, ppd, shared, errorPolicy, information, location
+func (_m *MockCUPSClientInterface) CreatePrinter(name string, deviceURI string, ppd string, shared bool, errorPolicy string, information string, location string) error {
+	ret := _m.Called(name, deviceURI, ppd, shared, errorPolicy, information, location)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePrinter")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string, string, bool, string, string, string) error); ok {
+		r0 = rf(name, deviceURI, ppd, shared, errorPolicy, information, location)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_CreatePrinter_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePrinter'
+type MockCUPSClientInterface_CreatePrinter_Call struct {
+	*mock.Call
+}
+
+// CreatePrinter is a helper method to define mock.On call
+//   - name string
+//   - deviceURI string
+//   - ppd string
+//   - shared bool
+//   - errorPolicy string
+//   - information string
+//   - location string
+func (_e *MockCUPSClientInterface_Expecter) CreatePrinter(name interface{}, deviceURI interface{}, ppd interface{}, shared interface{}, errorPolicy interface{}, information interface{}, location interface{}) *MockCUPSClientInterface_CreatePrinter_Call {
+	return &MockCUPSClientInterface_CreatePrinter_Call{Call: _e.mock.On("CreatePrinter", name, deviceURI, ppd, shared, errorPolicy, information, location)}
+}
+
+func (_c *MockCUPSClientInterface_CreatePrinter_Call) Run(run func(name string, deviceURI string, ppd string, shared bool, errorPolicy string, information string, location string)) *MockCUPSClientInterface_CreatePrinter_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string), args[2].(string), args[3].(bool), args[4].(string), args[5].(string), args[6].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_CreatePrinter_Call) Return(_a0 error) *MockCUPSClientInterface_CreatePrinter_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_CreatePrinter_Call) RunAndReturn(run func(string, string, string, bool, string, string, string) error) *MockCUPSClientInterface_CreatePrinter_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteClass provides a mock function with given fields: class
+func (_m *MockCUPSClientInterface) DeleteClass(class string) error {
+	ret := _m.Called(class)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteClass")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(class)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_DeleteClass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteClass'
+type MockCUPSClientInterface_DeleteClass_Call struct {
+	*mock.Call
+}
+
+// DeleteClass is a helper method to define mock.On call
+//   - class string
+func (_e *MockCUPSClientInterface_Expecter) DeleteClass(class interface{}) *MockCUPSClientInterface_DeleteClass_Call {
+	return &MockCUPSClientInterface_DeleteClass_Call{Call: _e.mock.On("DeleteClass", class)}
+}
+
+func (_c *MockCUPSClientInterface_DeleteClass_Call) Run(run func(class string)) *MockCUPSClientInterface_DeleteClass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeleteClass_Call) Return(_a0 error) *MockCUPSClientInterface_DeleteClass_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeleteClass_Call) RunAndReturn(run func(string) error) *MockCUPSClientInterface_DeleteClass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeletePrinter provides a mock function with given fields: printer
+func (_m *MockCUPSClientInterface) DeletePrinter(printer string) error {
+	ret := _m.Called(printer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePrinter")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(printer)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_DeletePrinter_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePrinter'
+type MockCUPSClientInterface_DeletePrinter_Call struct {
+	*mock.Call
+}
+
+// DeletePrinter is a helper method to define mock.On call
+//   - printer string
+func (_e *MockCUPSClientInterface_Expecter) DeletePrinter(printer interface{}) *MockCUPSClientInterface_DeletePrinter_Call {
+	return &MockCUPSClientInterface_DeletePrinter_Call{Call: _e.mock.On("DeletePrinter", printer)}
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinter_Call) Run(run func(printer string)) *MockCUPSClientInterface_DeletePrinter_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinter_Call) Return(_a0 error) *MockCUPSClientInterface_DeletePrinter_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinter_Call) RunAndReturn(run func(string) error) *MockCUPSClientInterface_DeletePrinter_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeletePrinterFromClass provides a mock function with given fields: class, printer
+func (_m *MockCUPSClientInterface) DeletePrinterFromClass(class string, printer string) error {
+	ret := _m.Called(class, printer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeletePrinterFromClass")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(class, printer)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_DeletePrinterFromClass_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeletePrinterFromClass'
+type MockCUPSClientInterface_DeletePrinterFromClass_Call struct {
+	*mock.Call
+}
+
+// DeletePrinterFromClass is a helper method to define mock.On call
+//   - class string
+//   - printer string
+func (_e *MockCUPSClientInterface_Expecter) DeletePrinterFromClass(class interface{}, printer interface{}) *MockCUPSClientInterface_DeletePrinterFromClass_Call {
+	return &MockCUPSClientInterface_DeletePrinterFromClass_Call{Call: _e.mock.On("DeletePrinterFromClass", class, printer)}
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinterFromClass_Call) Run(run func(class string, printer string)) *MockCUPSClientInterface_DeletePrinterFromClass_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinterFromClass_Call) Return(_a0 error) *MockCUPSClientInterface_DeletePrinterFromClass_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_DeletePrinterFromClass_Call) RunAndReturn(run func(string, string) error) *MockCUPSClientInterface_DeletePrinterFromClass_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetClasses provides a mock function with given fields: attributes
+func (_m *MockCUPSClientInterface) GetClasses(attributes []string) (map[string]ipp.Attributes, error) {
+	ret := _m.Called(attributes)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetClasses")
+	}
+
+	var r0 map[string]ipp.Attributes
+	var r1 error
+	if rf, ok := ret.Get(0).(func([]string) (map[string]ipp.Attributes, error)); ok {
+		return rf(attributes)
+	}
+	if rf, ok := ret.Get(0).(func([]string) map[string]ipp.Attributes); ok {
+		r0 = rf(attributes)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]ipp.Attributes)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func([]string) error); ok {
+		r1 = rf(attributes)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCUPSClientInterface_GetClasses_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetClasses'
+type MockCUPSClientInterface_GetClasses_Call struct {
+	*mock.Call
+}
+
+// GetClasses is a helper method to define mock.On call
+//   - attributes []string
+func (_e *MockCUPSClientInterface_Expecter) GetClasses(attributes interface{}) *MockCUPSClientInterface_GetClasses_Call {
+	return &MockCUPSClientInterface_GetClasses_Call{Call: _e.mock.On("GetClasses", attributes)}
+}
+
+func (_c *MockCUPSClientInterface_GetClasses_Call) Run(run func(attributes []string)) *MockCUPSClientInterface_GetClasses_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].([]string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetClasses_Call) Return(_a0 map[string]ipp.Attributes, _a1 error) *MockCUPSClientInterface_GetClasses_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetClasses_Call) RunAndReturn(run func([]string) (map[string]ipp.Attributes, error)) *MockCUPSClientInterface_GetClasses_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetDevices provides a mock function with no fields
+func (_m *MockCUPSClientInterface) GetDevices() (map[string]ipp.Attributes, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDevices")
+	}
+
+	var r0 map[string]ipp.Attributes
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (map[string]ipp.Attributes, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() map[string]ipp.Attributes); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]ipp.Attributes)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCUPSClientInterface_GetDevices_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDevices'
+type MockCUPSClientInterface_GetDevices_Call struct {
+	*mock.Call
+}
+
+// GetDevices is a helper method to define mock.On call
+func (_e *MockCUPSClientInterface_Expecter) GetDevices() *MockCUPSClientInterface_GetDevices_Call {
+	return &MockCUPSClientInterface_GetDevices_Call{Call: _e.mock.On("GetDevices")}
+}
+
+func (_c *MockCUPSClientInterface_GetDevices_Call) Run(run func()) *MockCUPSClientInterface_GetDevices_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetDevices_Call) Return(_a0 map[string]ipp.Attributes, _a1 error) *MockCUPSClientInterface_GetDevices_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetDevices_Call) RunAndReturn(run func() (map[string]ipp.Attributes, error)) *MockCUPSClientInterface_GetDevices_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetJobs provides a mock function with given fields: printer, class, whichJobs, myJobs, firstJobId, limit, attributes
 func (_m *MockCUPSClientInterface) GetJobs(printer string, class string, whichJobs string, myJobs bool, firstJobId int, limit int, attributes []string) (map[int]ipp.Attributes, error) {
 	ret := _m.Called(printer, class, whichJobs, myJobs, firstJobId, limit, attributes)
@@ -180,6 +579,63 @@ func (_c *MockCUPSClientInterface_GetJobs_Call) RunAndReturn(run func(string, st
 	return _c
 }
 
+// GetPPDs provides a mock function with no fields
+func (_m *MockCUPSClientInterface) GetPPDs() (map[string]ipp.Attributes, error) {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPPDs")
+	}
+
+	var r0 map[string]ipp.Attributes
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (map[string]ipp.Attributes, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() map[string]ipp.Attributes); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[string]ipp.Attributes)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCUPSClientInterface_GetPPDs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPPDs'
+type MockCUPSClientInterface_GetPPDs_Call struct {
+	*mock.Call
+}
+
+// GetPPDs is a helper method to define mock.On call
+func (_e *MockCUPSClientInterface_Expecter) GetPPDs() *MockCUPSClientInterface_GetPPDs_Call {
+	return &MockCUPSClientInterface_GetPPDs_Call{Call: _e.mock.On("GetPPDs")}
+}
+
+func (_c *MockCUPSClientInterface_GetPPDs_Call) Run(run func()) *MockCUPSClientInterface_GetPPDs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetPPDs_Call) Return(_a0 map[string]ipp.Attributes, _a1 error) *MockCUPSClientInterface_GetPPDs_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_GetPPDs_Call) RunAndReturn(run func() (map[string]ipp.Attributes, error)) *MockCUPSClientInterface_GetPPDs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetPrinters provides a mock function with given fields: attributes
 func (_m *MockCUPSClientInterface) GetPrinters(attributes []string) (map[string]ipp.Attributes, error) {
 	ret := _m.Called(attributes)
@@ -238,6 +694,100 @@ func (_c *MockCUPSClientInterface_GetPrinters_Call) RunAndReturn(run func([]stri
 	return _c
 }
 
+// HoldJobUntil provides a mock function with given fields: jobID, holdUntil
+func (_m *MockCUPSClientInterface) HoldJobUntil(jobID int, holdUntil string) error {
+	ret := _m.Called(jobID, holdUntil)
+
+	if len(ret) == 0 {
+		panic("no return value specified for HoldJobUntil")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, string) error); ok {
+		r0 = rf(jobID, holdUntil)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_HoldJobUntil_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HoldJobUntil'
+type MockCUPSClientInterface_HoldJobUntil_Call struct {
+	*mock.Call
+}
+
+// HoldJobUntil is a helper method to define mock.On call
+//   - jobID int
+//   - holdUntil string
+func (_e *MockCUPSClientInterface_Expecter) HoldJobUntil(jobID interface{}, holdUntil interface{}) *MockCUPSClientInterface_HoldJobUntil_Call {
+	return &MockCUPSClientInterface_HoldJobUntil_Call{Call: _e.mock.On("HoldJobUntil", jobID, holdUntil)}
+}
+
+func (_c *MockCUPSClientInterface_HoldJobUntil_Call) Run(run func(jobID int, holdUntil string)) *MockCUPSClientInterface_HoldJobUntil_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_HoldJobUntil_Call) Return(_a0 error) *MockCUPSClientInterface_HoldJobUntil_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_HoldJobUntil_Call) RunAndReturn(run func(int, string) error) *MockCUPSClientInterface_HoldJobUntil_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MoveJob provides a mock function with given fields: jobID, destPrinter
+func (_m *MockCUPSClientInterface) MoveJob(jobID int, destPrinter string) error {
+	ret := _m.Called(jobID, destPrinter)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MoveJob")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int, string) error); ok {
+		r0 = rf(jobID, destPrinter)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_MoveJob_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MoveJob'
+type MockCUPSClientInterface_MoveJob_Call struct {
+	*mock.Call
+}
+
+// MoveJob is a helper method to define mock.On call
+//   - jobID int
+//   - destPrinter string
+func (_e *MockCUPSClientInterface_Expecter) MoveJob(jobID interface{}, destPrinter interface{}) *MockCUPSClientInterface_MoveJob_Call {
+	return &MockCUPSClientInterface_MoveJob_Call{Call: _e.mock.On("MoveJob", jobID, destPrinter)}
+}
+
+func (_c *MockCUPSClientInterface_MoveJob_Call) Run(run func(jobID int, destPrinter string)) *MockCUPSClientInterface_MoveJob_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_MoveJob_Call) Return(_a0 error) *MockCUPSClientInterface_MoveJob_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_MoveJob_Call) RunAndReturn(run func(int, string) error) *MockCUPSClientInterface_MoveJob_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // PausePrinter provides a mock function with given fields: printer
 func (_m *MockCUPSClientInterface) PausePrinter(printer string) error {
 	ret := _m.Called(printer)
@@ -280,6 +830,156 @@ func (_c *MockCUPSClientInterface_PausePrinter_Call) Return(_a0 error) *MockCUPS
 }
 
 func (_c *MockCUPSClientInterface_PausePrinter_Call) RunAndReturn(run func(string) error) *MockCUPSClientInterface_PausePrinter_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PrintTestPage provides a mock function with given fields: printer, testPageData, size
+func (_m *MockCUPSClientInterface) PrintTestPage(printer string, testPageData io.Reader, size int) (int, error) {
+	ret := _m.Called(printer, testPageData, size)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PrintTestPage")
+	}
+
+	var r0 int
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, io.Reader, int) (int, error)); ok {
+		return rf(printer, testPageData, size)
+	}
+	if rf, ok := ret.Get(0).(func(string, io.Reader, int) int); ok {
+		r0 = rf(printer, testPageData, size)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	if rf, ok := ret.Get(1).(func(string, io.Reader, int) error); ok {
+		r1 = rf(printer, testPageData, size)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockCUPSClientInterface_PrintTestPage_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PrintTestPage'
+type MockCUPSClientInterface_PrintTestPage_Call struct {
+	*mock.Call
+}
+
+// PrintTestPage is a helper method to define mock.On call
+//   - printer string
+//   - testPageData io.Reader
+//   - size int
+func (_e *MockCUPSClientInterface_Expecter) PrintTestPage(printer interface{}, testPageData interface{}, size interface{}) *MockCUPSClientInterface_PrintTestPage_Call {
+	return &MockCUPSClientInterface_PrintTestPage_Call{Call: _e.mock.On("PrintTestPage", printer, testPageData, size)}
+}
+
+func (_c *MockCUPSClientInterface_PrintTestPage_Call) Run(run func(printer string, testPageData io.Reader, size int)) *MockCUPSClientInterface_PrintTestPage_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(io.Reader), args[2].(int))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_PrintTestPage_Call) Return(_a0 int, _a1 error) *MockCUPSClientInterface_PrintTestPage_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_PrintTestPage_Call) RunAndReturn(run func(string, io.Reader, int) (int, error)) *MockCUPSClientInterface_PrintTestPage_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RejectJobs provides a mock function with given fields: printer
+func (_m *MockCUPSClientInterface) RejectJobs(printer string) error {
+	ret := _m.Called(printer)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RejectJobs")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(printer)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_RejectJobs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RejectJobs'
+type MockCUPSClientInterface_RejectJobs_Call struct {
+	*mock.Call
+}
+
+// RejectJobs is a helper method to define mock.On call
+//   - printer string
+func (_e *MockCUPSClientInterface_Expecter) RejectJobs(printer interface{}) *MockCUPSClientInterface_RejectJobs_Call {
+	return &MockCUPSClientInterface_RejectJobs_Call{Call: _e.mock.On("RejectJobs", printer)}
+}
+
+func (_c *MockCUPSClientInterface_RejectJobs_Call) Run(run func(printer string)) *MockCUPSClientInterface_RejectJobs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_RejectJobs_Call) Return(_a0 error) *MockCUPSClientInterface_RejectJobs_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_RejectJobs_Call) RunAndReturn(run func(string) error) *MockCUPSClientInterface_RejectJobs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RestartJob provides a mock function with given fields: jobID
+func (_m *MockCUPSClientInterface) RestartJob(jobID int) error {
+	ret := _m.Called(jobID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RestartJob")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(int) error); ok {
+		r0 = rf(jobID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_RestartJob_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RestartJob'
+type MockCUPSClientInterface_RestartJob_Call struct {
+	*mock.Call
+}
+
+// RestartJob is a helper method to define mock.On call
+//   - jobID int
+func (_e *MockCUPSClientInterface_Expecter) RestartJob(jobID interface{}) *MockCUPSClientInterface_RestartJob_Call {
+	return &MockCUPSClientInterface_RestartJob_Call{Call: _e.mock.On("RestartJob", jobID)}
+}
+
+func (_c *MockCUPSClientInterface_RestartJob_Call) Run(run func(jobID int)) *MockCUPSClientInterface_RestartJob_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(int))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_RestartJob_Call) Return(_a0 error) *MockCUPSClientInterface_RestartJob_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_RestartJob_Call) RunAndReturn(run func(int) error) *MockCUPSClientInterface_RestartJob_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -386,6 +1086,147 @@ func (_c *MockCUPSClientInterface_SendRequest_Call) Return(_a0 *ipp.Response, _a
 }
 
 func (_c *MockCUPSClientInterface_SendRequest_Call) RunAndReturn(run func(string, *ipp.Request, io.Writer) (*ipp.Response, error)) *MockCUPSClientInterface_SendRequest_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetPrinterInformation provides a mock function with given fields: printer, information
+func (_m *MockCUPSClientInterface) SetPrinterInformation(printer string, information string) error {
+	ret := _m.Called(printer, information)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPrinterInformation")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(printer, information)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_SetPrinterInformation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPrinterInformation'
+type MockCUPSClientInterface_SetPrinterInformation_Call struct {
+	*mock.Call
+}
+
+// SetPrinterInformation is a helper method to define mock.On call
+//   - printer string
+//   - information string
+func (_e *MockCUPSClientInterface_Expecter) SetPrinterInformation(printer interface{}, information interface{}) *MockCUPSClientInterface_SetPrinterInformation_Call {
+	return &MockCUPSClientInterface_SetPrinterInformation_Call{Call: _e.mock.On("SetPrinterInformation", printer, information)}
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterInformation_Call) Run(run func(printer string, information string)) *MockCUPSClientInterface_SetPrinterInformation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterInformation_Call) Return(_a0 error) *MockCUPSClientInterface_SetPrinterInformation_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterInformation_Call) RunAndReturn(run func(string, string) error) *MockCUPSClientInterface_SetPrinterInformation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetPrinterIsShared provides a mock function with given fields: printer, shared
+func (_m *MockCUPSClientInterface) SetPrinterIsShared(printer string, shared bool) error {
+	ret := _m.Called(printer, shared)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPrinterIsShared")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, bool) error); ok {
+		r0 = rf(printer, shared)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_SetPrinterIsShared_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPrinterIsShared'
+type MockCUPSClientInterface_SetPrinterIsShared_Call struct {
+	*mock.Call
+}
+
+// SetPrinterIsShared is a helper method to define mock.On call
+//   - printer string
+//   - shared bool
+func (_e *MockCUPSClientInterface_Expecter) SetPrinterIsShared(printer interface{}, shared interface{}) *MockCUPSClientInterface_SetPrinterIsShared_Call {
+	return &MockCUPSClientInterface_SetPrinterIsShared_Call{Call: _e.mock.On("SetPrinterIsShared", printer, shared)}
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterIsShared_Call) Run(run func(printer string, shared bool)) *MockCUPSClientInterface_SetPrinterIsShared_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(bool))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterIsShared_Call) Return(_a0 error) *MockCUPSClientInterface_SetPrinterIsShared_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterIsShared_Call) RunAndReturn(run func(string, bool) error) *MockCUPSClientInterface_SetPrinterIsShared_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetPrinterLocation provides a mock function with given fields: printer, location
+func (_m *MockCUPSClientInterface) SetPrinterLocation(printer string, location string) error {
+	ret := _m.Called(printer, location)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetPrinterLocation")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, string) error); ok {
+		r0 = rf(printer, location)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockCUPSClientInterface_SetPrinterLocation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetPrinterLocation'
+type MockCUPSClientInterface_SetPrinterLocation_Call struct {
+	*mock.Call
+}
+
+// SetPrinterLocation is a helper method to define mock.On call
+//   - printer string
+//   - location string
+func (_e *MockCUPSClientInterface_Expecter) SetPrinterLocation(printer interface{}, location interface{}) *MockCUPSClientInterface_SetPrinterLocation_Call {
+	return &MockCUPSClientInterface_SetPrinterLocation_Call{Call: _e.mock.On("SetPrinterLocation", printer, location)}
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterLocation_Call) Run(run func(printer string, location string)) *MockCUPSClientInterface_SetPrinterLocation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterLocation_Call) Return(_a0 error) *MockCUPSClientInterface_SetPrinterLocation_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockCUPSClientInterface_SetPrinterLocation_Call) RunAndReturn(run func(string, string) error) *MockCUPSClientInterface_SetPrinterLocation_Call {
 	_c.Call.Return(run)
 	return _c
 }

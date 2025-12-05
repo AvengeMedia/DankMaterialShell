@@ -1,0 +1,9 @@
+dgop (0.1.11ppa2) questing; urgency=medium
+
+  * Rebuild for Questing (25.10) - Ubuntu 25.10+ only
+  * Stateless CPU/GPU monitoring tool
+  * Support for NVIDIA and AMD GPUs
+  * JSON output for integration
+  * Pre-built binary package for amd64 and arm64
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Sun, 16 Nov 2025 22:50:00 -0500

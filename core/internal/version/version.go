@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
 type VersionInfo struct {
@@ -18,28 +20,31 @@ type VersionInfo struct {
 	HasUpdate bool
 }
 
-func GetCurrentDMSVersion() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
+// VersionFetcher is an interface for fetching version information
+type VersionFetcher interface {
+	GetCurrentVersion(dmsPath string) (string, error)
+	GetLatestVersion(dmsPath string) (string, error)
+}
 
-	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
-	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
-		return "", fmt.Errorf("DMS not installed")
-	}
+// DefaultVersionFetcher is the default implementation that uses git/curl
+type DefaultVersionFetcher struct{}
 
-	originalDir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	defer os.Chdir(originalDir)
-
-	if err := os.Chdir(dmsPath); err != nil {
-		return "", fmt.Errorf("failed to change to DMS directory: %w", err)
-	}
-
+func (d *DefaultVersionFetcher) GetCurrentVersion(dmsPath string) (string, error) {
 	if _, err := os.Stat(filepath.Join(dmsPath, ".git")); err == nil {
+		originalDir, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		defer func() {
+			if err := os.Chdir(originalDir); err != nil {
+				log.Warnf("failed to change back to original directory: %v", err)
+			}
+		}()
+
+		if err := os.Chdir(dmsPath); err != nil {
+			return "", fmt.Errorf("failed to change to DMS directory: %w", err)
+		}
+
 		tagCmd := exec.Command("git", "describe", "--exact-match", "--tags", "HEAD")
 		if tagOutput, err := tagCmd.Output(); err == nil {
 			return strings.TrimSpace(string(tagOutput)), nil
@@ -65,21 +70,18 @@ func GetCurrentDMSVersion() (string, error) {
 	return "unknown", nil
 }
 
-func GetLatestDMSVersion() (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
-
-	originalDir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	defer os.Chdir(originalDir)
-
+func (d *DefaultVersionFetcher) GetLatestVersion(dmsPath string) (string, error) {
 	if _, err := os.Stat(filepath.Join(dmsPath, ".git")); err == nil {
+		originalDir, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		defer func() {
+			if err := os.Chdir(originalDir); err != nil {
+				log.Warnf("failed to change back to original directory: %v", err)
+			}
+		}()
+
 		if err := os.Chdir(dmsPath); err != nil {
 			return "", fmt.Errorf("failed to change to DMS directory: %w", err)
 		}
@@ -93,7 +95,9 @@ func GetLatestDMSVersion() (string, error) {
 			if _, err := tagCmd.Output(); err == nil {
 				// Add timeout to git fetch to prevent hanging
 				fetchCmd := exec.Command("timeout", "5s", "git", "fetch", "origin", "--tags", "--quiet")
-				fetchCmd.Run()
+				if err := fetchCmd.Run(); err != nil {
+					log.Debugf("git fetch tags failed (continuing with local tags): %v", err)
+				}
 
 				latestTagCmd := exec.Command("git", "tag", "-l", "v*", "--sort=-version:refname")
 				latestTagOutput, err := latestTagCmd.Output()
@@ -117,7 +121,9 @@ func GetLatestDMSVersion() (string, error) {
 
 			// Add timeout to git fetch to prevent hanging
 			fetchCmd := exec.Command("timeout", "5s", "git", "fetch", "origin", currentBranch, "--quiet")
-			fetchCmd.Run()
+			if err := fetchCmd.Run(); err != nil {
+				log.Debugf("git fetch branch failed (continuing with local ref): %v", err)
+			}
 
 			remoteRevCmd := exec.Command("git", "rev-parse", "--short", fmt.Sprintf("origin/%s", currentBranch))
 			remoteRevOutput, err := remoteRevCmd.Output()
@@ -154,13 +160,54 @@ func GetLatestDMSVersion() (string, error) {
 	return result.TagName, nil
 }
 
+// defaultFetcher is used by the public functions
+var defaultFetcher VersionFetcher = &DefaultVersionFetcher{}
+
+func GetCurrentDMSVersion() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
+	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
+		return "", fmt.Errorf("DMS not installed")
+	}
+
+	return defaultFetcher.GetCurrentVersion(dmsPath)
+}
+
+func GetLatestDMSVersion() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
+	return defaultFetcher.GetLatestVersion(dmsPath)
+}
+
 func GetDMSVersionInfo() (*VersionInfo, error) {
-	current, err := GetCurrentDMSVersion()
+	return GetDMSVersionInfoWithFetcher(defaultFetcher)
+}
+
+func GetDMSVersionInfoWithFetcher(fetcher VersionFetcher) (*VersionInfo, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	dmsPath := filepath.Join(homeDir, ".config", "quickshell", "dms")
+	if _, err := os.Stat(dmsPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("DMS not installed")
+	}
+
+	current, err := fetcher.GetCurrentVersion(dmsPath)
 	if err != nil {
 		return nil, err
 	}
 
-	latest, err := GetLatestDMSVersion()
+	latest, err := fetcher.GetLatestVersion(dmsPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get latest version: %w", err)
 	}
@@ -203,10 +250,10 @@ func CompareVersions(v1, v2 string) int {
 	for i := 0; i < maxLen; i++ {
 		var p1, p2 int
 		if i < len(parts1) {
-			fmt.Sscanf(parts1[i], "%d", &p1)
+			fmt.Sscanf(parts1[i], "%d", &p1) //nolint:errcheck
 		}
 		if i < len(parts2) {
-			fmt.Sscanf(parts2[i], "%d", &p2)
+			fmt.Sscanf(parts2[i], "%d", &p2) //nolint:errcheck
 		}
 
 		if p1 < p2 {

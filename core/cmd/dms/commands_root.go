@@ -1,14 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/dms"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	tea "github.com/charmbracelet/bubbletea"
@@ -76,14 +74,7 @@ func findConfig(cmd *cobra.Command, args []string) error {
 	return nil
 }
 func runInteractiveMode(cmd *cobra.Command, args []string) {
-	detector, err := dms.NewDetector()
-	if err != nil && !errors.Is(err, &distros.UnsupportedDistributionError{}) {
-		log.Fatalf("Error initializing DMS detector: %v", err)
-	} else if errors.Is(err, &distros.UnsupportedDistributionError{}) {
-		log.Error("Interactive mode is not supported on this distribution.")
-		log.Info("Please run 'dms --help' for available commands.")
-		os.Exit(1)
-	}
+	detector, _ := dms.NewDetector()
 
 	if !detector.IsDMSInstalled() {
 		log.Error("DankMaterialShell (DMS) is not detected as installed on this system.")

@@ -22,8 +22,19 @@ func LocateDMSConfig() (string, error) {
 		primaryPaths = append(primaryPaths, filepath.Join(configHome, "quickshell", "dms"))
 	}
 
-	primaryPaths = append(primaryPaths, "/usr/share/quickshell/dms")
+	// System data directories
+	dataDirs := os.Getenv("XDG_DATA_DIRS")
+	if dataDirs == "" {
+		dataDirs = "/usr/local/share:/usr/share"
+	}
 
+	for _, dir := range strings.Split(dataDirs, ":") {
+		if dir != "" {
+			primaryPaths = append(primaryPaths, filepath.Join(dir, "quickshell", "dms"))
+		}
+	}
+
+	// System config directories (fallback)
 	configDirs := os.Getenv("XDG_CONFIG_DIRS")
 	if configDirs == "" {
 		configDirs = "/etc/xdg"

@@ -123,3 +123,25 @@ func TestSystemdNetworkdBackend_DisconnectEthernet(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "not supported")
 }
+
+func TestSystemdNetworkdBackend_GetEthernetDevices(t *testing.T) {
+	backend, _ := NewSystemdNetworkdBackend()
+
+	backend.state.EthernetDevices = []EthernetDevice{
+		{Name: "enp0s3", State: "routable", Connected: true},
+		{Name: "enp0s8", State: "no-carrier", Connected: false},
+	}
+
+	devices := backend.GetEthernetDevices()
+	assert.Len(t, devices, 2)
+	assert.Equal(t, "enp0s3", devices[0].Name)
+	assert.True(t, devices[0].Connected)
+}
+
+func TestSystemdNetworkdBackend_DisconnectEthernetDevice(t *testing.T) {
+	backend, _ := NewSystemdNetworkdBackend()
+
+	err := backend.DisconnectEthernetDevice("enp0s3")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "not supported")
+}

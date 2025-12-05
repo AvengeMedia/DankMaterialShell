@@ -61,6 +61,26 @@ func (b *NetworkManagerBackend) startSignalPump() error {
 		return err
 	}
 
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
+		dbus.WithMatchInterface(dbusNMInterface),
+		dbus.WithMatchMember("DeviceAdded"),
+	); err != nil {
+		conn.RemoveSignal(signals)
+		conn.Close()
+		return err
+	}
+
+	if err := conn.AddMatchSignal(
+		dbus.WithMatchObjectPath(dbus.ObjectPath(dbusNMPath)),
+		dbus.WithMatchInterface(dbusNMInterface),
+		dbus.WithMatchMember("DeviceRemoved"),
+	); err != nil {
+		conn.RemoveSignal(signals)
+		conn.Close()
+		return err
+	}
+
 	if b.wifiDevice != nil {
 		dev := b.wifiDevice.(gonetworkmanager.Device)
 		if err := conn.AddMatchSignal(
@@ -171,6 +191,24 @@ func (b *NetworkManagerBackend) handleDBusSignal(sig *dbus.Signal) {
 		b.ListVPNProfiles()
 		if b.onStateChange != nil {
 			b.onStateChange()
+		}
+		return
+	}
+
+	if sig.Name == "org.freedesktop.NetworkManager.DeviceAdded" {
+		if len(sig.Body) >= 1 {
+			if devicePath, ok := sig.Body[0].(dbus.ObjectPath); ok {
+				b.handleDeviceAdded(devicePath)
+			}
+		}
+		return
+	}
+
+	if sig.Name == "org.freedesktop.NetworkManager.DeviceRemoved" {
+		if len(sig.Body) >= 1 {
+			if devicePath, ok := sig.Body[0].(dbus.ObjectPath); ok {
+				b.handleDeviceRemoved(devicePath)
+			}
 		}
 		return
 	}
@@ -316,6 +354,159 @@ func (b *NetworkManagerBackend) handleAccessPointChange(changes map[string]dbus.
 	if signalChangeSignificant(oldSignal, newSignal) {
 		if b.onStateChange != nil {
 			b.onStateChange()
+		}
+	}
+}
+
+func (b *NetworkManagerBackend) handleDeviceAdded(devicePath dbus.ObjectPath) {
+	dev, err := gonetworkmanager.NewDevice(devicePath)
+	if err != nil {
+		return
+	}
+
+	devType, err := dev.GetPropertyDeviceType()
+	if err != nil {
+		return
+	}
+
+	managed, _ := dev.GetPropertyManaged()
+	if !managed {
+		return
+	}
+
+	iface, err := dev.GetPropertyInterface()
+	if err != nil {
+		return
+	}
+
+	switch devType {
+	case gonetworkmanager.NmDeviceTypeEthernet:
+		w, err := gonetworkmanager.NewDeviceWired(devicePath)
+		if err != nil {
+			return
+		}
+		hwAddr, _ := w.GetPropertyHwAddress()
+
+		b.ethernetDevices[iface] = &ethernetDeviceInfo{
+			device:    dev,
+			wired:     w,
+			name:      iface,
+			hwAddress: hwAddr,
+		}
+
+		if b.ethernetDevice == nil {
+			b.ethernetDevice = dev
+		}
+
+		if b.dbusConn != nil {
+			b.dbusConn.AddMatchSignal(
+				dbus.WithMatchObjectPath(devicePath),
+				dbus.WithMatchInterface(dbusPropsInterface),
+				dbus.WithMatchMember("PropertiesChanged"),
+			)
+		}
+
+		b.updateAllEthernetDevices()
+		b.updateEthernetState()
+		b.listEthernetConnections()
+		b.updatePrimaryConnection()
+
+	case gonetworkmanager.NmDeviceTypeWifi:
+		w, err := gonetworkmanager.NewDeviceWireless(devicePath)
+		if err != nil {
+			return
+		}
+		hwAddr, _ := w.GetPropertyHwAddress()
+
+		b.wifiDevices[iface] = &wifiDeviceInfo{
+			device:    dev,
+			wireless:  w,
+			name:      iface,
+			hwAddress: hwAddr,
+		}
+
+		if b.wifiDevice == nil {
+			b.wifiDevice = dev
+			b.wifiDev = w
+		}
+
+		if b.dbusConn != nil {
+			b.dbusConn.AddMatchSignal(
+				dbus.WithMatchObjectPath(devicePath),
+				dbus.WithMatchInterface(dbusPropsInterface),
+				dbus.WithMatchMember("PropertiesChanged"),
+			)
+		}
+
+		b.updateAllWiFiDevices()
+		b.updateWiFiState()
+	}
+
+	if b.onStateChange != nil {
+		b.onStateChange()
+	}
+}
+
+func (b *NetworkManagerBackend) handleDeviceRemoved(devicePath dbus.ObjectPath) {
+	if b.dbusConn != nil {
+		b.dbusConn.RemoveMatchSignal(
+			dbus.WithMatchObjectPath(devicePath),
+			dbus.WithMatchInterface(dbusPropsInterface),
+			dbus.WithMatchMember("PropertiesChanged"),
+		)
+	}
+
+	for iface, info := range b.ethernetDevices {
+		if info.device.GetPath() == devicePath {
+			delete(b.ethernetDevices, iface)
+
+			if b.ethernetDevice != nil {
+				dev := b.ethernetDevice.(gonetworkmanager.Device)
+				if dev.GetPath() == devicePath {
+					b.ethernetDevice = nil
+					for _, remaining := range b.ethernetDevices {
+						b.ethernetDevice = remaining.device
+						break
+					}
+				}
+			}
+
+			b.updateAllEthernetDevices()
+			b.updateEthernetState()
+			b.listEthernetConnections()
+			b.updatePrimaryConnection()
+
+			if b.onStateChange != nil {
+				b.onStateChange()
+			}
+			return
+		}
+	}
+
+	for iface, info := range b.wifiDevices {
+		if info.device.GetPath() == devicePath {
+			delete(b.wifiDevices, iface)
+
+			if b.wifiDevice != nil {
+				dev := b.wifiDevice.(gonetworkmanager.Device)
+				if dev.GetPath() == devicePath {
+					b.wifiDevice = nil
+					b.wifiDev = nil
+					for _, remaining := range b.wifiDevices {
+						b.wifiDevice = remaining.device
+						b.wifiDev = remaining.wireless
+						break
+					}
+				}
+			}
+
+			b.updateAllWiFiDevices()
+			b.updateWiFiState()
+
+			if b.onStateChange != nil {
+				b.onStateChange()
+			}
+			return
 		}
 	}
 }

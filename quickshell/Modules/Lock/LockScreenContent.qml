@@ -1,6 +1,5 @@
 pragma ComponentBehavior: Bound
 
-import QtCore
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
@@ -30,52 +29,60 @@ Item {
     signal unlockRequested
 
     function pickRandomFact() {
-        randomFact = Facts.getRandomFact()
+        randomFact = Facts.getRandomFact();
     }
 
     Component.onCompleted: {
         if (demoMode) {
-            pickRandomFact()
+            pickRandomFact();
         }
 
-        WeatherService.addRef()
-        UserInfoService.refreshUserInfo()
+        WeatherService.addRef();
+        UserInfoService.getUserInfo();
 
         if (CompositorService.isHyprland) {
-            updateHyprlandLayout()
-            hyprlandLayoutUpdateTimer.start()
+            updateHyprlandLayout();
+            hyprlandLayoutUpdateTimer.start();
         }
 
-        lockerReadyArmed = true
+        lockerReadyArmed = true;
     }
+
     onDemoModeChanged: {
         if (demoMode) {
-            pickRandomFact()
+            pickRandomFact();
         }
     }
     Component.onDestruction: {
-        WeatherService.removeRef()
+        WeatherService.removeRef();
         if (CompositorService.isHyprland) {
-            hyprlandLayoutUpdateTimer.stop()
+            hyprlandLayoutUpdateTimer.stop();
         }
     }
 
     function sendLockerReadyOnce() {
-        if (lockerReadySent) return;
-        if (root.unlocking) return;
+        if (lockerReadySent)
+            return;
+        if (root.unlocking)
+            return;
         lockerReadySent = true;
         if (SessionService.loginctlAvailable && DMSService.apiVersion >= 2) {
             DMSService.sendRequest("loginctl.lockerReady", null, resp => {
-                if (resp?.error) console.warn("lockerReady failed:", resp.error)
-                else console.log("lockerReady sent (afterAnimating/afterRendering)");
+                if (resp?.error)
+                    console.warn("lockerReady failed:", resp.error);
+                else
+                    console.log("lockerReady sent (afterAnimating/afterRendering)");
             });
         }
     }
 
     function maybeSend() {
-        if (!lockerReadyArmed) return;
-        if (root.unlocking) return;
-        if (!root.visible || root.opacity <= 0) return;
+        if (!lockerReadyArmed)
+            return;
+        if (root.unlocking)
+            return;
+        if (!root.visible || root.opacity <= 0)
+            return;
         Qt.callLater(() => {
             if (root.visible && root.opacity > 0 && !root.unlocking)
                 sendLockerReadyOnce();
@@ -86,8 +93,12 @@ Item {
         target: root.Window.window
         enabled: target !== null
 
-        function onAfterAnimating() { maybeSend(); }
-        function onAfterRendering() { maybeSend(); }
+        function onAfterAnimating() {
+            maybeSend();
+        }
+        function onAfterRendering() {
+            maybeSend();
+        }
     }
 
     onVisibleChanged: maybeSend()
@@ -95,7 +106,7 @@ Item {
 
     function updateHyprlandLayout() {
         if (CompositorService.isHyprland) {
-            hyprlandLayoutProcess.running = true
+            hyprlandLayoutProcess.running = true;
         }
     }
 
@@ -106,27 +117,27 @@ Item {
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    const data = JSON.parse(text)
-                    const mainKeyboard = data.keyboards.find(kb => kb.main === true)
-                    hyprlandKeyboard = mainKeyboard.name
+                    const data = JSON.parse(text);
+                    const mainKeyboard = data.keyboards.find(kb => kb.main === true);
+                    hyprlandKeyboard = mainKeyboard.name;
                     if (mainKeyboard && mainKeyboard.active_keymap) {
-                        const parts = mainKeyboard.active_keymap.split(" ")
+                        const parts = mainKeyboard.active_keymap.split(" ");
                         if (parts.length > 0) {
-                            hyprlandCurrentLayout = parts[0].substring(0, 2).toUpperCase()
+                            hyprlandCurrentLayout = parts[0].substring(0, 2).toUpperCase();
                         } else {
-                            hyprlandCurrentLayout = mainKeyboard.active_keymap.substring(0, 2).toUpperCase()
+                            hyprlandCurrentLayout = mainKeyboard.active_keymap.substring(0, 2).toUpperCase();
                         }
                     } else {
-                        hyprlandCurrentLayout = ""
+                        hyprlandCurrentLayout = "";
                     }
                     if (mainKeyboard && mainKeyboard.layout_names) {
-                        hyprlandLayoutCount = mainKeyboard.layout_names.length
+                        hyprlandLayoutCount = mainKeyboard.layout_names.length;
                     } else {
-                        hyprlandLayoutCount = 0
+                        hyprlandLayoutCount = 0;
                     }
                 } catch (e) {
-                    hyprlandCurrentLayout = ""
-                    hyprlandLayoutCount = 0
+                    hyprlandCurrentLayout = "";
+                    hyprlandLayoutCount = 0;
                 }
             }
         }
@@ -143,8 +154,8 @@ Item {
     Loader {
         anchors.fill: parent
         active: {
-            var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
-            return !currentWallpaper || (currentWallpaper && currentWallpaper.startsWith("#"))
+            var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
+            return !currentWallpaper || (currentWallpaper && currentWallpaper.startsWith("#"));
         }
         asynchronous: true
 
@@ -158,8 +169,8 @@ Item {
 
         anchors.fill: parent
         source: {
-            var currentWallpaper = SessionData.getMonitorWallpaper(screenName)
-            return (currentWallpaper && !currentWallpaper.startsWith("#")) ? currentWallpaper : ""
+            var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
+            return (currentWallpaper && !currentWallpaper.startsWith("#")) ? currentWallpaper : "";
         }
         fillMode: Theme.getFillMode(SettingsData.wallpaperFillMode)
         smooth: true
@@ -213,8 +224,8 @@ Item {
                 spacing: 0
 
                 property string fullTimeStr: {
-                    const format = SettingsData.getEffectiveTimeFormat()
-                    return systemClock.date.toLocaleTimeString(Qt.locale(), format)
+                    const format = SettingsData.getEffectiveTimeFormat();
+                    return systemClock.date.toLocaleTimeString(Qt.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
                 property string hours: timeParts[0] || ""
@@ -222,8 +233,8 @@ Item {
                 property string secondsWithAmPm: timeParts.length > 2 ? timeParts[2] : ""
                 property string seconds: secondsWithAmPm.replace(/\s*(AM|PM|am|pm)$/i, '')
                 property string ampm: {
-                    const match = fullTimeStr.match(/\s*(AM|PM|am|pm)$/i)
-                    return match ? match[0].trim() : ""
+                    const match = fullTimeStr.match(/\s*(AM|PM|am|pm)$/i);
+                    return match ? match[0].trim() : "";
                 }
                 property bool hasSeconds: timeParts.length > 2
 
@@ -322,9 +333,9 @@ Item {
             anchors.verticalCenterOffset: -25
             text: {
                 if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat)
+                    return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat);
                 }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat)
+                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"
@@ -347,14 +358,14 @@ Item {
                     Layout.preferredHeight: 60
                     imageSource: {
                         if (PortalService.profileImage === "") {
-                            return ""
+                            return "";
                         }
 
                         if (PortalService.profileImage.startsWith("/")) {
-                            return "file://" + PortalService.profileImage
+                            return "file://" + PortalService.profileImage;
                         }
 
-                        return PortalService.profileImage
+                        return PortalService.profileImage;
                     }
                     fallbackIcon: "person"
                 }
@@ -414,20 +425,20 @@ Item {
                         anchors.fill: parent
                         anchors.leftMargin: lockIconContainer.width + Theme.spacingM * 2
                         anchors.rightMargin: {
-                            let margin = Theme.spacingM
+                            let margin = Theme.spacingM;
                             if (loadingSpinner.visible) {
-                                margin += loadingSpinner.width
+                                margin += loadingSpinner.width;
                             }
                             if (enterButton.visible) {
-                                margin += enterButton.width + 2
+                                margin += enterButton.width + 2;
                             }
                             if (virtualKeyboardButton.visible) {
-                                margin += virtualKeyboardButton.width
+                                margin += virtualKeyboardButton.width;
                             }
                             if (revealButton.visible) {
-                                margin += revealButton.width
+                                margin += revealButton.width;
                             }
-                            return margin
+                            return margin;
                         }
                         opacity: 0
                         focus: true
@@ -436,36 +447,36 @@ Item {
                         echoMode: parent.showPassword ? TextInput.Normal : TextInput.Password
                         onTextChanged: {
                             if (!demoMode) {
-                                root.passwordBuffer = text
+                                root.passwordBuffer = text;
                             }
                         }
                         onAccepted: {
                             if (!demoMode && !pam.passwd.active) {
-                                console.log("Enter pressed, starting PAM authentication")
-                                pam.passwd.start()
+                                console.log("Enter pressed, starting PAM authentication");
+                                pam.passwd.start();
                             }
                         }
                         Keys.onPressed: event => {
-                                            if (demoMode) {
-                                                return
-                                            }
+                            if (demoMode) {
+                                return;
+                            }
 
-                                            if (pam.passwd.active) {
-                                                console.log("PAM is active, ignoring input")
-                                                event.accepted = true
-                                                return
-                                            }
-                                        }
+                            if (pam.passwd.active) {
+                                console.log("PAM is active, ignoring input");
+                                event.accepted = true;
+                                return;
+                            }
+                        }
 
                         Component.onCompleted: {
                             if (!demoMode) {
-                                forceActiveFocus()
+                                forceActiveFocus();
                             }
                         }
 
                         onVisibleChanged: {
                             if (visible && !demoMode) {
-                                forceActiveFocus()
+                                forceActiveFocus();
                             }
                         }
 
@@ -473,9 +484,9 @@ Item {
                             if (!activeFocus && !demoMode && visible && passwordField && !powerMenu.isVisible) {
                                 Qt.callLater(() => {
                                     if (passwordField && passwordField.forceActiveFocus) {
-                                        passwordField.forceActiveFocus()
+                                        passwordField.forceActiveFocus();
                                     }
-                                })
+                                });
                             }
                         }
 
@@ -483,9 +494,9 @@ Item {
                             if (enabled && !demoMode && visible && passwordField && !powerMenu.isVisible) {
                                 Qt.callLater(() => {
                                     if (passwordField && passwordField.forceActiveFocus) {
-                                        passwordField.forceActiveFocus()
+                                        passwordField.forceActiveFocus();
                                     }
-                                })
+                                });
                             }
                         }
                     }
@@ -506,15 +517,15 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: {
                             if (demoMode) {
-                                return ""
+                                return "";
                             }
                             if (root.unlocking) {
-                                return "Unlocking..."
+                                return "Unlocking...";
                             }
                             if (pam.passwd.active) {
-                                return "Authenticating..."
+                                return "Authenticating...";
                             }
-                            return "Password..."
+                            return "Password...";
                         }
                         color: root.unlocking ? Theme.primary : (pam.passwd.active ? Theme.primary : Theme.outline)
                         font.pixelSize: Theme.fontSizeMedium
@@ -543,12 +554,12 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         text: {
                             if (demoMode) {
-                                return "••••••••"
+                                return "••••••••";
                             }
                             if (parent.showPassword) {
-                                return root.passwordBuffer
+                                return root.passwordBuffer;
                             }
-                            return "•".repeat(root.passwordBuffer.length)
+                            return "•".repeat(root.passwordBuffer.length);
                         }
                         color: Theme.surfaceText
                         font.pixelSize: parent.showPassword ? Theme.fontSizeMedium : Theme.fontSizeLarge
@@ -589,9 +600,9 @@ Item {
                         enabled: visible
                         onClicked: {
                             if (keyboardController.isKeyboardActive) {
-                                keyboardController.hide()
+                                keyboardController.hide();
                             } else {
-                                keyboardController.show()
+                                keyboardController.show();
                             }
                         }
                     }
@@ -690,8 +701,8 @@ Item {
                         enabled: !demoMode
                         onClicked: {
                             if (!demoMode) {
-                                console.log("Enter button clicked, starting PAM authentication")
-                                pam.passwd.start()
+                                console.log("Enter button clicked, starting PAM authentication");
+                                pam.passwd.start();
                             }
                         }
 
@@ -717,15 +728,15 @@ Item {
                 Layout.preferredHeight: 20
                 text: {
                     if (root.pamState === "error") {
-                        return "Authentication error - try again"
+                        return "Authentication error - try again";
                     }
                     if (root.pamState === "max") {
-                        return "Too many attempts - locked out"
+                        return "Too many attempts - locked out";
                     }
                     if (root.pamState === "fail") {
-                        return "Incorrect password - try again"
+                        return "Incorrect password - try again";
                     }
-                    return ""
+                    return "";
                 }
                 color: Theme.error
                 font.pixelSize: Theme.fontSizeSmall
@@ -793,11 +804,11 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: {
                     if (CompositorService.isNiri) {
-                        return NiriService.keyboardLayoutNames.length > 1
+                        return NiriService.keyboardLayoutNames.length > 1;
                     } else if (CompositorService.isHyprland) {
-                        return hyprlandLayoutCount > 1
+                        return hyprlandLayoutCount > 1;
                     }
-                    return false
+                    return false;
                 }
 
                 Row {
@@ -823,17 +834,18 @@ Item {
                         StyledText {
                             text: {
                                 if (CompositorService.isNiri) {
-                                    const layout = NiriService.getCurrentKeyboardLayoutName()
-                                    if (!layout) return ""
-                                    const parts = layout.split(" ")
+                                    const layout = NiriService.getCurrentKeyboardLayoutName();
+                                    if (!layout)
+                                        return "";
+                                    const parts = layout.split(" ");
                                     if (parts.length > 0) {
-                                        return parts[0].substring(0, 2).toUpperCase()
+                                        return parts[0].substring(0, 2).toUpperCase();
                                     }
-                                    return layout.substring(0, 2).toUpperCase()
+                                    return layout.substring(0, 2).toUpperCase();
                                 } else if (CompositorService.isHyprland) {
-                                    return hyprlandCurrentLayout
+                                    return hyprlandCurrentLayout;
                                 }
-                                return ""
+                                return "";
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             font.weight: Font.Light
@@ -851,15 +863,10 @@ Item {
                     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: {
                         if (CompositorService.isNiri) {
-                            NiriService.cycleKeyboardLayout()
+                            NiriService.cycleKeyboardLayout();
                         } else if (CompositorService.isHyprland) {
-                            Quickshell.execDetached([
-                                "hyprctl",
-                                "switchxkblayout",
-                                hyprlandKeyboard,
-                                "next"
-                            ])
-                            updateHyprlandLayout()
+                            Quickshell.execDetached(["hyprctl", "switchxkblayout", hyprlandKeyboard, "next"]);
+                            updateHyprlandLayout();
                         }
                     }
                 }
@@ -898,7 +905,7 @@ Item {
                         interval: 256
                         repeat: true
                         onTriggered: {
-                            CavaService.values = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25]
+                            CavaService.values = [Math.random() * 40 + 10, Math.random() * 60 + 20, Math.random() * 50 + 15, Math.random() * 35 + 20, Math.random() * 45 + 15, Math.random() * 55 + 25];
                         }
                     }
 
@@ -914,13 +921,13 @@ Item {
                                 width: 2
                                 height: {
                                     if (MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing && CavaService.values.length > index) {
-                                        const rawLevel = CavaService.values[index] || 0
-                                        const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100
-                                        const maxHeight = Theme.iconSize - 2
-                                        const minHeight = 3
-                                        return minHeight + (scaledLevel / 100) * (maxHeight - minHeight)
+                                        const rawLevel = CavaService.values[index] || 0;
+                                        const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100;
+                                        const maxHeight = Theme.iconSize - 2;
+                                        const minHeight = 3;
+                                        return minHeight + (scaledLevel / 100) * (maxHeight - minHeight);
                                     }
-                                    return 3
+                                    return 3;
                                 }
                                 radius: 1.5
                                 color: "white"
@@ -940,11 +947,12 @@ Item {
 
                 StyledText {
                     text: {
-                        const player = MprisController.activePlayer
-                        if (!player?.trackTitle) return ""
-                        const title = player.trackTitle
-                        const artist = player.trackArtist || ""
-                        return artist ? title + " • " + artist : title
+                        const player = MprisController.activePlayer;
+                        if (!player?.trackTitle)
+                            return "";
+                        const title = player.trackTitle;
+                        const artist = player.trackArtist || "";
+                        return artist ? title + " • " + artist : title;
                     }
                     font.pixelSize: Theme.fontSizeLarge
                     color: "white"
@@ -1099,15 +1107,15 @@ Item {
                 DankIcon {
                     name: {
                         if (!AudioService.sink?.audio) {
-                            return "volume_up"
+                            return "volume_up";
                         }
                         if (AudioService.sink.audio.muted || AudioService.sink.audio.volume === 0) {
-                            return "volume_off"
+                            return "volume_off";
                         }
                         if (AudioService.sink.audio.volume * 100 < 33) {
-                            return "volume_down"
+                            return "volume_down";
                         }
-                        return "volume_up"
+                        return "volume_up";
                     }
                     size: Theme.iconSize - 2
                     color: (AudioService.sink && AudioService.sink.audio && (AudioService.sink.audio.muted || AudioService.sink.audio.volume === 0)) ? Qt.rgba(255, 255, 255, 0.5) : "white"
@@ -1133,95 +1141,95 @@ Item {
                     name: {
                         if (BatteryService.isCharging) {
                             if (BatteryService.batteryLevel >= 90) {
-                                return "battery_charging_full"
+                                return "battery_charging_full";
                             }
 
                             if (BatteryService.batteryLevel >= 80) {
-                                return "battery_charging_90"
+                                return "battery_charging_90";
                             }
 
                             if (BatteryService.batteryLevel >= 60) {
-                                return "battery_charging_80"
+                                return "battery_charging_80";
                             }
 
                             if (BatteryService.batteryLevel >= 50) {
-                                return "battery_charging_60"
+                                return "battery_charging_60";
                             }
 
                             if (BatteryService.batteryLevel >= 30) {
-                                return "battery_charging_50"
+                                return "battery_charging_50";
                             }
 
                             if (BatteryService.batteryLevel >= 20) {
-                                return "battery_charging_30"
+                                return "battery_charging_30";
                             }
 
-                            return "battery_charging_20"
+                            return "battery_charging_20";
                         }
                         if (BatteryService.isPluggedIn) {
                             if (BatteryService.batteryLevel >= 90) {
-                                return "battery_charging_full"
+                                return "battery_charging_full";
                             }
 
                             if (BatteryService.batteryLevel >= 80) {
-                                return "battery_charging_90"
+                                return "battery_charging_90";
                             }
 
                             if (BatteryService.batteryLevel >= 60) {
-                                return "battery_charging_80"
+                                return "battery_charging_80";
                             }
 
                             if (BatteryService.batteryLevel >= 50) {
-                                return "battery_charging_60"
+                                return "battery_charging_60";
                             }
 
                             if (BatteryService.batteryLevel >= 30) {
-                                return "battery_charging_50"
+                                return "battery_charging_50";
                             }
 
                             if (BatteryService.batteryLevel >= 20) {
-                                return "battery_charging_30"
+                                return "battery_charging_30";
                             }
 
-                            return "battery_charging_20"
+                            return "battery_charging_20";
                         }
                         if (BatteryService.batteryLevel >= 95) {
-                            return "battery_full"
+                            return "battery_full";
                         }
 
                         if (BatteryService.batteryLevel >= 85) {
-                            return "battery_6_bar"
+                            return "battery_6_bar";
                         }
 
                         if (BatteryService.batteryLevel >= 70) {
-                            return "battery_5_bar"
+                            return "battery_5_bar";
                         }
 
                         if (BatteryService.batteryLevel >= 55) {
-                            return "battery_4_bar"
+                            return "battery_4_bar";
                         }
 
                         if (BatteryService.batteryLevel >= 40) {
-                            return "battery_3_bar"
+                            return "battery_3_bar";
                         }
 
                         if (BatteryService.batteryLevel >= 25) {
-                            return "battery_2_bar"
+                            return "battery_2_bar";
                         }
 
-                        return "battery_1_bar"
+                        return "battery_1_bar";
                     }
                     size: Theme.iconSize
                     color: {
                         if (BatteryService.isLowBattery && !BatteryService.isCharging) {
-                            return Theme.error
+                            return Theme.error;
                         }
 
                         if (BatteryService.isCharging || BatteryService.isPluggedIn) {
-                            return Theme.primary
+                            return Theme.primary;
                         }
 
-                        return "white"
+                        return "white";
                     }
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -1246,9 +1254,9 @@ Item {
             buttonSize: 40
             onClicked: {
                 if (demoMode) {
-                    console.log("Demo: Power Menu")
+                    console.log("Demo: Power Menu");
                 } else {
-                    powerMenu.show()
+                    powerMenu.show();
                 }
             }
         }
@@ -1272,18 +1280,18 @@ Item {
         id: pam
         lockSecured: !demoMode
         onUnlockRequested: {
-            root.unlocking = true
-            lockerReadyArmed = false
-            passwordField.text = ""
-            root.passwordBuffer = ""
-            root.unlockRequested()
+            root.unlocking = true;
+            lockerReadyArmed = false;
+            passwordField.text = "";
+            root.passwordBuffer = "";
+            root.unlockRequested();
         }
         onStateChanged: {
-            root.pamState = state
+            root.pamState = state;
             if (state !== "") {
-                placeholderDelay.restart()
-                passwordField.text = ""
-                root.passwordBuffer = ""
+                placeholderDelay.restart();
+                passwordField.text = "";
+                root.passwordBuffer = "";
             }
         }
     }
@@ -1312,7 +1320,7 @@ Item {
         showLogout: true
         onClosed: {
             if (!demoMode && passwordField && passwordField.forceActiveFocus) {
-                Qt.callLater(() => passwordField.forceActiveFocus())
+                Qt.callLater(() => passwordField.forceActiveFocus());
             }
         }
     }

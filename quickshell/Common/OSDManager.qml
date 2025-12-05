@@ -1,4 +1,5 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtQuick
@@ -10,15 +11,14 @@ Singleton {
 
     function showOSD(osd) {
         if (!osd || !osd.screen)
-            return
-
-        const screenName = osd.screen.name
-        const currentOSD = currentOSDsByScreen[screenName]
+            return;
+        const screenName = osd.screen.name;
+        const currentOSD = currentOSDsByScreen[screenName];
 
         if (currentOSD && currentOSD !== osd) {
-            currentOSD.hide()
+            currentOSD.hide();
         }
 
-        currentOSDsByScreen[screenName] = osd
+        currentOSDsByScreen[screenName] = osd;
     }
 }

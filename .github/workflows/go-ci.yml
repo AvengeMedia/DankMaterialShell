@@ -3,13 +3,22 @@ name: Go CI
 on:
   push:
     branches:
-      - '**'
+      - "**"
     paths:
-      - 'core/**'
-      - '.github/workflows/go-ci.yml'
+      - "core/**"
+      - ".github/workflows/go-ci.yml"
+  pull_request:
+    branches: [master, main]
+    paths:
+      - "core/**"
+      - ".github/workflows/go-ci.yml"
+
+concurrency:
+  group: go-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  lint-and-test:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -32,11 +41,20 @@ jobs:
             exit 1
           fi
 
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.6
+          working-directory: core
+
       - name: Test
         run: go test -v ./...
 
       - name: Build dms
         run: go build -v ./cmd/dms
+
+      - name: Build dms (distropkg)
+        run: go build -v -tags distro_binary ./cmd/dms
 
       - name: Build dankinstall
         run: go build -v ./cmd/dankinstall

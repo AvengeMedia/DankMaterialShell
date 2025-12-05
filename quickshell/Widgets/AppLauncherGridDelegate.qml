@@ -1,6 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 import qs.Common
 import qs.Widgets
 
@@ -12,7 +10,6 @@ Rectangle {
     required property var gridView
     property int cellWidth: 120
     property int cellHeight: 120
-    property int cellPadding: 8
     property int minIconSize: 32
     property int maxIconSize: 64
     property real iconSizeRatio: 0.5
@@ -31,10 +28,10 @@ Rectangle {
 
     signal itemClicked(int index, var modelData)
     signal itemRightClicked(int index, var modelData, real mouseX, real mouseY)
-    signal keyboardNavigationReset()
+    signal keyboardNavigationReset
 
-    width: cellWidth - cellPadding
-    height: cellHeight - cellPadding
+    width: cellWidth
+    height: cellHeight
     radius: Theme.cornerRadius
     color: currentIndex === index ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : mouseArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
 
@@ -87,17 +84,27 @@ Rectangle {
         z: 10
         onEntered: {
             if (root.hoverUpdatesSelection && !root.keyboardNavigationActive)
-                root.gridView.currentIndex = root.index
+                root.gridView.currentIndex = root.index;
         }
         onPositionChanged: {
-            root.keyboardNavigationReset()
+            root.keyboardNavigationReset();
         }
         onClicked: mouse => {
             if (mouse.button === Qt.LeftButton) {
-                root.itemClicked(root.index, root.model)
-            } else if (mouse.button === Qt.RightButton && !root.isPlugin) {
-                const globalPos = mapToItem(null, mouse.x, mouse.y)
-                root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y)
+                root.itemClicked(root.index, root.model);
+            }
+        }
+        onPressAndHold: mouse => {
+            if (!root.isPlugin) {
+                const globalPos = mapToItem(null, mouse.x, mouse.y);
+                root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y);
+            }
+        }
+        onPressed: mouse => {
+            if (mouse.button === Qt.RightButton && !root.isPlugin) {
+                const globalPos = mapToItem(null, mouse.x, mouse.y);
+                root.itemRightClicked(root.index, root.model, globalPos.x, globalPos.y);
+                mouse.accepted = true;
             }
         }
     }

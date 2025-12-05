@@ -16,14 +16,26 @@ var dpmsOnCmd = &cobra.Command{
 	Use:   "on [output]",
 	Short: "Turn display(s) on",
 	Args:  cobra.MaximumNArgs(1),
-	Run:   runDPMSOn,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getDPMSOutputs(), cobra.ShellCompDirectiveNoFileComp
+	},
+	Run: runDPMSOn,
 }
 
 var dpmsOffCmd = &cobra.Command{
 	Use:   "off [output]",
 	Short: "Turn display(s) off",
 	Args:  cobra.MaximumNArgs(1),
-	Run:   runDPMSOff,
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return getDPMSOutputs(), cobra.ShellCompDirectiveNoFileComp
+	},
+	Run: runDPMSOff,
 }
 
 var dpmsListCmd = &cobra.Command{
@@ -69,6 +81,15 @@ func runDPMSOff(cmd *cobra.Command, args []string) {
 	if err := client.SetDPMS(outputName, false); err != nil {
 		log.Fatalf("%v", err)
 	}
+}
+
+func getDPMSOutputs() []string {
+	client, err := newDPMSClient()
+	if err != nil {
+		return nil
+	}
+	defer client.Close()
+	return client.ListOutputs()
 }
 
 func runDPMSList(cmd *cobra.Command, args []string) {

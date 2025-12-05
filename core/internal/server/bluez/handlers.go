@@ -9,9 +9,9 @@ import (
 )
 
 type Request struct {
-	ID     int                    `json:"id,omitempty"`
-	Method string                 `json:"method"`
-	Params map[string]interface{} `json:"params,omitempty"`
+	ID     int            `json:"id,omitempty"`
+	Method string         `json:"method"`
+	Params map[string]any `json:"params,omitempty"`
 }
 
 type SuccessResult struct {
@@ -190,7 +190,7 @@ func handlePairingSubmit(conn net.Conn, req Request, manager *Manager) {
 		return
 	}
 
-	secretsRaw, ok := req.Params["secrets"].(map[string]interface{})
+	secretsRaw, ok := req.Params["secrets"].(map[string]any)
 	secrets := make(map[string]string)
 	if ok {
 		for k, v := range secretsRaw {

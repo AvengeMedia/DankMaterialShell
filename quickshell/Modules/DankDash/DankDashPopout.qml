@@ -1,13 +1,8 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
 import QtQuick.Layouts
-import Quickshell
-import Quickshell.Services.Mpris
-import Quickshell.Wayland
 import qs.Common
+import qs.Services
 import qs.Widgets
-import qs.Modules.DankDash
 
 DankPopout {
     id: root
@@ -18,30 +13,8 @@ DankPopout {
     property var triggerScreen: null
     property int currentTabIndex: 0
 
-
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerSection = section
-        triggerScreen = screen
-        triggerY = y
-
-        if (section === "center" && (SettingsData.dankBarPosition === SettingsData.Position.Top || SettingsData.dankBarPosition === SettingsData.Position.Bottom)) {
-            const screenWidth = screen ? screen.width : Screen.width
-            triggerX = (screenWidth - popupWidth) / 2
-            triggerWidth = popupWidth
-        } else if (section === "center" && (SettingsData.dankBarPosition === SettingsData.Position.Left || SettingsData.dankBarPosition === SettingsData.Position.Right)) {
-            const screenHeight = screen ? screen.height : Screen.height
-            triggerX = (screenHeight - popupHeight) / 2
-            triggerWidth = popupHeight
-        } else {
-            triggerX = x
-            triggerWidth = width
-        }
-    }
-
     popupWidth: 700
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 500
-    triggerX: Screen.width - 620 - Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 80
     screen: triggerScreen
     shouldBeVisible: dashVisible
@@ -49,42 +22,130 @@ DankPopout {
     property bool __focusArmed: false
     property bool __contentReady: false
 
+    property var __mediaTabRef: null
+
+    property int __dropdownType: 0
+    property point __dropdownAnchor: Qt.point(0, 0)
+    property bool __dropdownRightEdge: false
+    property var __dropdownPlayer: null
+    property var __dropdownPlayers: []
+
+    function __showVolumeDropdown(pos, rightEdge, player, players) {
+        __dropdownAnchor = pos;
+        __dropdownRightEdge = rightEdge;
+        __dropdownPlayer = player;
+        __dropdownPlayers = players;
+        __dropdownType = 1;
+    }
+
+    function __showAudioDevicesDropdown(pos, rightEdge) {
+        __dropdownAnchor = pos;
+        __dropdownRightEdge = rightEdge;
+        __dropdownType = 2;
+    }
+
+    function __showPlayersDropdown(pos, rightEdge, player, players) {
+        __dropdownAnchor = pos;
+        __dropdownRightEdge = rightEdge;
+        __dropdownPlayer = player;
+        __dropdownPlayers = players;
+        __dropdownType = 3;
+    }
+
+    function __hideDropdowns() {
+        __volumeCloseTimer.stop();
+        __dropdownType = 0;
+        __mediaTabRef?.resetDropdownStates();
+    }
+
+    function __startCloseTimer() {
+        __volumeCloseTimer.restart();
+    }
+
+    function __stopCloseTimer() {
+        __volumeCloseTimer.stop();
+    }
+
+    Timer {
+        id: __volumeCloseTimer
+        interval: 400
+        onTriggered: {
+            if (__dropdownType === 1) {
+                __hideDropdowns();
+            }
+        }
+    }
+
+    overlayContent: Component {
+        MediaDropdownOverlay {
+            dropdownType: root.__dropdownType
+            anchorPos: root.__dropdownAnchor
+            isRightEdge: root.__dropdownRightEdge
+            activePlayer: root.__dropdownPlayer
+            allPlayers: root.__dropdownPlayers
+            onCloseRequested: root.__hideDropdowns()
+            onPanelEntered: root.__stopCloseTimer()
+            onPanelExited: root.__startCloseTimer()
+            onVolumeChanged: volume => {
+                const player = root.__dropdownPlayer;
+                const isChrome = player?.identity?.toLowerCase().includes("chrome") || player?.identity?.toLowerCase().includes("chromium");
+                const usePlayerVolume = player && player.volumeSupported && !isChrome;
+                if (usePlayerVolume) {
+                    player.volume = volume;
+                } else if (AudioService.sink?.audio) {
+                    AudioService.sink.audio.volume = volume;
+                }
+            }
+            onPlayerSelected: player => {
+                const currentPlayer = MprisController.activePlayer;
+                if (currentPlayer && currentPlayer !== player && currentPlayer.canPause) {
+                    currentPlayer.pause();
+                }
+                MprisController.activePlayer = player;
+                root.__hideDropdowns();
+            }
+            onDeviceSelected: device => {
+                root.__hideDropdowns();
+            }
+        }
+    }
+
     function __tryFocusOnce() {
         if (!__focusArmed)
-            return
-        const win = root.window
+            return;
+        const win = root.window;
         if (!win || !win.visible)
-            return
+            return;
         if (!contentLoader.item)
-            return
-
+            return;
         if (win.requestActivate)
-            win.requestActivate()
-        contentLoader.item.forceActiveFocus(Qt.TabFocusReason)
+            win.requestActivate();
+        contentLoader.item.forceActiveFocus(Qt.TabFocusReason);
 
         if (contentLoader.item.activeFocus)
-            __focusArmed = false
+            __focusArmed = false;
     }
 
     onDashVisibleChanged: {
         if (dashVisible) {
-            __focusArmed = true
-            __contentReady = !!contentLoader.item
-            open()
-            __tryFocusOnce()
+            __focusArmed = true;
+            __contentReady = !!contentLoader.item;
+            open();
+            __tryFocusOnce();
         } else {
-            __focusArmed = false
-            __contentReady = false
-            close()
+            __focusArmed = false;
+            __contentReady = false;
+            __hideDropdowns();
+            close();
         }
     }
 
     Connections {
         target: contentLoader
         function onLoaded() {
-            __contentReady = true
+            __contentReady = true;
             if (__focusArmed)
-                __tryFocusOnce()
+                __tryFocusOnce();
         }
     }
 
@@ -93,12 +154,12 @@ DankPopout {
         enabled: !!root.window
         function onVisibleChanged() {
             if (__focusArmed)
-                __tryFocusOnce()
+                __tryFocusOnce();
         }
     }
 
     onBackgroundClicked: {
-        dashVisible = false
+        dashVisible = false;
     }
 
     content: Component {
@@ -112,7 +173,7 @@ DankPopout {
 
             Component.onCompleted: {
                 if (root.shouldBeVisible) {
-                    mainContainer.forceActiveFocus()
+                    mainContainer.forceActiveFocus();
                 }
             }
 
@@ -121,54 +182,54 @@ DankPopout {
                 function onShouldBeVisibleChanged() {
                     if (root.shouldBeVisible) {
                         Qt.callLater(function () {
-                            mainContainer.forceActiveFocus()
-                        })
+                            mainContainer.forceActiveFocus();
+                        });
                     }
                 }
             }
 
             Keys.onPressed: function (event) {
                 if (event.key === Qt.Key_Escape) {
-                    root.dashVisible = false
-                    event.accepted = true
-                    return
+                    root.dashVisible = false;
+                    event.accepted = true;
+                    return;
                 }
 
                 if (event.key === Qt.Key_Tab && !(event.modifiers & Qt.ShiftModifier)) {
-                    let nextIndex = root.currentTabIndex + 1
+                    let nextIndex = root.currentTabIndex + 1;
                     while (nextIndex < tabBar.model.length && tabBar.model[nextIndex] && tabBar.model[nextIndex].isAction) {
-                        nextIndex++
+                        nextIndex++;
                     }
                     if (nextIndex >= tabBar.model.length) {
-                        nextIndex = 0
+                        nextIndex = 0;
                     }
-                    root.currentTabIndex = nextIndex
-                    event.accepted = true
-                    return
+                    root.currentTabIndex = nextIndex;
+                    event.accepted = true;
+                    return;
                 }
 
                 if (event.key === Qt.Key_Backtab || (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier))) {
-                    let prevIndex = root.currentTabIndex - 1
+                    let prevIndex = root.currentTabIndex - 1;
                     while (prevIndex >= 0 && tabBar.model[prevIndex] && tabBar.model[prevIndex].isAction) {
-                        prevIndex--
+                        prevIndex--;
                     }
                     if (prevIndex < 0) {
-                        prevIndex = tabBar.model.length - 1
+                        prevIndex = tabBar.model.length - 1;
                         while (prevIndex >= 0 && tabBar.model[prevIndex] && tabBar.model[prevIndex].isAction) {
-                            prevIndex--
+                            prevIndex--;
                         }
                     }
                     if (prevIndex >= 0) {
-                        root.currentTabIndex = prevIndex
+                        root.currentTabIndex = prevIndex;
                     }
-                    event.accepted = true
-                    return
+                    event.accepted = true;
+                    return;
                 }
 
-                if (root.currentTabIndex === 2 && wallpaperTab.handleKeyEvent) {
-                    if (wallpaperTab.handleKeyEvent(event)) {
-                        event.accepted = true
-                        return
+                if (root.currentTabIndex === 2 && wallpaperLoader.item?.handleKeyEvent) {
+                    if (wallpaperLoader.item.handleKeyEvent(event)) {
+                        event.accepted = true;
+                        return;
                     }
                 }
             }
@@ -193,50 +254,54 @@ DankPopout {
                     focus: false
                     activeFocusOnTab: false
                     nextFocusTarget: {
-                        const item = pages.currentItem
+                        const item = pages.currentItem;
                         if (!item)
-                            return null
+                            return null;
                         if (item.focusTarget)
-                            return item.focusTarget
-                        return item
+                            return item.focusTarget;
+                        return item;
                     }
 
                     model: {
-                        let tabs = [{
-                                        "icon": "dashboard",
-                                        "text": I18n.tr("Overview")
-                                    }, {
-                                        "icon": "music_note",
-                                        "text": I18n.tr("Media")
-                                    }, {
-                                        "icon": "wallpaper",
-                                        "text": I18n.tr("Wallpapers")
-                                    }]
+                        let tabs = [
+                            {
+                                "icon": "dashboard",
+                                "text": I18n.tr("Overview")
+                            },
+                            {
+                                "icon": "music_note",
+                                "text": I18n.tr("Media")
+                            },
+                            {
+                                "icon": "wallpaper",
+                                "text": I18n.tr("Wallpapers")
+                            }
+                        ];
 
                         if (SettingsData.weatherEnabled) {
                             tabs.push({
-                                          "icon": "wb_sunny",
-                                          "text": I18n.tr("Weather")
-                                      })
+                                "icon": "wb_sunny",
+                                "text": I18n.tr("Weather")
+                            });
                         }
 
                         tabs.push({
-                                      "icon": "settings",
-                                      "text": I18n.tr("Settings"),
-                                      "isAction": true
-                                  })
-                        return tabs
+                            "icon": "settings",
+                            "text": I18n.tr("Settings"),
+                            "isAction": true
+                        });
+                        return tabs;
                     }
 
                     onTabClicked: function (index) {
-                        root.currentTabIndex = index
+                        root.currentTabIndex = index;
                     }
 
                     onActionTriggered: function (index) {
-                        let settingsIndex = SettingsData.weatherEnabled ? 4 : 3
+                        let settingsIndex = SettingsData.weatherEnabled ? 4 : 3;
                         if (index === settingsIndex) {
-                            dashVisible = false
-                            settingsModal.show()
+                            dashVisible = false;
+                            PopoutService.focusOrToggleSettings();
                         }
                     }
                 }
@@ -251,53 +316,84 @@ DankPopout {
                     width: parent.width
                     implicitHeight: {
                         if (currentIndex === 0)
-                            return overviewTab.implicitHeight
+                            return overviewLoader.item?.implicitHeight ?? 410;
                         if (currentIndex === 1)
-                            return mediaTab.implicitHeight
+                            return mediaLoader.item?.implicitHeight ?? 410;
                         if (currentIndex === 2)
-                            return wallpaperTab.implicitHeight
+                            return wallpaperLoader.item?.implicitHeight ?? 410;
                         if (SettingsData.weatherEnabled && currentIndex === 3)
-                            return weatherTab.implicitHeight
-                        return overviewTab.implicitHeight
+                            return weatherLoader.item?.implicitHeight ?? 410;
+                        return 410;
                     }
                     currentIndex: root.currentTabIndex
 
-                    OverviewTab {
-                        id: overviewTab
-
-                        onCloseDash: {
-                            root.dashVisible = false
-                        }
-
-                        onSwitchToWeatherTab: {
-                            if (SettingsData.weatherEnabled) {
-                                tabBar.currentIndex = 3
-                                tabBar.tabClicked(3)
+                    Loader {
+                        id: overviewLoader
+                        active: root.currentTabIndex === 0
+                        sourceComponent: Component {
+                            OverviewTab {
+                                onCloseDash: root.dashVisible = false
+                                onSwitchToWeatherTab: {
+                                    if (SettingsData.weatherEnabled) {
+                                        tabBar.currentIndex = 3;
+                                        tabBar.tabClicked(3);
+                                    }
+                                }
+                                onSwitchToMediaTab: {
+                                    tabBar.currentIndex = 1;
+                                    tabBar.tabClicked(1);
+                                }
                             }
                         }
+                    }
 
-                        onSwitchToMediaTab: {
-                            tabBar.currentIndex = 1
-                            tabBar.tabClicked(1)
+                    Loader {
+                        id: mediaLoader
+                        active: root.currentTabIndex === 1
+                        sourceComponent: Component {
+                            MediaPlayerTab {
+                                targetScreen: root.screen
+                                popoutX: root.alignedX
+                                popoutY: root.alignedY
+                                popoutWidth: root.alignedWidth
+                                popoutHeight: root.alignedHeight
+                                contentOffsetY: Theme.spacingM + 48 + Theme.spacingS + Theme.spacingXS
+                                Component.onCompleted: root.__mediaTabRef = this
+                                onShowVolumeDropdown: (pos, screen, rightEdge, player, players) => {
+                                    root.__showVolumeDropdown(pos, rightEdge, player, players);
+                                }
+                                onShowAudioDevicesDropdown: (pos, screen, rightEdge) => {
+                                    root.__showAudioDevicesDropdown(pos, rightEdge);
+                                }
+                                onShowPlayersDropdown: (pos, screen, rightEdge, player, players) => {
+                                    root.__showPlayersDropdown(pos, rightEdge, player, players);
+                                }
+                                onHideDropdowns: root.__hideDropdowns()
+                                onVolumeButtonExited: root.__startCloseTimer()
+                            }
                         }
                     }
 
-                    MediaPlayerTab {
-                        id: mediaTab
-                    }
-
-                    WallpaperTab {
-                        id: wallpaperTab
+                    Loader {
+                        id: wallpaperLoader
                         active: root.currentTabIndex === 2
-                        tabBarItem: tabBar
-                        keyForwardTarget: mainContainer
-                        targetScreen: root.triggerScreen
-                        parentPopout: root
+                        sourceComponent: Component {
+                            WallpaperTab {
+                                active: true
+                                tabBarItem: tabBar
+                                keyForwardTarget: mainContainer
+                                targetScreen: root.triggerScreen
+                                parentPopout: root
+                            }
+                        }
                     }
 
-                    WeatherTab {
-                        id: weatherTab
-                        visible: SettingsData.weatherEnabled && root.currentTabIndex === 3
+                    Loader {
+                        id: weatherLoader
+                        active: SettingsData.weatherEnabled && root.currentTabIndex === 3
+                        sourceComponent: Component {
+                            WeatherTab {}
+                        }
                     }
                 }
             }

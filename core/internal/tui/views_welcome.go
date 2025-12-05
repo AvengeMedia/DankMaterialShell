@@ -69,7 +69,7 @@ func (m Model) viewWelcome() string {
 			case "debian":
 				errorMsg = fmt.Sprintf("Debian %s is not supported.\n\nOnly Debian 13+ (Trixie) is supported.\n\nPlease upgrade to Debian 13 or later.", m.osInfo.VersionID)
 			case "nixos":
-				errorMsg = "NixOS is currently not supported, but there is a DankMaterialShell flake available."
+				errorMsg = "See the NixOS documentation for installation instructions: https://danklinux.com/docs/dankmaterialshell/nixos."
 			default:
 				errorMsg = fmt.Sprintf("%s is not supported.\nFeel free to request on https://github.com/AvengeMedia/DankMaterialShell", m.osInfo.PrettyName)
 			}

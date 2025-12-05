@@ -7,6 +7,7 @@ DankModal {
     id: root
 
     layerNamespace: "dms:confirm-modal"
+    keepPopoutsOpen: true
 
     property string confirmTitle: ""
     property string confirmMessage: ""
@@ -19,141 +20,141 @@ DankModal {
     property bool keyboardNavigation: false
 
     function show(title, message, onConfirmCallback, onCancelCallback) {
-        confirmTitle = title || ""
-        confirmMessage = message || ""
-        confirmButtonText = "Confirm"
-        cancelButtonText = "Cancel"
-        confirmButtonColor = Theme.primary
-        onConfirm = onConfirmCallback || (() => {})
-        onCancel = onCancelCallback || (() => {})
-        selectedButton = -1
-        keyboardNavigation = false
-        open()
+        confirmTitle = title || "";
+        confirmMessage = message || "";
+        confirmButtonText = "Confirm";
+        cancelButtonText = "Cancel";
+        confirmButtonColor = Theme.primary;
+        onConfirm = onConfirmCallback || (() => {});
+        onCancel = onCancelCallback || (() => {});
+        selectedButton = -1;
+        keyboardNavigation = false;
+        open();
     }
 
     function showWithOptions(options) {
-        confirmTitle = options.title || ""
-        confirmMessage = options.message || ""
-        confirmButtonText = options.confirmText || "Confirm"
-        cancelButtonText = options.cancelText || "Cancel"
-        confirmButtonColor = options.confirmColor || Theme.primary
-        onConfirm = options.onConfirm || (() => {})
-        onCancel = options.onCancel || (() => {})
-        selectedButton = -1
-        keyboardNavigation = false
-        open()
+        confirmTitle = options.title || "";
+        confirmMessage = options.message || "";
+        confirmButtonText = options.confirmText || "Confirm";
+        cancelButtonText = options.cancelText || "Cancel";
+        confirmButtonColor = options.confirmColor || Theme.primary;
+        onConfirm = options.onConfirm || (() => {});
+        onCancel = options.onCancel || (() => {});
+        selectedButton = -1;
+        keyboardNavigation = false;
+        open();
     }
 
     function selectButton() {
-        close()
+        close();
         if (selectedButton === 0) {
             if (onCancel) {
-                onCancel()
+                onCancel();
             }
         } else {
             if (onConfirm) {
-                onConfirm()
+                onConfirm();
             }
         }
     }
 
     shouldBeVisible: false
     allowStacking: true
-    width: 350
-    height: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 160
+    modalWidth: 350
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 160
     enableShadow: true
     shouldHaveFocus: true
     onBackgroundClicked: {
-        close()
+        close();
         if (onCancel) {
-            onCancel()
+            onCancel();
         }
     }
     onOpened: {
         Qt.callLater(function () {
-            modalFocusScope.forceActiveFocus()
-            modalFocusScope.focus = true
-            shouldHaveFocus = true
-        })
+            modalFocusScope.forceActiveFocus();
+            modalFocusScope.focus = true;
+            shouldHaveFocus = true;
+        });
     }
     modalFocusScope.Keys.onPressed: function (event) {
         switch (event.key) {
         case Qt.Key_Escape:
-            close()
+            close();
             if (onCancel) {
-                onCancel()
+                onCancel();
             }
-            event.accepted = true
-            break
+            event.accepted = true;
+            break;
         case Qt.Key_Left:
         case Qt.Key_Up:
-            keyboardNavigation = true
-            selectedButton = 0
-            event.accepted = true
-            break
+            keyboardNavigation = true;
+            selectedButton = 0;
+            event.accepted = true;
+            break;
         case Qt.Key_Right:
         case Qt.Key_Down:
-            keyboardNavigation = true
-            selectedButton = 1
-            event.accepted = true
-            break
+            keyboardNavigation = true;
+            selectedButton = 1;
+            event.accepted = true;
+            break;
         case Qt.Key_N:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = (selectedButton + 1) % 2
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = (selectedButton + 1) % 2;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_P:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = selectedButton === -1 ? 1 : (selectedButton - 1 + 2) % 2
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = selectedButton === -1 ? 1 : (selectedButton - 1 + 2) % 2;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_J:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = 1
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = 1;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_K:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = 0
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = 0;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_H:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = 0
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = 0;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_L:
             if (event.modifiers & Qt.ControlModifier) {
-                keyboardNavigation = true
-                selectedButton = 1
-                event.accepted = true
+                keyboardNavigation = true;
+                selectedButton = 1;
+                event.accepted = true;
             }
-            break
+            break;
         case Qt.Key_Tab:
-            keyboardNavigation = true
-            selectedButton = selectedButton === -1 ? 0 : (selectedButton + 1) % 2
-            event.accepted = true
-            break
+            keyboardNavigation = true;
+            selectedButton = selectedButton === -1 ? 0 : (selectedButton + 1) % 2;
+            event.accepted = true;
+            break;
         case Qt.Key_Return:
         case Qt.Key_Enter:
             if (selectedButton !== -1) {
-                selectButton()
+                selectButton();
             } else {
-                selectedButton = 1
-                selectButton()
+                selectedButton = 1;
+                selectButton();
             }
-            event.accepted = true
-            break
+            event.accepted = true;
+            break;
         }
     }
 
@@ -210,11 +211,11 @@ DankModal {
                         radius: Theme.cornerRadius
                         color: {
                             if (keyboardNavigation && selectedButton === 0) {
-                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12)
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
                             } else if (cancelButton.containsMouse) {
-                                return Theme.surfacePressed
+                                return Theme.surfacePressed;
                             } else {
-                                return Theme.surfaceVariantAlpha
+                                return Theme.surfaceVariantAlpha;
                             }
                         }
                         border.color: (keyboardNavigation && selectedButton === 0) ? Theme.primary : "transparent"
@@ -235,8 +236,8 @@ DankModal {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                selectedButton = 0
-                                selectButton()
+                                selectedButton = 0;
+                                selectButton();
                             }
                         }
                     }
@@ -246,13 +247,13 @@ DankModal {
                         height: 40
                         radius: Theme.cornerRadius
                         color: {
-                            const baseColor = confirmButtonColor
+                            const baseColor = confirmButtonColor;
                             if (keyboardNavigation && selectedButton === 1) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1)
+                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1);
                             } else if (confirmButton.containsMouse) {
-                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9)
+                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9);
                             } else {
-                                return baseColor
+                                return baseColor;
                             }
                         }
                         border.color: (keyboardNavigation && selectedButton === 1) ? "white" : "transparent"
@@ -273,8 +274,8 @@ DankModal {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                selectedButton = 1
-                                selectButton()
+                                selectedButton = 1;
+                                selectButton();
                             }
                         }
                     }

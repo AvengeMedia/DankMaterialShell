@@ -20,9 +20,8 @@
                 system: fn system nixpkgs.legacyPackages.${system}
             );
         buildDmsPkgs = pkgs: {
-            dmsCli = self.packages.${pkgs.stdenv.hostPlatform.system}.dmsCli;
+            inherit (self.packages.${pkgs.stdenv.hostPlatform.system}) dmsCli dankMaterialShell;
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
-            dankMaterialShell = self.packages.${pkgs.stdenv.hostPlatform.system}.dankMaterialShell;
         };
         mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
             imports = [
@@ -52,7 +51,7 @@
 
                     pname = "dmsCli";
                     src = ./core;
-                    vendorHash = "sha256-nc4CvEPfJ6l16/zmhnXr1jqpi6BeSXd3g/51djbEfpQ=";
+                    vendorHash = "sha256-2PCqiW4frxME8IlmwWH5ktznhd/G1bah5Ae4dp0HPTQ=";
 
                     subPackages = ["cmd/dms"];
 
@@ -61,6 +60,15 @@
                         "-w"
                         "-X main.Version=${finalAttrs.version}"
                     ];
+
+                    nativeBuildInputs = [pkgs.installShellFiles];
+
+                    postInstall = ''
+                        installShellCompletion --cmd dms \
+                          --bash <($out/bin/dms completion bash) \
+                          --fish <($out/bin/dms completion fish ) \
+                          --zsh <($out/bin/dms completion zsh)
+                    '';
 
                     meta = {
                         description = "DankMaterialShell Command Line Interface";
@@ -79,6 +87,17 @@
                     installPhase = ''
                         mkdir -p $out/etc/xdg/quickshell
                         cp -r ./ $out/etc/xdg/quickshell/dms
+
+                        # Create DMS Version file
+                        echo "${version}" > $out/etc/xdg/quickshell/dms/VERSION
+
+                        # Install desktop file
+                        mkdir -p $out/share/applications
+                        cp ${./assets/dms-open.desktop} $out/share/applications/dms-open.desktop
+
+                        # Install icon
+                        mkdir -p $out/share/icons/hicolor/scalable/apps
+                        cp ${./core/assets/danklogo.svg} $out/share/icons/hicolor/scalable/apps/danklogo.svg
                     '';
                 };
 

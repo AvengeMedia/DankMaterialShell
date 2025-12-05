@@ -7,6 +7,7 @@ import qs.Widgets
 BasePill {
     id: root
 
+    property var widgetData: null
     property bool compactMode: false
     signal clockClicked
 
@@ -28,14 +29,14 @@ BasePill {
                     StyledText {
                         text: {
                             if (SettingsData.use24HourClock) {
-                                return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(0)
+                                return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(0);
                             } else {
-                                const hours = systemClock?.date?.getHours()
-                                const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
-                                return String(display).padStart(2, '0').charAt(0)
+                                const hours = systemClock?.date?.getHours();
+                                const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                                return String(display).padStart(2, '0').charAt(0);
                             }
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -44,14 +45,14 @@ BasePill {
                     StyledText {
                         text: {
                             if (SettingsData.use24HourClock) {
-                                return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(1)
+                                return String(systemClock?.date?.getHours()).padStart(2, '0').charAt(1);
                             } else {
-                                const hours = systemClock?.date?.getHours()
-                                const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
-                                return String(display).padStart(2, '0').charAt(1)
+                                const hours = systemClock?.date?.getHours();
+                                const display = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                                return String(display).padStart(2, '0').charAt(1);
                             }
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -64,7 +65,7 @@ BasePill {
 
                     StyledText {
                         text: String(systemClock?.date?.getMinutes()).padStart(2, '0').charAt(0)
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -72,7 +73,7 @@ BasePill {
 
                     StyledText {
                         text: String(systemClock?.date?.getMinutes()).padStart(2, '0').charAt(1)
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -86,7 +87,7 @@ BasePill {
 
                     StyledText {
                         text: String(systemClock?.date?.getSeconds()).padStart(2, '0').charAt(0)
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -94,7 +95,7 @@ BasePill {
 
                     StyledText {
                         text: String(systemClock?.date?.getSeconds()).padStart(2, '0').charAt(1)
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.widgetTextColor
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -120,13 +121,13 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale()
-                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat)
-                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M')
-                            const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0')
-                            return value.charAt(0)
+                            const locale = Qt.locale();
+                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
+                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
+                            const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0');
+                            return value.charAt(0);
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.primary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -134,13 +135,13 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale()
-                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat)
-                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M')
-                            const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0')
-                            return value.charAt(1)
+                            const locale = Qt.locale();
+                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
+                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
+                            const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0');
+                            return value.charAt(1);
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.primary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -153,13 +154,13 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale()
-                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat)
-                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M')
-                            const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0')
-                            return value.charAt(0)
+                            const locale = Qt.locale();
+                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
+                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
+                            const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0');
+                            return value.charAt(0);
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.primary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -167,13 +168,13 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale()
-                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat)
-                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M')
-                            const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0')
-                            return value.charAt(1)
+                            const locale = Qt.locale();
+                            const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
+                            const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
+                            const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0');
+                            return value.charAt(1);
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                         color: Theme.primary
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignBottom
@@ -190,9 +191,9 @@ BasePill {
                 StyledText {
                     id: timeText
                     text: {
-                        return systemClock?.date?.toLocaleTimeString(Qt.locale(), SettingsData.getEffectiveTimeFormat())
+                        return systemClock?.date?.toLocaleTimeString(Qt.locale(), SettingsData.getEffectiveTimeFormat());
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.baseline: dateText.baseline
                 }
@@ -203,21 +204,21 @@ BasePill {
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.outlineButton
                     anchors.baseline: dateText.baseline
-                    visible: !SettingsData.clockCompactMode
+                    visible: !(widgetData?.clockCompactMode !== undefined ? widgetData.clockCompactMode : SettingsData.clockCompactMode)
                 }
 
                 StyledText {
                     id: dateText
                     text: {
                         if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0) {
-                            return systemClock?.date?.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat)
+                            return systemClock?.date?.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat);
                         }
-                        return systemClock?.date?.toLocaleDateString(Qt.locale(), "ddd d")
+                        return systemClock?.date?.toLocaleDateString(Qt.locale(), "ddd d");
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: !SettingsData.clockCompactMode
+                    visible: !(widgetData?.clockCompactMode !== undefined ? widgetData.clockCompactMode : SettingsData.clockCompactMode)
                 }
             }
 
@@ -235,13 +236,7 @@ BasePill {
         height: root.height + root.topMargin + root.bottomMargin
         cursorShape: Qt.PointingHandCursor
         onPressed: {
-            if (root.popoutTarget && root.popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = root.parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, root.barThickness, root.visualWidth)
-                root.popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, root.section, currentScreen)
-            }
-            root.clockClicked()
+            root.clockClicked();
         }
     }
 }

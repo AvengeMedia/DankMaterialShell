@@ -49,6 +49,7 @@ func (b *SubscriptionBroker) Ask(ctx context.Context, req PromptRequest) (string
 			VpnService:     req.VpnService,
 			Setting:        req.SettingName,
 			Fields:         req.Fields,
+			FieldsInfo:     req.FieldsInfo,
 			Hints:          req.Hints,
 			Reason:         req.Reason,
 			ConnectionId:   req.ConnectionId,

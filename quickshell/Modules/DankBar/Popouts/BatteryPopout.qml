@@ -15,14 +15,6 @@ DankPopout {
 
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x;
-        triggerY = y;
-        triggerWidth = width;
-        triggerSection = section;
-        triggerScreen = screen;
-    }
-
     function isActiveProfile(profile) {
         if (typeof PowerProfiles === "undefined") {
             return false;
@@ -45,8 +37,6 @@ DankPopout {
 
     popupWidth: 400
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 400
-    triggerX: Screen.width - 380 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing
     triggerWidth: 70
     positioning: ""
     screen: triggerScreen

@@ -45,24 +45,28 @@ Item {
 
     Component.onCompleted: {
         Proc.runCommand(null, ["sh", "-c", ". /etc/os-release && echo $ID"], (output, exitCode) => {
-            if (exitCode !== 0) return
+            if (!root || exitCode !== 0 || !output) return
             const distroId = output.trim()
+            if (!distroId) return
 
-            // Nerd fonts are better than images usually
             const supportedDistroNFs = ["debian", "arch", "archcraft", "fedora", "nixos", "ubuntu", "guix", "gentoo", "endeavouros", "manjaro", "opensuse"]
             if (supportedDistroNFs.includes(distroId)) {
+                if (!root) return
                 root.useNerdFont = true
                 root.nerdFontIcon = distroId
                 return
             }
 
             Proc.runCommand(null, ["sh", "-c", ". /etc/os-release && echo $LOGO"], (logoOutput, logoExitCode) => {
-                if (logoExitCode !== 0) return
+                if (!root || !iconImage || logoExitCode !== 0 || !logoOutput) return
                 const logo = logoOutput.trim()
+                if (!logo) return
+
                 if (logo === "cachyos") {
                     iconImage.source = "file:///usr/share/icons/cachyos.svg"
                     return
-                } else if (logo === "guix-icon") {
+                }
+                if (logo === "guix-icon") {
                     iconImage.source = "file:///run/current-system/profile/share/icons/hicolor/scalable/apps/guix-icon.svg"
                     return
                 }

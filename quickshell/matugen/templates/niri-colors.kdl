@@ -28,7 +28,7 @@ layout {
     }
 }
 
-/-recent-windows {
+recent-windows {
     highlight {
         active-color   "{{colors.primary_container.dark.hex}}"
         urgent-color   "{{colors.error.default.hex}}"

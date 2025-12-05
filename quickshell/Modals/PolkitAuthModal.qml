@@ -1,70 +1,60 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import qs.Common
-import qs.Modals.Common
 import qs.Services
 import qs.Widgets
 
-DankModal {
+FloatingWindow {
     id: root
-
-    layerNamespace: "dms:polkit"
-
-    HyprlandFocusGrab {
-        windows: [root]
-        active: CompositorService.isHyprland && root.shouldHaveFocus
-    }
 
     property string passwordInput: ""
     property var currentFlow: PolkitService.agent?.flow
     property bool isLoading: false
-    property real minHeight: 240
+    property int calculatedHeight: Math.max(240, headerRow.implicitHeight + mainColumn.implicitHeight + Theme.spacingM * 3)
+
+    function focusPasswordField() {
+        passwordField.forceActiveFocus();
+    }
 
     function show() {
-        passwordInput = ""
-        isLoading = false
-        open()
-        Qt.callLater(() => {
-            if (contentLoader.item && contentLoader.item.passwordField) {
-                contentLoader.item.passwordField.forceActiveFocus()
-            }
-        })
+        passwordInput = "";
+        isLoading = false;
+        visible = true;
+        Qt.callLater(focusPasswordField);
     }
 
-    shouldBeVisible: false
-    width: 420
-    height: Math.max(minHeight, contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 240)
+    function hide() {
+        visible = false;
+    }
 
-    Connections {
-        target: contentLoader.item
-        function onImplicitHeightChanged() {
-            if (shouldBeVisible && contentLoader.item) {
-                const newHeight = contentLoader.item.implicitHeight + Theme.spacingM * 2
-                if (newHeight > minHeight) {
-                    minHeight = newHeight
-                }
-            }
+    function submitAuth() {
+        if (passwordInput.length === 0 || !currentFlow || isLoading)
+            return;
+        isLoading = true;
+        currentFlow.submit(passwordInput);
+        passwordInput = "";
+    }
+
+    function cancelAuth() {
+        if (!currentFlow || isLoading)
+            return;
+        currentFlow.cancelAuthenticationRequest();
+    }
+
+    objectName: "polkitAuthModal"
+    title: I18n.tr("Authentication")
+    minimumSize: Qt.size(420, calculatedHeight)
+    maximumSize: Qt.size(420, calculatedHeight)
+    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+    visible: false
+
+    onVisibleChanged: {
+        if (visible) {
+            Qt.callLater(focusPasswordField);
+            return;
         }
-    }
-
-    onOpened: {
-        Qt.callLater(() => {
-            if (contentLoader.item && contentLoader.item.passwordField) {
-                contentLoader.item.passwordField.forceActiveFocus()
-            }
-        })
-    }
-
-    onClosed: {
-        passwordInput = ""
-        isLoading = false
-    }
-
-    onBackgroundClicked: () => {
-        if (currentFlow && !isLoading) {
-            currentFlow.cancelAuthenticationRequest()
-        }
+        passwordInput = "";
+        isLoading = false;
     }
 
     Connections {
@@ -72,13 +62,12 @@ DankModal {
         enabled: PolkitService.polkitAvailable
 
         function onAuthenticationRequestStarted() {
-            show()
+            show();
         }
 
         function onIsActiveChanged() {
-            if (!(PolkitService.agent?.isActive ?? false)) {
-                close()
-            }
+            if (!(PolkitService.agent?.isActive ?? false))
+                hide();
         }
     }
 
@@ -87,184 +76,154 @@ DankModal {
         enabled: currentFlow !== null
 
         function onIsResponseRequiredChanged() {
-            if (currentFlow.isResponseRequired) {
-                isLoading = false
-                passwordInput = ""
-                if (contentLoader.item && contentLoader.item.passwordField) {
-                    contentLoader.item.passwordField.forceActiveFocus()
-                }
-            }
+            if (!currentFlow.isResponseRequired)
+                return;
+            isLoading = false;
+            passwordInput = "";
+            passwordField.forceActiveFocus();
         }
 
         function onAuthenticationSucceeded() {
-            close()
+            hide();
         }
 
         function onAuthenticationFailed() {
-            isLoading = false
+            isLoading = false;
         }
 
         function onAuthenticationRequestCancelled() {
-            close()
+            hide();
         }
     }
 
-    content: Component {
-        FocusScope {
-            id: authContent
+    FocusScope {
+        id: contentFocusScope
 
-            property alias passwordField: passwordField
+        anchors.fill: parent
+        focus: true
 
-            anchors.fill: parent
-            focus: true
-            implicitHeight: headerRow.implicitHeight + mainColumn.implicitHeight + Theme.spacingM
+        Keys.onEscapePressed: event => {
+            cancelAuth();
+            event.accepted = true;
+        }
 
-            Keys.onEscapePressed: event => {
-                if (currentFlow && !isLoading) {
-                    currentFlow.cancelAuthenticationRequest()
+        Row {
+            id: headerRow
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            anchors.topMargin: Theme.spacingM
+
+            Column {
+                width: parent.width - 40
+                spacing: Theme.spacingXS
+
+                StyledText {
+                    text: I18n.tr("Authentication Required")
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.surfaceText
+                    font.weight: Font.Medium
                 }
-                event.accepted = true
-            }
-
-            Row {
-                id: headerRow
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.leftMargin: Theme.spacingM
-                anchors.rightMargin: Theme.spacingM
-                anchors.topMargin: Theme.spacingM
 
                 Column {
-                    width: parent.width - 40
+                    width: parent.width
                     spacing: Theme.spacingXS
 
                     StyledText {
-                        text: I18n.tr("Authentication Required")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
-
-                    Column {
+                        text: currentFlow?.message ?? ""
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceTextMedium
                         width: parent.width
-                        spacing: Theme.spacingXS
-
-                        StyledText {
-                            text: currentFlow?.message ?? ""
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceTextMedium
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                        }
-
-                        StyledText {
-                            visible: (currentFlow?.supplementaryMessage ?? "") !== ""
-                            text: currentFlow?.supplementaryMessage ?? ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: (currentFlow?.supplementaryIsError ?? false) ? Theme.error : Theme.surfaceTextMedium
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                            opacity: (currentFlow?.supplementaryIsError ?? false) ? 1 : 0.8
-                        }
+                        wrapMode: Text.Wrap
                     }
-                }
 
-                DankActionButton {
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    enabled: !isLoading
-                    opacity: enabled ? 1 : 0.5
-                    onClicked: () => {
-                        if (currentFlow) {
-                            currentFlow.cancelAuthenticationRequest()
-                        }
+                    StyledText {
+                        visible: (currentFlow?.supplementaryMessage ?? "") !== ""
+                        text: currentFlow?.supplementaryMessage ?? ""
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: (currentFlow?.supplementaryIsError ?? false) ? Theme.error : Theme.surfaceTextMedium
+                        width: parent.width
+                        wrapMode: Text.Wrap
+                        opacity: (currentFlow?.supplementaryIsError ?? false) ? 1 : 0.8
                     }
                 }
             }
 
-            Column {
-                id: mainColumn
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.leftMargin: Theme.spacingM
-                anchors.rightMargin: Theme.spacingM
-                anchors.bottomMargin: Theme.spacingM
-                spacing: Theme.spacingM
+            DankActionButton {
+                iconName: "close"
+                iconSize: Theme.iconSize - 4
+                iconColor: Theme.surfaceText
+                enabled: !isLoading
+                opacity: enabled ? 1 : 0.5
+                onClicked: cancelAuth()
+            }
+        }
+
+        Column {
+            id: mainColumn
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: Theme.spacingM
+            anchors.rightMargin: Theme.spacingM
+            anchors.bottomMargin: Theme.spacingM
+            spacing: Theme.spacingM
+
+            StyledText {
+                text: currentFlow?.inputPrompt ?? ""
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+                width: parent.width
+                visible: (currentFlow?.inputPrompt ?? "") !== ""
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 50
+                radius: Theme.cornerRadius
+                color: Theme.surfaceHover
+                border.color: passwordField.activeFocus ? Theme.primary : Theme.outlineStrong
+                border.width: passwordField.activeFocus ? 2 : 1
+                opacity: isLoading ? 0.5 : 1
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: !isLoading
+                    onClicked: passwordField.forceActiveFocus()
+                }
+
+                DankTextField {
+                    id: passwordField
+
+                    anchors.fill: parent
+                    font.pixelSize: Theme.fontSizeMedium
+                    textColor: Theme.surfaceText
+                    text: passwordInput
+                    echoMode: (currentFlow?.responseVisible ?? false) ? TextInput.Normal : TextInput.Password
+                    placeholderText: ""
+                    backgroundColor: "transparent"
+                    enabled: !isLoading
+                    onTextEdited: passwordInput = text
+                    onAccepted: submitAuth()
+                }
+            }
+
+            Item {
+                width: parent.width
+                height: (currentFlow?.failed ?? false) ? failedText.implicitHeight : 0
+                visible: height > 0
 
                 StyledText {
-                    text: currentFlow?.inputPrompt ?? ""
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
+                    id: failedText
+                    text: I18n.tr("Authentication failed, please try again")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.error
                     width: parent.width
-                    visible: (currentFlow?.inputPrompt ?? "") !== ""
-                }
+                    opacity: (currentFlow?.failed ?? false) ? 1 : 0
 
-                Rectangle {
-                    width: parent.width
-                    height: 50
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceHover
-                    border.color: passwordField.activeFocus ? Theme.primary : Theme.outlineStrong
-                    border.width: passwordField.activeFocus ? 2 : 1
-                    opacity: isLoading ? 0.5 : 1
-
-                    MouseArea {
-                        anchors.fill: parent
-                        enabled: !isLoading
-                        onClicked: () => {
-                            passwordField.forceActiveFocus()
-                        }
-                    }
-
-                    DankTextField {
-                        id: passwordField
-
-                        anchors.fill: parent
-                        font.pixelSize: Theme.fontSizeMedium
-                        textColor: Theme.surfaceText
-                        text: passwordInput
-                        echoMode: (currentFlow?.responseVisible ?? false) ? TextInput.Normal : TextInput.Password
-                        placeholderText: ""
-                        backgroundColor: "transparent"
-                        enabled: !isLoading
-                        onTextEdited: () => {
-                            passwordInput = text
-                        }
-                        onAccepted: () => {
-                            if (passwordInput.length > 0 && currentFlow && !isLoading) {
-                                isLoading = true
-                                currentFlow.submit(passwordInput)
-                                passwordInput = ""
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    width: parent.width
-                    height: (currentFlow?.failed ?? false) ? failedText.implicitHeight : 0
-                    visible: height > 0
-
-                    StyledText {
-                        id: failedText
-                        text: I18n.tr("Authentication failed, please try again")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.error
-                        width: parent.width
-                        opacity: (currentFlow?.failed ?? false) ? 1 : 0
-
-                        Behavior on opacity {
-                            NumberAnimation {
-                                duration: Theme.shortDuration
-                                easing.type: Theme.standardEasing
-                            }
-                        }
-                    }
-
-                    Behavior on height {
+                    Behavior on opacity {
                         NumberAnimation {
                             duration: Theme.shortDuration
                             easing.type: Theme.standardEasing
@@ -272,89 +231,82 @@ DankModal {
                     }
                 }
 
-                Item {
-                    width: parent.width
-                    height: 40
+                Behavior on height {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+            }
 
-                    Row {
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: Theme.spacingM
+            Item {
+                width: parent.width
+                height: 40
 
-                        Rectangle {
-                            width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
-                            border.color: Theme.surfaceVariantAlpha
-                            border.width: 1
-                            enabled: !isLoading
-                            opacity: enabled ? 1 : 0.5
+                Row {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
 
-                            StyledText {
-                                id: cancelText
+                    Rectangle {
+                        width: Math.max(70, cancelText.contentWidth + Theme.spacingM * 2)
+                        height: 36
+                        radius: Theme.cornerRadius
+                        color: cancelArea.containsMouse ? Theme.surfaceTextHover : "transparent"
+                        border.color: Theme.surfaceVariantAlpha
+                        border.width: 1
+                        enabled: !isLoading
+                        opacity: enabled ? 1 : 0.5
 
-                                anchors.centerIn: parent
-                                text: I18n.tr("Cancel")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.surfaceText
-                                font.weight: Font.Medium
-                            }
-
-                            MouseArea {
-                                id: cancelArea
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                enabled: parent.enabled
-                                onClicked: () => {
-                                    if (currentFlow) {
-                                        currentFlow.cancelAuthenticationRequest()
-                                    }
-                                }
-                            }
+                        StyledText {
+                            id: cancelText
+                            anchors.centerIn: parent
+                            text: I18n.tr("Cancel")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
                         }
 
-                        Rectangle {
-                            width: Math.max(80, authText.contentWidth + Theme.spacingM * 2)
-                            height: 36
-                            radius: Theme.cornerRadius
-                            color: authArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
-                            enabled: !isLoading && (passwordInput.length > 0 || !(currentFlow?.isResponseRequired ?? true))
-                            opacity: enabled ? 1 : 0.5
+                        MouseArea {
+                            id: cancelArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            enabled: parent.enabled
+                            onClicked: cancelAuth()
+                        }
+                    }
 
-                            StyledText {
-                                id: authText
+                    Rectangle {
+                        width: Math.max(80, authText.contentWidth + Theme.spacingM * 2)
+                        height: 36
+                        radius: Theme.cornerRadius
+                        color: authArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
+                        enabled: !isLoading && (passwordInput.length > 0 || !(currentFlow?.isResponseRequired ?? true))
+                        opacity: enabled ? 1 : 0.5
 
-                                anchors.centerIn: parent
-                                text: I18n.tr("Authenticate")
-                                font.pixelSize: Theme.fontSizeMedium
-                                color: Theme.background
-                                font.weight: Font.Medium
-                            }
+                        StyledText {
+                            id: authText
+                            anchors.centerIn: parent
+                            text: I18n.tr("Authenticate")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.background
+                            font.weight: Font.Medium
+                        }
 
-                            MouseArea {
-                                id: authArea
+                        MouseArea {
+                            id: authArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            enabled: parent.enabled
+                            onClicked: submitAuth()
+                        }
 
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                enabled: parent.enabled
-                                onClicked: () => {
-                                    if (currentFlow && !isLoading) {
-                                        isLoading = true
-                                        currentFlow.submit(passwordInput)
-                                        passwordInput = ""
-                                    }
-                                }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                    easing.type: Theme.standardEasing
-                                }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
                             }
                         }
                     }

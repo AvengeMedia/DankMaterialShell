@@ -13,7 +13,26 @@ BasePill {
     }
 
     property var popoutTarget: null
+    property var barConfig: null
     property bool isHovered: clickArea.containsMouse
+    property real barSpacing: 4
+    property bool isAutoHideBar: false
+
+    readonly property real minTooltipY: {
+        if (!parentScreen || !isVerticalOrientation) {
+            return 0
+        }
+
+        if (isAutoHideBar) {
+            return 0
+        }
+
+        if (parentScreen.y > 0) {
+            return barThickness + barSpacing
+        }
+
+        return 0
+    }
 
     signal toggleVpnPopup()
 
@@ -56,50 +75,46 @@ BasePill {
         acceptedButtons: Qt.LeftButton
         enabled: !DMSNetworkService.isBusy
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
-            root.toggleVpnPopup();
+            root.toggleVpnPopup()
         }
         onEntered: {
-            if (root.parentScreen && !(popoutTarget && popoutTarget.shouldBeVisible)) {
-                tooltipLoader.active = true
-                if (tooltipLoader.item) {
-                    let tooltipText = ""
-                    if (!DMSNetworkService.connected) {
-                        tooltipText = "VPN Disconnected"
-                    } else {
-                        const names = DMSNetworkService.activeNames || []
-                        if (names.length <= 1) {
-                            const name = names[0] || ""
-                            const maxLength = 25
-                            const displayName = name.length > maxLength ? name.substring(0, maxLength) + "..." : name
-                            tooltipText = "VPN Connected • " + displayName
-                        } else {
-                            const name = names[0]
-                            const maxLength = 20
-                            const displayName = name.length > maxLength ? name.substring(0, maxLength) + "..." : name
-                            tooltipText = "VPN Connected • " + displayName + " +" + (names.length - 1)
-                        }
-                    }
+            if (!root.parentScreen || (popoutTarget?.shouldBeVisible)) return
 
-                    if (root.isVerticalOrientation) {
-                        const globalPos = mapToGlobal(width / 2, height / 2)
-                        const screenX = root.parentScreen ? root.parentScreen.x : 0
-                        const screenY = root.parentScreen ? root.parentScreen.y : 0
-                        const relativeY = globalPos.y - screenY
-                        const tooltipX = root.axis?.edge === "left" ? (Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS) : (root.parentScreen.width - Theme.barHeight - SettingsData.dankBarSpacing - Theme.spacingXS)
-                        const isLeft = root.axis?.edge === "left"
-                        tooltipLoader.item.show(tooltipText, screenX + tooltipX, relativeY, root.parentScreen, isLeft, !isLeft)
-                    } else {
-                        const globalPos = mapToGlobal(width / 2, height)
-                        const tooltipY = Theme.barHeight + SettingsData.dankBarSpacing + Theme.spacingXS
-                        tooltipLoader.item.show(tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false)
-                    }
+            tooltipLoader.active = true
+            if (!tooltipLoader.item) return
+
+            let tooltipText = ""
+            if (!DMSNetworkService.connected) {
+                tooltipText = "VPN Disconnected"
+            } else {
+                const names = DMSNetworkService.activeNames || []
+                if (names.length <= 1) {
+                    const name = names[0] || ""
+                    const maxLength = 25
+                    const displayName = name.length > maxLength ? name.substring(0, maxLength) + "..." : name
+                    tooltipText = "VPN Connected • " + displayName
+                } else {
+                    const name = names[0]
+                    const maxLength = 20
+                    const displayName = name.length > maxLength ? name.substring(0, maxLength) + "..." : name
+                    tooltipText = "VPN Connected • " + displayName + " +" + (names.length - 1)
                 }
+            }
+
+            if (root.isVerticalOrientation) {
+                const globalPos = mapToGlobal(width / 2, height / 2)
+                const currentScreen = root.parentScreen || Screen
+                const screenX = currentScreen ? currentScreen.x : 0
+                const screenY = currentScreen ? currentScreen.y : 0
+                const relativeY = globalPos.y - screenY
+                const adjustedY = relativeY + root.minTooltipY
+                const tooltipX = root.axis?.edge === "left" ? (root.barThickness + root.barSpacing + Theme.spacingXS) : (currentScreen.width - root.barThickness - root.barSpacing - Theme.spacingXS)
+                const isLeft = root.axis?.edge === "left"
+                tooltipLoader.item.show(tooltipText, screenX + tooltipX, adjustedY, currentScreen, isLeft, !isLeft)
+            } else {
+                const globalPos = mapToGlobal(width / 2, height)
+                const tooltipY = root.barThickness + root.barSpacing + Theme.spacingXS
+                tooltipLoader.item.show(tooltipText, globalPos.x, tooltipY, root.parentScreen, false, false)
             }
         }
         onExited: {

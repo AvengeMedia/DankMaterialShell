@@ -30,12 +30,28 @@ const (
 	NmDeviceStateReasonNewActivation        = 60
 )
 
+type wifiDeviceInfo struct {
+	device    gonetworkmanager.Device
+	wireless  gonetworkmanager.DeviceWireless
+	name      string
+	hwAddress string
+}
+
+type ethernetDeviceInfo struct {
+	device    gonetworkmanager.Device
+	wired     gonetworkmanager.DeviceWired
+	name      string
+	hwAddress string
+}
+
 type NetworkManagerBackend struct {
-	nmConn         interface{}
-	ethernetDevice interface{}
-	wifiDevice     interface{}
-	settings       interface{}
-	wifiDev        interface{}
+	nmConn          any
+	ethernetDevice  any
+	ethernetDevices map[string]*ethernetDeviceInfo
+	wifiDevice      any
+	settings        any
+	wifiDev         any
+	wifiDevices     map[string]*wifiDeviceInfo
 
 	dbusConn *dbus.Conn
 	signals  chan *dbus.Signal
@@ -52,7 +68,25 @@ type NetworkManagerBackend struct {
 	lastFailedTime int64
 	failedMutex    sync.RWMutex
 
+	pendingVPNSave   *pendingVPNCredentials
+	pendingVPNSaveMu sync.Mutex
+	cachedVPNCreds   *cachedVPNCredentials
+	cachedVPNCredsMu sync.Mutex
+
 	onStateChange func()
+}
+
+type pendingVPNCredentials struct {
+	ConnectionPath string
+	Username       string
+	Password       string
+	SavePassword   bool
+}
+
+type cachedVPNCredentials struct {
+	ConnectionUUID string
+	Password       string
+	SavePassword   bool
 }
 
 func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*NetworkManagerBackend, error) {
@@ -71,8 +105,10 @@ func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*Netwo
 	}
 
 	backend := &NetworkManagerBackend{
-		nmConn:   nm,
-		stopChan: make(chan struct{}),
+		nmConn:          nm,
+		stopChan:        make(chan struct{}),
+		ethernetDevices: make(map[string]*ethernetDeviceInfo),
+		wifiDevices:     make(map[string]*wifiDeviceInfo),
 		state: &BackendState{
 			Backend: "networkmanager",
 		},
@@ -104,36 +140,78 @@ func (b *NetworkManagerBackend) Initialize() error {
 			if managed, _ := dev.GetPropertyManaged(); !managed {
 				continue
 			}
-			b.ethernetDevice = dev
+			iface, err := dev.GetPropertyInterface()
+			if err != nil {
+				continue
+			}
+			w, err := gonetworkmanager.NewDeviceWired(dev.GetPath())
+			if err != nil {
+				continue
+			}
+			hwAddr, _ := w.GetPropertyHwAddress()
+
+			b.ethernetDevices[iface] = &ethernetDeviceInfo{
+				device:    dev,
+				wired:     w,
+				name:      iface,
+				hwAddress: hwAddr,
+			}
+
+			if b.ethernetDevice == nil {
+				b.ethernetDevice = dev
+			}
 			if err := b.updateEthernetState(); err != nil {
 				continue
 			}
-			_, err := b.listEthernetConnections()
+			_, err = b.listEthernetConnections()
 			if err != nil {
 				return fmt.Errorf("failed to get wired configurations: %w", err)
 			}
 
 		case gonetworkmanager.NmDeviceTypeWifi:
-			b.wifiDevice = dev
-			if w, err := gonetworkmanager.NewDeviceWireless(dev.GetPath()); err == nil {
-				b.wifiDev = w
-			}
-			wifiEnabled, err := nm.GetPropertyWirelessEnabled()
-			if err == nil {
-				b.stateMutex.Lock()
-				b.state.WiFiEnabled = wifiEnabled
-				b.stateMutex.Unlock()
-			}
-			if err := b.updateWiFiState(); err != nil {
+			iface, err := dev.GetPropertyInterface()
+			if err != nil {
 				continue
 			}
-			if wifiEnabled {
-				if _, err := b.updateWiFiNetworks(); err != nil {
-					log.Warnf("Failed to get initial networks: %v", err)
-				}
+			w, err := gonetworkmanager.NewDeviceWireless(dev.GetPath())
+			if err != nil {
+				continue
+			}
+			hwAddr, _ := w.GetPropertyHwAddress()
+
+			b.wifiDevices[iface] = &wifiDeviceInfo{
+				device:    dev,
+				wireless:  w,
+				name:      iface,
+				hwAddress: hwAddr,
+			}
+
+			if b.wifiDevice == nil {
+				b.wifiDevice = dev
+				b.wifiDev = w
 			}
 		}
 	}
+
+	wifiEnabled, err := nm.GetPropertyWirelessEnabled()
+	if err == nil {
+		b.stateMutex.Lock()
+		b.state.WiFiEnabled = wifiEnabled
+		b.stateMutex.Unlock()
+	}
+
+	if err := b.updateWiFiState(); err != nil {
+		log.Warnf("Failed to update WiFi state: %v", err)
+	}
+
+	if wifiEnabled {
+		if _, err := b.updateWiFiNetworks(); err != nil {
+			log.Warnf("Failed to get initial networks: %v", err)
+		}
+		b.updateAllWiFiDevices()
+	}
+
+	b.updateAllEthernetDevices()
 
 	if err := b.updatePrimaryConnection(); err != nil {
 		return err
@@ -165,7 +243,9 @@ func (b *NetworkManagerBackend) GetCurrentState() (*BackendState, error) {
 
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
+	state.WiFiDevices = append([]WiFiDevice(nil), b.state.WiFiDevices...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
+	state.EthernetDevices = append([]EthernetDevice(nil), b.state.EthernetDevices...)
 	state.VPNProfiles = append([]VPNProfile(nil), b.state.VPNProfiles...)
 	state.VPNActive = append([]VPNActive(nil), b.state.VPNActive...)
 

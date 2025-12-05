@@ -37,22 +37,55 @@ type WiFiNetwork struct {
 	Mode        string `json:"mode"`
 	Rate        uint32 `json:"rate"`
 	Channel     uint32 `json:"channel"`
+	Device      string `json:"device,omitempty"`
+}
+
+type WiFiDevice struct {
+	Name      string        `json:"name"`
+	HwAddress string        `json:"hwAddress"`
+	State     string        `json:"state"`
+	Connected bool          `json:"connected"`
+	SSID      string        `json:"ssid,omitempty"`
+	BSSID     string        `json:"bssid,omitempty"`
+	Signal    uint8         `json:"signal,omitempty"`
+	IP        string        `json:"ip,omitempty"`
+	Networks  []WiFiNetwork `json:"networks"`
+}
+
+type EthernetDevice struct {
+	Name      string `json:"name"`
+	HwAddress string `json:"hwAddress"`
+	State     string `json:"state"`
+	Connected bool   `json:"connected"`
+	IP        string `json:"ip,omitempty"`
+	Speed     uint32 `json:"speed,omitempty"`
+	Driver    string `json:"driver,omitempty"`
 }
 
 type VPNProfile struct {
-	Name        string `json:"name"`
-	UUID        string `json:"uuid"`
-	Type        string `json:"type"`
-	ServiceType string `json:"serviceType"`
+	Name        string            `json:"name"`
+	UUID        string            `json:"uuid"`
+	Type        string            `json:"type"`
+	ServiceType string            `json:"serviceType"`
+	RemoteHost  string            `json:"remoteHost,omitempty"`
+	Username    string            `json:"username,omitempty"`
+	Autoconnect bool              `json:"autoconnect"`
+	Data        map[string]string `json:"data,omitempty"`
 }
 
 type VPNActive struct {
-	Name   string `json:"name"`
-	UUID   string `json:"uuid"`
-	Device string `json:"device,omitempty"`
-	State  string `json:"state,omitempty"`
-	Type   string `json:"type"`
-	Plugin string `json:"serviceType"`
+	Name       string            `json:"name"`
+	UUID       string            `json:"uuid"`
+	Device     string            `json:"device,omitempty"`
+	State      string            `json:"state,omitempty"`
+	Type       string            `json:"type"`
+	Plugin     string            `json:"serviceType"`
+	IP         string            `json:"ip,omitempty"`
+	Gateway    string            `json:"gateway,omitempty"`
+	RemoteHost string            `json:"remoteHost,omitempty"`
+	Username   string            `json:"username,omitempty"`
+	MTU        uint32            `json:"mtu,omitempty"`
+	Data       map[string]string `json:"data,omitempty"`
 }
 
 type VPNState struct {
@@ -68,6 +101,7 @@ type NetworkState struct {
 	EthernetDevice         string               `json:"ethernetDevice"`
 	EthernetConnected      bool                 `json:"ethernetConnected"`
 	EthernetConnectionUuid string               `json:"ethernetConnectionUuid"`
+	EthernetDevices        []EthernetDevice     `json:"ethernetDevices"`
 	WiFiIP                 string               `json:"wifiIP"`
 	WiFiDevice             string               `json:"wifiDevice"`
 	WiFiConnected          bool                 `json:"wifiConnected"`
@@ -76,11 +110,13 @@ type NetworkState struct {
 	WiFiBSSID              string               `json:"wifiBSSID"`
 	WiFiSignal             uint8                `json:"wifiSignal"`
 	WiFiNetworks           []WiFiNetwork        `json:"wifiNetworks"`
+	WiFiDevices            []WiFiDevice         `json:"wifiDevices"`
 	WiredConnections       []WiredConnection    `json:"wiredConnections"`
 	VPNProfiles            []VPNProfile         `json:"vpnProfiles"`
 	VPNActive              []VPNActive          `json:"vpnActive"`
 	IsConnecting           bool                 `json:"isConnecting"`
 	ConnectingSSID         string               `json:"connectingSSID"`
+	ConnectingDevice       string               `json:"connectingDevice,omitempty"`
 	LastError              string               `json:"lastError"`
 }
 
@@ -91,6 +127,13 @@ type ConnectionRequest struct {
 	AnonymousIdentity string `json:"anonymousIdentity,omitempty"`
 	DomainSuffixMatch string `json:"domainSuffixMatch,omitempty"`
 	Interactive       bool   `json:"interactive,omitempty"`
+	Device            string `json:"device,omitempty"`
+	EAPMethod         string `json:"eapMethod,omitempty"`
+	Phase2Auth        string `json:"phase2Auth,omitempty"`
+	CACertPath        string `json:"caCertPath,omitempty"`
+	ClientCertPath    string `json:"clientCertPath,omitempty"`
+	PrivateKeyPath    string `json:"privateKeyPath,omitempty"`
+	UseSystemCACerts  *bool  `json:"useSystemCACerts,omitempty"`
 }
 
 type WiredConnection struct {
@@ -134,17 +177,18 @@ type NetworkEvent struct {
 }
 
 type PromptRequest struct {
-	Name           string   `json:"name"`
-	SSID           string   `json:"ssid"`
-	ConnType       string   `json:"connType"`
-	VpnService     string   `json:"vpnService"`
-	SettingName    string   `json:"setting"`
-	Fields         []string `json:"fields"`
-	Hints          []string `json:"hints"`
-	Reason         string   `json:"reason"`
-	ConnectionId   string   `json:"connectionId"`
-	ConnectionUuid string   `json:"connectionUuid"`
-	ConnectionPath string   `json:"connectionPath"`
+	Name           string      `json:"name"`
+	SSID           string      `json:"ssid"`
+	ConnType       string      `json:"connType"`
+	VpnService     string      `json:"vpnService"`
+	SettingName    string      `json:"setting"`
+	Fields         []string    `json:"fields"`
+	FieldsInfo     []FieldInfo `json:"fieldsInfo"`
+	Hints          []string    `json:"hints"`
+	Reason         string      `json:"reason"`
+	ConnectionId   string      `json:"connectionId"`
+	ConnectionUuid string      `json:"connectionUuid"`
+	ConnectionPath string      `json:"connectionPath"`
 }
 
 type PromptReply struct {
@@ -153,18 +197,25 @@ type PromptReply struct {
 	Cancel  bool              `json:"cancel"`
 }
 
+type FieldInfo struct {
+	Name     string `json:"name"`
+	Label    string `json:"label"`
+	IsSecret bool   `json:"isSecret"`
+}
+
 type CredentialPrompt struct {
-	Token          string   `json:"token"`
-	Name           string   `json:"name"`
-	SSID           string   `json:"ssid"`
-	ConnType       string   `json:"connType"`
-	VpnService     string   `json:"vpnService"`
-	Setting        string   `json:"setting"`
-	Fields         []string `json:"fields"`
-	Hints          []string `json:"hints"`
-	Reason         string   `json:"reason"`
-	ConnectionId   string   `json:"connectionId"`
-	ConnectionUuid string   `json:"connectionUuid"`
+	Token          string      `json:"token"`
+	Name           string      `json:"name"`
+	SSID           string      `json:"ssid"`
+	ConnType       string      `json:"connType"`
+	VpnService     string      `json:"vpnService"`
+	Setting        string      `json:"setting"`
+	Fields         []string    `json:"fields"`
+	FieldsInfo     []FieldInfo `json:"fieldsInfo"`
+	Hints          []string    `json:"hints"`
+	Reason         string      `json:"reason"`
+	ConnectionId   string      `json:"connectionId"`
+	ConnectionUuid string      `json:"connectionUuid"`
 }
 
 type NetworkInfoResponse struct {
@@ -186,4 +237,29 @@ type WiredIPConfig struct {
 	IPs     []string `json:"ips"`
 	Gateway string   `json:"gateway"`
 	DNS     string   `json:"dns"`
+}
+
+type VPNPlugin struct {
+	Name           string   `json:"name"`
+	ServiceType    string   `json:"serviceType"`
+	Program        string   `json:"program,omitempty"`
+	Supports       []string `json:"supports,omitempty"`
+	FileExtensions []string `json:"fileExtensions"`
+}
+
+type VPNConfig struct {
+	UUID        string            `json:"uuid"`
+	Name        string            `json:"name"`
+	Type        string            `json:"type"`
+	ServiceType string            `json:"serviceType,omitempty"`
+	Autoconnect bool              `json:"autoconnect"`
+	Data        map[string]string `json:"data,omitempty"`
+}
+
+type VPNImportResult struct {
+	Success     bool   `json:"success"`
+	UUID        string `json:"uuid,omitempty"`
+	Name        string `json:"name,omitempty"`
+	ServiceType string `json:"serviceType,omitempty"`
+	Error       string `json:"error,omitempty"`
 }

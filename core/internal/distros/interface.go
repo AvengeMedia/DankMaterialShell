@@ -39,6 +39,7 @@ const (
 	RepoTypeAUR    RepositoryType = "aur"    // Arch User Repository
 	RepoTypeCOPR   RepositoryType = "copr"   // Fedora COPR
 	RepoTypePPA    RepositoryType = "ppa"    // Ubuntu PPA
+	RepoTypeOBS    RepositoryType = "obs"    // OpenBuild Service (Debian/OpenSUSE)
 	RepoTypeFlake  RepositoryType = "flake"  // Nix flake
 	RepoTypeGURU   RepositoryType = "guru"   // Gentoo GURU
 	RepoTypeManual RepositoryType = "manual" // Manual build from source

@@ -132,38 +132,40 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-core
     steps:
+      - name: Create GitHub App token
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app_token.outputs.token }}
           fetch-depth: 0
 
       - name: Update VERSION
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "dms-ci[bot]"
+          git config user.email "dms-ci[bot]@users.noreply.github.com"
 
           version="${GITHUB_REF#refs/tags/}"
-          version_no_v="${version#v}"
           echo "Updating to version: $version"
-
-          # Update VERSION file in quickshell/
           echo "${version}" > quickshell/VERSION
-
           git add quickshell/VERSION
 
           if ! git diff --cached --quiet; then
             git commit -m "chore: bump version to $version"
-            git push origin HEAD:master || git push origin HEAD:main
-            echo "Pushed version updates to master"
-          else
-            echo "No version changes needed"
+            git pull --rebase origin master
+            git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:master
           fi
 
-          # Force-push the tag to point to the commit with updated VERSION
           git tag -f "${version}"
-          git push -f origin "${version}"
+          git push -f https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git "${version}"
 
   release:
     runs-on: ubuntu-24.04
@@ -386,6 +388,68 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  trigger-obs-update:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install OSC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y osc
+          
+          mkdir -p ~/.config/osc
+          cat > ~/.config/osc/oscrc << EOF
+          [general]
+          apiurl = https://api.opensuse.org
+          
+          [https://api.opensuse.org]
+          user = ${{ secrets.OBS_USERNAME }}
+          pass = ${{ secrets.OBS_PASSWORD }}
+          EOF
+          chmod 600 ~/.config/osc/oscrc
+      
+      - name: Update OBS packages
+        run: |
+          VERSION="${{ github.ref_name }}"
+          cd distro
+          bash scripts/obs-upload.sh dms "Update to $VERSION"
+
+  trigger-ppa-update:
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            debhelper \
+            devscripts \
+            dput \
+            lftp \
+            build-essential \
+            fakeroot \
+            dpkg-dev
+      
+      - name: Configure GPG
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_KEY" | gpg --import
+          GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
+          echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> $GITHUB_ENV
+      
+      - name: Upload to PPA
+        run: |
+          VERSION="${{ github.ref_name }}"
+          cd distro/ubuntu/ppa
+          bash create-and-upload.sh ../dms dms questing
+
   copr-build:
     runs-on: ubuntu-latest
     needs: release
@@ -453,7 +517,6 @@ jobs:
           Recommends:     cava
           Recommends:     cliphist
           Recommends:     danksearch
-          Recommends:     hyprpicker
           Recommends:     matugen
           Recommends:     wl-clipboard
           Recommends:     NetworkManager
@@ -533,7 +596,10 @@ jobs:
           %{_builddir}/dms-cli completion zsh > %{buildroot}%{_datadir}/zsh/site-functions/_dms || :
           %{_builddir}/dms-cli completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/dms.fish || :
 
-          install -Dm644 %{_builddir}/dms-qml/assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
+          install -Dm644 assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
+
+          install -Dm644 assets/dms-open.desktop %{buildroot}%{_datadir}/applications/dms-open.desktop
+          install -Dm644 assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
 
           install -dm755 %{buildroot}%{_datadir}/quickshell/dms
           cp -r %{_builddir}/dms-qml/* %{buildroot}%{_datadir}/quickshell/dms/
@@ -542,6 +608,8 @@ jobs:
           rm -f %{buildroot}%{_datadir}/quickshell/dms/.gitignore
           rm -rf %{buildroot}%{_datadir}/quickshell/dms/.github
           rm -rf %{buildroot}%{_datadir}/quickshell/dms/distro
+
+          echo "%{version}" > %{buildroot}%{_datadir}/quickshell/dms/VERSION
 
           %posttrans
           if [ -d "%{_sysconfdir}/xdg/quickshell/dms" ]; then
@@ -559,6 +627,8 @@ jobs:
           %doc README.md CONTRIBUTING.md
           %{_datadir}/quickshell/dms/
           %{_userunitdir}/dms.service
+          %{_datadir}/applications/dms-open.desktop
+          %{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
 
           %files -n dms-cli
           %{_bindir}/dms

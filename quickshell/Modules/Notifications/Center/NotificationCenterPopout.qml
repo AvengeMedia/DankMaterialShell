@@ -1,9 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
-import Quickshell
-import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -22,83 +17,83 @@ DankPopout {
         listView: null
         isOpen: notificationHistoryVisible
         onClose: () => {
-                     notificationHistoryVisible = false
-                 }
-    }
-
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x
-        triggerY = y
-        triggerWidth = width
-        triggerSection = section
-        triggerScreen = screen
+            notificationHistoryVisible = false;
+        }
     }
 
     popupWidth: 400
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 400
-    triggerX: 0
-    triggerY: 0
-    triggerWidth: 40
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: notificationHistoryVisible
 
     function toggle() {
-        notificationHistoryVisible = !notificationHistoryVisible
+        notificationHistoryVisible = !notificationHistoryVisible;
     }
 
     onBackgroundClicked: {
-        notificationHistoryVisible = false
+        notificationHistoryVisible = false;
     }
 
     onNotificationHistoryVisibleChanged: {
         if (notificationHistoryVisible) {
-            open()
+            open();
         } else {
-            close()
+            close();
+        }
+    }
+
+    function setupKeyboardNavigation() {
+        if (!contentLoader.item)
+            return;
+        contentLoader.item.externalKeyboardController = keyboardController;
+
+        const notificationList = findChild(contentLoader.item, "notificationList");
+        const notificationHeader = findChild(contentLoader.item, "notificationHeader");
+
+        if (notificationList) {
+            keyboardController.listView = notificationList;
+            notificationList.keyboardController = keyboardController;
+        }
+        if (notificationHeader) {
+            notificationHeader.keyboardController = keyboardController;
+        }
+
+        keyboardController.reset();
+        keyboardController.rebuildFlatNavigation();
+    }
+
+    Connections {
+        target: contentLoader
+        function onLoaded() {
+            if (root.shouldBeVisible)
+                Qt.callLater(root.setupKeyboardNavigation);
         }
     }
 
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
-            NotificationService.onOverlayOpen()
-            Qt.callLater(() => {
-                             if (contentLoader.item) {
-                                 contentLoader.item.externalKeyboardController = keyboardController
-
-                                 const notificationList = findChild(contentLoader.item, "notificationList")
-                                 const notificationHeader = findChild(contentLoader.item, "notificationHeader")
-
-                                 if (notificationList) {
-                                     keyboardController.listView = notificationList
-                                     notificationList.keyboardController = keyboardController
-                                 }
-                                 if (notificationHeader) {
-                                     notificationHeader.keyboardController = keyboardController
-                                 }
-
-                                 keyboardController.reset()
-                                 keyboardController.rebuildFlatNavigation()
-                             }
-                         })
+            NotificationService.onOverlayOpen();
+            if (contentLoader.item)
+                Qt.callLater(setupKeyboardNavigation);
         } else {
-            NotificationService.onOverlayClose()
-            keyboardController.keyboardNavigationActive = false
+            NotificationService.onOverlayClose();
+            keyboardController.keyboardNavigationActive = false;
         }
     }
 
     function findChild(parent, objectName) {
         if (parent.objectName === objectName) {
-            return parent
+            return parent;
         }
         for (let i = 0; i < parent.children.length; i++) {
-            const child = parent.children[i]
-            const result = findChild(child, objectName)
+            const child = parent.children[i];
+            const result = findChild(child, objectName);
             if (result) {
-                return result
+                return result;
             }
         }
-        return null
+        return null;
     }
 
     content: Component {
@@ -109,24 +104,24 @@ DankPopout {
             property real cachedHeaderHeight: 32
 
             implicitHeight: {
-                let baseHeight = Theme.spacingL * 2
-                baseHeight += cachedHeaderHeight
-                baseHeight += Theme.spacingM * 2
+                let baseHeight = Theme.spacingL * 2;
+                baseHeight += cachedHeaderHeight;
+                baseHeight += Theme.spacingM * 2;
 
-                const settingsHeight = notificationSettings.expanded ? notificationSettings.contentHeight : 0
-                let listHeight = notificationList.listContentHeight
+                const settingsHeight = notificationSettings.expanded ? notificationSettings.contentHeight : 0;
+                let listHeight = notificationList.listContentHeight;
                 if (NotificationService.groupedNotifications.length === 0) {
-                    listHeight = 200
+                    listHeight = 200;
                 }
 
-                const maxContentArea = 600
-                const availableListSpace = Math.max(200, maxContentArea - settingsHeight)
+                const maxContentArea = 600;
+                const availableListSpace = Math.max(200, maxContentArea - settingsHeight);
 
-                baseHeight += settingsHeight
-                baseHeight += Math.min(listHeight, availableListSpace)
+                baseHeight += settingsHeight;
+                baseHeight += Math.min(listHeight, availableListSpace);
 
-                const maxHeight = root.screen ? root.screen.height * 0.8 : Screen.height * 0.8
-                return Math.max(300, Math.min(baseHeight, maxHeight))
+                const maxHeight = root.screen ? root.screen.height * 0.8 : Screen.height * 0.8;
+                return Math.max(300, Math.min(baseHeight, maxHeight));
             }
 
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -137,27 +132,27 @@ DankPopout {
 
             Component.onCompleted: {
                 if (root.shouldBeVisible) {
-                    forceActiveFocus()
+                    forceActiveFocus();
                 }
             }
 
             Keys.onPressed: event => {
-                                if (event.key === Qt.Key_Escape) {
-                                    root.close()
-                                    event.accepted = true
-                                } else if (externalKeyboardController) {
-                                    externalKeyboardController.handleKey(event)
-                                }
-                            }
+                if (event.key === Qt.Key_Escape) {
+                    root.close();
+                    event.accepted = true;
+                } else if (externalKeyboardController) {
+                    externalKeyboardController.handleKey(event);
+                }
+            }
 
             Connections {
                 function onShouldBeVisibleChanged() {
                     if (root.shouldBeVisible) {
                         Qt.callLater(() => {
-                                         notificationContent.forceActiveFocus()
-                                     })
+                            notificationContent.forceActiveFocus();
+                        });
                     } else {
-                        notificationContent.focus = false
+                        notificationContent.focus = false;
                     }
                 }
                 target: root

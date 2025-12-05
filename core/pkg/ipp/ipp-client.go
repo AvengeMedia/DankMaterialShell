@@ -62,7 +62,7 @@ func (c *IPPClient) SendRequest(url string, req *Request, additionalResponseData
 }
 
 // PrintDocuments prints one or more documents using a Create-Job operation followed by one or more Send-Document operation(s). custom job settings can be specified via the jobAttributes parameter
-func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttributes map[string]interface{}) (int, error) {
+func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttributes map[string]any) (int, error) {
 	printerURI := c.getPrinterUri(printer)
 
 	req := NewRequest(OperationCreateJob, 1)
@@ -112,7 +112,7 @@ func (c *IPPClient) PrintDocuments(docs []Document, printer string, jobAttribute
 }
 
 // PrintJob prints a document using a Print-Job operation. custom job settings can be specified via the jobAttributes parameter
-func (c *IPPClient) PrintJob(doc Document, printer string, jobAttributes map[string]interface{}) (int, error) {
+func (c *IPPClient) PrintJob(doc Document, printer string, jobAttributes map[string]any) (int, error) {
 	printerURI := c.getPrinterUri(printer)
 
 	req := NewRequest(OperationPrintJob, 1)
@@ -147,7 +147,7 @@ func (c *IPPClient) PrintJob(doc Document, printer string, jobAttributes map[str
 }
 
 // PrintFile prints a local file on the file system. custom job settings can be specified via the jobAttributes parameter
-func (c *IPPClient) PrintFile(filePath, printer string, jobAttributes map[string]interface{}) (int, error) {
+func (c *IPPClient) PrintFile(filePath, printer string, jobAttributes map[string]any) (int, error) {
 	fileStats, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
 		return -1, err

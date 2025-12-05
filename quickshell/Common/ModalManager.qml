@@ -1,4 +1,5 @@
 pragma Singleton
+pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtQuick
@@ -10,11 +11,11 @@ Singleton {
 
     function openModal(modal) {
         if (!modal.allowStacking) {
-            closeAllModalsExcept(modal)
+            closeAllModalsExcept(modal);
         }
         if (!modal.keepPopoutsOpen) {
-            PopoutManager.closeAllPopouts()
+            PopoutManager.closeAllPopouts();
         }
-        TrayMenuManager.closeAllMenus()
+        TrayMenuManager.closeAllMenus();
     }
 }

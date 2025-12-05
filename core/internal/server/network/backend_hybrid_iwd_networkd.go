@@ -2,14 +2,12 @@ package network
 
 import (
 	"fmt"
-	"sync"
 )
 
 type HybridIwdNetworkdBackend struct {
 	wifi          *IWDBackend
 	l3            *SystemdNetworkdBackend
 	onStateChange func()
-	stateMutex    sync.RWMutex
 }
 
 func NewHybridIwdNetworkdBackend(w *IWDBackend, n *SystemdNetworkdBackend) (*HybridIwdNetworkdBackend, error) {
@@ -84,6 +82,7 @@ func (b *HybridIwdNetworkdBackend) GetCurrentState() (*BackendState, error) {
 	merged.EthernetDevice = ls.EthernetDevice
 	merged.EthernetConnectionUuid = ls.EthernetConnectionUuid
 	merged.WiredConnections = ls.WiredConnections
+	merged.EthernetDevices = ls.EthernetDevices
 
 	if ls.EthernetConnected && ls.EthernetIP != "" {
 		merged.NetworkStatus = StatusEthernet
@@ -119,7 +118,7 @@ func (b *HybridIwdNetworkdBackend) ConnectWiFi(req ConnectionRequest) error {
 
 	ws, err := b.wifi.GetCurrentState()
 	if err == nil && ws.WiFiDevice != "" {
-		b.l3.EnsureDhcpUp(ws.WiFiDevice)
+		b.l3.EnsureDhcpUp(ws.WiFiDevice) //nolint:errcheck
 	}
 
 	return nil
@@ -147,6 +146,14 @@ func (b *HybridIwdNetworkdBackend) ConnectEthernet() error {
 
 func (b *HybridIwdNetworkdBackend) DisconnectEthernet() error {
 	return b.l3.DisconnectEthernet()
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectEthernetDevice(device string) error {
+	return b.l3.DisconnectEthernetDevice(device)
+}
+
+func (b *HybridIwdNetworkdBackend) GetEthernetDevices() []EthernetDevice {
+	return b.l3.GetEthernetDevices()
 }
 
 func (b *HybridIwdNetworkdBackend) ActivateWiredConnection(uuid string) error {
@@ -177,6 +184,26 @@ func (b *HybridIwdNetworkdBackend) ClearVPNCredentials(uuidOrName string) error 
 	return fmt.Errorf("VPN not supported in hybrid mode")
 }
 
+func (b *HybridIwdNetworkdBackend) ListVPNPlugins() ([]VPNPlugin, error) {
+	return []VPNPlugin{}, nil
+}
+
+func (b *HybridIwdNetworkdBackend) ImportVPN(filePath string, name string) (*VPNImportResult, error) {
+	return nil, fmt.Errorf("VPN not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) GetVPNConfig(uuidOrName string) (*VPNConfig, error) {
+	return nil, fmt.Errorf("VPN not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) UpdateVPNConfig(uuid string, updates map[string]any) error {
+	return fmt.Errorf("VPN not supported in hybrid mode")
+}
+
+func (b *HybridIwdNetworkdBackend) DeleteVPN(uuidOrName string) error {
+	return fmt.Errorf("VPN not supported in hybrid mode")
+}
+
 func (b *HybridIwdNetworkdBackend) GetPromptBroker() PromptBroker {
 	return b.wifi.GetPromptBroker()
 }
@@ -195,4 +222,20 @@ func (b *HybridIwdNetworkdBackend) CancelCredentials(token string) error {
 
 func (b *HybridIwdNetworkdBackend) SetWiFiAutoconnect(ssid string, autoconnect bool) error {
 	return b.wifi.SetWiFiAutoconnect(ssid, autoconnect)
+}
+
+func (b *HybridIwdNetworkdBackend) ScanWiFiDevice(device string) error {
+	return b.wifi.ScanWiFiDevice(device)
+}
+
+func (b *HybridIwdNetworkdBackend) DisconnectWiFiDevice(device string) error {
+	return b.wifi.DisconnectWiFiDevice(device)
+}
+
+func (b *HybridIwdNetworkdBackend) GetWiFiDevices() []WiFiDevice {
+	return b.wifi.GetWiFiDevices()
+}
+
+func (b *HybridIwdNetworkdBackend) SetVPNCredentials(uuid, username, password string, save bool) error {
+	return fmt.Errorf("VPN not supported in hybrid mode")
 }

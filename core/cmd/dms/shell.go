@@ -16,6 +16,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 )
 
+type ipcTargets map[string][]string
+
 var isSessionManaged bool
 
 func execDetachedRestart(targetPID int) {
@@ -57,13 +59,18 @@ func getRuntimeDir() string {
 	return os.TempDir()
 }
 
+func hasSystemdRun() bool {
+	_, err := exec.LookPath("systemd-run")
+	return err == nil
+}
+
 func getPIDFilePath() string {
 	return filepath.Join(getRuntimeDir(), fmt.Sprintf("danklinux-%d.pid", os.Getpid()))
 }
 
 func writePIDFile(childPID int) error {
 	pidFile := getPIDFilePath()
-	return os.WriteFile(pidFile, []byte(strconv.Itoa(childPID)), 0644)
+	return os.WriteFile(pidFile, []byte(strconv.Itoa(childPID)), 0o644)
 }
 
 func removePIDFile() {
@@ -139,7 +146,7 @@ func runShellInteractive(session bool) {
 	socketPath := server.GetSocketPath()
 
 	configStateFile := filepath.Join(getRuntimeDir(), "danklinux.path")
-	if err := os.WriteFile(configStateFile, []byte(configPath), 0644); err != nil {
+	if err := os.WriteFile(configStateFile, []byte(configPath), 0o644); err != nil {
 		log.Warnf("Failed to write config state file: %v", err)
 	}
 	defer os.Remove(configStateFile)
@@ -163,6 +170,10 @@ func runShellInteractive(session bool) {
 	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
 	if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 		cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
+	}
+
+	if isSessionManaged && hasSystemdRun() {
+		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -361,7 +372,7 @@ func runShellDaemon(session bool) {
 	socketPath := server.GetSocketPath()
 
 	configStateFile := filepath.Join(getRuntimeDir(), "danklinux.path")
-	if err := os.WriteFile(configStateFile, []byte(configPath), 0644); err != nil {
+	if err := os.WriteFile(configStateFile, []byte(configPath), 0o644); err != nil {
 		log.Warnf("Failed to write config state file: %v", err)
 	}
 	defer os.Remove(configStateFile)
@@ -374,6 +385,7 @@ func runShellDaemon(session bool) {
 				errChan <- fmt.Errorf("server panic: %v", r)
 			}
 		}()
+		server.CLIVersion = Version
 		if err := server.Start(false); err != nil {
 			errChan <- fmt.Errorf("server error: %w", err)
 		}
@@ -385,6 +397,10 @@ func runShellDaemon(session bool) {
 	cmd.Env = append(os.Environ(), "DMS_SOCKET="+socketPath)
 	if qtRules := log.GetQtLoggingRules(); qtRules != "" {
 		cmd.Env = append(cmd.Env, "QT_LOGGING_RULES="+qtRules)
+	}
+
+	if isSessionManaged && hasSystemdRun() {
+		cmd.Env = append(cmd.Env, "DMS_DEFAULT_LAUNCH_PREFIX=systemd-run --user --scope")
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -457,6 +473,51 @@ func runShellDaemon(session bool) {
 			os.Exit(1)
 		}
 	}
+}
+
+func parseTargetsFromIPCShowOutput(output string) ipcTargets {
+	targets := map[string][]string{}
+	var currentTarget string
+	for _, line := range strings.Split(output, "\n") {
+		if strings.HasPrefix(line, "target ") {
+			currentTarget = strings.TrimSpace(strings.TrimPrefix(line, "target "))
+		}
+		if strings.HasPrefix(line, "  function") && currentTarget != "" {
+			currentFunc := strings.TrimPrefix(line, "  function ")
+			currentFunc = strings.SplitN(currentFunc, "(", 2)[0]
+			targets[currentTarget] = append(targets[currentTarget], currentFunc)
+		}
+	}
+	return targets
+}
+
+func getShellIPCCompletions(args []string, toComplete string) []string {
+	cmdArgs := []string{"-p", configPath, "ipc", "show"}
+	cmd := exec.Command("qs", cmdArgs...)
+	var targets ipcTargets
+
+	if output, err := cmd.Output(); err == nil {
+		log.Debugf("IPC show output: %s", string(output))
+		targets = parseTargetsFromIPCShowOutput(string(output))
+	} else {
+		log.Debugf("Error getting IPC show output for completions: %v", err)
+		return nil
+	}
+
+	if len(args) > 0 && args[0] == "call" {
+		args = args[1:]
+	}
+
+	if len(args) == 0 {
+		targetNames := make([]string, 0)
+		targetNames = append(targetNames, "call")
+		for k := range targets {
+			targetNames = append(targetNames, k)
+		}
+		return targetNames
+	}
+
+	return targets[args[0]]
 }
 
 func runShellIPCCommand(args []string) {

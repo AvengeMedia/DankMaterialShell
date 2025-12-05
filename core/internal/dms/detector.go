@@ -122,15 +122,8 @@ func (d *Detector) GetInstalledComponents() []DependencyInfo {
 		return []DependencyInfo{}
 	}
 
-	isNixOS := d.isNixOS()
-
 	var components []DependencyInfo
 	for _, dep := range dependencies {
-		// On NixOS, filter out the window managers themselves but keep their components
-		if isNixOS && (dep.Name == "hyprland" || dep.Name == "niri") {
-			continue
-		}
-
 		components = append(components, DependencyInfo{
 			Name:        dep.Name,
 			Status:      dep.Status,
@@ -140,23 +133,6 @@ func (d *Detector) GetInstalledComponents() []DependencyInfo {
 	}
 
 	return components
-}
-
-func (d *Detector) isNixOS() bool {
-	_, err := os.Stat("/etc/nixos")
-	if err == nil {
-		return true
-	}
-
-	// Alternative check
-	if _, err := os.Stat("/nix/store"); err == nil {
-		// Also check for nixos-version command
-		if d.commandExists("nixos-version") {
-			return true
-		}
-	}
-
-	return false
 }
 
 type DependencyInfo struct {

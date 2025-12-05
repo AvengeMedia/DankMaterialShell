@@ -208,14 +208,11 @@ SWAY_EOF
         ;;
 
     mangowc)
-        TEMP_DIR=$(mktemp -d)
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
-            cp "$COMPOSITOR_CONFIG" "$TEMP_DIR/config.conf"
+            exec mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
         else
-            touch "$TEMP_DIR/config.conf"
+            exec mango -s "$QS_CMD && mmsg -d quit"
         fi
-        export MANGOCONFIG="$TEMP_DIR"
-        exec mango -s "$QS_CMD && mmsg -d quit"
         ;;
 
     *)

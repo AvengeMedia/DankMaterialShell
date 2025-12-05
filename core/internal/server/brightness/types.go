@@ -34,15 +34,16 @@ type DeviceUpdate struct {
 }
 
 type Request struct {
-	ID     interface{}            `json:"id"`
-	Method string                 `json:"method"`
-	Params map[string]interface{} `json:"params"`
+	ID     any            `json:"id"`
+	Method string         `json:"method"`
+	Params map[string]any `json:"params"`
 }
 
 type Manager struct {
 	logindBackend *LogindBackend
 	sysfsBackend  *SysfsBackend
 	ddcBackend    *DDCBackend
+	udevMonitor   *UdevMonitor
 
 	logindReady bool
 	sysfsReady  bool
@@ -180,6 +181,10 @@ func (m *Manager) Close() {
 		m.updateSubscribers.Delete(key)
 		return true
 	})
+
+	if m.udevMonitor != nil {
+		m.udevMonitor.Close()
+	}
 
 	if m.logindBackend != nil {
 		m.logindBackend.Close()

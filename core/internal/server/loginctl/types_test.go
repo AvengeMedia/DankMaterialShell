@@ -17,25 +17,12 @@ func TestEventType_Constants(t *testing.T) {
 
 func TestSessionState_Struct(t *testing.T) {
 	state := SessionState{
-		SessionID:         "1",
-		SessionPath:       "/org/freedesktop/login1/session/_31",
-		Locked:            false,
-		Active:            true,
-		IdleHint:          false,
-		IdleSinceHint:     0,
-		LockedHint:        false,
-		SessionType:       "wayland",
-		SessionClass:      "user",
-		User:              1000,
-		UserName:          "testuser",
-		RemoteHost:        "",
-		Service:           "gdm-password",
-		TTY:               "tty2",
-		Display:           ":1",
-		Remote:            false,
-		Seat:              "seat0",
-		VTNr:              2,
-		PreparingForSleep: false,
+		SessionID:   "1",
+		Locked:      false,
+		Active:      true,
+		SessionType: "wayland",
+		User:        1000,
+		UserName:    "testuser",
 	}
 
 	assert.Equal(t, "1", state.SessionID)

@@ -84,19 +84,21 @@ func (m *MangoWCProvider) categorizeByCommand(command string) string {
 
 func (m *MangoWCProvider) convertKeybind(kb *MangoWCKeyBinding) keybinds.Keybind {
 	key := m.formatKey(kb)
+	rawAction := m.formatRawAction(kb.Command, kb.Params)
 	desc := kb.Comment
 
 	if desc == "" {
-		desc = m.generateDescription(kb.Command, kb.Params)
+		desc = rawAction
 	}
 
 	return keybinds.Keybind{
 		Key:         key,
 		Description: desc,
+		Action:      rawAction,
 	}
 }
 
-func (m *MangoWCProvider) generateDescription(command, params string) string {
+func (m *MangoWCProvider) formatRawAction(command, params string) string {
 	if params != "" {
 		return command + " " + params
 	}

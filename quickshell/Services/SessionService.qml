@@ -1,5 +1,4 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtQuick
@@ -19,13 +18,13 @@ Singleton {
     property bool inhibitorAvailable: true
     property bool idleInhibited: false
     property string inhibitReason: "Keep system awake"
-    property bool hasPrimeRun: false
+    property string nvidiaCommand: ""
 
     readonly property bool nativeInhibitorAvailable: {
         try {
-            return typeof IdleInhibitor !== "undefined"
+            return typeof IdleInhibitor !== "undefined";
         } catch (e) {
-            return false
+            return false;
         }
     }
 
@@ -42,10 +41,10 @@ Singleton {
     property string seat: ""
     property string display: ""
 
-    signal sessionLocked()
-    signal sessionUnlocked()
-    signal prepareForSleep()
-    signal loginctlStateChanged()
+    signal sessionLocked
+    signal sessionUnlocked
+    signal sessionResumed
+    signal loginctlStateChanged
 
     property bool stateInitialized: false
 
@@ -57,22 +56,21 @@ Singleton {
         running: true
         repeat: false
         onTriggered: {
-            detectElogindProcess.running = true
-            detectHibernateProcess.running = true
-            detectPrimeRunProcess.running = true
-            console.info("SessionService: Native inhibitor available:", nativeInhibitorAvailable)
+            detectElogindProcess.running = true;
+            detectHibernateProcess.running = true;
+            detectPrimeRunProcess.running = true;
+            console.info("SessionService: Native inhibitor available:", nativeInhibitorAvailable);
             if (!SettingsData.loginctlLockIntegration) {
-                console.log("SessionService: loginctl lock integration disabled by user")
-                return
+                console.log("SessionService: loginctl lock integration disabled by user");
+                return;
             }
             if (socketPath && socketPath.length > 0) {
-                checkDMSCapabilities()
+                checkDMSCapabilities();
             } else {
-                console.log("SessionService: DMS_SOCKET not set")
+                console.log("SessionService: DMS_SOCKET not set");
             }
         }
     }
-
 
     Process {
         id: detectUwsmProcess
@@ -80,7 +78,7 @@ Singleton {
         command: ["which", "uwsm"]
 
         onExited: function (exitCode) {
-            hasUwsm = (exitCode === 0)
+            hasUwsm = (exitCode === 0);
         }
     }
 
@@ -90,8 +88,8 @@ Singleton {
         command: ["sh", "-c", "ps -eo comm= | grep -E '^(elogind|elogind-daemon)$'"]
 
         onExited: function (exitCode) {
-            console.log("SessionService: Elogind detection exited with code", exitCode)
-            isElogind = (exitCode === 0)
+            console.log("SessionService: Elogind detection exited with code", exitCode);
+            isElogind = (exitCode === 0);
         }
     }
 
@@ -101,7 +99,7 @@ Singleton {
         command: ["grep", "-q", "disk", "/sys/power/state"]
 
         onExited: function (exitCode) {
-            hibernateSupported = (exitCode === 0)
+            hibernateSupported = (exitCode === 0);
         }
     }
 
@@ -111,7 +109,23 @@ Singleton {
         command: ["which", "prime-run"]
 
         onExited: function (exitCode) {
-            hasPrimeRun = (exitCode === 0)
+            if (exitCode === 0) {
+                nvidiaCommand = "prime-run"
+            } else {
+                detectNvidiaOffloadProcess.running = true
+            }
+        }
+    }
+
+    Process {
+        id: detectNvidiaOffloadProcess
+        running: false
+        command: ["which", "nvidia-offload"]
+
+        onExited: function (exitCode) {
+            if (exitCode === 0) {
+                nvidiaCommand = "nvidia-offload"
+            }
         }
     }
 
@@ -124,160 +138,167 @@ Singleton {
             splitMarker: "\n"
             onRead: data => {
                 if (data.trim().toLowerCase().includes("not running")) {
-                    _logout()
+                    _logout();
                 }
             }
         }
 
         onExited: function (exitCode) {
             if (exitCode === 0) {
-                return
+                return;
             }
-            _logout()
+            _logout();
         }
     }
 
     function escapeShellArg(arg) {
-        return "'" + arg.replace(/'/g, "'\\''") + "'"
+        return "'" + arg.replace(/'/g, "'\\''") + "'";
     }
 
     function needsShellExecution(prefix) {
-        if (!prefix || prefix.length === 0) return false
-        return /[;&|<>()$`\\"']/.test(prefix)
+        if (!prefix || prefix.length === 0)
+            return false;
+        return /[;&|<>()$`\\"']/.test(prefix);
     }
 
-    function launchDesktopEntry(desktopEntry, usePrimeRun) {
-        let cmd = desktopEntry.command
-        if (usePrimeRun && hasPrimeRun) {
-            cmd = ["prime-run"].concat(cmd)
+    function launchDesktopEntry(desktopEntry, useNvidia) {
+        let cmd = desktopEntry.command;
+        if (useNvidia && nvidiaCommand) {
+            cmd = [nvidiaCommand].concat(cmd);
         }
 
-        const prefix = SettingsData.launchPrefix?.trim() || ""
+        const userPrefix = SettingsData.launchPrefix?.trim() || "";
+        const defaultPrefix = Quickshell.env("DMS_DEFAULT_LAUNCH_PREFIX") || "";
+        const prefix = userPrefix.length > 0 ? userPrefix : defaultPrefix;
 
         if (prefix.length > 0 && needsShellExecution(prefix)) {
-            const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ")
-            const shellCmd = `${prefix} ${escapedCmd}`
+            const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ");
+            const shellCmd = `${prefix} ${escapedCmd}`;
 
             Quickshell.execDetached({
                 command: ["sh", "-c", shellCmd],
-                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME"),
-            })
+                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME")
+            });
         } else {
             if (prefix.length > 0) {
-                const launchPrefix = prefix.split(" ")
-                cmd = launchPrefix.concat(cmd)
+                const launchPrefix = prefix.split(" ");
+                cmd = launchPrefix.concat(cmd);
             }
 
             Quickshell.execDetached({
                 command: cmd,
-                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME"),
-            })
+                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME")
+            });
         }
     }
 
-    function launchDesktopAction(desktopEntry, action, usePrimeRun) {
-        let cmd = action.command
-        if (usePrimeRun && hasPrimeRun) {
-            cmd = ["prime-run"].concat(cmd)
+    function launchDesktopAction(desktopEntry, action, useNvidia) {
+        let cmd = action.command;
+        if (useNvidia && nvidiaCommand) {
+            cmd = [nvidiaCommand].concat(cmd);
         }
 
-        const prefix = SettingsData.launchPrefix?.trim() || ""
+        const userPrefix = SettingsData.launchPrefix?.trim() || "";
+        const defaultPrefix = Quickshell.env("DMS_DEFAULT_LAUNCH_PREFIX") || "";
+        const prefix = userPrefix.length > 0 ? userPrefix : defaultPrefix;
 
         if (prefix.length > 0 && needsShellExecution(prefix)) {
-            const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ")
-            const shellCmd = `${prefix} ${escapedCmd}`
+            const escapedCmd = cmd.map(arg => escapeShellArg(arg)).join(" ");
+            const shellCmd = `${prefix} ${escapedCmd}`;
 
             Quickshell.execDetached({
                 command: ["sh", "-c", shellCmd],
-                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME"),
-            })
+                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME")
+            });
         } else {
             if (prefix.length > 0) {
-                const launchPrefix = prefix.split(" ")
-                cmd = launchPrefix.concat(cmd)
+                const launchPrefix = prefix.split(" ");
+                cmd = launchPrefix.concat(cmd);
             }
 
             Quickshell.execDetached({
                 command: cmd,
-                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME"),
-            })
+                workingDirectory: desktopEntry.workingDirectory || Quickshell.env("HOME")
+            });
         }
     }
 
     // * Session management
     function logout() {
         if (hasUwsm) {
-            uwsmLogout.running = true
+            uwsmLogout.running = true;
         }
-        _logout()
+        _logout();
     }
 
     function _logout() {
         if (SettingsData.customPowerActionLogout.length === 0) {
             if (CompositorService.isNiri) {
-                NiriService.quit()
-                return
+                NiriService.quit();
+                return;
             }
 
             if (CompositorService.isDwl) {
-                DwlService.quit()
-                return
+                DwlService.quit();
+                return;
             }
 
             if (CompositorService.isSway) {
-                try { I3.dispatch("exit") } catch(_){}
-                return
+                try {
+                    I3.dispatch("exit");
+                } catch (_) {}
+                return;
             }
 
-            Hyprland.dispatch("exit")
+            Hyprland.dispatch("exit");
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLogout])
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionLogout]);
         }
     }
 
     function suspend() {
         if (SettingsData.customPowerActionSuspend.length === 0) {
-            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend"])
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend"]);
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionSuspend])
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionSuspend]);
         }
     }
 
     function hibernate() {
         if (SettingsData.customPowerActionHibernate.length === 0) {
-            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "hibernate"])
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "hibernate"]);
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionHibernate])
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionHibernate]);
         }
     }
 
     function suspendThenHibernate() {
-        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend-then-hibernate"])
+        Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "suspend-then-hibernate"]);
     }
 
     function suspendWithBehavior(behavior) {
         if (behavior === SettingsData.SuspendBehavior.Hibernate) {
-            hibernate()
+            hibernate();
         } else if (behavior === SettingsData.SuspendBehavior.SuspendThenHibernate) {
-            suspendThenHibernate()
+            suspendThenHibernate();
         } else {
-            suspend()
+            suspend();
         }
     }
 
     function reboot() {
         if (SettingsData.customPowerActionReboot.length === 0) {
-            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "reboot"])
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "reboot"]);
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionReboot])
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionReboot]);
         }
     }
 
     function poweroff() {
         if (SettingsData.customPowerActionPowerOff.length === 0) {
-            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "poweroff"])
+            Quickshell.execDetached([isElogind ? "loginctl" : "systemctl", "poweroff"]);
         } else {
-            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionPowerOff])
+            Quickshell.execDetached(["sh", "-c", SettingsData.customPowerActionPowerOff]);
         }
     }
 
@@ -286,42 +307,42 @@ Singleton {
 
     function enableIdleInhibit() {
         if (idleInhibited) {
-            return
+            return;
         }
-        console.log("SessionService: Enabling idle inhibit (native:", nativeInhibitorAvailable, ")")
-        idleInhibited = true
-        inhibitorChanged()
+        console.log("SessionService: Enabling idle inhibit (native:", nativeInhibitorAvailable, ")");
+        idleInhibited = true;
+        inhibitorChanged();
     }
 
     function disableIdleInhibit() {
         if (!idleInhibited) {
-            return
+            return;
         }
-        console.log("SessionService: Disabling idle inhibit (native:", nativeInhibitorAvailable, ")")
-        idleInhibited = false
-        inhibitorChanged()
+        console.log("SessionService: Disabling idle inhibit (native:", nativeInhibitorAvailable, ")");
+        idleInhibited = false;
+        inhibitorChanged();
     }
 
     function toggleIdleInhibit() {
         if (idleInhibited) {
-            disableIdleInhibit()
+            disableIdleInhibit();
         } else {
-            enableIdleInhibit()
+            enableIdleInhibit();
         }
     }
 
     function setInhibitReason(reason) {
-        inhibitReason = reason
+        inhibitReason = reason;
 
         if (idleInhibited && !nativeInhibitorAvailable) {
-            const wasActive = idleInhibited
-            idleInhibited = false
+            const wasActive = idleInhibited;
+            idleInhibited = false;
 
             Qt.callLater(() => {
-                             if (wasActive) {
-                                 idleInhibited = true
-                             }
-                         })
+                if (wasActive) {
+                    idleInhibited = true;
+                }
+            });
         }
     }
 
@@ -330,24 +351,24 @@ Singleton {
 
         command: {
             if (!idleInhibited || nativeInhibitorAvailable) {
-                return ["true"]
+                return ["true"];
             }
 
-            console.log("SessionService: Starting systemd/elogind inhibit process")
-            return [isElogind ? "elogind-inhibit" : "systemd-inhibit", "--what=idle", "--who=quickshell", `--why=${inhibitReason}`, "--mode=block", "sleep", "infinity"]
+            console.log("SessionService: Starting systemd/elogind inhibit process");
+            return [isElogind ? "elogind-inhibit" : "systemd-inhibit", "--what=idle", "--who=quickshell", `--why=${inhibitReason}`, "--mode=block", "sleep", "infinity"];
         }
 
         running: idleInhibited && !nativeInhibitorAvailable
 
         onRunningChanged: {
-            console.log("SessionService: Inhibit process running:", running, "(native:", nativeInhibitorAvailable, ")")
+            console.log("SessionService: Inhibit process running:", running, "(native:", nativeInhibitorAvailable, ")");
         }
 
         onExited: function (exitCode) {
             if (idleInhibited && exitCode !== 0 && !nativeInhibitorAvailable) {
-                console.warn("SessionService: Inhibitor process crashed with exit code:", exitCode)
-                idleInhibited = false
-                ToastService.showWarning("Idle inhibitor failed")
+                console.warn("SessionService: Inhibitor process crashed with exit code:", exitCode);
+                idleInhibited = false;
+                ToastService.showWarning("Idle inhibitor failed");
             }
         }
     }
@@ -357,12 +378,12 @@ Singleton {
 
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
-                checkDMSCapabilities()
+                checkDMSCapabilities();
             }
         }
 
         function onCapabilitiesReceived() {
-            syncSleepInhibitor()
+            syncSleepInhibitor();
         }
     }
 
@@ -371,7 +392,7 @@ Singleton {
         enabled: DMSService.isConnected
 
         function onCapabilitiesChanged() {
-            checkDMSCapabilities()
+            checkDMSCapabilities();
         }
     }
 
@@ -382,22 +403,22 @@ Singleton {
             if (SettingsData.loginctlLockIntegration) {
                 if (socketPath && socketPath.length > 0 && loginctlAvailable) {
                     if (!stateInitialized) {
-                        stateInitialized = true
-                        getLoginctlState()
-                        syncLockBeforeSuspend()
+                        stateInitialized = true;
+                        getLoginctlState();
+                        syncLockBeforeSuspend();
                     }
                 }
             } else {
-                stateInitialized = false
+                stateInitialized = false;
             }
-            syncSleepInhibitor()
+            syncSleepInhibitor();
         }
 
         function onLockBeforeSuspendChanged() {
             if (SettingsData.loginctlLockIntegration) {
-                syncLockBeforeSuspend()
+                syncLockBeforeSuspend();
             }
-            syncSleepInhibitor()
+            syncSleepInhibitor();
         }
     }
 
@@ -406,109 +427,114 @@ Singleton {
         enabled: SettingsData.loginctlLockIntegration
 
         function onLoginctlStateUpdate(data) {
-            updateLoginctlState(data)
+            updateLoginctlState(data);
         }
 
         function onLoginctlEvent(event) {
-            handleLoginctlEvent(event)
+            handleLoginctlEvent(event);
         }
     }
 
     function checkDMSCapabilities() {
         if (!DMSService.isConnected) {
-            return
+            return;
         }
 
         if (DMSService.capabilities.length === 0) {
-            return
+            return;
         }
 
         if (DMSService.capabilities.includes("loginctl")) {
-            loginctlAvailable = true
+            loginctlAvailable = true;
             if (SettingsData.loginctlLockIntegration && !stateInitialized) {
-                stateInitialized = true
-                getLoginctlState()
-                syncLockBeforeSuspend()
+                stateInitialized = true;
+                getLoginctlState();
+                syncLockBeforeSuspend();
             }
         } else {
-            loginctlAvailable = false
-            console.log("SessionService: loginctl capability not available in DMS")
+            loginctlAvailable = false;
+            console.log("SessionService: loginctl capability not available in DMS");
         }
     }
 
     function getLoginctlState() {
-        if (!loginctlAvailable) return
-
+        if (!loginctlAvailable)
+            return;
         DMSService.sendRequest("loginctl.getState", null, response => {
             if (response.result) {
-                updateLoginctlState(response.result)
+                updateLoginctlState(response.result);
             }
-        })
+        });
     }
 
     function syncLockBeforeSuspend() {
-        if (!loginctlAvailable) return
-
+        if (!loginctlAvailable)
+            return;
         DMSService.sendRequest("loginctl.setLockBeforeSuspend", {
             enabled: SettingsData.lockBeforeSuspend
         }, response => {
             if (response.error) {
-                console.warn("SessionService: Failed to sync lock before suspend:", response.error)
+                console.warn("SessionService: Failed to sync lock before suspend:", response.error);
             } else {
-                console.log("SessionService: Synced lock before suspend:", SettingsData.lockBeforeSuspend)
+                console.log("SessionService: Synced lock before suspend:", SettingsData.lockBeforeSuspend);
             }
-        })
+        });
     }
 
     function syncSleepInhibitor() {
-        if (!loginctlAvailable) return
-
-        if (!DMSService.apiVersion || DMSService.apiVersion < 4) return
-
+        if (!loginctlAvailable)
+            return;
+        if (!DMSService.apiVersion || DMSService.apiVersion < 4)
+            return;
         DMSService.sendRequest("loginctl.setSleepInhibitorEnabled", {
             enabled: SettingsData.loginctlLockIntegration && SettingsData.lockBeforeSuspend
         }, response => {
             if (response.error) {
-                console.warn("SessionService: Failed to sync sleep inhibitor:", response.error)
+                console.warn("SessionService: Failed to sync sleep inhibitor:", response.error);
             } else {
-                console.log("SessionService: Synced sleep inhibitor:", SettingsData.loginctlLockIntegration)
+                console.log("SessionService: Synced sleep inhibitor:", SettingsData.loginctlLockIntegration);
             }
-        })
+        });
     }
 
     function updateLoginctlState(state) {
-        const wasLocked = locked
+        const wasLocked = locked;
+        const wasSleeping = preparingForSleep;
 
-        sessionId = state.sessionId || ""
-        sessionPath = state.sessionPath || ""
-        locked = state.locked || false
-        active = state.active || false
-        idleHint = state.idleHint || false
-        lockedHint = state.lockedHint || false
-        sessionType = state.sessionType || ""
-        userName = state.userName || ""
-        seat = state.seat || ""
-        display = state.display || ""
+        sessionId = state.sessionId || "";
+        sessionPath = state.sessionPath || "";
+        locked = state.locked || false;
+        active = state.active || false;
+        idleHint = state.idleHint || false;
+        lockedHint = state.lockedHint || false;
+        preparingForSleep = state.preparingForSleep || false;
+        sessionType = state.sessionType || "";
+        userName = state.userName || "";
+        seat = state.seat || "";
+        display = state.display || "";
 
         if (locked && !wasLocked) {
-            sessionLocked()
+            sessionLocked();
         } else if (!locked && wasLocked) {
-            sessionUnlocked()
+            sessionUnlocked();
         }
 
-        loginctlStateChanged()
+        if (wasSleeping && !preparingForSleep) {
+            sessionResumed();
+        }
+
+        loginctlStateChanged();
     }
 
     function handleLoginctlEvent(event) {
         if (event.event === "Lock") {
-            locked = true
-            lockedHint = true
-            sessionLocked()
+            locked = true;
+            lockedHint = true;
+            sessionLocked();
         } else if (event.event === "Unlock") {
-            locked = false
-            lockedHint = false
-            sessionUnlocked()
+            locked = false;
+            lockedHint = false;
+            sessionUnlocked();
         }
     }
-
 }

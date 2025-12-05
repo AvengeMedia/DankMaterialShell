@@ -1,6 +1,7 @@
 package cups
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -31,11 +32,21 @@ func NewManager() (*Manager, error) {
 	client := ipp.NewCUPSClient(host, port, username, password, false)
 	baseURL := fmt.Sprintf("http://%s:%d", host, port)
 
+	var pkHelper PkHelper
+	if isLocalCUPS(host) {
+		var err error
+		pkHelper, err = NewPkHelper()
+		if err != nil {
+			log.Warnf("[CUPS] Failed to initialize pkhelper: %v", err)
+		}
+	}
+
 	m := &Manager{
 		state: &CUPSState{
 			Printers: make(map[string]*Printer),
 		},
 		client:     client,
+		pkHelper:   pkHelper,
 		baseURL:    baseURL,
 		stateMutex: sync.RWMutex{},
 		stopChan:   make(chan struct{}),
@@ -98,6 +109,12 @@ func (m *Manager) eventHandler() {
 func (m *Manager) updateState() error {
 	printers, err := m.GetPrinters()
 	if err != nil {
+		if isNoPrintersError(err) {
+			m.stateMutex.Lock()
+			m.state.Printers = make(map[string]*Printer)
+			m.stateMutex.Unlock()
+			return nil
+		}
 		return err
 	}
 
@@ -117,6 +134,19 @@ func (m *Manager) updateState() error {
 	m.stateMutex.Unlock()
 
 	return nil
+}
+
+func isNoPrintersError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	var ippErr ipp.IPPError
+	if errors.As(err, &ippErr) {
+		return ippErr.Status == 1030
+	}
+
+	return false
 }
 
 func (m *Manager) notifier() {
@@ -168,6 +198,14 @@ func (m *Manager) notifySubscribers() {
 	case m.dirty <- struct{}{}:
 	default:
 	}
+}
+
+func (m *Manager) RefreshState() {
+	if err := m.updateState(); err != nil {
+		log.Warnf("[CUPS] Failed to refresh state: %v", err)
+		return
+	}
+	m.notifySubscribers()
 }
 
 func (m *Manager) GetState() CUPSState {
@@ -256,6 +294,7 @@ func stateChanged(old, new *CUPSState) bool {
 		}
 		if oldPrinter.State != newPrinter.State ||
 			oldPrinter.StateReason != newPrinter.StateReason ||
+			oldPrinter.Accepting != newPrinter.Accepting ||
 			len(oldPrinter.Jobs) != len(newPrinter.Jobs) {
 			return true
 		}
@@ -333,4 +372,19 @@ func getBoolAttr(attrs ipp.Attributes, key string) bool {
 		}
 	}
 	return false
+}
+
+func getStringSliceAttr(attrs ipp.Attributes, key string) []string {
+	attr, ok := attrs[key]
+	if !ok {
+		return nil
+	}
+
+	result := make([]string, 0, len(attr))
+	for _, a := range attr {
+		if val, ok := a.Value.(string); ok {
+			result = append(result, val)
+		}
+	}
+	return result
 }

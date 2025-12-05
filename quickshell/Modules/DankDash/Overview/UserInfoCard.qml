@@ -1,11 +1,13 @@
 import QtQuick
-import QtQuick.Effects
 import qs.Common
 import qs.Services
 import qs.Widgets
 
 Card {
     id: root
+
+    Component.onCompleted: DgopService.addRef("system")
+    Component.onDestruction: DgopService.removeRef("system")
 
     Row {
         anchors.left: parent.left
@@ -21,12 +23,12 @@ Card {
             anchors.verticalCenter: parent.verticalCenter
             imageSource: {
                 if (PortalService.profileImage === "")
-                    return ""
+                    return "";
 
                 if (PortalService.profileImage.startsWith("/"))
-                    return "file://" + PortalService.profileImage
+                    return "file://" + PortalService.profileImage;
 
-                return PortalService.profileImage
+                return PortalService.profileImage;
             }
             fallbackIcon: "person"
         }
@@ -56,12 +58,16 @@ Card {
 
                 StyledText {
                     text: {
-                        if (CompositorService.isNiri) return "on niri"
-                        if (CompositorService.isHyprland) return "on Hyprland"
+                        if (CompositorService.isNiri)
+                            return "on niri";
+                        if (CompositorService.isHyprland)
+                            return "on Hyprland";
                         // technically they might not be on mangowc, but its what we support in the docs
-                        if (CompositorService.isDwl) return "on MangoWC"
-                        if (CompositorService.isSway) return "on Sway"
-                        return ""
+                        if (CompositorService.isDwl)
+                            return "on MangoWC";
+                        if (CompositorService.isSway)
+                            return "on Sway";
+                        return "";
                     }
                     font.pixelSize: Theme.fontSizeSmall
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.8)
@@ -82,27 +88,10 @@ Card {
                 }
 
                 StyledText {
-                    id: uptimeText
-
-                    property real availableWidth: parent.parent.parent.parent.width - avatarContainer.width - Theme.spacingM * 3 - 16 - Theme.spacingS
-                    property real longTextWidth: {
-                        const fontSize = Math.round(Theme.fontSizeSmall || 12)
-                        const testMetrics = Qt.createQmlObject('import QtQuick; TextMetrics { font.pixelSize: ' + fontSize + ' }', uptimeText)
-                        testMetrics.text = UserInfoService.uptime || "up 1 hour, 23 minutes"
-                        const result = testMetrics.width
-                        testMetrics.destroy()
-                        return result
-                    }
-                    // Just using truncated is always true initially idk
-                    property bool shouldUseShort: longTextWidth > availableWidth
-
-                    text: shouldUseShort ? UserInfoService.shortUptime : UserInfoService.uptime || "up 1h 23m"
+                    text: DgopService.shortUptime || "up"
                     font.pixelSize: Theme.fontSizeSmall
                     color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                     anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    width: availableWidth
-                    wrapMode: Text.NoWrap
                 }
             }
         }

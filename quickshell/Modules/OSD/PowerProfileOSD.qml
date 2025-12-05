@@ -7,33 +7,36 @@ import qs.Widgets
 DankOSD {
     id: root
 
+    property int currentProfile: 0
+    property string profileIcon: "settings"
+
     osdWidth: Theme.iconSize + Theme.spacingS * 2
     osdHeight: Theme.iconSize + Theme.spacingS * 2
     autoHideInterval: 2000
     enableMouseInteraction: false
 
-    property int lastProfile: -1
-
     Connections {
-        target: typeof PowerProfiles !== "undefined" ? PowerProfiles : null
+        target: PowerProfileWatcher
 
-        function onProfileChanged() {
-            if (lastProfile !== -1 && lastProfile !== PowerProfiles.profile && SettingsData.osdPowerProfileEnabled) {
-                root.show()
+        function onProfileChanged(profile) {
+            if (SettingsData.osdPowerProfileEnabled) {
+                root.currentProfile = profile;
+                root.profileIcon = Theme.getPowerProfileIcon(profile);
+                root.show();
             }
-            lastProfile = PowerProfiles.profile
         }
     }
 
     Component.onCompleted: {
-        if (typeof PowerProfiles !== "undefined") {
-            lastProfile = PowerProfiles.profile
+        if (SettingsData.osdPowerProfileEnabled && typeof PowerProfileWatcher !== "undefined") {
+            root.currentProfile = PowerProfileWatcher.currentProfile;
+            root.profileIcon = Theme.getPowerProfileIcon(PowerProfileWatcher.currentProfile);
         }
     }
 
     content: DankIcon {
         anchors.centerIn: parent
-        name: typeof PowerProfiles !== "undefined" ? Theme.getPowerProfileIcon(PowerProfiles.profile) : "settings"
+        name: root.profileIcon
         size: Theme.iconSize
         color: Theme.primary
     }

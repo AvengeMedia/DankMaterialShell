@@ -1,9 +1,4 @@
 import QtQuick
-import QtQuick.Effects
-import Quickshell
-import Quickshell.Io
-import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -16,22 +11,12 @@ DankPopout {
     property var parentWidget: null
     property var triggerScreen: null
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x;
-        triggerY = y;
-        triggerWidth = width;
-        triggerSection = section;
-        triggerScreen = screen;
-    }
-
     Ref {
         service: SystemUpdateService
     }
 
     popupWidth: 400
     popupHeight: 500
-    triggerX: Screen.width - 600 - Theme.spacingL
-    triggerY: Math.max(26 + SettingsData.dankBarInnerPadding + 4, Theme.barHeight - 4 - (8 - SettingsData.dankBarInnerPadding)) + SettingsData.dankBarSpacing + SettingsData.dankBarBottomGap - 2
     triggerWidth: 55
     positioning: ""
     screen: triggerScreen
@@ -42,7 +27,7 @@ DankPopout {
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
             if (SystemUpdateService.updateCount === 0 && !SystemUpdateService.isChecking) {
-                SystemUpdateService.checkForUpdates()
+                SystemUpdateService.checkForUpdates();
             }
         }
     }
@@ -57,19 +42,23 @@ DankPopout {
             smooth: true
 
             Repeater {
-                model: [{
+                model: [
+                    {
                         "margin": -3,
                         "color": Qt.rgba(0, 0, 0, 0.05),
                         "z": -3
-                    }, {
+                    },
+                    {
                         "margin": -2,
                         "color": Qt.rgba(0, 0, 0, 0.08),
                         "z": -2
-                    }, {
+                    },
+                    {
                         "margin": 0,
                         "color": Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12),
                         "z": -1
-                    }]
+                    }
+                ]
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: modelData.margin
@@ -109,14 +98,18 @@ DankPopout {
                         StyledText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
-                                if (SystemUpdateService.isChecking) return "Checking...";
-                                if (SystemUpdateService.hasError) return "Error";
-                                if (SystemUpdateService.updateCount === 0) return "Up to date";
+                                if (SystemUpdateService.isChecking)
+                                    return "Checking...";
+                                if (SystemUpdateService.hasError)
+                                    return "Error";
+                                if (SystemUpdateService.updateCount === 0)
+                                    return "Up to date";
                                 return SystemUpdateService.updateCount + " updates";
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
-                                if (SystemUpdateService.hasError) return Theme.error;
+                                if (SystemUpdateService.hasError)
+                                    return Theme.error;
                                 return Theme.surfaceText;
                             }
                         }
@@ -131,7 +124,7 @@ DankPopout {
                             enabled: !SystemUpdateService.isChecking
                             opacity: enabled ? 1.0 : 0.5
                             onClicked: {
-                                SystemUpdateService.checkForUpdates()
+                                SystemUpdateService.checkForUpdates();
                             }
 
                             RotationAnimation {
@@ -145,7 +138,7 @@ DankPopout {
 
                                 onRunningChanged: {
                                     if (!running) {
-                                        checkForUpdatesButton.rotation = 0
+                                        checkForUpdatesButton.rotation = 0;
                                     }
                                 }
                             }
@@ -156,9 +149,9 @@ DankPopout {
                 Rectangle {
                     width: parent.width
                     height: {
-                        let usedHeight = 40 + Theme.spacingL
-                        usedHeight += 48 + Theme.spacingL
-                        return parent.height - usedHeight
+                        let usedHeight = 40 + Theme.spacingL;
+                        usedHeight += 48 + Theme.spacingL;
+                        return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
                     color: Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.1)
@@ -190,7 +183,8 @@ DankPopout {
                             }
                             font.pixelSize: Theme.fontSizeMedium
                             color: {
-                                if (SystemUpdateService.hasError) return Theme.errorText;
+                                if (SystemUpdateService.hasError)
+                                    return Theme.errorText;
                                 return Theme.surfaceText;
                             }
                             wrapMode: Text.WordWrap
@@ -246,7 +240,9 @@ DankPopout {
                                 }
 
                                 Behavior on color {
-                                    ColorAnimation { duration: Theme.shortDuration }
+                                    ColorAnimation {
+                                        duration: Theme.shortDuration
+                                    }
                                 }
 
                                 MouseArea {
@@ -274,7 +270,9 @@ DankPopout {
                         opacity: SystemUpdateService.updateCount > 0 ? 1.0 : 0.5
 
                         Behavior on color {
-                            ColorAnimation { duration: Theme.shortDuration }
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                            }
                         }
 
                         Row {
@@ -304,12 +302,11 @@ DankPopout {
                             cursorShape: Qt.PointingHandCursor
                             enabled: SystemUpdateService.updateCount > 0
                             onClicked: {
-                                SystemUpdateService.runUpdates()
-                                systemUpdatePopout.close()
+                                SystemUpdateService.runUpdates();
+                                systemUpdatePopout.close();
                             }
                         }
                     }
-
 
                     Rectangle {
                         width: (parent.width - Theme.spacingM) / 2
@@ -318,7 +315,9 @@ DankPopout {
                         color: closeMouseArea.containsMouse ? Theme.errorPressed : Theme.secondaryHover
 
                         Behavior on color {
-                            ColorAnimation { duration: Theme.shortDuration }
+                            ColorAnimation {
+                                duration: Theme.shortDuration
+                            }
                         }
 
                         Row {
@@ -347,13 +346,12 @@ DankPopout {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                systemUpdatePopout.close()
+                                systemUpdatePopout.close();
                             }
                         }
                     }
                 }
             }
-
         }
     }
 }

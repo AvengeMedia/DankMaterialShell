@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -12,6 +11,10 @@ Item {
 
     width: parent.width
     height: 32
+
+    DankTooltipV2 {
+        id: sharedTooltip
+    }
 
     Row {
         anchors.left: parent.left
@@ -35,17 +38,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             onClicked: SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
             onEntered: {
-                tooltipLoader.active = true
-                if (tooltipLoader.item) {
-                    const p = mapToItem(null, width / 2, 0)
-                    tooltipLoader.item.show(I18n.tr("Do Not Disturb"), p.x, p.y - 40, null)
-                }
+                sharedTooltip.show(I18n.tr("Do Not Disturb"), doNotDisturbButton, 0, 0, "bottom");
             }
             onExited: {
-                if (tooltipLoader.item) {
-                    tooltipLoader.item.hide()
-                }
-                tooltipLoader.active = false
+                sharedTooltip.hide();
             }
         }
     }
@@ -64,7 +60,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
                 if (keyboardController) {
-                    keyboardController.showKeyboardHints = !keyboardController.showKeyboardHints
+                    keyboardController.showKeyboardHints = !keyboardController.showKeyboardHints;
                 }
             }
         }
@@ -115,14 +111,6 @@ Item {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: NotificationService.clearAllNotifications()
             }
-
         }
-    }
-
-    Loader {
-        id: tooltipLoader
-
-        active: false
-        sourceComponent: DankTooltip {}
     }
 }

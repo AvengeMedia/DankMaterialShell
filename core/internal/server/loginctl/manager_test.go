@@ -287,7 +287,7 @@ func TestNewManager(t *testing.T) {
 		} else {
 			assert.NotNil(t, manager)
 			assert.NotNil(t, manager.state)
-			assert.NotNil(t, manager.subscribers)
+			assert.NotNil(t, &manager.subscribers)
 			assert.NotNil(t, manager.stopChan)
 
 			manager.Close()

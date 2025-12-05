@@ -1,7 +1,4 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
-import Quickshell.Services.Pipewire
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -30,9 +27,8 @@ Row {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (defaultSink) {
-                    AudioService.suppressOSD = true
-                    defaultSink.audio.muted = !defaultSink.audio.muted
-                    AudioService.suppressOSD = false
+                    SessionData.suppressOSDTemporarily();
+                    defaultSink.audio.muted = !defaultSink.audio.muted;
                 }
             }
         }
@@ -40,15 +36,19 @@ Row {
         DankIcon {
             anchors.centerIn: parent
             name: {
-                if (!defaultSink) return "volume_off"
+                if (!defaultSink)
+                    return "volume_off";
 
-                let volume = defaultSink.audio.volume
-                let muted = defaultSink.audio.muted
+                let volume = defaultSink.audio.volume;
+                let muted = defaultSink.audio.muted;
 
-                if (muted || volume === 0.0) return "volume_off"
-                if (volume <= 0.33) return "volume_down"
-                if (volume <= 0.66) return "volume_up"
-                return "volume_up"
+                if (muted || volume === 0.0)
+                    return "volume_off";
+                if (volume <= 0.33)
+                    return "volume_down";
+                if (volume <= 0.66)
+                    return "volume_up";
+                return "volume_up";
             }
             size: Theme.iconSize
             color: defaultSink && !defaultSink.audio.muted && defaultSink.audio.volume > 0 ? Theme.primary : Theme.surfaceText
@@ -70,21 +70,14 @@ Row {
         thumbOutlineColor: Theme.surfaceContainer
         trackColor: root.sliderTrackColor.a > 0 ? root.sliderTrackColor : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
-        onIsDraggingChanged: {
-            if (isDragging) {
-                AudioService.suppressOSD = true
-            } else {
-                Qt.callLater(() => { AudioService.suppressOSD = false })
-            }
-        }
-
-        onSliderValueChanged: function(newValue) {
+        onSliderValueChanged: function (newValue) {
             if (defaultSink) {
-                defaultSink.audio.volume = newValue / 100.0
+                SessionData.suppressOSDTemporarily();
+                defaultSink.audio.volume = newValue / 100.0;
                 if (newValue > 0 && defaultSink.audio.muted) {
-                    defaultSink.audio.muted = false
+                    defaultSink.audio.muted = false;
                 }
-                AudioService.playVolumeChangeSoundIfEnabled()
+                AudioService.playVolumeChangeSoundIfEnabled();
             }
         }
     }

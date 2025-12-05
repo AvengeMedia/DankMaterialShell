@@ -1,7 +1,6 @@
 package dank16
 
 import (
-	"encoding/json"
 	"math"
 	"testing"
 )
@@ -346,103 +345,33 @@ func TestGeneratePalette(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := GeneratePalette(tt.base, tt.opts)
 
-			if len(result) != 16 {
-				t.Errorf("GeneratePalette returned %d colors, expected 16", len(result))
+			colors := []ColorInfo{
+				result.Color0, result.Color1, result.Color2, result.Color3,
+				result.Color4, result.Color5, result.Color6, result.Color7,
+				result.Color8, result.Color9, result.Color10, result.Color11,
+				result.Color12, result.Color13, result.Color14, result.Color15,
 			}
 
-			for i, color := range result {
-				if len(color) != 7 || color[0] != '#' {
-					t.Errorf("Color at index %d (%s) is not a valid hex color", i, color)
+			for i, color := range colors {
+				if len(color.Hex) != 7 || color.Hex[0] != '#' {
+					t.Errorf("Color at index %d (%s) is not a valid hex color", i, color.Hex)
 				}
 			}
 
-			if tt.opts.Background != "" && result[0] != tt.opts.Background {
-				t.Errorf("Background color = %s, expected %s", result[0], tt.opts.Background)
-			} else if !tt.opts.IsLight && tt.opts.Background == "" && result[0] != "#1a1a1a" {
-				t.Errorf("Dark mode background = %s, expected #1a1a1a", result[0])
-			} else if tt.opts.IsLight && tt.opts.Background == "" && result[0] != "#f8f8f8" {
-				t.Errorf("Light mode background = %s, expected #f8f8f8", result[0])
+			if tt.opts.Background != "" && result.Color0.Hex != tt.opts.Background {
+				t.Errorf("Background color = %s, expected %s", result.Color0.Hex, tt.opts.Background)
+			} else if !tt.opts.IsLight && tt.opts.Background == "" && result.Color0.Hex != "#1a1a1a" {
+				t.Errorf("Dark mode background = %s, expected #1a1a1a", result.Color0.Hex)
+			} else if tt.opts.IsLight && tt.opts.Background == "" && result.Color0.Hex != "#f8f8f8" {
+				t.Errorf("Light mode background = %s, expected #f8f8f8", result.Color0.Hex)
 			}
 
-			if tt.opts.IsLight && result[15] != "#1a1a1a" {
-				t.Errorf("Light mode foreground = %s, expected #1a1a1a", result[15])
-			} else if !tt.opts.IsLight && result[15] != "#ffffff" {
-				t.Errorf("Dark mode foreground = %s, expected #ffffff", result[15])
+			if tt.opts.IsLight && result.Color15.Hex != "#1a1a1a" {
+				t.Errorf("Light mode foreground = %s, expected #1a1a1a", result.Color15.Hex)
+			} else if !tt.opts.IsLight && result.Color15.Hex != "#ffffff" {
+				t.Errorf("Dark mode foreground = %s, expected #ffffff", result.Color15.Hex)
 			}
 		})
-	}
-}
-
-func TestEnrichVSCodeTheme(t *testing.T) {
-	colors := GeneratePalette("#625690", PaletteOptions{IsLight: false})
-
-	baseTheme := map[string]interface{}{
-		"name": "Test Theme",
-		"type": "dark",
-		"colors": map[string]interface{}{
-			"editor.background": "#000000",
-		},
-	}
-
-	themeJSON, err := json.Marshal(baseTheme)
-	if err != nil {
-		t.Fatalf("Failed to marshal base theme: %v", err)
-	}
-
-	result, err := EnrichVSCodeTheme(themeJSON, colors)
-	if err != nil {
-		t.Fatalf("EnrichVSCodeTheme failed: %v", err)
-	}
-
-	var enriched map[string]interface{}
-	if err := json.Unmarshal(result, &enriched); err != nil {
-		t.Fatalf("Failed to unmarshal result: %v", err)
-	}
-
-	colorsMap, ok := enriched["colors"].(map[string]interface{})
-	if !ok {
-		t.Fatal("colors is not a map")
-	}
-
-	terminalColors := []string{
-		"terminal.ansiBlack",
-		"terminal.ansiRed",
-		"terminal.ansiGreen",
-		"terminal.ansiYellow",
-		"terminal.ansiBlue",
-		"terminal.ansiMagenta",
-		"terminal.ansiCyan",
-		"terminal.ansiWhite",
-		"terminal.ansiBrightBlack",
-		"terminal.ansiBrightRed",
-		"terminal.ansiBrightGreen",
-		"terminal.ansiBrightYellow",
-		"terminal.ansiBrightBlue",
-		"terminal.ansiBrightMagenta",
-		"terminal.ansiBrightCyan",
-		"terminal.ansiBrightWhite",
-	}
-
-	for i, key := range terminalColors {
-		if val, ok := colorsMap[key]; !ok {
-			t.Errorf("Missing terminal color: %s", key)
-		} else if val != colors[i] {
-			t.Errorf("%s = %s, expected %s", key, val, colors[i])
-		}
-	}
-
-	if colorsMap["editor.background"] != "#000000" {
-		t.Error("Original theme colors should be preserved")
-	}
-}
-
-func TestEnrichVSCodeThemeInvalidJSON(t *testing.T) {
-	colors := GeneratePalette("#625690", PaletteOptions{IsLight: false})
-	invalidJSON := []byte("{invalid json")
-
-	_, err := EnrichVSCodeTheme(invalidJSON, colors)
-	if err == nil {
-		t.Error("Expected error for invalid JSON, got nil")
 	}
 }
 
@@ -635,23 +564,26 @@ func TestGeneratePaletteWithDPS(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := GeneratePalette(tt.base, tt.opts)
 
-			if len(result) != 16 {
-				t.Errorf("GeneratePalette returned %d colors, expected 16", len(result))
+			colors := []ColorInfo{
+				result.Color0, result.Color1, result.Color2, result.Color3,
+				result.Color4, result.Color5, result.Color6, result.Color7,
+				result.Color8, result.Color9, result.Color10, result.Color11,
+				result.Color12, result.Color13, result.Color14, result.Color15,
 			}
 
-			for i, color := range result {
-				if len(color) != 7 || color[0] != '#' {
-					t.Errorf("Color at index %d (%s) is not a valid hex color", i, color)
+			for i, color := range colors {
+				if len(color.Hex) != 7 || color.Hex[0] != '#' {
+					t.Errorf("Color at index %d (%s) is not a valid hex color", i, color.Hex)
 				}
 			}
 
-			bgColor := result[0]
+			bgColor := result.Color0.Hex
 			for i := 1; i < 8; i++ {
-				lc := DeltaPhiStarContrast(result[i], bgColor, tt.opts.IsLight)
+				lc := DeltaPhiStarContrast(colors[i].Hex, bgColor, tt.opts.IsLight)
 				minLc := 30.0
 				if lc < minLc && lc > 0 {
 					t.Errorf("Color %d (%s) has insufficient DPS contrast %f with background %s (expected >= %f)",
-						i, result[i], lc, bgColor, minLc)
+						i, colors[i].Hex, lc, bgColor, minLc)
 				}
 			}
 		})
@@ -708,17 +640,26 @@ func TestContrastAlgorithmComparison(t *testing.T) {
 	paletteWCAG := GeneratePalette(base, optsWCAG)
 	paletteDPS := GeneratePalette(base, optsDPS)
 
-	if len(paletteWCAG) != 16 || len(paletteDPS) != 16 {
-		t.Fatal("Both palettes should have 16 colors")
+	wcagColors := []ColorInfo{
+		paletteWCAG.Color0, paletteWCAG.Color1, paletteWCAG.Color2, paletteWCAG.Color3,
+		paletteWCAG.Color4, paletteWCAG.Color5, paletteWCAG.Color6, paletteWCAG.Color7,
+		paletteWCAG.Color8, paletteWCAG.Color9, paletteWCAG.Color10, paletteWCAG.Color11,
+		paletteWCAG.Color12, paletteWCAG.Color13, paletteWCAG.Color14, paletteWCAG.Color15,
+	}
+	dpsColors := []ColorInfo{
+		paletteDPS.Color0, paletteDPS.Color1, paletteDPS.Color2, paletteDPS.Color3,
+		paletteDPS.Color4, paletteDPS.Color5, paletteDPS.Color6, paletteDPS.Color7,
+		paletteDPS.Color8, paletteDPS.Color9, paletteDPS.Color10, paletteDPS.Color11,
+		paletteDPS.Color12, paletteDPS.Color13, paletteDPS.Color14, paletteDPS.Color15,
 	}
 
-	if paletteWCAG[0] != paletteDPS[0] {
-		t.Errorf("Background colors differ: WCAG=%s, DPS=%s", paletteWCAG[0], paletteDPS[0])
+	if paletteWCAG.Color0.Hex != paletteDPS.Color0.Hex {
+		t.Errorf("Background colors differ: WCAG=%s, DPS=%s", paletteWCAG.Color0.Hex, paletteDPS.Color0.Hex)
 	}
 
 	differentCount := 0
 	for i := 0; i < 16; i++ {
-		if paletteWCAG[i] != paletteDPS[i] {
+		if wcagColors[i].Hex != dpsColors[i].Hex {
 			differentCount++
 		}
 	}

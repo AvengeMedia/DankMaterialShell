@@ -1,11 +1,33 @@
 package cups
 
 import (
+	"errors"
 	"strings"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/ipp"
 )
+
+func isAuthError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	var httpErr ipp.HTTPError
+	if errors.As(err, &httpErr) {
+		return httpErr.Code == 401 || httpErr.Code == 403
+	}
+
+	var ippErr ipp.IPPError
+	if errors.As(err, &ippErr) {
+		return ippErr.Status == ipp.StatusErrorForbidden ||
+			ippErr.Status == ipp.StatusErrorNotAuthenticated ||
+			ippErr.Status == ipp.StatusErrorNotAuthorized
+	}
+
+	return false
+}
 
 func (m *Manager) GetPrinters() ([]Printer, error) {
 	attributes := []string{
@@ -21,6 +43,9 @@ func (m *Manager) GetPrinters() ([]Printer, error) {
 
 	printerAttrs, err := m.client.GetPrinters(attributes)
 	if err != nil {
+		if isNoPrintersError(err) {
+			return []Printer{}, nil
+		}
 		return nil, err
 	}
 
@@ -91,17 +116,289 @@ func (m *Manager) GetJobs(printerName string, whichJobs string) ([]Job, error) {
 }
 
 func (m *Manager) CancelJob(jobID int) error {
-	return m.client.CancelJob(jobID, false)
+	err := m.client.CancelJob(jobID, false)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.JobCancelPurge(jobID, false)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
 }
 
 func (m *Manager) PausePrinter(printerName string) error {
-	return m.client.PausePrinter(printerName)
+	err := m.client.PausePrinter(printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetEnabled(printerName, false)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
 }
 
 func (m *Manager) ResumePrinter(printerName string) error {
-	return m.client.ResumePrinter(printerName)
+	err := m.client.ResumePrinter(printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetEnabled(printerName, true)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
 }
 
 func (m *Manager) PurgeJobs(printerName string) error {
-	return m.client.CancelAllJob(printerName, true)
+	err := m.client.CancelAllJob(printerName, true)
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) GetDevices() ([]Device, error) {
+	if m.pkHelper != nil {
+		return m.pkHelper.DevicesGet(10, 0, nil, nil)
+	}
+
+	deviceAttrs, err := m.client.GetDevices()
+	if err != nil {
+		return nil, err
+	}
+
+	devices := make([]Device, 0, len(deviceAttrs))
+	for uri, attrs := range deviceAttrs {
+		device := Device{
+			URI:       uri,
+			Class:     getStringAttr(attrs, "device-class"),
+			Info:      getStringAttr(attrs, "device-info"),
+			MakeModel: getStringAttr(attrs, "device-make-and-model"),
+			ID:        getStringAttr(attrs, "device-id"),
+			Location:  getStringAttr(attrs, "device-location"),
+		}
+		devices = append(devices, device)
+	}
+
+	return devices, nil
+}
+
+func (m *Manager) GetPPDs() ([]PPD, error) {
+	ppdAttrs, err := m.client.GetPPDs()
+	if err != nil {
+		return nil, err
+	}
+
+	ppds := make([]PPD, 0, len(ppdAttrs))
+	for name, attrs := range ppdAttrs {
+		ppd := PPD{
+			Name:            name,
+			NaturalLanguage: getStringAttr(attrs, "ppd-natural-language"),
+			MakeModel:       getStringAttr(attrs, ipp.AttributePPDMakeAndModel),
+			DeviceID:        getStringAttr(attrs, "ppd-device-id"),
+			Product:         getStringAttr(attrs, "ppd-product"),
+			PSVersion:       getStringAttr(attrs, "ppd-psversion"),
+			Type:            getStringAttr(attrs, "ppd-type"),
+		}
+		ppds = append(ppds, ppd)
+	}
+
+	return ppds, nil
+}
+
+func (m *Manager) GetClasses() ([]PrinterClass, error) {
+	attributes := []string{
+		ipp.AttributePrinterName,
+		ipp.AttributePrinterUriSupported,
+		ipp.AttributePrinterState,
+		ipp.AttributeMemberURIs,
+		ipp.AttributeMemberNames,
+		ipp.AttributePrinterLocation,
+		ipp.AttributePrinterInfo,
+	}
+
+	classAttrs, err := m.client.GetClasses(attributes)
+	if err != nil {
+		return nil, err
+	}
+
+	classes := make([]PrinterClass, 0, len(classAttrs))
+	for _, attrs := range classAttrs {
+		class := PrinterClass{
+			Name:     getStringAttr(attrs, ipp.AttributePrinterName),
+			URI:      getStringAttr(attrs, ipp.AttributePrinterUriSupported),
+			State:    parsePrinterState(attrs),
+			Location: getStringAttr(attrs, ipp.AttributePrinterLocation),
+			Info:     getStringAttr(attrs, ipp.AttributePrinterInfo),
+			Members:  getStringSliceAttr(attrs, ipp.AttributeMemberNames),
+		}
+		classes = append(classes, class)
+	}
+
+	return classes, nil
+}
+
+func (m *Manager) CreatePrinter(name, deviceURI, ppd string, shared bool, errorPolicy, information, location string) error {
+	usedPkHelper := false
+
+	err := m.client.CreatePrinter(name, deviceURI, ppd, shared, errorPolicy, information, location)
+	if isAuthError(err) && m.pkHelper != nil {
+		if err = m.pkHelper.PrinterAdd(name, deviceURI, ppd, information, location); err != nil {
+			return err
+		}
+		usedPkHelper = true
+	} else if err != nil {
+		return err
+	}
+
+	if usedPkHelper {
+		m.pkHelper.PrinterSetEnabled(name, true)        //nolint:errcheck
+		m.pkHelper.PrinterSetAcceptJobs(name, true, "") //nolint:errcheck
+	} else {
+		if err := m.client.ResumePrinter(name); isAuthError(err) && m.pkHelper != nil {
+			m.pkHelper.PrinterSetEnabled(name, true) //nolint:errcheck
+		}
+		if err := m.client.AcceptJobs(name); isAuthError(err) && m.pkHelper != nil {
+			m.pkHelper.PrinterSetAcceptJobs(name, true, "") //nolint:errcheck
+		}
+	}
+
+	m.RefreshState()
+	return nil
+}
+
+func (m *Manager) DeletePrinter(printerName string) error {
+	err := m.client.DeletePrinter(printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterDelete(printerName)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) AcceptJobs(printerName string) error {
+	err := m.client.AcceptJobs(printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetAcceptJobs(printerName, true, "")
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) RejectJobs(printerName string) error {
+	err := m.client.RejectJobs(printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetAcceptJobs(printerName, false, "")
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) SetPrinterShared(printerName string, shared bool) error {
+	err := m.client.SetPrinterIsShared(printerName, shared)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetShared(printerName, shared)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) SetPrinterLocation(printerName, location string) error {
+	err := m.client.SetPrinterLocation(printerName, location)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetLocation(printerName, location)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) SetPrinterInfo(printerName, info string) error {
+	err := m.client.SetPrinterInformation(printerName, info)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.PrinterSetInfo(printerName, info)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) MoveJob(jobID int, destPrinter string) error {
+	err := m.client.MoveJob(jobID, destPrinter)
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) PrintTestPage(printerName string) (int, error) {
+	jobID, err := m.client.PrintTestPage(printerName, strings.NewReader(config.TestPage), len(config.TestPage))
+	if err == nil {
+		m.RefreshState()
+	}
+	return jobID, err
+}
+
+func (m *Manager) AddPrinterToClass(className, printerName string) error {
+	err := m.client.AddPrinterToClass(className, printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.ClassAddPrinter(className, printerName)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) RemovePrinterFromClass(className, printerName string) error {
+	err := m.client.DeletePrinterFromClass(className, printerName)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.ClassDeletePrinter(className, printerName)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) DeleteClass(className string) error {
+	err := m.client.DeleteClass(className)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.ClassDelete(className)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) RestartJob(jobID int) error {
+	err := m.client.RestartJob(jobID)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.JobRestart(jobID)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
+}
+
+func (m *Manager) HoldJob(jobID int, holdUntil string) error {
+	err := m.client.HoldJobUntil(jobID, holdUntil)
+	if isAuthError(err) && m.pkHelper != nil {
+		err = m.pkHelper.JobSetHoldUntil(jobID, holdUntil)
+	}
+	if err == nil {
+		m.RefreshState()
+	}
+	return err
 }

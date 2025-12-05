@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -139,9 +140,13 @@ func (b *IWDBackend) discoverDevices() error {
 }
 
 func (b *IWDBackend) GetCurrentState() (*BackendState, error) {
+	b.stateMutex.RLock()
+	defer b.stateMutex.RUnlock()
+
 	state := *b.state
 	state.WiFiNetworks = append([]WiFiNetwork(nil), b.state.WiFiNetworks...)
 	state.WiredConnections = append([]WiredConnection(nil), b.state.WiredConnections...)
+	state.WiFiDevices = b.getWiFiDevicesLocked()
 
 	return &state, nil
 }
@@ -155,6 +160,7 @@ func (b *IWDBackend) OnUserCanceledPrompt() {
 
 	if cancelledSSID != "" {
 		if err := b.ForgetWiFiNetwork(cancelledSSID); err != nil {
+			log.Warnf("failed to forget cancelled WiFi network %s: %v", cancelledSSID, err)
 		}
 	}
 

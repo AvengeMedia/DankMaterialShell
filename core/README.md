@@ -16,6 +16,9 @@ Distribution-aware installer with TUI for deploying DMS and compositor configura
 
 **Wayland Protocols**
 - `wlr-gamma-control-unstable-v1` - Night mode and gamma control
+- `wlr-screencopy-unstable-v1` - Screen capture for color picker
+- `wlr-layer-shell-unstable-v1` - Overlay surfaces for color picker
+- `wp-viewporter` - Fractional scaling support
 - `dwl-ipc-unstable-v2` - dwl/MangoWC workspace integration
 - `ext-workspace-v1` - Workspace protocol support
 - `wlr-output-management-unstable-v1` - Display configuration
@@ -44,8 +47,23 @@ Distribution-aware installer with TUI for deploying DMS and compositor configura
 - `dms ipc <command>` - Send IPC commands (toggle launcher, notifications, etc.)
 - `dms plugins [install|browse|search]` - Plugin management
 - `dms brightness [list|set]` - Control display/monitor brightness
+- `dms color pick` - Native color picker (see below)
 - `dms update` - Update DMS and dependencies (disabled in distro packages)
 - `dms greeter install` - Install greetd greeter (disabled in distro packages)
+
+### Color Picker
+
+Native Wayland color picker with magnifier, no external dependencies. Supports HiDPI and fractional scaling.
+
+```bash
+dms color pick              # Pick color, output hex
+dms color pick --rgb        # Output as RGB (255 128 64)
+dms color pick --hsv        # Output as HSV (24 75% 100%)
+dms color pick --json       # Output all formats as JSON
+dms color pick -a           # Auto-copy to clipboard
+```
+
+The on-screen preview displays the selected format. JSON output includes hex, RGB, HSL, HSV, and CMYK values.
 
 ## Building
 
@@ -71,6 +89,13 @@ sudo make install  # Install to /usr/local/bin/dms
 ```
 
 ## Development
+
+**Setup pre-commit hooks:**
+```bash
+git config core.hooksPath .githooks
+```
+
+This runs gofmt, golangci-lint, tests, and builds before each commit when `core/` files are staged.
 
 **Regenerating Wayland Protocol Bindings:**
 ```bash

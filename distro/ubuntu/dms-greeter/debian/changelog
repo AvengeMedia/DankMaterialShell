@@ -1,0 +1,5 @@
+dms-greeter (0.6.2ppa3) questing; urgency=medium
+
+  * Rebuild for packaging fixes (ppa3)
+
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Thu, 27 Nov 2025 23:38:37 -0500

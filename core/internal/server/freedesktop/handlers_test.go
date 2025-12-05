@@ -56,7 +56,7 @@ func mockGetAllAccountsProperties() *dbus.Call {
 		"Locked":        dbus.MakeVariant(false),
 		"PasswordMode":  dbus.MakeVariant(int32(1)),
 	}
-	return &dbus.Call{Err: nil, Body: []interface{}{props}}
+	return &dbus.Call{Err: nil, Body: []any{props}}
 }
 
 func TestRespondError_Freedesktop(t *testing.T) {
@@ -134,7 +134,7 @@ func TestHandleSetIconFile(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setIconFile",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetIconFile(conn, req, manager)
@@ -167,7 +167,7 @@ func TestHandleSetIconFile(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setIconFile",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"path": "/path/to/icon.png",
 			},
 		}
@@ -199,7 +199,7 @@ func TestHandleSetIconFile(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setIconFile",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"path": "/path/to/icon.png",
 			},
 		}
@@ -226,7 +226,7 @@ func TestHandleSetRealName(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setRealName",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetRealName(conn, req, manager)
@@ -259,7 +259,7 @@ func TestHandleSetRealName(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setRealName",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"name": "New Name",
 			},
 		}
@@ -289,7 +289,7 @@ func TestHandleSetEmail(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setEmail",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetEmail(conn, req, manager)
@@ -322,7 +322,7 @@ func TestHandleSetEmail(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setEmail",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"email": "test@example.com",
 			},
 		}
@@ -352,7 +352,7 @@ func TestHandleSetLanguage(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setLanguage",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetLanguage(conn, req, manager)
@@ -377,7 +377,7 @@ func TestHandleSetLocation(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.setLocation",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleSetLocation(conn, req, manager)
@@ -402,7 +402,7 @@ func TestHandleGetUserIconFile(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.getUserIconFile",
-			Params: map[string]interface{}{},
+			Params: map[string]any{},
 		}
 
 		handleGetUserIconFile(conn, req, manager)
@@ -429,7 +429,7 @@ func TestHandleGetUserIconFile(t *testing.T) {
 		req := Request{
 			ID:     123,
 			Method: "freedesktop.accounts.getUserIconFile",
-			Params: map[string]interface{}{
+			Params: map[string]any{
 				"username": "testuser",
 			},
 		}
@@ -473,7 +473,7 @@ func TestHandleGetColorScheme(t *testing.T) {
 		mockSettingsObj := mockdbus.NewMockBusObject(t)
 		mockCall := &dbus.Call{
 			Err:  nil,
-			Body: []interface{}{dbus.MakeVariant(uint32(1))},
+			Body: []any{dbus.MakeVariant(uint32(1))},
 		}
 		mockSettingsObj.EXPECT().Call("org.freedesktop.portal.Settings.ReadOne", dbus.Flags(0), "org.freedesktop.appearance", "color-scheme").Return(mockCall)
 
@@ -564,7 +564,7 @@ func TestHandleRequest(t *testing.T) {
 			req := Request{
 				ID:     123,
 				Method: method,
-				Params: map[string]interface{}{},
+				Params: map[string]any{},
 			}
 
 			HandleRequest(conn, req, manager)

@@ -1,5 +1,4 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtCore
@@ -23,79 +22,79 @@ Singleton {
     property string profileLastPath: ""
 
     property var fileBrowserSettings: ({
-        "wallpaper": {
-            "lastPath": "",
-            "viewMode": "grid",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        },
-        "profile": {
-            "lastPath": "",
-            "viewMode": "grid",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        },
-        "notepad_save": {
-            "lastPath": "",
-            "viewMode": "list",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        },
-        "notepad_load": {
-            "lastPath": "",
-            "viewMode": "list",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        },
-        "generic": {
-            "lastPath": "",
-            "viewMode": "list",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        },
-        "default": {
-            "lastPath": "",
-            "viewMode": "list",
-            "sortBy": "name",
-            "sortAscending": true,
-            "iconSizeIndex": 1,
-            "showSidebar": true
-        }
-    })
+            "wallpaper": {
+                "lastPath": "",
+                "viewMode": "grid",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            },
+            "profile": {
+                "lastPath": "",
+                "viewMode": "grid",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            },
+            "notepad_save": {
+                "lastPath": "",
+                "viewMode": "list",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            },
+            "notepad_load": {
+                "lastPath": "",
+                "viewMode": "list",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            },
+            "generic": {
+                "lastPath": "",
+                "viewMode": "list",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            },
+            "default": {
+                "lastPath": "",
+                "viewMode": "list",
+                "sortBy": "name",
+                "sortAscending": true,
+                "iconSizeIndex": 1,
+                "showSidebar": true
+            }
+        })
 
     Component.onCompleted: {
         if (!isGreeterMode) {
-            loadCache()
+            loadCache();
         }
     }
 
     function loadCache() {
-        _loading = true
-        parseCache(cacheFile.text())
-        _loading = false
+        _loading = true;
+        parseCache(cacheFile.text());
+        _loading = false;
     }
 
     function parseCache(content) {
-        _loading = true
+        _loading = true;
         try {
             if (content && content.trim()) {
-                const cache = JSON.parse(content)
+                const cache = JSON.parse(content);
 
-                wallpaperLastPath = cache.wallpaperLastPath !== undefined ? cache.wallpaperLastPath : ""
-                profileLastPath = cache.profileLastPath !== undefined ? cache.profileLastPath : ""
+                wallpaperLastPath = cache.wallpaperLastPath !== undefined ? cache.wallpaperLastPath : "";
+                profileLastPath = cache.profileLastPath !== undefined ? cache.profileLastPath : "";
 
                 if (cache.fileBrowserSettings !== undefined) {
-                    fileBrowserSettings = cache.fileBrowserSettings
+                    fileBrowserSettings = cache.fileBrowserSettings;
                 } else if (cache.fileBrowserViewMode !== undefined) {
                     fileBrowserSettings = {
                         "wallpaper": {
@@ -122,65 +121,60 @@ Singleton {
                             "iconSizeIndex": 1,
                             "showSidebar": true
                         }
-                    }
+                    };
                 }
 
                 if (cache.configVersion === undefined) {
-                    migrateFromUndefinedToV1(cache)
-                    cleanupUnusedKeys()
-                    saveCache()
+                    migrateFromUndefinedToV1(cache);
+                    cleanupUnusedKeys();
+                    saveCache();
                 }
             }
         } catch (e) {
-            console.warn("CacheData: Failed to parse cache:", e.message)
+            console.warn("CacheData: Failed to parse cache:", e.message);
         } finally {
-            _loading = false
+            _loading = false;
         }
     }
 
     function saveCache() {
         if (_loading)
-            return
+            return;
         cacheFile.setText(JSON.stringify({
-                                             "wallpaperLastPath": wallpaperLastPath,
-                                             "profileLastPath": profileLastPath,
-                                             "fileBrowserSettings": fileBrowserSettings,
-                                             "configVersion": cacheConfigVersion
-                                         }, null, 2))
+            "wallpaperLastPath": wallpaperLastPath,
+            "profileLastPath": profileLastPath,
+            "fileBrowserSettings": fileBrowserSettings,
+            "configVersion": cacheConfigVersion
+        }, null, 2));
     }
 
     function migrateFromUndefinedToV1(cache) {
-        console.info("CacheData: Migrating configuration from undefined to version 1")
+        console.info("CacheData: Migrating configuration from undefined to version 1");
     }
 
     function cleanupUnusedKeys() {
-        const validKeys = [
-            "wallpaperLastPath",
-            "profileLastPath",
-            "fileBrowserSettings",
-            "configVersion"
-        ]
+        const validKeys = ["wallpaperLastPath", "profileLastPath", "fileBrowserSettings", "configVersion"];
 
         try {
-            const content = cacheFile.text()
-            if (!content || !content.trim()) return
-
-            const cache = JSON.parse(content)
-            let needsSave = false
+            const content = cacheFile.text();
+            if (!content || !content.trim())
+                return;
+            const cache = JSON.parse(content);
+            let needsSave = false;
 
             for (const key in cache) {
                 if (!validKeys.includes(key)) {
-                    console.log("CacheData: Removing unused key:", key)
-                    delete cache[key]
-                    needsSave = true
+                    console.log("CacheData: Removing unused key:", key);
+                    delete cache[key];
+                    needsSave = true;
                 }
             }
 
             if (needsSave) {
-                cacheFile.setText(JSON.stringify(cache, null, 2))
+                cacheFile.setText(JSON.stringify(cache, null, 2));
             }
         } catch (e) {
-            console.warn("CacheData: Failed to cleanup unused keys:", e.message)
+            console.warn("CacheData: Failed to cleanup unused keys:", e.message);
         }
     }
 
@@ -194,12 +188,12 @@ Singleton {
         watchChanges: !isGreeterMode
         onLoaded: {
             if (!isGreeterMode) {
-                parseCache(cacheFile.text())
+                parseCache(cacheFile.text());
             }
         }
         onLoadFailed: error => {
             if (!isGreeterMode) {
-                console.info("CacheData: No cache file found, starting fresh")
+                console.info("CacheData: No cache file found, starting fresh");
             }
         }
     }

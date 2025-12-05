@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -15,6 +14,8 @@ BasePill {
     property var widgetData: null
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
 
+    signal cpuClicked
+
     Component.onCompleted: {
         DgopService.addRef(["cpu"]);
     }
@@ -25,7 +26,7 @@ BasePill {
     content: Component {
         Item {
             implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : cpuContent.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? cpuColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitHeight: root.isVerticalOrientation ? cpuColumn.implicitHeight : cpuContent.implicitHeight
 
             Column {
                 id: cpuColumn
@@ -58,7 +59,7 @@ BasePill {
 
                         return DgopService.cpuUsage.toFixed(0);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -68,9 +69,10 @@ BasePill {
                 id: cpuContent
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: 3
+                spacing: Theme.spacingXS
 
                 DankIcon {
+                    id: cpuIcon
                     name: "memory"
                     size: Theme.barIconSize(root.barThickness)
                     color: {
@@ -87,33 +89,45 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                StyledText {
-                    text: {
-                        if (DgopService.cpuUsage === undefined || DgopService.cpuUsage === null || DgopService.cpuUsage === 0) {
-                            return "--%";
-                        }
-
-                        return DgopService.cpuUsage.toFixed(0) + "%";
-                    }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
-                    color: Theme.widgetTextColor
+                Item {
+                    id: textBox
                     anchors.verticalCenter: parent.verticalCenter
-                    horizontalAlignment: Text.AlignLeft
-                    elide: Text.ElideNone
 
-                    StyledTextMetrics {
-                        id: cpuBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
-                        text: "100%"
-                    }
+                    implicitWidth: root.minimumWidth ? Math.max(cpuBaseline.width, cpuText.paintedWidth) : cpuText.paintedWidth
+                    implicitHeight: cpuText.implicitHeight
 
-                    width: root.minimumWidth ? Math.max(cpuBaseline.width, paintedWidth) : paintedWidth
+                    width: implicitWidth
+                    height: implicitHeight
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 120
+                            duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
                         }
+                    }
+
+                    StyledTextMetrics {
+                        id: cpuBaseline
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        text: "88%"
+                    }
+
+                    StyledText {
+                        id: cpuText
+                        text: {
+                            const v = DgopService.cpuUsage;
+                            if (v === undefined || v === null || v === 0) {
+                                return "--%";
+                            }
+                            return v.toFixed(0) + "%";
+                        }
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        color: Theme.widgetTextColor
+
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideNone
                     }
                 }
             }
@@ -125,16 +139,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
             DgopService.setSortBy("cpu");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "cpu");
-            }
+            cpuClicked();
         }
     }
 }

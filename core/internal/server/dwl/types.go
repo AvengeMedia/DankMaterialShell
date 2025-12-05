@@ -41,7 +41,7 @@ type Manager struct {
 	display  *wlclient.Display
 	ctx      *wlclient.Context
 	registry *wlclient.Registry
-	manager  interface{}
+	manager  any
 
 	outputs syncmap.Map[uint32, *outputState]
 
@@ -67,7 +67,7 @@ type outputState struct {
 	id           uint32
 	registryName uint32
 	output       *wlclient.Output
-	ipcOutput    interface{}
+	ipcOutput    any
 	name         string
 	active       uint32
 	tags         []TagState

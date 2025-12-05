@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 import qs.Common
 import qs.Modules.Plugins
 import qs.Services
@@ -15,6 +14,8 @@ BasePill {
     property var widgetData: null
     property bool minimumWidth: (widgetData && widgetData.minimumWidth !== undefined) ? widgetData.minimumWidth : true
 
+    signal cpuTempClicked
+
     Component.onCompleted: {
         DgopService.addRef(["cpu"]);
     }
@@ -24,8 +25,8 @@ BasePill {
 
     content: Component {
         Item {
-            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : cpuTempContent.implicitWidth
-            implicitHeight: root.isVerticalOrientation ? cpuTempColumn.implicitHeight : (root.widgetThickness - root.horizontalPadding * 2)
+            implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : cpuTempRow.implicitWidth
+            implicitHeight: root.isVerticalOrientation ? cpuTempColumn.implicitHeight : cpuTempRow.implicitHeight
 
             Column {
                 id: cpuTempColumn
@@ -58,19 +59,20 @@ BasePill {
 
                         return Math.round(DgopService.cpuTemperature).toString();
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
             }
 
             Row {
-                id: cpuTempContent
+                id: cpuTempRow
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
-                spacing: 3
+                spacing: Theme.spacingXS
 
                 DankIcon {
+                    id: cpuTempIcon
                     name: "device_thermostat"
                     size: Theme.barIconSize(root.barThickness)
                     color: {
@@ -87,33 +89,45 @@ BasePill {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                StyledText {
-                    text: {
-                        if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
-                            return "--°";
-                        }
-
-                        return Math.round(DgopService.cpuTemperature) + "°";
-                    }
-                    font.pixelSize: Theme.barTextSize(root.barThickness)
-                    color: Theme.widgetTextColor
+                Item {
+                    id: textBox
                     anchors.verticalCenter: parent.verticalCenter
-                    horizontalAlignment: Text.AlignLeft
-                    elide: Text.ElideNone
 
-                    StyledTextMetrics {
-                        id: tempBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness)
-                        text: "100°"
-                    }
+                    implicitWidth: root.minimumWidth ? Math.max(tempBaseline.width, cpuTempText.paintedWidth) : cpuTempText.paintedWidth
+                    implicitHeight: cpuTempText.implicitHeight
 
-                    width: root.minimumWidth ? Math.max(tempBaseline.width, paintedWidth) : paintedWidth
+                    width: implicitWidth
+                    height: implicitHeight
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 120
+                            duration: Theme.shortDuration
                             easing.type: Easing.OutCubic
                         }
+                    }
+
+                    StyledTextMetrics {
+                        id: tempBaseline
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        text: "88°"
+                    }
+
+                    StyledText {
+                        id: cpuTempText
+                        text: {
+                            if (DgopService.cpuTemperature === undefined || DgopService.cpuTemperature === null || DgopService.cpuTemperature < 0) {
+                                return "--°";
+                            }
+
+                            return Math.round(DgopService.cpuTemperature) + "°";
+                        }
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        color: Theme.widgetTextColor
+
+                        anchors.fill: parent
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideNone
                     }
                 }
             }
@@ -125,16 +139,8 @@ BasePill {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
         onPressed: {
-            if (popoutTarget && popoutTarget.setTriggerPosition) {
-                const globalPos = root.visualContent.mapToGlobal(0, 0)
-                const currentScreen = parentScreen || Screen
-                const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barThickness, root.visualWidth)
-                popoutTarget.setTriggerPosition(pos.x, pos.y, pos.width, section, currentScreen)
-            }
             DgopService.setSortBy("cpu");
-            if (popoutTarget) {
-                PopoutManager.requestPopout(popoutTarget, undefined, "cpu_temp");
-            }
+            cpuTempClicked();
         }
     }
 }

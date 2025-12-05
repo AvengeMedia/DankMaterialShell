@@ -77,8 +77,6 @@ func runUpdate() {
 	switch config.Family {
 	case distros.FamilyArch:
 		updateErr = updateArchLinux()
-	case distros.FamilyNix:
-		updateErr = updateNixOS()
 	case distros.FamilySUSE:
 		updateErr = updateOtherDistros()
 	default:
@@ -146,27 +144,6 @@ func updateArchLinux() error {
 	err = updateCmd.Run()
 	if err != nil {
 		fmt.Printf("Error: Failed to update using %s: %v\n", helper, err)
-	}
-
-	fmt.Println("dms successfully updated")
-	return nil
-}
-
-func updateNixOS() error {
-	fmt.Println("This will update DankMaterialShell using nix profile.")
-	if !confirmUpdate() {
-		return errdefs.ErrUpdateCancelled
-	}
-
-	fmt.Println("\nRunning: nix profile upgrade github:AvengeMedia/DankMaterialShell")
-	updateCmd := exec.Command("nix", "profile", "upgrade", "github:AvengeMedia/DankMaterialShell")
-	updateCmd.Stdout = os.Stdout
-	updateCmd.Stderr = os.Stderr
-	err := updateCmd.Run()
-	if err != nil {
-		fmt.Printf("Error: Failed to update using nix profile: %v\n", err)
-		fmt.Println("Falling back to git-based update method...")
-		return updateOtherDistros()
 	}
 
 	fmt.Println("dms successfully updated")

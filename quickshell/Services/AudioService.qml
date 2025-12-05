@@ -1,5 +1,4 @@
 pragma Singleton
-
 pragma ComponentBehavior: Bound
 
 import QtCore
@@ -15,7 +14,6 @@ Singleton {
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
 
-    property bool suppressOSD: true
     property bool soundsAvailable: false
     property bool gsettingsAvailable: false
     property var availableSoundThemes: []
@@ -32,13 +30,42 @@ Singleton {
     property var mediaDevicesConnections: null
 
     signal micMuteChanged
+    signal audioOutputCycled(string deviceName)
 
-    Timer {
-        id: startupTimer
-        interval: 500
-        repeat: false
-        running: true
-        onTriggered: root.suppressOSD = false
+    function getAvailableSinks() {
+        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream);
+    }
+
+    function cycleAudioOutput() {
+        const sinks = getAvailableSinks();
+        if (sinks.length < 2)
+            return null;
+
+        const currentSink = root.sink;
+        let currentIndex = -1;
+        for (let i = 0; i < sinks.length; i++) {
+            if (sinks[i] === currentSink) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        const nextIndex = (currentIndex + 1) % sinks.length;
+        const nextSink = sinks[nextIndex];
+        Pipewire.preferredDefaultAudioSink = nextSink;
+        const name = displayName(nextSink);
+        audioOutputCycled(name);
+        return name;
+    }
+
+    Connections {
+        target: root.sink?.audio ?? null
+
+        function onVolumeChanged() {
+            if (SessionData.suppressOSD)
+                return;
+            root.playVolumeChangeSoundIfEnabled();
+        }
     }
 
     function detectSoundsAvailability() {
@@ -47,35 +74,33 @@ Singleton {
                 import QtQuick
                 import QtMultimedia
                 Item {}
-            `, root, "AudioService.TestComponent")
+            `, root, "AudioService.TestComponent");
             if (testObj) {
-                testObj.destroy()
+                testObj.destroy();
             }
-            soundsAvailable = true
-            return true
+            soundsAvailable = true;
+            return true;
         } catch (e) {
-            soundsAvailable = false
-            return false
+            soundsAvailable = false;
+            return false;
         }
     }
 
     function checkGsettings() {
         Proc.runCommand("checkGsettings", ["sh", "-c", "gsettings get org.gnome.desktop.sound theme-name 2>/dev/null"], (output, exitCode) => {
-            gsettingsAvailable = (exitCode === 0)
+            gsettingsAvailable = (exitCode === 0);
             if (gsettingsAvailable) {
-                scanSoundThemes()
-                getCurrentSoundTheme()
+                scanSoundThemes();
+                getCurrentSoundTheme();
             }
-        }, 0)
+        }, 0);
     }
 
     function scanSoundThemes() {
-        const xdgDataDirs = Quickshell.env("XDG_DATA_DIRS")
-        const searchPaths = xdgDataDirs && xdgDataDirs.trim() !== ""
-            ? xdgDataDirs.split(":").concat(Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation)))
-            : ["/usr/share", "/usr/local/share", Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))]
+        const xdgDataDirs = Quickshell.env("XDG_DATA_DIRS");
+        const searchPaths = xdgDataDirs && xdgDataDirs.trim() !== "" ? xdgDataDirs.split(":").concat(Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))) : ["/usr/share", "/usr/local/share", Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))];
 
-        const basePaths = searchPaths.map(p => p + "/sounds").join(" ")
+        const basePaths = searchPaths.map(p => p + "/sounds").join(" ");
         const script = `
             for base_dir in ${basePaths}; do
                 [ -d "$base_dir" ] || continue
@@ -84,65 +109,63 @@ Singleton {
                     basename "$theme_dir"
                 done
             done | sort -u
-        `
+        `;
 
         Proc.runCommand("scanSoundThemes", ["sh", "-c", script], (output, exitCode) => {
             if (exitCode === 0 && output.trim()) {
-                const themes = output.trim().split('\n').filter(t => t && t.length > 0)
-                availableSoundThemes = themes
+                const themes = output.trim().split('\n').filter(t => t && t.length > 0);
+                availableSoundThemes = themes;
             } else {
-                availableSoundThemes = []
+                availableSoundThemes = [];
             }
-        }, 0)
+        }, 0);
     }
 
     function getCurrentSoundTheme() {
         Proc.runCommand("getCurrentSoundTheme", ["sh", "-c", "gsettings get org.gnome.desktop.sound theme-name 2>/dev/null | sed \"s/'//g\""], (output, exitCode) => {
             if (exitCode === 0 && output.trim()) {
-                currentSoundTheme = output.trim()
-                console.log("AudioService: Current system sound theme:", currentSoundTheme)
+                currentSoundTheme = output.trim();
+                console.log("AudioService: Current system sound theme:", currentSoundTheme);
                 if (SettingsData.useSystemSoundTheme) {
-                    discoverSoundFiles(currentSoundTheme)
+                    discoverSoundFiles(currentSoundTheme);
                 }
             } else {
-                currentSoundTheme = ""
-                console.log("AudioService: No system sound theme found")
+                currentSoundTheme = "";
+                console.log("AudioService: No system sound theme found");
             }
-        }, 0)
+        }, 0);
     }
 
     function setSoundTheme(themeName) {
         if (!themeName || themeName === currentSoundTheme) {
-            return
+            return;
         }
 
         Proc.runCommand("setSoundTheme", ["sh", "-c", `gsettings set org.gnome.desktop.sound theme-name '${themeName}'`], (output, exitCode) => {
             if (exitCode === 0) {
-                currentSoundTheme = themeName
+                currentSoundTheme = themeName;
                 if (SettingsData.useSystemSoundTheme) {
-                    discoverSoundFiles(themeName)
+                    discoverSoundFiles(themeName);
                 }
             }
-        }, 0)
+        }, 0);
     }
 
     function discoverSoundFiles(themeName) {
         if (!themeName) {
-            soundFilePaths = {}
+            soundFilePaths = {};
             if (soundsAvailable) {
-                destroySoundPlayers()
-                createSoundPlayers()
+                destroySoundPlayers();
+                createSoundPlayers();
             }
-            return
+            return;
         }
 
-        const xdgDataDirs = Quickshell.env("XDG_DATA_DIRS")
-        const searchPaths = xdgDataDirs && xdgDataDirs.trim() !== ""
-            ? xdgDataDirs.split(":").concat(Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation)))
-            : ["/usr/share", "/usr/local/share", Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))]
+        const xdgDataDirs = Quickshell.env("XDG_DATA_DIRS");
+        const searchPaths = xdgDataDirs && xdgDataDirs.trim() !== "" ? xdgDataDirs.split(":").concat(Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))) : ["/usr/share", "/usr/local/share", Paths.strip(StandardPaths.writableLocation(StandardPaths.GenericDataLocation))];
 
-        const extensions = ["oga", "ogg", "wav", "mp3", "flac"]
-        const themesToSearch = themeName !== "freedesktop" ? `${themeName} freedesktop` : themeName
+        const extensions = ["oga", "ogg", "wav", "mp3", "flac"];
+        const themesToSearch = themeName !== "freedesktop" ? `${themeName} freedesktop` : themeName;
 
         const script = `
             for event_key in audio-volume-change power-plug power-unplug message message-new-instant; do
@@ -179,26 +202,26 @@ Singleton {
                     [ $found -eq 1 ] && break
                 done
             done
-        `
+        `;
 
         Proc.runCommand("discoverSoundFiles", ["sh", "-c", script], (output, exitCode) => {
-            const paths = {}
+            const paths = {};
             if (exitCode === 0 && output.trim()) {
-                const lines = output.trim().split('\n')
+                const lines = output.trim().split('\n');
                 for (let line of lines) {
-                    const parts = line.split('=')
+                    const parts = line.split('=');
                     if (parts.length === 2) {
-                        paths[parts[0]] = "file://" + parts[1]
+                        paths[parts[0]] = "file://" + parts[1];
                     }
                 }
             }
-            soundFilePaths = paths
+            soundFilePaths = paths;
 
             if (soundsAvailable) {
-                destroySoundPlayers()
-                createSoundPlayers()
+                destroySoundPlayers();
+                createSoundPlayers();
             }
-        }, 0)
+        }, 0);
     }
 
     function getSoundPath(soundEvent) {
@@ -208,45 +231,45 @@ Singleton {
             "power-unplug": "../assets/sounds/plasma/power-unplug.wav",
             "message": "../assets/sounds/freedesktop/message.wav",
             "message-new-instant": "../assets/sounds/freedesktop/message-new-instant.wav"
-        }
+        };
 
         const specialConditions = {
             "smooth": ["audio-volume-change"]
-        }
+        };
 
-        const themeLower = currentSoundTheme.toLowerCase()
+        const themeLower = currentSoundTheme.toLowerCase();
         if (SettingsData.useSystemSoundTheme && specialConditions[themeLower]?.includes(soundEvent)) {
-            const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav")
-            console.log("AudioService: Using bundled sound (special condition) for", soundEvent, ":", bundledPath)
-            return bundledPath
+            const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav");
+            console.log("AudioService: Using bundled sound (special condition) for", soundEvent, ":", bundledPath);
+            return bundledPath;
         }
 
         if (SettingsData.useSystemSoundTheme && soundFilePaths[soundEvent]) {
-            console.log("AudioService: Using system sound for", soundEvent, ":", soundFilePaths[soundEvent])
-            return soundFilePaths[soundEvent]
+            console.log("AudioService: Using system sound for", soundEvent, ":", soundFilePaths[soundEvent]);
+            return soundFilePaths[soundEvent];
         }
 
-        const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav")
-        console.log("AudioService: Using bundled sound for", soundEvent, ":", bundledPath)
-        return bundledPath
+        const bundledPath = Qt.resolvedUrl(soundMap[soundEvent] || "../assets/sounds/freedesktop/message.wav");
+        console.log("AudioService: Using bundled sound for", soundEvent, ":", bundledPath);
+        return bundledPath;
     }
 
     function reloadSounds() {
-        console.log("AudioService: Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme)
+        console.log("AudioService: Reloading sounds, useSystemSoundTheme:", SettingsData.useSystemSoundTheme, "currentSoundTheme:", currentSoundTheme);
         if (SettingsData.useSystemSoundTheme && currentSoundTheme) {
-            discoverSoundFiles(currentSoundTheme)
+            discoverSoundFiles(currentSoundTheme);
         } else {
-            soundFilePaths = {}
+            soundFilePaths = {};
             if (soundsAvailable) {
-                destroySoundPlayers()
-                createSoundPlayers()
+                destroySoundPlayers();
+                createSoundPlayers();
             }
         }
     }
 
     function setupMediaDevices() {
         if (!soundsAvailable || mediaDevices) {
-            return
+            return;
         }
 
         try {
@@ -259,7 +282,7 @@ Singleton {
                         console.log("AudioService: MediaDevices initialized, default output:", defaultAudioOutput?.description)
                     }
                 }
-            `, root, "AudioService.MediaDevices")
+            `, root, "AudioService.MediaDevices");
 
             if (mediaDevices) {
                 mediaDevicesConnections = Qt.createQmlObject(`
@@ -272,48 +295,48 @@ Singleton {
                             root.createSoundPlayers()
                         }
                     }
-                `, root, "AudioService.MediaDevicesConnections")
+                `, root, "AudioService.MediaDevicesConnections");
             }
         } catch (e) {
-            console.log("AudioService: MediaDevices not available, using default audio output")
-            mediaDevices = null
+            console.log("AudioService: MediaDevices not available, using default audio output");
+            mediaDevices = null;
         }
     }
 
     function destroySoundPlayers() {
         if (volumeChangeSound) {
-            volumeChangeSound.destroy()
-            volumeChangeSound = null
+            volumeChangeSound.destroy();
+            volumeChangeSound = null;
         }
         if (powerPlugSound) {
-            powerPlugSound.destroy()
-            powerPlugSound = null
+            powerPlugSound.destroy();
+            powerPlugSound = null;
         }
         if (powerUnplugSound) {
-            powerUnplugSound.destroy()
-            powerUnplugSound = null
+            powerUnplugSound.destroy();
+            powerUnplugSound = null;
         }
         if (normalNotificationSound) {
-            normalNotificationSound.destroy()
-            normalNotificationSound = null
+            normalNotificationSound.destroy();
+            normalNotificationSound = null;
         }
         if (criticalNotificationSound) {
-            criticalNotificationSound.destroy()
-            criticalNotificationSound = null
+            criticalNotificationSound.destroy();
+            criticalNotificationSound = null;
         }
     }
 
     function createSoundPlayers() {
         if (!soundsAvailable) {
-            return
+            return;
         }
 
-        setupMediaDevices()
+        setupMediaDevices();
 
         try {
-            const deviceProperty = mediaDevices ? `device: root.mediaDevices.defaultAudioOutput\n                    ` : ""
+            const deviceProperty = mediaDevices ? `device: root.mediaDevices.defaultAudioOutput\n                    ` : "";
 
-            const volumeChangePath = getSoundPath("audio-volume-change")
+            const volumeChangePath = getSoundPath("audio-volume-change");
             volumeChangeSound = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
@@ -323,9 +346,9 @@ Singleton {
                         ${deviceProperty}volume: 1.0
                     }
                 }
-            `, root, "AudioService.VolumeChangeSound")
+            `, root, "AudioService.VolumeChangeSound");
 
-            const powerPlugPath = getSoundPath("power-plug")
+            const powerPlugPath = getSoundPath("power-plug");
             powerPlugSound = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
@@ -335,9 +358,9 @@ Singleton {
                         ${deviceProperty}volume: 1.0
                     }
                 }
-            `, root, "AudioService.PowerPlugSound")
+            `, root, "AudioService.PowerPlugSound");
 
-            const powerUnplugPath = getSoundPath("power-unplug")
+            const powerUnplugPath = getSoundPath("power-unplug");
             powerUnplugSound = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
@@ -347,9 +370,9 @@ Singleton {
                         ${deviceProperty}volume: 1.0
                     }
                 }
-            `, root, "AudioService.PowerUnplugSound")
+            `, root, "AudioService.PowerUnplugSound");
 
-            const messagePath = getSoundPath("message")
+            const messagePath = getSoundPath("message");
             normalNotificationSound = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
@@ -359,9 +382,9 @@ Singleton {
                         ${deviceProperty}volume: 1.0
                     }
                 }
-            `, root, "AudioService.NormalNotificationSound")
+            `, root, "AudioService.NormalNotificationSound");
 
-            const messageNewInstantPath = getSoundPath("message-new-instant")
+            const messageNewInstantPath = getSoundPath("message-new-instant");
             criticalNotificationSound = Qt.createQmlObject(`
                 import QtQuick
                 import QtMultimedia
@@ -371,114 +394,114 @@ Singleton {
                         ${deviceProperty}volume: 1.0
                     }
                 }
-            `, root, "AudioService.CriticalNotificationSound")
+            `, root, "AudioService.CriticalNotificationSound");
         } catch (e) {
-            console.warn("AudioService: Error creating sound players:", e)
+            console.warn("AudioService: Error creating sound players:", e);
         }
     }
 
     function playVolumeChangeSound() {
         if (soundsAvailable && volumeChangeSound) {
-            volumeChangeSound.play()
+            volumeChangeSound.play();
         }
     }
 
     function playPowerPlugSound() {
         if (soundsAvailable && powerPlugSound) {
-            powerPlugSound.play()
+            powerPlugSound.play();
         }
     }
 
     function playPowerUnplugSound() {
         if (soundsAvailable && powerUnplugSound) {
-            powerUnplugSound.play()
+            powerUnplugSound.play();
         }
     }
 
     function playNormalNotificationSound() {
         if (soundsAvailable && normalNotificationSound && !SessionData.doNotDisturb) {
-            normalNotificationSound.play()
+            normalNotificationSound.play();
         }
     }
 
     function playCriticalNotificationSound() {
         if (soundsAvailable && criticalNotificationSound && !SessionData.doNotDisturb) {
-            criticalNotificationSound.play()
+            criticalNotificationSound.play();
         }
     }
 
     function playVolumeChangeSoundIfEnabled() {
         if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged) {
-            playVolumeChangeSound()
+            playVolumeChangeSound();
         }
     }
 
     function displayName(node) {
         if (!node) {
-            return ""
+            return "";
         }
 
         if (node.properties && node.properties["device.description"]) {
-            return node.properties["device.description"]
+            return node.properties["device.description"];
         }
 
         if (node.description && node.description !== node.name) {
-            return node.description
+            return node.description;
         }
 
         if (node.nickname && node.nickname !== node.name) {
-            return node.nickname
+            return node.nickname;
         }
 
         if (node.name.includes("analog-stereo")) {
-            return "Built-in Speakers"
+            return "Built-in Speakers";
         }
         if (node.name.includes("bluez")) {
-            return "Bluetooth Audio"
+            return "Bluetooth Audio";
         }
         if (node.name.includes("usb")) {
-            return "USB Audio"
+            return "USB Audio";
         }
         if (node.name.includes("hdmi")) {
-            return "HDMI Audio"
+            return "HDMI Audio";
         }
 
-        return node.name
+        return node.name;
     }
 
     function subtitle(name) {
         if (!name) {
-            return ""
+            return "";
         }
 
         if (name.includes('usb-')) {
             if (name.includes('SteelSeries')) {
-                return "USB Gaming Headset"
+                return "USB Gaming Headset";
             }
             if (name.includes('Generic')) {
-                return "USB Audio Device"
+                return "USB Audio Device";
             }
-            return "USB Audio"
+            return "USB Audio";
         }
 
         if (name.includes('pci-')) {
             if (name.includes('01_00.1') || name.includes('01:00.1')) {
-                return "NVIDIA GPU Audio"
+                return "NVIDIA GPU Audio";
             }
-            return "PCI Audio"
+            return "PCI Audio";
         }
 
         if (name.includes('bluez')) {
-            return "Bluetooth Audio"
+            return "Bluetooth Audio";
         }
         if (name.includes('analog')) {
-            return "Built-in Audio"
+            return "Built-in Audio";
         }
         if (name.includes('hdmi')) {
-            return "HDMI Audio"
+            return "HDMI Audio";
         }
 
-        return ""
+        return "";
     }
 
     PwObjectTracker {
@@ -487,136 +510,141 @@ Singleton {
 
     function setVolume(percentage) {
         if (!root.sink?.audio) {
-            return "No audio sink available"
+            return "No audio sink available";
         }
 
-        const clampedVolume = Math.max(0, Math.min(100, percentage))
-        root.sink.audio.volume = clampedVolume / 100
-        return `Volume set to ${clampedVolume}%`
+        const clampedVolume = Math.max(0, Math.min(100, percentage));
+        root.sink.audio.volume = clampedVolume / 100;
+        return `Volume set to ${clampedVolume}%`;
     }
 
     function toggleMute() {
         if (!root.sink?.audio) {
-            return "No audio sink available"
+            return "No audio sink available";
         }
 
-        root.sink.audio.muted = !root.sink.audio.muted
-        return root.sink.audio.muted ? "Audio muted" : "Audio unmuted"
+        root.sink.audio.muted = !root.sink.audio.muted;
+        return root.sink.audio.muted ? "Audio muted" : "Audio unmuted";
     }
 
     function setMicVolume(percentage) {
         if (!root.source?.audio) {
-            return "No audio source available"
+            return "No audio source available";
         }
 
-        const clampedVolume = Math.max(0, Math.min(100, percentage))
-        root.source.audio.volume = clampedVolume / 100
-        return `Microphone volume set to ${clampedVolume}%`
+        const clampedVolume = Math.max(0, Math.min(100, percentage));
+        root.source.audio.volume = clampedVolume / 100;
+        return `Microphone volume set to ${clampedVolume}%`;
     }
 
     function toggleMicMute() {
         if (!root.source?.audio) {
-            return "No audio source available"
+            return "No audio source available";
         }
 
-        root.source.audio.muted = !root.source.audio.muted
-        return root.source.audio.muted ? "Microphone muted" : "Microphone unmuted"
+        root.source.audio.muted = !root.source.audio.muted;
+        return root.source.audio.muted ? "Microphone muted" : "Microphone unmuted";
     }
 
     IpcHandler {
         target: "audio"
 
         function setvolume(percentage: string): string {
-            return root.setVolume(parseInt(percentage))
+            return root.setVolume(parseInt(percentage));
         }
 
         function increment(step: string): string {
             if (!root.sink?.audio) {
-                return "No audio sink available"
+                return "No audio sink available";
             }
 
             if (root.sink.audio.muted) {
-                root.sink.audio.muted = false
+                root.sink.audio.muted = false;
             }
 
-            const currentVolume = Math.round(root.sink.audio.volume * 100)
-            const stepValue = parseInt(step || "5")
-            const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue))
+            const currentVolume = Math.round(root.sink.audio.volume * 100);
+            const stepValue = parseInt(step || "5");
+            const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
 
-            root.sink.audio.volume = newVolume / 100
-            root.playVolumeChangeSoundIfEnabled()
-            return `Volume increased to ${newVolume}%`
+            root.sink.audio.volume = newVolume / 100;
+            return `Volume increased to ${newVolume}%`;
         }
 
         function decrement(step: string): string {
             if (!root.sink?.audio) {
-                return "No audio sink available"
+                return "No audio sink available";
             }
 
             if (root.sink.audio.muted) {
-                root.sink.audio.muted = false
+                root.sink.audio.muted = false;
             }
 
-            const currentVolume = Math.round(root.sink.audio.volume * 100)
-            const stepValue = parseInt(step || "5")
-            const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue))
+            const currentVolume = Math.round(root.sink.audio.volume * 100);
+            const stepValue = parseInt(step || "5");
+            const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
 
-            root.sink.audio.volume = newVolume / 100
-            root.playVolumeChangeSoundIfEnabled()
-            return `Volume decreased to ${newVolume}%`
+            root.sink.audio.volume = newVolume / 100;
+            return `Volume decreased to ${newVolume}%`;
         }
 
         function mute(): string {
-            return root.toggleMute()
+            return root.toggleMute();
         }
 
         function setmic(percentage: string): string {
-            return root.setMicVolume(parseInt(percentage))
+            return root.setMicVolume(parseInt(percentage));
         }
 
         function micmute(): string {
-            const result = root.toggleMicMute()
-            root.micMuteChanged()
-            return result
+            const result = root.toggleMicMute();
+            root.micMuteChanged();
+            return result;
         }
 
         function status(): string {
-            let result = "Audio Status:\n"
+            let result = "Audio Status:\n";
 
             if (root.sink?.audio) {
-                const volume = Math.round(root.sink.audio.volume * 100)
-                const muteStatus = root.sink.audio.muted ? " (muted)" : ""
-                result += `Output: ${volume}%${muteStatus}\n`
+                const volume = Math.round(root.sink.audio.volume * 100);
+                const muteStatus = root.sink.audio.muted ? " (muted)" : "";
+                result += `Output: ${volume}%${muteStatus}\n`;
             } else {
-                result += "Output: No sink available\n"
+                result += "Output: No sink available\n";
             }
 
             if (root.source?.audio) {
-                const micVolume = Math.round(root.source.audio.volume * 100)
-                const muteStatus = root.source.audio.muted ? " (muted)" : ""
-                result += `Input: ${micVolume}%${muteStatus}`
+                const micVolume = Math.round(root.source.audio.volume * 100);
+                const muteStatus = root.source.audio.muted ? " (muted)" : "";
+                result += `Input: ${micVolume}%${muteStatus}`;
             } else {
-                result += "Input: No source available"
+                result += "Input: No source available";
             }
 
-            return result
+            return result;
+        }
+
+        function cycleoutput(): string {
+            const result = root.cycleAudioOutput();
+            if (!result)
+                return "Only one audio output available";
+            return `Switched to: ${result}`;
         }
     }
 
     Connections {
         target: SettingsData
         function onUseSystemSoundThemeChanged() {
-            reloadSounds()
+            reloadSounds();
         }
     }
 
     Component.onCompleted: {
         if (!detectSoundsAvailability()) {
-            console.warn("AudioService: QtMultimedia not available - sound effects disabled")
+            console.warn("AudioService: QtMultimedia not available - sound effects disabled");
         } else {
-            console.info("AudioService: Sound effects enabled")
-            checkGsettings()
-            Qt.callLater(createSoundPlayers)
+            console.info("AudioService: Sound effects enabled");
+            checkGsettings();
+            Qt.callLater(createSoundPlayers);
         }
     }
 }

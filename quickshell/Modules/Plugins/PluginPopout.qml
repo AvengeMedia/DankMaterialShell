@@ -13,14 +13,6 @@ DankPopout {
     property real contentWidth: 400
     property real contentHeight: 0
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        triggerX = x
-        triggerY = y
-        triggerWidth = width
-        triggerSection = section
-        triggerScreen = screen
-    }
-
     popupWidth: contentWidth
     popupHeight: contentHeight
     screen: triggerScreen
@@ -82,8 +74,8 @@ DankPopout {
                                 root.close()
                             }
                         }
-                        if (root.contentHeight === 0 && item) {
-                            root.contentHeight = item.implicitHeight + Theme.spacingS * 2
+                        if (item) {
+                            root.contentHeight = Qt.binding(() => item.implicitHeight + Theme.spacingS * 2)
                         }
                     }
                 }

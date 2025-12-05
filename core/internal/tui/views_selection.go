@@ -3,7 +3,6 @@ package tui
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -72,10 +71,10 @@ func (m Model) viewSelectTerminal() string {
 	b.WriteString(title)
 	b.WriteString("\n\n")
 
-	options := []struct {
+	var options []struct {
 		name        string
 		description string
-	}{}
+	}
 
 	if m.osInfo != nil && m.osInfo.Distribution.ID == "gentoo" {
 		options = []struct {
@@ -140,20 +139,6 @@ func (m Model) updateSelectTerminalState(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.selectedTerminal++
 			}
 		case "enter":
-			if m.osInfo != nil && m.osInfo.Distribution.ID == "nixos" {
-				var wmInstalled bool
-				if m.selectedWM == 0 {
-					wmInstalled = m.commandExists("niri")
-				} else {
-					wmInstalled = m.commandExists("hyprland") || m.commandExists("Hyprland")
-				}
-
-				if !wmInstalled {
-					m.state = StateMissingWMInstructions
-					return m, m.listenForLogs()
-				}
-			}
-
 			m.state = StateDetectingDeps
 			m.isLoading = true
 			return m, tea.Batch(m.spinner.Tick, m.detectDependencies())
@@ -191,11 +176,6 @@ func (m Model) updateSelectWindowManagerState(msg tea.Msg) (tea.Model, tea.Cmd) 
 		}
 	}
 	return m, m.listenForLogs()
-}
-
-func (m Model) commandExists(cmd string) bool {
-	_, err := exec.LookPath(cmd)
-	return err == nil
 }
 
 func (m Model) detectDependencies() tea.Cmd {

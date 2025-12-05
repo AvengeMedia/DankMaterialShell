@@ -367,7 +367,7 @@ func SyncDMSConfigs(dmsPath string, logFunc func(string), sudoPassword string) e
 			}
 		}
 
-		runSudoCmd(sudoPassword, "rm", "-f", link.target)
+		runSudoCmd(sudoPassword, "rm", "-f", link.target) //nolint:errcheck
 
 		if err := runSudoCmd(sudoPassword, "ln", "-sf", link.source, link.target); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to create symlink for %s: %v", link.desc, err))

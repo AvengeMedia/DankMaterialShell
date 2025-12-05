@@ -55,7 +55,7 @@ Column {
                 cursorShape: Qt.PointingHandCursor
                 onPressed: {
                     if (root.closePopout) {
-                        root.closePopout()
+                        root.closePopout();
                     }
                 }
             }

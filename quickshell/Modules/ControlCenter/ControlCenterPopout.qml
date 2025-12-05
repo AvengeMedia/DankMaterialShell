@@ -1,16 +1,7 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Effects
-import QtQuick.Layouts
-import Quickshell
-import Quickshell.Io
 import Quickshell.Wayland
-import Quickshell.Widgets
 import qs.Common
-import qs.Modules.ControlCenter
-import qs.Modules.ControlCenter.Widgets
 import qs.Modules.ControlCenter.Details
-import qs.Modules.DankBar
 import qs.Services
 import qs.Widgets
 import qs.Modules.ControlCenter.Components
@@ -32,73 +23,82 @@ DankPopout {
     signal lockRequested
 
     function collapseAll() {
-        expandedSection = ""
-        expandedWidgetIndex = -1
-        expandedWidgetData = null
+        expandedSection = "";
+        expandedWidgetIndex = -1;
+        expandedWidgetData = null;
     }
 
     onEditModeChanged: {
         if (editMode) {
-            collapseAll()
+            collapseAll();
         }
     }
 
     onVisibleChanged: {
         if (!visible) {
-            collapseAll()
+            collapseAll();
         }
     }
 
     readonly property color _containerBg: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
 
-    function setTriggerPosition(x, y, width, section, screen) {
-        StateUtils.setTriggerPosition(root, x, y, width, section, screen)
-    }
-
     function openWithSection(section) {
-        StateUtils.openWithSection(root, section)
+        StateUtils.openWithSection(root, section);
     }
 
     function toggleSection(section) {
-        StateUtils.toggleSection(root, section)
+        StateUtils.toggleSection(root, section);
     }
 
     popupWidth: 550
-    popupHeight: Math.min((triggerScreen?.height ?? 1080) - 100, contentLoader.item && contentLoader.item.implicitHeight > 0 ? contentLoader.item.implicitHeight + 20 : 400)
-    triggerX: (triggerScreen?.width ?? 1920) - 600 - Theme.spacingL
-    triggerY: Theme.barHeight - 4 + SettingsData.dankBarSpacing
+    popupHeight: {
+        const screenHeight = (triggerScreen?.height ?? 1080);
+        const maxHeight = screenHeight - 100;
+        const contentHeight = contentLoader.item && contentLoader.item.implicitHeight > 0 ? contentLoader.item.implicitHeight + 20 : 400;
+        return Math.min(maxHeight, contentHeight);
+    }
+    triggerX: 0
+    triggerY: 0
     triggerWidth: 80
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: false
 
-    WlrLayershell.keyboardFocus: {
-        if (!shouldBeVisible) return WlrKeyboardFocus.None
-        if (powerMenuOpen) return WlrKeyboardFocus.None
-        if (CompositorService.isHyprland) return WlrKeyboardFocus.OnDemand
-        return WlrKeyboardFocus.Exclusive
+    property bool credentialsPromptOpen: NetworkService.credentialsRequested
+    property bool wifiPasswordModalOpen: PopoutService.wifiPasswordModal?.visible ?? false
+    property bool polkitModalOpen: PopoutService.polkitAuthModal?.visible ?? false
+    property bool anyModalOpen: credentialsPromptOpen || wifiPasswordModalOpen || polkitModalOpen || powerMenuOpen
+
+    backgroundInteractive: !anyModalOpen
+
+    customKeyboardFocus: {
+        if (!shouldBeVisible)
+            return WlrKeyboardFocus.None;
+        if (anyModalOpen)
+            return WlrKeyboardFocus.None;
+        if (CompositorService.isHyprland)
+            return WlrKeyboardFocus.OnDemand;
+        return WlrKeyboardFocus.Exclusive;
     }
 
     onBackgroundClicked: close()
 
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
+            collapseAll();
             Qt.callLater(() => {
-                             if (NetworkService.activeService) {
-                                 NetworkService.activeService.autoRefreshEnabled = NetworkService.wifiEnabled
-                             }
-                             if (UserInfoService)
-                             UserInfoService.getUptime()
-                         })
+                if (NetworkService.activeService)
+                    NetworkService.activeService.autoRefreshEnabled = NetworkService.wifiEnabled;
+            });
         } else {
             Qt.callLater(() => {
-                             if (NetworkService.activeService) {
-                                 NetworkService.activeService.autoRefreshEnabled = false
-                             }
-                             if (BluetoothService.adapter && BluetoothService.adapter.discovering)
-                             BluetoothService.adapter.discovering = false
-                             editMode = false
-                         })
+                if (NetworkService.activeService) {
+                    NetworkService.activeService.autoRefreshEnabled = false;
+                }
+                if (BluetoothService.adapter && BluetoothService.adapter.discovering)
+                    BluetoothService.adapter.discovering = false;
+                editMode = false;
+            });
         }
     }
 
@@ -114,9 +114,9 @@ DankPopout {
             property alias bluetoothCodecSelector: bluetoothCodecSelector
 
             color: {
-                const transparency = Theme.popupTransparency
-                const surface = Theme.surfaceContainer || Qt.rgba(0.1, 0.1, 0.1, 1)
-                return Qt.rgba(surface.r, surface.g, surface.b, transparency)
+                const transparency = Theme.popupTransparency;
+                const surface = Theme.surfaceContainer || Qt.rgba(0.1, 0.1, 0.1, 1);
+                return Qt.rgba(surface.r, surface.g, surface.b, transparency);
             }
             radius: Theme.cornerRadius
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
@@ -153,20 +153,19 @@ DankPopout {
                     onEditModeToggled: root.editMode = !root.editMode
                     onPowerButtonClicked: {
                         if (powerMenuModalLoader) {
-                            powerMenuModalLoader.active = true
+                            powerMenuModalLoader.active = true;
                             if (powerMenuModalLoader.item) {
-                                const popoutPos = controlContent.mapToItem(null, 0, 0)
-                                const bounds = Qt.rect(popoutPos.x, popoutPos.y, controlContent.width, controlContent.height)
-                                powerMenuModalLoader.item.openFromControlCenter(bounds, root.triggerScreen)
+                                const bounds = Qt.rect(root.alignedX, root.alignedY, root.popupWidth, root.popupHeight);
+                                powerMenuModalLoader.item.openFromControlCenter(bounds, root.screen);
                             }
                         }
                     }
                     onLockRequested: {
-                        root.close()
-                        root.lockRequested()
+                        root.close();
+                        root.lockRequested();
                     }
                     onSettingsButtonClicked: {
-                        root.close()
+                        root.close();
                     }
                 }
 
@@ -181,18 +180,19 @@ DankPopout {
                     bluetoothCodecSelector: bluetoothCodecSelector
                     colorPickerModal: root.colorPickerModal
                     screenName: root.triggerScreen?.name || ""
+                    screenModel: root.triggerScreen?.model || ""
                     parentScreen: root.triggerScreen
                     onExpandClicked: (widgetData, globalIndex) => {
-                                         root.expandedWidgetIndex = globalIndex
-                                         root.expandedWidgetData = widgetData
-                                         if (widgetData.id === "diskUsage") {
-                                             root.toggleSection("diskUsage_" + (widgetData.instanceId || "default"))
-                                         } else if (widgetData.id === "brightnessSlider") {
-                                             root.toggleSection("brightnessSlider_" + (widgetData.instanceId || "default"))
-                                         } else {
-                                             root.toggleSection(widgetData.id)
-                                         }
-                                     }
+                        root.expandedWidgetIndex = globalIndex;
+                        root.expandedWidgetData = widgetData;
+                        if (widgetData.id === "diskUsage") {
+                            root.toggleSection("diskUsage_" + (widgetData.instanceId || "default"));
+                        } else if (widgetData.id === "brightnessSlider") {
+                            root.toggleSection("brightnessSlider_" + (widgetData.instanceId || "default"));
+                        } else {
+                            root.toggleSection(widgetData.id);
+                        }
+                    }
                     onRemoveWidget: index => widgetModel.removeWidget(index)
                     onMoveWidget: (fromIndex, toIndex) => widgetModel.moveWidget(fromIndex, toIndex)
                     onToggleWidgetSize: index => widgetModel.toggleWidgetSize(index)
@@ -205,10 +205,10 @@ DankPopout {
                     popoutContent: controlContent
                     availableWidgets: {
                         if (!editMode)
-                            return []
-                        const existingIds = (SettingsData.controlCenterWidgets || []).map(w => w.id)
-                        const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets())
-                        return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id))
+                            return [];
+                        const existingIds = (SettingsData.controlCenterWidgets || []).map(w => w.id);
+                        const allWidgets = widgetModel.baseWidgetDefinitions.concat(widgetModel.getPluginWidgets());
+                        return allWidgets.filter(w => w.allowMultiple || !existingIds.includes(w.id));
                     }
                     onAddWidget: widgetId => widgetModel.addWidget(widgetId)
                     onResetToDefault: () => widgetModel.resetToDefault()
@@ -235,10 +235,10 @@ DankPopout {
             id: bluetoothDetail
             onShowCodecSelector: function (device) {
                 if (contentLoader.item && contentLoader.item.bluetoothCodecSelector) {
-                    contentLoader.item.bluetoothCodecSelector.show(device)
+                    contentLoader.item.bluetoothCodecSelector.show(device);
                     contentLoader.item.bluetoothCodecSelector.codecSelected.connect(function (deviceAddress, codecName) {
-                        bluetoothDetail.updateDeviceCodecDisplay(deviceAddress, codecName)
-                    })
+                        bluetoothDetail.updateDeviceCodecDisplay(deviceAddress, codecName);
+                    });
                 }
             }
         }

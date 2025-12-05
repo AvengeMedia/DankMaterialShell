@@ -15,6 +15,17 @@ Item {
     property var options: []
     property var optionIcons: []
     property bool enableFuzzySearch: false
+
+    onOptionsChanged: {
+        if (dropdownMenu.visible) {
+            dropdownMenu.fzfFinder = new Fzf.Finder(options, {
+                "selector": option => option,
+                "limit": 50,
+                "casing": "case-insensitive"
+            });
+            dropdownMenu.updateFilteredOptions();
+        }
+    }
     property int popupWidthOffset: 0
     property int maxPopupHeight: 400
     property bool openUpwards: false
@@ -30,9 +41,9 @@ Item {
     implicitHeight: compactMode ? 40 : Math.max(60, labelColumn.implicitHeight + Theme.spacingM)
 
     Component.onDestruction: {
-        const popup = dropdownMenu
+        const popup = dropdownMenu;
         if (popup && popup.visible) {
-            popup.close()
+            popup.close();
         }
     }
 
@@ -85,38 +96,38 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 if (dropdownMenu.visible) {
-                    dropdownMenu.close()
-                    return
+                    dropdownMenu.close();
+                    return;
                 }
 
-                dropdownMenu.searchQuery = ""
-                dropdownMenu.updateFilteredOptions()
+                dropdownMenu.searchQuery = "";
+                dropdownMenu.updateFilteredOptions();
 
-                dropdownMenu.open()
+                dropdownMenu.open();
 
-                const pos = dropdown.mapToItem(Overlay.overlay, 0, 0)
-                const popupWidth = dropdownMenu.width
-                const popupHeight = dropdownMenu.height
-                const overlayHeight = Overlay.overlay.height
+                const pos = dropdown.mapToItem(Overlay.overlay, 0, 0);
+                const popupWidth = dropdownMenu.width;
+                const popupHeight = dropdownMenu.height;
+                const overlayHeight = Overlay.overlay.height;
 
                 if (root.openUpwards || pos.y + dropdown.height + popupHeight + 4 > overlayHeight) {
                     if (root.alignPopupRight) {
-                        dropdownMenu.x = pos.x + dropdown.width - popupWidth
+                        dropdownMenu.x = pos.x + dropdown.width - popupWidth;
                     } else {
-                        dropdownMenu.x = pos.x - (root.popupWidthOffset / 2)
+                        dropdownMenu.x = pos.x - (root.popupWidthOffset / 2);
                     }
-                    dropdownMenu.y = pos.y - popupHeight - 4
+                    dropdownMenu.y = pos.y - popupHeight - 4;
                 } else {
                     if (root.alignPopupRight) {
-                        dropdownMenu.x = pos.x + dropdown.width - popupWidth
+                        dropdownMenu.x = pos.x + dropdown.width - popupWidth;
                     } else {
-                        dropdownMenu.x = pos.x - (root.popupWidthOffset / 2)
+                        dropdownMenu.x = pos.x - (root.popupWidthOffset / 2);
                     }
-                    dropdownMenu.y = pos.y + dropdown.height + 4
+                    dropdownMenu.y = pos.y + dropdown.height + 4;
                 }
 
                 if (root.enableFuzzySearch && searchField.visible) {
-                    searchField.forceActiveFocus()
+                    searchField.forceActiveFocus();
                 }
             }
         }
@@ -133,8 +144,8 @@ Item {
 
             DankIcon {
                 name: {
-                    const currentIndex = root.options.indexOf(root.currentValue)
-                    return currentIndex >= 0 && root.optionIcons.length > currentIndex ? root.optionIcons[currentIndex] : ""
+                    const currentIndex = root.options.indexOf(root.currentValue);
+                    return currentIndex >= 0 && root.optionIcons.length > currentIndex ? root.optionIcons[currentIndex] : "";
                 }
                 size: 18
                 color: Theme.surfaceText
@@ -186,39 +197,39 @@ Item {
 
         function updateFilteredOptions() {
             if (!root.enableFuzzySearch || searchQuery.length === 0) {
-                filteredOptions = root.options
-                selectedIndex = -1
-                return
+                filteredOptions = root.options;
+                selectedIndex = -1;
+                return;
             }
 
-            const results = fzfFinder.find(searchQuery)
-            filteredOptions = results.map(result => result.item)
-            selectedIndex = -1
+            const results = fzfFinder.find(searchQuery);
+            filteredOptions = results.map(result => result.item);
+            selectedIndex = -1;
         }
 
         function selectNext() {
             if (filteredOptions.length === 0) {
-                return
+                return;
             }
-            selectedIndex = (selectedIndex + 1) % filteredOptions.length
-            listView.positionViewAtIndex(selectedIndex, ListView.Contain)
+            selectedIndex = (selectedIndex + 1) % filteredOptions.length;
+            listView.positionViewAtIndex(selectedIndex, ListView.Contain);
         }
 
         function selectPrevious() {
             if (filteredOptions.length === 0) {
-                return
+                return;
             }
-            selectedIndex = selectedIndex <= 0 ? filteredOptions.length - 1 : selectedIndex - 1
-            listView.positionViewAtIndex(selectedIndex, ListView.Contain)
+            selectedIndex = selectedIndex <= 0 ? filteredOptions.length - 1 : selectedIndex - 1;
+            listView.positionViewAtIndex(selectedIndex, ListView.Contain);
         }
 
         function selectCurrent() {
             if (selectedIndex < 0 || selectedIndex >= filteredOptions.length) {
-                return
+                return;
             }
-            root.currentValue = filteredOptions[selectedIndex]
-            root.valueChanged(filteredOptions[selectedIndex])
-            close()
+            root.currentValue = filteredOptions[selectedIndex];
+            root.valueChanged(filteredOptions[selectedIndex]);
+            close();
         }
 
         parent: Overlay.overlay
@@ -270,8 +281,8 @@ Item {
                         topPadding: Theme.spacingS
                         bottomPadding: Theme.spacingS
                         onTextChanged: {
-                            dropdownMenu.searchQuery = text
-                            dropdownMenu.updateFilteredOptions()
+                            dropdownMenu.searchQuery = text;
+                            dropdownMenu.updateFilteredOptions();
                         }
                         Keys.onDownPressed: dropdownMenu.selectNext()
                         Keys.onUpPressed: dropdownMenu.selectPrevious()
@@ -279,17 +290,17 @@ Item {
                         Keys.onEnterPressed: dropdownMenu.selectCurrent()
                         Keys.onPressed: event => {
                             if (event.key === Qt.Key_N && event.modifiers & Qt.ControlModifier) {
-                                dropdownMenu.selectNext()
-                                event.accepted = true
+                                dropdownMenu.selectNext();
+                                event.accepted = true;
                             } else if (event.key === Qt.Key_P && event.modifiers & Qt.ControlModifier) {
-                                dropdownMenu.selectPrevious()
-                                event.accepted = true
+                                dropdownMenu.selectPrevious();
+                                event.accepted = true;
                             } else if (event.key === Qt.Key_J && event.modifiers & Qt.ControlModifier) {
-                                dropdownMenu.selectNext()
-                                event.accepted = true
+                                dropdownMenu.selectNext();
+                                event.accepted = true;
                             } else if (event.key === Qt.Key_K && event.modifiers & Qt.ControlModifier) {
-                                dropdownMenu.selectPrevious()
-                                event.accepted = true
+                                dropdownMenu.selectPrevious();
+                                event.accepted = true;
                             }
                         }
                     }
@@ -362,9 +373,9 @@ Item {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                root.currentValue = modelData
-                                root.valueChanged(modelData)
-                                dropdownMenu.close()
+                                root.currentValue = modelData;
+                                root.valueChanged(modelData);
+                                dropdownMenu.close();
                             }
                         }
                     }

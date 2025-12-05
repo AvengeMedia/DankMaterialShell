@@ -109,6 +109,9 @@ func (m Model) renderAboutView() string {
 
 	b.WriteString(normalStyle.Render("Components:"))
 	b.WriteString("\n")
+	if len(m.dependencies) == 0 {
+		b.WriteString(normalStyle.Render("\n  Component detection not supported on this platform."))
+	}
 	for _, dep := range m.dependencies {
 		status := "✗"
 		if dep.Status == 1 {

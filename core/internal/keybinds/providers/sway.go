@@ -99,6 +99,7 @@ func (s *SwayProvider) convertKeybind(kb *SwayKeyBinding, subcategory string) ke
 	return keybinds.Keybind{
 		Key:         key,
 		Description: desc,
+		Action:      kb.Command,
 		Subcategory: subcategory,
 	}
 }

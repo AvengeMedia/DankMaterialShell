@@ -11,48 +11,72 @@ Scope {
 
     property bool searchActive: false
     property string searchActiveScreen: ""
-    property bool overlayActive: NiriService.inOverview && !(PopoutService.spotlightModal?.spotlightOpen ?? false)
+    property bool isClosing: false
+    property bool releaseKeyboard: false
+    property bool overlayActive: (NiriService.inOverview && !(PopoutService.spotlightModal?.spotlightOpen ?? false)) || searchActive
 
     function showSpotlight(screenName) {
-        searchActive = true
-        searchActiveScreen = screenName
+        isClosing = false;
+        releaseKeyboard = false;
+        searchActive = true;
+        searchActiveScreen = screenName;
     }
 
     function hideSpotlight() {
-        searchActive = false
-        searchActiveScreen = ""
+        if (!searchActive)
+            return;
+        isClosing = true;
+    }
+
+    function hideAndReleaseKeyboard() {
+        releaseKeyboard = true;
+        hideSpotlight();
+    }
+
+    function completeHide() {
+        searchActive = false;
+        searchActiveScreen = "";
+        isClosing = false;
+        releaseKeyboard = false;
     }
 
     Connections {
         target: NiriService
         function onInOverviewChanged() {
             if (!NiriService.inOverview) {
-                hideSpotlight()
-            } else {
-                searchActive = false
-                searchActiveScreen = ""
+                if (searchActive) {
+                    isClosing = true;
+                    return;
+                }
+                searchActive = false;
+                searchActiveScreen = "";
+                isClosing = false;
+                return;
             }
+            searchActive = false;
+            searchActiveScreen = "";
+            isClosing = false;
         }
 
         function onCurrentOutputChanged() {
-            if (NiriService.inOverview && searchActive && searchActiveScreen !== "" && searchActiveScreen !== NiriService.currentOutput) {
-                hideSpotlight()
-            }
+            if (!NiriService.inOverview || !searchActive || searchActiveScreen === "" || searchActiveScreen === NiriService.currentOutput)
+                return;
+            hideSpotlight();
         }
     }
 
     Connections {
         target: PopoutService.spotlightModal
         function onSpotlightOpenChanged() {
-            if (PopoutService.spotlightModal?.spotlightOpen && searchActive) {
-                hideSpotlight()
-            }
+            if (!PopoutService.spotlightModal?.spotlightOpen || !searchActive)
+                return;
+            hideSpotlight();
         }
     }
 
     Loader {
         id: niriOverlayLoader
-        active: overlayActive
+        active: overlayActive || isClosing
         asynchronous: false
 
         sourceComponent: Variants {
@@ -65,29 +89,34 @@ Scope {
 
                 readonly property real dpr: CompositorService.getScreenScale(screen)
                 readonly property bool isActiveScreen: screen.name === NiriService.currentOutput
-                readonly property bool shouldShowSpotlight: niriOverviewScope.searchActive && screen.name === niriOverviewScope.searchActiveScreen
+                readonly property bool shouldShowSpotlight: niriOverviewScope.searchActive && screen.name === niriOverviewScope.searchActiveScreen && !niriOverviewScope.isClosing
+                readonly property bool isSpotlightScreen: screen.name === niriOverviewScope.searchActiveScreen
 
                 screen: modelData
-                visible: NiriService.inOverview
+                visible: NiriService.inOverview || niriOverviewScope.isClosing
                 color: "transparent"
 
                 WlrLayershell.namespace: "dms:niri-overview-spotlight"
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.exclusiveZone: -1
                 WlrLayershell.keyboardFocus: {
-                    if (!NiriService.inOverview) return WlrKeyboardFocus.None
-                    if (!isActiveScreen) return WlrKeyboardFocus.None
-                    return WlrKeyboardFocus.Exclusive
+                    if (!NiriService.inOverview)
+                        return WlrKeyboardFocus.None;
+                    if (!isActiveScreen)
+                        return WlrKeyboardFocus.None;
+                    if (niriOverviewScope.releaseKeyboard)
+                        return WlrKeyboardFocus.None;
+                    return WlrKeyboardFocus.Exclusive;
                 }
 
                 mask: Region {
-                    item: shouldShowSpotlight ? spotlightContainer : null
+                    item: spotlightContainer.visible ? spotlightContainer : null
                 }
 
                 onShouldShowSpotlightChanged: {
-                    if (!shouldShowSpotlight && isActiveScreen) {
-                        Qt.callLater(() => keyboardFocusScope.forceActiveFocus())
-                    }
+                    if (shouldShowSpotlight || !isActiveScreen)
+                        return;
+                    Qt.callLater(() => keyboardFocusScope.forceActiveFocus());
                 }
 
                 anchors {
@@ -97,61 +126,61 @@ Scope {
                     bottom: true
                 }
 
-
                 FocusScope {
                     id: keyboardFocusScope
                     anchors.fill: parent
                     focus: true
 
                     Keys.onPressed: event => {
-                        if (!overlayWindow.shouldShowSpotlight) {
-                            if ([Qt.Key_Escape, Qt.Key_Return].includes(event.key)) {
-                                NiriService.toggleOverview()
-                                event.accepted = true
-                                return
-                            }
-
-                            if (event.key === Qt.Key_Left) {
-                                NiriService.moveColumnLeft()
-                                event.accepted = true
-                                return
-                            }
-
-                            if (event.key === Qt.Key_Right) {
-                                NiriService.moveColumnRight()
-                                event.accepted = true
-                                return
-                            }
-
-                            if (event.key === Qt.Key_Up) {
-                                NiriService.moveWorkspaceUp()
-                                event.accepted = true
-                                return
-                            }
-
-                            if (event.key === Qt.Key_Down) {
-                                NiriService.moveWorkspaceDown()
-                                event.accepted = true
-                                return
-                            }
-
-                            if (event.modifiers & (Qt.ControlModifier | Qt.MetaModifier) || [Qt.Key_Delete, Qt.Key_Backspace].includes(event.key)) {
-                                event.accepted = false
-                                return
-                            }
-
-                            if (!event.isAutoRepeat && event.text) {
-                                niriOverviewScope.showSpotlight(overlayWindow.screen.name)
-                                if (spotlightContent?.searchField) {
-                                    spotlightContent.searchField.text = event.text.trim()
-                                    if (spotlightContent.appLauncher) {
-                                        spotlightContent.appLauncher.searchQuery = event.text.trim()
-                                    }
-                                    Qt.callLater(() => spotlightContent.searchField.forceActiveFocus())
-                                }
-                                event.accepted = true
-                            }
+                        if (overlayWindow.shouldShowSpotlight || niriOverviewScope.isClosing)
+                            return;
+                        if ([Qt.Key_Escape, Qt.Key_Return].includes(event.key)) {
+                            NiriService.toggleOverview();
+                            event.accepted = true;
+                            return;
                         }
+
+                        if (event.key === Qt.Key_Left) {
+                            NiriService.moveColumnLeft();
+                            event.accepted = true;
+                            return;
+                        }
+
+                        if (event.key === Qt.Key_Right) {
+                            NiriService.moveColumnRight();
+                            event.accepted = true;
+                            return;
+                        }
+
+                        if (event.key === Qt.Key_Up) {
+                            NiriService.moveWorkspaceUp();
+                            event.accepted = true;
+                            return;
+                        }
+
+                        if (event.key === Qt.Key_Down) {
+                            NiriService.moveWorkspaceDown();
+                            event.accepted = true;
+                            return;
+                        }
+
+                        if (event.modifiers & (Qt.ControlModifier | Qt.MetaModifier) || [Qt.Key_Delete, Qt.Key_Backspace].includes(event.key)) {
+                            event.accepted = false;
+                            return;
+                        }
+
+                        if (event.isAutoRepeat || !event.text)
+                            return;
+                        if (!spotlightContent?.searchField)
+                            return;
+                        const trimmedText = event.text.trim();
+                        spotlightContent.searchField.text = trimmedText;
+                        if (spotlightContent.appLauncher) {
+                            spotlightContent.appLauncher.searchQuery = trimmedText;
+                        }
+                        niriOverviewScope.showSpotlight(overlayWindow.screen.name);
+                        Qt.callLater(() => spotlightContent.searchField.forceActiveFocus());
+                        event.accepted = true;
                     }
                 }
 
@@ -162,28 +191,27 @@ Scope {
                     width: Theme.px(500, overlayWindow.dpr)
                     height: Theme.px(600, overlayWindow.dpr)
 
-                    property real scaleValue: 0.96
+                    readonly property bool animatingOut: niriOverviewScope.isClosing && overlayWindow.isSpotlightScreen
 
-                    scale: scaleValue
+                    scale: overlayWindow.shouldShowSpotlight ? 1.0 : 0.96
                     opacity: overlayWindow.shouldShowSpotlight ? 1 : 0
+                    visible: overlayWindow.shouldShowSpotlight || animatingOut
                     enabled: overlayWindow.shouldShowSpotlight
 
                     layer.enabled: true
                     layer.smooth: false
                     layer.textureSize: Qt.size(Math.round(width * overlayWindow.dpr), Math.round(height * overlayWindow.dpr))
 
-                    Connections {
-                        target: overlayWindow
-                        function onShouldShowSpotlightChanged() {
-                            spotlightContainer.scaleValue = overlayWindow.shouldShowSpotlight ? 1.0 : 0.96
-                        }
-                    }
-
-                    Behavior on scaleValue {
+                    Behavior on scale {
                         NumberAnimation {
                             duration: Theme.expressiveDurations.expressiveDefaultSpatial
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: niriOverviewScope.searchActive ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                            onRunningChanged: {
+                                if (running || !spotlightContainer.animatingOut)
+                                    return;
+                                niriOverviewScope.completeHide();
+                            }
                         }
                     }
 
@@ -191,7 +219,7 @@ Scope {
                         NumberAnimation {
                             duration: Theme.expressiveDurations.expressiveDefaultSpatial
                             easing.type: Easing.BezierSpline
-                            easing.bezierCurve: niriOverviewScope.searchActive ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
+                            easing.bezierCurve: spotlightContainer.visible ? Theme.expressiveCurves.expressiveDefaultSpatial : Theme.expressiveCurves.emphasized
                         }
                     }
 
@@ -207,19 +235,44 @@ Scope {
                         id: spotlightContent
                         anchors.fill: parent
                         anchors.margins: 0
+                        usePopupContextMenu: true
 
                         property var fakeParentModal: QtObject {
-                            property bool spotlightOpen: overlayWindow.shouldShowSpotlight
+                            property bool spotlightOpen: spotlightContainer.visible
                             function hide() {
-                                niriOverviewScope.hideSpotlight()
-                                if (overlayWindow.isActiveScreen) {
-                                    Qt.callLater(() => keyboardFocusScope.forceActiveFocus())
+                                if (spotlightContent.searchField.text.length > 0) {
+                                    niriOverviewScope.hideSpotlight();
+                                    return;
                                 }
+                                NiriService.toggleOverview();
+                            }
+                        }
+
+                        Connections {
+                            target: spotlightContent.searchField
+                            function onTextChanged() {
+                                if (spotlightContent.searchField.text.length > 0 || !niriOverviewScope.searchActive)
+                                    return;
+                                niriOverviewScope.hideSpotlight();
                             }
                         }
 
                         Component.onCompleted: {
-                            parentModal = fakeParentModal
+                            parentModal = fakeParentModal;
+                        }
+
+                        Connections {
+                            target: spotlightContent.appLauncher
+                            function onAppLaunched() {
+                                niriOverviewScope.releaseKeyboard = true;
+                            }
+                        }
+
+                        Connections {
+                            target: spotlightContent.fileSearchController
+                            function onFileOpened() {
+                                niriOverviewScope.releaseKeyboard = true;
+                            }
                         }
                     }
                 }

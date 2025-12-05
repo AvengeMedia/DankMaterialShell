@@ -89,6 +89,6 @@ in {
             }
         ];
 
-        home.packages = common.packages;
+        home.packages = common.packages ++ [dmsPkgs.dankMaterialShell];
     };
 }

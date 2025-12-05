@@ -108,3 +108,13 @@ func (b *SystemdNetworkdBackend) ActivateWiredConnection(id string) error {
 	linkObj := b.conn.Object(networkdBusName, link.path)
 	return linkObj.Call(networkdLinkIface+".Reconfigure", 0).Err
 }
+
+func (b *SystemdNetworkdBackend) GetEthernetDevices() []EthernetDevice {
+	b.stateMutex.RLock()
+	defer b.stateMutex.RUnlock()
+	return append([]EthernetDevice(nil), b.state.EthernetDevices...)
+}
+
+func (b *SystemdNetworkdBackend) DisconnectEthernetDevice(device string) error {
+	return fmt.Errorf("not supported by networkd backend")
+}
