@@ -7,7 +7,6 @@ BasePill {
     id: root
 
     property bool isActive: false
-    property var powerMenuModal: null
 
     content: Component {
         Item {

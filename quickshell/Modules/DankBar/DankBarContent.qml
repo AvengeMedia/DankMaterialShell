@@ -301,9 +301,9 @@ Item {
             "keyboard_layout_name": keyboardLayoutNameComponent,
             "vpn": vpnComponent,
             "notepadButton": notepadButtonComponent,
-            "powerButton": powerButtonComponent,
             "colorPicker": colorPickerComponent,
-            "systemUpdate": systemUpdateComponent
+            "systemUpdate": systemUpdateComponent,
+            "powerMenuButton": powerMenuButtonComponent
         };
 
         let pluginMap = PluginService.getWidgetComponents();
@@ -342,9 +342,9 @@ Item {
         "keyboardLayoutNameComponent": keyboardLayoutNameComponent,
         "vpnComponent": vpnComponent,
         "notepadButtonComponent": notepadButtonComponent,
-        "powerButtonComponent": powerButtonComponent,
         "colorPickerComponent": colorPickerComponent,
-        "systemUpdateComponent": systemUpdateComponent
+        "systemUpdateComponent": systemUpdateComponent,
+        "powerMenuButtonComponent": powerMenuButtonComponent
     })
 
     Item {
@@ -540,10 +540,9 @@ Item {
     }
 
     Component {
-        id: powerButtonComponent
+        id: powerMenuButtonComponent
 
-        PowerButton {
-            id: powerButton
+        PowerMenuButton {
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
             axis: barWindow.axis

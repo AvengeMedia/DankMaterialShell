@@ -239,7 +239,14 @@ Item {
                 "description": I18n.tr("Check for system updates"),
                 "icon": "update",
                 "enabled": SystemUpdateService.distributionSupported
-            }
+            },
+            {
+                "id": "powerMenuButton",
+                "text": I18n.tr("Power"),
+                "description": I18n.tr("Display the power system menu"),
+                "icon": "power_settings_new",
+                "enabled": true
+            },
         ];
 
         var allPluginVariants = PluginService.getAllPluginVariants();
