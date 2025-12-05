@@ -20,7 +20,7 @@
                 system: fn system nixpkgs.legacyPackages.${system}
             );
         buildDmsPkgs = pkgs: {
-            inherit (self.packages.${pkgs.stdenv.hostPlatform.system}) dmsCli dankMaterialShell;
+            dms-shell = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
         };
         mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
@@ -46,10 +46,11 @@
                     + "_"
                     + (self.shortRev or "dirty");
             in {
-                dmsCli = pkgs.buildGoModule (finalAttrs: {
+                dms-shell = pkgs.buildGoModule (let
+                    rootSrc = ./.;
+                in {
                     inherit version;
-
-                    pname = "dmsCli";
+                    pname = "dms-shell";
                     src = ./core;
                     vendorHash = "sha256-2PCqiW4frxME8IlmwWH5ktznhd/G1bah5Ae4dp0HPTQ=";
 
@@ -58,50 +59,56 @@
                     ldflags = [
                         "-s"
                         "-w"
-                        "-X main.Version=${finalAttrs.version}"
+                        "-X main.Version=${version}"
                     ];
 
-                    nativeBuildInputs = [pkgs.installShellFiles];
+                    nativeBuildInputs = [
+                        pkgs.installShellFiles
+                        pkgs.makeWrapper
+                    ];
 
                     postInstall = ''
+                        mkdir -p $out/share/quickshell/dms
+                        cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
+
+                        chmod u+w $out/share/quickshell/dms/VERSION
+                        echo "${version}" > $out/share/quickshell/dms/VERSION
+
+                        # Install desktop file and icon
+                        install -D ${rootSrc}/assets/dms-open.desktop \
+                          $out/share/applications/dms-open.desktop
+                        install -D ${rootSrc}/core/assets/danklogo.svg \
+                          $out/share/hicolor/scalable/apps/danklogo.svg
+
+                        wrapProgram $out/bin/dms --add-flags "-c $out/share/quickshell/dms"
+
+                        install -Dm644 ${rootSrc}/assets/systemd/dms.service \
+                          $out/lib/systemd/user/dms.service
+
+                        substituteInPlace $out/lib/systemd/user/dms.service \
+                          --replace-fail /usr/bin/dms $out/bin/dms \
+                          --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
+
+                        substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
+                          --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
+
                         installShellCompletion --cmd dms \
                           --bash <($out/bin/dms completion bash) \
-                          --fish <($out/bin/dms completion fish ) \
+                          --fish <($out/bin/dms completion fish) \
                           --zsh <($out/bin/dms completion zsh)
                     '';
 
                     meta = {
-                        description = "DankMaterialShell Command Line Interface";
-                        homepage = "https://github.com/AvengeMedia/danklinux";
-                        mainProgram = "dms";
+                        description = "Desktop shell for wayland compositors built with Quickshell & GO";
+                        homepage = "https://danklinux.com";
+                        changelog = "https://github.com/AvengeMedia/DankMaterialShell/releases/tag/v${version}";
                         license = pkgs.lib.licenses.mit;
-                        platforms = pkgs.lib.platforms.unix;
+                        mainProgram = "dms";
+                        platforms = pkgs.lib.platforms.linux;
                     };
                 });
 
-                dankMaterialShell = pkgs.stdenvNoCC.mkDerivation {
-                    inherit version;
-
-                    pname = "dankMaterialShell";
-                    src = ./quickshell;
-                    installPhase = ''
-                        mkdir -p $out/etc/xdg/quickshell
-                        cp -r ./ $out/etc/xdg/quickshell/dms
-
-                        # Create DMS Version file
-                        echo "${version}" > $out/etc/xdg/quickshell/dms/VERSION
-
-                        # Install desktop file
-                        mkdir -p $out/share/applications
-                        cp ${./assets/dms-open.desktop} $out/share/applications/dms-open.desktop
-
-                        # Install icon
-                        mkdir -p $out/share/icons/hicolor/scalable/apps
-                        cp ${./core/assets/danklogo.svg} $out/share/icons/hicolor/scalable/apps/danklogo.svg
-                    '';
-                };
-
-                default = self.packages.${system}.dmsCli;
+                default = self.packages.${system}.dms-shell;
             }
         );
 

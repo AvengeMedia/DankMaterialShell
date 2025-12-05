@@ -20,7 +20,7 @@
             "--command"
             cfg.compositor.name
             "-p"
-            "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms"
+            "${dmsPkgs.dms-shell}/share/quickshell/dms"
         ]
         ++ lib.optionals (cfg.compositor.customConfig != "") [
             "-C"

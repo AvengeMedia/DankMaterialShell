@@ -7,7 +7,7 @@
 }: let
     cfg = config.programs.dankMaterialShell;
 in {
-    qmlPath = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
+    qmlPath = "${dmsPkgs.dms-shell}/share/quickshell/dms";
 
     packages =
         [
@@ -19,7 +19,7 @@ in {
             pkgs.libsForQt5.qt5ct
             pkgs.kdePackages.qt6ct
 
-            dmsPkgs.dmsCli
+            dmsPkgs.dms-shell
         ]
         ++ lib.optional cfg.enableSystemMonitoring dmsPkgs.dgop
         ++ lib.optionals cfg.enableClipboard [pkgs.cliphist pkgs.wl-clipboard]

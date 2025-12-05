@@ -14,7 +14,7 @@ in {
 
     config = lib.mkIf cfg.enable
     {
-        environment.etc."xdg/quickshell/dms".source = "${dmsPkgs.dankMaterialShell}/etc/xdg/quickshell/dms";
+        environment.etc."xdg/quickshell/dms".source = "${dmsPkgs.dms-shell}/share/quickshell/dms";
 
         systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
             description = "DankMaterialShell";
@@ -26,11 +26,11 @@ in {
             restartTriggers = lib.optional cfg.systemd.restartIfChanged common.qmlPath;
 
             serviceConfig = {
-                ExecStart = lib.getExe dmsPkgs.dmsCli + " run --session";
+                ExecStart = lib.getExe dmsPkgs.dms-shell + " run --session";
                 Restart = "on-failure";
             };
         };
 
-        environment.systemPackages = [cfg.quickshell.package dmsPkgs.dankMaterialShell] ++ common.packages;
+        environment.systemPackages = [cfg.quickshell.package] ++ common.packages;
     };
 }
