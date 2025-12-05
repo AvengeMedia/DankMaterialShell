@@ -8,52 +8,72 @@ import qs.Widgets
 Item {
     id: displaysTab
 
-    property var variantComponents: [{
-        "id": "dankBar",
-        "name": "Dank Bar",
-        "description": I18n.tr("System bar with widgets and system information"),
-        "icon": "toolbar"
-    }, {
-        "id": "dock",
-        "name": I18n.tr("Application Dock"),
-        "description": I18n.tr("Bottom dock for pinned and running applications"),
-        "icon": "dock"
-    }, {
-        "id": "notifications",
-        "name": I18n.tr("Notification Popups"),
-        "description": I18n.tr("Notification toast popups"),
-        "icon": "notifications"
-    }, {
-        "id": "wallpaper",
-        "name": I18n.tr("Wallpaper"),
-        "description": I18n.tr("Desktop background images"),
-        "icon": "wallpaper"
-    }, {
-        "id": "osd",
-        "name": I18n.tr("On-Screen Displays"),
-        "description": I18n.tr("Volume, brightness, and other system OSDs"),
-        "icon": "picture_in_picture"
-    }, {
-        "id": "toast",
-        "name": I18n.tr("Toast Messages"),
-        "description": I18n.tr("System toast notifications"),
-        "icon": "campaign"
-    }, {
-        "id": "notepad",
-        "name": I18n.tr("Notepad Slideout"),
-        "description": I18n.tr("Quick note-taking slideout panel"),
-        "icon": "sticky_note_2"
-    }, {
-        "id": "power",
-        "text": I18n.tr("Power"),
-        "description": I18n.tr("Display the power system menu"),
-        "icon": "power_settings_new"
-    }, {
-        "id": "systemTray",
-        "name": I18n.tr("System Tray"),
-        "description": I18n.tr("System tray icons"),
-        "icon": "notifications"
-    }]
+    function getBarComponentsFromSettings() {
+        const bars = SettingsData.barConfigs || [];
+        return bars.map(bar => ({
+                    "id": "bar:" + bar.id,
+                    "name": bar.name || "Bar",
+                    "description": I18n.tr("Individual bar configuration"),
+                    "icon": "toolbar",
+                    "barId": bar.id
+                }));
+    }
+
+    property var variantComponents: getVariantComponentsList()
+
+    function getVariantComponentsList() {
+        return [...getBarComponentsFromSettings(),
+            {
+                "id": "dock",
+                "name": I18n.tr("Application Dock"),
+                "description": I18n.tr("Bottom dock for pinned and running applications"),
+                "icon": "dock"
+            },
+            {
+                "id": "notifications",
+                "name": I18n.tr("Notification Popups"),
+                "description": I18n.tr("Notification toast popups"),
+                "icon": "notifications"
+            },
+            {
+                "id": "wallpaper",
+                "name": I18n.tr("Wallpaper"),
+                "description": I18n.tr("Desktop background images"),
+                "icon": "wallpaper"
+            },
+            {
+                "id": "osd",
+                "name": I18n.tr("On-Screen Displays"),
+                "description": I18n.tr("Volume, brightness, and other system OSDs"),
+                "icon": "picture_in_picture"
+            },
+            {
+                "id": "toast",
+                "name": I18n.tr("Toast Messages"),
+                "description": I18n.tr("System toast notifications"),
+                "icon": "campaign"
+            },
+            {
+                "id": "notepad",
+                "name": I18n.tr("Notepad Slideout"),
+                "description": I18n.tr("Quick note-taking slideout panel"),
+                "icon": "sticky_note_2"
+            },
+            {
+                "id": "systemTray",
+                "name": I18n.tr("System Tray"),
+                "description": I18n.tr("System tray icons"),
+                "icon": "notifications"
+            }
+        ];
+    }
+
+    Connections {
+        target: SettingsData
+        function onBarConfigsChanged() {
+            variantComponents = getVariantComponentsList();
+        }
+    }
 
     function getScreenPreferences(componentId) {
         if (componentId.startsWith("bar:")) {
