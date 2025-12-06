@@ -16,7 +16,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server"
 )
 
-type ipcTargets map[string][]string
+type ipcTargets map[string]map[string][]string
 
 var isSessionManaged bool
 
@@ -476,16 +476,29 @@ func runShellDaemon(session bool) {
 }
 
 func parseTargetsFromIPCShowOutput(output string) ipcTargets {
-	targets := map[string][]string{}
+	targets := make(ipcTargets)
 	var currentTarget string
 	for _, line := range strings.Split(output, "\n") {
 		if strings.HasPrefix(line, "target ") {
 			currentTarget = strings.TrimSpace(strings.TrimPrefix(line, "target "))
+			targets[currentTarget] = make(map[string][]string)
 		}
 		if strings.HasPrefix(line, "  function") && currentTarget != "" {
+			argsList := []string{}
 			currentFunc := strings.TrimPrefix(line, "  function ")
-			currentFunc = strings.SplitN(currentFunc, "(", 2)[0]
-			targets[currentTarget] = append(targets[currentTarget], currentFunc)
+			funcDef := strings.SplitN(currentFunc, "(", 2)
+			argList := strings.SplitN(funcDef[1], ")", 2)[0]
+			args := strings.Split(argList, ",")
+			if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+				argsList = append(argsList, funcDef[0])
+				for _, arg := range args {
+					argName := strings.SplitN(strings.TrimSpace(arg), ":", 2)[0]
+					argsList = append(argsList, argName)
+				}
+				targets[currentTarget][funcDef[0]] = argsList
+			} else {
+				targets[currentTarget][funcDef[0]] = make([]string, 0)
+			}
 		}
 	}
 	return targets
@@ -497,7 +510,6 @@ func getShellIPCCompletions(args []string, toComplete string) []string {
 	var targets ipcTargets
 
 	if output, err := cmd.Output(); err == nil {
-		log.Debugf("IPC show output: %s", string(output))
 		targets = parseTargetsFromIPCShowOutput(string(output))
 	} else {
 		log.Debugf("Error getting IPC show output for completions: %v", err)
@@ -516,8 +528,24 @@ func getShellIPCCompletions(args []string, toComplete string) []string {
 		}
 		return targetNames
 	}
+	if len(args) == 1 {
+		if targetFuncs, ok := targets[args[0]]; ok {
+			funcNames := make([]string, 0)
+			for k := range targetFuncs {
+				funcNames = append(funcNames, k)
+			}
+			return funcNames
+		}
+		return nil
+	}
+	if len(args) <= len(targets[args[0]]) {
+		funcArgs := targets[args[0]][args[1]]
+		if len(funcArgs) >= len(args) {
+			return []string{fmt.Sprintf("[%s]", funcArgs[len(args)-1])}
+		}
+	}
 
-	return targets[args[0]]
+	return nil
 }
 
 func runShellIPCCommand(args []string) {
