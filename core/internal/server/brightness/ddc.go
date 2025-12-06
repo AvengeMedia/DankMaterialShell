@@ -68,10 +68,6 @@ func (b *DDCBackend) scanI2CDevicesInternal(force bool) error {
 		activeBuses[i] = true
 		id := fmt.Sprintf("ddc:i2c-%d", i)
 
-		if _, exists := b.devices.Load(id); exists {
-			continue
-		}
-
 		dev, err := b.probeDDCDevice(i)
 		if err != nil || dev == nil {
 			continue
