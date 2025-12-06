@@ -306,6 +306,15 @@ func (m *Manager) readAndUpdateCapsLockState(deviceIndex int) {
 		return
 	}
 
+	if len(ledStates) == 0 {
+		log.Debug("No LED state available (empty map)")
+
+		// This means the device either:
+		// - doesn't support LED reporting at all, or
+		// - the kernel returned an empty state
+		return
+	}
+
 	capsLockState := ledStates[ledCapslockKey]
 	m.updateCapsLockStateDirect(capsLockState)
 }
