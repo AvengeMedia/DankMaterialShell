@@ -1,35 +1,74 @@
 {
   "$schema": "vscode://schemas/color-theme",
-  "name": "Dynamic Base16 DankShell",
+  "name": "Dynamic Base16 DankShell (Light)",
+  "semanticHighlighting": true,
   "colors": {
-    "editor.background": "{{colors.background.light.hex}}",
+    "foreground": "{{colors.on_surface.light.hex}}",
+    "selection.background": "{{colors.primary.light.hex}}4D",
+    "errorForeground": "{{colors.error.light.hex}}",
+    "focusBorder": "{{colors.primary.light.hex}}",
+    "editor.background": "{{colors.surface_container_high.light.hex}}",
     "editor.foreground": "{{colors.on_surface.light.hex}}",
-    "editorLineNumber.foreground": "{{colors.outline.light.hex}}",
+    "editorLineNumber.foreground": "{{colors.on_surface.light.hex}}80",
     "editorLineNumber.activeForeground": "{{colors.on_surface.light.hex}}",
     "editorCursor.foreground": "{{colors.primary.light.hex}}",
-    "editor.selectionBackground": "{{colors.primary_container.light.hex}}",
-    "editor.inactiveSelectionBackground": "{{colors.background.light.hex}}",
-    "editor.lineHighlightBackground": "{{colors.background.light.hex}}",
-    "editorIndentGuide.background": "{{colors.background.light.hex}}",
-    "editorIndentGuide.activeBackground": "{{colors.outline.light.hex}}",
-    "editorWhitespace.foreground": "{{colors.outline_variant.light.hex}}",
-    "editorBracketMatch.background": "{{colors.background.light.hex}}",
+    "editor.selectionBackground": "{{colors.primary.light.hex}}4D",
+    "editor.inactiveSelectionBackground": "{{colors.primary.light.hex}}26",
+    "editor.lineHighlightBackground": "{{colors.surface_container.light.hex}}66",
+    "editor.lineHighlightBorder": "{{colors.outline_variant.light.hex}}18",
+    "editor.wordHighlightBackground": "{{colors.secondary.light.hex}}22",
+    "editor.wordHighlightStrongBackground": "{{colors.tertiary.light.hex}}22",
+    "editor.findMatchBackground": "{{colors.secondary.light.hex}}33",
+    "editor.findMatchHighlightBackground": "{{colors.secondary.light.hex}}22",
+    "editor.findRangeHighlightBackground": "{{colors.surface_container.light.hex}}33",
+    "editorWhitespace.foreground": "{{colors.on_surface.light.hex}}33",
+    "editorIndentGuide.background1": "{{colors.on_surface.light.hex}}1F",
+    "editorIndentGuide.activeBackground1": "{{colors.on_surface.light.hex}}66",
+    "editorBracketMatch.background": "{{colors.primary_container.light.hex}}33",
     "editorBracketMatch.border": "{{colors.primary.light.hex}}",
-
+    "editorGutter.addedBackground": "{{colors.secondary.light.hex}}AA",
+    "editorGutter.modifiedBackground": "{{colors.tertiary.light.hex}}AA",
+    "editorGutter.deletedBackground": "{{colors.error.light.hex}}AA",
+    "editorError.foreground": "{{colors.error.light.hex}}",
+    "editorWarning.foreground": "{{colors.tertiary.light.hex}}",
+    "editorInfo.foreground": "{{colors.primary.light.hex}}",
+    "editorOverviewRuler.border": "{{colors.outline_variant.light.hex}}",
+    "editorOverviewRuler.errorForeground": "{{colors.error.light.hex}}88",
+    "editorOverviewRuler.warningForeground": "{{colors.tertiary.light.hex}}88",
+    "editorOverviewRuler.infoForeground": "{{colors.primary.light.hex}}88",
+    "editorWidget.background": "{{colors.surface_container.light.hex}}",
+    "editorWidget.border": "{{colors.outline_variant.light.hex}}",
+    "editorHoverWidget.background": "{{colors.surface_container_high.light.hex}}",
+    "editorHoverWidget.border": "{{colors.outline.light.hex}}",
+    "editorSuggestWidget.background": "{{colors.surface_container.light.hex}}",
+    "editorSuggestWidget.foreground": "{{colors.on_surface.light.hex}}",
+    "editorSuggestWidget.border": "{{colors.outline_variant.light.hex}}",
+    "editorSuggestWidget.selectedBackground": "{{colors.surface_container_high.light.hex}}",
+    "editorSuggestWidget.highlightForeground": "{{colors.primary.light.hex}}",
+    "editorGroup.border": "{{colors.outline_variant.light.hex}}",
+    "editorGroup.dropBackground": "{{colors.primary_container.light.hex}}33",
+    "editorGroupHeader.tabsBackground": "{{colors.background.light.hex}}",
+    "editorGroupHeader.noTabsBackground": "{{colors.background.light.hex}}",
+    "tab.border": "{{colors.outline_variant.light.hex}}",
+    "tab.activeBackground": "{{colors.surface_container_high.light.hex}}",
+    "tab.inactiveBackground": "{{colors.surface_container.light.hex}}",
+    "tab.activeForeground": "{{colors.on_surface.light.hex}}",
+    "tab.inactiveForeground": "{{colors.on_surface.light.hex}}99",
+    "tab.activeBorder": "{{colors.primary.light.hex}}",
+    "tab.unfocusedActiveBorder": "{{colors.outline.light.hex}}",
     "activityBar.background": "{{colors.background.light.hex}}",
     "activityBar.foreground": "{{colors.on_surface.light.hex}}",
+    "activityBar.inactiveForeground": "{{colors.on_surface.light.hex}}99",
     "activityBar.activeBorder": "{{colors.primary.light.hex}}",
     "activityBar.activeBackground": "{{colors.background.light.hex}}",
     "activityBarBadge.background": "{{colors.primary.light.hex}}",
     "activityBarBadge.foreground": "{{colors.on_primary.light.hex}}",
-
-    "sideBar.background": "{{colors.background.light.hex}}",
+    "sideBar.background": "{{colors.surface_container.light.hex}}",
     "sideBar.foreground": "{{colors.on_surface.light.hex}}",
-    "sideBar.border": "{{colors.background.light.hex}}",
+    "sideBar.border": "{{colors.outline_variant.light.hex}}",
     "sideBarTitle.foreground": "{{colors.on_surface.light.hex}}",
-    "sideBarSectionHeader.background": "{{colors.background.light.hex}}",
+    "sideBarSectionHeader.background": "{{colors.surface_container_low.light.hex}}",
     "sideBarSectionHeader.foreground": "{{colors.on_surface.light.hex}}",
-
     "list.activeSelectionBackground": "{{colors.primary_container.light.hex}}",
     "list.activeSelectionForeground": "{{colors.on_primary_container.light.hex}}",
     "list.inactiveSelectionBackground": "{{colors.surface_container.light.hex}}",
@@ -39,63 +78,45 @@
     "list.focusBackground": "{{colors.surface_container_high.light.hex}}",
     "list.focusForeground": "{{colors.on_surface.light.hex}}",
     "list.highlightForeground": "{{colors.primary.light.hex}}",
-
-    "statusBar.background": "{{colors.background.light.hex}}",
+    "list.errorForeground": "{{colors.error.light.hex}}",
+    "list.warningForeground": "{{colors.tertiary.light.hex}}",
+    "statusBar.background": "{{colors.surface_container.light.hex}}",
     "statusBar.foreground": "{{colors.on_surface.light.hex}}",
-    "statusBar.border": "{{colors.background.light.hex}}",
-    "statusBar.noFolderBackground": "{{colors.background.light.hex}}",
+    "statusBar.border": "{{colors.outline_variant.light.hex}}",
+    "statusBar.noFolderBackground": "{{colors.surface_container.light.hex}}",
+    "statusBar.noFolderForeground": "{{colors.on_surface.light.hex}}",
     "statusBar.debuggingBackground": "{{colors.error.light.hex}}",
     "statusBar.debuggingForeground": "{{colors.on_error.light.hex}}",
-
-    "tab.activeBackground": "{{colors.background.light.hex}}",
-    "tab.inactiveBackground": "{{colors.background.light.hex}}",
-    "tab.activeForeground": "{{colors.on_surface.light.hex}}",
-    "tab.inactiveForeground": "{{colors.outline.light.hex}}",
-    "tab.border": "{{colors.background.light.hex}}",
-    "tab.activeBorder": "{{colors.primary.light.hex}}",
-    "tab.unfocusedActiveBorder": "{{colors.outline.light.hex}}",
-
-    "editorGroupHeader.tabsBackground": "{{colors.background.light.hex}}",
-    "editorGroupHeader.noTabsBackground": "{{colors.background.light.hex}}",
-
     "titleBar.activeBackground": "{{colors.background.light.hex}}",
     "titleBar.activeForeground": "{{colors.on_surface.light.hex}}",
     "titleBar.inactiveBackground": "{{colors.background.light.hex}}",
-    "titleBar.inactiveForeground": "{{colors.outline.light.hex}}",
-    "titleBar.border": "{{colors.background.light.hex}}",
-
-    "input.background": "{{colors.background.light.hex}}",
+    "titleBar.inactiveForeground": "{{colors.on_surface.light.hex}}99",
+    "titleBar.border": "{{colors.outline_variant.light.hex}}",
+    "input.background": "{{colors.surface_container_low.light.hex}}",
     "input.foreground": "{{colors.on_surface.light.hex}}",
-    "input.border": "{{colors.outline.light.hex}}",
+    "input.border": "{{colors.outline_variant.light.hex}}",
     "input.placeholderForeground": "{{colors.outline.light.hex}}",
     "inputOption.activeBorder": "{{colors.primary.light.hex}}",
-    "inputValidation.errorBackground": "{{colors.error.light.hex}}",
+    "inputValidation.errorBackground": "{{colors.error_container.light.hex}}",
     "inputValidation.errorBorder": "{{colors.error.light.hex}}",
-
-    "dropdown.background": "{{colors.background.light.hex}}",
+    "dropdown.background": "{{colors.surface_container_low.light.hex}}",
     "dropdown.foreground": "{{colors.on_surface.light.hex}}",
-    "dropdown.border": "{{colors.outline.light.hex}}",
-
-    "quickInput.background": "{{colors.background.light.hex}}",
+    "dropdown.border": "{{colors.outline_variant.light.hex}}",
+    "quickInput.background": "{{colors.surface_container.light.hex}}",
     "quickInput.foreground": "{{colors.on_surface.light.hex}}",
     "quickInputList.focusBackground": "{{colors.surface_container_high.light.hex}}",
     "quickInputList.focusForeground": "{{colors.on_surface.light.hex}}",
-
     "button.background": "{{colors.primary.light.hex}}",
     "button.foreground": "{{colors.on_primary.light.hex}}",
     "button.hoverBackground": "{{colors.primary_container.light.hex}}",
-
-    "focusBorder": "{{colors.primary.light.hex}}",
     "badge.background": "{{colors.secondary.light.hex}}",
     "badge.foreground": "{{colors.on_secondary.light.hex}}",
-
-    "panel.background": "{{colors.background.light.hex}}",
-    "panel.border": "{{colors.primary.light.hex}}",
+    "panel.background": "{{colors.surface_container.light.hex}}",
+    "panel.border": "{{colors.outline_variant.light.hex}}",
     "panelTitle.activeBorder": "{{colors.primary.light.hex}}",
     "panelTitle.activeForeground": "{{colors.on_surface.light.hex}}",
-    "panelTitle.inactiveForeground": "{{colors.outline.light.hex}}",
-
-    "terminal.background": "{{colors.background.light.hex}}",
+    "panelTitle.inactiveForeground": "{{colors.on_surface.light.hex}}99",
+    "terminal.background": "{{colors.surface_container_high.light.hex}}",
     "terminal.foreground": "{{colors.on_surface.light.hex}}",
     "terminal.ansiBlack": "{{dank16.color0.hex}}",
     "terminal.ansiRed": "{{dank16.color1.hex}}",
@@ -113,9 +134,8 @@
     "terminal.ansiBrightMagenta": "{{dank16.color13.hex}}",
     "terminal.ansiBrightCyan": "{{dank16.color14.hex}}",
     "terminal.ansiBrightWhite": "{{dank16.color15.hex}}",
-
     "gitDecoration.modifiedResourceForeground": "{{colors.primary.light.hex}}",
-    "gitDecoration.addedResourceForeground": "{{colors.primary.light.hex}}",
+    "gitDecoration.addedResourceForeground": "{{colors.secondary.light.hex}}",
     "gitDecoration.stageModifiedResourceForeground": "{{colors.primary.light.hex}}",
     "gitDecoration.stageDeletedResourceForeground": "{{colors.error.light.hex}}",
     "gitDecoration.deletedResourceForeground": "{{colors.error.light.hex}}",
@@ -123,270 +143,253 @@
     "gitDecoration.ignoredResourceForeground": "{{colors.outline.light.hex}}",
     "gitDecoration.conflictingResourceForeground": "{{colors.error_container.light.hex}}",
     "gitDecoration.submoduleResourceForeground": "{{colors.primary.light.hex}}",
-
-    "editorWidget.background": "{{colors.background.light.hex}}",
-    "editorWidget.border": "{{colors.outline.light.hex}}",
-    "editorSuggestWidget.background": "{{colors.background.light.hex}}",
-    "editorSuggestWidget.border": "{{colors.outline.light.hex}}",
-    "editorSuggestWidget.selectedBackground": "{{colors.surface_container_high.light.hex}}",
-    "editorSuggestWidget.highlightForeground": "{{colors.primary.light.hex}}",
-
     "peekView.border": "{{colors.primary.light.hex}}",
-    "peekViewEditor.background": "{{colors.background.light.hex}}",
-    "peekViewResult.background": "{{colors.background.light.hex}}",
-    "peekViewTitle.background": "{{colors.background.light.hex}}",
-
-    "notificationCenter.border": "{{colors.outline.light.hex}}",
-    "notifications.background": "{{colors.background.light.hex}}",
-    "notifications.border": "{{colors.outline.light.hex}}",
-
-    "breadcrumb.foreground": "{{colors.outline.light.hex}}",
+    "peekViewEditor.background": "{{colors.surface_container_high.light.hex}}",
+    "peekViewResult.background": "{{colors.surface_container.light.hex}}",
+    "peekViewTitle.background": "{{colors.surface_container_low.light.hex}}",
+    "notificationCenter.border": "{{colors.outline_variant.light.hex}}",
+    "notifications.background": "{{colors.surface_container.light.hex}}",
+    "notifications.border": "{{colors.outline_variant.light.hex}}",
+    "breadcrumb.background": "{{colors.surface_container_high.light.hex}}",
+    "breadcrumb.foreground": "{{colors.on_surface.light.hex}}99",
     "breadcrumb.focusForeground": "{{colors.on_surface.light.hex}}",
     "breadcrumb.activeSelectionForeground": "{{colors.primary.light.hex}}",
-
     "scrollbarSlider.background": "{{colors.outline.light.hex}}40",
     "scrollbarSlider.hoverBackground": "{{colors.outline.light.hex}}60",
     "scrollbarSlider.activeBackground": "{{colors.outline.light.hex}}80",
-
-    "editorError.foreground": "{{colors.error.light.hex}}",
-    "editorWarning.foreground": "{{colors.tertiary.light.hex}}",
-    "editorInfo.foreground": "{{colors.primary.light.hex}}",
-
-    "editorGutter.addedBackground": "{{colors.secondary.light.hex}}",
-    "editorGutter.modifiedBackground": "{{colors.tertiary.light.hex}}",
-    "editorGutter.deletedBackground": "{{colors.error.light.hex}}",
-
-    "diffEditor.insertedTextBackground": "{{colors.secondary.light.hex}}20",
-    "diffEditor.removedTextBackground": "{{colors.error.light.hex}}20",
-
-    "merge.currentHeaderBackground": "{{colors.primary.light.hex}}40",
-    "merge.incomingHeaderBackground": "{{colors.secondary.light.hex}}40",
-
     "menubar.selectionBackground": "{{colors.surface_container.light.hex}}",
     "menu.background": "{{colors.background.light.hex}}",
     "menu.foreground": "{{colors.on_surface.light.hex}}",
     "menu.selectionBackground": "{{colors.surface_container_high.light.hex}}",
     "menu.selectionForeground": "{{colors.on_surface.light.hex}}",
-
+    "diffEditor.insertedTextBackground": "{{colors.secondary.light.hex}}20",
+    "diffEditor.removedTextBackground": "{{colors.error.light.hex}}20",
+    "merge.currentHeaderBackground": "{{colors.primary.light.hex}}40",
+    "merge.incomingHeaderBackground": "{{colors.secondary.light.hex}}40",
     "debugToolBar.background": "{{colors.background.light.hex}}",
     "debugExceptionWidget.background": "{{colors.background.light.hex}}",
     "debugExceptionWidget.border": "{{colors.error.light.hex}}"
   },
-
   "tokenColors": [
     {
-      "scope": ["variable", "meta.object-literal.key"],
+      "name": "Comments",
+      "scope": [
+        "comment",
+        "punctuation.definition.comment"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color8.hex}}"
+      }
+    },
+    {
+      "name": "Keywords",
+      "scope": [
+        "keyword",
+        "punctuation.definition.keyword"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color5.hex}}"
+      }
+    },
+    {
+      "name": "Storage types",
+      "scope": [
+        "storage.type"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color13.hex}}"
+      }
+    },
+    {
+      "name": "Storage modifiers",
+      "scope": [
+        "storage.modifier"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color5.hex}}"
+      }
+    },
+    {
+      "name": "Variables",
+      "scope": [
+        "variable"
+      ],
       "settings": {
         "foreground": "{{colors.on_surface.light.hex}}"
       }
     },
     {
-      "scope": ["string", "constant.other.symbol"],
+      "name": "Parameters",
+      "scope": [
+        "variable.parameter"
+      ],
       "settings": {
-        "foreground": "{{colors.secondary.light.hex}}"
+        "foreground": "{{colors.on_surface.light.hex}}"
       }
     },
     {
-      "scope": ["constant.numeric", "constant.language", "constant.character"],
+      "name": "Object properties and keys",
+      "scope": [
+        "meta.object-literal.key",
+        "meta.property.object",
+        "variable.other.property",
+        "entity.name.tag.yaml"
+      ],
       "settings": {
-        "foreground": "{{colors.tertiary.light.hex}}"
+        "foreground": "{{colors.on_surface.light.hex}}"
       }
     },
     {
-      "scope": ["entity.name.type", "support.type", "entity.name.class"],
+      "name": "Constants and numbers",
+      "scope": [
+        "constant.numeric",
+        "constant.language",
+        "constant.other",
+        "constant.character"
+      ],
       "settings": {
-        "foreground": "{{colors.tertiary.light.hex}}"
+        "foreground": "{{dank16.color2.hex}}"
       }
     },
     {
-      "scope": ["entity.name.function", "support.function"],
+      "name": "Strings",
+      "scope": [
+        "string"
+      ],
       "settings": {
-        "foreground": "{{colors.primary.light.hex}}"
+        "foreground": "{{dank16.color5.hex}}"
       }
     },
     {
-      "scope": ["support.class", "support.variable", "variable.language"],
+      "name": "YAML bare strings",
+      "scope": [
+        "string.unquoted.plain.out.yaml",
+        "string.unquoted.yaml"
+      ],
       "settings": {
-        "foreground": "{{colors.secondary.light.hex}}"
+        "foreground": "{{dank16.color4.hex}}"
       }
     },
     {
-      "scope": ["invalid"],
+      "name": "Types and classes",
+      "scope": [
+        "entity.name.type",
+        "entity.name.class",
+        "support.type"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color2.hex}}"
+      }
+    },
+    {
+      "name": "Language builtins and special variables",
+      "scope": [
+        "support.class",
+        "support.variable",
+        "variable.language"
+      ],
+      "settings": {
+        "foreground": "{{dank16.color4.hex}}"
+      }
+    },
+    {
+      "name": "Invalid",
+      "scope": [
+        "invalid"
+      ],
       "settings": {
         "foreground": "{{colors.error.light.hex}}"
       }
     },
     {
-      "scope": ["invalid.deprecated"],
+      "name": "Invalid deprecated",
+      "scope": [
+        "invalid.deprecated"
+      ],
       "settings": {
         "foreground": "{{colors.outline.light.hex}}"
       }
     },
     {
-      "scope": ["markup.heading"],
+      "name": "Headings",
+      "scope": [
+        "markup.heading"
+      ],
       "settings": {
         "foreground": "{{colors.primary.light.hex}}",
         "fontStyle": "bold"
       }
     },
     {
-      "scope": ["markup.bold"],
+      "name": "Bold",
+      "scope": [
+        "markup.bold"
+      ],
       "settings": {
         "foreground": "{{colors.tertiary.light.hex}}",
         "fontStyle": "bold"
       }
     },
     {
-      "scope": ["markup.italic"],
+      "name": "Italic",
+      "scope": [
+        "markup.italic"
+      ],
       "settings": {
         "foreground": "{{colors.primary.light.hex}}",
         "fontStyle": "italic"
       }
     },
     {
-      "scope": ["markup.underline"],
+      "name": "Underline",
+      "scope": [
+        "markup.underline"
+      ],
       "settings": {
         "fontStyle": "underline"
       }
     },
     {
-      "scope": ["markup.quote"],
+      "name": "Quotes",
+      "scope": [
+        "markup.quote"
+      ],
       "settings": {
         "foreground": "{{colors.secondary.light.hex}}"
       }
     },
     {
-      "scope": ["markup.list"],
+      "name": "Lists",
+      "scope": [
+        "markup.list"
+      ],
       "settings": {
         "foreground": "{{colors.on_surface.light.hex}}"
       }
     },
     {
-      "scope": ["markup.raw", "markup.inline.raw"],
+      "name": "Inline code in prose",
+      "scope": [
+        "markup.raw",
+        "markup.inline.raw"
+      ],
       "settings": {
         "foreground": "{{colors.secondary.light.hex}}"
       }
-    },
-    {
-      "scope": ["comment", "punctuation.definition.comment"],
-      "settings": {
-        "foreground": "{{dank16.color8.hex}}"
-      }
-    },
-    {
-      "scope": "keyword",
-      "settings": {
-        "foreground": "{{dank16.color5.hex}}"
-      }
-    },
-    {
-      "scope": "storage.type",
-      "settings": {
-        "foreground": "{{dank16.color13.hex}}"
-      }
-    },
-    {
-      "scope": "storage.modifier",
-      "settings": {
-        "foreground": "{{dank16.color5.hex}}"
-      }
-    },
-    {
-      "scope": "variable",
-      "settings": {
-        "foreground": "{{dank16.color15.hex}}"
-      }
-    },
-    {
-      "scope": "variable.parameter",
-      "settings": {
-        "foreground": "{{dank16.color7.hex}}"
-      }
-    },
-    {
-      "scope": ["meta.object-literal.key", "meta.property.object", "variable.other.property"],
-      "settings": {
-        "foreground": "{{dank16.color4.hex}}"
-      }
-    },
-    {
-      "scope": "constant.other.symbol",
-      "settings": {
-        "foreground": "{{dank16.color12.hex}}"
-      }
-    },
-    {
-      "scope": ["constant.numeric", "constant.language"],
-      "settings": {
-        "foreground": "{{dank16.color12.hex}}"
-      }
-    },
-    {
-      "scope": "constant.character",
-      "settings": {
-        "foreground": "{{dank16.color3.hex}}"
-      }
-    },
-    {
-      "scope": ["entity.name.type", "entity.name.class"],
-      "settings": {
-        "foreground": "{{dank16.color12.hex}}"
-      }
-    },
-    {
-      "scope": "support.type",
-      "settings": {
-        "foreground": "{{dank16.color13.hex}}"
-      }
-    },
-    {
-      "scope": ["entity.name.function", "support.function"],
-      "settings": {
-        "foreground": "{{dank16.color2.hex}}"
-      }
-    },
-    {
-      "scope": ["support.class", "support.variable"],
-      "settings": {
-        "foreground": "{{dank16.color15.hex}}"
-      }
-    },
-    {
-      "scope": "variable.language",
-      "settings": {
-        "foreground": "{{dank16.color12.hex}}"
-      }
-    },
-    {
-      "scope": "entity.name.tag.yaml",
-      "settings": {
-        "foreground": "{{dank16.color12.hex}}"
-      }
-    },
-    {
-      "scope": ["string.unquoted.plain.out.yaml", "string.unquoted.yaml"],
-      "settings": {
-        "foreground": "{{dank16.color15.hex}}"
-      }
-    },
-    {
-      "scope": "string",
-      "settings": {
-        "foreground": "{{dank16.color3.hex}}"
-      }
     }
   ],
-
-  "semanticHighlighting": true,
   "semanticTokenColors": {
     "variable": {
-      "foreground": "{{dank16.color15.hex}}"
+      "foreground": "{{colors.on_surface.light.hex}}"
     },
     "variable.readonly": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
+    },
+    "parameter": {
+      "foreground": "{{colors.on_surface.light.hex}}"
     },
     "property": {
-      "foreground": "{{dank16.color4.hex}}"
+      "foreground": "{{colors.on_surface.light.hex}}"
     },
     "function": {
       "foreground": "{{dank16.color2.hex}}"
@@ -395,22 +398,22 @@
       "foreground": "{{dank16.color2.hex}}"
     },
     "type": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
     },
     "class": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color4.hex}}"
     },
     "typeParameter": {
       "foreground": "{{dank16.color13.hex}}"
     },
     "enumMember": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
     },
     "string": {
-      "foreground": "{{dank16.color3.hex}}"
+      "foreground": "{{dank16.color5.hex}}"
     },
     "number": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color2.hex}}"
     },
     "comment": {
       "foreground": "{{dank16.color8.hex}}"
@@ -419,13 +422,10 @@
       "foreground": "{{dank16.color5.hex}}"
     },
     "operator": {
-      "foreground": "{{dank16.color15.hex}}"
-    },
-    "parameter": {
-      "foreground": "{{dank16.color7.hex}}"
+      "foreground": "{{colors.on_surface.light.hex}}"
     },
     "namespace": {
-      "foreground": "{{dank16.color15.hex}}"
+      "foreground": "{{colors.on_surface.light.hex}}"
     }
   }
 }
