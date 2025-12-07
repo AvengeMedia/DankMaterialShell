@@ -12,7 +12,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' 
+NC='\033[0m'
 
 info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -58,23 +58,18 @@ CHANGES_FILE=$(realpath "$CHANGES_FILE")
 info "Uploading to PPA: ppa:avengemedia/$PPA_NAME"
 info "Changes file: $CHANGES_FILE"
 
-# Check if dput or lftp is installed
-UPLOAD_METHOD=""
-if command -v dput &> /dev/null; then
-    UPLOAD_METHOD="dput"
-elif command -v lftp &> /dev/null; then
-    UPLOAD_METHOD="lftp"
-    warn "dput not found, using lftp as fallback"
+# Check if dput is installed
+if command -v dput &>/dev/null; then
+    info "dput found"
 else
-    error "Neither dput nor lftp found. Install one with:"
-    error "  sudo dnf install dput-ng    # Preferred but broken on Fedora"
-    error "  sudo dnf install lftp        # Alternative upload method"
+    error "dput not found. Install with:"
+    error "  sudo dnf install dput-ng"
     exit 1
 fi
 
 # Check if ~/.dput.cf exists
 if [ ! -f "$HOME/.dput.cf" ]; then
-    error "~/.dput.cf not found!"
+    error "$HOME/.dput.cf not found!"
     echo
     info "Create it from template:"
     echo "  cp $(dirname "$0")/../dput.cf.template ~/.dput.cf"

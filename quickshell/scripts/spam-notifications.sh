@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Notification Spam Test Script - Sends 100 rapid notifications from fake apps
 
@@ -151,7 +151,7 @@ echo "Starting notification spam..."
 echo "------------------------------"
 
 # Send notifications rapidly
-for i in $(seq 1 $TOTAL); do
+for _ in $(seq 1 $TOTAL); do
     # Pick random app, title, message, and urgency
     APP=${APPS[$RANDOM % ${#APPS[@]}]}
     APP_NAME=${APP%%:*}
@@ -159,32 +159,32 @@ for i in $(seq 1 $TOTAL); do
     TITLE=${TITLES[$RANDOM % ${#TITLES[@]}]}
     MESSAGE=${MESSAGES[$RANDOM % ${#MESSAGES[@]}]}
     URG=${URGENCY[$RANDOM % ${#URGENCY[@]}]}
-    
+
     # Add some variety with random numbers and timestamps
     RAND_NUM=$((RANDOM % 1000))
     TIMESTAMP=$(date +"%H:%M:%S")
-    
+
     # Randomly add extra details to some messages
     if [ $((RANDOM % 3)) -eq 0 ]; then
         MESSAGE="[$TIMESTAMP] $MESSAGE (#$RAND_NUM)"
     fi
-    
+
     # Send notification with very short delay
     notify-send \
-        -h string:desktop-entry:$APP_NAME \
-        -i $APP_ICON \
-        -u $URG \
+        -h "string:desktop-entry:$APP_NAME" \
+        -i "$APP_ICON" \
+        -u "$URG" \
         "$APP_NAME: $TITLE" \
         "$MESSAGE" &
-    
+
     # Increment counter
     COUNT=$((COUNT + 1))
-    
+
     # Show progress every 10 notifications
     if [ $((COUNT % 10)) -eq 0 ]; then
         echo "  Sent $COUNT/$TOTAL notifications..."
     fi
-    
+
     # Tiny delay to prevent complete system freeze
     # Adjust this value: smaller = faster spam, larger = slower spam
     sleep 0.01
@@ -200,7 +200,7 @@ echo "Statistics:"
 echo "  Total notifications sent: $TOTAL"
 echo "  Apps simulated: ${#APPS[@]}"
 echo "  Message variations: ${#MESSAGES[@]}"
-echo "  Time taken: ~$(($TOTAL / 100)) seconds"
+echo "  Time taken: ~$((TOTAL / 100)) seconds"
 echo ""
 echo "Check your notification center - it should be FULL!"
 echo "Tip: You may want to clear all notifications after this test"

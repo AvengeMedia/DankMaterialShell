@@ -45,7 +45,7 @@ rm -rf "$TEMP_DIR"
 echo "Generating spec file..."
 CHANGELOG_DATE="$(date '+%a %b %d %Y')"
 
-cat > ~/rpmbuild/SPECS/dms.spec <<'SPECEOF'
+cat >~/rpmbuild/SPECS/dms.spec <<'SPECEOF'
 # Spec for DMS stable releases - Built locally
 
 %global debug_package %{nil}
@@ -187,7 +187,7 @@ echo "Building SRPM..."
 cd ~/rpmbuild/SPECS
 rpmbuild -bs dms.spec
 
-SRPM=$(ls ~/rpmbuild/SRPMS/dms-${VERSION}-*.src.rpm | tail -n 1)
+SRPM=$(ls ~/rpmbuild/SRPMS/dms-"${VERSION}"-*.src.rpm | tail -n 1)
 if [ ! -f "$SRPM" ]; then
     echo "Error: SRPM not found!"
     exit 1
@@ -196,7 +196,7 @@ fi
 echo "SRPM built successfully: $SRPM"
 
 # Check if copr-cli is installed
-if ! command -v copr-cli &> /dev/null; then
+if ! command -v copr-cli &>/dev/null; then
     echo ""
     echo "copr-cli is not installed. Install it with:"
     echo "  pip install copr-cli"

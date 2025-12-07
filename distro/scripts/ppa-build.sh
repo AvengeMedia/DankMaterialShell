@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Generic source package builder for DMS PPA packages
 # Usage: ./create-source.sh <package-dir> [ubuntu-series]
 #
@@ -54,7 +54,7 @@ PACKAGE_PARENT=$(dirname "$PACKAGE_DIR")
 
 # Create temporary working directory (like OBS)
 TEMP_WORK_DIR=$(mktemp -d -t ppa_build_work_XXXXXX)
-trap "rm -rf '$TEMP_WORK_DIR'" EXIT
+trap 'rm -rf "$TEMP_WORK_DIR"' EXIT
 
 info "Building source package for: $PACKAGE_NAME"
 info "Package directory: $PACKAGE_DIR"
@@ -79,7 +79,7 @@ done
 
 # Verify GPG key is set up
 info "Checking GPG key setup..."
-if ! gpg --list-secret-keys &> /dev/null; then
+if ! gpg --list-secret-keys &>/dev/null; then
     error "No GPG secret keys found. Please set up GPG first!"
     error "See GPG_SETUP.md for instructions"
     exit 1
@@ -88,7 +88,7 @@ fi
 success "GPG key found"
 
 # Check if debuild is installed
-if ! command -v debuild &> /dev/null; then
+if ! command -v debuild &>/dev/null; then
     error "debuild not found. Install devscripts:"
     error "  sudo dnf install devscripts"
     exit 1
@@ -137,7 +137,7 @@ cd "$WORK_PACKAGE_DIR"
 get_latest_tag() {
     local repo="$1"
     # Try GitHub API first (faster)
-    if command -v curl &> /dev/null; then
+    if command -v curl &>/dev/null; then
         LATEST_TAG=$(curl -s "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null | grep '"tag_name":' | sed 's/.*"tag_name": "\(.*\)".*/\1/' | head -1)
         if [ -n "$LATEST_TAG" ]; then
             echo "$LATEST_TAG" | sed 's/^v//'
@@ -175,69 +175,69 @@ fi
 
 # Special handling for known packages
 case "$PACKAGE_NAME" in
-    dms-git)
-        IS_GIT_PACKAGE=true
-        GIT_REPO="AvengeMedia/DankMaterialShell"
-        SOURCE_DIR="dms-git-repo"
-        ;;
-    dms)
-        GIT_REPO="AvengeMedia/DankMaterialShell"
-        info "Downloading pre-built binaries and source for dms..."
-        # Get version from changelog (remove ppa suffix for both quilt and native formats)
-        # Native: 0.5.2ppa1 -> 0.5.2, Quilt: 0.5.2-1ppa1 -> 0.5.2
-        VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
+dms-git)
+    IS_GIT_PACKAGE=true
+    GIT_REPO="AvengeMedia/DankMaterialShell"
+    SOURCE_DIR="dms-git-repo"
+    ;;
+dms)
+    GIT_REPO="AvengeMedia/DankMaterialShell"
+    info "Downloading pre-built binaries and source for dms..."
+    # Get version from changelog (remove ppa suffix for both quilt and native formats)
+    # Native: 0.5.2ppa1 -> 0.5.2, Quilt: 0.5.2-1ppa1 -> 0.5.2
+    VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
 
-        # Download amd64 binary (will be included in source package)
-        if [ ! -f "dms-distropkg-amd64.gz" ]; then
-            info "Downloading dms binary for amd64..."
-            if wget -O dms-distropkg-amd64.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-distropkg-amd64.gz"; then
-                success "amd64 binary downloaded"
-            else
-                error "Failed to download dms-distropkg-amd64.gz"
-                exit 1
-            fi
+    # Download amd64 binary (will be included in source package)
+    if [ ! -f "dms-distropkg-amd64.gz" ]; then
+        info "Downloading dms binary for amd64..."
+        if wget -O dms-distropkg-amd64.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-distropkg-amd64.gz"; then
+            success "amd64 binary downloaded"
+        else
+            error "Failed to download dms-distropkg-amd64.gz"
+            exit 1
         fi
+    fi
 
-        # Download source tarball for QML files
-        if [ ! -f "dms-source.tar.gz" ]; then
-            info "Downloading dms source for QML files..."
-            if wget -O dms-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
-                success "source tarball downloaded"
-            else
-                error "Failed to download dms-source.tar.gz"
-                exit 1
-            fi
+    # Download source tarball for QML files
+    if [ ! -f "dms-source.tar.gz" ]; then
+        info "Downloading dms source for QML files..."
+        if wget -O dms-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
+            success "source tarball downloaded"
+        else
+            error "Failed to download dms-source.tar.gz"
+            exit 1
         fi
-        ;;
-    dms-greeter)
-        GIT_REPO="AvengeMedia/DankMaterialShell"
-        info "Downloading source for dms-greeter..."
-        VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
+    fi
+    ;;
+dms-greeter)
+    GIT_REPO="AvengeMedia/DankMaterialShell"
+    info "Downloading source for dms-greeter..."
+    VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
 
-        if [ ! -f "dms-greeter-source.tar.gz" ]; then
-            info "Downloading dms-greeter source..."
-            if wget -O dms-greeter-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
-                success "source tarball downloaded"
-            else
-                error "Failed to download dms-greeter-source.tar.gz"
-                exit 1
-            fi
+    if [ ! -f "dms-greeter-source.tar.gz" ]; then
+        info "Downloading dms-greeter source..."
+        if wget -O dms-greeter-source.tar.gz "https://github.com/AvengeMedia/DankMaterialShell/archive/refs/tags/v${VERSION}.tar.gz"; then
+            success "source tarball downloaded"
+        else
+            error "Failed to download dms-greeter-source.tar.gz"
+            exit 1
         fi
-        ;;
-    danksearch)
-        # danksearch uses pre-built binary from releases
-        GIT_REPO="AvengeMedia/danksearch"
-        ;;
-    dgop)
-        # dgop uses pre-built binary from releases
-        GIT_REPO="AvengeMedia/dgop"
-        ;;
+    fi
+    ;;
+danksearch)
+    # danksearch uses pre-built binary from releases
+    GIT_REPO="AvengeMedia/danksearch"
+    ;;
+dgop)
+    # dgop uses pre-built binary from releases
+    GIT_REPO="AvengeMedia/dgop"
+    ;;
 esac
 
 # Handle git packages
 if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
     info "Detected git package: $PACKAGE_NAME"
-    
+
     # Determine source directory name
     if [ -z "$SOURCE_DIR" ]; then
         # Default: use package name without -git suffix + -source or -repo
@@ -252,7 +252,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
             SOURCE_DIR="${BASE_NAME}-source"
         fi
     fi
-    
+
     # Always clone fresh source to get latest commit info
     info "Cloning $GIT_REPO from GitHub (getting latest commit info)..."
     TEMP_CLONE=$(mktemp -d)
@@ -260,7 +260,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
         # Get git commit info from fresh clone
         GIT_COMMIT_HASH=$(cd "$TEMP_CLONE" && git rev-parse --short HEAD)
         GIT_COMMIT_COUNT=$(cd "$TEMP_CLONE" && git rev-list --count HEAD)
-        
+
         # Get upstream version from latest git tag (e.g., 0.2.1)
         # Sort all tags by version and get the latest one (not just the one reachable from HEAD)
         UPSTREAM_VERSION=$(cd "$TEMP_CLONE" && git tag -l "v*" | sed 's/^v//' | sort -V | tail -1)
@@ -272,36 +272,36 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
             # Last resort: use git describe
             UPSTREAM_VERSION=$(cd "$TEMP_CLONE" && git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.1")
         fi
-        
+
         # Verify we got valid commit info
         if [ -z "$GIT_COMMIT_COUNT" ] || [ "$GIT_COMMIT_COUNT" = "0" ]; then
             error "Failed to get commit count from $GIT_REPO"
             rm -rf "$TEMP_CLONE"
             exit 1
         fi
-        
+
         if [ -z "$GIT_COMMIT_HASH" ]; then
             error "Failed to get commit hash from $GIT_REPO"
             rm -rf "$TEMP_CLONE"
             exit 1
         fi
-        
+
         success "Got commit info: $GIT_COMMIT_COUNT ($GIT_COMMIT_HASH), upstream: $UPSTREAM_VERSION"
-        
+
         # Update changelog with git commit info
         info "Updating changelog with git commit info..."
         # Format: 0.2.1+git705.fdbb86appa1
         # Check if we're rebuilding the same commit (increment PPA number if so)
         BASE_VERSION="${UPSTREAM_VERSION}+git${GIT_COMMIT_COUNT}.${GIT_COMMIT_HASH}"
         CURRENT_VERSION=$(dpkg-parsechangelog -S Version 2>/dev/null || echo "")
-        
+
         # Use REBUILD_RELEASE if provided, otherwise auto-increment
         if [[ -n "${REBUILD_RELEASE:-}" ]]; then
             PPA_NUM=$REBUILD_RELEASE
             info "Using REBUILD_RELEASE=$REBUILD_RELEASE for PPA number"
         else
             PPA_NUM=1
-            
+
             # If current version matches the base version, increment PPA number
             # Escape special regex characters in BASE_VERSION for pattern matching
             ESCAPED_BASE=$(echo "$BASE_VERSION" | sed 's/\./\\./g' | sed 's/+/\\+/g')
@@ -318,36 +318,36 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
                 info "New commit or first build, using PPA number $PPA_NUM"
             fi
         fi
-        
+
         NEW_VERSION="${BASE_VERSION}ppa${PPA_NUM}"
-        
+
         # Use sed to update changelog (non-interactive, faster)
         # Get current changelog content - find the next package header line (starts with package name)
         # Skip the first entry entirely by finding the second occurrence of the package name at start of line
         OLD_ENTRY_START=$(grep -n "^${SOURCE_NAME} (" debian/changelog | sed -n '2p' | cut -d: -f1)
         if [ -n "$OLD_ENTRY_START" ]; then
             # Found second entry, use everything from there
-            CHANGELOG_CONTENT=$(tail -n +$OLD_ENTRY_START debian/changelog)
+            CHANGELOG_CONTENT=$(tail -n +"$OLD_ENTRY_START" debian/changelog)
         else
             # No second entry found, changelog will only have new entry
             CHANGELOG_CONTENT=""
         fi
-        
+
         # Create new changelog entry with proper format
         CHANGELOG_ENTRY="${SOURCE_NAME} (${NEW_VERSION}) ${UBUNTU_SERIES}; urgency=medium
 
   * Git snapshot (commit ${GIT_COMMIT_COUNT}: ${GIT_COMMIT_HASH})
 
  -- Avenge Media <AvengeMedia.US@gmail.com>  $(date -R)"
-        
+
         # Write new changelog (new entry, blank line, then old entries)
-        echo "$CHANGELOG_ENTRY" > debian/changelog
+        echo "$CHANGELOG_ENTRY" >debian/changelog
         if [ -n "$CHANGELOG_CONTENT" ]; then
-            echo "" >> debian/changelog
-            echo "$CHANGELOG_CONTENT" >> debian/changelog
+            echo "" >>debian/changelog
+            echo "$CHANGELOG_CONTENT" >>debian/changelog
         fi
         success "Version updated to $NEW_VERSION"
-        
+
         # Now clone to source directory (without .git for inclusion in package)
         rm -rf "$SOURCE_DIR"
         cp -r "$TEMP_CLONE" "$SOURCE_DIR"
@@ -355,8 +355,8 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
         # Save version info for dms-git build process
         if [ "$PACKAGE_NAME" = "dms-git" ]; then
             info "Saving version info to .dms-version for build process..."
-            echo "VERSION=${UPSTREAM_VERSION}+git${GIT_COMMIT_COUNT}.${GIT_COMMIT_HASH}" > "$SOURCE_DIR/.dms-version"
-            echo "COMMIT=${GIT_COMMIT_HASH}" >> "$SOURCE_DIR/.dms-version"
+            echo "VERSION=${UPSTREAM_VERSION}+git${GIT_COMMIT_COUNT}.${GIT_COMMIT_HASH}" >"$SOURCE_DIR/.dms-version"
+            echo "COMMIT=${GIT_COMMIT_HASH}" >>"$SOURCE_DIR/.dms-version"
             success "Version info saved: ${UPSTREAM_VERSION}+git${GIT_COMMIT_COUNT}.${GIT_COMMIT_HASH}"
 
             # Vendor Go dependencies (Launchpad has no internet access)
@@ -397,7 +397,7 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
                     /^\[source\.crates-io\]/ { printing=1 }
                     printing { print }
                     /^directory = "vendor"$/ { exit }
-                ' > .cargo/config.toml
+                ' >.cargo/config.toml
 
                 # Verify vendor directory was created
                 if [ ! -d "vendor" ]; then
@@ -428,7 +428,6 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
             fi
         fi
 
-
         success "Source prepared for packaging"
     else
         error "Failed to clone $GIT_REPO"
@@ -439,15 +438,15 @@ if [ "$IS_GIT_PACKAGE" = true ] && [ -n "$GIT_REPO" ]; then
 elif [ -n "$GIT_REPO" ]; then
     info "Detected stable package: $PACKAGE_NAME"
     info "Fetching latest tag from $GIT_REPO..."
-    
+
     LATEST_TAG=$(get_latest_tag "$GIT_REPO")
     if [ -n "$LATEST_TAG" ]; then
         # Check source format - native packages can't use dashes
-        SOURCE_FORMAT=$(cat debian/source/format 2>/dev/null | head -1 || echo "3.0 (quilt)")
+        SOURCE_FORMAT=$(head -1 debian/source/format 2>/dev/null || echo "3.0 (quilt)")
 
         # Get current version to check if we need to increment PPA number
         CURRENT_VERSION=$(dpkg-parsechangelog -S Version 2>/dev/null || echo "")
-        
+
         # Use REBUILD_RELEASE if provided, otherwise auto-increment
         if [[ -n "${REBUILD_RELEASE:-}" ]]; then
             PPA_NUM=$REBUILD_RELEASE
@@ -498,11 +497,11 @@ elif [ -n "$GIT_REPO" ]; then
             # Get current changelog content - find the next package header line
             OLD_ENTRY_START=$(grep -n "^${SOURCE_NAME} (" debian/changelog | sed -n '2p' | cut -d: -f1)
             if [ -n "$OLD_ENTRY_START" ]; then
-                CHANGELOG_CONTENT=$(tail -n +$OLD_ENTRY_START debian/changelog)
+                CHANGELOG_CONTENT=$(tail -n +"$OLD_ENTRY_START" debian/changelog)
             else
                 CHANGELOG_CONTENT=""
             fi
-            
+
             # Create appropriate changelog message
             if [ "$PPA_NUM" -gt 1 ]; then
                 CHANGELOG_MSG="Rebuild for packaging fixes (ppa${PPA_NUM})"
@@ -515,10 +514,10 @@ elif [ -n "$GIT_REPO" ]; then
   * ${CHANGELOG_MSG}
 
  -- Avenge Media <AvengeMedia.US@gmail.com>  $(date -R)"
-            echo "$CHANGELOG_ENTRY" > debian/changelog
+            echo "$CHANGELOG_ENTRY" >debian/changelog
             if [ -n "$CHANGELOG_CONTENT" ]; then
-                echo "" >> debian/changelog
-                echo "$CHANGELOG_CONTENT" >> debian/changelog
+                echo "" >>debian/changelog
+                echo "$CHANGELOG_CONTENT" >>debian/changelog
             fi
             success "Version updated to $NEW_VERSION"
         else
@@ -532,47 +531,47 @@ fi
 # Handle packages that need pre-built binaries downloaded
 cd "$PACKAGE_DIR"
 case "$PACKAGE_NAME" in
-    danksearch)
-        info "Downloading pre-built binaries for danksearch..."
-        # Get version from changelog (remove ppa suffix for both quilt and native formats)
-        # Native: 0.5.2ppa1 -> 0.5.2, Quilt: 0.5.2-1ppa1 -> 0.5.2
-        VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
+danksearch)
+    info "Downloading pre-built binaries for danksearch..."
+    # Get version from changelog (remove ppa suffix for both quilt and native formats)
+    # Native: 0.5.2ppa1 -> 0.5.2, Quilt: 0.5.2-1ppa1 -> 0.5.2
+    VERSION=$(dpkg-parsechangelog -S Version | sed 's/-[^-]*$//' | sed 's/ppa[0-9]*$//')
 
-        # Download both amd64 and arm64 binaries (will be included in source package)
-        # Launchpad can't download during build, so we include both architectures
-        if [ ! -f "dsearch-amd64" ]; then
-            info "Downloading dsearch binary for amd64..."
-            if wget -O dsearch-amd64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-amd64.gz"; then
-                gunzip dsearch-amd64.gz
-                chmod +x dsearch-amd64
-                success "amd64 binary downloaded"
-            else
-                error "Failed to download dsearch-amd64.gz"
-                exit 1
-            fi
+    # Download both amd64 and arm64 binaries (will be included in source package)
+    # Launchpad can't download during build, so we include both architectures
+    if [ ! -f "dsearch-amd64" ]; then
+        info "Downloading dsearch binary for amd64..."
+        if wget -O dsearch-amd64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-amd64.gz"; then
+            gunzip dsearch-amd64.gz
+            chmod +x dsearch-amd64
+            success "amd64 binary downloaded"
+        else
+            error "Failed to download dsearch-amd64.gz"
+            exit 1
         fi
+    fi
 
-        if [ ! -f "dsearch-arm64" ]; then
-            info "Downloading dsearch binary for arm64..."
-            if wget -O dsearch-arm64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-arm64.gz"; then
-                gunzip dsearch-arm64.gz
-                chmod +x dsearch-arm64
-                success "arm64 binary downloaded"
-            else
-                error "Failed to download dsearch-arm64.gz"
-                exit 1
-            fi
+    if [ ! -f "dsearch-arm64" ]; then
+        info "Downloading dsearch binary for arm64..."
+        if wget -O dsearch-arm64.gz "https://github.com/AvengeMedia/danksearch/releases/download/v${VERSION}/dsearch-linux-arm64.gz"; then
+            gunzip dsearch-arm64.gz
+            chmod +x dsearch-arm64
+            success "arm64 binary downloaded"
+        else
+            error "Failed to download dsearch-arm64.gz"
+            exit 1
         fi
-        ;;
-    dgop)
-        # dgop binary should already be committed in the repo
-        if [ ! -f "dgop" ]; then
-            warn "dgop binary not found - should be committed to repo"
-        fi
-        ;;
+    fi
+    ;;
+dgop)
+    # dgop binary should already be committed in the repo
+    if [ ! -f "dgop" ]; then
+        warn "dgop binary not found - should be committed to repo"
+    fi
+    ;;
 esac
 
-cd - > /dev/null
+cd - >/dev/null
 
 # Check if this version already exists on PPA (only in CI environment)
 if command -v rmadison >/dev/null 2>&1; then
@@ -586,10 +585,10 @@ if command -v rmadison >/dev/null 2>&1; then
         cd "$PACKAGE_DIR"
         # Still clean up extracted sources
         case "$PACKAGE_NAME" in
-            dms-git)
-                rm -rf DankMaterialShell-*
-                success "Cleaned up DankMaterialShell-*/ directory"
-                ;;
+        dms-git)
+            rm -rf DankMaterialShell-*
+            success "Cleaned up DankMaterialShell-*/ directory"
+            ;;
         esac
         exit 0
     fi
@@ -621,11 +620,11 @@ if yes | DEBIAN_FRONTEND=noninteractive debuild -S $DEBUILD_SOURCE_FLAG -d; then
 
     # Copy build artifacts back to parent directory
     info "Copying build artifacts to $PACKAGE_PARENT..."
-    cp -v "$TEMP_WORK_DIR"/${SOURCE_NAME}_${CHANGELOG_VERSION}* "$PACKAGE_PARENT/" 2>/dev/null || true
+    cp -v "$TEMP_WORK_DIR"/"${SOURCE_NAME}"_"${CHANGELOG_VERSION}"* "$PACKAGE_PARENT/" 2>/dev/null || true
 
     # List generated files
     info "Generated files in $PACKAGE_PARENT:"
-    ls -lh "$PACKAGE_PARENT"/${SOURCE_NAME}_${CHANGELOG_VERSION}* 2>/dev/null || true
+    ls -lh "$PACKAGE_PARENT"/"${SOURCE_NAME}"_"${CHANGELOG_VERSION}"* 2>/dev/null || true
 
     # Show what to do next
     echo

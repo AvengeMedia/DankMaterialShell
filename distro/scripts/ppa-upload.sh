@@ -12,7 +12,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' 
+NC='\033[0m'
 
 info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
@@ -98,24 +98,20 @@ info "Step 2: Uploading to PPA..."
 # Check if using lftp (for all PPAs) or dput
 if [ "$PPA_NAME" = "danklinux" ] || [ "$PPA_NAME" = "dms" ] || [ "$PPA_NAME" = "dms-git" ]; then
     warn "Using lftp for upload"
-    
-    # Extract version from changes file
-    VERSION=$(grep "^Version:" "$CHANGES_FILE" | awk '{print $2}')
-    SOURCE_NAME=$(grep "^Source:" "$CHANGES_FILE" | awk '{print $2}')
-    
+
     # Find all files to upload
     BUILD_DIR=$(dirname "$CHANGES_FILE")
     CHANGES_BASENAME=$(basename "$CHANGES_FILE")
     DSC_FILE="${CHANGES_BASENAME/_source.changes/.dsc}"
     TARBALL="${CHANGES_BASENAME/_source.changes/.tar.xz}"
     BUILDINFO="${CHANGES_BASENAME/_source.changes/_source.buildinfo}"
-    
+
     # Check all files exist
     MISSING_FILES=()
     [ ! -f "$BUILD_DIR/$DSC_FILE" ] && MISSING_FILES+=("$DSC_FILE")
     [ ! -f "$BUILD_DIR/$TARBALL" ] && MISSING_FILES+=("$TARBALL")
     [ ! -f "$BUILD_DIR/$BUILDINFO" ] && MISSING_FILES+=("$BUILDINFO")
-    
+
     if [ ${#MISSING_FILES[@]} -gt 0 ]; then
         error "Missing required files:"
         for file in "${MISSING_FILES[@]}"; do
@@ -123,17 +119,17 @@ if [ "$PPA_NAME" = "danklinux" ] || [ "$PPA_NAME" = "dms" ] || [ "$PPA_NAME" = "
         done
         exit 1
     fi
-    
+
     info "Uploading files:"
     info "  - $CHANGES_BASENAME"
     info "  - $DSC_FILE"
     info "  - $TARBALL"
     info "  - $BUILDINFO"
     echo
-    
+
     # lftp build dir change
     LFTP_SCRIPT=$(mktemp)
-    cat > "$LFTP_SCRIPT" <<EOF
+    cat >"$LFTP_SCRIPT" <<EOF
 cd ~avengemedia/ubuntu/$PPA_NAME/
 lcd $BUILD_DIR
 mput $CHANGES_BASENAME
@@ -142,8 +138,8 @@ mput $TARBALL
 mput $BUILDINFO
 bye
 EOF
-    
-    if lftp -d ftp://anonymous:@ppa.launchpad.net < "$LFTP_SCRIPT"; then
+
+    if lftp -d ftp://anonymous:@ppa.launchpad.net <"$LFTP_SCRIPT"; then
         success "Upload successful!"
         rm -f "$LFTP_SCRIPT"
     else
@@ -197,41 +193,41 @@ if [ "$KEEP_BUILDS" = "false" ]; then
 
     # Clean up downloaded binaries in package directory
     case "$PACKAGE_NAME" in
-        danksearch)
-            if [ -f "$PACKAGE_DIR/dsearch-amd64" ]; then
-                rm -f "$PACKAGE_DIR/dsearch-amd64"
-                REMOVED=$((REMOVED + 1))
-            fi
-            if [ -f "$PACKAGE_DIR/dsearch-arm64" ]; then
-                rm -f "$PACKAGE_DIR/dsearch-arm64"
-                REMOVED=$((REMOVED + 1))
-            fi
-            ;;
-        dms)
-            # Remove downloaded binaries and source
-            if [ -f "$PACKAGE_DIR/dms-distropkg-amd64.gz" ]; then
-                rm -f "$PACKAGE_DIR/dms-distropkg-amd64.gz"
-                REMOVED=$((REMOVED + 1))
-            fi
-            if [ -f "$PACKAGE_DIR/dms-source.tar.gz" ]; then
-                rm -f "$PACKAGE_DIR/dms-source.tar.gz"
-                REMOVED=$((REMOVED + 1))
-            fi
-            ;;
-        dms-git)
-            # Remove git source directory binary
-            if [ -d "$PACKAGE_DIR/dms-git-repo" ]; then
-                rm -rf "$PACKAGE_DIR/dms-git-repo"
-                REMOVED=$((REMOVED + 1))
-            fi
-            ;;
-        dms-greeter)
-            # Remove downloaded source
-            if [ -f "$PACKAGE_DIR/dms-greeter-source.tar.gz" ]; then
-                rm -f "$PACKAGE_DIR/dms-greeter-source.tar.gz"
-                REMOVED=$((REMOVED + 1))
-            fi
-            ;;
+    danksearch)
+        if [ -f "$PACKAGE_DIR/dsearch-amd64" ]; then
+            rm -f "$PACKAGE_DIR/dsearch-amd64"
+            REMOVED=$((REMOVED + 1))
+        fi
+        if [ -f "$PACKAGE_DIR/dsearch-arm64" ]; then
+            rm -f "$PACKAGE_DIR/dsearch-arm64"
+            REMOVED=$((REMOVED + 1))
+        fi
+        ;;
+    dms)
+        # Remove downloaded binaries and source
+        if [ -f "$PACKAGE_DIR/dms-distropkg-amd64.gz" ]; then
+            rm -f "$PACKAGE_DIR/dms-distropkg-amd64.gz"
+            REMOVED=$((REMOVED + 1))
+        fi
+        if [ -f "$PACKAGE_DIR/dms-source.tar.gz" ]; then
+            rm -f "$PACKAGE_DIR/dms-source.tar.gz"
+            REMOVED=$((REMOVED + 1))
+        fi
+        ;;
+    dms-git)
+        # Remove git source directory binary
+        if [ -d "$PACKAGE_DIR/dms-git-repo" ]; then
+            rm -rf "$PACKAGE_DIR/dms-git-repo"
+            REMOVED=$((REMOVED + 1))
+        fi
+        ;;
+    dms-greeter)
+        # Remove downloaded source
+        if [ -f "$PACKAGE_DIR/dms-greeter-source.tar.gz" ]; then
+            rm -f "$PACKAGE_DIR/dms-greeter-source.tar.gz"
+            REMOVED=$((REMOVED + 1))
+        fi
+        ;;
     esac
 
     if [ $REMOVED -gt 0 ]; then
@@ -246,4 +242,3 @@ fi
 
 echo
 success "Done!"
-

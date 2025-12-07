@@ -8,12 +8,10 @@ echo "============================================================="
 
 # Check what icons are available
 echo "Checking available icons..."
-if [ -d "~/.local/share/icons/Papirus" ]; then
+if [ -d "$HOME/.local/share/icons/Papirus" ]; then
     echo "✓ Icon theme found"
-    ICON_BASE="~/.local/share/icons/Papirus"
 else
     echo "! Using fallback icons"
-    ICON_BASE=""
 fi
 
 # Test 1: Basic notifications with markdown

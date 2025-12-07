@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
@@ -9,8 +9,8 @@ NC='\033[0m' # No Color
 
 # Check for root privileges
 if [ "$(id -u)" == "0" ]; then
-   printf "%bError: This script must not be run as root%b\n" "$RED" "$NC"
-   exit 1
+    printf "%bError: This script must not be run as root%b\n" "$RED" "$NC"
+    exit 1
 fi
 
 # Check if running on Linux
@@ -22,17 +22,17 @@ fi
 # Detect architecture
 ARCH=$(uname -m)
 case "$ARCH" in
-    x86_64)
-        ARCH="amd64"
-        ;;
-    aarch64)
-        ARCH="arm64"
-        ;;
-    *)
-        printf "%bError: Unsupported architecture: %s%b\n" "$RED" "$ARCH" "$NC"
-        printf "This installer only supports x86_64 (amd64) and aarch64 (arm64) architectures\n"
-        exit 1
-        ;;
+x86_64)
+    ARCH="amd64"
+    ;;
+aarch64)
+    ARCH="arm64"
+    ;;
+*)
+    printf "%bError: Unsupported architecture: %s%b\n" "$RED" "$ARCH" "$NC"
+    printf "This installer only supports x86_64 (amd64) and aarch64 (arm64) architectures\n"
+    exit 1
+    ;;
 esac
 
 # Get the latest release version
@@ -55,7 +55,7 @@ curl -L "https://github.com/AvengeMedia/DankMaterialShell/releases/download/$LAT
 curl -L "https://github.com/AvengeMedia/DankMaterialShell/releases/download/$LATEST_VERSION/dankinstall-$ARCH.gz.sha256" -o "expected.sha256"
 
 # Get the expected checksum
-EXPECTED_CHECKSUM=$(cat expected.sha256 | awk '{print $1}')
+EXPECTED_CHECKSUM=$(awk '{print $1}' expected.sha256)
 
 # Calculate actual checksum
 printf "%bVerifying checksum...%b\n" "$GREEN" "$NC"
@@ -67,7 +67,7 @@ if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
     printf "Expected: %s\n" "$EXPECTED_CHECKSUM"
     printf "Got:      %s\n" "$ACTUAL_CHECKSUM"
     printf "The downloaded file may be corrupted or tampered with\n"
-    cd - > /dev/null
+    cd - >/dev/null
     rm -rf "$TEMP_DIR"
     exit 1
 fi
@@ -82,5 +82,5 @@ printf "%bRunning installer...%b\n" "$GREEN" "$NC"
 ./installer
 
 # Cleanup
-cd - > /dev/null
-rm -rf "$TEMP_DIR" 
+cd - >/dev/null
+rm -rf "$TEMP_DIR"
