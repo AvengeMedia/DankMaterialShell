@@ -17,8 +17,10 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 )
 
-const forceQuickshellGit = false
-const forceDMSGit = false
+const (
+	forceQuickshellGit = false
+	forceDMSGit        = false
+)
 
 // BaseDistribution provides common functionality for all distributions
 type BaseDistribution struct {
@@ -217,20 +219,6 @@ func (b *BaseDistribution) detectClipboardTools() []deps.Dependency {
 	)
 
 	return dependencies
-}
-
-func (b *BaseDistribution) detectHyprpicker() deps.Dependency {
-	status := deps.StatusMissing
-	if b.commandExists("hyprpicker") {
-		status = deps.StatusInstalled
-	}
-
-	return deps.Dependency{
-		Name:        "hyprpicker",
-		Status:      status,
-		Description: "Color picker for Wayland",
-		Required:    true,
-	}
 }
 
 func (b *BaseDistribution) detectHyprlandTools() []deps.Dependency {
@@ -602,7 +590,7 @@ func (b *BaseDistribution) installDMSBinary(ctx context.Context, sudoPassword st
 		return fmt.Errorf("failed to get user home directory: %w", err)
 	}
 	tmpDir := filepath.Join(homeDir, ".cache", "dankinstall", "manual-builds")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
