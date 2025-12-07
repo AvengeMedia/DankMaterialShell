@@ -170,22 +170,22 @@
     //
     "terminal.background": "{{colors.background.dark.hex}}",
     "terminal.foreground": "{{colors.on_surface.dark.hex}}",
-    "terminal.ansiBlack": "{{dank16.color0.hex}}",
-    "terminal.ansiRed": "{{dank16.color1.hex}}",
-    "terminal.ansiGreen": "{{dank16.color2.hex}}",
-    "terminal.ansiYellow": "{{dank16.color3.hex}}",
-    "terminal.ansiBlue": "{{dank16.color4.hex}}",
-    "terminal.ansiMagenta": "{{dank16.color5.hex}}",
-    "terminal.ansiCyan": "{{dank16.color6.hex}}",
-    "terminal.ansiWhite": "{{dank16.color7.hex}}",
-    "terminal.ansiBrightBlack": "{{dank16.color8.hex}}",
-    "terminal.ansiBrightRed": "{{dank16.color9.hex}}",
-    "terminal.ansiBrightGreen": "{{dank16.color10.hex}}",
-    "terminal.ansiBrightYellow": "{{dank16.color11.hex}}",
-    "terminal.ansiBrightBlue": "{{dank16.color12.hex}}",
-    "terminal.ansiBrightMagenta": "{{dank16.color13.hex}}",
-    "terminal.ansiBrightCyan": "{{dank16.color14.hex}}",
-    "terminal.ansiBrightWhite": "{{dank16.color15.hex}}"
+    "terminal.ansiBlack": "{{dank16.color0.dark.hex}}",
+    "terminal.ansiRed": "{{dank16.color1.dark.hex}}",
+    "terminal.ansiGreen": "{{dank16.color2.dark.hex}}",
+    "terminal.ansiYellow": "{{dank16.color3.dark.hex}}",
+    "terminal.ansiBlue": "{{dank16.color4.dark.hex}}",
+    "terminal.ansiMagenta": "{{dank16.color5.dark.hex}}",
+    "terminal.ansiCyan": "{{dank16.color6.dark.hex}}",
+    "terminal.ansiWhite": "{{dank16.color7.dark.hex}}",
+    "terminal.ansiBrightBlack": "{{dank16.color8.dark.hex}}",
+    "terminal.ansiBrightRed": "{{dank16.color9.dark.hex}}",
+    "terminal.ansiBrightGreen": "{{dank16.color10.dark.hex}}",
+    "terminal.ansiBrightYellow": "{{dank16.color11.dark.hex}}",
+    "terminal.ansiBrightBlue": "{{dank16.color12.dark.hex}}",
+    "terminal.ansiBrightMagenta": "{{dank16.color13.dark.hex}}",
+    "terminal.ansiBrightCyan": "{{dank16.color14.dark.hex}}",
+    "terminal.ansiBrightWhite": "{{dank16.color15.dark.hex}}"
   },
   //
   // Token colors
@@ -196,7 +196,7 @@
         "comment"
       ],
       "settings": {
-        "foreground": "{{dank16.color8.hex}}"
+        "foreground": "{{dank16.color8.dark.hex}}"
       }
     },
     {
@@ -204,7 +204,7 @@
         "keyword"
       ],
       "settings": {
-        "foreground": "{{dank16.color5.hex}}"
+        "foreground": "{{dank16.color5.dark.hex}}"
       }
     },
     {
@@ -212,7 +212,7 @@
         "string"
       ],
       "settings": {
-        "foreground": "{{dank16.color3.hex}}"
+        "foreground": "{{dank16.color3.dark.hex}}"
       }
     },
     {
@@ -221,7 +221,7 @@
         "number"
       ],
       "settings": {
-        "foreground": "{{dank16.color12.hex}}"
+        "foreground": "{{dank16.color12.dark.hex}}"
       }
     },
     {
@@ -229,7 +229,7 @@
         "variable"
       ],
       "settings": {
-        "foreground": "{{dank16.color15.hex}}"
+        "foreground": "{{dank16.color15.dark.hex}}"
       }
     },
     {
@@ -237,7 +237,7 @@
         "entity.name.function"
       ],
       "settings": {
-        "foreground": "{{dank16.color2.hex}}"
+        "foreground": "{{dank16.color2.dark.hex}}"
       }
     },
     {
@@ -246,7 +246,7 @@
         "support.type"
       ],
       "settings": {
-        "foreground": "{{dank16.color12.hex}}"
+        "foreground": "{{dank16.color12.dark.hex}}"
       }
     },
     {
@@ -272,28 +272,28 @@
   //
   "semanticTokenColors": {
     "variable": {
-      "foreground": "{{dank16.color15.hex}}"
+      "foreground": "{{dank16.color15.dark.hex}}"
     },
     "parameter": {
-      "foreground": "{{dank16.color7.hex}}"
+      "foreground": "{{dank16.color7.dark.hex}}"
     },
     "property": {
-      "foreground": "{{dank16.color4.hex}}"
+      "foreground": "{{dank16.color4.dark.hex}}"
     },
     "function": {
-      "foreground": "{{dank16.color2.hex}}"
+      "foreground": "{{dank16.color2.dark.hex}}"
     },
     "string": {
-      "foreground": "{{dank16.color3.hex}}"
+      "foreground": "{{dank16.color3.dark.hex}}"
     },
     "number": {
-      "foreground": "{{dank16.color12.hex}}"
+      "foreground": "{{dank16.color12.dark.hex}}"
     },
     "keyword": {
-      "foreground": "{{dank16.color5.hex}}"
+      "foreground": "{{dank16.color5.dark.hex}}"
     },
     "comment": {
-      "foreground": "{{dank16.color8.hex}}"
+      "foreground": "{{dank16.color8.dark.hex}}"
     }
   }
 }

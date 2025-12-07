@@ -23,6 +23,17 @@ type ColorInfo struct {
 	B           int    `json:"b"`
 }
 
+type VariantColorValue struct {
+	Hex         string `json:"hex"`
+	HexStripped string `json:"hex_stripped"`
+}
+
+type VariantColorInfo struct {
+	Dark    VariantColorValue `json:"dark"`
+	Light   VariantColorValue `json:"light"`
+	Default VariantColorValue `json:"default"`
+}
+
 type Palette struct {
 	Color0  ColorInfo `json:"color0"`
 	Color1  ColorInfo `json:"color1"`
@@ -40,6 +51,25 @@ type Palette struct {
 	Color13 ColorInfo `json:"color13"`
 	Color14 ColorInfo `json:"color14"`
 	Color15 ColorInfo `json:"color15"`
+}
+
+type VariantPalette struct {
+	Color0  VariantColorInfo `json:"color0"`
+	Color1  VariantColorInfo `json:"color1"`
+	Color2  VariantColorInfo `json:"color2"`
+	Color3  VariantColorInfo `json:"color3"`
+	Color4  VariantColorInfo `json:"color4"`
+	Color5  VariantColorInfo `json:"color5"`
+	Color6  VariantColorInfo `json:"color6"`
+	Color7  VariantColorInfo `json:"color7"`
+	Color8  VariantColorInfo `json:"color8"`
+	Color9  VariantColorInfo `json:"color9"`
+	Color10 VariantColorInfo `json:"color10"`
+	Color11 VariantColorInfo `json:"color11"`
+	Color12 VariantColorInfo `json:"color12"`
+	Color13 VariantColorInfo `json:"color13"`
+	Color14 VariantColorInfo `json:"color14"`
+	Color15 VariantColorInfo `json:"color15"`
 }
 
 func NewColorInfo(hex string) ColorInfo {
@@ -491,4 +521,55 @@ func GeneratePalette(primaryColor string, opts PaletteOptions) Palette {
 	}
 
 	return palette
+}
+
+type VariantOptions struct {
+	PrimaryDark  string
+	PrimaryLight string
+	Background   string
+	UseDPS       bool
+	IsLightMode  bool
+}
+
+func mergeColorInfo(dark, light ColorInfo, isLightMode bool) VariantColorInfo {
+	darkVal := VariantColorValue{Hex: dark.Hex, HexStripped: dark.HexStripped}
+	lightVal := VariantColorValue{Hex: light.Hex, HexStripped: light.HexStripped}
+
+	defaultVal := darkVal
+	if isLightMode {
+		defaultVal = lightVal
+	}
+
+	return VariantColorInfo{
+		Dark:    darkVal,
+		Light:   lightVal,
+		Default: defaultVal,
+	}
+}
+
+func GenerateVariantPalette(opts VariantOptions) VariantPalette {
+	darkOpts := PaletteOptions{IsLight: false, Background: opts.Background, UseDPS: opts.UseDPS}
+	lightOpts := PaletteOptions{IsLight: true, Background: opts.Background, UseDPS: opts.UseDPS}
+
+	dark := GeneratePalette(opts.PrimaryDark, darkOpts)
+	light := GeneratePalette(opts.PrimaryLight, lightOpts)
+
+	return VariantPalette{
+		Color0:  mergeColorInfo(dark.Color0, light.Color0, opts.IsLightMode),
+		Color1:  mergeColorInfo(dark.Color1, light.Color1, opts.IsLightMode),
+		Color2:  mergeColorInfo(dark.Color2, light.Color2, opts.IsLightMode),
+		Color3:  mergeColorInfo(dark.Color3, light.Color3, opts.IsLightMode),
+		Color4:  mergeColorInfo(dark.Color4, light.Color4, opts.IsLightMode),
+		Color5:  mergeColorInfo(dark.Color5, light.Color5, opts.IsLightMode),
+		Color6:  mergeColorInfo(dark.Color6, light.Color6, opts.IsLightMode),
+		Color7:  mergeColorInfo(dark.Color7, light.Color7, opts.IsLightMode),
+		Color8:  mergeColorInfo(dark.Color8, light.Color8, opts.IsLightMode),
+		Color9:  mergeColorInfo(dark.Color9, light.Color9, opts.IsLightMode),
+		Color10: mergeColorInfo(dark.Color10, light.Color10, opts.IsLightMode),
+		Color11: mergeColorInfo(dark.Color11, light.Color11, opts.IsLightMode),
+		Color12: mergeColorInfo(dark.Color12, light.Color12, opts.IsLightMode),
+		Color13: mergeColorInfo(dark.Color13, light.Color13, opts.IsLightMode),
+		Color14: mergeColorInfo(dark.Color14, light.Color14, opts.IsLightMode),
+		Color15: mergeColorInfo(dark.Color15, light.Color15, opts.IsLightMode),
+	}
 }

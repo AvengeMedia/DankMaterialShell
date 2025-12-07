@@ -61,7 +61,7 @@ compute_key() {
   local mtype=$(read_json_field "$json" "matugenType")
   local run_user=$(read_json_bool "$json" "runUserTemplates")
   local stock_colors=$(read_json_escaped_field "$json" "stockColors")
-  echo "${kind}|${value}|${mode}|${icon:-default}|${mtype:-scheme-tonal-spot}|${run_user:-true}|${stock_colors:-}" | sha256sum | cut -d' ' -f1
+  echo "${kind}|${value}|${mode}|${icon:-default}|${mtype:-scheme-tonal-spot}|${run_user:-true}|${stock_colors:-}|${TERMINALS_ALWAYS_DARK:-false}" | sha256sum | cut -d' ' -f1
 }
 
 append_config() {
@@ -70,6 +70,33 @@ append_config() {
   [[ ! -f "$target" ]] && return
   [[ "$check_cmd" != "skip" ]] && ! command -v "$check_cmd" >/dev/null 2>&1 && return
   sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$target" >> "$cfg_file"
+  echo "" >> "$cfg_file"
+}
+
+append_terminal_config() {
+  local check_cmd="$1" file_name="$2" cfg_file="$3" tmp_dir="$4"
+  local config_file="$SHELL_DIR/matugen/configs/$file_name"
+  [[ ! -f "$config_file" ]] && return
+  [[ "$check_cmd" != "skip" ]] && ! command -v "$check_cmd" >/dev/null 2>&1 && return
+
+  if [[ "$TERMINALS_ALWAYS_DARK" == "true" ]]; then
+    local config_content
+    config_content=$(cat "$config_file")
+    local templates
+    templates=$(echo "$config_content" | grep "input_path.*SHELL_DIR/matugen/templates/" | sed "s/.*'SHELL_DIR\/matugen\/templates\/\([^']*\)'.*/\1/")
+    for tpl in $templates; do
+      local orig="$SHELL_DIR/matugen/templates/$tpl"
+      [[ ! -f "$orig" ]] && continue
+      local tmp_template="$tmp_dir/$tpl"
+      sed 's/\.default\./\.dark\./g' "$orig" > "$tmp_template"
+      config_content=$(echo "$config_content" | sed "s|'SHELL_DIR/matugen/templates/$tpl'|'$tmp_template'|g")
+    done
+    echo "$config_content" | sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" >> "$cfg_file"
+    echo "" >> "$cfg_file"
+    return
+  fi
+
+  sed "s|'SHELL_DIR/|'$SHELL_DIR/|g" "$config_file" >> "$cfg_file"
   echo "" >> "$cfg_file"
 }
 
@@ -95,7 +122,7 @@ EOF
 }
 
 build_merged_config() {
-  local mode="$1" run_user="$2" cfg_file="$3"
+  local mode="$1" run_user="$2" cfg_file="$3" tmp_dir="$4"
 
   if [[ "$run_user" == "true" && -f "$CONFIG_DIR/matugen/config.toml" ]]; then
     awk '/^\[config\]/{p=1} /^\[templates\]/{p=0} p' "$CONFIG_DIR/matugen/config.toml" >> "$cfg_file"
@@ -122,11 +149,11 @@ EOF
   append_config "firefox" "firefox.toml" "$cfg_file"
   append_config "pywalfox" "pywalfox.toml" "$cfg_file"
   append_config "vesktop" "vesktop.toml" "$cfg_file"
-  append_config "ghostty" "ghostty.toml" "$cfg_file"
-  append_config "kitty" "kitty.toml" "$cfg_file"
-  append_config "foot" "foot.toml" "$cfg_file"
-  append_config "alacritty" "alacritty.toml" "$cfg_file"
-  append_config "wezterm" "wezterm.toml" "$cfg_file"
+  append_terminal_config "ghostty" "ghostty.toml" "$cfg_file" "$tmp_dir"
+  append_terminal_config "kitty" "kitty.toml" "$cfg_file" "$tmp_dir"
+  append_terminal_config "foot" "foot.toml" "$cfg_file" "$tmp_dir"
+  append_terminal_config "alacritty" "alacritty.toml" "$cfg_file" "$tmp_dir"
+  append_terminal_config "wezterm" "wezterm.toml" "$cfg_file" "$tmp_dir"
   append_config "dgop" "dgop.toml" "$cfg_file"
 
   append_vscode_config "vscode" "$HOME/.vscode/extensions/local.dynamic-base16-dankshell-0.0.1" "$cfg_file"
@@ -149,10 +176,10 @@ EOF
   fi
 }
 
-generate_dank16() {
-  local primary="$1" surface="$2" light_flag="$3"
-  local args=("$primary" --json)
-  [[ -n "$light_flag" ]] && args+=("$light_flag")
+generate_dank16_variants() {
+  local primary_dark="$1" primary_light="$2" surface="$3" mode="$4"
+  local args=(--variants --primary-dark "$primary_dark" --primary-light "$primary_light")
+  [[ "$mode" == "light" ]] && args+=(--light)
   [[ -n "$surface" ]] && args+=(--background "$surface")
   dms dank16 "${args[@]}" 2>/dev/null || echo '{}'
 }
@@ -210,33 +237,28 @@ build_once() {
   [[ -z "$run_user" ]] && run_user="true"
 
   local TMP_CFG=$(mktemp)
-  trap "rm -f '$TMP_CFG'" RETURN
+  local TMP_DIR=$(mktemp -d)
+  trap "rm -f '$TMP_CFG'; rm -rf '$TMP_DIR'" RETURN
 
-  build_merged_config "$mode" "$run_user" "$TMP_CFG"
+  build_merged_config "$mode" "$run_user" "$TMP_CFG" "$TMP_DIR"
 
-  local light_flag=""
-  [[ "$mode" == "light" ]] && light_flag="--light"
-
-  local primary surface dank16_dark dank16_light import_args=()
+  local primary_dark primary_light surface dank16 import_args=()
 
   if [[ -n "$stock_colors" ]]; then
     log "Using stock/custom theme colors with matugen base"
-    primary=$(echo "$stock_colors" | sed -n 's/.*"primary"[^{]*{[^}]*"dark"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+    primary_dark=$(echo "$stock_colors" | sed -n 's/.*"primary"[^{]*{[^}]*"dark"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+    primary_light=$(echo "$stock_colors" | sed -n 's/.*"primary"[^{]*{[^}]*"light"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
     surface=$(echo "$stock_colors" | sed -n 's/.*"surface"[^{]*{[^}]*"dark"[^{]*{[^}]*"color"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 
-    [[ -z "$primary" ]] && { err "Failed to extract primary from stock colors"; return 1; }
+    [[ -z "$primary_dark" ]] && { err "Failed to extract primary dark from stock colors"; return 1; }
+    [[ -z "$primary_light" ]] && primary_light="$primary_dark"
 
-    dank16_dark=$(generate_dank16 "$primary" "$surface" "")
-    dank16_light=$(generate_dank16 "$primary" "$surface" "--light")
+    dank16=$(generate_dank16_variants "$primary_dark" "$primary_light" "$surface" "$mode")
 
-    local dank16_current
-    [[ "$mode" == "light" ]] && dank16_current="$dank16_light" || dank16_current="$dank16_dark"
-    [[ "$TERMINALS_ALWAYS_DARK" == "true" && "$mode" == "light" ]] && dank16_current="$dank16_dark"
-
-    import_args+=(--import-json-string "{\"colors\": $stock_colors, \"dank16\": $dank16_current}")
+    import_args+=(--import-json-string "{\"colors\": $stock_colors, \"dank16\": $dank16}")
 
     log "Running matugen color hex with stock color overrides"
-    if ! matugen color hex "$primary" -m "$mode" -t "${mtype:-scheme-tonal-spot}" -c "$TMP_CFG" "${import_args[@]}"; then
+    if ! matugen color hex "$primary_dark" -m "$mode" -t "${mtype:-scheme-tonal-spot}" -c "$TMP_CFG" "${import_args[@]}"; then
       err "matugen failed"
       return 1
     fi
@@ -251,19 +273,16 @@ build_once() {
     mat_json=$("${matugen_cmd[@]}" -m dark -t "$mtype" --json hex --dry-run 2>/dev/null | tr -d '\n')
     [[ -z "$mat_json" ]] && { err "matugen dry-run failed"; return 1; }
 
-    primary=$(echo "$mat_json" | sed -n 's/.*"primary"[[:space:]]*:[[:space:]]*{[^}]*"dark"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+    primary_dark=$(echo "$mat_json" | sed -n 's/.*"primary"[[:space:]]*:[[:space:]]*{[^}]*"dark"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+    primary_light=$(echo "$mat_json" | sed -n 's/.*"primary"[[:space:]]*:[[:space:]]*{[^}]*"light"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
     surface=$(echo "$mat_json" | sed -n 's/.*"surface"[[:space:]]*:[[:space:]]*{[^}]*"dark"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 
-    [[ -z "$primary" ]] && { err "Failed to extract primary color"; return 1; }
+    [[ -z "$primary_dark" ]] && { err "Failed to extract primary color"; return 1; }
+    [[ -z "$primary_light" ]] && primary_light="$primary_dark"
 
-    dank16_dark=$(generate_dank16 "$primary" "$surface" "")
-    dank16_light=$(generate_dank16 "$primary" "$surface" "--light")
+    dank16=$(generate_dank16_variants "$primary_dark" "$primary_light" "$surface" "$mode")
 
-    local dank16_current
-    [[ "$mode" == "light" ]] && dank16_current="$dank16_light" || dank16_current="$dank16_dark"
-    [[ "$TERMINALS_ALWAYS_DARK" == "true" && "$mode" == "light" ]] && dank16_current="$dank16_dark"
-
-    import_args+=(--import-json-string "{\"dank16\": $dank16_current}")
+    import_args+=(--import-json-string "{\"dank16\": $dank16}")
 
     log "Running matugen $kind with dank16 injection"
     if ! "${matugen_cmd[@]}" -m "$mode" -t "$mtype" -c "$TMP_CFG" "${import_args[@]}"; then

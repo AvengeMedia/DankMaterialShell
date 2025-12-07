@@ -219,20 +219,6 @@ func (b *BaseDistribution) detectClipboardTools() []deps.Dependency {
 	return dependencies
 }
 
-func (b *BaseDistribution) detectHyprpicker() deps.Dependency {
-	status := deps.StatusMissing
-	if b.commandExists("hyprpicker") {
-		status = deps.StatusInstalled
-	}
-
-	return deps.Dependency{
-		Name:        "hyprpicker",
-		Status:      status,
-		Description: "Color picker for Wayland",
-		Required:    true,
-	}
-}
-
 func (b *BaseDistribution) detectHyprlandTools() []deps.Dependency {
 	var dependencies []deps.Dependency
 

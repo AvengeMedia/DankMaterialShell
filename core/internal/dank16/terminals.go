@@ -11,6 +11,11 @@ func GenerateJSON(p Palette) string {
 	return string(marshalled)
 }
 
+func GenerateVariantJSON(p VariantPalette) string {
+	marshalled, _ := json.Marshal(p)
+	return string(marshalled)
+}
+
 func GenerateKittyTheme(p Palette) string {
 	var result strings.Builder
 	fmt.Fprintf(&result, "color0   %s\n", p.Color0.Hex)

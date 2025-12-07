@@ -10,15 +10,15 @@ import (
 )
 
 var dank16Cmd = &cobra.Command{
-	Use:   "dank16 <hex_color>",
+	Use:   "dank16 [hex_color]",
 	Short: "Generate Base16 color palettes",
 	Long:  "Generate Base16 color palettes from a color with support for various output formats",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MaximumNArgs(1),
 	Run:   runDank16,
 }
 
 func init() {
-	dank16Cmd.Flags().Bool("light", false, "Generate light theme variant")
+	dank16Cmd.Flags().Bool("light", false, "Generate light theme variant (sets default to light)")
 	dank16Cmd.Flags().Bool("json", false, "Output in JSON format")
 	dank16Cmd.Flags().Bool("kitty", false, "Output in Kitty terminal format")
 	dank16Cmd.Flags().Bool("foot", false, "Output in Foot terminal format")
@@ -27,17 +27,15 @@ func init() {
 	dank16Cmd.Flags().Bool("wezterm", false, "Output in Wezterm terminal format")
 	dank16Cmd.Flags().String("background", "", "Custom background color")
 	dank16Cmd.Flags().String("contrast", "dps", "Contrast algorithm: dps (Delta Phi Star, default) or wcag")
+	dank16Cmd.Flags().Bool("variants", false, "Output all variants (dark/light/default) in JSON")
+	dank16Cmd.Flags().String("primary-dark", "", "Primary color for dark mode (use with --variants)")
+	dank16Cmd.Flags().String("primary-light", "", "Primary color for light mode (use with --variants)")
 	_ = dank16Cmd.RegisterFlagCompletionFunc("contrast", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return []string{"dps", "wcag"}, cobra.ShellCompDirectiveNoFileComp
 	})
 }
 
 func runDank16(cmd *cobra.Command, args []string) {
-	primaryColor := args[0]
-	if !strings.HasPrefix(primaryColor, "#") {
-		primaryColor = "#" + primaryColor
-	}
-
 	isLight, _ := cmd.Flags().GetBool("light")
 	isJson, _ := cmd.Flags().GetBool("json")
 	isKitty, _ := cmd.Flags().GetBool("kitty")
@@ -47,14 +45,55 @@ func runDank16(cmd *cobra.Command, args []string) {
 	isWezterm, _ := cmd.Flags().GetBool("wezterm")
 	background, _ := cmd.Flags().GetString("background")
 	contrastAlgo, _ := cmd.Flags().GetString("contrast")
+	useVariants, _ := cmd.Flags().GetBool("variants")
+	primaryDark, _ := cmd.Flags().GetString("primary-dark")
+	primaryLight, _ := cmd.Flags().GetString("primary-light")
 
 	if background != "" && !strings.HasPrefix(background, "#") {
 		background = "#" + background
+	}
+	if primaryDark != "" && !strings.HasPrefix(primaryDark, "#") {
+		primaryDark = "#" + primaryDark
+	}
+	if primaryLight != "" && !strings.HasPrefix(primaryLight, "#") {
+		primaryLight = "#" + primaryLight
 	}
 
 	contrastAlgo = strings.ToLower(contrastAlgo)
 	if contrastAlgo != "dps" && contrastAlgo != "wcag" {
 		log.Fatalf("Invalid contrast algorithm: %s (must be 'dps' or 'wcag')", contrastAlgo)
+	}
+
+	if useVariants {
+		if primaryDark == "" || primaryLight == "" {
+			if len(args) == 0 {
+				log.Fatalf("--variants requires either a positional color argument or both --primary-dark and --primary-light")
+			}
+			primaryColor := args[0]
+			if !strings.HasPrefix(primaryColor, "#") {
+				primaryColor = "#" + primaryColor
+			}
+			primaryDark = primaryColor
+			primaryLight = primaryColor
+		}
+		variantOpts := dank16.VariantOptions{
+			PrimaryDark:  primaryDark,
+			PrimaryLight: primaryLight,
+			Background:   background,
+			UseDPS:       contrastAlgo == "dps",
+			IsLightMode:  isLight,
+		}
+		variantColors := dank16.GenerateVariantPalette(variantOpts)
+		fmt.Print(dank16.GenerateVariantJSON(variantColors))
+		return
+	}
+
+	if len(args) == 0 {
+		log.Fatalf("A color argument is required (or use --variants with --primary-dark and --primary-light)")
+	}
+	primaryColor := args[0]
+	if !strings.HasPrefix(primaryColor, "#") {
+		primaryColor = "#" + primaryColor
 	}
 
 	opts := dank16.PaletteOptions{
