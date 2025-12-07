@@ -541,6 +541,34 @@ Item {
         }
     }
 
+    function getWorkspaceIndex(modelData) {
+        let isPlaceholder;
+        if (root.useExtWorkspace) {
+            isPlaceholder = modelData?.hidden === true;
+        } else if (CompositorService.isHyprland) {
+            isPlaceholder = modelData?.id === -1;
+        } else if (CompositorService.isDwl) {
+            isPlaceholder = modelData?.tag === -1;
+        } else if (CompositorService.isSway) {
+            isPlaceholder = modelData?.num === -1;
+        } else {
+            isPlaceholder = modelData === -1;
+        }
+
+        if (isPlaceholder)
+            return index + 1;
+
+        if (root.useExtWorkspace)
+            return index + 1;
+        if (CompositorService.isHyprland)
+            return modelData?.id || "";
+        if (CompositorService.isDwl)
+            return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
+        if (CompositorService.isSway)
+            return modelData?.num || "";
+        return modelData - 1;
+    }
+
     readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway
     readonly property bool hasWorkspaces: getRealWorkspaces().length > 0
     readonly property bool shouldShow: hasNativeWorkspaceSupport || (useExtWorkspace && hasWorkspaces)
@@ -862,7 +890,18 @@ Item {
                                 id: rowLayout
                                 Row {
                                     spacing: 4
-                                    visible: loadedIcons.length > 0
+                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex
+                                    StyledText {
+                                        topPadding: 2
+                                        rightPadding: isActive ? 4 : 0
+                                        visible: SettingsData.showWorkspaceIndex
+                                        text: {
+                                            return root.getWorkspaceIndex(modelData);
+                                        }
+                                        color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
+                                        font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
+                                        font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
+                                    }
 
                                     Repeater {
                                         model: ScriptModel {
@@ -1045,31 +1084,7 @@ Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: {
-                                    let isPlaceholder;
-                                    if (root.useExtWorkspace) {
-                                        isPlaceholder = modelData?.hidden === true;
-                                    } else if (CompositorService.isHyprland) {
-                                        isPlaceholder = modelData?.id === -1;
-                                    } else if (CompositorService.isDwl) {
-                                        isPlaceholder = modelData?.tag === -1;
-                                    } else if (CompositorService.isSway) {
-                                        isPlaceholder = modelData?.num === -1;
-                                    } else {
-                                        isPlaceholder = modelData === -1;
-                                    }
-
-                                    if (isPlaceholder)
-                                        return index + 1;
-
-                                    if (root.useExtWorkspace)
-                                        return index + 1;
-                                    if (CompositorService.isHyprland)
-                                        return modelData?.id || "";
-                                    if (CompositorService.isDwl)
-                                        return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
-                                    if (CompositorService.isSway)
-                                        return modelData?.num || "";
-                                    return modelData - 1;
+                                    return root.getWorkspaceIndex(modelData);
                                 }
                                 color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                 font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
