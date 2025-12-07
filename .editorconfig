@@ -1,0 +1,8 @@
+[*.sh]
+# like -i=4
+indent_style = space
+indent_size = 4
+[*.nix]
+# like -i=4
+indent_style = space
+indent_size = 4

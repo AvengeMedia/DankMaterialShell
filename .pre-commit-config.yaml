@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: [-e, SC2164, -e, SC2001, -e, SC2012, -e, SC2317]

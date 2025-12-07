@@ -6,10 +6,10 @@ To contribute fork this repository, make your changes, and open a pull request.
 
 ## Setup
 
-Enable pre-commit hooks to catch CI failures before pushing:
+Install [prek](https://prek.j178.dev/) then activate pre-commit hooks:
 
 ```bash
-git config core.hooksPath .githooks
+prek install
 ```
 
 ### Nix Development Shell

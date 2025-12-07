@@ -1,0 +1,15 @@
+name: Pre-commit Checks
+
+on:
+  push:
+  pull_request:
+    branches: [master, main]
+jobs:
+  pre-commit-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: run pre-commit hooks
+        uses: j178/prek-action@v1

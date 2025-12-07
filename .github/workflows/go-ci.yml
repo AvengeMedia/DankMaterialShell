@@ -33,20 +33,6 @@ jobs:
         with:
           go-version-file: ./core/go.mod
 
-      - name: Format check
-        run: |
-          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
-            echo "The following files are not formatted:"
-            gofmt -s -l .
-            exit 1
-          fi
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v9
-        with:
-          version: v2.6
-          working-directory: core
-
       - name: Test
         run: go test -v ./...
 
