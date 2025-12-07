@@ -195,6 +195,8 @@ refresh_gtk() {
 signal_terminals() {
   pgrep -x kitty >/dev/null 2>&1 && pkill -USR1 kitty
   pgrep -x ghostty >/dev/null 2>&1 && pkill -USR2 ghostty
+  pgrep -x .kitty-wrapped >/dev/null 2>&1 && pkill -USR2 .kitty-wrapped
+  pgrep -x .ghostty-wrappe >/dev/null 2>&1 && pkill -USR2 .ghostty-wrappe
 }
 
 build_once() {
