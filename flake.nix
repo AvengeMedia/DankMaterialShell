@@ -99,6 +99,9 @@
                             substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
                               --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
 
+                            substituteInPlace $out/share/quickshell/dms/assets/pam/fprint \
+                              --replace-fail pam_fprintd.so ${pkgs.fprintd}/lib/security/pam_fprintd.so
+
                             installShellCompletion --cmd dms \
                               --bash <($out/bin/dms completion bash) \
                               --fish <($out/bin/dms completion fish) \
