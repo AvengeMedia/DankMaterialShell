@@ -71,7 +71,7 @@
 
                         nativeBuildInputs = with pkgs; [
                             installShellFiles
-                            .makeWrapper
+                            makeWrapper
                         ];
 
                         postInstall = ''
