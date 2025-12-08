@@ -61,7 +61,9 @@ in {
             '';
         };
         quickshell = {
-            package = lib.mkPackageOption pkgs "quickshell" {};
+            package = lib.mkPackageOption dmsPkgs "quickshell" {
+                extraDescription = "The quickshell package to use (defaults to be built from source, in the commit 26531f due to unreleased features used by DMS).";
+            };
         };
         logs.save = lib.mkEnableOption "saving logs from DMS greeter to file";
         logs.path = lib.mkOption {
