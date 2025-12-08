@@ -7,12 +7,17 @@
             url = "github:AvengeMedia/dgop";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        quickshell = {
+            url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=26531fc46ef17e9365b03770edd3fb9206fcb460";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
     };
 
     outputs = {
         self,
         nixpkgs,
         dgop,
+        quickshell,
         ...
     }: let
         forEachSystem = fn:
@@ -22,6 +27,7 @@
         buildDmsPkgs = pkgs: {
             dms-shell = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
             dgop = dgop.packages.${pkgs.stdenv.hostPlatform.system}.dgop;
+            quickshell = quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
         };
         mkModuleWithDmsPkgs = path: args @ {pkgs, ...}: {
             imports = [

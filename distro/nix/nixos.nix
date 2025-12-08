@@ -4,12 +4,12 @@
     lib,
     dmsPkgs,
     ...
-}: let
+} @ args: let
     cfg = config.programs.dankMaterialShell;
     common = import ./common.nix {inherit config pkgs lib dmsPkgs;};
 in {
     imports = [
-        ./options.nix
+        (import ./options.nix args)
     ];
 
     config = lib.mkIf cfg.enable

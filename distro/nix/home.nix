@@ -4,13 +4,13 @@
     lib,
     dmsPkgs,
     ...
-}: let
+} @ args: let
     cfg = config.programs.dankMaterialShell;
     jsonFormat = pkgs.formats.json {};
     common = import ./common.nix {inherit config pkgs lib dmsPkgs;};
 in {
     imports = [
-        ./options.nix
+        (import ./options.nix args)
         (lib.mkRemovedOptionModule ["programs" "dankMaterialShell" "enableNightMode"] "Night mode is now always available.")
         (lib.mkRenamedOptionModule ["programs" "dankMaterialShell" "enableSystemd"] ["programs" "dankMaterialShell" "systemd" "enable"])
     ];
