@@ -52,67 +52,69 @@
                     + "_"
                     + (self.shortRev or "dirty");
             in {
-                dms-shell = pkgs.buildGoModule (let
-                    rootSrc = ./.;
-                in {
-                    inherit version;
-                    pname = "dms-shell";
-                    src = ./core;
-                    vendorHash = "sha256-2PCqiW4frxME8IlmwWH5ktznhd/G1bah5Ae4dp0HPTQ=";
+                dms-shell = pkgs.buildGoModule (
+                    let
+                        rootSrc = ./.;
+                    in {
+                        inherit version;
+                        pname = "dms-shell";
+                        src = ./core;
+                        vendorHash = "sha256-2PCqiW4frxME8IlmwWH5ktznhd/G1bah5Ae4dp0HPTQ=";
 
-                    subPackages = ["cmd/dms"];
+                        subPackages = ["cmd/dms"];
 
-                    ldflags = [
-                        "-s"
-                        "-w"
-                        "-X main.Version=${version}"
-                    ];
+                        ldflags = [
+                            "-s"
+                            "-w"
+                            "-X main.Version=${version}"
+                        ];
 
-                    nativeBuildInputs = [
-                        pkgs.installShellFiles
-                        pkgs.makeWrapper
-                    ];
+                        nativeBuildInputs = with pkgs; [
+                            installShellFiles
+                            .makeWrapper
+                        ];
 
-                    postInstall = ''
-                        mkdir -p $out/share/quickshell/dms
-                        cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
+                        postInstall = ''
+                            mkdir -p $out/share/quickshell/dms
+                            cp -r ${rootSrc}/quickshell/. $out/share/quickshell/dms/
 
-                        chmod u+w $out/share/quickshell/dms/VERSION
-                        echo "${version}" > $out/share/quickshell/dms/VERSION
+                            chmod u+w $out/share/quickshell/dms/VERSION
+                            echo "${version}" > $out/share/quickshell/dms/VERSION
 
-                        # Install desktop file and icon
-                        install -D ${rootSrc}/assets/dms-open.desktop \
-                          $out/share/applications/dms-open.desktop
-                        install -D ${rootSrc}/core/assets/danklogo.svg \
-                          $out/share/hicolor/scalable/apps/danklogo.svg
+                            # Install desktop file and icon
+                            install -D ${rootSrc}/assets/dms-open.desktop \
+                              $out/share/applications/dms-open.desktop
+                            install -D ${rootSrc}/core/assets/danklogo.svg \
+                              $out/share/hicolor/scalable/apps/danklogo.svg
 
-                        wrapProgram $out/bin/dms --add-flags "-c $out/share/quickshell/dms"
+                            wrapProgram $out/bin/dms --add-flags "-c $out/share/quickshell/dms"
 
-                        install -Dm644 ${rootSrc}/assets/systemd/dms.service \
-                          $out/lib/systemd/user/dms.service
+                            install -Dm644 ${rootSrc}/assets/systemd/dms.service \
+                              $out/lib/systemd/user/dms.service
 
-                        substituteInPlace $out/lib/systemd/user/dms.service \
-                          --replace-fail /usr/bin/dms $out/bin/dms \
-                          --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
+                            substituteInPlace $out/lib/systemd/user/dms.service \
+                              --replace-fail /usr/bin/dms $out/bin/dms \
+                              --replace-fail /usr/bin/pkill ${pkgs.procps}/bin/pkill
 
-                        substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
-                          --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
+                            substituteInPlace $out/share/quickshell/dms/Modules/Greetd/assets/dms-greeter \
+                              --replace-fail /bin/bash ${pkgs.bashInteractive}/bin/bash
 
-                        installShellCompletion --cmd dms \
-                          --bash <($out/bin/dms completion bash) \
-                          --fish <($out/bin/dms completion fish) \
-                          --zsh <($out/bin/dms completion zsh)
-                    '';
+                            installShellCompletion --cmd dms \
+                              --bash <($out/bin/dms completion bash) \
+                              --fish <($out/bin/dms completion fish) \
+                              --zsh <($out/bin/dms completion zsh)
+                        '';
 
-                    meta = {
-                        description = "Desktop shell for wayland compositors built with Quickshell & GO";
-                        homepage = "https://danklinux.com";
-                        changelog = "https://github.com/AvengeMedia/DankMaterialShell/releases/tag/v${version}";
-                        license = pkgs.lib.licenses.mit;
-                        mainProgram = "dms";
-                        platforms = pkgs.lib.platforms.linux;
-                    };
-                });
+                        meta = {
+                            description = "Desktop shell for wayland compositors built with Quickshell & GO";
+                            homepage = "https://danklinux.com";
+                            changelog = "https://github.com/AvengeMedia/DankMaterialShell/releases/tag/v${version}";
+                            license = pkgs.lib.licenses.mit;
+                            mainProgram = "dms";
+                            platforms = pkgs.lib.platforms.linux;
+                        };
+                    }
+                );
 
                 default = self.packages.${system}.dms-shell;
             }
@@ -125,5 +127,38 @@
         nixosModules.dankMaterialShell = mkModuleWithDmsPkgs ./distro/nix/nixos.nix;
 
         nixosModules.greeter = mkModuleWithDmsPkgs ./distro/nix/greeter.nix;
+
+        devShells = forEachSystem (
+            system: pkgs: let
+                qmlPkgs =
+                    [
+                        quickshell.packages.${system}.default
+                    ]
+                    ++ (with pkgs.kdePackages; [
+                        qtdeclarative
+                        kirigami.unwrapped
+                        sonnet
+                        qtmultimedia
+                    ]);
+            in {
+                default = pkgs.mkShell {
+                    buildInputs = with pkgs;
+                        [
+                            go_1_24
+                            gopls
+                            delve
+                            go-tools
+                            gnumake
+                        ]
+                        ++ qmlPkgs;
+
+                    shellHook = ''
+                        touch quickshell/.qmlls.ini 2>/dev/null
+                    '';
+
+                    QML2_IMPORT_PATH = pkgs.lib.concatStringsSep ":" (map (o: "${o}/lib/qt-6/qml") qmlPkgs);
+                };
+            }
+        );
     };
 }
