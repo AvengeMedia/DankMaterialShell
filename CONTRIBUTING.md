@@ -12,6 +12,21 @@ Enable pre-commit hooks to catch CI failures before pushing:
 git config core.hooksPath .githooks
 ```
 
+### Nix Development Shell
+
+If you have Nix installed with flakes enabled, you can use the provided development shell which includes all necessary dependencies:
+
+```bash
+nix develop
+```
+
+This will provide:
+- Go 1.24 toolchain (go, gopls, delve, go-tools) and GNU Make
+- Quickshell and required QML packages
+- Properly configured QML2_IMPORT_PATH
+
+The dev shell automatically creates the `.qmlls.ini` file in the `quickshell/` directory.
+
 ## VSCode Setup
 
 This is a monorepo, the easiest thing to do is to open an editor in either `quickshell`, `core`, or both depending on which part of the project you are working on.
