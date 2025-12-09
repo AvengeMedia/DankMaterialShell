@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import Quickshell
+import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
