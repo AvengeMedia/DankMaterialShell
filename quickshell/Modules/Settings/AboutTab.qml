@@ -10,6 +10,7 @@ Item {
     property bool isHyprland: CompositorService.isHyprland
     property bool isNiri: CompositorService.isNiri
     property bool isSway: CompositorService.isSway
+    property bool isScroll: CompositorService.isScroll
     property bool isDwl: CompositorService.isDwl
     property bool isLabwc: CompositorService.isLabwc
 
@@ -18,6 +19,8 @@ Item {
             return "hyprland";
         if (isSway)
             return "sway";
+	if (isScroll)
+	    return "scroll";
         if (isDwl)
             return "mangowc";
         if (isLabwc)
@@ -30,6 +33,8 @@ Item {
             return "/assets/hyprland.svg";
         if (isSway)
             return "/assets/sway.svg";
+	if (isScroll)
+	    return "/assets/sway.svg";
         if (isDwl)
             return "/assets/mango.png";
         if (isLabwc)
@@ -42,6 +47,8 @@ Item {
             return "https://hypr.land";
         if (isSway)
             return "https://swaywm.org";
+	if (isScroll)
+	    return "https://github.com/dawsers/scroll";
         if (isDwl)
             return "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
@@ -54,6 +61,8 @@ Item {
             return "Hyprland Website";
         if (isSway)
             return "Sway Website";
+	if (isScroll)
+	    return "Scroll Github";
         if (isDwl)
             return "mangowc GitHub";
         if (isLabwc)
@@ -86,9 +95,9 @@ Item {
     property string ircUrl: "https://web.libera.chat/gamja/?channels=#labwc"
     property string ircTooltip: "LabWC IRC Channel"
 
-    property bool showMatrix: isNiri && !isHyprland && !isSway && !isDwl && !isLabwc
+    property bool showMatrix: isNiri && !isHyprland && !isSway && !isScroll && !isDwl && !isLabwc
     property bool showCompositorDiscord: isHyprland || isDwl
-    property bool showReddit: isNiri && !isHyprland && !isSway && !isDwl && !isLabwc
+    property bool showReddit: isNiri && !isHyprland && !isSway && !isScroll && !isDwl && !isLabwc
     property bool showIrc: isLabwc
 
     DankFlickable {

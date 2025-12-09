@@ -67,6 +67,8 @@ Card {
                             return "on MangoWC";
                         if (CompositorService.isSway)
                             return "on Sway";
+			if (CompositorService.isScroll)
+			    return "on Scroll";
                         return "";
                     }
                     font.pixelSize: Theme.fontSizeSmall

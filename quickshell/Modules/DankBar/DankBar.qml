@@ -96,7 +96,7 @@ Item {
             focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
             focusedScreenName = NiriService.currentOutput;
-        } else if (CompositorService.isSway) {
+        } else if (CompositorService.isSway || CompositorService.isScroll) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             focusedScreenName = focusedWs?.monitor?.name || "";
         }
@@ -123,7 +123,7 @@ Item {
             focusedScreenName = Hyprland.focusedWorkspace.monitor.name;
         } else if (CompositorService.isNiri && NiriService.currentOutput) {
             focusedScreenName = NiriService.currentOutput;
-        } else if (CompositorService.isSway) {
+        } else if (CompositorService.isSway || CompositorService.isScroll) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             focusedScreenName = focusedWs?.monitor?.name || "";
         }

@@ -56,7 +56,7 @@ BasePill {
             }
 
             IconImage {
-                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isLabwc)
+                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
                 height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset)
@@ -70,6 +70,8 @@ BasePill {
                     } else if (CompositorService.isDwl) {
                         return "file://" + Theme.shellDir + "/assets/mango.png"
                     } else if (CompositorService.isSway) {
+                        return "file://" + Theme.shellDir + "/assets/sway.svg"
+		    } else if (CompositorService.isScroll) {
                         return "file://" + Theme.shellDir + "/assets/sway.svg"
                     } else if (CompositorService.isLabwc) {
                         return "file://" + Theme.shellDir + "/assets/labwc.png"

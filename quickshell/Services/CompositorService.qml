@@ -14,6 +14,7 @@ Singleton {
     property bool isNiri: false
     property bool isDwl: false
     property bool isSway: false
+    property bool isScroll: false
     property bool isLabwc: false
     property string compositor: "unknown"
     readonly property bool useHyprlandFocusGrab: isHyprland && Quickshell.env("DMS_HYPRLAND_EXCLUSIVE_FOCUS") !== "1"
@@ -21,6 +22,7 @@ Singleton {
     readonly property string hyprlandSignature: Quickshell.env("HYPRLAND_INSTANCE_SIGNATURE")
     readonly property string niriSocket: Quickshell.env("NIRI_SOCKET")
     readonly property string swaySocket: Quickshell.env("SWAYSOCK")
+    readonly property string scrollSocket: Quickshell.env("SWAYSOCK")
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
 
@@ -71,7 +73,7 @@ Singleton {
             screenName = Hyprland.focusedWorkspace.monitor.name;
         else if (isNiri && NiriService.currentOutput)
             screenName = NiriService.currentOutput;
-        else if (isSway) {
+        else if (isSway || isScroll) {
             const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
             screenName = focusedWs?.monitor?.name || "";
         } else if (isDwl && DwlService.activeOutput)
@@ -398,11 +400,12 @@ Singleton {
     }
 
     function detectCompositor() {
-        if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !labwcPid) {
+        if (hyprlandSignature && hyprlandSignature.length > 0 && !niriSocket && !swaySocket && !scrollSocket && !labwcPid) {
             isHyprland = true;
             isNiri = false;
             isDwl = false;
             isSway = false;
+            isScroll = false;
             isLabwc = false;
             compositor = "hyprland";
             console.info("CompositorService: Detected Hyprland");
@@ -416,6 +419,7 @@ Singleton {
                     isHyprland = false;
                     isDwl = false;
                     isSway = false;
+		    isScroll = false;
                     isLabwc = false;
                     compositor = "niri";
                     console.info("CompositorService: Detected Niri with socket:", niriSocket);
@@ -425,16 +429,33 @@ Singleton {
             return;
         }
 
-        if (swaySocket && swaySocket.length > 0) {
+	if (swaySocket && swaySocket.length > 0 && !scrollSocket && scrollSocket.length == 0) {
             Proc.runCommand("swaySocketCheck", ["test", "-S", swaySocket], (output, exitCode) => {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
                     isDwl = false;
                     isSway = true;
+                    isScroll = false;
                     isLabwc = false;
                     compositor = "sway";
                     console.info("CompositorService: Detected Sway with socket:", swaySocket);
+                }
+            }, 0);
+            return;
+        }
+
+	if (scrollSocket && scrollSocket.length > 0) {
+            Proc.runCommand("scrollSocketCheck", ["test", "-S", scrollSocket], (output, exitCode) => {
+                if (exitCode === 0) {
+                    isNiri = false;
+                    isHyprland = false;
+                    isDwl = false;
+                    isSway = false;
+		    isScroll = true;
+                    isLabwc = false;
+                    compositor = "scroll";
+                    console.info("CompositorService: Detected Scroll with socket:", scrollSocket);
                 }
             }, 0);
             return;
@@ -445,6 +466,7 @@ Singleton {
             isNiri = false;
             isDwl = false;
             isSway = false;
+	    isScroll = false;
             isLabwc = true;
             compositor = "labwc";
             console.info("CompositorService: Detected LabWC with PID:", labwcPid);
@@ -458,6 +480,7 @@ Singleton {
             isNiri = false;
             isDwl = false;
             isSway = false;
+	    isScroll = false;
             isLabwc = false;
             compositor = "unknown";
             console.warn("CompositorService: No compositor detected");
@@ -479,6 +502,7 @@ Singleton {
             isNiri = false;
             isDwl = true;
             isSway = false;
+	    isScroll = false;
             isLabwc = false;
             compositor = "dwl";
             console.info("CompositorService: Detected DWL via DMS capability");
@@ -492,7 +516,7 @@ Singleton {
             return Hyprland.dispatch("dpms off");
         if (isDwl)
             return _dwlPowerOffMonitors();
-        if (isSway) {
+        if (isSway || isScroll) {
             try {
                 I3.dispatch("output * dpms off");
             } catch (_) {}
@@ -511,7 +535,7 @@ Singleton {
             return Hyprland.dispatch("dpms on");
         if (isDwl)
             return _dwlPowerOnMonitors();
-        if (isSway) {
+        if (isSway || isScroll) {
             try {
                 I3.dispatch("output * dpms on");
             } catch (_) {}

@@ -94,6 +94,11 @@ func initializeProviders() {
 		log.Warnf("Failed to register Sway provider: %v", err)
 	}
 
+	scrollProvider := providers.NewSwayProvider("$HOME/.config/scroll")
+	if err := registry.Register(scrollProvider); err != nil {
+		log.Warnf("Failed to register Scroll provider: %v", err)
+	}
+
 	niriProvider := providers.NewNiriProvider("")
 	if err := registry.Register(niriProvider); err != nil {
 		log.Warnf("Failed to register Niri provider: %v", err)
@@ -124,6 +129,8 @@ func makeProviderWithPath(name, path string) keybinds.Provider {
 	case "mangowc":
 		return providers.NewMangoWCProvider(path)
 	case "sway":
+		return providers.NewSwayProvider(path)
+	case "scroll":
 		return providers.NewSwayProvider(path)
 	case "niri":
 		return providers.NewNiriProvider(path)

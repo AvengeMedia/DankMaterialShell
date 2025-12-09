@@ -243,7 +243,7 @@ Singleton {
                 return;
             }
 
-            if (CompositorService.isSway) {
+            if (CompositorService.isSway || CompositorService.isScroll) {
                 try {
                     I3.dispatch("exit");
                 } catch (_) {}
