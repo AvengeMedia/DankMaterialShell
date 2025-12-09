@@ -89,14 +89,14 @@ func initializeProviders() {
 		log.Warnf("Failed to register MangoWC provider: %v", err)
 	}
 
-	swayProvider := providers.NewSwayProvider("$HOME/.config/sway")
-	if err := registry.Register(swayProvider); err != nil {
-		log.Warnf("Failed to register Sway provider: %v", err)
-	}
-
 	scrollProvider := providers.NewSwayProvider("$HOME/.config/scroll")
 	if err := registry.Register(scrollProvider); err != nil {
 		log.Warnf("Failed to register Scroll provider: %v", err)
+	}
+
+	swayProvider := providers.NewSwayProvider("$HOME/.config/sway")
+	if err := registry.Register(swayProvider); err != nil {
+		log.Warnf("Failed to register Sway provider: %v", err)
 	}
 
 	niriProvider := providers.NewNiriProvider("")
