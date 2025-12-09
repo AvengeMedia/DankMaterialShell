@@ -54,8 +54,13 @@ func (s *SwayProvider) GetCheatSheet() (*keybinds.CheatSheet, error) {
 	categorizedBinds := make(map[string][]keybinds.Keybind)
 	s.convertSection(section, "", categorizedBinds)
 
+	cheatSheetTitle := "Sway Keybinds"
+	if s != nil && s.isScroll {
+		cheatSheetTitle = "Scroll Keybinds"
+	}
+
 	return &keybinds.CheatSheet{
-		Title:    "Sway Keybinds",
+		Title:    cheatSheetTitle,
 		Provider: s.Name(),
 		Binds:    categorizedBinds,
 	}, nil
