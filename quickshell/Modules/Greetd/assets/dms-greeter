@@ -16,7 +16,7 @@ dms-greeter - DankMaterialShell greeter launcher
 Usage: dms-greeter --command COMPOSITOR [OPTIONS]
 
 Required:
-    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, or mangowc)
+    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, scroll or mangowc)
 
 Options:
     -C, --config PATH       Custom compositor config file
@@ -30,6 +30,7 @@ Examples:
     dms-greeter --command niri
     dms-greeter --command hyprland -C /etc/greetd/custom-hypr.conf
     dms-greeter --command sway -p /home/user/.config/quickshell/custom-dms
+    dms-greeter --command scroll -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command niri --cache-dir /tmp/dmsgreeter
     dms-greeter --command mangowc
 EOF
@@ -205,6 +206,25 @@ SWAY_EOF
             COMPOSITOR_CONFIG="$TEMP_CONFIG"
         fi
         exec sway -c "$COMPOSITOR_CONFIG"
+        ;;
+
+    scroll)
+        if [[ -z "$COMPOSITOR_CONFIG" ]]; then
+            TEMP_CONFIG=$(mktemp)
+            cat > "$TEMP_CONFIG" << SCROLL_EOF
+exec "$QS_CMD; scrollmsg exit"
+SCROLL_EOF
+            COMPOSITOR_CONFIG="$TEMP_CONFIG"
+        else
+            TEMP_CONFIG=$(mktemp)
+            cat "$COMPOSITOR_CONFIG" > "$TEMP_CONFIG"
+            cat >> "$TEMP_CONFIG" << SCROLL_EOF
+
+exec "$QS_CMD; scrollmsg exit"
+SCROLL_EOF
+            COMPOSITOR_CONFIG="$TEMP_CONFIG"
+        fi
+        exec scroll -c "$COMPOSITOR_CONFIG"
         ;;
 
     mangowc)
