@@ -10,13 +10,14 @@
 
     user = config.services.greetd.settings.default_session.user;
 
+    cacheDir = "/var/lib/dms-greeter";
     greeterScript = pkgs.writeShellScriptBin "dms-greeter" ''
         export PATH=$PATH:${lib.makeBinPath [cfg.quickshell.package config.programs.${cfg.compositor.name}.package]}
         ${lib.escapeShellArgs ([
             "sh"
             "${../../quickshell/Modules/Greetd/assets/dms-greeter}"
             "--cache-dir"
-            "/var/lib/dmsgreeter"
+            cacheDir
             "--command"
             cfg.compositor.name
             "-p"
@@ -27,6 +28,8 @@
             "${pkgs.writeText "dmsgreeter-compositor-config" cfg.compositor.customConfig}"
         ])} ${lib.optionalString cfg.logs.save "> ${cfg.logs.path} 2>&1"}
     '';
+
+    jq = lib.getExe pkgs.jq;
 in {
     imports = let
         msg = "The option 'programs.dankMaterialShell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dankMaterialShell.greeter.compositor.customConfig' instead.";
@@ -93,17 +96,17 @@ in {
             material-symbols
         ];
         systemd.tmpfiles.settings."10-dmsgreeter" = {
-            "/var/lib/dmsgreeter".d = {
+            ${cacheDir}.d = {
                 user = user;
                 group =
                     if config.users.users.${user}.group != ""
                     then config.users.users.${user}.group
                     else "greeter";
-                mode = "0755";
+                mode = "0750";
             };
         };
         systemd.services.greetd.preStart = ''
-            cd /var/lib/dmsgreeter
+            cd ${cacheDir}
             ${lib.concatStringsSep "\n" (lib.map (f: ''
                 if [ -f "${f}" ]; then
                     cp "${f}" .
@@ -112,9 +115,16 @@ in {
             cfg.configFiles)}
 
             if [ -f session.json ]; then
-                if cp "$(${lib.getExe pkgs.jq} -r '.wallpaperPath' session.json)" wallpaper.jpg; then
+                if cp "$(${jq} -r '.wallpaperPath' session.json)" wallpaper.jpg; then
                     mv session.json session.orig.json
-                    ${lib.getExe pkgs.jq} '.wallpaperPath = "/var/lib/dmsgreeter/wallpaper.jpg"' session.orig.json > session.json
+                    ${jq} '.wallpaperPath = "${cacheDir}/wallpaper.jpg"' session.orig.json > session.json
+                fi
+            fi
+
+            if [ -f settings.json ]; then
+                if cp "$(${jq} -r '.customThemeFile' settings.json)" custom-theme.json; then
+                    mv settings.json settings.orig.json
+                    ${jq} '.customThemeFile = "${cacheDir}/custom-theme.json"' settings.orig.json > settings.json
                 fi
             fi
 
