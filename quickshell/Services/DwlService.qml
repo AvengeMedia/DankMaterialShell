@@ -15,81 +15,82 @@ Singleton {
     property string activeOutput: ""
     property var outputScales: ({})
     property string currentKeyboardLayout: {
-        if (!outputs || !activeOutput) return ""
-        const output = outputs[activeOutput]
-        return (output && output.kbLayout) || ""
+        if (!outputs || !activeOutput)
+            return "";
+        const output = outputs[activeOutput];
+        return (output && output.kbLayout) || "";
     }
 
-    signal stateChanged()
+    signal stateChanged
 
     Connections {
         target: DMSService
         function onCapabilitiesReceived() {
-            checkCapabilities()
+            checkCapabilities();
         }
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
-                checkCapabilities()
+                checkCapabilities();
             } else {
-                dwlAvailable = false
+                dwlAvailable = false;
             }
         }
         function onDwlStateUpdate(data) {
             if (dwlAvailable) {
-                handleStateUpdate(data)
+                handleStateUpdate(data);
             }
         }
     }
 
     Component.onCompleted: {
         if (DMSService.dmsAvailable) {
-            checkCapabilities()
+            checkCapabilities();
         }
         if (dwlAvailable) {
-            refreshOutputScales()
+            refreshOutputScales();
         }
     }
 
     function checkCapabilities() {
         if (!DMSService.capabilities || !Array.isArray(DMSService.capabilities)) {
-            dwlAvailable = false
-            return
+            dwlAvailable = false;
+            return;
         }
 
-        const hasDwl = DMSService.capabilities.includes("dwl")
+        const hasDwl = DMSService.capabilities.includes("dwl");
         if (hasDwl && !dwlAvailable) {
-            dwlAvailable = true
-            console.info("DwlService: DWL capability detected")
-            requestState()
-            refreshOutputScales()
+            dwlAvailable = true;
+            console.info("DwlService: DWL capability detected");
+            requestState();
+            refreshOutputScales();
         } else if (!hasDwl) {
-            dwlAvailable = false
+            dwlAvailable = false;
         }
     }
 
     function requestState() {
         if (!DMSService.isConnected || !dwlAvailable) {
-            return
+            return;
         }
 
         DMSService.sendRequest("dwl.getState", null, response => {
             if (response.result) {
-                handleStateUpdate(response.result)
+                handleStateUpdate(response.result);
             }
-        })
+        });
     }
 
     function handleStateUpdate(state) {
-        outputs = state.outputs || {}
-        tagCount = state.tagCount || 9
-        layouts = state.layouts || []
-        activeOutput = state.activeOutput || ""
-        stateChanged()
+        outputs = state.outputs || {};
+        tagCount = state.tagCount || 9;
+        layouts = state.layouts || [];
+        activeOutput = state.activeOutput || "";
+        stateChanged();
     }
 
     function setTags(outputName, tagmask, toggleTagset) {
         if (!DMSService.isConnected || !dwlAvailable) {
-            return
+            return;
         }
 
         DMSService.sendRequest("dwl.setTags", {
@@ -98,14 +99,14 @@ Singleton {
             "toggleTagset": toggleTagset
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setTags error:", response.error)
+                console.warn("DwlService: setTags error:", response.error);
             }
-        })
+        });
     }
 
     function setClientTags(outputName, andTags, xorTags) {
         if (!DMSService.isConnected || !dwlAvailable) {
-            return
+            return;
         }
 
         DMSService.sendRequest("dwl.setClientTags", {
@@ -114,14 +115,14 @@ Singleton {
             "xorTags": xorTags
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setClientTags error:", response.error)
+                console.warn("DwlService: setClientTags error:", response.error);
             }
-        })
+        });
     }
 
     function setLayout(outputName, index) {
         if (!DMSService.isConnected || !dwlAvailable) {
-            return
+            return;
         }
 
         DMSService.sendRequest("dwl.setLayout", {
@@ -129,77 +130,77 @@ Singleton {
             "index": index
         }, response => {
             if (response.error) {
-                console.warn("DwlService: setLayout error:", response.error)
+                console.warn("DwlService: setLayout error:", response.error);
             }
-        })
+        });
     }
 
     function getOutputState(outputName) {
         if (!outputs || !outputs[outputName]) {
-            return null
+            return null;
         }
-        return outputs[outputName]
+        return outputs[outputName];
     }
 
     function getActiveTags(outputName) {
-        const output = getOutputState(outputName)
+        const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            return []
+            return [];
         }
-        return output.tags.filter(tag => tag.state === 1).map(tag => tag.tag)
+        return output.tags.filter(tag => tag.state === 1).map(tag => tag.tag);
     }
 
     function getTagsWithClients(outputName) {
-        const output = getOutputState(outputName)
+        const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            return []
+            return [];
         }
-        return output.tags.filter(tag => tag.clients > 0).map(tag => tag.tag)
+        return output.tags.filter(tag => tag.clients > 0).map(tag => tag.tag);
     }
 
     function getUrgentTags(outputName) {
-        const output = getOutputState(outputName)
+        const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            return []
+            return [];
         }
-        return output.tags.filter(tag => tag.state === 2).map(tag => tag.tag)
+        return output.tags.filter(tag => tag.state === 2).map(tag => tag.tag);
     }
 
     function switchToTag(outputName, tagIndex) {
-        const tagmask = 1 << tagIndex
-        setTags(outputName, tagmask, 0)
+        const tagmask = 1 << tagIndex;
+        setTags(outputName, tagmask, 0);
     }
 
     function toggleTag(outputName, tagIndex) {
-        const output = getOutputState(outputName)
+        const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            console.log("toggleTag: no output or tags for", outputName)
-            return
+            console.log("toggleTag: no output or tags for", outputName);
+            return;
         }
 
-        let currentMask = 0
+        let currentMask = 0;
         output.tags.forEach(tag => {
             if (tag.state === 1) {
-                currentMask |= (1 << tag.tag)
+                currentMask |= (1 << tag.tag);
             }
-        })
+        });
 
-        const clickedMask = 1 << tagIndex
-        const newMask = currentMask ^ clickedMask
+        const clickedMask = 1 << tagIndex;
+        const newMask = currentMask ^ clickedMask;
 
-        console.log("toggleTag:", outputName, "tag:", tagIndex, "currentMask:", currentMask.toString(2), "clickedMask:", clickedMask.toString(2), "newMask:", newMask.toString(2))
+        console.log("toggleTag:", outputName, "tag:", tagIndex, "currentMask:", currentMask.toString(2), "clickedMask:", clickedMask.toString(2), "newMask:", newMask.toString(2));
 
         if (newMask === 0) {
-            console.log("toggleTag: newMask is 0, switching to tag", tagIndex)
-            setTags(outputName, 1 << tagIndex, 0)
+            console.log("toggleTag: newMask is 0, switching to tag", tagIndex);
+            setTags(outputName, 1 << tagIndex, 0);
         } else {
-            console.log("toggleTag: setting combined mask", newMask)
-            setTags(outputName, newMask, 0)
+            console.log("toggleTag: setting combined mask", newMask);
+            setTags(outputName, newMask, 0);
         }
     }
 
     function quit() {
-        Quickshell.execDetached(["mmsg", "-d", "quit"])
+        Quickshell.execDetached(["mmsg", "-d", "quit"]);
     }
 
     Process {
@@ -210,55 +211,56 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    const newScales = {}
-                    const lines = text.trim().split('\n')
+                    const newScales = {};
+                    const lines = text.trim().split('\n');
                     for (const line of lines) {
-                        const parts = line.trim().split(/\s+/)
+                        const parts = line.trim().split(/\s+/);
                         if (parts.length >= 3 && parts[1] === "scale_factor") {
-                            const outputName = parts[0]
-                            const scale = parseFloat(parts[2])
+                            const outputName = parts[0];
+                            const scale = parseFloat(parts[2]);
                             if (!isNaN(scale)) {
-                                newScales[outputName] = scale
+                                newScales[outputName] = scale;
                             }
                         }
                     }
-                    outputScales = newScales
+                    outputScales = newScales;
                 } catch (e) {
-                    console.warn("DwlService: Failed to parse mmsg output:", e)
+                    console.warn("DwlService: Failed to parse mmsg output:", e);
                 }
             }
         }
 
         onExited: exitCode => {
             if (exitCode !== 0) {
-                console.warn("DwlService: mmsg failed with exit code:", exitCode)
+                console.warn("DwlService: mmsg failed with exit code:", exitCode);
             }
         }
     }
 
     function refreshOutputScales() {
-        if (!dwlAvailable) return
-        scaleQueryProcess.running = true
+        if (!dwlAvailable)
+            return;
+        scaleQueryProcess.running = true;
     }
 
     function getOutputScale(outputName) {
-        return outputScales[outputName]
+        return outputScales[outputName];
     }
 
     function getVisibleTags(outputName) {
-        const output = getOutputState(outputName)
+        const output = getOutputState(outputName);
         if (!output || !output.tags) {
-            return []
+            return [];
         }
 
-        const visibleTags = new Set()
+        const visibleTags = new Set();
 
         output.tags.forEach(tag => {
             if (tag.state === 1 || tag.clients > 0) {
-                visibleTags.add(tag.tag)
+                visibleTags.add(tag.tag);
             }
-        })
+        });
 
-        return Array.from(visibleTags).sort((a, b) => a - b)
+        return Array.from(visibleTags).sort((a, b) => a - b);
     }
 }

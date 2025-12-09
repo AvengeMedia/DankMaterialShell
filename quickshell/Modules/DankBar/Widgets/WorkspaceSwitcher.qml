@@ -44,8 +44,8 @@ Item {
         case "dwl":
             const activeTags = getDwlActiveTags();
             return activeTags.length > 0 ? activeTags[0] : -1;
-	case "sway":
-	case "scroll":
+        case "sway":
+        case "scroll":
             return getSwayActiveWorkspace();
         default:
             return 1;
@@ -75,7 +75,7 @@ Item {
             baseList = getDwlTags();
             break;
         case "sway":
-	case "scroll":
+        case "scroll":
             baseList = getSwayWorkspaces();
             break;
         default:

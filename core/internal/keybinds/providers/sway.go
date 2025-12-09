@@ -27,7 +27,7 @@ func NewSwayProvider(configPath string) *SwayProvider {
 	}
 	return &SwayProvider{
 		configPath: configPath,
-		isScroll:   true,
+		isScroll:   isScroll,
 	}
 }
 

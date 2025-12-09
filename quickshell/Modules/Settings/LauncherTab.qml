@@ -63,8 +63,8 @@ Item {
                                 modes.push("mango");
                             } else if (CompositorService.isSway) {
                                 modes.push("Sway");
-			    } else if (CompositorService.isScroll) {
-				modes.push("Scroll")
+                            } else if (CompositorService.isScroll) {
+                                modes.push("Scroll");
                             } else {
                                 modes.push(I18n.tr("Compositor"));
                             }

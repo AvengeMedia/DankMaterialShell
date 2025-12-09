@@ -420,7 +420,7 @@ Singleton {
                     isHyprland = false;
                     isDwl = false;
                     isSway = false;
-		    isScroll = false;
+                    isScroll = false;
                     isLabwc = false;
                     compositor = "niri";
                     console.info("CompositorService: Detected Niri with socket:", niriSocket);
@@ -430,7 +430,7 @@ Singleton {
             return;
         }
 
-	if (swaySocket && swaySocket.length > 0 && !scrollSocket && scrollSocket.length == 0) {
+        if (swaySocket && swaySocket.length > 0 && !scrollSocket && scrollSocket.length == 0) {
             Proc.runCommand("swaySocketCheck", ["test", "-S", swaySocket], (output, exitCode) => {
                 if (exitCode === 0) {
                     isNiri = false;
@@ -446,14 +446,14 @@ Singleton {
             return;
         }
 
-	if (scrollSocket && scrollSocket.length > 0) {
+        if (scrollSocket && scrollSocket.length > 0) {
             Proc.runCommand("scrollSocketCheck", ["test", "-S", scrollSocket], (output, exitCode) => {
                 if (exitCode === 0) {
                     isNiri = false;
                     isHyprland = false;
                     isDwl = false;
                     isSway = false;
-		    isScroll = true;
+                    isScroll = true;
                     isLabwc = false;
                     compositor = "scroll";
                     console.info("CompositorService: Detected Scroll with socket:", scrollSocket);
@@ -467,7 +467,7 @@ Singleton {
             isNiri = false;
             isDwl = false;
             isSway = false;
-	    isScroll = false;
+            isScroll = false;
             isLabwc = true;
             compositor = "labwc";
             console.info("CompositorService: Detected LabWC with PID:", labwcPid);
@@ -481,7 +481,7 @@ Singleton {
             isNiri = false;
             isDwl = false;
             isSway = false;
-	    isScroll = false;
+            isScroll = false;
             isLabwc = false;
             compositor = "unknown";
             console.warn("CompositorService: No compositor detected");
@@ -503,7 +503,7 @@ Singleton {
             isNiri = false;
             isDwl = true;
             isSway = false;
-	    isScroll = false;
+            isScroll = false;
             isLabwc = false;
             compositor = "dwl";
             console.info("CompositorService: Detected DWL via DMS capability");

@@ -19,8 +19,8 @@ Item {
             return "hyprland";
         if (isSway)
             return "sway";
-	if (isScroll)
-	    return "scroll";
+        if (isScroll)
+            return "scroll";
         if (isDwl)
             return "mangowc";
         if (isLabwc)
@@ -33,8 +33,8 @@ Item {
             return "/assets/hyprland.svg";
         if (isSway)
             return "/assets/sway.svg";
-	if (isScroll)
-	    return "/assets/sway.svg";
+        if (isScroll)
+            return "/assets/sway.svg";
         if (isDwl)
             return "/assets/mango.png";
         if (isLabwc)
@@ -47,8 +47,8 @@ Item {
             return "https://hypr.land";
         if (isSway)
             return "https://swaywm.org";
-	if (isScroll)
-	    return "https://github.com/dawsers/scroll";
+        if (isScroll)
+            return "https://github.com/dawsers/scroll";
         if (isDwl)
             return "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
@@ -61,8 +61,8 @@ Item {
             return "Hyprland Website";
         if (isSway)
             return "Sway Website";
-	if (isScroll)
-	    return "Scroll Github";
+        if (isScroll)
+            return "Scroll Github";
         if (isDwl)
             return "mangowc GitHub";
         if (isLabwc)
