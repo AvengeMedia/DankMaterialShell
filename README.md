@@ -5,21 +5,21 @@
     <img src="assets/danklogo.svg" alt="DankMaterialShell" width="200">
   </a>
 
-  ### A modern desktop shell for Wayland
+### A modern desktop shell for Wayland
 
-  Built with [Quickshell](https://quickshell.org/) and [Go](https://go.dev/)
+Built with [Quickshell](https://quickshell.org/) and [Go](https://go.dev/)
 
 [![Documentation](https://img.shields.io/badge/docs-danklinux.com-9ccbfb?style=for-the-badge&labelColor=101418)](https://danklinux.com/docs)
 [![GitHub stars](https://img.shields.io/github/stars/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=ffd700)](https://github.com/AvengeMedia/DankMaterialShell/stargazers)
 [![GitHub License](https://img.shields.io/github/license/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=b9c8da)](https://github.com/AvengeMedia/DankMaterialShell/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/AvengeMedia/DankMaterialShell?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://github.com/AvengeMedia/DankMaterialShell/releases)
 [![AUR version](https://img.shields.io/aur/version/dms-shell-bin?style=for-the-badge&labelColor=101418&color=9ccbfb)](https://aur.archlinux.org/packages/dms-shell-bin)
-[![AUR version (git)](https://img.shields.io/aur/version/dms-shell-git?style=for-the-badge&labelColor=101418&color=9ccbfb&label=AUR%20(git))](https://aur.archlinux.org/packages/dms-shell-git)
+[![AUR version (git)](<https://img.shields.io/aur/version/dms-shell-git?style=for-the-badge&labelColor=101418&color=9ccbfb&label=AUR%20(git)>)](https://aur.archlinux.org/packages/dms-shell-git)
 [![Ko-Fi donate](https://img.shields.io/badge/donate-kofi?style=for-the-badge&logo=ko-fi&logoColor=ffffff&label=ko-fi&labelColor=101418&color=f16061&link=https%3A%2F%2Fko-fi.com%2Fdanklinux)](https://ko-fi.com/danklinux)
 
 </div>
 
-DankMaterialShell is a complete desktop shell for [niri](https://github.com/YaLTeR/niri), [Hyprland](https://hyprland.org/), [MangoWC](https://github.com/DreamMaoMao/mangowc), [Sway](https://swaywm.org), [Scroll](https://github.com/dawsers/scroll), [labwc](https://labwc.github.io/), and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop.
+DankMaterialShell is a complete desktop shell for [niri](https://github.com/YaLTeR/niri), [Hyprland](https://hyprland.org/), [MangoWC](https://github.com/DreamMaoMao/mangowc), [Sway](https://swaywm.org), [labwc](https://labwc.github.io/), [Scroll](https://github.com/dawsers/scroll), and other Wayland compositors. It replaces waybar, swaylock, swayidle, mako, fuzzel, polkit, and everything else you'd normally stitch together to make a desktop.
 
 ## Repository Structure
 
@@ -105,7 +105,7 @@ Extend functionality with the [plugin registry](https://plugins.danklinux.com).
 
 ## Supported Compositors
 
-Works best with [niri](https://github.com/YaLTeR/niri), [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [Scroll](https://github.com/dawsers/scroll), [MangoWC](https://github.com/DreamMaoMao/mangowc), and [labwc](https://labwc.github.io/) with full workspace switching, overview integration, and monitor management. Other Wayland compositors work with reduced features.
+Works best with [niri](https://github.com/YaLTeR/niri), [Hyprland](https://hyprland.org/), [Sway](https://swaywm.org/), [MangoWC](https://github.com/DreamMaoMao/mangowc), [labwc](https://labwc.github.io/), and [Scroll](https://github.com/dawsers/scroll) with full workspace switching, overview integration, and monitor management. Other Wayland compositors work with reduced features.
 
 [Compositor configuration guide](https://danklinux.com/docs/dankmaterialshell/compositors)
 
@@ -143,6 +143,7 @@ See component-specific documentation:
 ### Building from Source
 
 **Core + Dankinstall:**
+
 ```bash
 cd core
 make              # Build dms CLI
@@ -150,11 +151,13 @@ make dankinstall  # Build installer
 ```
 
 **Shell:**
+
 ```bash
 quickshell -p quickshell/
 ```
 
 **NixOS:**
+
 ```nix
 {
   inputs.dms.url = "github:AvengeMedia/DankMaterialShell";
