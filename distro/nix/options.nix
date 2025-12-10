@@ -5,11 +5,21 @@
 }:
 let
   inherit (lib) types;
+  path = [
+    "programs"
+    "dankMaterialShell"
+  ];
+
+  builtInRemovedMsg = "This is now built-in in DMS and doesn't need additional dependencies.";
 in
 {
+  imports = [
+    (lib.mkRemovedOptionModule (path ++ [ "enableBrightnessControl" ]) builtInRemovedMsg)
+    (lib.mkRemovedOptionModule (path ++ [ "enableColorPicker" ]) builtInRemovedMsg)
+  ];
+
   options.programs.dankMaterialShell = {
     enable = lib.mkEnableOption "DankMaterialShell";
-
     systemd = {
       enable = lib.mkEnableOption "DankMaterialShell systemd startup";
       restartIfChanged = lib.mkOption {
@@ -32,16 +42,6 @@ in
       type = types.bool;
       default = true;
       description = "Add needed dependencies to use the VPN widget";
-    };
-    enableBrightnessControl = lib.mkOption {
-      type = types.bool;
-      default = true;
-      description = "Add needed dependencies to have brightness/backlight support";
-    };
-    enableColorPicker = lib.mkOption {
-      type = types.bool;
-      default = true;
-      description = "Add needed dependencies to have color picking support";
     };
     enableDynamicTheming = lib.mkOption {
       type = types.bool;
