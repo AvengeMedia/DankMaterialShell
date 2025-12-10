@@ -40,5 +40,8 @@ in
     };
 
     environment.systemPackages = [ cfg.quickshell.package ] ++ common.packages;
+
+    services.power-profiles-daemon.enable = lib.mkDefault true;
+    services.accounts-daemon.enable = lib.mkDefault true;
   };
 }
