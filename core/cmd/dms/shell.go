@@ -155,6 +155,7 @@ func runShellInteractive(session bool) {
 				errChan <- fmt.Errorf("server panic: %v", r)
 			}
 		}()
+		server.CLIVersion = Version
 		if err := server.Start(false); err != nil {
 			errChan <- fmt.Errorf("server error: %w", err)
 		}
