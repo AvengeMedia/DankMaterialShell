@@ -643,6 +643,16 @@ func (m *Manager) applyCurrentTemp() {
 		return
 	}
 
+	m.configMutex.RLock()
+	low, high := m.config.LowTemp, m.config.HighTemp
+	m.configMutex.RUnlock()
+
+	if low == high {
+		m.applyGamma(low)
+		m.updateStateFromSchedule()
+		return
+	}
+
 	if !m.hasValidSchedule() {
 		m.updateStateFromSchedule()
 		return
