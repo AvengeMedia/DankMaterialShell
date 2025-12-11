@@ -293,6 +293,12 @@ Singleton {
     property bool modalDarkenBackground: true
 
     property bool lockScreenShowPowerActions: true
+    property bool lockScreenShowSystemIcons: true
+    property bool lockScreenShowTime: true
+    property bool lockScreenShowDate: true
+    property bool lockScreenShowProfileImage: true
+    property bool lockScreenShowPasswordField: true
+
     property bool enableFprint: false
     property int maxFprintTries: 15
     property bool fprintdAvailable: false

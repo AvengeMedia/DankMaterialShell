@@ -23,7 +23,7 @@ Item {
             SettingsCard {
                 width: parent.width
                 iconName: "lock"
-                title: I18n.tr("Lock Screen")
+                title: I18n.tr("Lock Screen layout")
 
                 SettingsToggleRow {
                     text: I18n.tr("Show Power Actions")
@@ -31,6 +31,47 @@ Item {
                     checked: SettingsData.lockScreenShowPowerActions
                     onToggled: checked => SettingsData.set("lockScreenShowPowerActions", checked)
                 }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show System icons")
+                    description: I18n.tr("Show system icons on the lock screen")
+                    checked: SettingsData.lockScreenShowSystemIcons
+                    onToggled: checked => SettingsData.set("lockScreenShowSystemIcons", checked)
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show Time")
+                    description: I18n.tr("Show system time on the lock screen")
+                    checked: SettingsData.lockScreenShowTime
+                    onToggled: checked => SettingsData.set("lockScreenShowTime", checked)
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show Date")
+                    description: I18n.tr("Show system date on the lock screen")
+                    checked: SettingsData.lockScreenShowDate
+                    onToggled: checked => SettingsData.set("lockScreenShowDate", checked)
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show Profile image")
+                    description: I18n.tr("Show profile image on the lock screen")
+                    checked: SettingsData.lockScreenShowProfileImage
+                    onToggled: checked => SettingsData.set("lockScreenShowProfileImage", checked)
+                }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show Password field")
+                    description: I18n.tr("If hidden the field will be displayed as soon as the password is typed")
+                    checked: SettingsData.lockScreenShowPasswordField
+                    onToggled: checked => SettingsData.set("lockScreenShowPasswordField", checked)
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "lock"
+                title: I18n.tr("Lock Screen behaviour")
 
                 StyledText {
                     text: I18n.tr("loginctl not available - lock integration requires DMS socket connection")

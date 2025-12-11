@@ -216,6 +216,7 @@ Item {
             anchors.verticalCenterOffset: -100
             width: parent.width
             height: 140
+            visible: SettingsData.lockScreenShowTime
 
             Row {
                 id: clockText
@@ -331,6 +332,7 @@ Item {
         StyledText {
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -25
+            visible: SettingsData.lockScreenShowDate
             text: {
                 if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
                     return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat);
@@ -368,6 +370,7 @@ Item {
                         return PortalService.profileImage;
                     }
                     fallbackIcon: "person"
+                    visible: SettingsData.lockScreenShowProfileImage
                 }
 
                 Rectangle {
@@ -379,6 +382,8 @@ Item {
                     color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.9)
                     border.color: passwordField.activeFocus ? Theme.primary : Qt.rgba(1, 1, 1, 0.3)
                     border.width: passwordField.activeFocus ? 2 : 1
+                    visible: SettingsData.lockScreenShowPasswordField || root.passwordBuffer.length > 0
+
 
                     Item {
                         id: lockIconContainer
@@ -797,6 +802,7 @@ Item {
             anchors.right: parent.right
             anchors.margins: Theme.spacingXL
             spacing: Theme.spacingL
+            visible: SettingsData.lockScreenShowSystemIcons
 
             Item {
                 width: keyboardLayoutRow.width

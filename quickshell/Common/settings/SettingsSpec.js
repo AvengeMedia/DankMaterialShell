@@ -192,6 +192,11 @@ var SPEC = {
     modalDarkenBackground: { def: true },
 
     lockScreenShowPowerActions: { def: true },
+    lockScreenShowSystemIcons: { def: true },
+    lockScreenShowTime: { def: true },
+    lockScreenShowDate: { def: true },
+    lockScreenShowProfileImage: { def: true },
+    lockScreenShowPasswordField: { def: true },
     enableFprint: { def: false },
     maxFprintTries: { def: 15 },
     fprintdAvailable: { def: false, persist: false },
