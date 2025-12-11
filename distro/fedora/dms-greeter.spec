@@ -15,7 +15,6 @@ VCS:            {{{ git_repo_vcs }}}
 Source0:        {{{ git_repo_pack }}}
 
 BuildRequires:  git-core
-BuildRequires:  rpkg
 # For the _tmpfilesdir macro.
 BuildRequires: systemd-rpm-macros
 
