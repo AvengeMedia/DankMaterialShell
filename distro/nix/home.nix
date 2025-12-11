@@ -48,7 +48,6 @@ in
     plugins = lib.mkOption {
       type = attrsOf (
         types.submodule (
-          { config, ... }:
           {
             options = {
               enable = lib.mkOption {
@@ -73,8 +72,6 @@ in
     programs.quickshell = {
       enable = true;
       inherit (cfg.quickshell) package;
-
-      configs.dms = common.qmlPath;
     };
 
     systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
@@ -82,7 +79,6 @@ in
         Description = "DankMaterialShell";
         PartOf = [ config.wayland.systemd.target ];
         After = [ config.wayland.systemd.target ];
-        X-Restart-Triggers = lib.optional cfg.systemd.restartIfChanged common.qmlPath;
       };
 
       Service = {

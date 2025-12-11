@@ -9,8 +9,6 @@ let
   cfg = config.programs.dankMaterialShell;
 in
 {
-  qmlPath = "${dmsPkgs.dms-shell}/share/quickshell/dms";
-
   packages = [
     dmsPkgs.dms-shell
   ]
