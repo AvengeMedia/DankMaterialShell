@@ -16,7 +16,6 @@ VCS:            {{{ git_repo_vcs }}}
 Source0:        {{{ git_repo_pack }}}
 
 BuildRequires:  git-core
-BuildRequires:  rpkg
 BuildRequires:  gzip
 BuildRequires:  golang >= 1.24
 BuildRequires:  make
