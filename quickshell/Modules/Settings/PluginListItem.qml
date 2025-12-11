@@ -28,6 +28,7 @@ StyledRect {
     property string pluginSettingsPath: pluginData ? (pluginData.settingsPath || "") : ""
     property var pluginPermissions: pluginData ? (pluginData.permissions || []) : []
     property bool hasSettings: pluginData && pluginData.settings !== undefined && pluginData.settings !== ""
+    property bool isSystemPlugin: pluginData ? (pluginData.source === "system") : false
     property bool isExpanded: expandedPluginId === pluginId
     property bool isLoaded: {
         PluginService.loadedPlugins;
@@ -116,7 +117,7 @@ StyledRect {
                     height: 28
                     radius: 14
                     color: updateArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
-                    visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate
+                    visible: DMSService.dmsAvailable && root.isLoaded && root.hasUpdate && !root.isSystemPlugin
 
                     DankIcon {
                         anchors.centerIn: parent
@@ -160,7 +161,7 @@ StyledRect {
                     height: 28
                     radius: 14
                     color: uninstallArea.containsMouse ? Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency) : "transparent"
-                    visible: DMSService.dmsAvailable
+                    visible: DMSService.dmsAvailable && !root.isSystemPlugin
 
                     DankIcon {
                         anchors.centerIn: parent
