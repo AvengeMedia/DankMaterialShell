@@ -171,7 +171,9 @@
                 delve
                 go-tools
                 gnumake
+
                 prek
+                uv # for prek
               ]
               ++ devQmlPkgs;
 
