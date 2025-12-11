@@ -13,10 +13,6 @@ in
     dmsPkgs.dms-shell
   ]
   ++ lib.optional cfg.enableSystemMonitoring dmsPkgs.dgop
-  ++ lib.optionals cfg.enableClipboard [
-    pkgs.cliphist
-    pkgs.wl-clipboard
-  ]
   ++ lib.optionals cfg.enableVPN [
     pkgs.glib
     pkgs.networkmanager

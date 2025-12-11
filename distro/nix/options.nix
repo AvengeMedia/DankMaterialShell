@@ -16,6 +16,7 @@ in
   imports = [
     (lib.mkRemovedOptionModule (path ++ [ "enableBrightnessControl" ]) builtInRemovedMsg)
     (lib.mkRemovedOptionModule (path ++ [ "enableColorPicker" ]) builtInRemovedMsg)
+    (lib.mkRemovedOptionModule (path ++ [ "enableClipboard" ]) builtInRemovedMsg)
     (lib.mkRemovedOptionModule (
       path ++ [ "enableSystemSound" ]
     ) "qtmultimedia is now included on dms-shell package.")
@@ -35,11 +36,6 @@ in
       type = types.bool;
       default = true;
       description = "Add needed dependencies to use system monitoring widgets";
-    };
-    enableClipboard = lib.mkOption {
-      type = types.bool;
-      default = true;
-      description = "Add needed dependencies to use the clipboard widget";
     };
     enableVPN = lib.mkOption {
       type = types.bool;
