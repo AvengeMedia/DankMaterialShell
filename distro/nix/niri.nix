@@ -63,6 +63,14 @@ in
               allow-when-locked = true;
               action = dms-ipc "audio" "micmute";
             };
+            "XF86MonBrightnessUp" = {
+              allow-when-locked = true;
+              action = dms-ipc "brightness" "increment" "5" "";
+            };
+            "XF86MonBrightnessDown" = {
+              allow-when-locked = true;
+              action = dms-ipc "brightness" "decrement" "5" "";
+            };
             "Mod+Alt+N" = {
               allow-when-locked = true;
               action = dms-ipc "night" "toggle";
@@ -79,16 +87,6 @@ in
             "Mod+V" = {
               action = dms-ipc "clipboard" "toggle";
               hotkey-overlay.title = "Toggle Clipboard Manager";
-            };
-          }
-          // lib.attrsets.optionalAttrs cfg.enableBrightnessControl {
-            "XF86MonBrightnessUp" = {
-              allow-when-locked = true;
-              action = dms-ipc "brightness" "increment" "5" "";
-            };
-            "XF86MonBrightnessDown" = {
-              allow-when-locked = true;
-              action = dms-ipc "brightness" "decrement" "5" "";
             };
           };
       })
