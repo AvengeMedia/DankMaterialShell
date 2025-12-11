@@ -39,6 +39,11 @@ in
 
     environment.systemPackages = [ cfg.quickshell.package ] ++ common.packages;
 
+    environment.etc = lib.mapAttrs' (name: value: {
+      name = "xdg/quickshell/dms-plugins/${name}";
+      inherit value;
+    }) common.plugins;
+
     services.power-profiles-daemon.enable = lib.mkDefault true;
     services.accounts-daemon.enable = lib.mkDefault true;
   };

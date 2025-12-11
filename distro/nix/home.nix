@@ -72,10 +72,10 @@ in
     };
 
     xdg.configFile = lib.mkMerge [
-      (lib.mapAttrs' (name: plugin: {
+      (lib.mapAttrs' (name: value: {
         name = "DankMaterialShell/plugins/${name}";
-        value.source = plugin.src;
-      }) (lib.filterAttrs (n: v: v.enable) cfg.plugins))
+        inherit value;
+      }) common.plugins)
       {
         "DankMaterialShell/default-settings.json" = lib.mkIf (cfg.default.settings != { }) {
           source = jsonFormat.generate "default-settings.json" cfg.default.settings;

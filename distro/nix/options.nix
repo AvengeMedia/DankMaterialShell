@@ -77,7 +77,7 @@ in
               description = "Whether to enable this plugin";
             };
             src = lib.mkOption {
-              type = types.package;
+              type = types.either types.package types.path;
               description = "Source of the plugin package or path";
             };
           };
