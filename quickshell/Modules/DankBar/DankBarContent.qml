@@ -1088,6 +1088,7 @@ Item {
         id: layoutComponent
 
         DWLLayout {
+            id: layoutWidget
             layoutPopupVisible: layoutPopoutLoader.item ? layoutPopoutLoader.item.shouldBeVisible : false
             widgetThickness: barWindow.widgetThickness
             barThickness: barWindow.effectiveBarThickness
@@ -1100,14 +1101,19 @@ Item {
             parentScreen: barWindow.screen
             onToggleLayoutPopup: {
                 layoutPopoutLoader.active = true;
+                if (!layoutPopoutLoader.item)
+                    return;
                 const effectiveBarConfig = topBarContent.barConfig;
                 const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (layoutPopoutLoader.item && layoutPopoutLoader.item.setBarContext) {
-                    layoutPopoutLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
+
+                if (layoutPopoutLoader.item.setTriggerPosition) {
+                    const globalPos = layoutWidget.mapToGlobal(0, 0);
+                    const pos = SettingsData.getPopupTriggerPosition(globalPos, barWindow.screen, barWindow.effectiveBarThickness, layoutWidget.width, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
+                    const widgetSection = topBarContent.getWidgetSection(parent) || "center";
+                    layoutPopoutLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, widgetSection, barWindow.screen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
                 }
-                if (layoutPopoutLoader.item) {
-                    PopoutManager.requestPopout(layoutPopoutLoader.item, undefined, "layout");
-                }
+
+                PopoutManager.requestPopout(layoutPopoutLoader.item, undefined, "layout");
             }
         }
     }
