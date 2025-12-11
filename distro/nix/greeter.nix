@@ -139,10 +139,32 @@ in
       )}
 
       if [ -f session.json ]; then
-          if cp "$(${jq} -r '.wallpaperPath' session.json)" wallpaper.jpg; then
-              mv session.json session.orig.json
-              ${jq} '.wallpaperPath = "${cacheDir}/wallpaper.jpg"' session.orig.json > session.json
-          fi
+          copy_wallpaper() {
+              local path=$(${jq} -r ".$1 // empty" session.json)
+              if [ -f "$path" ]; then
+                  cp "$path" "$2"
+                  ${jq} ".$1 = \"${cacheDir}/$2\"" session.json > session.tmp
+                  mv session.tmp session.json
+              fi
+          }
+
+          copy_monitor_wallpapers() {
+              ${jq} -r ".$1 // {} | to_entries[] | .key + \":\" + .value" session.json 2>/dev/null | while IFS=: read monitor path; do
+                  local dest="$2-$(echo "$monitor" | tr -c '[:alnum:]' '-')"
+                  if [ -f "$path" ]; then
+                      cp "$path" "$dest"
+                      ${jq} --arg m "$monitor" --arg p "${cacheDir}/$dest" ".$1[\$m] = \$p" session.json > session.tmp
+                      mv session.tmp session.json
+                  fi
+              done
+          }
+
+          copy_wallpaper "wallpaperPath" "wallpaper"
+          copy_wallpaper "wallpaperPathLight" "wallpaper-light"
+          copy_wallpaper "wallpaperPathDark" "wallpaper-dark"
+          copy_monitor_wallpapers "monitorWallpapers" "wallpaper-monitor"
+          copy_monitor_wallpapers "monitorWallpapersLight" "wallpaper-monitor-light"
+          copy_monitor_wallpapers "monitorWallpapersDark" "wallpaper-monitor-dark"
       fi
 
       if [ -f settings.json ]; then
