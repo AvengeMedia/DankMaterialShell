@@ -272,7 +272,7 @@ jobs:
           # Create QML source package (exclude build artifacts and git files)
           # Copy root LICENSE and CONTRIBUTING.md to quickshell/ for packaging
           cp LICENSE CONTRIBUTING.md quickshell/
-          
+
           # Copy root assets directory to quickshell for systemd service and desktop file
           cp -r assets quickshell/
 

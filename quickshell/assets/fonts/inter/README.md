@@ -161,4 +161,3 @@ Inter is a [variable font](https://rsms.me/inter/#variable) and is in addition a
 | Bold                 | Bold Italic          | 700
 | Extra Bold           | Extra Bold Italic    | 800
 | Black                | Black Italic         | 900
-

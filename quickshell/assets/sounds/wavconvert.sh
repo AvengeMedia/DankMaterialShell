@@ -9,7 +9,7 @@ for file in *.oga; do
     fi
 done
 
-# Convert plasma sounds  
+# Convert plasma sounds
 cd ../plasma
 for file in *.ogg; do
     if [ -f "$file" ]; then

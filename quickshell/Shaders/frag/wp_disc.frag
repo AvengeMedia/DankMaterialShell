@@ -15,7 +15,7 @@ layout(std140, binding = 0) uniform buf {
     float centerY;       // Y coordinate of disc center (0.0 to 1.0)
     float smoothness;    // Edge smoothness (0.0 to 1.0, 0=sharp, 1=very smooth)
     float aspectRatio;   // Width / Height of the screen
-    
+
     float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad
     float imageWidth1;
     float imageHeight1;
@@ -97,29 +97,29 @@ void main() {
     // This makes distances circular instead of elliptical
     vec2 adjustedUV = vec2(uv.x * ubuf.aspectRatio, uv.y);
     vec2 adjustedCenter = vec2(ubuf.centerX * ubuf.aspectRatio, ubuf.centerY);
-    
+
     // Calculate distance in aspect-corrected space
     float dist = distance(adjustedUV, adjustedCenter);
-    
+
     // Calculate the maximum possible distance (corner to corner)
     // This ensures the disc can cover the entire screen
-    float maxDistX = max(ubuf.centerX * ubuf.aspectRatio, 
+    float maxDistX = max(ubuf.centerX * ubuf.aspectRatio,
                          (1.0 - ubuf.centerX) * ubuf.aspectRatio);
     float maxDistY = max(ubuf.centerY, 1.0 - ubuf.centerY);
     float maxDist = length(vec2(maxDistX, maxDistY));
-    
+
     // Scale progress to cover the maximum distance
     // Add extra range for smoothness to ensure complete coverage
     // Adjust smoothness for aspect ratio to maintain consistent visual appearance
     float adjustedSmoothness = mappedSmoothness * max(1.0, ubuf.aspectRatio);
     float radius = ubuf.progress * (maxDist + adjustedSmoothness);
-    
+
     // Use smoothstep for a smooth edge transition
     float factor = smoothstep(radius - adjustedSmoothness, radius + adjustedSmoothness, dist);
-    
+
     // Mix the textures (factor = 0 inside disc, 1 outside)
     fragColor = mix(color2, color1, factor);
-    
+
     if (ubuf.progress <= 0.0) fragColor = color1;
 
     fragColor *= ubuf.qt_Opacity;

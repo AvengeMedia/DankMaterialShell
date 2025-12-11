@@ -104,7 +104,7 @@ void main() {
     float radius = p * maxDist;
 
     // squash factor for the "eye" slit
-    float squash = mix(0.2, 1.0, p); 
+    float squash = mix(0.2, 1.0, p);
     q.y /= squash;
 
     float dist = length(q);

@@ -14,20 +14,20 @@ Popup {
     function show(x, y, app, fromKeyboard) {
         fromKeyboard = fromKeyboard || false;
         menuContent.currentApp = app;
-        
+
         root.x = x + 4;
         root.y = y + 4;
-        
+
         menuContent.selectedMenuIndex = fromKeyboard ? 0 : -1;
         menuContent.keyboardNavigation = true;
-        
+
         if (parentHandler) {
             parentHandler.enabled = false;
         }
-        
+
         open();
     }
-    
+
     onOpened: {
         Qt.callLater(() => {
             menuContent.keyboardHandler.forceActiveFocus();

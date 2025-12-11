@@ -104,7 +104,7 @@ go.work.sum
 
 bin/
 
-# Extracted source trees in Ubuntu package directories  
+# Extracted source trees in Ubuntu package directories
 distro/ubuntu/*/dms-git-repo/
 distro/ubuntu/*/DankMaterialShell-*/
 distro/ubuntu/danklinux/*/dsearch-*/

@@ -161,7 +161,7 @@ Rectangle {
 
                     const pins = SettingsData.bluetoothDevicePins || {}
                     const pinnedAddr = pins["preferredDevice"]
-                    
+
                     let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
                     devices.sort((a, b) => {
                         // Pinned device first
@@ -337,13 +337,13 @@ Rectangle {
                             onClicked: {
                                 const pins = JSON.parse(JSON.stringify(SettingsData.bluetoothDevicePins || {}))
                                 const isCurrentlyPinned = pins["preferredDevice"] === modelData.address
-                                
+
                                 if (isCurrentlyPinned) {
                                     delete pins["preferredDevice"]
                                 } else {
                                     pins["preferredDevice"] = modelData.address
                                 }
-                                
+
                                 SettingsData.set("bluetoothDevicePins", pins)
                             }
                         }

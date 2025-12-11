@@ -11,7 +11,7 @@ layout(std140, binding = 0) uniform buf {
     mat4 qt_Matrix;
     float qt_Opacity;
     float progress;
-    
+
     // Fill mode parameters
     float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad
     float imageWidth1;   // Width of source1 image
@@ -81,11 +81,11 @@ vec4 sampleWithFillMode(sampler2D tex, vec2 uv, float imgWidth, float imgHeight)
 
 void main() {
     vec2 uv = qt_TexCoord0;
-    
+
     // Sample textures with fill mode
     vec4 color1 = sampleWithFillMode(source1, uv, ubuf.imageWidth1, ubuf.imageHeight1);
     vec4 color2 = sampleWithFillMode(source2, uv, ubuf.imageWidth2, ubuf.imageHeight2);
-    
+
     // Mix the two textures based on progress value
     fragColor = mix(color1, color2, ubuf.progress) * ubuf.qt_Opacity;
 }

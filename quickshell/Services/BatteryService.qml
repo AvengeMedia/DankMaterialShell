@@ -73,7 +73,7 @@ Singleton {
         }
 
         const profileValue = BatteryService.isPluggedIn
-            ? SettingsData.acProfileName 
+            ? SettingsData.acProfileName
             : SettingsData.batteryProfileName;
 
         if (profileValue !== "") {

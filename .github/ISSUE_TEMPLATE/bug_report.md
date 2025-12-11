@@ -6,7 +6,7 @@ labels: "bug"
 assignees: ""
 ---
 
-<!-- If your issue is related to ICONS 
+<!-- If your issue is related to ICONS
 - Purple and black checkerboards are QT's way of signalling an icon doesn't exist
   - FIX: Configure a QT6 or Icon Pack in DMS Settings that has the icon you want
   - Follow the [THEMING](https://danklinux.com/docs/dankmaterialshell/icon-theming) section to ensure your QT environment variable is configured correctly for themes.

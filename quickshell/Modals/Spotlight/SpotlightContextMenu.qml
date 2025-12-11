@@ -18,18 +18,18 @@ PanelWindow {
     property var parentModal: null
     property real menuPositionX: 0
     property real menuPositionY: 0
-    
+
     readonly property real shadowBuffer: 5
-    
+
     screen: parentModal?.effectiveScreen
 
     function show(x, y, app, fromKeyboard) {
         fromKeyboard = fromKeyboard || false;
         menuContent.currentApp = app;
-        
+
         let screenX = x;
         let screenY = y;
-        
+
         if (parentModal) {
             if (fromKeyboard) {
                 screenX = x + parentModal.alignedX;
@@ -39,14 +39,14 @@ PanelWindow {
                 screenY = y + (parentModal.alignedY - shadowBuffer);
             }
         }
-        
+
         menuPositionX = screenX;
         menuPositionY = screenY;
-        
+
         menuContent.selectedMenuIndex = fromKeyboard ? 0 : -1;
         menuContent.keyboardNavigation = true;
         visible = true;
-        
+
         if (parentHandler) {
             parentHandler.enabled = false;
         }

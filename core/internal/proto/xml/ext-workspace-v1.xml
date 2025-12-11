@@ -73,7 +73,7 @@
       </description>
       <arg name="workspace" type="new_id" interface="ext_workspace_handle_v1"/>
     </event>
-  
+
     <request name="commit">
       <description summary="all requests about the workspaces have been sent">
         The client must send this request after it has finished sending other
@@ -242,7 +242,7 @@
       - a list of states, conveyed to the client with the state event
       - and optionally a set of coordinates, conveyed to the client with the
       coordinates event
-      
+
       The client may request that the compositor activate or deactivate the workspace.
 
       Each workspace can belong to only a single workspace group.

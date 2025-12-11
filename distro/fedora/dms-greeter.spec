@@ -104,19 +104,19 @@ if [ -x /usr/sbin/semanage ] && [ -x /usr/sbin/restorecon ]; then
     # Greeter launcher binary
     semanage fcontext -a -t bin_t '%{_bindir}/dms-greeter' >/dev/null 2>&1 || true
     restorecon %{_bindir}/dms-greeter >/dev/null 2>&1 || true
-    
+
     # Greeter home directory
     semanage fcontext -a -t user_home_dir_t '%{_sharedstatedir}/greeter(/.*)?' >/dev/null 2>&1 || true
     restorecon -R %{_sharedstatedir}/greeter >/dev/null 2>&1 || true
-    
+
     # Cache directory for greeter data
     semanage fcontext -a -t cache_home_t '%{_localstatedir}/cache/dms-greeter(/.*)?' >/dev/null 2>&1 || true
     restorecon -R %{_localstatedir}/cache/dms-greeter >/dev/null 2>&1 || true
-    
+
     # Shared data directory
     semanage fcontext -a -t usr_t '%{_datadir}/quickshell/dms-greeter(/.*)?' >/dev/null 2>&1 || true
     restorecon -R %{_datadir}/quickshell/dms-greeter >/dev/null 2>&1 || true
-    
+
     # PAM configuration
     restorecon %{_sysconfdir}/pam.d/greetd >/dev/null 2>&1 || true
 fi

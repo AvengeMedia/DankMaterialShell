@@ -22,7 +22,7 @@ Audio system control and information.
 - Returns: Confirmation message
 
 **`decrement <step>`**
-- Decrease output volume by step amount  
+- Decrease output volume by step amount
 - Parameters: `step` - Volume decrease amount (default: 5)
 - Returns: Confirmation message
 
@@ -72,7 +72,7 @@ Display brightness control for internal and external displays.
 **`decrement <step> [device]`**
 - Decrease brightness by step amount
 - Parameters:
-  - `step` - Brightness decrease amount  
+  - `step` - Brightness decrease amount
   - `device` - Optional device name (empty string for default)
 - Returns: Confirmation with new brightness level
 
@@ -105,7 +105,7 @@ Night mode (gamma/color temperature) control.
 - Enable night mode
 - Returns: Confirmation message
 
-**`disable`** 
+**`disable`**
 - Disable night mode
 - Returns: Confirmation message
 
@@ -163,7 +163,7 @@ Media player control via MPRIS interface.
 - Returns: Nothing
 
 **`pause`**
-- Pause playback on active player  
+- Pause playback on active player
 - Returns: Nothing
 
 **`playPause`**
@@ -272,7 +272,7 @@ Wallpaper management and retrieval with support for per-monitor configurations.
 
 **`setFor <screenName> <path>`**
 - Set wallpaper for specific monitor (automatically enables per-monitor mode)
-- Parameters: 
+- Parameters:
   - `screenName` - Monitor name (e.g., "DP-2", "eDP-1")
   - `path` - Absolute or relative path to image file
 - Returns: Success confirmation with monitor and path info
@@ -365,7 +365,7 @@ Theme mode control (light/dark mode switching).
 - Returns: "light"
 
 **`dark`**
-- Switch to dark theme mode  
+- Switch to dark theme mode
 - Returns: "dark"
 
 **`getMode`**
@@ -445,7 +445,7 @@ Clipboard history modal control.
 
 **Functions:**
 - `open` - Show clipboard history
-- `close` - Hide clipboard history  
+- `close` - Hide clipboard history
 - `toggle` - Toggle clipboard history visibility
 
 ### Target: `notifications`

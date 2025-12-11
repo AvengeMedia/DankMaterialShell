@@ -139,7 +139,7 @@ StyledRect {
 
         MouseArea {
             anchors.fill: parent
-            hoverEnabled: true 
+            hoverEnabled: true
             cursorShape: Qt.IBeamCursor
             acceptedButtons: Qt.NoButton
         }

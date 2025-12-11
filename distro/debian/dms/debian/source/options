@@ -1,4 +1,4 @@
 # Include files that are normally excluded by .gitignore
-# These are needed for the build process on Launchpad 
+# These are needed for the build process on Launchpad
 tar-ignore = !dms-distropkg-amd64.gz
 tar-ignore = !dms-source.tar.gz

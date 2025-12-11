@@ -15,7 +15,7 @@ layout(std140, binding = 0) uniform buf {
     float angle;         // Angle of stripes in degrees (default 30.0)
     float smoothness;    // Edge smoothness (0.0 to 1.0, 0=sharp, 1=very smooth)
     float aspectRatio;   // Width / Height of the screen
-    
+
     float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad
     float imageWidth1;
     float imageHeight1;
@@ -84,58 +84,58 @@ vec4 sampleWithFillMode(sampler2D tex, vec2 uv, float imgWidth, float imgHeight)
 
 void main() {
     vec2 uv = qt_TexCoord0;
-    
+
     // Sample textures with fill mode
     vec4 color1 = sampleWithFillMode(source1, uv, ubuf.imageWidth1, ubuf.imageHeight1);
     vec4 color2 = sampleWithFillMode(source2, uv, ubuf.imageWidth2, ubuf.imageHeight2);
-    
+
     // Map smoothness from 0.0-1.0 to 0.001-0.3 range
     // Using a non-linear mapping for better control at low values
     float mappedSmoothness = mix(0.001, 0.3, ubuf.smoothness * ubuf.smoothness);
-    
+
     // Use values directly without forcing defaults
     float stripes = (ubuf.stripeCount > 0.0) ? ubuf.stripeCount : 12.0;
     float angleRad = radians(ubuf.angle);
     float edgeSmooth = mappedSmoothness;
-    
+
     // Create a coordinate system for stripes based on angle
     // At 0°: vertical stripes (divide by x)
     // At 45°: diagonal stripes
     // At 90°: horizontal stripes (divide by y)
-    
+
     // Transform coordinates based on angle
     float cosA = cos(angleRad);
     float sinA = sin(angleRad);
-    
+
     // Project the UV position onto the stripe direction
     // This gives us the position along the stripe direction
     float stripeCoord = uv.x * cosA + uv.y * sinA;
-    
+
     // Perpendicular coordinate (for edge movement)
     float perpCoord = -uv.x * sinA + uv.y * cosA;
-    
+
     // Calculate the range of perpCoord based on angle
     // This determines how far edges need to travel to fully cover the screen
     float minPerp = min(min(0.0 * -sinA + 0.0 * cosA, 1.0 * -sinA + 0.0 * cosA),
                        min(0.0 * -sinA + 1.0 * cosA, 1.0 * -sinA + 1.0 * cosA));
     float maxPerp = max(max(0.0 * -sinA + 0.0 * cosA, 1.0 * -sinA + 0.0 * cosA),
                        max(0.0 * -sinA + 1.0 * cosA, 1.0 * -sinA + 1.0 * cosA));
-    
+
     // Determine which stripe we're in
     float stripePos = stripeCoord * stripes;
     int stripeIndex = int(floor(stripePos));
-    
+
     // Determine if this is an odd or even stripe
     bool isOddStripe = mod(float(stripeIndex), 2.0) != 0.0;
-    
+
     // Calculate the progress for this specific stripe with wave delay
     // Use absolute stripe position for consistent delay across all stripes
     float normalizedStripePos = clamp(stripePos / stripes, 0.0, 1.0);
-    
+
     // Increased delay and better distribution
     float maxDelay = 0.1;
     float stripeDelay = normalizedStripePos * maxDelay;
-    
+
     // Better progress mapping that uses the full 0.0-1.0 range
     // Map progress so that:
     // - First stripe starts at progress = 0.0
@@ -151,13 +151,13 @@ void main() {
         float activeEnd = stripeDelay + (1.0 - maxDelay);
         stripeProgress = (ubuf.progress - activeStart) / (activeEnd - activeStart);
     }
-    
+
     // Use gentler easing curve
     stripeProgress = stripeProgress * stripeProgress * (3.0 - 2.0 * stripeProgress);  // Smootherstep instead of smoothstep
-    
+
     // Use the perpendicular coordinate for edge comparison
     float yPos = perpCoord;
-    
+
     // Calculate edge position for this stripe
     // Use the actual perpendicular coordinate range for this angle
     float perpRange = maxPerp - minPerp;
@@ -170,7 +170,7 @@ void main() {
         // Even stripes: edge moves from min to max
         edgePosition = minPerp - margin + stripeProgress * (perpRange + margin * 2.0);
     }
-    
+
     // Determine which wallpaper to show based on rotated position
     float mask;
     if (isOddStripe) {
@@ -180,10 +180,10 @@ void main() {
         // Even stripes reveal new wallpaper from top
         mask = 1.0 - smoothstep(edgePosition - edgeSmooth, edgePosition + edgeSmooth, yPos);
     }
-    
+
     // Mix the wallpapers
     fragColor = mix(color1, color2, mask);
-    
+
     // Force exact values at start and end to prevent any bleed-through
     if (ubuf.progress <= 0.0) {
         fragColor = color1;  // Only show old wallpaper at start
@@ -195,11 +195,11 @@ void main() {
         float shadowStrength = 1.0 - smoothstep(0.0, edgeSmooth * 2.5, edgeDist);
         shadowStrength *= 0.2 * (1.0 - abs(stripeProgress - 0.5) * 2.0);
         fragColor.rgb *= (1.0 - shadowStrength);
-        
-        // Add slight vignette during transition for dramatic effect  
+
+        // Add slight vignette during transition for dramatic effect
         float vignette = 1.0 - ubuf.progress * 0.1 * (1.0 - abs(stripeProgress - 0.5) * 2.0);
         fragColor.rgb *= vignette;
     }
-    
+
     fragColor *= ubuf.qt_Opacity;
 }

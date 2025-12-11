@@ -143,7 +143,7 @@ Item {
 
     implicitWidth: Math.max(180, menuColumn.implicitWidth + Theme.spacingS * 2)
     implicitHeight: menuColumn.implicitHeight + Theme.spacingS * 2
-    
+
     width: implicitWidth
     height: implicitHeight
 

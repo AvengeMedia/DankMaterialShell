@@ -77,7 +77,7 @@ There are example themes you can start from:
 
 - [Cyberpunk Electric](theme_cyberpunk_electric.json) - Neon green and magenta cyberpunk aesthetic
 - [Hotline Miami](theme_hotline_miami.json) - Retro 80s inspired hot pink and blue
-- [Miami Vice](theme_miami_vice.json) - Classic teal and pink vice aesthetic  
+- [Miami Vice](theme_miami_vice.json) - Classic teal and pink vice aesthetic
 - [Synthwave Electric](theme_synthwave_electric.json) - Electric purple and cyan synthwave vibes
 
 ### Color Definitions
@@ -87,7 +87,7 @@ There are example themes you can start from:
 - `primaryText` - Text color that contrasts well with primary background
 - `primaryContainer` - Darker/lighter variant of primary for containers
 
-**Secondary Colors**  
+**Secondary Colors**
 - `secondary` - Supporting accent color for variety and hierarchy
 - `surfaceTint` - Tint color applied to surfaces, usually derived from primary
 
@@ -115,7 +115,7 @@ While the core colors above are required, you can also customize these optional 
 ```json
 {
   "error": "#f44336",
-  "warning": "#ff9800", 
+  "warning": "#ff9800",
   "info": "#2196f3"
 }
 ```

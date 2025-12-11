@@ -21,34 +21,34 @@ jobs:
   check-updates:
     name: Check for updates
     runs-on: ubuntu-latest
-    
+
     outputs:
       has_updates: ${{ steps.check.outputs.has_updates }}
       packages: ${{ steps.check.outputs.packages }}
       version: ${{ steps.check.outputs.version }}
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Install OSC
         run: |
           sudo apt-get update
           sudo apt-get install -y osc
-          
+
           mkdir -p ~/.config/osc
           cat > ~/.config/osc/oscrc << EOF
           [general]
           apiurl = https://api.opensuse.org
-          
+
           [https://api.opensuse.org]
           user = ${{ secrets.OBS_USERNAME }}
           pass = ${{ secrets.OBS_PASSWORD }}
           EOF
           chmod 600 ~/.config/osc/oscrc
-      
+
       - name: Check for updates
         id: check
         run: |
@@ -116,13 +116,13 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       needs.check-updates.outputs.has_updates == 'true'
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Determine packages to update
         id: packages
         run: |
@@ -140,7 +140,7 @@ jobs:
           else
             echo "packages=${{ needs.check-updates.outputs.packages }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Update dms-git spec version
         if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
         run: |
@@ -148,13 +148,13 @@ jobs:
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
           BASE_VERSION=$(grep -oP '^Version:\s+\K[0-9.]+' distro/opensuse/dms.spec | head -1 || echo "0.6.2")
-          
+
           NEW_VERSION="${BASE_VERSION}+git${COMMIT_COUNT}.${COMMIT_HASH}"
           echo "📦 Updating dms-git.spec to version: $NEW_VERSION"
-          
+
           # Update version in spec
           sed -i "s/^Version:.*/Version:        $NEW_VERSION/" distro/opensuse/dms-git.spec
-          
+
           # Add changelog entry
           DATE_STR=$(date "+%a %b %d %Y")
           CHANGELOG_ENTRY="* $DATE_STR Avenge Media <AvengeMedia.US@gmail.com> - ${NEW_VERSION}-1\n- Git snapshot (commit $COMMIT_COUNT: $COMMIT_HASH)"
@@ -163,12 +163,12 @@ jobs:
       - name: Update Debian dms-git changelog version
         if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
         run: |
-          # Get commit info for dms-git versioning 
+          # Get commit info for dms-git versioning
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
           BASE_VERSION=$(grep -oP '^Version:\s+\K[0-9.]+' distro/opensuse/dms.spec | head -1 || echo "0.6.2")
 
-          # Debian version format: 0.6.2+git2256.9162e314 
+          # Debian version format: 0.6.2+git2256.9162e314
           NEW_VERSION="${BASE_VERSION}+git${COMMIT_COUNT}.${COMMIT_HASH}"
           echo "📦 Updating Debian dms-git changelog to version: $NEW_VERSION"
 
@@ -182,7 +182,7 @@ jobs:
           echo "Current Debian version: $CURRENT_VERSION"
           echo "New version: $NEW_VERSION"
 
-          # Only update if version changed 
+          # Only update if version changed
           if [ "$CURRENT_VERSION" != "$NEW_VERSION" ]; then
             # Create new changelog entry at top
             TEMP_CHANGELOG=$(mktemp)
@@ -211,10 +211,10 @@ jobs:
           VERSION="${{ steps.packages.outputs.version }}"
           VERSION_NO_V="${VERSION#v}"
           echo "Updating packaging to version $VERSION_NO_V"
-          
+
           # Update openSUSE dms spec (stable only)
           sed -i "s/^Version:.*/Version:        $VERSION_NO_V/" distro/opensuse/dms.spec
-          
+
           # Update Debian _service files
           for service in distro/debian/*/_service; do
             if [[ -f "$service" ]]; then
@@ -250,18 +250,18 @@ jobs:
         run: |
           PACKAGES="${{ steps.packages.outputs.packages }}"
           MESSAGE="Automated update from GitHub Actions"
-          
+
           if [[ -n "${{ steps.packages.outputs.version }}" ]]; then
             MESSAGE="Update to ${{ steps.packages.outputs.version }}"
           fi
-          
+
           if [[ "$PACKAGES" == "all" ]]; then
             bash distro/scripts/obs-upload.sh dms "$MESSAGE"
             bash distro/scripts/obs-upload.sh dms-git "Automated git update"
           else
             bash distro/scripts/obs-upload.sh "$PACKAGES" "$MESSAGE"
           fi
-      
+
       - name: Summary
         run: |
           echo "### OBS Package Update Complete" >> $GITHUB_STEP_SUMMARY

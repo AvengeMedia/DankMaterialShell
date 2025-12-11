@@ -155,7 +155,7 @@ elif [ "$UPLOAD_METHOD" = "lftp" ]; then
     # Use lftp to upload to Launchpad PPA
     CHANGES_DIR=$(dirname "$CHANGES_FILE")
     CHANGES_BASENAME=$(basename "$CHANGES_FILE")
-    
+
     # Extract files to upload from .changes file
     FILES_TO_UPLOAD=("$CHANGES_BASENAME")
     while IFS= read -r line; do
@@ -163,14 +163,14 @@ elif [ "$UPLOAD_METHOD" = "lftp" ]; then
             FILES_TO_UPLOAD+=("${BASH_REMATCH[1]}")
         fi
     done < "$CHANGES_FILE"
-    
+
     # Build lftp command to upload all files
     LFTP_COMMANDS="set ftp:ssl-allow no; open ftp://ppa.launchpad.net; user anonymous ''; cd ~avengemedia/ubuntu/$PPA_NAME/;"
     for file in "${FILES_TO_UPLOAD[@]}"; do
         LFTP_COMMANDS="$LFTP_COMMANDS put '$CHANGES_DIR/$file';"
     done
     LFTP_COMMANDS="$LFTP_COMMANDS bye"
-    
+
     if echo "$LFTP_COMMANDS" | lftp; then
         UPLOAD_SUCCESS=true
     fi

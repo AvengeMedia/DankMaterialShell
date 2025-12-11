@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Determine version
         id: version
         run: |
@@ -40,31 +40,31 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "release=$RELEASE" >> $GITHUB_OUTPUT
           echo "✅ Building DMS hotfix version: $VERSION-$RELEASE"
-      
+
       - name: Setup build environment
         run: |
           sudo apt-get update
           sudo apt-get install -y rpm wget curl jq gzip
           mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
           echo "✅ RPM build environment ready"
-      
+
       - name: Download release assets
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           cd ~/rpmbuild/SOURCES
-          
+
           echo "📦 Downloading DMS QML source for v${VERSION}..."
-          
+
           # Download DMS QML source
           wget "https://github.com/AvengeMedia/DankMaterialShell/releases/download/v${VERSION}/dms-qml.tar.gz" || {
             echo "❌ Failed to download dms-qml.tar.gz for v${VERSION}"
             exit 1
           }
-          
+
           echo "✅ Source downloaded"
           echo "Note: dms-cli binary will be downloaded during build based on target architecture"
           ls -lh
-      
+
       - name: Generate stable spec file
         run: |
           VERSION="${{ steps.version.outputs.version }}"
@@ -211,38 +211,38 @@ jobs:
           echo ""
           echo "=== Spec file preview ==="
           head -40 ~/rpmbuild/SPECS/dms.spec
-      
+
       - name: Build SRPM
         id: build
         run: |
           cd ~/rpmbuild/SPECS
-          
+
           echo "🔨 Building SRPM..."
           rpmbuild -bs dms.spec
-          
+
           SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm | tail -n 1)
           SRPM_NAME=$(basename "$SRPM")
-          
+
           echo "srpm_path=$SRPM" >> $GITHUB_OUTPUT
           echo "srpm_name=$SRPM_NAME" >> $GITHUB_OUTPUT
-          
+
           echo "✅ SRPM built: $SRPM_NAME"
           echo ""
           echo "=== SRPM Info ==="
           rpm -qpi "$SRPM"
-      
+
       - name: Upload SRPM artifact
         uses: actions/upload-artifact@v4
         with:
           name: dms-stable-srpm-${{ steps.version.outputs.version }}
           path: ${{ steps.build.outputs.srpm_path }}
           retention-days: 90
-      
+
       - name: Install Copr CLI
         run: |
           sudo apt-get install -y python3-pip
           pip3 install copr-cli
-          
+
           mkdir -p ~/.config
           cat > ~/.config/copr << EOF
           [copr-cli]
@@ -252,30 +252,30 @@ jobs:
           copr_url = https://copr.fedorainfracloud.org
           EOF
           chmod 600 ~/.config/copr
-          
+
           echo "✅ Copr CLI configured"
-      
+
       - name: Upload to Copr
         run: |
           SRPM="${{ steps.build.outputs.srpm_path }}"
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           echo "🚀 Uploading SRPM to avengemedia/dms..."
           echo "   SRPM: $(basename $SRPM)"
           echo "   Version: $VERSION"
-          
+
           BUILD_OUTPUT=$(copr-cli build avengemedia/dms "$SRPM" --nowait 2>&1)
           echo "$BUILD_OUTPUT"
-          
+
           BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build was added to.*\K[0-9]+' || echo "unknown")
-          
+
           if [ "$BUILD_ID" != "unknown" ]; then
             echo "✅ Build submitted successfully!"
             echo "🔗 https://copr.fedorainfracloud.org/coprs/avengemedia/dms/build/$BUILD_ID/"
           else
             echo "⚠️  Could not extract build ID, but upload may have succeeded"
           fi
-      
+
       - name: Build summary
         if: always()
         run: |

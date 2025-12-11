@@ -13,7 +13,7 @@ layout(std140, binding = 0) uniform buf {
     float progress;      // Transition progress (0.0 to 1.0)
     float direction;     // 0=left, 1=right, 2=up, 3=down
     float smoothness;    // Edge smoothness (0.0 to 1.0, 0=sharp, 1=very smooth)
-    
+
     float fillMode;      // 0=stretch, 1=fit, 2=crop, 3=tile, 4=tileV, 5=tileH, 6=pad
     float imageWidth1;
     float imageHeight1;
@@ -82,22 +82,22 @@ vec4 sampleWithFillMode(sampler2D tex, vec2 uv, float imgWidth, float imgHeight)
 
 void main() {
     vec2 uv = qt_TexCoord0;
-    
+
     // Sample textures with fill mode
     vec4 color1 = sampleWithFillMode(source1, uv, ubuf.imageWidth1, ubuf.imageHeight1);
     vec4 color2 = sampleWithFillMode(source2, uv, ubuf.imageWidth2, ubuf.imageHeight2);
-    
+
     // Map smoothness from 0.0-1.0 to 0.001-0.5 range
     // Using a non-linear mapping for better control
     float mappedSmoothness = mix(0.001, 0.5, ubuf.smoothness * ubuf.smoothness);
-    
+
     float edge = 0.0;
     float factor = 0.0;
-    
+
     // Extend the progress range to account for smoothness
     // This ensures the transition completes fully at the edges
     float extendedProgress = ubuf.progress * (1.0 + 2.0 * mappedSmoothness) - mappedSmoothness;
-    
+
     // Calculate edge position based on direction
     // As progress goes from 0 to 1, we reveal source2 (new wallpaper)
     if (ubuf.direction < 0.5) {
@@ -105,7 +105,7 @@ void main() {
         edge = 1.0 - extendedProgress;
         factor = smoothstep(edge - mappedSmoothness, edge + mappedSmoothness, uv.x);
         fragColor = mix(color1, color2, factor);
-    } 
+    }
     else if (ubuf.direction < 1.5) {
         // Wipe from left to right (new image enters from left)
         edge = extendedProgress;
@@ -124,6 +124,6 @@ void main() {
         factor = smoothstep(edge - mappedSmoothness, edge + mappedSmoothness, uv.y);
         fragColor = mix(color2, color1, factor);
     }
-    
+
     fragColor *= ubuf.qt_Opacity;
 }

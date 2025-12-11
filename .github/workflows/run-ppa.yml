@@ -84,12 +84,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
-          cache: false  
+          cache: false
 
       - name: Install build dependencies
         run: |
@@ -102,7 +102,7 @@ jobs:
             build-essential \
             fakeroot \
             dpkg-dev
-      
+
       - name: Configure GPG
         env:
           GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -110,7 +110,7 @@ jobs:
           echo "$GPG_KEY" | gpg --import
           GPG_KEY_ID=$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
           echo "DEBSIGN_KEYID=$GPG_KEY_ID" >> $GITHUB_ENV
-      
+
       - name: Determine packages to upload
         id: packages
         run: |
@@ -123,19 +123,19 @@ jobs:
           else
             echo "packages=${{ needs.check-updates.outputs.packages }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Upload to PPA
         env:
           REBUILD_RELEASE: ${{ github.event.inputs.rebuild_release }}
         run: |
           PACKAGES="${{ steps.packages.outputs.packages }}"
-          
+
           # Export to ensure it's available to subprocesses
           if [ -n "$REBUILD_RELEASE" ]; then
             export REBUILD_RELEASE
             echo "✓ Using rebuild release number: ppa$REBUILD_RELEASE"
           fi
-          
+
           if [[ "$PACKAGES" == "all" ]]; then
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "Uploading dms to PPA..."
@@ -144,13 +144,13 @@ jobs:
             fi
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             REBUILD_RELEASE="$REBUILD_RELEASE" bash distro/scripts/ppa-upload.sh "distro/ubuntu/dms" dms questing
-            
+
             echo ""
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "Uploading dms-git to PPA..."
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             REBUILD_RELEASE="$REBUILD_RELEASE" bash distro/scripts/ppa-upload.sh "distro/ubuntu/dms-git" dms-git questing
-            
+
             echo ""
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             echo "Uploading dms-greeter to PPA..."
@@ -163,7 +163,7 @@ jobs:
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
             REBUILD_RELEASE="$REBUILD_RELEASE" bash distro/scripts/ppa-upload.sh "distro/ubuntu/$PACKAGES" "$PPA_NAME" questing
           fi
-      
+
       - name: Summary
         run: |
           echo "### PPA Package Upload Complete" >> $GITHUB_STEP_SUMMARY
@@ -186,7 +186,7 @@ jobs:
           elif [[ "$PACKAGES" == "dms-greeter" ]]; then
             echo "- **PPA**: https://launchpad.net/~avengemedia/+archive/ubuntu/danklinux/+packages" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           if [[ -n "${{ steps.packages.outputs.version }}" ]]; then
             echo "- **Version**: ${{ steps.packages.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           fi

@@ -14,7 +14,7 @@ BASE_VERSION := $(shell echo $(UPSTREAM_VERSION) | sed 's/ppa[0-9]*$$//' | sed '
 override_dh_auto_build:
 	# All files are included in source package
 	test -f dms-greeter-source.tar.gz || (echo "ERROR: dms-greeter-source.tar.gz not found!" && exit 1)
-	
+
 	# Extract source tarball
 	tar -xzf dms-greeter-source.tar.gz
 	# Find the extracted directory
@@ -27,22 +27,22 @@ override_dh_auto_install:
 	# Install greeter files to shared data location
 	mkdir -p debian/dms-greeter/usr/share/quickshell/dms-greeter
 	cp -r DankMaterialShell-$(BASE_VERSION)/quickshell/* debian/dms-greeter/usr/share/quickshell/dms-greeter/
-	
+
 	# Install launcher script
 	install -Dm755 DankMaterialShell-$(BASE_VERSION)/quickshell/Modules/Greetd/assets/dms-greeter \
 		debian/dms-greeter/usr/bin/dms-greeter
-	
+
 	# Install documentation
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/quickshell/Modules/Greetd/README.md \
 		debian/dms-greeter/usr/share/doc/dms-greeter/README.md
-	
+
 	# Install LICENSE file
 	install -Dm644 DankMaterialShell-$(BASE_VERSION)/LICENSE \
 		debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE
-	
+
 	# Create cache directory structure (will be created by postinst)
 	mkdir -p debian/dms-greeter/var/cache/dms-greeter
-	
+
 	# Remove build and development files
 	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/core
 	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/distro

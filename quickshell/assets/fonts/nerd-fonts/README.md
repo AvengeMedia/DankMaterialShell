@@ -45,4 +45,3 @@ Once you narrow down your font choice of family (`Droid Sans`, `Inconsolata`, et
 For more information see: [The FAQ](https://github.com/ryanoasis/nerd-fonts/wiki/FAQ-and-Troubleshooting#which-font)
 
 [SIL-RFN]:http://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web_fonts_and_RFNs#14cbfd4a
-
