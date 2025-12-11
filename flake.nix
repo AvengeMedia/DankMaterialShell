@@ -40,6 +40,16 @@
             (import path (args // { dmsPkgs = buildDmsPkgs pkgs; }))
           ];
         };
+      mkQmlImportPath =
+        pkgs: qmlPkgs:
+        pkgs.lib.concatStringsSep ":" (map (o: "${o}/${pkgs.qt6.qtbase.qtQmlPrefix}") qmlPkgs);
+
+      qmlPkgs =
+        pkgs: with pkgs.kdePackages; [
+          kirigami.unwrapped
+          sonnet
+          qtmultimedia
+        ];
     in
     {
       packages = forEachSystem (
@@ -96,7 +106,9 @@
                 install -D ${rootSrc}/core/assets/danklogo.svg \
                   $out/share/hicolor/scalable/apps/danklogo.svg
 
-                wrapProgram $out/bin/dms --add-flags "-c $out/share/quickshell/dms"
+                wrapProgram $out/bin/dms \
+                  --add-flags "-c $out/share/quickshell/dms" \
+                  --prefix "NIXPKGS_QT6_QML_IMPORT_PATH" ":" "${mkQmlImportPath pkgs (qmlPkgs pkgs)}"
 
                 install -Dm644 ${rootSrc}/assets/systemd/dms.service \
                   $out/lib/systemd/user/dms.service
@@ -143,15 +155,11 @@
       devShells = forEachSystem (
         system: pkgs:
         let
-          qmlPkgs = [
+          devQmlPkgs = [
             quickshell.packages.${system}.default
+            pkgs.kdePackages.qtdeclarative
           ]
-          ++ (with pkgs.kdePackages; [
-            qtdeclarative
-            kirigami.unwrapped
-            sonnet
-            qtmultimedia
-          ]);
+          ++ (qmlPkgs pkgs);
         in
         {
           default = pkgs.mkShell {
@@ -164,13 +172,13 @@
                 go-tools
                 gnumake
               ]
-              ++ qmlPkgs;
+              ++ devQmlPkgs;
 
             shellHook = ''
               touch quickshell/.qmlls.ini 2>/dev/null
             '';
 
-            QML2_IMPORT_PATH = pkgs.lib.concatStringsSep ":" (map (o: "${o}/lib/qt-6/qml") qmlPkgs);
+            QML2_IMPORT_PATH = mkQmlImportPath pkgs devQmlPkgs;
           };
         }
       );

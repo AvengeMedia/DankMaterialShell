@@ -23,8 +23,7 @@ in
   ]
   ++ lib.optional cfg.enableDynamicTheming pkgs.matugen
   ++ lib.optional cfg.enableAudioWavelength pkgs.cava
-  ++ lib.optional cfg.enableCalendarEvents pkgs.khal
-  ++ lib.optional cfg.enableSystemSound pkgs.kdePackages.qtmultimedia;
+  ++ lib.optional cfg.enableCalendarEvents pkgs.khal;
 
   plugins = lib.mapAttrs (name: plugin: {
     source = plugin.src;

@@ -16,6 +16,9 @@ in
   imports = [
     (lib.mkRemovedOptionModule (path ++ [ "enableBrightnessControl" ]) builtInRemovedMsg)
     (lib.mkRemovedOptionModule (path ++ [ "enableColorPicker" ]) builtInRemovedMsg)
+    (lib.mkRemovedOptionModule (
+      path ++ [ "enableSystemSound" ]
+    ) "qtmultimedia is now included on dms-shell package.")
   ];
 
   options.programs.dankMaterialShell = {
@@ -57,11 +60,6 @@ in
       type = types.bool;
       default = true;
       description = "Add calendar events support via khal";
-    };
-    enableSystemSound = lib.mkOption {
-      type = types.bool;
-      default = true;
-      description = "Add needed dependencies to have system sound support";
     };
     quickshell = {
       package = lib.mkPackageOption dmsPkgs "quickshell" {
