@@ -171,11 +171,13 @@
                 delve
                 go-tools
                 gnumake
+                prek
               ]
               ++ devQmlPkgs;
 
             shellHook = ''
               touch quickshell/.qmlls.ini 2>/dev/null
+              if [ ! -f .git/hooks/pre-commit ]; then prek install; fi
             '';
 
             QML2_IMPORT_PATH = mkQmlImportPath pkgs devQmlPkgs;
