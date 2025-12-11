@@ -44,28 +44,6 @@ in
         description = "The default session are only read if the session.json file don't exist";
       };
     };
-
-    plugins = lib.mkOption {
-      type = attrsOf (
-        types.submodule (
-          {
-            options = {
-              enable = lib.mkOption {
-                type = types.bool;
-                default = true;
-                description = "Whether to link this plugin";
-              };
-              src = lib.mkOption {
-                type = types.path;
-                description = "Source to link to DMS plugins directory";
-              };
-            };
-          }
-        )
-      );
-      default = { };
-      description = "DMS Plugins to install";
-    };
   };
 
   config = lib.mkIf cfg.enable {
