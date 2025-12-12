@@ -371,7 +371,7 @@ func (o *OpenSUSEDistribution) InstallPackages(ctx context.Context, dependencies
 		o.log(fmt.Sprintf("Warning: failed to write window manager config: %v", err))
 	}
 
-	if err := o.EnableDMSService(ctx); err != nil {
+	if err := o.EnableDMSService(ctx, wm); err != nil {
 		o.log(fmt.Sprintf("Warning: failed to enable dms service: %v", err))
 	}
 

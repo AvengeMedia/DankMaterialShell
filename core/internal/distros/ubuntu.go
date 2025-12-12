@@ -331,7 +331,7 @@ func (u *UbuntuDistribution) InstallPackages(ctx context.Context, dependencies [
 		u.log(fmt.Sprintf("Warning: failed to write window manager config: %v", err))
 	}
 
-	if err := u.EnableDMSService(ctx); err != nil {
+	if err := u.EnableDMSService(ctx, wm); err != nil {
 		u.log(fmt.Sprintf("Warning: failed to enable dms service: %v", err))
 	}
 

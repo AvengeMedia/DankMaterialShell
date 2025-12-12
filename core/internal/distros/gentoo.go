@@ -410,7 +410,7 @@ func (g *GentooDistribution) InstallPackages(ctx context.Context, dependencies [
 		g.log(fmt.Sprintf("Warning: failed to write window manager config: %v", err))
 	}
 
-	if err := g.EnableDMSService(ctx); err != nil {
+	if err := g.EnableDMSService(ctx, wm); err != nil {
 		g.log(fmt.Sprintf("Warning: failed to enable dms service: %v", err))
 	}
 

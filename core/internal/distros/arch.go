@@ -344,7 +344,7 @@ func (a *ArchDistribution) InstallPackages(ctx context.Context, dependencies []d
 		a.log(fmt.Sprintf("Warning: failed to write window manager config: %v", err))
 	}
 
-	if err := a.EnableDMSService(ctx); err != nil {
+	if err := a.EnableDMSService(ctx, wm); err != nil {
 		a.log(fmt.Sprintf("Warning: failed to enable dms service: %v", err))
 	}
 
