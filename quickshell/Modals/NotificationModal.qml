@@ -98,6 +98,12 @@ DankModal {
             return "NOTIFICATION_MODAL_TOGGLE_SUCCESS";
         }
 
+        function toggleDoNotDisturb(): string {
+	    SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
+
+            return "NOTIFICATION_MODAL_TOGGLE_DND_SUCCESS";
+        }
+
         target: "notifications"
     }
 
