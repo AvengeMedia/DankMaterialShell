@@ -66,6 +66,19 @@ Singleton {
         onTriggered: root.doGenerateNiriLayoutConfig()
     }
 
+    property int _lastGapValue: -1
+
+    Connections {
+        target: SettingsData
+        function onBarConfigsChanged() {
+            const newGaps = Math.max(4, (SettingsData.barConfigs[0]?.spacing ?? 4));
+            if (newGaps === root._lastGapValue)
+                return;
+            root._lastGapValue = newGaps;
+            generateNiriLayoutConfig();
+        }
+    }
+
     Process {
         id: validateProcess
         command: ["niri", "validate"]
