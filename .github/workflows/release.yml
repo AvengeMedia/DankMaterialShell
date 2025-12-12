@@ -1,16 +1,19 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g., v1.0.1)'
+        required: true
+        type: string
 
 permissions:
   contents: write
   actions: write
 
 concurrency:
-  group: release-${{ github.ref_name }}
+  group: release-${{ inputs.tag }}
   cancel-in-progress: true
 
 jobs:
@@ -24,10 +27,14 @@ jobs:
       run:
         working-directory: core
 
+    env:
+      TAG: ${{ inputs.tag }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag }}
           fetch-depth: 0
 
       - name: Set up Go
@@ -54,7 +61,7 @@ jobs:
         run: |
           set -eux
           cd cmd/dankinstall
-          go build -trimpath -ldflags "-s -w -X main.Version=${GITHUB_REF#refs/tags/}" \
+          go build -trimpath -ldflags "-s -w -X main.Version=${TAG}" \
             -o ../../dankinstall-${{ matrix.arch }}
           cd ../..
           gzip -9 -k dankinstall-${{ matrix.arch }}
@@ -68,7 +75,7 @@ jobs:
         run: |
           set -eux
           cd cmd/dms
-          go build -trimpath -ldflags "-s -w -X main.Version=${GITHUB_REF#refs/tags/}" \
+          go build -trimpath -ldflags "-s -w -X main.Version=${TAG}" \
             -o ../../dms-${{ matrix.arch }}
           cd ../..
           gzip -9 -k dms-${{ matrix.arch }}
@@ -91,7 +98,7 @@ jobs:
         run: |
           set -eux
           cd cmd/dms
-          go build -trimpath -tags distro_binary -ldflags "-s -w -X main.Version=${GITHUB_REF#refs/tags/}" \
+          go build -trimpath -tags distro_binary -ldflags "-s -w -X main.Version=${TAG}" \
             -o ../../dms-distropkg-${{ matrix.arch }}
           cd ../..
           gzip -9 -k dms-distropkg-${{ matrix.arch }}
@@ -171,17 +178,18 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build-core] #, update-versions]
     env:
-      TAG: ${{ github.ref_name }}
+      TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ inputs.tag }}
           fetch-depth: 0
 
       - name: Fetch updated tag after version bump
         run: |
-          git fetch origin --force tag ${{ github.ref_name }}
-          git checkout ${{ github.ref_name }}
+          git fetch origin --force tag ${TAG}
+          git checkout ${TAG}
 
       - name: Download core artifacts
         uses: actions/download-artifact@v4
@@ -391,9 +399,13 @@ jobs:
   trigger-obs-update:
     runs-on: ubuntu-latest
     needs: release
+    env:
+      TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Install OSC
         run: |
@@ -413,16 +425,19 @@ jobs:
 
       - name: Update OBS packages
         run: |
-          VERSION="${{ github.ref_name }}"
           cd distro
-          bash scripts/obs-upload.sh dms "Update to $VERSION"
+          bash scripts/obs-upload.sh dms "Update to ${TAG}"
 
   trigger-ppa-update:
     runs-on: ubuntu-latest
     needs: release
+    env:
+      TAG: ${{ inputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Install build dependencies
         run: |
@@ -446,7 +461,6 @@ jobs:
 
       - name: Upload to PPA
         run: |
-          VERSION="${{ github.ref_name }}"
           cd distro/ubuntu/ppa
           bash create-and-upload.sh ../dms dms questing
 
@@ -454,11 +468,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     env:
-      TAG: ${{ github.ref_name }}
+      TAG: ${{ inputs.tag }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Determine version
         id: version
