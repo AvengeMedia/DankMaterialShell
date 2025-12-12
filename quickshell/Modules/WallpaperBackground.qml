@@ -57,15 +57,11 @@ Variants {
                 }
             }
             onTransitionTypeChanged: {
-                if (transitionType === "random") {
-                    if (SessionData.includedTransitions.length === 0) {
-                        actualTransitionType = "none";
-                    } else {
-                        actualTransitionType = SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)];
-                    }
-                } else {
+                if (transitionType !== "random") {
                     actualTransitionType = transitionType;
+                    return;
                 }
+                actualTransitionType = SessionData.includedTransitions.length === 0 ? "none" : SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)];
             }
 
             property real transitionProgress: 0
@@ -108,30 +104,33 @@ Variants {
             }
 
             Component.onCompleted: {
-                if (source) {
-                    const formattedSource = source.startsWith("file://") ? source : "file://" + source;
-                    setWallpaperImmediate(formattedSource);
+                if (!source) {
+                    isInitialized = true;
+                    return;
                 }
+                const formattedSource = source.startsWith("file://") ? source : "file://" + source;
+                setWallpaperImmediate(formattedSource);
                 isInitialized = true;
             }
 
             onSourceChanged: {
-                const isColor = source.startsWith("#");
-
-                if (!source) {
+                if (!source || source.startsWith("#")) {
                     setWallpaperImmediate("");
-                } else if (isColor) {
-                    setWallpaperImmediate("");
-                } else {
-                    if (!isInitialized || !currentWallpaper.source) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
-                        isInitialized = true;
-                    } else if (CompositorService.isNiri && SessionData.isSwitchingMode) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
-                    } else {
-                        changeWallpaper(source.startsWith("file://") ? source : "file://" + source);
-                    }
+                    return;
                 }
+
+                const formattedSource = source.startsWith("file://") ? source : "file://" + source;
+
+                if (!isInitialized || !currentWallpaper.source) {
+                    setWallpaperImmediate(formattedSource);
+                    isInitialized = true;
+                    return;
+                }
+                if (CompositorService.isNiri && SessionData.isSwitchingMode) {
+                    setWallpaperImmediate(formattedSource);
+                    return;
+                }
+                changeWallpaper(formattedSource);
             }
 
             function setWallpaperImmediate(newSource) {
@@ -143,8 +142,6 @@ Variants {
             }
 
             function startTransition() {
-                currentWallpaper.cache = true;
-                nextWallpaper.cache = true;
                 currentWallpaper.layer.enabled = true;
                 nextWallpaper.layer.enabled = true;
                 root.useNextForEffect = true;
@@ -153,9 +150,14 @@ Variants {
                     srcCurrent.scheduleUpdate();
                 if (srcNext.scheduleUpdate)
                     srcNext.scheduleUpdate();
-                Qt.callLater(() => {
-                    transitionAnimation.start();
-                });
+                transitionDelayTimer.start();
+            }
+
+            Timer {
+                id: transitionDelayTimer
+                interval: 16
+                repeat: false
+                onTriggered: transitionAnimation.start()
             }
 
             function changeWallpaper(newPath, force) {
@@ -163,23 +165,17 @@ Variants {
                     return;
                 if (!newPath || newPath.startsWith("#"))
                     return;
-
                 if (root.transitioning || root.effectActive) {
                     root.pendingWallpaper = newPath;
                     return;
                 }
-
                 if (!currentWallpaper.source) {
                     setWallpaperImmediate(newPath);
                     return;
                 }
 
                 if (root.transitionType === "random") {
-                    if (SessionData.includedTransitions.length === 0) {
-                        root.actualTransitionType = "none";
-                    } else {
-                        root.actualTransitionType = SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)];
-                    }
+                    root.actualTransitionType = SessionData.includedTransitions.length === 0 ? "none" : SessionData.includedTransitions[Math.floor(Math.random() * SessionData.includedTransitions.length)];
                 }
 
                 if (root.actualTransitionType === "none") {
@@ -187,21 +183,26 @@ Variants {
                     return;
                 }
 
-                if (root.actualTransitionType === "wipe") {
+                switch (root.actualTransitionType) {
+                case "wipe":
                     root.wipeDirection = Math.random() * 4;
-                } else if (root.actualTransitionType === "disc" || root.actualTransitionType === "pixelate" || root.actualTransitionType === "portal") {
+                    break;
+                case "disc":
+                case "pixelate":
+                case "portal":
                     root.discCenterX = Math.random();
                     root.discCenterY = Math.random();
-                } else if (root.actualTransitionType === "stripes") {
+                    break;
+                case "stripes":
                     root.stripesCount = Math.round(Math.random() * 20 + 4);
                     root.stripesAngle = Math.random() * 360;
+                    break;
                 }
 
                 nextWallpaper.source = newPath;
 
-                if (nextWallpaper.status === Image.Ready) {
+                if (nextWallpaper.status === Image.Ready)
                     root.startTransition();
-                }
             }
 
             Loader {
@@ -214,9 +215,9 @@ Variants {
                 }
             }
 
-            property real screenScale: CompositorService.getScreenScale(modelData)
-            property int physicalWidth: Math.round(modelData.width * screenScale)
-            property int physicalHeight: Math.round(modelData.height * screenScale)
+            readonly property int maxTextureSize: 8192
+            property int textureWidth: Math.min(modelData.width, maxTextureSize)
+            property int textureHeight: Math.min(modelData.height, maxTextureSize)
 
             Image {
                 id: currentWallpaper
@@ -227,7 +228,7 @@ Variants {
                 asynchronous: true
                 smooth: true
                 cache: true
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
+                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
                 fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
             }
 
@@ -239,8 +240,8 @@ Variants {
                 layer.enabled: false
                 asynchronous: true
                 smooth: true
-                cache: false
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
+                cache: true
+                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
                 fillMode: root.getFillMode(SettingsData.wallpaperFillMode)
 
                 onStatusChanged: {
@@ -263,7 +264,7 @@ Variants {
                 live: root.effectActive
                 mipmap: false
                 recursive: false
-                textureSize: root.effectActive ? Qt.size(root.physicalWidth, root.physicalHeight) : Qt.size(1, 1)
+                textureSize: Qt.size(root.textureWidth, root.textureHeight)
             }
 
             ShaderEffectSource {
@@ -273,7 +274,7 @@ Variants {
                 live: root.effectActive
                 mipmap: false
                 recursive: false
-                textureSize: root.effectActive ? Qt.size(root.physicalWidth, root.physicalHeight) : Qt.size(1, 1)
+                textureSize: Qt.size(root.textureWidth, root.textureHeight)
             }
 
             Rectangle {
@@ -297,8 +298,9 @@ Variants {
                 id: effectLoader
                 anchors.fill: parent
                 active: root.effectActive
-                sourceComponent: {
-                    switch (root.actualTransitionType) {
+
+                function getTransitionComponent(type) {
+                    switch (type) {
                     case "fade":
                         return fadeComp;
                     case "wipe":
@@ -317,6 +319,8 @@ Variants {
                         return null;
                     }
                 }
+
+                sourceComponent: getTransitionComponent(root.actualTransitionType)
             }
 
             Component {
@@ -491,17 +495,13 @@ Variants {
                     root.transitionProgress = 0.0;
                     currentWallpaper.layer.enabled = false;
                     nextWallpaper.layer.enabled = false;
-                    currentWallpaper.cache = true;
-                    nextWallpaper.cache = false;
                     root.effectActive = false;
 
-                    if (root.pendingWallpaper) {
-                        var pending = root.pendingWallpaper;
-                        root.pendingWallpaper = "";
-                        Qt.callLater(() => {
-                            root.changeWallpaper(pending, true);
-                        });
-                    }
+                    if (!root.pendingWallpaper)
+                        return;
+                    var pending = root.pendingWallpaper;
+                    root.pendingWallpaper = "";
+                    Qt.callLater(() => root.changeWallpaper(pending, true));
                 }
             }
 

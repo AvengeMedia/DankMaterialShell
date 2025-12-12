@@ -79,10 +79,12 @@ Variants {
             }
 
             Component.onCompleted: {
-                if (source) {
-                    const formattedSource = source.startsWith("file://") ? source : "file://" + source;
-                    setWallpaperImmediate(formattedSource);
+                if (!source) {
+                    isInitialized = true;
+                    return;
                 }
+                const formattedSource = source.startsWith("file://") ? source : "file://" + source;
+                setWallpaperImmediate(formattedSource);
                 isInitialized = true;
             }
 
@@ -93,22 +95,23 @@ Variants {
             property bool useNextForEffect: false
 
             onSourceChanged: {
-                const isColor = source.startsWith("#");
-
-                if (!source) {
+                if (!source || source.startsWith("#")) {
                     setWallpaperImmediate("");
-                } else if (isColor) {
-                    setWallpaperImmediate("");
-                } else {
-                    if (!isInitialized || !currentWallpaper.source) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
-                        isInitialized = true;
-                    } else if (CompositorService.isNiri && SessionData.isSwitchingMode) {
-                        setWallpaperImmediate(source.startsWith("file://") ? source : "file://" + source);
-                    } else {
-                        changeWallpaper(source.startsWith("file://") ? source : "file://" + source);
-                    }
+                    return;
                 }
+
+                const formattedSource = source.startsWith("file://") ? source : "file://" + source;
+
+                if (!isInitialized || !currentWallpaper.source) {
+                    setWallpaperImmediate(formattedSource);
+                    isInitialized = true;
+                    return;
+                }
+                if (CompositorService.isNiri && SessionData.isSwitchingMode) {
+                    setWallpaperImmediate(formattedSource);
+                    return;
+                }
+                changeWallpaper(formattedSource);
             }
 
             function setWallpaperImmediate(newSource) {
@@ -120,15 +123,18 @@ Variants {
             }
 
             function startTransition() {
-                currentWallpaper.cache = true;
-                nextWallpaper.cache = true;
                 root.useNextForEffect = true;
                 root.effectActive = true;
                 if (srcNext.scheduleUpdate)
                     srcNext.scheduleUpdate();
-                Qt.callLater(() => {
-                    transitionAnimation.start();
-                });
+                transitionDelayTimer.start();
+            }
+
+            Timer {
+                id: transitionDelayTimer
+                interval: 16
+                repeat: false
+                onTriggered: transitionAnimation.start()
             }
 
             function changeWallpaper(newPath) {
@@ -143,7 +149,6 @@ Variants {
                     currentWallpaper.source = nextWallpaper.source;
                     nextWallpaper.source = "";
                 }
-
                 if (!currentWallpaper.source) {
                     setWallpaperImmediate(newPath);
                     return;
@@ -151,9 +156,8 @@ Variants {
 
                 nextWallpaper.source = newPath;
 
-                if (nextWallpaper.status === Image.Ready) {
+                if (nextWallpaper.status === Image.Ready)
                     root.startTransition();
-                }
             }
 
             Loader {
@@ -166,9 +170,9 @@ Variants {
                 }
             }
 
-            property real screenScale: CompositorService.getScreenScale(modelData)
-            property int physicalWidth: Math.round(modelData.width * screenScale)
-            property int physicalHeight: Math.round(modelData.height * screenScale)
+            readonly property int maxTextureSize: 8192
+            property int textureWidth: Math.min(modelData.width, maxTextureSize)
+            property int textureHeight: Math.min(modelData.height, maxTextureSize)
 
             Image {
                 id: currentWallpaper
@@ -178,7 +182,7 @@ Variants {
                 asynchronous: true
                 smooth: true
                 cache: true
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
+                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
                 fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SettingsData.wallpaperFillMode)
             }
 
@@ -189,8 +193,8 @@ Variants {
                 opacity: 0
                 asynchronous: true
                 smooth: true
-                cache: false
-                sourceSize: Qt.size(root.physicalWidth, root.physicalHeight)
+                cache: true
+                sourceSize: Qt.size(root.textureWidth, root.textureHeight)
                 fillMode: root.getFillMode(SessionData.isGreeterMode ? GreetdSettings.wallpaperFillMode : SettingsData.wallpaperFillMode)
 
                 onStatusChanged: {
@@ -209,7 +213,7 @@ Variants {
                 live: root.effectActive
                 mipmap: false
                 recursive: false
-                textureSize: root.effectActive ? Qt.size(root.physicalWidth, root.physicalHeight) : Qt.size(1, 1)
+                textureSize: Qt.size(root.textureWidth, root.textureHeight)
             }
 
             Rectangle {
@@ -265,19 +269,12 @@ Variants {
                 duration: 1000
                 easing.type: Easing.InOutCubic
                 onFinished: {
-                    if (nextWallpaper.source && nextWallpaper.status === Image.Ready) {
+                    if (nextWallpaper.source && nextWallpaper.status === Image.Ready)
                         currentWallpaper.source = nextWallpaper.source;
-                    }
                     root.useNextForEffect = false;
-                    Qt.callLater(() => {
-                        nextWallpaper.source = "";
-                        Qt.callLater(() => {
-                            root.effectActive = false;
-                            currentWallpaper.cache = true;
-                            nextWallpaper.cache = false;
-                            root.transitionProgress = 0.0;
-                        });
-                    });
+                    nextWallpaper.source = "";
+                    root.transitionProgress = 0.0;
+                    root.effectActive = false;
                 }
             }
         }
