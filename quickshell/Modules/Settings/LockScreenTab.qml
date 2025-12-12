@@ -26,43 +26,38 @@ Item {
                 title: I18n.tr("Lock Screen layout")
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show Power Actions")
-                    description: I18n.tr("Show power, restart, and logout buttons on the lock screen")
+                    text: I18n.tr("Show Power Actions", "Enable power action icon on the lock screen window")
                     checked: SettingsData.lockScreenShowPowerActions
                     onToggled: checked => SettingsData.set("lockScreenShowPowerActions", checked)
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show System icons")
-                    description: I18n.tr("Show system icons on the lock screen")
+                    text: I18n.tr("Show System Icons", "Enable system status icons on the lock screen window")
                     checked: SettingsData.lockScreenShowSystemIcons
                     onToggled: checked => SettingsData.set("lockScreenShowSystemIcons", checked)
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show Time")
-                    description: I18n.tr("Show system time on the lock screen")
+                    text: I18n.tr("Show System Time", "Enable system time display on the lock screen window")
                     checked: SettingsData.lockScreenShowTime
                     onToggled: checked => SettingsData.set("lockScreenShowTime", checked)
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show Date")
-                    description: I18n.tr("Show system date on the lock screen")
+                    text: I18n.tr("Show System Date", "Enable system date display on the lock screen window")
                     checked: SettingsData.lockScreenShowDate
                     onToggled: checked => SettingsData.set("lockScreenShowDate", checked)
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show Profile image")
-                    description: I18n.tr("Show profile image on the lock screen")
+                    text: I18n.tr("Show Profile Image", "Enable profile image display on the lock screen window")
                     checked: SettingsData.lockScreenShowProfileImage
                     onToggled: checked => SettingsData.set("lockScreenShowProfileImage", checked)
                 }
 
                 SettingsToggleRow {
-                    text: I18n.tr("Show Password field")
-                    description: I18n.tr("If hidden the field will be displayed as soon as the password is typed")
+                    text: I18n.tr("Show Password Field", "Enable password field display on the lock screen window")
+                    description: I18n.tr("If the field is hidden, it will appear as soon as a key is pressed.")
                     checked: SettingsData.lockScreenShowPasswordField
                     onToggled: checked => SettingsData.set("lockScreenShowPasswordField", checked)
                 }
