@@ -314,7 +314,8 @@ Singleton {
                 const keyData = {
                     key: bind.key || "",
                     source: bind.source || "config",
-                    isOverride: bind.source === "dms"
+                    isOverride: bind.source === "dms",
+                    cooldownMs: bind.cooldownMs || 0
                 };
                 if (actionMap[action]) {
                     actionMap[action].keys.push(keyData);
@@ -378,6 +379,8 @@ Singleton {
         const cmd = ["dms", "keybinds", "set", currentProvider, bindData.key, bindData.action, "--desc", bindData.desc || ""];
         if (originalKey && originalKey !== bindData.key)
             cmd.push("--replace-key", originalKey);
+        if (bindData.cooldownMs > 0)
+            cmd.push("--cooldown-ms", String(bindData.cooldownMs));
         saveProcess.command = cmd;
         saveProcess.running = true;
         bindSaved(bindData.key);

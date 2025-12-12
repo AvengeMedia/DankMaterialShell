@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/sblinch/kdl-go"
@@ -17,6 +18,7 @@ type NiriKeyBinding struct {
 	Args          []string
 	Description   string
 	HideOnOverlay bool
+	CooldownMs    int
 	Source        string
 }
 
@@ -275,6 +277,7 @@ func (p *NiriParser) parseKeybindNode(node *document.Node, _ string) *NiriKeyBin
 
 	var description string
 	var hideOnOverlay bool
+	var cooldownMs int
 	if node.Properties != nil {
 		if val, ok := node.Properties.Get("hotkey-overlay-title"); ok {
 			switch val.ValueString() {
@@ -283,6 +286,9 @@ func (p *NiriParser) parseKeybindNode(node *document.Node, _ string) *NiriKeyBin
 			default:
 				description = val.ValueString()
 			}
+		}
+		if val, ok := node.Properties.Get("cooldown-ms"); ok {
+			cooldownMs, _ = strconv.Atoi(val.String())
 		}
 	}
 
@@ -293,6 +299,7 @@ func (p *NiriParser) parseKeybindNode(node *document.Node, _ string) *NiriKeyBin
 		Args:          args,
 		Description:   description,
 		HideOnOverlay: hideOnOverlay,
+		CooldownMs:    cooldownMs,
 		Source:        p.currentSource,
 	}
 }

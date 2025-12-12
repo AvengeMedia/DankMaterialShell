@@ -23,6 +23,8 @@ Item {
     property string editKey: ""
     property string editAction: ""
     property string editDesc: ""
+    property int editCooldownMs: 0
+    property int _savedCooldownMs: -1
     property bool hasChanges: false
     property string _actionType: ""
     property bool addingNewKey: false
@@ -90,6 +92,12 @@ Item {
                 editKey = keyToFind;
                 editAction = bindData.action || "";
                 editDesc = bindData.desc || "";
+                if (_savedCooldownMs >= 0) {
+                    editCooldownMs = _savedCooldownMs;
+                    _savedCooldownMs = -1;
+                } else {
+                    editCooldownMs = keys[i].cooldownMs || 0;
+                }
                 hasChanges = false;
                 _actionType = Actions.getActionType(editAction);
                 useCustomCompositor = _actionType === "compositor" && editAction && !Actions.isKnownCompositorAction(editAction);
@@ -109,6 +117,7 @@ Item {
         editKey = editingKeyIndex >= 0 ? keys[editingKeyIndex].key : "";
         editAction = bindData.action || "";
         editDesc = bindData.desc || "";
+        editCooldownMs = editingKeyIndex >= 0 ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
         hasChanges = false;
         _actionType = Actions.getActionType(editAction);
         useCustomCompositor = _actionType === "compositor" && editAction && !Actions.isKnownCompositorAction(editAction);
@@ -127,6 +136,7 @@ Item {
         addingNewKey = false;
         editingKeyIndex = index;
         editKey = keys[index].key;
+        editCooldownMs = keys[index].cooldownMs || 0;
         hasChanges = false;
     }
 
@@ -137,8 +147,11 @@ Item {
             editAction = changes.action;
         if (changes.desc !== undefined)
             editDesc = changes.desc;
+        if (changes.cooldownMs !== undefined)
+            editCooldownMs = changes.cooldownMs;
         const origKey = editingKeyIndex >= 0 && editingKeyIndex < keys.length ? keys[editingKeyIndex].key : "";
-        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== (bindData.desc || "");
+        const origCooldown = editingKeyIndex >= 0 && editingKeyIndex < keys.length ? (keys[editingKeyIndex].cooldownMs || 0) : 0;
+        hasChanges = editKey !== origKey || editAction !== (bindData.action || "") || editDesc !== (bindData.desc || "") || editCooldownMs !== origCooldown;
     }
 
     function canSave() {
@@ -156,10 +169,12 @@ Item {
         let desc = editDesc;
         if (expandedLoader.item?.currentTitle !== undefined)
             desc = expandedLoader.item.currentTitle;
+        _savedCooldownMs = editCooldownMs;
         saveBind(origKey, {
             key: editKey,
             action: editAction,
-            desc: desc
+            desc: desc,
+            cooldownMs: editCooldownMs
         });
         hasChanges = false;
         addingNewKey = false;
@@ -1428,6 +1443,57 @@ Item {
                         onTextChanged: root.updateEdit({
                             desc: text
                         })
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Theme.spacingM
+
+                    StyledText {
+                        text: I18n.tr("Cooldown")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceVariantText
+                        Layout.preferredWidth: 60
+                    }
+
+                    DankTextField {
+                        id: cooldownField
+                        Layout.preferredWidth: 100
+                        Layout.preferredHeight: 40
+                        placeholderText: "0"
+
+                        Connections {
+                            target: root
+                            function onEditCooldownMsChanged() {
+                                const newText = root.editCooldownMs > 0 ? String(root.editCooldownMs) : "";
+                                if (cooldownField.text !== newText)
+                                    cooldownField.text = newText;
+                            }
+                        }
+
+                        Component.onCompleted: {
+                            text = root.editCooldownMs > 0 ? String(root.editCooldownMs) : "";
+                        }
+
+                        onTextChanged: {
+                            const val = parseInt(text) || 0;
+                            if (val !== root.editCooldownMs)
+                                root.updateEdit({
+                                    cooldownMs: val
+                                });
+                        }
+                    }
+
+                    StyledText {
+                        text: I18n.tr("ms")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
                     }
                 }
 

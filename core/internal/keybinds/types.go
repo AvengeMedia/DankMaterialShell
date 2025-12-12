@@ -7,6 +7,7 @@ type Keybind struct {
 	Subcategory   string   `json:"subcat,omitempty"`
 	Source        string   `json:"source,omitempty"`
 	HideOnOverlay bool     `json:"hideOnOverlay,omitempty"`
+	CooldownMs    int      `json:"cooldownMs,omitempty"`
 	Conflict      *Keybind `json:"conflict,omitempty"`
 }
 

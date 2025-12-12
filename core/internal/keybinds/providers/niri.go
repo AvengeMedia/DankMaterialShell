@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/keybinds"
@@ -153,6 +154,7 @@ func (n *NiriProvider) convertKeybind(kb *NiriKeyBinding, subcategory string, co
 		Subcategory:   subcategory,
 		Source:        source,
 		HideOnOverlay: kb.HideOnOverlay,
+		CooldownMs:    kb.CooldownMs,
 	}
 
 	if source == "dms" && conflicts != nil {
@@ -310,7 +312,9 @@ func (n *NiriProvider) extractOptions(node *document.Node) map[string]any {
 		opts["repeat"] = val.String() == "true"
 	}
 	if val, ok := node.Properties.Get("cooldown-ms"); ok {
-		opts["cooldown-ms"] = val.String()
+		if ms, err := strconv.Atoi(val.String()); err == nil {
+			opts["cooldown-ms"] = ms
+		}
 	}
 	if val, ok := node.Properties.Get("allow-when-locked"); ok {
 		opts["allow-when-locked"] = val.String() == "true"
@@ -336,7 +340,14 @@ func (n *NiriProvider) buildBindNode(bind *overrideBind) *document.Node {
 			node.AddProperty("repeat", false, "")
 		}
 		if v, ok := bind.Options["cooldown-ms"]; ok {
-			node.AddProperty("cooldown-ms", v, "")
+			switch val := v.(type) {
+			case int:
+				node.AddProperty("cooldown-ms", val, "")
+			case string:
+				if ms, err := strconv.Atoi(val); err == nil {
+					node.AddProperty("cooldown-ms", ms, "")
+				}
+			}
 		}
 		if v, ok := bind.Options["allow-when-locked"]; ok && v == true {
 			node.AddProperty("allow-when-locked", true, "")
