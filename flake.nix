@@ -44,6 +44,10 @@
         pkgs: qmlPkgs:
         pkgs.lib.concatStringsSep ":" (map (o: "${o}/${pkgs.qt6.qtbase.qtQmlPrefix}") qmlPkgs);
 
+      mkQtPluginPath =
+        pkgs: qtPkgs:
+        pkgs.lib.concatStringsSep ":" (map (o: "${o}/${pkgs.qt6.qtbase.qtPluginPrefix}") qtPkgs);
+
       qmlPkgs =
         pkgs: with pkgs.kdePackages; [
           kirigami.unwrapped
@@ -108,7 +112,8 @@
 
                 wrapProgram $out/bin/dms \
                   --add-flags "-c $out/share/quickshell/dms" \
-                  --prefix "NIXPKGS_QT6_QML_IMPORT_PATH" ":" "${mkQmlImportPath pkgs (qmlPkgs pkgs)}"
+                  --prefix "NIXPKGS_QT6_QML_IMPORT_PATH" ":" "${mkQmlImportPath pkgs (qmlPkgs pkgs)}" \
+                  --prefix "QT_PLUGIN_PATH" ":" "${mkQtPluginPath pkgs (qmlPkgs pkgs)}"
 
                 install -Dm644 ${rootSrc}/assets/systemd/dms.service \
                   $out/lib/systemd/user/dms.service
@@ -183,6 +188,7 @@
             '';
 
             QML2_IMPORT_PATH = mkQmlImportPath pkgs devQmlPkgs;
+            QT_PLUGIN_PATH = mkQtPluginPath pkgs devQmlPkgs;
           };
         }
       );
