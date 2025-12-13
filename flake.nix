@@ -179,6 +179,10 @@
 
                 prek
                 uv # for prek
+
+                # Nix development tools
+                nixd
+                nil
               ]
               ++ devQmlPkgs;
 
