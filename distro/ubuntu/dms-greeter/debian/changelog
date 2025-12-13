@@ -1,5 +1,5 @@
-dms-greeter (0.6.2ppa3) questing; urgency=medium
+dms-greeter (1.0.2ppa1) questing; urgency=medium
 
-  * Rebuild for packaging fixes (ppa3)
+  * Upstream release 1.0.2
 
- -- Avenge Media <AvengeMedia.US@gmail.com>  Thu, 27 Nov 2025 23:38:37 -0500
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Sat, 13 Dec 2025 04:56:48 +0000
