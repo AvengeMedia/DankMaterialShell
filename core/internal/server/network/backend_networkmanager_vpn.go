@@ -880,29 +880,24 @@ func (b *NetworkManagerBackend) ImportVPN(filePath string, name string) (*VPNImp
 }
 
 func (b *NetworkManagerBackend) importVPNWithNmcli(filePath string, name string) (*VPNImportResult, error) {
-	args := []string{"connection", "import", "type", "openvpn", "file", filePath}
-	cmd := exec.Command("nmcli", args...)
-	output, err := cmd.CombinedOutput()
+	vpnTypes := []string{"openvpn", "wireguard", "vpnc", "pptp", "l2tp", "openconnect", "strongswan"}
+
+	var output []byte
+	var err error
+	for _, vpnType := range vpnTypes {
+		args := []string{"connection", "import", "type", vpnType, "file", filePath}
+		cmd := exec.Command("nmcli", args...)
+		output, err = cmd.CombinedOutput()
+		if err == nil {
+			break
+		}
+	}
 
 	if err != nil {
-		outputStr := string(output)
-		if strings.Contains(outputStr, "vpnc") || strings.Contains(outputStr, "unknown connection type") {
-			for _, vpnType := range []string{"vpnc", "pptp", "l2tp", "openconnect", "strongswan", "wireguard"} {
-				args = []string{"connection", "import", "type", vpnType, "file", filePath}
-				cmd = exec.Command("nmcli", args...)
-				output, err = cmd.CombinedOutput()
-				if err == nil {
-					break
-				}
-			}
-		}
-
-		if err != nil {
-			return &VPNImportResult{
-				Success: false,
-				Error:   fmt.Sprintf("import failed: %s", strings.TrimSpace(string(output))),
-			}, nil
-		}
+		return &VPNImportResult{
+			Success: false,
+			Error:   fmt.Sprintf("import failed: %s", strings.TrimSpace(string(output))),
+		}, nil
 	}
 
 	outputStr := string(output)
