@@ -204,10 +204,6 @@ Singleton {
                 "label": "Vibrant",
                 "description": I18n.tr("Lively palette with saturated accents.")
             }), ({
-                "value": "scheme-dynamic-contrast",
-                "label": "Dynamic Contrast",
-                "description": I18n.tr("High-contrast palette for strong visual distinction.")
-            }), ({
                 "value": "scheme-content",
                 "label": "Content",
                 "description": I18n.tr("Derives colors that closely match the underlying image.")
