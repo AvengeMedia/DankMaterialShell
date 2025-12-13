@@ -216,8 +216,9 @@ Variants {
             }
 
             readonly property int maxTextureSize: 8192
-            property int textureWidth: Math.min(modelData.width, maxTextureSize)
-            property int textureHeight: Math.min(modelData.height, maxTextureSize)
+            property real screenScale: CompositorService.getScreenScale(modelData)
+            property int textureWidth: Math.min(Math.round(modelData.width * screenScale), maxTextureSize)
+            property int textureHeight: Math.min(Math.round(modelData.height * screenScale), maxTextureSize)
 
             Image {
                 id: currentWallpaper
