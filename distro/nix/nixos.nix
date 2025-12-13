@@ -6,7 +6,7 @@
   ...
 }@args:
 let
-  cfg = config.programs.dankMaterialShell;
+  cfg = config.programs.dank-material-shell;
   common = import ./common.nix {
     inherit
       config

@@ -7,7 +7,7 @@ let
   inherit (lib) types;
   path = [
     "programs"
-    "dankMaterialShell"
+    "dank-material-shell"
   ];
 
   builtInRemovedMsg = "This is now built-in in DMS and doesn't need additional dependencies.";
@@ -20,16 +20,17 @@ in
     (lib.mkRemovedOptionModule (
       path ++ [ "enableSystemSound" ]
     ) "qtmultimedia is now included on dms-shell package.")
+    ./dms-rename.nix
   ];
 
-  options.programs.dankMaterialShell = {
+  options.programs.dank-material-shell = {
     enable = lib.mkEnableOption "DankMaterialShell";
     systemd = {
       enable = lib.mkEnableOption "DankMaterialShell systemd startup";
       restartIfChanged = lib.mkOption {
         type = types.bool;
         default = true;
-        description = "Auto-restart dms.service when dankMaterialShell changes";
+        description = "Auto-restart dms.service when dank-material-shell changes";
       };
     };
     enableSystemMonitoring = lib.mkOption {

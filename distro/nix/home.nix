@@ -6,7 +6,7 @@
   ...
 }@args:
 let
-  cfg = config.programs.dankMaterialShell;
+  cfg = config.programs.dank-material-shell;
   jsonFormat = pkgs.formats.json { };
   common = import ./common.nix {
     inherit
@@ -22,16 +22,16 @@ in
     (import ./options.nix args)
     (lib.mkRemovedOptionModule [
       "programs"
-      "dankMaterialShell"
+      "dank-material-shell"
       "enableNightMode"
     ] "Night mode is now always available.")
     (lib.mkRenamedOptionModule
-      [ "programs" "dankMaterialShell" "enableSystemd" ]
-      [ "programs" "dankMaterialShell" "systemd" "enable" ]
+      [ "programs" "dank-material-shell" "enableSystemd" ]
+      [ "programs" "dank-material-shell" "systemd" "enable" ]
     )
   ];
 
-  options.programs.dankMaterialShell = with lib.types; {
+  options.programs.dank-material-shell = with lib.types; {
     default = {
       settings = lib.mkOption {
         type = jsonFormat.type;

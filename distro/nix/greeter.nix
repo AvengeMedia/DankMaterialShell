@@ -7,7 +7,7 @@
 }:
 let
   inherit (lib) types;
-  cfg = config.programs.dankMaterialShell.greeter;
+  cfg = config.programs.dank-material-shell.greeter;
 
   inherit (config.services.greetd.settings.default_session) user;
 
@@ -44,19 +44,20 @@ in
 {
   imports =
     let
-      msg = "The option 'programs.dankMaterialShell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dankMaterialShell.greeter.compositor.customConfig' instead.";
+      msg = "The option 'programs.dank-material-shell.greeter.compositor.extraConfig' is deprecated. Please use 'programs.dank-material-shell.greeter.compositor.customConfig' instead.";
     in
     [
       (lib.mkRemovedOptionModule [
         "programs"
-        "dankMaterialShell"
+        "dank-material-shell"
         "greeter"
         "compositor"
         "extraConfig"
       ] msg)
+      ./dms-rename.nix
     ];
 
-  options.programs.dankMaterialShell.greeter = {
+  options.programs.dank-material-shell.greeter = {
     enable = lib.mkEnableOption "DankMaterialShell greeter";
     compositor.name = lib.mkOption {
       type = types.enum [
@@ -177,7 +178,7 @@ in
       mv dms-colors.json colors.json || :
       chown ${user}: * || :
     '';
-    programs.dankMaterialShell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
+    programs.dank-material-shell.greeter.configFiles = lib.mkIf (cfg.configHome != null) [
       "${cfg.configHome}/.config/DankMaterialShell/settings.json"
       "${cfg.configHome}/.local/state/DankMaterialShell/session.json"
       "${cfg.configHome}/.cache/DankMaterialShell/dms-colors.json"

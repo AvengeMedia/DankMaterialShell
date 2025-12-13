@@ -4,10 +4,14 @@
   ...
 }:
 let
-  cfg = config.programs.dankMaterialShell;
+  cfg = config.programs.dank-material-shell;
 in
 {
-  options.programs.dankMaterialShell = {
+  imports = [
+    ./dms-rename.nix
+  ];
+
+  options.programs.dank-material-shell = {
     niri = {
       enableKeybinds = lib.mkEnableOption "DankMaterialShell niri keybinds";
       enableSpawn = lib.mkEnableOption "DankMaterialShell niri spawn-at-startup";

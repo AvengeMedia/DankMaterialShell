@@ -177,13 +177,13 @@ If you prefer the old method with separate shell scripts and config files:
 To install the greeter on NixOS add the repo to your flake inputs as described in the readme. Then somewhere in your NixOS config add this to imports:
 ```nix
 imports = [
-  inputs.dankMaterialShell.nixosModules.greeter
+  inputs.dank-material-shell.nixosModules.greeter
 ]
 ```
 
 Enable the greeter with this in your NixOS config:
 ```nix
-programs.dankMaterialShell.greeter = {
+programs.dank-material-shell.greeter = {
   enable = true;
   compositor.name = "niri"; # or set to hyprland
   configHome = "/home/user"; # optionally copyies that users DMS settings (and wallpaper if set) to the greeters data directory as root before greeter starts

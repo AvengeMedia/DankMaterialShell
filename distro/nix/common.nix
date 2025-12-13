@@ -6,7 +6,7 @@
   ...
 }:
 let
-  cfg = config.programs.dankMaterialShell;
+  cfg = config.programs.dank-material-shell;
 in
 {
   packages = [

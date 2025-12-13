@@ -163,7 +163,7 @@ quickshell -p quickshell/
   inputs.dms.url = "github:AvengeMedia/DankMaterialShell";
 
   # Use in home-manager or NixOS configuration
-  imports = [ inputs.dms.homeModules.dankMaterialShell.default ];
+  imports = [ inputs.dms.homeModules.dank-material-shell ];
 }
 ```
 
