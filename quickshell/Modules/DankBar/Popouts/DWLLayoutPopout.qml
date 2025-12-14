@@ -15,6 +15,7 @@ DankPopout {
         triggerY = y;
         triggerWidth = width;
         triggerSection = section;
+        triggerScreen = screen;
         root.screen = screen;
 
         storedBarThickness = barThickness !== undefined ? barThickness : (Theme.barHeight - 4);
@@ -101,6 +102,8 @@ DankPopout {
     positioning: ""
     screen: triggerScreen
     shouldBeVisible: false
+
+    onBackgroundClicked: close()
 
     content: Component {
         Rectangle {
