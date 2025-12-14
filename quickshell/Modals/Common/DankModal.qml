@@ -45,8 +45,9 @@ Item {
     property bool keepPopoutsOpen: false
     property var customKeyboardFocus: null
     property bool useOverlayLayer: false
+
+    readonly property alias backgroundWindow: contentWindow
     readonly property alias contentWindow: contentWindow
-    readonly property alias backgroundWindow: backgroundWindow
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
 
     signal opened
@@ -54,7 +55,8 @@ Item {
     signal backgroundClicked
 
     property bool animationsEnabled: true
-    readonly property bool useBackgroundWindow: true
+
+    readonly property bool useBackgroundWindow: false
 
     function open() {
         ModalManager.openModal(root);
@@ -62,13 +64,9 @@ Item {
         const focusedScreen = CompositorService.getFocusedScreen();
         if (focusedScreen) {
             contentWindow.screen = focusedScreen;
-            if (useBackgroundWindow)
-                backgroundWindow.screen = focusedScreen;
         }
         shouldBeVisible = true;
         contentWindow.visible = false;
-        if (useBackgroundWindow)
-            backgroundWindow.visible = true;
         Qt.callLater(() => {
             contentWindow.visible = true;
             shouldHaveFocus = false;
@@ -90,8 +88,6 @@ Item {
         shouldHaveFocus = false;
         closeTimer.stop();
         contentWindow.visible = false;
-        if (useBackgroundWindow)
-            backgroundWindow.visible = false;
         dialogClosed();
         Qt.callLater(() => animationsEnabled = true);
     }
@@ -127,8 +123,6 @@ Item {
             const newScreen = CompositorService.getFocusedScreen();
             if (newScreen) {
                 contentWindow.screen = newScreen;
-                if (useBackgroundWindow)
-                    backgroundWindow.screen = newScreen;
             }
         }
     }
@@ -139,8 +133,6 @@ Item {
         onTriggered: {
             if (!shouldBeVisible) {
                 contentWindow.visible = false;
-                if (useBackgroundWindow)
-                    backgroundWindow.visible = false;
                 dialogClosed();
             }
         }
@@ -177,65 +169,6 @@ Item {
         })(), dpr)
 
     PanelWindow {
-        id: backgroundWindow
-        visible: false
-        color: "transparent"
-
-        WlrLayershell.namespace: root.layerNamespace + ":background"
-        WlrLayershell.layer: WlrLayershell.Top
-        WlrLayershell.exclusiveZone: -1
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-
-        anchors {
-            top: true
-            left: true
-            right: true
-            bottom: true
-        }
-
-        mask: Region {
-            item: Rectangle {
-                x: root.alignedX
-                y: root.alignedY
-                width: root.shouldBeVisible ? root.alignedWidth : 0
-                height: root.shouldBeVisible ? root.alignedHeight : 0
-            }
-            intersection: Intersection.Xor
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
-            onClicked: mouse => {
-                const clickX = mouse.x;
-                const clickY = mouse.y;
-                const outsideContent = clickX < root.alignedX || clickX > root.alignedX + root.alignedWidth || clickY < root.alignedY || clickY > root.alignedY + root.alignedHeight;
-
-                if (!outsideContent)
-                    return;
-                root.backgroundClicked();
-            }
-        }
-
-        Rectangle {
-            id: background
-            anchors.fill: parent
-            color: "black"
-            opacity: root.showBackground && SettingsData.modalDarkenBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-            visible: root.showBackground && SettingsData.modalDarkenBackground
-
-            Behavior on opacity {
-                enabled: root.animationsEnabled
-                NumberAnimation {
-                    duration: root.animationDuration
-                    easing.type: Easing.BezierSpline
-                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
-                }
-            }
-        }
-    }
-
-    PanelWindow {
         id: contentWindow
         visible: false
         color: "transparent"
@@ -246,10 +179,8 @@ Item {
                 return WlrLayershell.Overlay;
             switch (Quickshell.env("DMS_MODAL_LAYER")) {
             case "bottom":
-                console.error("DankModal: 'bottom' layer is not valid for modals. Defaulting to 'top' layer.");
-                return WlrLayershell.Top;
             case "background":
-                console.error("DankModal: 'background' layer is not valid for modals. Defaulting to 'top' layer.");
+                console.error("DankModal: 'bottom'/'background' layer is not valid. Defaulting to 'top'.");
                 return WlrLayershell.Top;
             case "overlay":
                 return WlrLayershell.Overlay;
@@ -271,15 +202,16 @@ Item {
         anchors {
             left: true
             top: true
+            right: true
+            bottom: true
         }
 
         WlrLayershell.margins {
-            left: Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-            top: Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+            left: 0
+            top: 0
+            right: 0
+            bottom: 0
         }
-
-        implicitWidth: root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible) {
@@ -292,12 +224,45 @@ Item {
             }
         }
 
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
+            z: -2
+            onClicked: root.backgroundClicked()
+        }
+
+        Rectangle {
+            id: background
+            anchors.fill: parent
+            z: -1
+            color: "black"
+            opacity: root.showBackground && SettingsData.modalDarkenBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+
+            Behavior on opacity {
+                enabled: root.animationsEnabled
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+        }
+
         Item {
             id: modalContainer
-            x: shadowBuffer
-            y: shadowBuffer
+            x: root.alignedX
+            y: root.alignedY
             width: root.alignedWidth
             height: root.alignedHeight
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             readonly property bool slide: root.animationType === "slide"
             readonly property real offsetX: slide ? 15 : 0

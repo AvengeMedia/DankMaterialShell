@@ -13,7 +13,7 @@ DankModal {
     layerNamespace: "dms:clipboard"
 
     HyprlandFocusGrab {
-        windows: [clipboardHistoryModal.contentWindow, clipboardHistoryModal.backgroundWindow]
+        windows: [clipboardHistoryModal.contentWindow]
         active: clipboardHistoryModal.useHyprlandFocusGrab && clipboardHistoryModal.shouldHaveFocus
     }
 
