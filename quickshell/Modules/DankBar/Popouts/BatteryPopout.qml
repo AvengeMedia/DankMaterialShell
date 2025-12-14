@@ -552,22 +552,31 @@ DankPopout {
                     }
                 }
 
-                DankButtonGroup {
-                    property var profileModel: (typeof PowerProfiles !== "undefined") ? [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []) : [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
-                    property int currentProfileIndex: {
-                        if (typeof PowerProfiles === "undefined")
-                            return 1;
-                        return profileModel.findIndex(profile => root.isActiveProfile(profile));
-                    }
+                Item {
+                    width: parent.width
+                    height: profileButtonGroup.height * profileButtonGroup.scale
 
-                    model: profileModel.map(profile => Theme.getPowerProfileLabel(profile))
-                    currentIndex: currentProfileIndex
-                    selectionMode: "single"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    onSelectionChanged: (index, selected) => {
-                        if (!selected)
-                            return;
-                        root.setProfile(profileModel[index]);
+                    DankButtonGroup {
+                        id: profileButtonGroup
+
+                        property var profileModel: (typeof PowerProfiles !== "undefined") ? [PowerProfile.PowerSaver, PowerProfile.Balanced].concat(PowerProfiles.hasPerformanceProfile ? [PowerProfile.Performance] : []) : [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
+                        property int currentProfileIndex: {
+                            if (typeof PowerProfiles === "undefined")
+                                return 1;
+                            return profileModel.findIndex(profile => root.isActiveProfile(profile));
+                        }
+
+                        scale: Math.min(1, parent.width / implicitWidth)
+                        transformOrigin: Item.Center
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        model: profileModel.map(profile => Theme.getPowerProfileLabel(profile))
+                        currentIndex: currentProfileIndex
+                        selectionMode: "single"
+                        onSelectionChanged: (index, selected) => {
+                            if (!selected)
+                                return;
+                            root.setProfile(profileModel[index]);
+                        }
                     }
                 }
 
