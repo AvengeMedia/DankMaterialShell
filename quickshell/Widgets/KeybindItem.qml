@@ -54,6 +54,12 @@ Item {
     readonly property var _conflicts: editKey ? KeyUtils.getConflictingBinds(editKey, bindData.action, KeybindsService.getFlatBinds()) : []
     readonly property bool hasConflict: _conflicts.length > 0
 
+    readonly property real _inputHeight: Math.round(Theme.fontSizeMedium * 3)
+    readonly property real _chipHeight: Math.round(Theme.fontSizeSmall * 2.3)
+    readonly property real _buttonHeight: Math.round(Theme.fontSizeMedium * 2.3)
+    readonly property real _keysColumnWidth: Math.round(Theme.fontSizeSmall * 12)
+    readonly property real _labelWidth: Math.round(Theme.fontSizeSmall * 5)
+
     signal toggleExpand
     signal saveBind(string originalKey, var newData)
     signal removeBind(string key)
@@ -223,7 +229,7 @@ Item {
         Rectangle {
             id: collapsedRect
             width: parent.width
-            height: Math.max(52, keysColumn.implicitHeight + Theme.spacingM * 2)
+            height: Math.max(root._inputHeight + Theme.spacingM, keysColumn.implicitHeight + Theme.spacingM * 2)
             radius: root.isExpanded ? 0 : Theme.cornerRadius
             topLeftRadius: Theme.cornerRadius
             topRightRadius: Theme.cornerRadius
@@ -240,7 +246,7 @@ Item {
 
                 Column {
                     id: keysColumn
-                    Layout.preferredWidth: 140
+                    Layout.preferredWidth: root._keysColumnWidth
                     Layout.alignment: Qt.AlignVCenter
                     spacing: Theme.spacingXS
 
@@ -253,9 +259,9 @@ Item {
 
                             property bool isSelected: root.isExpanded && root.editingKeyIndex === index && !root.addingNewKey
 
-                            width: 140
-                            height: 28
-                            radius: 6
+                            width: root._keysColumnWidth
+                            height: root._chipHeight
+                            radius: root._chipHeight / 4
                             color: isSelected ? Theme.primary : Theme.surfaceVariant
 
                             Rectangle {
@@ -332,7 +338,7 @@ Item {
 
                         DankIcon {
                             name: "warning"
-                            size: 14
+                            size: Theme.iconSizeSmall
                             color: Theme.primary
                             visible: root.hasConfigConflict
                         }
@@ -352,7 +358,7 @@ Item {
 
                 DankIcon {
                     name: root.isExpanded ? "expand_less" : "expand_more"
-                    size: 20
+                    size: Theme.iconSize - 4
                     color: Theme.surfaceVariantText
                     Layout.alignment: Qt.AlignVCenter
                 }
@@ -360,7 +366,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                anchors.leftMargin: 140 + Theme.spacingM * 2
+                anchors.leftMargin: root._keysColumnWidth + Theme.spacingM * 2
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.toggleExpand()
             }
@@ -420,7 +426,7 @@ Item {
 
                             DankIcon {
                                 name: "warning"
-                                size: 16
+                                size: Theme.iconSizeSmall
                                 color: Theme.primary
                             }
 
@@ -461,7 +467,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     Flow {
@@ -478,8 +484,8 @@ Item {
                                 property bool isSelected: root.editingKeyIndex === index && !root.addingNewKey
 
                                 width: editKeyChipText.implicitWidth + Theme.spacingM
-                                height: 28
-                                radius: 6
+                                height: root._chipHeight
+                                radius: root._chipHeight / 4
                                 color: isSelected ? Theme.primary : Theme.surfaceVariant
 
                                 Rectangle {
@@ -509,9 +515,9 @@ Item {
                         }
 
                         Rectangle {
-                            width: 28
-                            height: 28
-                            radius: 6
+                            width: root._chipHeight
+                            height: root._chipHeight
+                            radius: root._chipHeight / 4
                             color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
                             visible: !root.isNew
 
@@ -523,7 +529,7 @@ Item {
 
                             DankIcon {
                                 name: "add"
-                                size: 16
+                                size: Theme.iconSizeSmall
                                 color: root.addingNewKey ? Theme.primaryText : Theme.surfaceVariantText
                                 anchors.centerIn: parent
                             }
@@ -548,13 +554,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     FocusScope {
                         id: captureScope
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         focus: root.recording
 
                         Component.onCompleted: {
@@ -596,12 +602,12 @@ Item {
 
                                 DankActionButton {
                                     id: recordBtn
-                                    width: 28
-                                    height: 28
+                                    width: root._chipHeight
+                                    height: root._chipHeight
                                     anchors.verticalCenter: parent.verticalCenter
                                     circular: false
                                     iconName: root.recording ? "close" : "radio_button_checked"
-                                    iconSize: 16
+                                    iconSize: Theme.iconSizeSmall
                                     iconColor: root.recording ? Theme.error : Theme.primary
                                     onClicked: root.recording ? root.stopRecording() : root.startRecording()
                                 }
@@ -703,8 +709,8 @@ Item {
                     }
 
                     Rectangle {
-                        Layout.preferredWidth: 40
-                        Layout.preferredHeight: 40
+                        Layout.preferredWidth: root._inputHeight
+                        Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
                         color: root.addingNewKey ? Theme.primary : Theme.surfaceVariant
                         visible: root.keys.length === 1 && !root.isNew
@@ -717,7 +723,7 @@ Item {
 
                         DankIcon {
                             name: "add"
-                            size: 18
+                            size: Theme.iconSizeSmall + 2
                             color: root.addingNewKey ? Theme.primaryText : Theme.surfaceVariantText
                             anchors.centerIn: parent
                         }
@@ -736,11 +742,11 @@ Item {
                     Layout.fillWidth: true
                     spacing: Theme.spacingS
                     visible: root.hasConflict
-                    Layout.leftMargin: 60 + Theme.spacingM
+                    Layout.leftMargin: root._labelWidth + Theme.spacingM
 
                     DankIcon {
                         name: "warning"
-                        size: 16
+                        size: Theme.iconSizeSmall
                         color: Theme.primary
                     }
 
@@ -762,7 +768,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     RowLayout {
@@ -785,7 +791,7 @@ Item {
                                     })
 
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 36
+                                Layout.preferredHeight: root._buttonHeight
                                 radius: Theme.cornerRadius
                                 color: root._actionType === modelData.id ? Theme.surfaceContainerHighest : Theme.surfaceContainer
                                 border.color: root._actionType === modelData.id ? Theme.outline : (typeArea.containsMouse ? Theme.outlineVariant : "transparent")
@@ -797,7 +803,7 @@ Item {
 
                                     DankIcon {
                                         name: typeDelegate.modelData.icon
-                                        size: 16
+                                        size: Theme.iconSizeSmall
                                         color: root._actionType === typeDelegate.modelData.id ? Theme.surfaceText : Theme.surfaceVariantText
                                     }
 
@@ -869,7 +875,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankDropdown {
@@ -913,14 +919,14 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                         visible: dmsArgsRow.hasAmountArg
                     }
 
                     DankTextField {
                         id: dmsAmountField
-                        Layout.preferredWidth: 80
-                        Layout.preferredHeight: 40
+                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 5.5)
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: "5"
                         visible: dmsArgsRow.hasAmountArg
 
@@ -961,14 +967,14 @@ Item {
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
                         Layout.leftMargin: dmsArgsRow.hasAmountArg ? Theme.spacingM : 0
-                        Layout.preferredWidth: dmsArgsRow.hasAmountArg ? -1 : 60
+                        Layout.preferredWidth: dmsArgsRow.hasAmountArg ? -1 : root._labelWidth
                         visible: dmsArgsRow.hasDeviceArg
                     }
 
                     DankTextField {
                         id: dmsDeviceField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: I18n.tr("leave empty for default")
                         visible: dmsArgsRow.hasDeviceArg
 
@@ -1006,7 +1012,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                         visible: dmsArgsRow.hasTabArg
                     }
 
@@ -1064,12 +1070,12 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankDropdown {
                         id: compositorCatDropdown
-                        Layout.preferredWidth: 120
+                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 8.5)
                         compactMode: true
                         currentValue: {
                             const base = root.editAction.split(" ")[0];
@@ -1108,8 +1114,8 @@ Item {
                     }
 
                     Rectangle {
-                        Layout.preferredWidth: 40
-                        Layout.preferredHeight: 40
+                        Layout.preferredWidth: root._inputHeight
+                        Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
                         color: Theme.surfaceVariant
 
@@ -1121,7 +1127,7 @@ Item {
 
                         DankIcon {
                             name: "edit"
-                            size: 18
+                            size: Theme.iconSizeSmall + 2
                             color: Theme.surfaceVariantText
                             anchors.centerIn: parent
                         }
@@ -1150,7 +1156,7 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     RowLayout {
@@ -1160,7 +1166,7 @@ Item {
                         DankTextField {
                             id: argValueField
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 40
+                            Layout.preferredHeight: root._inputHeight
                             visible: {
                                 const cfg = optionsRow.argConfig;
                                 if (!cfg?.config?.args)
@@ -1308,13 +1314,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankTextField {
                         id: customCompositorField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: I18n.tr("e.g., focus-workspace 3, resize-column -10")
                         text: root._actionType === "compositor" ? root.editAction : ""
                         onTextChanged: {
@@ -1327,8 +1333,8 @@ Item {
                     }
 
                     Rectangle {
-                        Layout.preferredWidth: 40
-                        Layout.preferredHeight: 40
+                        Layout.preferredWidth: root._inputHeight
+                        Layout.preferredHeight: root._inputHeight
                         radius: Theme.cornerRadius
                         color: Theme.surfaceVariant
 
@@ -1340,7 +1346,7 @@ Item {
 
                         DankIcon {
                             name: "list"
-                            size: 18
+                            size: Theme.iconSizeSmall + 2
                             color: Theme.surfaceVariantText
                             anchors.centerIn: parent
                         }
@@ -1371,13 +1377,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankTextField {
                         id: spawnTextField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: I18n.tr("e.g., firefox, kitty --title foo")
                         readonly property var _parsed: root._actionType === "spawn" ? Actions.parseSpawnCommand(root.editAction) : null
                         text: _parsed ? (_parsed.command + " " + _parsed.args.join(" ")).trim() : ""
@@ -1403,13 +1409,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankTextField {
                         id: shellTextField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: I18n.tr("e.g., notify-send 'Hello' && sleep 1")
                         text: root._actionType === "shell" ? Actions.parseShellCommand(root.editAction) : ""
                         onTextChanged: {
@@ -1431,13 +1437,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankTextField {
                         id: titleField
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 40
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: I18n.tr("Hotkey overlay title (optional)")
                         text: root.editDesc
                         onTextChanged: root.updateEdit({
@@ -1455,13 +1461,13 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Medium
                         color: Theme.surfaceVariantText
-                        Layout.preferredWidth: 60
+                        Layout.preferredWidth: root._labelWidth
                     }
 
                     DankTextField {
                         id: cooldownField
-                        Layout.preferredWidth: 100
-                        Layout.preferredHeight: 40
+                        Layout.preferredWidth: Math.round(Theme.fontSizeMedium * 7)
+                        Layout.preferredHeight: root._inputHeight
                         placeholderText: "0"
 
                         Connections {
@@ -1508,8 +1514,8 @@ Item {
                     spacing: Theme.spacingM
 
                     DankActionButton {
-                        Layout.preferredWidth: 32
-                        Layout.preferredHeight: 32
+                        Layout.preferredWidth: root._buttonHeight
+                        Layout.preferredHeight: root._buttonHeight
                         circular: false
                         iconName: "delete"
                         iconSize: Theme.iconSize - 4
@@ -1531,7 +1537,7 @@ Item {
 
                     DankButton {
                         text: I18n.tr("Cancel")
-                        buttonHeight: 32
+                        buttonHeight: root._buttonHeight
                         backgroundColor: Theme.surfaceContainer
                         textColor: Theme.surfaceText
                         visible: root.hasChanges || root.isNew
@@ -1547,7 +1553,7 @@ Item {
 
                     DankButton {
                         text: root.isNew ? I18n.tr("Add") : I18n.tr("Save")
-                        buttonHeight: 32
+                        buttonHeight: root._buttonHeight
                         enabled: root.canSave()
                         visible: root.hasChanges || root.isNew
                         onClicked: root.doSave()

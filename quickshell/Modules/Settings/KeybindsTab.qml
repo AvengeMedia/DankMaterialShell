@@ -229,7 +229,7 @@ Item {
                         DankTextField {
                             id: searchField
                             width: parent.width - addButton.width - Theme.spacingM
-                            height: 44
+                            height: Math.round(Theme.fontSizeMedium * 3)
                             placeholderText: I18n.tr("Search keybinds...")
                             leftIconName: "search"
                             onTextChanged: {
@@ -240,8 +240,8 @@ Item {
 
                         DankActionButton {
                             id: addButton
-                            width: 44
-                            height: 44
+                            width: searchField.height
+                            height: searchField.height
                             circular: false
                             iconName: "add"
                             iconSize: Theme.iconSize
@@ -331,7 +331,7 @@ Item {
                         Rectangle {
                             id: fixButton
                             width: fixButtonText.implicitWidth + Theme.spacingL * 2
-                            height: 36
+                            height: Math.round(Theme.fontSizeMedium * 2.5)
                             radius: Theme.cornerRadius
                             visible: warningBox.showError || warningBox.showSetup
                             color: KeybindsService.fixing ? Theme.withAlpha(Theme.error, 0.6) : Theme.error
@@ -382,9 +382,10 @@ Item {
                         spacing: Theme.spacingS
 
                         Rectangle {
+                            readonly property real chipHeight: allChip.implicitHeight + Theme.spacingM
                             width: allChip.implicitWidth + Theme.spacingL
-                            height: 32
-                            radius: 16
+                            height: chipHeight
+                            radius: chipHeight / 2
                             color: !keybindsTab.selectedCategory ? Theme.primary : Theme.surfaceContainerHighest
 
                             StyledText {
@@ -412,9 +413,10 @@ Item {
                                 required property string modelData
                                 required property int index
 
+                                readonly property real chipHeight: catText.implicitHeight + Theme.spacingM
                                 width: catText.implicitWidth + Theme.spacingL
-                                height: 32
-                                radius: 16
+                                height: chipHeight
+                                radius: chipHeight / 2
                                 color: keybindsTab.selectedCategory === modelData ? Theme.primary : (modelData === "__overrides__" ? Theme.withAlpha(Theme.primary, 0.15) : Theme.surfaceContainerHighest)
 
                                 StyledText {
