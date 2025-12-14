@@ -18,13 +18,16 @@ Item {
 
     function getDetailHeight(section) {
         const maxAvailable = parent ? parent.height - Theme.spacingS : 9999;
-        if (section === "wifi")
+        switch (true) {
+        case section === "wifi":
+        case section === "bluetooth":
+        case section === "builtin_vpn":
             return Math.min(350, maxAvailable);
-        if (section === "bluetooth")
-            return Math.min(350, maxAvailable);
-        if (section.startsWith("brightnessSlider_"))
+        case section.startsWith("brightnessSlider_"):
             return Math.min(400, maxAvailable);
-        return Math.min(250, maxAvailable);
+        default:
+            return Math.min(250, maxAvailable);
+        }
     }
 
     Loader {

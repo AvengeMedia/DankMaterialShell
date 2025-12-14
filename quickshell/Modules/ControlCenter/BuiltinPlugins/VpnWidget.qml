@@ -27,7 +27,7 @@ PluginComponent {
 
     ccDetailContent: Component {
         VpnDetailContent {
-            listHeight: 180
+            listHeight: 260
         }
     }
 }
