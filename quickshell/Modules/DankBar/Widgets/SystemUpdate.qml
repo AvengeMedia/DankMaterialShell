@@ -11,6 +11,9 @@ BasePill {
     readonly property bool hasUpdates: SystemUpdateService.updateCount > 0
     readonly property bool isChecking: SystemUpdateService.isChecking
 
+    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 2 : Theme.spacingS
+    width : (SettingsData.updaterHideWidget && !hasUpdates) ? 0 : (18 + horizontalPadding * 2)
+
     Ref {
         service: SystemUpdateService
     }

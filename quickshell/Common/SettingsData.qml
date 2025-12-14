@@ -352,6 +352,7 @@ Singleton {
     property string customPowerActionReboot: ""
     property string customPowerActionPowerOff: ""
 
+    property bool updaterHideWidget: false
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""

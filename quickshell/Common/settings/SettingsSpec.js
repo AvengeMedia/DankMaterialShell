@@ -250,6 +250,7 @@ var SPEC = {
     customPowerActionReboot: { def: "" },
     customPowerActionPowerOff: { def: "" },
 
+    updaterHideWidget: { def: false },
     updaterUseCustomCommand: { def: false },
     updaterCustomCommand: { def: "" },
     updaterTerminalAdditionalParams: { def: "" },

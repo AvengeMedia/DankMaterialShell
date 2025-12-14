@@ -24,6 +24,15 @@ Item {
                 title: I18n.tr("System Updater")
 
                 SettingsToggleRow {
+                    text: I18n.tr("Hide Updater Widget", "When updater widget is used, then hide it if no update found")
+                    description: I18n.tr("When updater widget is used, then hide it if no update found")
+                    checked: SettingsData.updaterHideWidget
+                    onToggled: checked => {
+                        SettingsData.set("updaterHideWidget", checked);
+                    }
+                }
+
+                SettingsToggleRow {
                     text: I18n.tr("Use Custom Command")
                     description: I18n.tr("Use custom command for update your system")
                     checked: SettingsData.updaterUseCustomCommand
