@@ -90,6 +90,7 @@ type headState struct {
 	modeIDs        []uint32
 	adaptiveSync   uint32
 	finished       bool
+	ready          bool
 }
 
 type modeState struct {

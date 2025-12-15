@@ -125,13 +125,45 @@ FocusScope {
         }
 
         Loader {
-            id: displaysLoader
+            id: displayConfigLoader
             anchors.fill: parent
-            active: root.currentIndex === 6
+            active: root.currentIndex === 24
             visible: active
             focus: active
 
-            sourceComponent: DisplaysTab {}
+            sourceComponent: DisplayConfigTab {}
+
+            onActiveChanged: {
+                if (active && item) {
+                    Qt.callLater(() => item.forceActiveFocus());
+                }
+            }
+        }
+
+        Loader {
+            id: gammaControlLoader
+            anchors.fill: parent
+            active: root.currentIndex === 25
+            visible: active
+            focus: active
+
+            sourceComponent: GammaControlTab {}
+
+            onActiveChanged: {
+                if (active && item) {
+                    Qt.callLater(() => item.forceActiveFocus());
+                }
+            }
+        }
+
+        Loader {
+            id: displayWidgetsLoader
+            anchors.fill: parent
+            active: root.currentIndex === 26
+            visible: active
+            focus: active
+
+            sourceComponent: DisplayWidgetsTab {}
 
             onActiveChanged: {
                 if (active && item) {

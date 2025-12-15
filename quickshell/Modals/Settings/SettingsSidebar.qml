@@ -145,6 +145,32 @@ Rectangle {
             "shortcutsOnly": true
         },
         {
+            "id": "displays",
+            "text": I18n.tr("Displays"),
+            "icon": "monitor",
+            "collapsedByDefault": true,
+            "children": [
+                {
+                    "id": "display_config",
+                    "text": I18n.tr("Configuration") + " (Beta)",
+                    "icon": "display_settings",
+                    "tabIndex": 24
+                },
+                {
+                    "id": "display_gamma",
+                    "text": I18n.tr("Gamma Control"),
+                    "icon": "brightness_6",
+                    "tabIndex": 25
+                },
+                {
+                    "id": "display_widgets",
+                    "text": I18n.tr("Widgets", "settings_displays"),
+                    "icon": "widgets",
+                    "tabIndex": 26
+                }
+            ]
+        },
+        {
             "id": "network",
             "text": I18n.tr("Network"),
             "icon": "wifi",
@@ -157,12 +183,6 @@ Rectangle {
             "icon": "computer",
             "collapsedByDefault": true,
             "children": [
-                {
-                    "id": "displays",
-                    "text": I18n.tr("Displays"),
-                    "icon": "monitor",
-                    "tabIndex": 6
-                },
                 {
                     "id": "printers",
                     "text": I18n.tr("Printers"),

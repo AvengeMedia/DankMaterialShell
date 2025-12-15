@@ -238,7 +238,7 @@ func (i *ZwlrOutputManagerV1) Dispatch(opcode uint32, fd int, data []byte) {
 		l := 0
 		objectID := client.Uint32(data[l : l+4])
 		proxy := i.Context().GetProxy(objectID)
-		if proxy == nil {
+		if proxy == nil || proxy.IsZombie() {
 			head := &ZwlrOutputHeadV1{}
 			head.SetContext(i.Context())
 			head.SetID(objectID)
@@ -723,7 +723,7 @@ func (i *ZwlrOutputHeadV1) Dispatch(opcode uint32, fd int, data []byte) {
 		l := 0
 		objectID := client.Uint32(data[l : l+4])
 		proxy := i.Context().GetProxy(objectID)
-		if proxy == nil {
+		if proxy == nil || proxy.IsZombie() {
 			mode := &ZwlrOutputModeV1{}
 			mode.SetContext(i.Context())
 			mode.SetID(objectID)
@@ -761,8 +761,8 @@ func (i *ZwlrOutputHeadV1) Dispatch(opcode uint32, fd int, data []byte) {
 		l := 0
 		objectID := client.Uint32(data[l : l+4])
 		proxy := i.Context().GetProxy(objectID)
-		if proxy == nil {
-			// Mode not yet registered, create it
+		if proxy == nil || proxy.IsZombie() {
+			// Mode not yet registered or zombie, create fresh
 			mode := &ZwlrOutputModeV1{}
 			mode.SetContext(i.Context())
 			mode.SetID(objectID)

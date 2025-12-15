@@ -7,10 +7,11 @@ DankModal {
     id: root
 
     property string outputName: ""
-    property var position: undefined
-    property var mode: undefined
-    property var vrr: undefined
-    property int countdown: 15
+    property var changes: []
+    property int countdown: 10
+
+    signal confirmed
+    signal reverted
 
     shouldBeVisible: false
     allowStacking: true
@@ -23,23 +24,27 @@ DankModal {
         repeat: true
         running: root.shouldBeVisible
         onTriggered: {
-            countdown--;
-            if (countdown <= 0) {
-                revert();
+            root.countdown--
+            if (root.countdown <= 0) {
+                root.reverted()
+                root.close()
             }
         }
     }
 
     onOpened: {
-        countdown = 15;
-        countdownTimer.start();
+        countdown = 10
+        countdownTimer.start()
     }
 
-    onClosed: {
-        countdownTimer.stop();
+    onDialogClosed: {
+        countdownTimer.stop()
     }
 
-    onBackgroundClicked: revert
+    onBackgroundClicked: {
+        root.reverted()
+        root.close()
+    }
 
     content: Component {
         FocusScope {
@@ -50,13 +55,15 @@ DankModal {
             implicitHeight: mainColumn.implicitHeight
 
             Keys.onEscapePressed: event => {
-                revert();
-                event.accepted = true;
+                root.reverted()
+                root.close()
+                event.accepted = true
             }
 
             Keys.onReturnPressed: event => {
-                confirm();
-                event.accepted = true;
+                root.confirmed()
+                root.close()
+                event.accepted = true
             }
 
             Column {
@@ -69,81 +76,42 @@ DankModal {
                 anchors.topMargin: Theme.spacingM
                 spacing: Theme.spacingM
 
-                Column {
-                    width: parent.width
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: I18n.tr("Confirm Display Changes")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
-
-                    StyledText {
-                        text: I18n.tr("Display settings for ") + outputName
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.surfaceTextMedium
-                    }
+                StyledText {
+                    text: I18n.tr("Confirm Display Changes")
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.surfaceText
+                    font.weight: Font.Medium
                 }
 
                 Rectangle {
                     width: parent.width
-                    height: 80
+                    height: 70
                     radius: Theme.cornerRadius
                     color: Theme.surfaceContainerHighest
 
-                    Column {
+                    StyledText {
                         anchors.centerIn: parent
-                        spacing: 4
-
-                        StyledText {
-                            text: I18n.tr("Reverting in:")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceTextMedium
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        StyledText {
-                            text: countdown + "s"
-                            font.pixelSize: Theme.fontSizeXLarge * 1.5
-                            color: Theme.primary
-                            font.weight: Font.Bold
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                        text: root.countdown + "s"
+                        font.pixelSize: Theme.fontSizeXLarge * 1.5
+                        color: Theme.primary
+                        font.weight: Font.Bold
                     }
                 }
 
                 Column {
                     width: parent.width
                     spacing: Theme.spacingXS
+                    visible: root.changes.length > 0
 
-                    StyledText {
-                        text: I18n.tr("Changes:")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceTextMedium
-                        font.weight: Font.Medium
-                    }
+                    Repeater {
+                        model: root.changes
 
-                    StyledText {
-                        visible: position !== undefined && position !== null
-                        text: I18n.tr("Position: ") + (position ? position.x + ", " + position.y : "")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                    }
-
-                    StyledText {
-                        visible: mode !== undefined && mode !== null && mode !== ""
-                        text: I18n.tr("Mode: ") + (mode || "")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
-                    }
-
-                    StyledText {
-                        visible: vrr !== undefined && vrr !== null
-                        text: I18n.tr("VRR: ") + (vrr ? I18n.tr("Enabled") : I18n.tr("Disabled"))
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceText
+                        StyledText {
+                            required property var modelData
+                            text: modelData
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
                     }
                 }
 
@@ -180,7 +148,10 @@ DankModal {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: revert
+                                onClicked: {
+                                    root.reverted()
+                                    root.close()
+                                }
                             }
                         }
 
@@ -206,7 +177,10 @@ DankModal {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: confirm
+                                onClicked: {
+                                    root.confirmed()
+                                    root.close()
+                                }
                             }
 
                             Behavior on color {
@@ -228,18 +202,11 @@ DankModal {
                 iconName: "close"
                 iconSize: Theme.iconSize - 4
                 iconColor: Theme.surfaceText
-                onClicked: revert
+                onClicked: {
+                    root.reverted()
+                    root.close()
+                }
             }
         }
-    }
-
-    function confirm() {
-        displaysTab.confirmChanges();
-        close();
-    }
-
-    function revert() {
-        displaysTab.revertChanges();
-        close();
     }
 }

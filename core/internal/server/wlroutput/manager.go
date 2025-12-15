@@ -145,6 +145,7 @@ func (m *Manager) handleHead(e wlr_output_management.ZwlrOutputManagerV1HeadEven
 	handle.SetNameHandler(func(e wlr_output_management.ZwlrOutputHeadV1NameEvent) {
 		log.Debugf("WlrOutput: Head %d name: %s", headID, e.Name)
 		head.name = e.Name
+		head.ready = true
 		m.post(func() {
 			m.updateState()
 		})
@@ -251,11 +252,11 @@ func (m *Manager) handleHead(e wlr_output_management.ZwlrOutputManagerV1HeadEven
 
 		m.heads.Delete(headID)
 
-		m.post(func() {
-			m.wlMutex.Lock()
-			handle.Release()
-			m.wlMutex.Unlock()
+		m.wlMutex.Lock()
+		handle.Release()
+		m.wlMutex.Unlock()
 
+		m.post(func() {
 			m.updateState()
 		})
 	})
@@ -310,11 +311,11 @@ func (m *Manager) handleMode(headID uint32, e wlr_output_management.ZwlrOutputHe
 
 		m.modes.Delete(modeID)
 
-		m.post(func() {
-			m.wlMutex.Lock()
-			handle.Release()
-			m.wlMutex.Unlock()
+		m.wlMutex.Lock()
+		handle.Release()
+		m.wlMutex.Unlock()
 
+		m.post(func() {
 			m.updateState()
 		})
 	})
@@ -325,6 +326,10 @@ func (m *Manager) updateState() {
 
 	m.heads.Range(func(key uint32, head *headState) bool {
 		if head.finished {
+			return true
+		}
+
+		if !head.ready {
 			return true
 		}
 
