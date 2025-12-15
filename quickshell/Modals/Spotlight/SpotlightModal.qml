@@ -11,7 +11,7 @@ DankModal {
     layerNamespace: "dms:spotlight"
 
     HyprlandFocusGrab {
-        windows: [spotlightModal.contentWindow]
+        windows: [spotlightModal.contentWindow, spotlightModal.backgroundWindow]
         active: spotlightModal.useHyprlandFocusGrab && spotlightModal.shouldHaveFocus
     }
 
