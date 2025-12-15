@@ -265,7 +265,13 @@ func (cd *ConfigDeployer) deployGhosttyConfig() ([]DeploymentResult, error) {
 
 	colorResult := DeploymentResult{
 		ConfigType: "Ghostty Colors",
-		Path:       filepath.Join(os.Getenv("HOME"), ".config", "ghostty", "config-dankcolors"),
+		Path:       filepath.Join(os.Getenv("HOME"), ".config", "ghostty", "themes", "dankcolors"),
+	}
+
+	themesDir := filepath.Dir(colorResult.Path)
+	if err := os.MkdirAll(themesDir, 0755); err != nil {
+		mainResult.Error = fmt.Errorf("failed to create themes directory: %w", err)
+		return []DeploymentResult{mainResult}, mainResult.Error
 	}
 
 	if err := os.WriteFile(colorResult.Path, []byte(GhosttyColorConfig), 0644); err != nil {
