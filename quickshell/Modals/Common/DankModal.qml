@@ -49,12 +49,14 @@ Item {
     readonly property alias backgroundWindow: backgroundWindow
     readonly property bool useHyprlandFocusGrab: CompositorService.useHyprlandFocusGrab
 
+    readonly property bool useSingleWindow: root.useHyprlandFocusGrab
+
     signal opened
     signal dialogClosed
     signal backgroundClicked
 
     property bool animationsEnabled: true
-    readonly property bool useBackgroundWindow: true
+    readonly property bool useBackgroundWindow: !useSingleWindow
 
     function open() {
         ModalManager.openModal(root);
@@ -205,7 +207,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
-            enabled: root.closeOnBackgroundClick && root.shouldBeVisible
+            enabled: root.useBackgroundWindow && root.closeOnBackgroundClick && root.shouldBeVisible
             onClicked: mouse => {
                 const clickX = mouse.x;
                 const clickY = mouse.y;
@@ -222,7 +224,7 @@ Item {
             anchors.fill: parent
             color: "black"
             opacity: root.showBackground && SettingsData.modalDarkenBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
-            visible: root.showBackground && SettingsData.modalDarkenBackground
+            visible: root.useBackgroundWindow && root.showBackground && SettingsData.modalDarkenBackground
 
             Behavior on opacity {
                 enabled: root.animationsEnabled
@@ -271,15 +273,19 @@ Item {
         anchors {
             left: true
             top: true
+            right: root.useSingleWindow ? true : undefined
+            bottom: root.useSingleWindow ? true : undefined
         }
 
         WlrLayershell.margins {
-            left: Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
-            top: Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+            left: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
+            top: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
+            right: 0
+            bottom: 0
         }
 
-        implicitWidth: root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.alignedHeight + (shadowBuffer * 2)
+        implicitWidth: root.useSingleWindow ? undefined : root.alignedWidth + (shadowBuffer * 2)
+        implicitHeight: root.useSingleWindow ? undefined : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible) {
@@ -292,12 +298,47 @@ Item {
             }
         }
 
+        MouseArea {
+            anchors.fill: parent
+            enabled: root.useSingleWindow && root.closeOnBackgroundClick && root.shouldBeVisible
+            z: -2
+            onClicked: root.backgroundClicked()
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            z: -1
+            color: "black"
+            opacity: root.showBackground && SettingsData.modalDarkenBackground ? (root.shouldBeVisible ? root.backgroundOpacity : 0) : 0
+            visible: root.useSingleWindow && root.showBackground && SettingsData.modalDarkenBackground
+
+            Behavior on opacity {
+                enabled: root.animationsEnabled
+                NumberAnimation {
+                    duration: root.animationDuration
+                    easing.type: Easing.BezierSpline
+                    easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                }
+            }
+        }
+
         Item {
             id: modalContainer
-            x: shadowBuffer
-            y: shadowBuffer
+            x: root.useSingleWindow ? root.alignedX : shadowBuffer
+            y: root.useSingleWindow ? root.alignedY : shadowBuffer
+
             width: root.alignedWidth
             height: root.alignedHeight
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.useSingleWindow
+                hoverEnabled: false
+                acceptedButtons: Qt.AllButtons
+                onPressed: mouse.accepted = true
+                onClicked: mouse.accepted = true
+                z: -1
+            }
 
             readonly property bool slide: root.animationType === "slide"
             readonly property real offsetX: slide ? 15 : 0
