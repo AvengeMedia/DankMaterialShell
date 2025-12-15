@@ -241,7 +241,7 @@ Item {
                 configFile: configDir + "/hypr/hyprland.conf",
                 outputsFile: configDir + "/hypr/dms/outputs.conf",
                 grepPattern: 'source.*dms/outputs.conf',
-                includeLine: "source = ~/.config/hypr/dms/outputs.conf"
+                includeLine: "source = ./dms/outputs.conf"
             }
         case "dwl":
             return {
@@ -297,8 +297,10 @@ Item {
             `echo '${paths.includeLine}' >> "${paths.configFile}"; fi`
         ], (output, exitCode) => {
             fixingInclude = false
-            if (exitCode === 0)
-                checkIncludeStatus()
+            if (exitCode !== 0)
+                return
+            checkIncludeStatus()
+            WlrOutputService.requestState()
         })
     }
 
@@ -974,36 +976,21 @@ Item {
                             }
                         }
 
-                        Rectangle {
+                        DankButton {
                             id: includeFixButton
-                            width: includeFixButtonText.implicitWidth + Theme.spacingL * 2
-                            height: Math.round(Theme.fontSizeMedium * 2.5)
-                            radius: Theme.cornerRadius
                             visible: includeWarningBox.showError || includeWarningBox.showSetup
-                            color: root.fixingInclude ? Theme.withAlpha(Theme.error, 0.6) : Theme.error
+                            text: {
+                                if (root.fixingInclude)
+                                    return I18n.tr("Fixing...")
+                                if (includeWarningBox.showSetup)
+                                    return I18n.tr("Setup")
+                                return I18n.tr("Fix Now")
+                            }
+                            backgroundColor: Theme.primary
+                            textColor: Theme.primaryText
+                            enabled: !root.fixingInclude
                             anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                id: includeFixButtonText
-                                text: {
-                                    if (root.fixingInclude)
-                                        return I18n.tr("Fixing...")
-                                    if (includeWarningBox.showSetup)
-                                        return I18n.tr("Setup")
-                                    return I18n.tr("Fix Now")
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surface
-                                anchors.centerIn: parent
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                enabled: !root.fixingInclude
-                                onClicked: root.fixOutputsInclude()
-                            }
+                            onClicked: root.fixOutputsInclude()
                         }
                     }
                 }

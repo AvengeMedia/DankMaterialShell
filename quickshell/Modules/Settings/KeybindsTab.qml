@@ -328,36 +328,21 @@ Item {
                             }
                         }
 
-                        Rectangle {
+                        DankButton {
                             id: fixButton
-                            width: fixButtonText.implicitWidth + Theme.spacingL * 2
-                            height: Math.round(Theme.fontSizeMedium * 2.5)
-                            radius: Theme.cornerRadius
                             visible: warningBox.showError || warningBox.showSetup
-                            color: KeybindsService.fixing ? Theme.withAlpha(Theme.error, 0.6) : Theme.error
+                            text: {
+                                if (KeybindsService.fixing)
+                                    return I18n.tr("Fixing...")
+                                if (warningBox.showSetup)
+                                    return I18n.tr("Setup")
+                                return I18n.tr("Fix Now")
+                            }
+                            backgroundColor: Theme.primary
+                            textColor: Theme.primaryText
+                            enabled: !KeybindsService.fixing
                             anchors.verticalCenter: parent.verticalCenter
-
-                            StyledText {
-                                id: fixButtonText
-                                text: {
-                                    if (KeybindsService.fixing)
-                                        return I18n.tr("Fixing...");
-                                    if (warningBox.showSetup)
-                                        return I18n.tr("Setup");
-                                    return I18n.tr("Fix Now");
-                                }
-                                font.pixelSize: Theme.fontSizeSmall
-                                font.weight: Font.Medium
-                                color: Theme.surface
-                                anchors.centerIn: parent
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                enabled: !KeybindsService.fixing
-                                onClicked: KeybindsService.fixDmsBindsInclude()
-                            }
+                            onClicked: KeybindsService.fixDmsBindsInclude()
                         }
                     }
                 }
