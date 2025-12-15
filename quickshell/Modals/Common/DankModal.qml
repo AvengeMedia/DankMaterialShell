@@ -284,8 +284,8 @@ Item {
             bottom: 0
         }
 
-        implicitWidth: root.useSingleWindow ? undefined : root.alignedWidth + (shadowBuffer * 2)
-        implicitHeight: root.useSingleWindow ? undefined : root.alignedHeight + (shadowBuffer * 2)
+        implicitWidth: root.useSingleWindow ? 0 : root.alignedWidth + (shadowBuffer * 2)
+        implicitHeight: root.useSingleWindow ? 0 : root.alignedHeight + (shadowBuffer * 2)
 
         onVisibleChanged: {
             if (visible) {

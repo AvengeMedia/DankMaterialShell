@@ -94,7 +94,7 @@ Item {
         switch (CompositorService.compositor) {
         case "niri":
             return parseNiriOutputs(content)
-        case "Hyprland":
+        case "hyprland":
             return parseHyprlandOutputs(content)
         case "dwl":
             return parseMangoOutputs(content)
@@ -236,7 +236,7 @@ Item {
                 grepPattern: 'include.*"dms/outputs.kdl"',
                 includeLine: 'include "dms/outputs.kdl"'
             }
-        case "Hyprland":
+        case "hyprland":
             return {
                 configFile: configDir + "/hypr/hyprland.conf",
                 outputsFile: configDir + "/hypr/dms/outputs.conf",
@@ -371,7 +371,7 @@ Item {
         case "niri":
             NiriService.generateOutputsConfig(outputsData)
             break
-        case "Hyprland":
+        case "hyprland":
             HyprlandService.generateOutputsConfig(outputsData)
             break
         case "dwl":
