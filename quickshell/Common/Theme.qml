@@ -918,6 +918,7 @@ Singleton {
 
     function buildMatugenColorsFromTheme(darkTheme, lightTheme) {
         const colors = {};
+        const isLight = SessionData !== "undefined" && SessionData.isLightMode;
 
         function addColor(matugenKey, darkVal, lightVal) {
             if (!darkVal && !lightVal)
@@ -930,7 +931,7 @@ Singleton {
                     "color": String(lightVal || darkVal)
                 },
                 "default": {
-                    "color": String(darkVal || lightVal)
+                    "color": String((isLight && lightVal) ? lightVal : darkVal)
                 }
             };
         }
