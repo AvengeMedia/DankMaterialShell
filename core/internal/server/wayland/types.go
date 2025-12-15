@@ -96,6 +96,9 @@ type Manager struct {
 
 	dbusConn   *dbus.Conn
 	dbusSignal chan *dbus.Signal
+
+	lastAppliedTemp  int
+	lastAppliedGamma float64
 }
 
 type outputState struct {
