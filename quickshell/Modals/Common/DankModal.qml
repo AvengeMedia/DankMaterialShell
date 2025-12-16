@@ -273,8 +273,8 @@ Item {
         anchors {
             left: true
             top: true
-            right: root.useSingleWindow ? true : undefined
-            bottom: root.useSingleWindow ? true : undefined
+            right: root.useSingleWindow
+            bottom: root.useSingleWindow
         }
 
         WlrLayershell.margins {
