@@ -548,7 +548,7 @@ Item {
         }
     }
 
-    function getWorkspaceIndex(modelData) {
+    function getWorkspaceIndex(modelData, index) {
         let isPlaceholder;
         if (root.useExtWorkspace) {
             isPlaceholder = modelData?.hidden === true;
@@ -976,7 +976,7 @@ Item {
                                         StyledText {
                                             id: wsIndexText
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: root.getWorkspaceIndex(modelData)
+                                            text: root.getWorkspaceIndex(modelData, index)
                                             color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
                                             font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
@@ -1203,12 +1203,12 @@ Item {
                     Loader {
                         id: indexLoader
                         anchors.fill: parent
-                        active: !isPlaceholder && SettingsData.showWorkspaceIndex && !loadedHasIcon && !SettingsData.showWorkspaceApps
+                        active: SettingsData.showWorkspaceIndex && !loadedHasIcon && !SettingsData.showWorkspaceApps
                         sourceComponent: Item {
                             StyledText {
                                 anchors.centerIn: parent
                                 text: {
-                                    return root.getWorkspaceIndex(modelData);
+                                    return root.getWorkspaceIndex(modelData, index);
                                 }
                                 color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                 font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
