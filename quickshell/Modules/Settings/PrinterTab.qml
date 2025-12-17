@@ -287,6 +287,7 @@ Item {
                                     id: deviceDropdown
                                     dropdownWidth: parent.width - 80 - scanDevicesBtn.width - Theme.spacingS * 2
                                     popupWidth: parent.width - 80 - scanDevicesBtn.width - Theme.spacingS * 2
+                                    enableFuzzySearch: true
                                     currentValue: {
                                         if (CupsService.loadingDevices)
                                             return I18n.tr("Scanning...");
@@ -365,6 +366,7 @@ Item {
                                     id: ppdDropdown
                                     dropdownWidth: parent.width - 80 - refreshPpdsBtn.width - Theme.spacingS * 2
                                     popupWidth: parent.width - 80 - refreshPpdsBtn.width - Theme.spacingS * 2
+                                    enableFuzzySearch: true
                                     currentValue: {
                                         if (CupsService.loadingPPDs)
                                             return I18n.tr("Loading...");
