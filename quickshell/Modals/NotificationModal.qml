@@ -57,6 +57,10 @@ DankModal {
         }
     }
 
+    function clearAll() {
+        NotificationService.clearAllNotifications();
+    }
+
     modalWidth: 500
     modalHeight: 700
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -102,6 +106,11 @@ DankModal {
             SessionData.setDoNotDisturb(!SessionData.doNotDisturb);
 
             return "NOTIFICATION_MODAL_TOGGLE_DND_SUCCESS";
+        }
+
+        function clearAll(): string {
+            notificationModal.clearAll();
+            return "NOTIFICATION_MODAL_CLEAR_ALL_SUCCESS";
         }
 
         target: "notifications"

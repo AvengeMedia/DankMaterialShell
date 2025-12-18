@@ -414,6 +414,9 @@ Singleton {
     }
 
     function clearAllNotifications() {
+        if (!notifications.length) {
+            return;
+        }
         bulkDismissing = true;
         popupsDisabled = true;
         addGate.stop();
