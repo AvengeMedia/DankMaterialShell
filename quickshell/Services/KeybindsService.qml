@@ -4,6 +4,8 @@ pragma ComponentBehavior: Bound
 import QtCore
 import QtQuick
 import Quickshell
+// Really needed for ShortcutInhibitor, don't remove
+import Quickshell.Wayland
 import Quickshell.Io
 import qs.Common
 import "../Common/KeybindActions.js" as Actions
