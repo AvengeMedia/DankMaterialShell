@@ -1,40 +1,49 @@
-# Feodra spec for DMS stable releases
+# Spec for DMS - uses rpkg macros for git builds
 
 %global debug_package %{nil}
-%global version VERSION_PLACEHOLDER
+%global version {{{ git_repo_version }}}
 %global pkg_summary DankMaterialShell - Material 3 inspired shell for Wayland compositors
 
 Name:           dms
+Epoch:          2
 Version:        %{version}
-Release:        RELEASE_PLACEHOLDER%{?dist}
+Release:        1%{?dist}
 Summary:        %{pkg_summary}
 
 License:        MIT
 URL:            https://github.com/AvengeMedia/DankMaterialShell
+VCS:            {{{ git_repo_vcs }}}
+Source0:        {{{ git_repo_pack }}}
 
-Source0:        dms-qml.tar.gz
-
+BuildRequires:  git-core
 BuildRequires:  gzip
+BuildRequires:  golang >= 1.24
+BuildRequires:  make
 BuildRequires:  wget
 BuildRequires:  systemd-rpm-macros
 
-Requires:       (quickshell or quickshell-git)
+# Core requirements
+Requires:       (quickshell-git or quickshell)
 Requires:       accountsservice
-Requires:       dms-cli = %{version}-%{release}
+Requires:       dms-cli = %{epoch}:%{version}-%{release}
 Requires:       dgop
 
+# Core utilities (Highly recommended for DMS functionality)
 Recommends:     cava
 Recommends:     cliphist
 Recommends:     danksearch
 Recommends:     matugen
+Recommends:     quickshell-git
 Recommends:     wl-clipboard
+
+# Recommended system packages
 Recommends:     NetworkManager
 Recommends:     qt6-qtmultimedia
 Suggests:       qt6ct
 
 %description
 DankMaterialShell (DMS) is a modern Wayland desktop shell built with Quickshell
-and optimized for the niri and hyprland compositors. Features notifications,
+and optimized for the niri, hyprland, sway, and dwl (MangoWC) compositors. Features notifications,
 app launcher, wallpaper customization, and fully customizable with plugins.
 
 Includes auto-theming for GTK/Qt apps with matugen, 20+ customizable widgets,
@@ -51,14 +60,24 @@ Command-line interface for DankMaterialShell configuration and management.
 Provides native DBus bindings, NetworkManager integration, and system utilities.
 
 %prep
-%setup -q -c -n dms-qml
+{{{ git_repo_setup_macro }}}
 
+%build
+# Build DMS CLI from source (core/subdirectory)
+VERSION="%{version}"
+COMMIT=$(echo "%{version}" | grep -oP '[a-f0-9]{7,}' | head -n1 || echo "unknown")
+
+cd core
+make dist VERSION="$VERSION" COMMIT="$COMMIT"
+
+%install
+# Install dms-cli binary (built from source)
 case "%{_arch}" in
   x86_64)
-    ARCH_SUFFIX="amd64"
+    DMS_BINARY="dms-linux-amd64"
     ;;
   aarch64)
-    ARCH_SUFFIX="arm64"
+    DMS_BINARY="dms-linux-arm64"
     ;;
   *)
     echo "Unsupported architecture: %{_arch}"
@@ -66,35 +85,27 @@ case "%{_arch}" in
     ;;
 esac
 
-# Download dms-cli for target architecture
-wget -O %{_builddir}/dms-cli.gz "https://github.com/AvengeMedia/DankMaterialShell/releases/latest/download/dms-distropkg-${ARCH_SUFFIX}.gz" || {
-  echo "Failed to download dms-cli for architecture %{_arch}"
-  exit 1
-}
-gunzip -c %{_builddir}/dms-cli.gz > %{_builddir}/dms-cli
-chmod +x %{_builddir}/dms-cli
-
-%build
-
-%install
-install -Dm755 %{_builddir}/dms-cli %{buildroot}%{_bindir}/dms
+install -Dm755 core/bin/${DMS_BINARY} %{buildroot}%{_bindir}/dms
 
 # Shell completions
 install -d %{buildroot}%{_datadir}/bash-completion/completions
 install -d %{buildroot}%{_datadir}/zsh/site-functions
 install -d %{buildroot}%{_datadir}/fish/vendor_completions.d
-%{_builddir}/dms-cli completion bash > %{buildroot}%{_datadir}/bash-completion/completions/dms || :
-%{_builddir}/dms-cli completion zsh > %{buildroot}%{_datadir}/zsh/site-functions/_dms || :
-%{_builddir}/dms-cli completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/dms.fish || :
+core/bin/${DMS_BINARY} completion bash > %{buildroot}%{_datadir}/bash-completion/completions/dms || :
+core/bin/${DMS_BINARY} completion zsh > %{buildroot}%{_datadir}/zsh/site-functions/_dms || :
+core/bin/${DMS_BINARY} completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/dms.fish || :
 
-install -Dm644 %{_builddir}/dms-qml/assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
+# Install systemd user service
+install -Dm644 assets/systemd/dms.service %{buildroot}%{_userunitdir}/dms.service
 
-install -Dm644 %{_builddir}/dms-qml/assets/dms-open.desktop %{buildroot}%{_datadir}/applications/dms-open.desktop
-install -Dm644 %{_builddir}/dms-qml/assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
+install -Dm644 assets/dms-open.desktop %{buildroot}%{_datadir}/applications/dms-open.desktop
+install -Dm644 assets/danklogo.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/danklogo.svg
 
+# Install shell files to shared data location
 install -dm755 %{buildroot}%{_datadir}/quickshell/dms
-cp -r %{_builddir}/dms-qml/* %{buildroot}%{_datadir}/quickshell/dms/
+cp -r quickshell/* %{buildroot}%{_datadir}/quickshell/dms/
 
+# Remove build files
 rm -rf %{buildroot}%{_datadir}/quickshell/dms/.git*
 rm -f %{buildroot}%{_datadir}/quickshell/dms/.gitignore
 rm -rf %{buildroot}%{_datadir}/quickshell/dms/.github
@@ -108,7 +119,8 @@ pkill -USR1 -x dms >/dev/null 2>&1 || :
 
 %files
 %license LICENSE
-%doc README.md CONTRIBUTING.md
+%doc CONTRIBUTING.md
+%doc quickshell/README.md
 %{_datadir}/quickshell/dms/
 %{_userunitdir}/dms.service
 %{_datadir}/applications/dms-open.desktop
@@ -121,6 +133,4 @@ pkill -USR1 -x dms >/dev/null 2>&1 || :
 %{_datadir}/fish/vendor_completions.d/dms.fish
 
 %changelog
-* CHANGELOG_DATE_PLACEHOLDER AvengeMedia <contact@avengemedia.com> - VERSION_PLACEHOLDER-RELEASE_PLACEHOLDER
-- Stable release VERSION_PLACEHOLDER
-- Built from GitHub release
+{{{ git_repo_changelog }}}
