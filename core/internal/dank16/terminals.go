@@ -112,3 +112,24 @@ func GenerateWeztermTheme(p Palette) string {
 		p.Color12.Hex, p.Color13.Hex, p.Color14.Hex, p.Color15.Hex)
 	return result.String()
 }
+
+func GenerateNeovimTheme(p Palette) string {
+	var result strings.Builder
+	fmt.Fprintf(&result, "vim.g.terminal_color_0 = \"%s\"\n", p.Color0.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_1 = \"%s\"\n", p.Color1.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_2 = \"%s\"\n", p.Color2.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_3 = \"%s\"\n", p.Color3.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_4 = \"%s\"\n", p.Color4.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_5 = \"%s\"\n", p.Color5.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_6 = \"%s\"\n", p.Color6.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_7 = \"%s\"\n", p.Color7.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_8 = \"%s\"\n", p.Color8.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_9 = \"%s\"\n", p.Color9.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_10 = \"%s\"\n", p.Color10.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_11 = \"%s\"\n", p.Color11.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_12 = \"%s\"\n", p.Color12.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_13 = \"%s\"\n", p.Color13.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_14 = \"%s\"\n", p.Color14.Hex)
+	fmt.Fprintf(&result, "vim.g.terminal_color_15 = \"%s\"\n", p.Color15.Hex)
+	return result.String()
+}

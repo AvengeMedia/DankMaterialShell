@@ -1,0 +1,3 @@
+[templates.dmsneovim]
+input_path = 'SHELL_DIR/matugen/templates/neovim.lua'
+output_path = '~/.config/nvim/lua/plugins/dankcolors.lua'

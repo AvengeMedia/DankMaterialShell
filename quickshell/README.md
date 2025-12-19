@@ -117,6 +117,7 @@ Templates in `scripts/templates/` generate themes for:
 - GTK 3/4
 - Qt5/Qt6
 - Alacritty, Kitty, Ghostty, Foot, Wezterm terminals
+- Neovim
 - VSCode/VSCodium
 - Firefox
 

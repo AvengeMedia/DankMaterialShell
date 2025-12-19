@@ -22,6 +22,7 @@ func init() {
 	dank16Cmd.Flags().Bool("json", false, "Output in JSON format")
 	dank16Cmd.Flags().Bool("kitty", false, "Output in Kitty terminal format")
 	dank16Cmd.Flags().Bool("foot", false, "Output in Foot terminal format")
+	dank16Cmd.Flags().Bool("neovim", false, "Output in Neovim plugin format")
 	dank16Cmd.Flags().Bool("alacritty", false, "Output in Alacritty terminal format")
 	dank16Cmd.Flags().Bool("ghostty", false, "Output in Ghostty terminal format")
 	dank16Cmd.Flags().Bool("wezterm", false, "Output in Wezterm terminal format")
@@ -40,6 +41,7 @@ func runDank16(cmd *cobra.Command, args []string) {
 	isJson, _ := cmd.Flags().GetBool("json")
 	isKitty, _ := cmd.Flags().GetBool("kitty")
 	isFoot, _ := cmd.Flags().GetBool("foot")
+	isNeovim, _ := cmd.Flags().GetBool("neovim")
 	isAlacritty, _ := cmd.Flags().GetBool("alacritty")
 	isGhostty, _ := cmd.Flags().GetBool("ghostty")
 	isWezterm, _ := cmd.Flags().GetBool("wezterm")
@@ -116,6 +118,8 @@ func runDank16(cmd *cobra.Command, args []string) {
 		fmt.Print(dank16.GenerateGhosttyTheme(colors))
 	} else if isWezterm {
 		fmt.Print(dank16.GenerateWeztermTheme(colors))
+	} else if isNeovim {
+		fmt.Print(dank16.GenerateNeovimTheme(colors))
 	} else {
 		fmt.Print(dank16.GenerateGhosttyTheme(colors))
 	}

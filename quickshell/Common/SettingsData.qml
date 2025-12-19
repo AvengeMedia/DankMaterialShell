@@ -282,6 +282,7 @@ Singleton {
     property bool matugenTemplateGhostty: true
     property bool matugenTemplateKitty: true
     property bool matugenTemplateFoot: true
+    property bool matugenTemplateNeovim: true
     property bool matugenTemplateAlacritty: true
     property bool matugenTemplateWezterm: true
     property bool matugenTemplateDgop: true

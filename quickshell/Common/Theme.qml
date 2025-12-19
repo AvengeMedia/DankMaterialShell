@@ -829,7 +829,7 @@ Singleton {
         if (typeof SettingsData !== "undefined") {
             const skipTemplates = [];
             if (!SettingsData.runDmsMatugenTemplates) {
-                skipTemplates.push("gtk", "niri", "qt5ct", "qt6ct", "firefox", "pywalfox", "vesktop", "ghostty", "kitty", "foot", "alacritty", "wezterm", "dgop", "kcolorscheme", "vscode");
+                skipTemplates.push("gtk", "neovim", "niri", "qt5ct", "qt6ct", "firefox", "pywalfox", "vesktop", "ghostty", "kitty", "foot", "alacritty", "wezterm", "dgop", "kcolorscheme", "vscode");
             } else {
                 if (!SettingsData.matugenTemplateGtk)
                     skipTemplates.push("gtk");
@@ -851,6 +851,8 @@ Singleton {
                     skipTemplates.push("kitty");
                 if (!SettingsData.matugenTemplateFoot)
                     skipTemplates.push("foot");
+                if (!SettingsData.matugenTemplateNeovim)
+                    skipTemplates.push("nvim");
                 if (!SettingsData.matugenTemplateAlacritty)
                     skipTemplates.push("alacritty");
                 if (!SettingsData.matugenTemplateWezterm)
