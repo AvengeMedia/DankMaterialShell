@@ -849,6 +849,17 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "neovim", "terminal", "template"]
+                    settingKey: "matugenTemplateNeovim"
+                    text: "neovim"
+                    description: "Requires lazy plugin manager"
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateNeovim
+                    onToggled: checked => SettingsData.set("matugenTemplateNeovim", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "alacritty", "terminal", "template"]
                     settingKey: "matugenTemplateAlacritty"
                     text: "Alacritty"

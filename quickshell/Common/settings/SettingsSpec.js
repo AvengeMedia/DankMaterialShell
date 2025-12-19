@@ -181,6 +181,7 @@ var SPEC = {
     matugenTemplateGhostty: { def: true },
     matugenTemplateKitty: { def: true },
     matugenTemplateFoot: { def: true },
+    matugenTemplateNeovim: { def: true },
     matugenTemplateAlacritty: { def: true },
     matugenTemplateWezterm: { def: true },
     matugenTemplateDgop: { def: true },

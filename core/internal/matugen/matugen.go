@@ -274,6 +274,9 @@ output_path = '%s'
 	if !opts.ShouldSkipTemplate("wezterm") {
 		appendTerminalConfig(opts, cfgFile, tmpDir, "wezterm", "wezterm.toml")
 	}
+	if !opts.ShouldSkipTemplate("nvim") {
+		appendTerminalConfig(opts, cfgFile, tmpDir, "nvim", "neovim.toml")
+	}
 
 	if !opts.ShouldSkipTemplate("dgop") {
 		appendConfig(opts, cfgFile, "dgop", "dgop.toml")
