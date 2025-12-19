@@ -30,7 +30,6 @@ Requires:       dgop
 
 # Core utilities (Highly recommended for DMS functionality)
 Recommends:     cava
-Recommends:     cliphist
 Recommends:     danksearch
 Recommends:     matugen
 Recommends:     quickshell-git
