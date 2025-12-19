@@ -61,6 +61,10 @@ DankModal {
         NotificationService.clearAllNotifications();
     }
 
+    function dismissAllPopups () {
+        NotificationService.dismissAllPopups();
+    }
+
     modalWidth: 500
     modalHeight: 700
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -111,6 +115,11 @@ DankModal {
         function clearAll(): string {
             notificationModal.clearAll();
             return "NOTIFICATION_MODAL_CLEAR_ALL_SUCCESS";
+        }
+
+        function dismissAllPopups(): string {
+            notificationModal.dismissAllPopups();
+            return "NOTIFICATION_MODAL_DISMISS_ALL_POPUPS_SUCCESS";
         }
 
         target: "notifications"

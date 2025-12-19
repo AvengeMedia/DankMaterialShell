@@ -1088,7 +1088,7 @@ Singleton {
         updateBarConfigs();
 
         if (positionChanged) {
-            NotificationService.clearAllPopups();
+            NotificationService.dismissAllPopups();
         }
     }
 
@@ -1233,7 +1233,7 @@ Singleton {
     }
 
     function sendTestNotifications() {
-        NotificationService.clearAllPopups();
+        NotificationService.dismissAllPopups();
         sendTestNotification(0);
         testNotifTimer1.start();
         testNotifTimer2.start();

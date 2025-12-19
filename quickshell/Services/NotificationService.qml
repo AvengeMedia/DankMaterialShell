@@ -403,7 +403,7 @@ Singleton {
         NotifWrapper {}
     }
 
-    function clearAllPopups() {
+    function dismissAllPopups() {
         for (const w of visibleNotifications) {
             if (w) {
                 w.popup = false;
