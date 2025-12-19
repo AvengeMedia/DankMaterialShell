@@ -3,6 +3,15 @@ name: DMS Copr Stable Release
 on:
   workflow_dispatch:
     inputs:
+      package:
+        description: 'Package to build (dms, dms-greeter, or both)'
+        required: false
+        default: 'dms'
+        type: choice
+        options:
+          - dms
+          - dms-greeter
+          - both
       version:
         description: 'Versioning (e.g., 1.0.3, leave empty for latest release)'
         required: false
@@ -13,8 +22,27 @@ on:
         default: '1'
 
 jobs:
-  build-and-upload:
+  determine-packages:
     runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.set-packages.outputs.packages }}
+    steps:
+      - name: Set package list
+        id: set-packages
+        run: |
+          PACKAGE_INPUT="${{ github.event.inputs.package || 'dms' }}"
+          if [ "$PACKAGE_INPUT" = "both" ]; then
+            echo 'packages=["dms","dms-greeter"]' >> $GITHUB_OUTPUT
+          else
+            echo "packages=[\"$PACKAGE_INPUT\"]" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-upload:
+    needs: determine-packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.determine-packages.outputs.packages) }}
 
     steps:
       - name: Checkout repository
@@ -39,7 +67,7 @@ jobs:
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "release=$RELEASE" >> $GITHUB_OUTPUT
-          echo "✅ Building DMS hotfix version: $VERSION-$RELEASE"
+          echo "✅ Building ${{ matrix.package }} version: $VERSION-$RELEASE"
 
       - name: Setup build environment
         run: |
@@ -70,29 +98,31 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           RELEASE="${{ steps.version.outputs.release }}"
           CHANGELOG_DATE="$(date '+%a %b %d %Y')"
+          PACKAGE="${{ matrix.package }}"
 
           # Copy spec file from repository
-          cp distro/fedora/dms.spec ~/rpmbuild/SPECS/dms.spec
+          cp distro/fedora/${PACKAGE}.spec ~/rpmbuild/SPECS/${PACKAGE}.spec
 
           # Replace placeholders with actual values
-          sed -i "s/VERSION_PLACEHOLDER/${VERSION}/g" ~/rpmbuild/SPECS/dms.spec
-          sed -i "s/RELEASE_PLACEHOLDER/${RELEASE}/g" ~/rpmbuild/SPECS/dms.spec
-          sed -i "s/CHANGELOG_DATE_PLACEHOLDER/${CHANGELOG_DATE}/g" ~/rpmbuild/SPECS/dms.spec
+          sed -i "s/VERSION_PLACEHOLDER/${VERSION}/g" ~/rpmbuild/SPECS/${PACKAGE}.spec
+          sed -i "s/RELEASE_PLACEHOLDER/${RELEASE}/g" ~/rpmbuild/SPECS/${PACKAGE}.spec
+          sed -i "s/CHANGELOG_DATE_PLACEHOLDER/${CHANGELOG_DATE}/g" ~/rpmbuild/SPECS/${PACKAGE}.spec
 
-          echo "✅ Spec file generated for v${VERSION}-${RELEASE}"
+          echo "✅ Spec file generated for ${PACKAGE} v${VERSION}-${RELEASE}"
           echo ""
           echo "=== Spec file preview ==="
-          head -40 ~/rpmbuild/SPECS/dms.spec
+          head -40 ~/rpmbuild/SPECS/${PACKAGE}.spec
 
       - name: Build SRPM
         id: build
         run: |
           cd ~/rpmbuild/SPECS
+          PACKAGE="${{ matrix.package }}"
 
-          echo "🔨 Building SRPM..."
-          rpmbuild -bs dms.spec
+          echo "🔨 Building SRPM for ${PACKAGE}..."
+          rpmbuild -bs ${PACKAGE}.spec
 
-          SRPM=$(ls ~/rpmbuild/SRPMS/*.src.rpm | tail -n 1)
+          SRPM=$(ls ~/rpmbuild/SRPMS/${PACKAGE}-*.src.rpm | tail -n 1)
           SRPM_NAME=$(basename "$SRPM")
 
           echo "srpm_path=$SRPM" >> $GITHUB_OUTPUT
@@ -106,7 +136,7 @@ jobs:
       - name: Upload SRPM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dms-stable-srpm-${{ steps.version.outputs.version }}
+          name: ${{ matrix.package }}-stable-srpm-${{ steps.version.outputs.version }}
           path: ${{ steps.build.outputs.srpm_path }}
           retention-days: 90
 
@@ -127,23 +157,40 @@ jobs:
 
           echo "✅ Copr CLI configured"
 
+      - name: Determine Copr project
+        id: copr_project
+        run: |
+          PACKAGE="${{ matrix.package }}"
+          if [ "$PACKAGE" = "dms" ]; then
+            COPR_PROJECT="avengemedia/dms"
+          elif [ "$PACKAGE" = "dms-greeter" ]; then
+            COPR_PROJECT="avengemedia/danklinux"
+          else
+            echo "❌ Unknown package: $PACKAGE"
+            exit 1
+          fi
+          echo "copr_project=$COPR_PROJECT" >> $GITHUB_OUTPUT
+          echo "✅ Copr project: $COPR_PROJECT"
+
       - name: Upload to Copr
         run: |
           SRPM="${{ steps.build.outputs.srpm_path }}"
           VERSION="${{ steps.version.outputs.version }}"
+          COPR_PROJECT="${{ steps.copr_project.outputs.copr_project }}"
+          PACKAGE="${{ matrix.package }}"
 
-          echo "🚀 Uploading SRPM to avengemedia/dms..."
+          echo "🚀 Uploading ${PACKAGE} SRPM to ${COPR_PROJECT}..."
           echo "   SRPM: $(basename $SRPM)"
           echo "   Version: $VERSION"
 
-          BUILD_OUTPUT=$(copr-cli build avengemedia/dms "$SRPM" --nowait 2>&1)
+          BUILD_OUTPUT=$(copr-cli build "$COPR_PROJECT" "$SRPM" --nowait 2>&1)
           echo "$BUILD_OUTPUT"
 
           BUILD_ID=$(echo "$BUILD_OUTPUT" | grep -oP 'Build was added to.*\K[0-9]+' || echo "unknown")
 
           if [ "$BUILD_ID" != "unknown" ]; then
             echo "✅ Build submitted successfully!"
-            echo "🔗 https://copr.fedorainfracloud.org/coprs/avengemedia/dms/build/$BUILD_ID/"
+            echo "🔗 https://copr.fedorainfracloud.org/coprs/${COPR_PROJECT}/build/$BUILD_ID/"
           else
             echo "⚠️  Could not extract build ID, but upload may have succeeded"
           fi
@@ -151,10 +198,13 @@ jobs:
       - name: Build summary
         if: always()
         run: |
-          echo "### 🎉 DMS Stable Build Summary" >> $GITHUB_STEP_SUMMARY
+          PACKAGE="${{ matrix.package }}"
+          COPR_PROJECT="${{ steps.copr_project.outputs.copr_project }}"
+          echo "### 🎉 ${PACKAGE} Stable Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package:** ${PACKAGE}" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ steps.version.outputs.version }}-${{ steps.version.outputs.release }}" >> $GITHUB_STEP_SUMMARY
           echo "- **SRPM:** ${{ steps.build.outputs.srpm_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Project:** https://copr.fedorainfracloud.org/coprs/avengemedia/dms/" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project:** https://copr.fedorainfracloud.org/coprs/${COPR_PROJECT}/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Stable release has been built and uploaded to Copr!" >> $GITHUB_STEP_SUMMARY

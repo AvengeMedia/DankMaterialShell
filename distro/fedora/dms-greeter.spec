@@ -1,22 +1,22 @@
-# Spec for DMS Greeter - Git builds using rpkg macros
+# Spec for DMS Greeter - Stable releases
 
 %global debug_package %{nil}
-%global version {{{ git_repo_version }}}
+%global version VERSION_PLACEHOLDER
 %global pkg_summary DankMaterialShell greeter for greetd
 
 Name:           dms-greeter
 Version:        %{version}
-Release:        0.git%{?dist}
+Release:        RELEASE_PLACEHOLDER%{?dist}
 Summary:        %{pkg_summary}
 
 License:        MIT
 URL:            https://github.com/AvengeMedia/DankMaterialShell
-VCS:            {{{ git_repo_vcs }}}
-Source0:        {{{ git_repo_pack }}}
 
-BuildRequires:  git-core
-# For the _tmpfilesdir macro.
-BuildRequires: systemd-rpm-macros
+Source0:        dms-qml.tar.gz
+
+BuildRequires:  gzip
+BuildRequires:  wget
+BuildRequires:  systemd-rpm-macros
 
 Requires:       greetd
 Requires:       (quickshell-git or quickshell)
@@ -24,13 +24,10 @@ Requires(post): /usr/sbin/useradd
 Requires(post): /usr/sbin/groupadd
 
 Recommends:     policycoreutils-python-utils
-Recommends:     setfacl
+Recommends:     acl
 Suggests:       niri
 Suggests:       hyprland
 Suggests:       sway
-
-# Provides:       greetd-dms-greeter = %{version}-%{release}
-# Conflicts:      greetd-dms-greeter
 
 %description
 DankMaterialShell greeter for greetd login manager. A modern, Material Design 3
@@ -41,31 +38,26 @@ compositor detection and configuration. Features session selection, user
 authentication, and dynamic theming.
 
 %prep
-{{{ git_repo_setup_macro }}}
+%setup -q -c -n dms-qml
+
+%build
 
 %install
-# Install greeter files to shared data location (from quickshell/ subdirectory)
+# Install greeter files to shared data location
 install -dm755 %{buildroot}%{_datadir}/quickshell/dms-greeter
-cp -r quickshell/* %{buildroot}%{_datadir}/quickshell/dms-greeter/
+cp -r %{_builddir}/dms-qml/* %{buildroot}%{_datadir}/quickshell/dms-greeter/
 
-# Install launcher script
-install -Dm755 quickshell/Modules/Greetd/assets/dms-greeter %{buildroot}%{_bindir}/dms-greeter
+install -Dm755 %{_builddir}/dms-qml/Modules/Greetd/assets/dms-greeter %{buildroot}%{_bindir}/dms-greeter
 
-# Install documentation
-install -Dm644 quickshell/Modules/Greetd/README.md %{buildroot}%{_docdir}/dms-greeter/README.md
+install -Dm644 %{_builddir}/dms-qml/Modules/Greetd/README.md %{buildroot}%{_docdir}/dms-greeter/README.md
 
-# Create cache directory for greeter data
-install -Dpm0644 quickshell/systemd/tmpfiles-dms-greeter.conf %{buildroot}%{_tmpfilesdir}/dms-greeter.conf
+install -Dpm0644 %{_builddir}/dms-qml/systemd/tmpfiles-dms-greeter.conf %{buildroot}%{_tmpfilesdir}/dms-greeter.conf
 
-# Install LICENSE file
-install -Dm644 LICENSE %{buildroot}%{_docdir}/dms-greeter/LICENSE
+install -Dm644 %{_builddir}/dms-qml/LICENSE %{buildroot}%{_docdir}/dms-greeter/LICENSE
 
-# Create greeter home directory
 install -dm755 %{buildroot}%{_sharedstatedir}/greeter
 
-# Note: We do NOT install a PAM config here to avoid conflicting with greetd package
-# Instead, we verify/fix it in %post if needed
-
+# Note: We do NOT install a PAM config here to avoid conflicting w/greetd packages
 # Remove build and development files
 rm -rf %{buildroot}%{_datadir}/quickshell/dms-greeter/.git*
 rm -f %{buildroot}%{_datadir}/quickshell/dms-greeter/.gitignore
@@ -73,9 +65,8 @@ rm -rf %{buildroot}%{_datadir}/quickshell/dms-greeter/.github
 rm -rf %{buildroot}%{_datadir}/quickshell/dms-greeter/distro
 
 %posttrans
-# Clean up old installation path from previous versions (only if empty)
 if [ -d "%{_sysconfdir}/xdg/quickshell/dms-greeter" ]; then
-    # Remove directories only if empty (preserves any user-added files)
+    # Remove directories & preserves any user-added files
     rmdir "%{_sysconfdir}/xdg/quickshell/dms-greeter" 2>/dev/null || true
     rmdir "%{_sysconfdir}/xdg/quickshell" 2>/dev/null || true
     rmdir "%{_sysconfdir}/xdg" 2>/dev/null || true
@@ -89,7 +80,7 @@ fi
 %{_tmpfilesdir}/%{name}.conf
 
 %pre
-# Create greeter user/group if they don't exist (greetd expects this)
+# Create greeter user/group if they don't exist
 getent group greeter >/dev/null || groupadd -r greeter
 getent passwd greeter >/dev/null || \
     useradd -r -g greeter -d %{_sharedstatedir}/greeter -s /bin/bash \
@@ -127,7 +118,6 @@ chown -R greeter:greeter %{_sharedstatedir}/greeter 2>/dev/null || true
 # Verify PAM configuration - only fix if insufficient
 PAM_CONFIG="/etc/pam.d/greetd"
 if [ ! -f "$PAM_CONFIG" ]; then
-    # PAM config doesn't exist - create it
     cat > "$PAM_CONFIG" << 'PAM_EOF'
 #%PAM-1.0
 auth       substack    system-auth
@@ -149,7 +139,6 @@ PAM_EOF
     # Only show message on initial install
     [ "$1" -eq 1 ] && echo "Created PAM configuration for greetd"
 elif ! grep -q "pam_systemd\|system-auth" "$PAM_CONFIG"; then
-    # PAM config exists but looks insufficient - back it up and replace
     cp "$PAM_CONFIG" "$PAM_CONFIG.backup-dms-greeter"
     cat > "$PAM_CONFIG" << 'PAM_EOF'
 #%PAM-1.0
@@ -198,9 +187,8 @@ command = "/usr/bin/dms-greeter --command COMPOSITOR_PLACEHOLDER"
 GREETD_EOF
         sed -i "s|COMPOSITOR_PLACEHOLDER|$COMPOSITOR|" "$GREETD_CONFIG"
         CONFIG_STATUS="Created new config with $COMPOSITOR ✓"
-# If config exists and doesn't have dms-greeter, update it
+
 elif ! grep -q "dms-greeter" "$GREETD_CONFIG"; then
-        # Backup existing config
         BACKUP_FILE="${GREETD_CONFIG}.backup-$(date +%%Y%%m%%d-%%H%%M%%S)"
         cp "$GREETD_CONFIG" "$BACKUP_FILE" 2>/dev/null || true
 
@@ -267,4 +255,6 @@ if [ "$1" -eq 0 ] && [ -x /usr/sbin/semanage ]; then
 fi
 
 %changelog
-{{{ git_repo_changelog }}}
+* CHANGELOG_DATE_PLACEHOLDER AvengeMedia <contact@avengemedia.com> - VERSION_PLACEHOLDER-RELEASE_PLACEHOLDER
+- Stable release VERSION_PLACEHOLDER
+- Built from GitHub release
