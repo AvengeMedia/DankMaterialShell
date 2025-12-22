@@ -47,6 +47,7 @@ FocusScope {
     property int actualGridColumns: 5
     property bool _initialized: false
     property bool closeOnEscape: true
+    property var windowControls: null
 
     signal fileSelected(string path)
     signal closeRequested
@@ -155,7 +156,6 @@ FocusScope {
         const lastSlash = path.lastIndexOf('/');
         if (lastSlash <= 0)
             return;
-
         const newPath = path.substring(0, lastSlash);
         if (newPath.length < homeDir.length) {
             currentPath = homeDir;
@@ -534,6 +534,14 @@ FocusScope {
             width: parent.width
             height: 48
 
+            MouseArea {
+                anchors.fill: parent
+                onPressed: if (windowControls)
+                    windowControls.tryStartMove()
+                onDoubleClicked: if (windowControls)
+                    windowControls.tryToggleMaximize()
+            }
+
             Row {
                 spacing: Theme.spacingM
                 anchors.verticalCenter: parent.verticalCenter
@@ -593,6 +601,16 @@ FocusScope {
                     iconSize: Theme.iconSize - 4
                     iconColor: Theme.surfaceText
                     onClicked: root.showKeyboardHints = !root.showKeyboardHints
+                }
+
+                DankActionButton {
+                    visible: windowControls?.supported ?? false
+                    circular: false
+                    iconName: windowControls?.targetWindow?.maximized ? "fullscreen_exit" : "fullscreen"
+                    iconSize: Theme.iconSize - 4
+                    iconColor: Theme.surfaceText
+                    onClicked: if (windowControls)
+                        windowControls.tryToggleMaximize()
                 }
 
                 DankActionButton {

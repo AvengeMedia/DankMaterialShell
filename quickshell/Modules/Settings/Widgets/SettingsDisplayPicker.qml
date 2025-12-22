@@ -12,10 +12,14 @@ Item {
 
     signal preferencesChanged(var preferences)
 
-    readonly property bool allDisplaysEnabled: {
-        if (!Array.isArray(displayPreferences) || displayPreferences.length === 0)
-            return true;
-        return displayPreferences.includes("all");
+    property bool localAllDisplays: true
+
+    onDisplayPreferencesChanged: {
+        if (!Array.isArray(displayPreferences) || displayPreferences.length === 0) {
+            localAllDisplays = true;
+            return;
+        }
+        localAllDisplays = displayPreferences.includes("all");
     }
 
     width: parent?.width ?? 0
@@ -37,8 +41,9 @@ Item {
         DankToggle {
             width: parent.width
             text: I18n.tr("All displays")
-            checked: root.allDisplaysEnabled
+            checked: root.localAllDisplays
             onToggled: isChecked => {
+                root.localAllDisplays = isChecked;
                 if (isChecked) {
                     root.preferencesChanged(["all"]);
                     return;
@@ -58,7 +63,7 @@ Item {
         Column {
             width: parent.width
             spacing: Theme.spacingXS
-            visible: !root.allDisplaysEnabled
+            visible: !root.localAllDisplays
 
             Repeater {
                 model: Quickshell.screens
@@ -66,17 +71,20 @@ Item {
                 DankToggle {
                     required property var modelData
 
+                    property bool localChecked: {
+                        const prefs = root.displayPreferences;
+                        if (!Array.isArray(prefs) || prefs.includes("all"))
+                            return true;
+                        return prefs.some(p => p.name === modelData.name);
+                    }
+
                     width: parent.width
                     text: SettingsData.getScreenDisplayName(modelData)
                     description: modelData.width + "×" + modelData.height
-                    checked: {
-                        const prefs = root.displayPreferences;
-                        if (!Array.isArray(prefs) || prefs.includes("all"))
-                            return false;
-                        return prefs.some(p => p.name === modelData.name);
-                    }
+                    checked: localChecked
                     onToggled: isChecked => {
-                        var prefs = root.displayPreferences;
+                        localChecked = isChecked;
+                        var prefs = JSON.parse(JSON.stringify(root.displayPreferences));
                         if (!Array.isArray(prefs) || prefs.includes("all"))
                             prefs = [];
                         prefs = prefs.filter(p => p.name !== modelData.name);

@@ -208,7 +208,7 @@ FloatingWindow {
         usernameInput.text = "";
         anonInput.text = "";
         domainMatchInput.text = "";
-        for (let i = 0; i < dynamicFieldsRepeater.count; i++) {
+        for (var i = 0; i < dynamicFieldsRepeater.count; i++) {
             const item = dynamicFieldsRepeater.itemAt(i);
             if (item?.children[0])
                 item.children[0].text = "";
@@ -248,51 +248,71 @@ FloatingWindow {
             Row {
                 width: contentCol.width
 
-                Column {
-                    width: parent.width - 40
-                    spacing: Theme.spacingXS
-
-                    StyledText {
-                        text: isVpnPrompt ? I18n.tr("Connect to VPN") : I18n.tr("Connect to Wi-Fi")
-                        font.pixelSize: Theme.fontSizeLarge
-                        color: Theme.surfaceText
-                        font.weight: Font.Medium
-                    }
+                MouseArea {
+                    width: parent.width - 60
+                    height: headerCol.height
+                    onPressed: windowControls.tryStartMove()
+                    onDoubleClicked: windowControls.tryToggleMaximize()
 
                     Column {
+                        id: headerCol
                         width: parent.width
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: {
-                                if (fieldsInfo.length > 0)
-                                    return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
-                                if (isVpnPrompt)
-                                    return I18n.tr("Enter password for ") + wifiPasswordSSID;
-                                const prefix = requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ");
-                                return prefix + wifiPasswordSSID;
-                            }
-                            font.pixelSize: Theme.fontSizeMedium
-                            color: Theme.surfaceTextMedium
-                            width: parent.width
-                            elide: Text.ElideRight
+                            text: isVpnPrompt ? I18n.tr("Connect to VPN") : I18n.tr("Connect to Wi-Fi")
+                            font.pixelSize: Theme.fontSizeLarge
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
                         }
 
-                        StyledText {
-                            visible: isPromptMode && promptReason === "wrong-password"
-                            text: I18n.tr("Incorrect password")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.error
+                        Column {
                             width: parent.width
+                            spacing: Theme.spacingXS
+
+                            StyledText {
+                                text: {
+                                    if (fieldsInfo.length > 0)
+                                        return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
+                                    if (isVpnPrompt)
+                                        return I18n.tr("Enter password for ") + wifiPasswordSSID;
+                                    const prefix = requiresEnterprise ? I18n.tr("Enter credentials for ") : I18n.tr("Enter password for ");
+                                    return prefix + wifiPasswordSSID;
+                                }
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceTextMedium
+                                width: parent.width
+                                elide: Text.ElideRight
+                            }
+
+                            StyledText {
+                                visible: isPromptMode && promptReason === "wrong-password"
+                                text: I18n.tr("Incorrect password")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.error
+                                width: parent.width
+                            }
                         }
                     }
                 }
 
-                DankActionButton {
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: clearAndClose()
+                Row {
+                    spacing: Theme.spacingXS
+
+                    DankActionButton {
+                        visible: windowControls.supported
+                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: windowControls.tryToggleMaximize()
+                    }
+
+                    DankActionButton {
+                        iconName: "close"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: clearAndClose()
+                    }
                 }
             }
 
@@ -624,7 +644,7 @@ FloatingWindow {
                         color: connectArea.containsMouse ? Qt.darker(Theme.primary, 1.1) : Theme.primary
                         enabled: {
                             if (fieldsInfo.length > 0) {
-                                for (let i = 0; i < fieldsInfo.length; i++) {
+                                for (var i = 0; i < fieldsInfo.length; i++) {
                                     if (!fieldsInfo[i].isSecret)
                                         continue;
                                     const fieldName = fieldsInfo[i].name;
@@ -667,5 +687,10 @@ FloatingWindow {
                 }
             }
         }
+    }
+
+    FloatingWindowControls {
+        id: windowControls
+        targetWindow: root
     }
 }

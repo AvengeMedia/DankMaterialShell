@@ -19,17 +19,16 @@ Item {
     height: implicitHeight
 
     readonly property bool isDesktopPlugin: {
-        if (!pluginService || !pluginId)
+        if (!pluginService?.availablePlugins || !pluginId)
             return false;
         const plugin = pluginService.availablePlugins[pluginId];
         return plugin?.type === "desktop";
     }
 
     readonly property bool hasPermission: {
-        if (!pluginService || !pluginId)
+        if (!pluginService?.availablePlugins || !pluginId)
             return true;
-        const allPlugins = pluginService.availablePlugins;
-        const plugin = allPlugins[pluginId];
+        const plugin = pluginService.availablePlugins[pluginId];
         if (!plugin)
             return true;
         const permissions = Array.isArray(plugin.permissions) ? plugin.permissions : [];
@@ -63,15 +62,27 @@ Item {
 
     Connections {
         target: pluginService
+        enabled: pluginService !== null
+
         function onPluginDataChanged(changedPluginId) {
             if (changedPluginId === pluginId) {
                 loadVariants();
+                reloadChildValues();
+            }
+        }
+    }
+
+    function reloadChildValues() {
+        for (let i = 0; i < content.length; i++) {
+            const child = content[i];
+            if (child.loadValue) {
+                child.loadValue();
             }
         }
     }
 
     function loadVariants() {
-        if (!pluginService || !pluginId) {
+        if (!pluginService?.getPluginVariants || !pluginId) {
             variants = [];
             return;
         }
@@ -95,21 +106,21 @@ Item {
     }
 
     function createVariant(variantName, variantConfig) {
-        if (!pluginService || !pluginId) {
+        if (!pluginService?.createPluginVariant || !pluginId) {
             return null;
         }
         return pluginService.createPluginVariant(pluginId, variantName, variantConfig);
     }
 
     function removeVariant(variantId) {
-        if (!pluginService || !pluginId) {
+        if (!pluginService?.removePluginVariant || !pluginId) {
             return;
         }
         pluginService.removePluginVariant(pluginId, variantId);
     }
 
     function updateVariant(variantId, variantConfig) {
-        if (!pluginService || !pluginId) {
+        if (!pluginService?.updatePluginVariant || !pluginId) {
             return;
         }
         pluginService.updatePluginVariant(pluginId, variantId, variantConfig);

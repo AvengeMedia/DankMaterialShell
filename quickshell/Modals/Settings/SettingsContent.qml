@@ -432,7 +432,9 @@ FocusScope {
             visible: active
             focus: active
 
-            sourceComponent: DesktopWidgetsTab {}
+            sourceComponent: DesktopWidgetsTab {
+                parentModal: root.parentModal
+            }
 
             onActiveChanged: {
                 if (active && item)

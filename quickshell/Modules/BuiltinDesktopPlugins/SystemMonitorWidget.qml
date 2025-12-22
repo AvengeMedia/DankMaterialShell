@@ -31,32 +31,32 @@ Item {
         return 180;
     }
 
-    property string variantId: ""
-    property var variantData: null
+    property string instanceId: ""
+    property var instanceData: null
 
-    readonly property var cfg: variantData?.config ?? null
-    readonly property bool isVariant: variantId !== "" && cfg !== null
+    readonly property var cfg: instanceData?.config ?? null
+    readonly property bool isInstance: instanceId !== "" && cfg !== null
 
-    property bool enabled: SettingsData.systemMonitorEnabled
-    property bool showHeader: isVariant ? (cfg.showHeader ?? true) : SettingsData.systemMonitorShowHeader
-    property real transparency: isVariant ? (cfg.transparency ?? 0.8) : SettingsData.systemMonitorTransparency
-    property string colorMode: isVariant ? (cfg.colorMode ?? "primary") : SettingsData.systemMonitorColorMode
-    property color customColor: isVariant ? (cfg.customColor ?? "#ffffff") : SettingsData.systemMonitorCustomColor
-    property bool showCpu: isVariant ? (cfg.showCpu ?? true) : SettingsData.systemMonitorShowCpu
-    property bool showCpuGraph: isVariant ? (cfg.showCpuGraph ?? true) : SettingsData.systemMonitorShowCpuGraph
-    property bool showCpuTemp: isVariant ? (cfg.showCpuTemp ?? true) : SettingsData.systemMonitorShowCpuTemp
-    property bool showGpuTemp: isVariant ? (cfg.showGpuTemp ?? false) : SettingsData.systemMonitorShowGpuTemp
-    property string selectedGpuPciId: isVariant ? (cfg.gpuPciId ?? "") : SettingsData.systemMonitorGpuPciId
-    property bool showMemory: isVariant ? (cfg.showMemory ?? true) : SettingsData.systemMonitorShowMemory
-    property bool showMemoryGraph: isVariant ? (cfg.showMemoryGraph ?? true) : SettingsData.systemMonitorShowMemoryGraph
-    property bool showNetwork: isVariant ? (cfg.showNetwork ?? true) : SettingsData.systemMonitorShowNetwork
-    property bool showNetworkGraph: isVariant ? (cfg.showNetworkGraph ?? true) : SettingsData.systemMonitorShowNetworkGraph
-    property bool showDisk: isVariant ? (cfg.showDisk ?? true) : SettingsData.systemMonitorShowDisk
-    property bool showTopProcesses: isVariant ? (cfg.showTopProcesses ?? false) : SettingsData.systemMonitorShowTopProcesses
-    property int topProcessCount: isVariant ? (cfg.topProcessCount ?? 3) : SettingsData.systemMonitorTopProcessCount
-    property string topProcessSortBy: isVariant ? (cfg.topProcessSortBy ?? "cpu") : SettingsData.systemMonitorTopProcessSortBy
-    property string layoutMode: isVariant ? (cfg.layoutMode ?? "auto") : SettingsData.systemMonitorLayoutMode
-    property int graphInterval: isVariant ? (cfg.graphInterval ?? 60) : SettingsData.systemMonitorGraphInterval
+    property bool enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.systemMonitorEnabled
+    property bool showHeader: isInstance ? (cfg.showHeader ?? true) : SettingsData.systemMonitorShowHeader
+    property real transparency: isInstance ? (cfg.transparency ?? 0.8) : SettingsData.systemMonitorTransparency
+    property string colorMode: isInstance ? (cfg.colorMode ?? "primary") : SettingsData.systemMonitorColorMode
+    property color customColor: isInstance ? (cfg.customColor ?? "#ffffff") : SettingsData.systemMonitorCustomColor
+    property bool showCpu: isInstance ? (cfg.showCpu ?? true) : SettingsData.systemMonitorShowCpu
+    property bool showCpuGraph: isInstance ? (cfg.showCpuGraph ?? true) : SettingsData.systemMonitorShowCpuGraph
+    property bool showCpuTemp: isInstance ? (cfg.showCpuTemp ?? true) : SettingsData.systemMonitorShowCpuTemp
+    property bool showGpuTemp: isInstance ? (cfg.showGpuTemp ?? false) : SettingsData.systemMonitorShowGpuTemp
+    property string selectedGpuPciId: isInstance ? (cfg.gpuPciId ?? "") : SettingsData.systemMonitorGpuPciId
+    property bool showMemory: isInstance ? (cfg.showMemory ?? true) : SettingsData.systemMonitorShowMemory
+    property bool showMemoryGraph: isInstance ? (cfg.showMemoryGraph ?? true) : SettingsData.systemMonitorShowMemoryGraph
+    property bool showNetwork: isInstance ? (cfg.showNetwork ?? true) : SettingsData.systemMonitorShowNetwork
+    property bool showNetworkGraph: isInstance ? (cfg.showNetworkGraph ?? true) : SettingsData.systemMonitorShowNetworkGraph
+    property bool showDisk: isInstance ? (cfg.showDisk ?? true) : SettingsData.systemMonitorShowDisk
+    property bool showTopProcesses: isInstance ? (cfg.showTopProcesses ?? false) : SettingsData.systemMonitorShowTopProcesses
+    property int topProcessCount: isInstance ? (cfg.topProcessCount ?? 3) : SettingsData.systemMonitorTopProcessCount
+    property string topProcessSortBy: isInstance ? (cfg.topProcessSortBy ?? "cpu") : SettingsData.systemMonitorTopProcessSortBy
+    property string layoutMode: isInstance ? (cfg.layoutMode ?? "auto") : SettingsData.systemMonitorLayoutMode
+    property int graphInterval: isInstance ? (cfg.graphInterval ?? 60) : SettingsData.systemMonitorGraphInterval
 
     readonly property color accentColor: {
         switch (colorMode) {

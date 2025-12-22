@@ -9,7 +9,12 @@ Item {
     property real widgetWidth: 280
     property real widgetHeight: 200
 
-    property string clockStyle: SettingsData.desktopClockStyle
+    property string instanceId: ""
+    property var instanceData: null
+    readonly property var cfg: instanceData?.config ?? null
+    readonly property bool isInstance: instanceId !== "" && cfg !== null
+
+    property string clockStyle: isInstance ? (cfg.style ?? "analog") : SettingsData.desktopClockStyle
     property bool forceSquare: clockStyle === "analog"
 
     property real defaultWidth: {
@@ -53,12 +58,12 @@ Item {
         }
     }
 
-    property bool enabled: SettingsData.desktopClockEnabled
-    property real transparency: SettingsData.desktopClockTransparency
-    property string colorMode: SettingsData.desktopClockColorMode
-    property color customColor: SettingsData.desktopClockCustomColor
-    property bool showDate: SettingsData.desktopClockShowDate
-    property bool showAnalogNumbers: SettingsData.desktopClockShowAnalogNumbers
+    property bool enabled: isInstance ? (instanceData?.enabled ?? true) : SettingsData.desktopClockEnabled
+    property real transparency: isInstance ? (cfg.transparency ?? 0.8) : SettingsData.desktopClockTransparency
+    property string colorMode: isInstance ? (cfg.colorMode ?? "primary") : SettingsData.desktopClockColorMode
+    property color customColor: isInstance ? (cfg.customColor ?? "#ffffff") : SettingsData.desktopClockCustomColor
+    property bool showDate: isInstance ? (cfg.showDate ?? true) : SettingsData.desktopClockShowDate
+    property bool showAnalogNumbers: isInstance ? (cfg.showAnalogNumbers ?? false) : SettingsData.desktopClockShowAnalogNumbers
 
     readonly property real scaleFactor: Math.min(width, height) / 200
 
@@ -78,7 +83,8 @@ Item {
     readonly property color subtleTextColor: Theme.onSurfaceVariant
     readonly property color backgroundColor: Theme.withAlpha(Theme.surface, root.transparency)
 
-    readonly property bool needsSeconds: clockStyle === "analog" ? SettingsData.desktopClockShowAnalogSeconds : SettingsData.showSeconds
+    readonly property bool showAnalogSeconds: isInstance ? (cfg.showAnalogSeconds ?? true) : SettingsData.desktopClockShowAnalogSeconds
+    readonly property bool needsSeconds: clockStyle === "analog" ? showAnalogSeconds : SettingsData.showSeconds
 
     SystemClock {
         id: systemClock
@@ -194,7 +200,7 @@ Item {
 
             Rectangle {
                 id: secondDot
-                visible: SettingsData.desktopClockShowAnalogSeconds
+                visible: root.showAnalogSeconds
 
                 property real angle: analogRoot.seconds * 6 * Math.PI / 180
                 property real orbitRadius: analogRoot.faceRadius * 0.92

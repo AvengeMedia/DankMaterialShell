@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 3
+    readonly property int settingsConfigVersion: 4
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -451,6 +451,7 @@ Singleton {
     property var systemMonitorVariants: []
     property var desktopWidgetPositions: ({})
     property var desktopWidgetGridSettings: ({})
+    property var desktopWidgetInstances: []
 
     function getDesktopWidgetGridSetting(screenKey, property, defaultValue) {
         const val = desktopWidgetGridSettings?.[screenKey]?.[property];
@@ -545,6 +546,73 @@ Singleton {
             height: 480,
             displayPreferences: ["all"]
         };
+    }
+
+    function createDesktopWidgetInstance(widgetType, name, config) {
+        const id = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+        const instance = {
+            id: id,
+            widgetType: widgetType,
+            name: name || widgetType,
+            enabled: true,
+            config: config || {},
+            positions: {}
+        };
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        instances.push(instance);
+        desktopWidgetInstances = instances;
+        saveSettings();
+        return instance;
+    }
+
+    function updateDesktopWidgetInstance(instanceId, updates) {
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const idx = instances.findIndex(inst => inst.id === instanceId);
+        if (idx === -1) return;
+        Object.assign(instances[idx], updates);
+        desktopWidgetInstances = instances;
+        saveSettings();
+    }
+
+    function updateDesktopWidgetInstanceConfig(instanceId, configUpdates) {
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const idx = instances.findIndex(inst => inst.id === instanceId);
+        if (idx === -1) return;
+        instances[idx].config = Object.assign({}, instances[idx].config || {}, configUpdates);
+        desktopWidgetInstances = instances;
+        saveSettings();
+    }
+
+    function updateDesktopWidgetInstancePosition(instanceId, screenKey, positionUpdates) {
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        const idx = instances.findIndex(inst => inst.id === instanceId);
+        if (idx === -1) return;
+        if (!instances[idx].positions) instances[idx].positions = {};
+        instances[idx].positions[screenKey] = Object.assign(
+            {},
+            instances[idx].positions[screenKey] || {},
+            positionUpdates
+        );
+        desktopWidgetInstances = instances;
+        saveSettings();
+    }
+
+    function removeDesktopWidgetInstance(instanceId) {
+        const instances = (desktopWidgetInstances || []).filter(inst => inst.id !== instanceId);
+        desktopWidgetInstances = instances;
+        saveSettings();
+    }
+
+    function getDesktopWidgetInstance(instanceId) {
+        return (desktopWidgetInstances || []).find(inst => inst.id === instanceId) || null;
+    }
+
+    function getDesktopWidgetInstancesOfType(widgetType) {
+        return (desktopWidgetInstances || []).filter(inst => inst.widgetType === widgetType);
+    }
+
+    function getEnabledDesktopWidgetInstances() {
+        return (desktopWidgetInstances || []).filter(inst => inst.enabled);
     }
 
     signal forceDankBarLayoutRefresh

@@ -171,190 +171,237 @@ FloatingWindow {
             }
         }
 
-        ColumnLayout {
+        Column {
             anchors.fill: parent
-            anchors.margins: Theme.spacingL
-            spacing: Theme.spacingL
+            spacing: 0
             visible: DgopService.dgopAvailable
 
-            RowLayout {
-                Layout.fillWidth: true
-                height: 40
+            Item {
+                width: parent.width
+                height: 48
 
-                StyledText {
-                    text: I18n.tr("System Monitor")
-                    font.pixelSize: Theme.fontSizeLarge + 4
-                    font.weight: Font.Bold
-                    color: Theme.surfaceText
-                    Layout.alignment: Qt.AlignVCenter
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: windowControls.tryStartMove()
+                    onDoubleClicked: windowControls.tryToggleMaximize()
                 }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                DankActionButton {
-                    circular: false
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: () => {
-                        processListModal.hide();
-                    }
-                    Layout.alignment: Qt.AlignVCenter
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 52
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                radius: Theme.cornerRadius
-                border.color: Theme.outlineLight
-                border.width: 1
 
                 Row {
-                    anchors.fill: parent
-                    anchors.margins: 4
-                    spacing: 2
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingM
 
-                    Repeater {
-                        model: tabNames
+                    DankIcon {
+                        name: "analytics"
+                        size: Theme.iconSize
+                        color: Theme.primary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
 
-                        Rectangle {
-                            width: (parent.width - (tabNames.length - 1) * 2) / tabNames.length
-                            height: 44
-                            radius: Theme.cornerRadius
-                            color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent")
-                            border.color: currentTab === index ? Theme.primary : "transparent"
-                            border.width: currentTab === index ? 1 : 0
+                    StyledText {
+                        text: I18n.tr("System Monitor")
+                        font.pixelSize: Theme.fontSizeXLarge
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
 
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: Theme.spacingXS
+                Row {
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.spacingM
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.spacingXS
 
-                                DankIcon {
-                                    name: {
-                                        const tabIcons = ["list_alt", "analytics", "settings"];
-                                        return tabIcons[index] || "tab";
-                                    }
-                                    size: Theme.iconSize - 2
-                                    color: currentTab === index ? Theme.primary : Theme.surfaceText
-                                    opacity: currentTab === index ? 1 : 0.7
-                                    anchors.verticalCenter: parent.verticalCenter
+                    DankActionButton {
+                        visible: windowControls.supported
+                        circular: false
+                        iconName: processListModal.maximized ? "fullscreen_exit" : "fullscreen"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: windowControls.tryToggleMaximize()
+                    }
 
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Theme.shortDuration
-                                        }
-                                    }
-                                }
-
-                                StyledText {
-                                    text: modelData
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    font.weight: Font.Medium
-                                    color: currentTab === index ? Theme.primary : Theme.surfaceText
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    anchors.verticalCenterOffset: -1
-
-                                    Behavior on color {
-                                        ColorAnimation {
-                                            duration: Theme.shortDuration
-                                        }
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: tabMouseArea
-
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: () => {
-                                    currentTab = index;
-                                }
-                            }
-
-                            Behavior on color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                }
-                            }
-
-                            Behavior on border.color {
-                                ColorAnimation {
-                                    duration: Theme.shortDuration
-                                }
-                            }
-                        }
+                    DankActionButton {
+                        circular: false
+                        iconName: "close"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: processListModal.hide()
                     }
                 }
             }
 
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                border.color: Theme.outlineLight
-                border.width: 1
+            Item {
+                width: parent.width
+                height: parent.height - 48
 
-                Loader {
-                    id: processesTab
-
+                ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 0
-                    visible: currentTab === 0
-                    opacity: currentTab === 0 ? 1 : 0
-                    sourceComponent: processesTabComponent
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.rightMargin: Theme.spacingL
+                    anchors.bottomMargin: Theme.spacingL
+                    anchors.topMargin: 0
+                    spacing: Theme.spacingL
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 52
+                        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                        radius: Theme.cornerRadius
+                        border.color: Theme.outlineLight
+                        border.width: 1
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 4
+                            spacing: 2
+
+                            Repeater {
+                                model: tabNames
+
+                                Rectangle {
+                                    width: (parent.width - (tabNames.length - 1) * 2) / tabNames.length
+                                    height: 44
+                                    radius: Theme.cornerRadius
+                                    color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent")
+                                    border.color: currentTab === index ? Theme.primary : "transparent"
+                                    border.width: currentTab === index ? 1 : 0
+
+                                    Row {
+                                        anchors.centerIn: parent
+                                        spacing: Theme.spacingXS
+
+                                        DankIcon {
+                                            name: {
+                                                const tabIcons = ["list_alt", "analytics", "settings"];
+                                                return tabIcons[index] || "tab";
+                                            }
+                                            size: Theme.iconSize - 2
+                                            color: currentTab === index ? Theme.primary : Theme.surfaceText
+                                            opacity: currentTab === index ? 1 : 0.7
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            Behavior on color {
+                                                ColorAnimation {
+                                                    duration: Theme.shortDuration
+                                                }
+                                            }
+                                        }
+
+                                        StyledText {
+                                            text: modelData
+                                            font.pixelSize: Theme.fontSizeLarge
+                                            font.weight: Font.Medium
+                                            color: currentTab === index ? Theme.primary : Theme.surfaceText
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.verticalCenterOffset: -1
+
+                                            Behavior on color {
+                                                ColorAnimation {
+                                                    duration: Theme.shortDuration
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    MouseArea {
+                                        id: tabMouseArea
+
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: () => {
+                                            currentTab = index;
+                                        }
+                                    }
+
+                                    Behavior on color {
+                                        ColorAnimation {
+                                            duration: Theme.shortDuration
+                                        }
+                                    }
+
+                                    Behavior on border.color {
+                                        ColorAnimation {
+                                            duration: Theme.shortDuration
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                }
 
-                Loader {
-                    id: performanceTab
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        radius: Theme.cornerRadius
+                        color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
+                        border.color: Theme.outlineLight
+                        border.width: 1
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 1
-                    visible: currentTab === 1
-                    opacity: currentTab === 1 ? 1 : 0
-                    sourceComponent: performanceTabComponent
+                        Loader {
+                            id: processesTab
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingS
+                            active: processListModal.visible && currentTab === 0
+                            visible: currentTab === 0
+                            opacity: currentTab === 0 ? 1 : 0
+                            sourceComponent: processesTabComponent
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
+                            }
                         }
-                    }
-                }
 
-                Loader {
-                    id: systemTab
+                        Loader {
+                            id: performanceTab
 
-                    anchors.fill: parent
-                    anchors.margins: Theme.spacingS
-                    active: processListModal.visible && currentTab === 2
-                    visible: currentTab === 2
-                    opacity: currentTab === 2 ? 1 : 0
-                    sourceComponent: systemTabComponent
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingS
+                            active: processListModal.visible && currentTab === 1
+                            visible: currentTab === 1
+                            opacity: currentTab === 1 ? 1 : 0
+                            sourceComponent: performanceTabComponent
 
-                    Behavior on opacity {
-                        NumberAnimation {
-                            duration: Theme.mediumDuration
-                            easing.type: Theme.emphasizedEasing
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
+                            }
+                        }
+
+                        Loader {
+                            id: systemTab
+
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingS
+                            active: processListModal.visible && currentTab === 2
+                            visible: currentTab === 2
+                            opacity: currentTab === 2 ? 1 : 0
+                            sourceComponent: systemTabComponent
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.mediumDuration
+                                    easing.type: Theme.emphasizedEasing
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    FloatingWindowControls {
+        id: windowControls
+        targetWindow: processListModal
     }
 }

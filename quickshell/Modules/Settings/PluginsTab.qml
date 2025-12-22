@@ -80,7 +80,7 @@ FocusScope {
                         width: parent.width
                         height: dmsWarningColumn.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.warning.r, Theme.warning.g, Theme.warning.b, 0.1)
+                        color: Theme.withAlpha(Theme.warning, 0.1)
                         border.color: Theme.warning
                         border.width: 1
                         visible: !DMSService.dmsAvailable
@@ -126,7 +126,7 @@ FocusScope {
                         width: parent.width
                         height: incompatWarningColumn.implicitHeight + Theme.spacingM * 2
                         radius: Theme.cornerRadius
-                        color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.1)
+                        color: Theme.withAlpha(Theme.error, 0.1)
                         border.color: Theme.error
                         border.width: 1
                         visible: incompatPlugins.length > 0

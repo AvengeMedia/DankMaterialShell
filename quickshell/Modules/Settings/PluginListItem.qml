@@ -28,6 +28,8 @@ StyledRect {
     property string pluginSettingsPath: pluginData ? (pluginData.settingsPath || "") : ""
     property var pluginPermissions: pluginData ? (pluginData.permissions || []) : []
     property bool hasSettings: pluginData && pluginData.settings !== undefined && pluginData.settings !== ""
+    property bool isDesktopPlugin: pluginData ? (pluginData.type === "desktop") : false
+    property bool showSettings: hasSettings && !isDesktopPlugin
     property bool isSystemPlugin: pluginData ? (pluginData.source === "system") : false
     property string requiresDms: pluginData ? (pluginData.requires_dms || "") : ""
     property bool meetsRequirements: requiresDms ? PluginService.checkPluginCompatibility(requiresDms) : true
@@ -55,8 +57,8 @@ StyledRect {
         anchors.fill: parent
         anchors.bottomMargin: root.isExpanded ? settingsContainer.height : 0
         hoverEnabled: true
-        cursorShape: root.hasSettings ? Qt.PointingHandCursor : Qt.ArrowCursor
-        enabled: root.hasSettings
+        cursorShape: root.showSettings ? Qt.PointingHandCursor : Qt.ArrowCursor
+        enabled: root.showSettings
         onClicked: {
             root.expandedPluginId = root.expandedPluginId === root.pluginId ? "" : root.pluginId;
         }
@@ -103,7 +105,7 @@ StyledRect {
                         width: incompatIcon.width + Theme.spacingXS * 2
                         height: 18
                         radius: 9
-                        color: Qt.rgba(Theme.error.r, Theme.error.g, Theme.error.b, 0.15)
+                        color: Theme.withAlpha(Theme.error, 0.15)
                         visible: !root.meetsRequirements
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -135,11 +137,28 @@ StyledRect {
                     }
 
                     DankIcon {
-                        name: root.hasSettings ? (root.isExpanded ? "expand_less" : "expand_more") : ""
+                        name: root.showSettings ? (root.isExpanded ? "expand_less" : "expand_more") : ""
                         size: 16
-                        color: root.hasSettings ? Theme.primary : "transparent"
+                        color: root.showSettings ? Theme.primary : "transparent"
                         anchors.verticalCenter: parent.verticalCenter
-                        visible: root.hasSettings
+                        visible: root.showSettings
+                    }
+
+                    Rectangle {
+                        width: desktopLabel.implicitWidth + Theme.spacingXS * 2
+                        height: 18
+                        radius: 9
+                        color: Theme.withAlpha(Theme.secondary, 0.15)
+                        visible: root.isDesktopPlugin
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        StyledText {
+                            id: desktopLabel
+                            anchors.centerIn: parent
+                            text: I18n.tr("Desktop Widget")
+                            font.pixelSize: Theme.fontSizeSmall - 2
+                            color: Theme.secondary
+                        }
                     }
                 }
 
@@ -333,8 +352,8 @@ StyledRect {
                     height: 20
                     width: permissionText.implicitWidth + Theme.spacingXS * 2
                     radius: 10
-                    color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1)
-                    border.color: Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.3)
+                    color: Theme.withAlpha(Theme.primary, 0.1)
+                    border.color: Theme.withAlpha(Theme.primary, 0.3)
                     border.width: 1
 
                     StyledText {
@@ -354,9 +373,9 @@ StyledRect {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: root.isExpanded && root.hasSettings ? (settingsLoader.item ? settingsLoader.item.implicitHeight + Theme.spacingL * 2 : 0) : 0
+        height: root.isExpanded && root.showSettings ? (settingsLoader.item ? settingsLoader.item.implicitHeight + Theme.spacingL * 2 : 0) : 0
         clip: true
-        focus: root.isExpanded && root.hasSettings
+        focus: root.isExpanded && root.showSettings
 
         Keys.onPressed: event => {
             event.accepted = true;
@@ -374,7 +393,7 @@ StyledRect {
             id: settingsLoader
             anchors.fill: parent
             anchors.margins: Theme.spacingL
-            active: root.isExpanded && root.hasSettings && root.isLoaded
+            active: root.isExpanded && root.showSettings && root.isLoaded
             asynchronous: false
 
             source: {

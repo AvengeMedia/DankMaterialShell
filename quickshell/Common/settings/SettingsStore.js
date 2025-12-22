@@ -119,6 +119,101 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 3;
     }
 
+    if (currentVersion < 4) {
+        console.info("Migrating settings from version", currentVersion, "to version 4");
+        console.info("Migrating desktop widgets to unified desktopWidgetInstances");
+
+        var instances = [];
+
+        if (settings.desktopClockEnabled) {
+            var clockPositions = {};
+            if (settings.desktopClockX !== undefined && settings.desktopClockX >= 0) {
+                clockPositions["default"] = {
+                    x: settings.desktopClockX,
+                    y: settings.desktopClockY,
+                    width: settings.desktopClockWidth || 280,
+                    height: settings.desktopClockHeight || 180
+                };
+            }
+
+            instances.push({
+                id: "dw_clock_primary",
+                widgetType: "desktopClock",
+                name: "Desktop Clock",
+                enabled: true,
+                config: {
+                    style: settings.desktopClockStyle || "analog",
+                    transparency: settings.desktopClockTransparency !== undefined ? settings.desktopClockTransparency : 0.8,
+                    colorMode: settings.desktopClockColorMode || "primary",
+                    customColor: settings.desktopClockCustomColor || "#ffffff",
+                    showDate: settings.desktopClockShowDate !== false,
+                    showAnalogNumbers: settings.desktopClockShowAnalogNumbers || false,
+                    showAnalogSeconds: settings.desktopClockShowAnalogSeconds !== false,
+                    displayPreferences: settings.desktopClockDisplayPreferences || ["all"]
+                },
+                positions: clockPositions
+            });
+        }
+
+        if (settings.systemMonitorEnabled) {
+            var sysmonPositions = {};
+            if (settings.systemMonitorX !== undefined && settings.systemMonitorX >= 0) {
+                sysmonPositions["default"] = {
+                    x: settings.systemMonitorX,
+                    y: settings.systemMonitorY,
+                    width: settings.systemMonitorWidth || 320,
+                    height: settings.systemMonitorHeight || 480
+                };
+            }
+
+            instances.push({
+                id: "dw_sysmon_primary",
+                widgetType: "systemMonitor",
+                name: "System Monitor",
+                enabled: true,
+                config: {
+                    showHeader: settings.systemMonitorShowHeader !== false,
+                    transparency: settings.systemMonitorTransparency !== undefined ? settings.systemMonitorTransparency : 0.8,
+                    colorMode: settings.systemMonitorColorMode || "primary",
+                    customColor: settings.systemMonitorCustomColor || "#ffffff",
+                    showCpu: settings.systemMonitorShowCpu !== false,
+                    showCpuGraph: settings.systemMonitorShowCpuGraph !== false,
+                    showCpuTemp: settings.systemMonitorShowCpuTemp !== false,
+                    showGpuTemp: settings.systemMonitorShowGpuTemp || false,
+                    gpuPciId: settings.systemMonitorGpuPciId || "",
+                    showMemory: settings.systemMonitorShowMemory !== false,
+                    showMemoryGraph: settings.systemMonitorShowMemoryGraph !== false,
+                    showNetwork: settings.systemMonitorShowNetwork !== false,
+                    showNetworkGraph: settings.systemMonitorShowNetworkGraph !== false,
+                    showDisk: settings.systemMonitorShowDisk !== false,
+                    showTopProcesses: settings.systemMonitorShowTopProcesses || false,
+                    topProcessCount: settings.systemMonitorTopProcessCount || 3,
+                    topProcessSortBy: settings.systemMonitorTopProcessSortBy || "cpu",
+                    layoutMode: settings.systemMonitorLayoutMode || "auto",
+                    graphInterval: settings.systemMonitorGraphInterval || 60,
+                    displayPreferences: settings.systemMonitorDisplayPreferences || ["all"]
+                },
+                positions: sysmonPositions
+            });
+        }
+
+        var variants = settings.systemMonitorVariants || [];
+        for (var i = 0; i < variants.length; i++) {
+            var v = variants[i];
+            instances.push({
+                id: v.id,
+                widgetType: "systemMonitor",
+                name: v.name || ("System Monitor " + (i + 2)),
+                enabled: true,
+                config: v.config || {},
+                positions: v.positions || {}
+            });
+        }
+
+        settings.desktopWidgetInstances = instances;
+        settings.configVersion = 4;
+    }
+
     return settings;
 }
 

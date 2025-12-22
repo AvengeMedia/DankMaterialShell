@@ -6,20 +6,34 @@ Item {
 
     property var pluginService: null
     property string pluginId: ""
+    property string instanceId: ""
+    property var instanceData: null
 
     property real widgetWidth: 200
     property real widgetHeight: 200
     property real minWidth: 100
     property real minHeight: 100
 
-    property var pluginData: ({})
+    readonly property bool isInstance: instanceId !== "" && instanceData !== null
+    readonly property var instanceConfig: instanceData?.config ?? {}
+
+    property var pluginData: isInstance ? instanceConfig : _globalPluginData
+    property var _globalPluginData: ({})
 
     Component.onCompleted: loadPluginData()
     onPluginServiceChanged: loadPluginData()
     onPluginIdChanged: loadPluginData()
+    onInstanceDataChanged: {
+        if (isInstance)
+            Qt.callLater(() => {
+                pluginData = instanceConfig;
+            });
+    }
 
     Connections {
         target: pluginService
+        enabled: pluginService !== null
+
         function onPluginDataChanged(changedPluginId) {
             if (changedPluginId !== pluginId)
                 return;
@@ -29,10 +43,14 @@ Item {
 
     function loadPluginData() {
         if (!pluginService || !pluginId) {
-            pluginData = {};
+            _globalPluginData = {};
             return;
         }
-        pluginData = SettingsData.getPluginSettingsForPlugin(pluginId);
+        if (isInstance) {
+            pluginData = instanceConfig;
+            return;
+        }
+        _globalPluginData = SettingsData.getPluginSettingsForPlugin(pluginId);
     }
 
     function getData(key, defaultValue) {

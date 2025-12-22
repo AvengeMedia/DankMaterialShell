@@ -163,6 +163,12 @@ FloatingWindow {
                 height: 48
                 z: 10
 
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: windowControls.tryStartMove()
+                    onDoubleClicked: windowControls.tryToggleMaximize()
+                }
+
                 Rectangle {
                     anchors.fill: parent
                     color: Theme.surfaceContainer
@@ -203,17 +209,28 @@ FloatingWindow {
                     }
                 }
 
-                DankActionButton {
+                Row {
                     anchors.right: parent.right
                     anchors.rightMargin: Theme.spacingM
                     anchors.top: parent.top
                     anchors.topMargin: Theme.spacingM
-                    circular: false
-                    iconName: "close"
-                    iconSize: Theme.iconSize - 4
-                    iconColor: Theme.surfaceText
-                    onClicked: () => {
-                        settingsModal.hide();
+                    spacing: Theme.spacingXS
+
+                    DankActionButton {
+                        visible: windowControls.supported
+                        circular: false
+                        iconName: settingsModal.maximized ? "fullscreen_exit" : "fullscreen"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: windowControls.tryToggleMaximize()
+                    }
+
+                    DankActionButton {
+                        circular: false
+                        iconName: "close"
+                        iconSize: Theme.iconSize - 4
+                        iconColor: Theme.surfaceText
+                        onClicked: settingsModal.hide()
                     }
                 }
             }
@@ -256,5 +273,10 @@ FloatingWindow {
                 }
             }
         }
+    }
+
+    FloatingWindowControls {
+        id: windowControls
+        targetWindow: settingsModal
     }
 }

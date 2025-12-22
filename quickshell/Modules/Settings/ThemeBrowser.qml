@@ -114,12 +114,12 @@ FloatingWindow {
         var themeId = PopoutService.pendingThemeInstall;
         PopoutService.pendingThemeInstall = "";
         urlInstallConfirm.showWithOptions({
-            title: I18n.tr("Install Theme", "theme installation dialog title"),
-            message: I18n.tr("Install theme '%1' from the DMS registry?", "theme installation confirmation").arg(themeId),
-            confirmText: I18n.tr("Install", "install action button"),
-            cancelText: I18n.tr("Cancel"),
-            onConfirm: () => installTheme(themeId, themeId, true),
-            onCancel: () => hide()
+            "title": I18n.tr("Install Theme", "theme installation dialog title"),
+            "message": I18n.tr("Install theme '%1' from the DMS registry?", "theme installation confirmation").arg(themeId),
+            "confirmText": I18n.tr("Install", "install action button"),
+            "cancelText": I18n.tr("Cancel"),
+            "onConfirm": () => installTheme(themeId, themeId, true),
+            "onCancel": () => hide()
         });
     }
 
@@ -222,6 +222,12 @@ FloatingWindow {
                 anchors.top: parent.top
                 height: Math.max(headerIcon.height, headerText.height, refreshButton.height, closeButton.height)
 
+                MouseArea {
+                    anchors.fill: parent
+                    onPressed: windowControls.tryStartMove()
+                    onDoubleClicked: windowControls.tryToggleMaximize()
+                }
+
                 DankIcon {
                     id: headerIcon
                     name: "palette"
@@ -254,6 +260,14 @@ FloatingWindow {
                         iconColor: Theme.primary
                         visible: !root.isLoading
                         onClicked: root.refreshThemes()
+                    }
+
+                    DankActionButton {
+                        visible: windowControls.supported
+                        iconName: root.maximized ? "fullscreen_exit" : "fullscreen"
+                        iconSize: Theme.iconSize - 2
+                        iconColor: Theme.outline
+                        onClicked: windowControls.tryToggleMaximize()
                     }
 
                     DankActionButton {
@@ -568,5 +582,10 @@ FloatingWindow {
                 }
             }
         }
+    }
+
+    FloatingWindowControls {
+        id: windowControls
+        targetWindow: root
     }
 }

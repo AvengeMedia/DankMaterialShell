@@ -11,16 +11,71 @@ Item {
     id: root
 
     required property string pluginId
-    required property var pluginComponent
     required property var screen
 
+    property var builtinComponent: null
     property var pluginService: null
-    property string variantId: ""
-    property var variantData: null
+    property string instanceId: ""
+    property var instanceData: null
 
-    readonly property string settingsKey: variantId ? variantId : pluginId
-    readonly property bool isVariant: variantId !== "" && variantData !== null
-    readonly property bool usePluginService: pluginService !== null && !isVariant
+    readonly property bool isBuiltin: pluginId === "desktopClock" || pluginId === "systemMonitor"
+    readonly property var activeComponent: isBuiltin ? builtinComponent : PluginService.pluginDesktopComponents[pluginId] ?? null
+
+    Connections {
+        target: PluginService
+        enabled: !root.isBuiltin
+
+        function onPluginLoaded(loadedPluginId) {
+            if (loadedPluginId === root.pluginId)
+                contentLoader.reloadComponent();
+        }
+
+        function onPluginUnloaded(unloadedPluginId) {
+            if (unloadedPluginId === root.pluginId)
+                contentLoader.reloadComponent();
+        }
+    }
+
+    readonly property string settingsKey: instanceId ? instanceId : pluginId
+    readonly property bool isInstance: instanceId !== "" && instanceData !== null
+    readonly property bool usePluginService: pluginService !== null && !isInstance
+
+    QtObject {
+        id: instanceScopedPluginService
+
+        readonly property var availablePlugins: PluginService.availablePlugins
+        readonly property var loadedPlugins: PluginService.loadedPlugins
+        readonly property var pluginDesktopComponents: PluginService.pluginDesktopComponents
+
+        signal pluginDataChanged(string pluginId)
+        signal pluginLoaded(string pluginId)
+        signal pluginUnloaded(string pluginId)
+
+        function loadPluginData(pluginId, key, defaultValue) {
+            const cfg = root.instanceData?.config;
+            if (cfg && key in cfg)
+                return cfg[key];
+            return SettingsData.getPluginSetting(pluginId, key, defaultValue);
+        }
+
+        function savePluginData(pluginId, key, value) {
+            if (!root.instanceId)
+                return false;
+            var updates = {};
+            updates[key] = value;
+            SettingsData.updateDesktopWidgetInstanceConfig(root.instanceId, updates);
+            Qt.callLater(() => pluginDataChanged(pluginId));
+            return true;
+        }
+
+        function getPluginVariants(pluginId) {
+            return PluginService.getPluginVariants(pluginId);
+        }
+
+        function isPluginLoaded(pluginId) {
+            return PluginService.isPluginLoaded(pluginId);
+        }
+    }
     readonly property string screenKey: SettingsData.getScreenDisplayName(screen)
 
     readonly property int screenWidth: screen?.width ?? 1920
@@ -34,45 +89,45 @@ Item {
     property real previewHeight: widgetHeight
 
     readonly property bool hasSavedPosition: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.x !== undefined;
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.x !== undefined;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopX_" + screenKey, null) !== null;
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "x", null) !== null;
     }
 
     readonly property bool hasSavedSize: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.width !== undefined;
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.width !== undefined;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopWidth_" + screenKey, null) !== null;
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "width", null) !== null;
     }
 
     property real savedX: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.x ?? (screenWidth / 2 - savedWidth / 2);
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.x ?? (screenWidth / 2 - savedWidth / 2);
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopX_" + screenKey, screenWidth / 2 - savedWidth / 2);
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "x", screenWidth / 2 - savedWidth / 2);
     }
     property real savedY: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.y ?? (screenHeight / 2 - savedHeight / 2);
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.y ?? (screenHeight / 2 - savedHeight / 2);
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopY_" + screenKey, screenHeight / 2 - savedHeight / 2);
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "y", screenHeight / 2 - savedHeight / 2);
     }
     property real savedWidth: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.width ?? 280;
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.width ?? 280;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopWidth_" + screenKey, 200);
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "width", 280);
     }
     property real savedHeight: {
-        if (isVariant)
-            return variantData?.positions?.[screenKey]?.height ?? 180;
+        if (isInstance)
+            return instanceData?.positions?.[screenKey]?.height ?? 180;
         if (usePluginService)
             return pluginService.loadPluginData(pluginId, "desktopHeight_" + screenKey, 200);
         return SettingsData.getDesktopWidgetPosition(pluginId, screenKey, "height", 180);
@@ -102,17 +157,9 @@ Item {
         return Math.round(value / gridSize) * gridSize;
     }
 
-    function updateVariantPositions(updates) {
-        const positions = JSON.parse(JSON.stringify(variantData?.positions || {}));
-        positions[screenKey] = Object.assign({}, positions[screenKey] || {}, updates);
-        SettingsData.updateSystemMonitorVariant(variantId, {
-            positions: positions
-        });
-    }
-
     function savePosition() {
-        if (isVariant && variantData) {
-            updateVariantPositions({
+        if (isInstance && instanceData) {
+            SettingsData.updateDesktopWidgetInstancePosition(instanceId, screenKey, {
                 x: root.widgetX,
                 y: root.widgetY
             });
@@ -130,8 +177,8 @@ Item {
     }
 
     function saveSize() {
-        if (isVariant && variantData) {
-            updateVariantPositions({
+        if (isInstance && instanceData) {
+            SettingsData.updateDesktopWidgetInstancePosition(instanceId, screenKey, {
                 width: root.widgetWidth,
                 height: root.widgetHeight
             });
@@ -151,11 +198,11 @@ Item {
     PanelWindow {
         id: widgetWindow
         screen: root.screen
-        visible: root.visible
+        visible: root.visible && root.activeComponent !== null
         color: "transparent"
 
-        WlrLayershell.namespace: "quickshell:desktop-widget:" + root.pluginId + (root.variantId ? ":" + root.variantId : "")
-        WlrLayershell.layer: WlrLayer.Bottom
+        WlrLayershell.namespace: "quickshell:desktop-widget:" + root.pluginId + (root.instanceId ? ":" + root.instanceId : "")
+        WlrLayershell.layer: root.isInteracting && !CompositorService.useHyprlandFocusGrab ? WlrLayer.Overlay : WlrLayer.Bottom
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
         WlrLayershell.keyboardFocus: {
             if (!root.isInteracting)
@@ -210,19 +257,41 @@ Item {
         Loader {
             id: contentLoader
             anchors.fill: parent
-            sourceComponent: root.pluginComponent
+            sourceComponent: root.activeComponent
+
+            function reloadComponent() {
+                active = false;
+                active = true;
+            }
+
+            function updateInstanceData() {
+                if (!item || item.instanceData === undefined)
+                    return;
+                item.instanceData = root.instanceData;
+            }
+
+            Connections {
+                target: root
+                enabled: contentLoader.item !== null
+
+                function onInstanceDataChanged() {
+                    contentLoader.updateInstanceData();
+                }
+            }
 
             onLoaded: {
                 if (!item)
                     return;
-                if (root.usePluginService) {
-                    item.pluginService = root.pluginService;
-                    item.pluginId = root.pluginId;
+
+                if (item.pluginService !== undefined) {
+                    item.pluginService = root.isInstance ? instanceScopedPluginService : root.pluginService;
                 }
-                if (item.variantId !== undefined)
-                    item.variantId = root.variantId;
-                if (item.variantData !== undefined)
-                    item.variantData = Qt.binding(() => root.variantData);
+                if (item.pluginId !== undefined)
+                    item.pluginId = root.pluginId;
+                if (item.instanceId !== undefined)
+                    item.instanceId = root.instanceId;
+                if (item.instanceData !== undefined)
+                    item.instanceData = root.instanceData;
                 if (!root.hasSavedSize) {
                     const defW = item.defaultWidth ?? item.widgetWidth ?? 280;
                     const defH = item.defaultHeight ?? item.widgetHeight ?? 180;

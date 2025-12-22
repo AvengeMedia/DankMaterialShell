@@ -1,22 +1,25 @@
+pragma ComponentBehavior
+
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 FloatingWindow {
     id: root
 
-    property var allWidgets: []
-    property string targetSection: ""
     property string searchQuery: ""
     property var filteredWidgets: []
     property int selectedIndex: -1
     property bool keyboardNavigationActive: false
     property var parentModal: null
 
-    signal widgetSelected(string widgetId, string targetSection)
+    signal closed
+    signal widgetAdded(string widgetType)
 
     function updateFilteredWidgets() {
+        const allWidgets = DesktopWidgetRegistry.registeredWidgetsList || [];
         if (!searchQuery || searchQuery.length === 0) {
             filteredWidgets = allWidgets.slice();
             return;
@@ -27,21 +30,17 @@ FloatingWindow {
 
         for (var i = 0; i < allWidgets.length; i++) {
             var widget = allWidgets[i];
-            var text = widget.text ? widget.text.toLowerCase() : "";
+            var name = widget.name ? widget.name.toLowerCase() : "";
             var description = widget.description ? widget.description.toLowerCase() : "";
             var id = widget.id ? widget.id.toLowerCase() : "";
 
-            if (text.indexOf(query) !== -1 || description.indexOf(query) !== -1 || id.indexOf(query) !== -1)
+            if (name.indexOf(query) !== -1 || description.indexOf(query) !== -1 || id.indexOf(query) !== -1)
                 filtered.push(widget);
         }
 
         filteredWidgets = filtered;
         selectedIndex = -1;
         keyboardNavigationActive = false;
-    }
-
-    onAllWidgetsChanged: {
-        updateFilteredWidgets();
     }
 
     function selectNext() {
@@ -64,11 +63,20 @@ FloatingWindow {
         if (selectedIndex < 0 || selectedIndex >= filteredWidgets.length)
             return;
         var widget = filteredWidgets[selectedIndex];
-        root.widgetSelected(widget.id, root.targetSection);
+        addWidget(widget);
+    }
+
+    function addWidget(widget) {
+        const widgetType = widget.id;
+        const defaultConfig = DesktopWidgetRegistry.getDefaultConfig(widgetType);
+        const name = widget.name || widgetType;
+        SettingsData.createDesktopWidgetInstance(widgetType, name, defaultConfig);
+        root.widgetAdded(widgetType);
         root.hide();
     }
 
     function show() {
+        updateFilteredWidgets();
         if (parentModal)
             parentModal.shouldHaveFocus = false;
         visible = true;
@@ -79,6 +87,7 @@ FloatingWindow {
 
     function hide() {
         visible = false;
+        root.closed();
         if (!parentModal)
             return;
         parentModal.shouldHaveFocus = Qt.binding(() => parentModal.shouldBeVisible);
@@ -88,8 +97,8 @@ FloatingWindow {
         });
     }
 
-    objectName: "widgetSelectionPopup"
-    title: I18n.tr("Add Widget")
+    objectName: "desktopWidgetBrowser"
+    title: I18n.tr("Add Desktop Widget")
     minimumSize: Qt.size(400, 350)
     implicitWidth: 500
     implicitHeight: 550
@@ -98,13 +107,12 @@ FloatingWindow {
 
     onVisibleChanged: {
         if (visible) {
+            updateFilteredWidgets();
             Qt.callLater(() => {
                 searchField.forceActiveFocus();
             });
             return;
         }
-        allWidgets = [];
-        targetSection = "";
         searchQuery = "";
         filteredWidgets = [];
         selectedIndex = -1;
@@ -116,6 +124,14 @@ FloatingWindow {
             if (parentModal && parentModal.modalFocusScope)
                 parentModal.modalFocusScope.forceActiveFocus();
         });
+    }
+
+    Connections {
+        target: DesktopWidgetRegistry
+        function onRegistryChanged() {
+            if (root.visible)
+                root.updateFilteredWidgets();
+        }
     }
 
     FocusScope {
@@ -143,9 +159,7 @@ FloatingWindow {
                 if (root.keyboardNavigationActive) {
                     root.selectWidget();
                 } else if (root.filteredWidgets.length > 0) {
-                    var firstWidget = root.filteredWidgets[0];
-                    root.widgetSelected(firstWidget.id, root.targetSection);
-                    root.hide();
+                    root.addWidget(root.filteredWidgets[0]);
                 }
                 event.accepted = true;
                 return;
@@ -183,8 +197,7 @@ FloatingWindow {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.surfaceContainer
-                    opacity: 0.5
+                    color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
                 }
 
                 Row {
@@ -201,7 +214,7 @@ FloatingWindow {
                     }
 
                     StyledText {
-                        text: I18n.tr("Add Widget to %1 Section").arg(root.targetSection)
+                        text: I18n.tr("Add Desktop Widget")
                         font.pixelSize: Theme.fontSizeXLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -245,7 +258,7 @@ FloatingWindow {
                     spacing: Theme.spacingM
 
                     StyledText {
-                        text: I18n.tr("Select a widget to add. You can add multiple instances of the same widget if needed.")
+                        text: I18n.tr("Select a widget to add to your desktop. Each widget is a separate instance with its own settings.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.outline
                         width: parent.width
@@ -274,7 +287,7 @@ FloatingWindow {
                         keyForwardTargets: [widgetKeyHandler]
                         onTextEdited: {
                             root.searchQuery = text;
-                            updateFilteredWidgets();
+                            root.updateFilteredWidgets();
                         }
                         Keys.onPressed: event => {
                             if (event.key === Qt.Key_Escape) {
@@ -297,12 +310,17 @@ FloatingWindow {
                         clip: true
 
                         delegate: Rectangle {
+                            id: delegateRoot
+
+                            required property var modelData
+                            required property int index
+
                             width: widgetList.width
-                            height: 60
+                            height: 72
                             radius: Theme.cornerRadius
                             property bool isSelected: root.keyboardNavigationActive && index === root.selectedIndex
-                            color: isSelected ? Theme.primarySelected : widgetArea.containsMouse ? Theme.primaryHover : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3)
-                            border.color: isSelected ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            color: isSelected ? Theme.primarySelected : widgetArea.containsMouse ? Theme.primaryHover : Theme.withAlpha(Theme.surfaceVariant, 0.3)
+                            border.color: isSelected ? Theme.primary : Theme.withAlpha(Theme.outline, 0.2)
                             border.width: isSelected ? 2 : 1
 
                             Row {
@@ -310,34 +328,63 @@ FloatingWindow {
                                 anchors.margins: Theme.spacingM
                                 spacing: Theme.spacingM
 
-                                DankIcon {
-                                    name: modelData.icon
-                                    size: Theme.iconSize
-                                    color: Theme.primary
+                                Rectangle {
+                                    width: 44
+                                    height: 44
+                                    radius: Theme.cornerRadius
+                                    color: Theme.primarySelected
                                     anchors.verticalCenter: parent.verticalCenter
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: delegateRoot.modelData.icon || "widgets"
+                                        size: Theme.iconSize
+                                        color: Theme.primary
+                                    }
                                 }
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
                                     spacing: 2
-                                    width: parent.width - Theme.iconSize - Theme.spacingM * 3
+                                    width: parent.width - 44 - Theme.iconSize - Theme.spacingM * 3
 
-                                    StyledText {
-                                        text: modelData.text
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        font.weight: Font.Medium
-                                        color: Theme.surfaceText
-                                        elide: Text.ElideRight
-                                        width: parent.width
+                                    Row {
+                                        spacing: Theme.spacingS
+
+                                        StyledText {
+                                            text: delegateRoot.modelData.name || delegateRoot.modelData.id
+                                            font.pixelSize: Theme.fontSizeMedium
+                                            font.weight: Font.Medium
+                                            color: Theme.surfaceText
+                                        }
+
+                                        Rectangle {
+                                            visible: delegateRoot.modelData.type === "plugin"
+                                            width: pluginLabel.implicitWidth + Theme.spacingXS * 2
+                                            height: 18
+                                            radius: 9
+                                            color: Theme.withAlpha(Theme.secondary, 0.15)
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            StyledText {
+                                                id: pluginLabel
+                                                anchors.centerIn: parent
+                                                text: I18n.tr("Plugin")
+                                                font.pixelSize: Theme.fontSizeSmall - 2
+                                                color: Theme.secondary
+                                            }
+                                        }
                                     }
 
                                     StyledText {
-                                        text: modelData.description
+                                        text: delegateRoot.modelData.description || ""
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.outline
                                         elide: Text.ElideRight
                                         width: parent.width
                                         wrapMode: Text.WordWrap
+                                        maximumLineCount: 2
+                                        visible: text !== ""
                                     }
                                 }
 
@@ -355,10 +402,7 @@ FloatingWindow {
                                 anchors.fill: parent
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
-                                onClicked: {
-                                    root.widgetSelected(modelData.id, root.targetSection);
-                                    root.hide();
-                                }
+                                onClicked: root.addWidget(delegateRoot.modelData)
                             }
 
                             Behavior on color {
@@ -366,6 +410,22 @@ FloatingWindow {
                                     duration: Theme.shortDuration
                                     easing.type: Theme.standardEasing
                                 }
+                            }
+                        }
+
+                        footer: Item {
+                            width: widgetList.width
+                            height: emptyText.visible ? 60 : 0
+
+                            StyledText {
+                                id: emptyText
+                                visible: root.filteredWidgets.length === 0
+                                text: root.searchQuery.length > 0 ? I18n.tr("No widgets match your search") : I18n.tr("No widgets available")
+                                font.pixelSize: Theme.fontSizeMedium
+                                color: Theme.surfaceVariantText
+                                width: parent.width
+                                horizontalAlignment: Text.AlignHCenter
+                                anchors.centerIn: parent
                             }
                         }
                     }

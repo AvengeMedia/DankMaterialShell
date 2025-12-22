@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Common
+import qs.Widgets
 
 FloatingWindow {
     id: fileBrowserModal
@@ -60,6 +61,7 @@ FloatingWindow {
         anchors.fill: parent
         focus: true
         closeOnEscape: false
+        windowControls: windowControls
 
         browserTitle: fileBrowserModal.browserTitle
         browserIcon: fileBrowserModal.browserIcon
@@ -73,5 +75,10 @@ FloatingWindow {
 
         onFileSelected: path => fileBrowserModal.fileSelected(path)
         onCloseRequested: fileBrowserModal.close()
+    }
+
+    FloatingWindowControls {
+        id: windowControls
+        targetWindow: fileBrowserModal
     }
 }
