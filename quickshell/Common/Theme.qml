@@ -854,7 +854,7 @@ Singleton {
                 if (!SettingsData.matugenTemplateVesktop)
                     skipTemplates.push("vesktop");
                 if (!SettingsData.matugenTemplateEquibop)
-                    skipTemplates.push("equibop");                   
+                    skipTemplates.push("equibop");
                 if (!SettingsData.matugenTemplateGhostty)
                     skipTemplates.push("ghostty");
                 if (!SettingsData.matugenTemplateKitty)
