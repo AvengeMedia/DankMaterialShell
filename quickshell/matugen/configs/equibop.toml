@@ -1,0 +1,3 @@
+[templates.dmsvesktop]
+input_path = 'SHELL_DIR/matugen/templates/vesktop.css'
+output_path = '~/.config/equibop/themes/dank-discord.css'

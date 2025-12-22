@@ -1024,6 +1024,17 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "equibop", "discord", "template"]
+                    settingKey: "matugenTemplateEquibop"
+                    text: "equibop"
+                    description: ""
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateEquibop
+                    onToggled: checked => SettingsData.set("matugenTemplateEquibop", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "ghostty", "terminal", "template"]
                     settingKey: "matugenTemplateGhostty"
                     text: "Ghostty"

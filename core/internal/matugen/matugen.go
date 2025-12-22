@@ -258,7 +258,9 @@ output_path = '%s'
 	if !opts.ShouldSkipTemplate("vesktop") {
 		appendConfig(opts, cfgFile, "vesktop", "vesktop.toml")
 	}
-
+	if !opts.ShouldSkipTemplate("equibop") {
+		appendConfig(opts, cfgFile, "equibop", "equibop.toml")
+	}
 	if !opts.ShouldSkipTemplate("ghostty") {
 		appendTerminalConfig(opts, cfgFile, tmpDir, "ghostty", "ghostty.toml")
 	}
