@@ -17,6 +17,7 @@ Singleton {
     property var pluginDaemonComponents: ({})
     property var pluginLauncherComponents: ({})
     property var pluginDesktopComponents: ({})
+    property var pluginDashTabComponents: ({})
     property var availablePluginsList: []
     property string pluginDirectory: {
         var configDir = StandardPaths.writableLocation(StandardPaths.ConfigLocation);
@@ -201,10 +202,15 @@ Singleton {
         }
         info.permissions = perms.map(p => String(p).trim());
 
+        let tabComp = manifest.tabComponent;
+        if (tabComp && tabComp.startsWith("./"))
+            tabComp = tabComp.slice(2);
+
         info.manifestPath = absPath;
         info.pluginDirectory = dir;
         info.componentPath = dir + "/" + comp;
         info.settingsPath = settings ? (dir + "/" + settings) : null;
+        info.tabComponentPath = tabComp ? (dir + "/" + tabComp) : null;
         info.loaded = isPluginLoaded(manifest.id);
         info.type = manifest.type || "widget";
         info.source = sourceTag;
@@ -266,6 +272,7 @@ Singleton {
         const isDaemon = plugin.type === "daemon";
         const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"));
         const isDesktop = plugin.type === "desktop";
+        const isDashTab = plugin.type === "dashtab" || (plugin.capabilities && plugin.capabilities.includes("dankdash-tab"));
 
         const prevInstance = pluginInstances[pluginId];
         if (prevInstance) {
@@ -310,10 +317,28 @@ Singleton {
                 const newDesktop = Object.assign({}, pluginDesktopComponents);
                 newDesktop[pluginId] = comp;
                 pluginDesktopComponents = newDesktop;
+            } else if (isDashTab) {
+                const newDashTabs = Object.assign({}, pluginDashTabComponents);
+                newDashTabs[pluginId] = comp;
+                pluginDashTabComponents = newDashTabs;
             } else {
                 const newComponents = Object.assign({}, pluginWidgetComponents);
                 newComponents[pluginId] = comp;
                 pluginWidgetComponents = newComponents;
+
+                if (plugin.tabComponentPath) {
+                    let tabUrl = "file://" + plugin.tabComponentPath;
+                    if (bustCache)
+                        tabUrl += "?t=" + Date.now();
+                    const tabComp = Qt.createComponent(tabUrl, Component.PreferSynchronous);
+                    if (tabComp.status === Component.Ready) {
+                        const newDashTabs = Object.assign({}, pluginDashTabComponents);
+                        newDashTabs[pluginId] = tabComp;
+                        pluginDashTabComponents = newDashTabs;
+                    } else if (tabComp.status === Component.Error) {
+                        console.warn("PluginService: tabComponent error", pluginId, tabComp.errorString());
+                    }
+                }
             }
 
             plugin.loaded = true;
@@ -341,6 +366,7 @@ Singleton {
             const isDaemon = plugin.type === "daemon";
             const isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"));
             const isDesktop = plugin.type === "desktop";
+            const isDashTab = plugin.type === "dashtab" || (plugin.capabilities && plugin.capabilities.includes("dankdash-tab"));
 
             const instance = pluginInstances[pluginId];
             if (instance) {
@@ -362,10 +388,20 @@ Singleton {
                 const newDesktop = Object.assign({}, pluginDesktopComponents);
                 delete newDesktop[pluginId];
                 pluginDesktopComponents = newDesktop;
+            } else if (isDashTab && pluginDashTabComponents[pluginId]) {
+                const newDashTabs = Object.assign({}, pluginDashTabComponents);
+                delete newDashTabs[pluginId];
+                pluginDashTabComponents = newDashTabs;
             } else if (pluginWidgetComponents[pluginId]) {
                 const newComponents = Object.assign({}, pluginWidgetComponents);
                 delete newComponents[pluginId];
                 pluginWidgetComponents = newComponents;
+
+                if (pluginDashTabComponents[pluginId]) {
+                    const newDashTabs = Object.assign({}, pluginDashTabComponents);
+                    delete newDashTabs[pluginId];
+                    pluginDashTabComponents = newDashTabs;
+                }
             }
 
             plugin.loaded = false;
@@ -391,6 +427,33 @@ Singleton {
 
     function getDesktopComponents() {
         return pluginDesktopComponents;
+    }
+
+    function getDashTabComponents() {
+        return pluginDashTabComponents;
+    }
+
+    function getDashTabPlugins() {
+        const tabs = [];
+        for (const pluginId in pluginDashTabComponents) {
+            const plugin = loadedPlugins[pluginId];
+            if (plugin) {
+                tabs.push({
+                    id: pluginId,
+                    name: plugin.tabName || plugin.name,
+                    icon: plugin.tabIcon || plugin.icon || "extension",
+                    component: pluginDashTabComponents[pluginId],
+                    position: plugin.tabPosition || "end"
+                });
+            }
+        }
+        tabs.sort((a, b) => {
+            if (a.position === b.position) return a.name.localeCompare(b.name);
+            if (a.position === "start") return -1;
+            if (b.position === "start") return 1;
+            return 0;
+        });
+        return tabs;
     }
 
     function getAvailablePlugins() {

@@ -24,6 +24,41 @@ DankPopout {
 
     property var __mediaTabRef: null
 
+    readonly property int weatherTabIndex: SettingsData.weatherEnabled ? 3 : -1
+
+    property var pluginTabs: PluginService.getDashTabPlugins()
+
+    Connections {
+        target: PluginService
+        function onPluginLoaded() { root.pluginTabs = PluginService.getDashTabPlugins(); }
+        function onPluginUnloaded() { root.pluginTabs = PluginService.getDashTabPlugins(); }
+    }
+
+    readonly property int pluginTabStartIndex: {
+        let idx = 3;
+        if (SettingsData.weatherEnabled) idx++;
+        return idx;
+    }
+
+    function tabToStackIndex(tabIdx) {
+        if (tabIdx <= 2) return tabIdx;
+        if (SettingsData.weatherEnabled && tabIdx === 3) return 3;
+        const pluginStart = pluginTabStartIndex;
+        if (tabIdx >= pluginStart && tabIdx < pluginStart + pluginTabs.length) {
+            return 4 + (tabIdx - pluginStart);
+        }
+        return tabIdx;
+    }
+
+    function isPluginTab(tabIdx) {
+        const pluginStart = pluginTabStartIndex;
+        return tabIdx >= pluginStart && tabIdx < pluginStart + pluginTabs.length;
+    }
+
+    function getPluginTabIndex(tabIdx) {
+        return tabIdx - pluginTabStartIndex;
+    }
+
     property int __dropdownType: 0
     property point __dropdownAnchor: Qt.point(0, 0)
     property bool __dropdownRightEdge: false
@@ -288,6 +323,14 @@ DankPopout {
                             });
                         }
 
+                        for (let plugin of root.pluginTabs) {
+                            tabs.push({
+                                "icon": plugin.icon,
+                                "text": plugin.name,
+                                "pluginId": plugin.id
+                            });
+                        }
+
                         tabs.push({
                             "icon": "settings",
                             "text": I18n.tr("Settings"),
@@ -301,7 +344,9 @@ DankPopout {
                     }
 
                     onActionTriggered: function (index) {
-                        let settingsIndex = SettingsData.weatherEnabled ? 4 : 3;
+                        let settingsIndex = 3;
+                        if (SettingsData.weatherEnabled) settingsIndex++;
+                        settingsIndex += root.pluginTabs.length;
                         if (index === settingsIndex) {
                             dashVisible = false;
                             PopoutService.focusOrToggleSettings();
@@ -317,29 +362,37 @@ DankPopout {
                 StackLayout {
                     id: pages
                     width: parent.width
+                    readonly property int stackIndex: root.tabToStackIndex(root.currentTabIndex)
                     implicitHeight: {
-                        if (currentIndex === 0)
+                        if (stackIndex === 0)
                             return overviewLoader.item?.implicitHeight ?? 410;
-                        if (currentIndex === 1)
+                        if (stackIndex === 1)
                             return mediaLoader.item?.implicitHeight ?? 410;
-                        if (currentIndex === 2)
+                        if (stackIndex === 2)
                             return wallpaperLoader.item?.implicitHeight ?? 410;
-                        if (SettingsData.weatherEnabled && currentIndex === 3)
+                        if (stackIndex === 3)
                             return weatherLoader.item?.implicitHeight ?? 410;
+                        if (stackIndex >= 4) {
+                            const pluginIdx = stackIndex - 4;
+                            if (pluginIdx < pluginTabRepeater.count) {
+                                const loader = pluginTabRepeater.itemAt(pluginIdx);
+                                return loader?.item?.implicitHeight ?? 410;
+                            }
+                        }
                         return 410;
                     }
-                    currentIndex: root.currentTabIndex
+                    currentIndex: stackIndex
 
                     Loader {
                         id: overviewLoader
-                        active: root.currentTabIndex === 0
+                        active: pages.stackIndex === 0
                         sourceComponent: Component {
                             OverviewTab {
                                 onCloseDash: root.dashVisible = false
                                 onSwitchToWeatherTab: {
-                                    if (SettingsData.weatherEnabled) {
-                                        tabBar.currentIndex = 3;
-                                        tabBar.tabClicked(3);
+                                    if (root.weatherTabIndex >= 0) {
+                                        tabBar.currentIndex = root.weatherTabIndex;
+                                        tabBar.tabClicked(root.weatherTabIndex);
                                     }
                                 }
                                 onSwitchToMediaTab: {
@@ -352,7 +405,7 @@ DankPopout {
 
                     Loader {
                         id: mediaLoader
-                        active: root.currentTabIndex === 1
+                        active: pages.stackIndex === 1
                         sourceComponent: Component {
                             MediaPlayerTab {
                                 targetScreen: root.screen
@@ -381,7 +434,7 @@ DankPopout {
 
                     Loader {
                         id: wallpaperLoader
-                        active: root.currentTabIndex === 2
+                        active: pages.stackIndex === 2
                         sourceComponent: Component {
                             WallpaperTab {
                                 active: true
@@ -395,9 +448,29 @@ DankPopout {
 
                     Loader {
                         id: weatherLoader
-                        active: SettingsData.weatherEnabled && root.currentTabIndex === 3
+                        active: SettingsData.weatherEnabled && pages.stackIndex === 3
                         sourceComponent: Component {
                             WeatherTab {}
+                        }
+                    }
+
+                    Repeater {
+                        id: pluginTabRepeater
+                        model: root.pluginTabs
+
+                        Loader {
+                            id: pluginTabLoader
+                            required property var modelData
+                            required property int index
+
+                            active: pages.stackIndex === (4 + index)
+                            sourceComponent: modelData.component
+
+                            onLoaded: {
+                                if (item && typeof item.pluginId !== "undefined") {
+                                    item.pluginId = modelData.id;
+                                }
+                            }
                         }
                     }
                 }

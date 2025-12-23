@@ -423,8 +423,44 @@ func (m *Manager) getPluginManifest(pluginPath string) *pluginManifest {
 }
 
 type pluginManifest struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	Type         string   `json:"type,omitempty"`
+	Component    string   `json:"component,omitempty"`
+	TabComponent string   `json:"tabComponent,omitempty"`
+	TabName      string   `json:"tabName,omitempty"`
+	TabIcon      string   `json:"tabIcon,omitempty"`
+	TabPosition  string   `json:"tabPosition,omitempty"`
+	Capabilities []string `json:"capabilities,omitempty"`
+}
+
+// IsDashTab returns true if the plugin provides a DankDash tab
+func (m *pluginManifest) IsDashTab() bool {
+	if m.Type == "dashtab" {
+		return true
+	}
+	for _, cap := range m.Capabilities {
+		if cap == "dankdash-tab" {
+			return true
+		}
+	}
+	return m.TabComponent != ""
+}
+
+// GetTabName returns the tab display name
+func (m *pluginManifest) GetTabName() string {
+	if m.TabName != "" {
+		return m.TabName
+	}
+	return m.Name
+}
+
+// GetTabIcon returns the tab icon
+func (m *pluginManifest) GetTabIcon() string {
+	if m.TabIcon != "" {
+		return m.TabIcon
+	}
+	return "extension"
 }
 
 func (m *Manager) GetPluginsDir() string {
