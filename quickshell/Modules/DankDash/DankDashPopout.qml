@@ -26,7 +26,7 @@ DankPopout {
 
     readonly property int weatherTabIndex: SettingsData.weatherEnabled ? 3 : -1
 
-    property var pluginTabs: PluginService.getDashTabPlugins()
+    property var pluginTabs: []
 
     Connections {
         target: PluginService
@@ -34,11 +34,11 @@ DankPopout {
         function onPluginUnloaded() { root.pluginTabs = PluginService.getDashTabPlugins(); }
     }
 
-    readonly property int pluginTabStartIndex: {
-        let idx = 3;
-        if (SettingsData.weatherEnabled) idx++;
-        return idx;
+    Component.onCompleted: {
+        pluginTabs = PluginService.getDashTabPlugins();
     }
+
+    readonly property int pluginTabStartIndex: SettingsData.weatherEnabled ? 4 : 3
 
     function tabToStackIndex(tabIdx) {
         if (tabIdx <= 2) return tabIdx;
@@ -363,6 +363,7 @@ DankPopout {
                     id: pages
                     width: parent.width
                     readonly property int stackIndex: root.tabToStackIndex(root.currentTabIndex)
+                    readonly property int pluginTabStackOffset: 4
                     implicitHeight: {
                         if (stackIndex === 0)
                             return overviewLoader.item?.implicitHeight ?? 410;
@@ -372,8 +373,8 @@ DankPopout {
                             return wallpaperLoader.item?.implicitHeight ?? 410;
                         if (stackIndex === 3)
                             return weatherLoader.item?.implicitHeight ?? 410;
-                        if (stackIndex >= 4) {
-                            const pluginIdx = stackIndex - 4;
+                        if (stackIndex >= pluginTabStackOffset) {
+                            const pluginIdx = stackIndex - pluginTabStackOffset;
                             if (pluginIdx < pluginTabRepeater.count) {
                                 const loader = pluginTabRepeater.itemAt(pluginIdx);
                                 return loader?.item?.implicitHeight ?? 410;
@@ -463,7 +464,7 @@ DankPopout {
                             required property var modelData
                             required property int index
 
-                            active: pages.stackIndex === (4 + index)
+                            active: pages.stackIndex === (pages.pluginTabStackOffset + index)
                             sourceComponent: modelData.component
 
                             onLoaded: {
