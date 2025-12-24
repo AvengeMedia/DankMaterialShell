@@ -49,7 +49,7 @@ BasePill {
     }
 
     property real scrollAccumulatorY: 0
-    property real touchpadThreshold: 500
+    property real touchpadThreshold: 100
 
     onWheel: function (wheelEvent) {
         wheelEvent.accepted = true;
@@ -72,9 +72,9 @@ BasePill {
             scrollAccumulatorY += deltaY;
             if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
                 if (scrollAccumulatorY > 0) {
-                    newVolume = Math.min(100, currentVolume + 5);
+                    newVolume = Math.min(100, currentVolume + 1);
                 } else {
-                    newVolume = Math.max(0, currentVolume - 5);
+                    newVolume = Math.max(0, currentVolume - 1);
                 }
                 scrollAccumulatorY = 0;
             }
