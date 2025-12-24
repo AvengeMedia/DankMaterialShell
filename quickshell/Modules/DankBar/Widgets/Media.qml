@@ -48,19 +48,36 @@ BasePill {
         return audioVizHeight + Theme.spacingXS + playButtonHeight;
     }
 
+    property real scrollAccumulatorY: 0
+    property real touchpadThreshold: 500
+
     onWheel: function (wheelEvent) {
         wheelEvent.accepted = true;
         if (!usePlayerVolume)
             return;
 
-        const delta = wheelEvent.angleDelta.y;
+        const deltaY = wheelEvent.angleDelta.y;
+        const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+
         const currentVolume = activePlayer.volume * 100;
 
-        let newVolume;
-        if (delta > 0) {
-            newVolume = Math.min(100, currentVolume + 5);
+        let newVolume = currentVolume;
+        if (isMouseWheelY) {
+            if (deltaY > 0) {
+                newVolume = Math.min(100, currentVolume + 5);
+            } else if (deltaY < 0) {
+                newVolume = Math.max(0, currentVolume - 5);
+            }
         } else {
-            newVolume = Math.max(0, currentVolume - 5);
+            scrollAccumulatorY += deltaY;
+            if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
+                if (scrollAccumulatorY > 0) {
+                    newVolume = Math.min(100, currentVolume + 5);
+                } else {
+                    newVolume = Math.max(0, currentVolume - 5);
+                }
+                scrollAccumulatorY = 0;
+            }
         }
 
         activePlayer.volume = newVolume / 100;

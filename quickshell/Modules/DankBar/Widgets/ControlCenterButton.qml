@@ -21,6 +21,10 @@ BasePill {
     property bool showMicIcon: widgetData?.showMicIcon !== undefined ? widgetData.showMicIcon : SettingsData.controlCenterShowMicIcon
     property bool showBatteryIcon: widgetData?.showBatteryIcon !== undefined ? widgetData.showBatteryIcon : SettingsData.controlCenterShowBatteryIcon
     property bool showPrinterIcon: widgetData?.showPrinterIcon !== undefined ? widgetData.showPrinterIcon : SettingsData.controlCenterShowPrinterIcon
+    property real touchpadThreshold: 500
+    property real micAccumulator: 0
+    property real volumeAccumulator: 0
+    property real brightnessAccumulator: 0
 
     Loader {
         active: root.showPrinterIcon
@@ -116,6 +120,17 @@ BasePill {
     function handleVolumeWheel(delta) {
         if (!AudioService.sink?.audio)
             return;
+
+        const isMouseWheel = Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
+        if (!isMouseWheel) {
+            volumeAccumulator += delta;
+            if (Math.abs(volumeAccumulator) < touchpadThreshold)
+                return;
+
+            delta = volumeAccumulator;
+            volumeAccumulator = 0;
+        }
+
         const currentVolume = AudioService.sink.audio.volume * 100;
         const newVolume = delta > 0 ? Math.min(100, currentVolume + 5) : Math.max(0, currentVolume - 5);
         AudioService.sink.audio.muted = false;
@@ -126,6 +141,17 @@ BasePill {
     function handleMicWheel(delta) {
         if (!AudioService.source?.audio)
             return;
+
+        const isMouseWheel = Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
+        if (!isMouseWheel) {
+            micAccumulator += delta;
+            if (Math.abs(micAccumulator) < touchpadThreshold)
+                return;
+
+            delta = micAccumulator;
+            micAccumulator = 0;
+        }
+
         const currentVolume = AudioService.source.audio.volume * 100;
         const newVolume = delta > 0 ? Math.min(100, currentVolume + 5) : Math.max(0, currentVolume - 5);
         AudioService.source.audio.muted = false;
@@ -137,6 +163,17 @@ BasePill {
         if (!deviceName) {
             return;
         }
+
+        const isMouseWheel = Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
+        if (!isMouseWheel) {
+            brightnessAccumulator += delta;
+            if (Math.abs(brightnessAccumulator) < touchpadThreshold)
+                return;
+
+            delta = brightnessAccumulator;
+            brightnessAccumulator = 0;
+        }
+
         const currentBrightness = DisplayService.getDeviceBrightness(deviceName);
         const newBrightness = delta > 0 ? Math.min(100, currentBrightness + 5) : Math.max(1, currentBrightness - 5);
         DisplayService.setBrightness(newBrightness, deviceName);
