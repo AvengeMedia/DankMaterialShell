@@ -77,8 +77,10 @@ Rectangle {
                         return "volume_off";
                     let muted = AudioService.sink.audio.muted;
                     let volume = AudioService.sink.audio.volume;
-                    if (muted || volume === 0.0)
+                    if (muted)
                         return "volume_off";
+                    if (volume === 0.0)
+                        return "volume_mute";
                     if (volume <= 0.33)
                         return "volume_down";
                     if (volume <= 0.66)
@@ -417,8 +419,10 @@ Rectangle {
                                         let volume = modelData.audio.volume;
                                         let muted = modelData.audio.muted;
 
-                                        if (muted || volume === 0.0)
+                                        if (muted)
                                             return "volume_off";
+                                        if (volume === 0.0)
+                                            return "volume_mute";
                                         if (volume <= 0.33)
                                             return "volume_down";
                                         if (volume <= 0.66)

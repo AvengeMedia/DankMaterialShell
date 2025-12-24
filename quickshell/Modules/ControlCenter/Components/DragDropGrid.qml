@@ -248,8 +248,10 @@ Column {
                             return "volume_off";
                         let volume = AudioService.sink.audio.volume;
                         let muted = AudioService.sink.audio.muted;
-                        if (muted || volume === 0.0)
+                        if (muted)
                             return "volume_off";
+                        if (volume === 0.0)
+                            return "volume_mute";
                         if (volume <= 0.33)
                             return "volume_down";
                         if (volume <= 0.66)
