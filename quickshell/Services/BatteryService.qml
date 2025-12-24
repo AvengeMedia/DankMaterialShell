@@ -12,6 +12,8 @@ Singleton {
     property bool suppressSound: true
     property bool previousPluggedState: false
 
+    readonly property var scale: 100 / SettingsData.batteryChargeLimit
+
     Timer {
         id: startupTimer
         interval: 500
@@ -43,14 +45,14 @@ Singleton {
             return 0;
         if (batteryCapacity === 0) {
             if (usePreferred && device && device.ready)
-                return Math.round(device.percentage * 100);
+                return Math.round(device.percentage * 100 * scale);
             const validBatteries = batteries.filter(b => b.ready && b.percentage >= 0);
             if (validBatteries.length === 0)
                 return 0;
             const avgPercentage = validBatteries.reduce((sum, b) => sum + b.percentage, 0) / validBatteries.length;
-            return Math.round(avgPercentage * 100);
+            return Math.round(avgPercentage * 100 * scale);
         }
-        return Math.round((batteryEnergy * 100) / batteryCapacity);
+        return Math.round((batteryEnergy * 100) / batteryCapacity * scale);
     }
     readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging)
 

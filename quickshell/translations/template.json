@@ -1015,6 +1015,13 @@
     "comment": ""
   },
   {
+    "term": "Battery Charge Limit",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Battery and power management",
     "translation": "",
     "context": "",
@@ -5580,6 +5587,13 @@
   },
   {
     "term": "Not connected",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Note: this only changes the displayed percentage, it does not actually limit charging.",
     "translation": "",
     "context": "",
     "reference": "",

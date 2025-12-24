@@ -870,6 +870,12 @@
     "comment": ""
   },
   {
+    "term": "Battery Charge Limit",
+    "context": "Battery Charge Limit",
+    "reference": "Modules/Settings/PowerSleepTab.qml:515",
+    "comment": ""
+  },
+  {
     "term": "Battery and power management",
     "context": "Battery and power management",
     "reference": "Modules/ControlCenter/Models/WidgetModel.qml:162",
@@ -4785,6 +4791,12 @@
     "term": "Not connected",
     "context": "Not connected",
     "reference": "Modules/Settings/NetworkTab.qml:744",
+    "comment": ""
+  },
+  {
+    "term": "Note: this only changes the displayed percentage, it does not actually limit charging.",
+    "context": "Note: this only changes the displayed percentage, it does not actually limit charging.",
+    "reference": "Modules/Settings/PowerSleepTab.qml:516",
     "comment": ""
   },
   {

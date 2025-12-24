@@ -258,6 +258,7 @@ Singleton {
     property int batterySuspendTimeout: 0
     property int batterySuspendBehavior: SettingsData.SuspendBehavior.Suspend
     property string batteryProfileName: ""
+    property int batteryChargeLimit: 100
     property bool lockBeforeSuspend: false
     property bool loginctlLockIntegration: true
     property bool fadeToLockEnabled: false

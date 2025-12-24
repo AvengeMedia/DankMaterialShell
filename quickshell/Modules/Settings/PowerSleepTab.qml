@@ -503,6 +503,24 @@ Item {
                     }
                 }
             }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "tune"
+                title: I18n.tr("Advanced")
+                collapsible: true
+                expanded: false
+
+                SettingsSliderRow {
+                    text: I18n.tr("Battery Charge Limit")
+                    description: I18n.tr("Note: this only changes the percentage, it does not actually limit charging.")
+                    value: SettingsData.batteryChargeLimit
+                    minimum: 50
+                    maximum: 100
+                    defaultValue: 100
+                    onSliderValueChanged: newValue => SettingsData.set("batteryChargeLimit", newValue)
+                }
+            }
         }
     }
 }
