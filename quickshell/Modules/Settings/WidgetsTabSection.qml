@@ -824,14 +824,29 @@ Column {
                             setting: "showAudioIcon"
                         },
                         {
+                            icon: "percent",
+                            label: I18n.tr("Volume"),
+                            setting: "showAudioPercent"
+                        },
+                        {
                             icon: "mic",
                             label: I18n.tr("Microphone"),
                             setting: "showMicIcon"
                         },
                         {
+                            icon: "percent",
+                            label: I18n.tr("Microphone Volume"),
+                            setting: "showMicPercent"
+                        },
+                        {
                             icon: "brightness_high",
                             label: I18n.tr("Brightness"),
                             setting: "showBrightnessIcon"
+                        },
+                        {
+                            icon: "percent",
+                            label: I18n.tr("Brightness Value"),
+                            setting: "showBrightnessPercent"
                         },
                         {
                             icon: "battery_full",
@@ -860,10 +875,16 @@ Column {
                                 return wd?.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
                             case "showAudioIcon":
                                 return wd?.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
+                            case "showAudioPercent":
+                                return wd?.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
                             case "showMicIcon":
                                 return wd?.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
+                            case "showMicPercent":
+                                return wd?.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
                             case "showBrightnessIcon":
                                 return wd?.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
+                            case "showBrightnessPercent":
+                                return wd?.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
                             case "showBatteryIcon":
                                 return wd?.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
                             case "showPrinterIcon":

@@ -21,9 +21,12 @@ Singleton {
             showNetworkIcon: true,
             showBluetoothIcon: true,
             showAudioIcon: true,
+            showAudioPercent: true,
             showVpnIcon: true,
             showBrightnessIcon: false,
+            showBrightnessPercent: false,
             showMicIcon: false,
+            showMicPercent: true,
             showBatteryIcon: false,
             showPrinterIcon: false
         };
@@ -65,12 +68,18 @@ Singleton {
                 item.showBluetoothIcon = order[i].showBluetoothIcon;
             if (isObj && order[i].showAudioIcon !== undefined)
                 item.showAudioIcon = order[i].showAudioIcon;
+            if (isObj && order[i].showAudioPercent !== undefined)
+                item.showAudioPercent = order[i].showAudioPercent;
             if (isObj && order[i].showVpnIcon !== undefined)
                 item.showVpnIcon = order[i].showVpnIcon;
             if (isObj && order[i].showBrightnessIcon !== undefined)
                 item.showBrightnessIcon = order[i].showBrightnessIcon;
+            if (isObj && order[i].showBrightnessPercent !== undefined)
+                item.showBrightnessPercent = order[i].showBrightnessPercent;
             if (isObj && order[i].showMicIcon !== undefined)
                 item.showMicIcon = order[i].showMicIcon;
+            if (isObj && order[i].showMicPercent !== undefined)
+                item.showMicPercent = order[i].showMicPercent;
             if (isObj && order[i].showBatteryIcon !== undefined)
                 item.showBatteryIcon = order[i].showBatteryIcon;
             if (isObj && order[i].showPrinterIcon !== undefined)

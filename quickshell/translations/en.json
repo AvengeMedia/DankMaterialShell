@@ -1026,6 +1026,12 @@
     "comment": ""
   },
   {
+    "term": "Brightness Value",
+    "context": "Brightness Value",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:848",
+    "comment": ""
+  },
+  {
     "term": "Brightness control not available",
     "context": "Brightness control not available",
     "reference": "Modules/ControlCenter/Details/BrightnessDetail.qml:144, Modules/ControlCenter/Models/WidgetModel.qml:148",
@@ -4299,6 +4305,12 @@
     "term": "Microphone Mute",
     "context": "Microphone Mute",
     "reference": "Modules/Settings/OSDTab.qml:125",
+    "comment": ""
+  },
+  {
+    "term": "Microphone Volume",
+    "context": "Microphone Volume",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:838",
     "comment": ""
   },
   {

@@ -108,9 +108,12 @@ Singleton {
     property bool controlCenterShowNetworkIcon: true
     property bool controlCenterShowBluetoothIcon: true
     property bool controlCenterShowAudioIcon: true
+    property bool controlCenterShowAudioPercent: true
     property bool controlCenterShowVpnIcon: true
     property bool controlCenterShowBrightnessIcon: false
+    property bool controlCenterShowBrightnessPercent: false
     property bool controlCenterShowMicIcon: false
+    property bool controlCenterShowMicPercent: true
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
     property bool showPrivacyButton: true

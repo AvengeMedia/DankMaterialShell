@@ -1197,6 +1197,13 @@
     "comment": ""
   },
   {
+    "term": "Brightness Value",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Brightness control not available",
     "translation": "",
     "context": "",
@@ -5013,6 +5020,13 @@
   },
   {
     "term": "Microphone Mute",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Microphone Volume",
     "translation": "",
     "context": "",
     "reference": "",
