@@ -112,6 +112,10 @@ DankModal {
             return "NOTIFICATION_MODAL_TOGGLE_DND_SUCCESS";
         }
 
+        function getDoNotDisturb(): bool {
+            return SessionData.doNotDisturb;
+        }
+
         function clearAll(): string {
             notificationModal.clearAll();
             return "NOTIFICATION_MODAL_CLEAR_ALL_SUCCESS";
