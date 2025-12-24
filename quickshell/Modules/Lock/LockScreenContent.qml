@@ -470,6 +470,10 @@ Item {
                                 return;
                             }
 
+                            if (event.key === Qt.Key_Escape) {
+                                clear();
+                            }
+
                             if (pam.passwd.active) {
                                 console.log("PAM is active, ignoring input");
                                 event.accepted = true;
