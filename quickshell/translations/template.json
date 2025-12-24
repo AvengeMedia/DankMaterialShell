@@ -2331,6 +2331,13 @@
     "comment": ""
   },
   {
+    "term": "Darken Modal Background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Date Format",
     "translation": "",
     "context": "",
@@ -5299,6 +5306,13 @@
     "comment": ""
   },
   {
+    "term": "Niri Layout Overrides",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Niri compositor actions (focus, move, etc.)",
     "translation": "",
     "context": "",
@@ -5839,6 +5853,20 @@
   },
   {
     "term": "Override",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Override Corner Radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Override Gaps",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6685,6 +6713,13 @@
     "comment": ""
   },
   {
+    "term": "Rounded corners for windows",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Run DMS Templates",
     "translation": "",
     "context": "",
@@ -7434,6 +7469,13 @@
     "comment": ""
   },
   {
+    "term": "Show darkened overlay behind modal dialogs",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
     "translation": "",
     "context": "",
@@ -7442,6 +7484,13 @@
   },
   {
     "term": "Show on Last Display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show on Overlay",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7673,6 +7722,13 @@
   },
   {
     "term": "Sounds",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Space between windows",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8540,6 +8596,20 @@
     "comment": ""
   },
   {
+    "term": "Use custom gaps instead of bar spacing",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Use custom window radius instead of theme radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)",
     "translation": "",
     "context": "",
@@ -9017,6 +9087,20 @@
   },
   {
     "term": "Wind Speed",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Window Corner Radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Window Gaps",
     "translation": "",
     "context": "",
     "reference": "",
