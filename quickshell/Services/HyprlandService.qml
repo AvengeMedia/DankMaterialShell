@@ -56,6 +56,9 @@ Singleton {
             if (output.vrr_supported && output.vrr_enabled)
                 monitorLine += ", vrr, 1";
 
+            if (output.mirror && output.mirror.length > 0)
+                monitorLine += ", mirror, " + output.mirror;
+
             if (outputSettings.bitdepth && outputSettings.bitdepth !== 8)
                 monitorLine += ", bitdepth, " + outputSettings.bitdepth;
 

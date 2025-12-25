@@ -10,7 +10,7 @@ import qs.Services
 Singleton {
     id: root
 
-    readonly property bool hasOutputBackend: WlrOutputService.wlrOutputAvailable
+    readonly property bool hasOutputBackend: WlrOutputService.wlrOutputAvailable 
     readonly property var wlrOutputs: WlrOutputService.outputs
     property var outputs: ({})
     property var savedOutputs: ({})
@@ -177,6 +177,7 @@ Singleton {
             const scaleMatch = body.match(/scale\s+([\d.]+)/);
             const transformMatch = body.match(/transform\s+"([^"]+)"/);
             const vrrMatch = body.match(/variable-refresh-rate(?:\s+on)?/);
+            const mirrorMatch = body.match(/mirror\s+"([^"]+)"/);
 
             result[name] = {
                 "name": name,
@@ -195,7 +196,8 @@ Singleton {
                 ] : [],
                 "current_mode": 0,
                 "vrr_enabled": !!vrrMatch,
-                "vrr_supported": true
+                "vrr_supported": true,
+                "mirror": mirrorMatch ? mirrorMatch[1] : ""
             };
         }
         return result;
@@ -238,6 +240,11 @@ Singleton {
             if (sdrSaturationMatch)
                 sdrSaturation = parseFloat(sdrSaturationMatch[1]);
 
+            let mirror = "";
+            const mirrorMatch = rest.match(/,\s*mirror,\s*([^,\s]+)/);
+            if (mirrorMatch)
+                mirror = mirrorMatch[1];
+
             result[name] = {
                 "name": name,
                 "logical": {
@@ -261,7 +268,8 @@ Singleton {
                     "colorManagement": cm,
                     "sdrBrightness": sdrBrightness,
                     "sdrSaturation": sdrSaturation
-                }
+                },
+                "mirror": mirror
             };
         }
         return result;
@@ -573,6 +581,8 @@ Singleton {
                 result[outputName].logical.transform = changes.transform;
             if (changes.vrr !== undefined)
                 result[outputName].vrr_enabled = changes.vrr;
+            if (changes.mirror !== undefined)
+                result[outputName].mirror = changes.mirror;
         }
         return normalizeOutputPositions(result);
     }

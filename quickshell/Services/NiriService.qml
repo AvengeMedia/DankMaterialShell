@@ -1191,6 +1191,10 @@ Singleton {
                 kdlContent += `    backdrop-color "${niriSettings.backdropColor}"\n`;
             }
 
+            if (output.mirror && output.mirror.length > 0) {
+                kdlContent += `    mirror "${output.mirror}"\n`;
+            }
+
             kdlContent += generateHotCornersBlock(niriSettings);
             kdlContent += generateLayoutBlock(niriSettings);
 
