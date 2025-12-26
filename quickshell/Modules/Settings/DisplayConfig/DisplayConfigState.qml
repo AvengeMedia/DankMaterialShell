@@ -177,7 +177,6 @@ Singleton {
             const scaleMatch = body.match(/scale\s+([\d.]+)/);
             const transformMatch = body.match(/transform\s+"([^"]+)"/);
             const vrrMatch = body.match(/variable-refresh-rate(?:\s+on)?/);
-            const mirrorMatch = body.match(/mirror\s+"([^"]+)"/);
 
             result[name] = {
                 "name": name,
@@ -196,8 +195,7 @@ Singleton {
                 ] : [],
                 "current_mode": 0,
                 "vrr_enabled": !!vrrMatch,
-                "vrr_supported": true,
-                "mirror": mirrorMatch ? mirrorMatch[1] : ""
+                "vrr_supported": true
             };
         }
         return result;

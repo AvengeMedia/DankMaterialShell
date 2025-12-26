@@ -72,33 +72,7 @@ Column {
             onToggled: checked => DisplayConfigState.setNiriSetting(root.outputData, root.outputName, "focusAtStartup", checked)
         }
 
-        DankDropdown {
-            width: parent.width
-            text: I18n.tr("Mirror Display")
-            addHorizontalPadding: true
-            
-            property var otherOutputs: {
-                const list = [I18n.tr("None")];
-                for (const name in DisplayConfigState.outputs) {
-                    if (name !== root.outputName)
-                        list.push(name);
-                }
-                return list;
-            }
-            options: otherOutputs
-            
-            currentValue: {
-                DisplayConfigState.pendingChanges;
-                const pending = DisplayConfigState.getPendingValue(root.outputName, "mirror");
-                const val = pending !== undefined ? pending : (root.outputData.mirror || "");
-                return val === "" ? I18n.tr("None") : val;
-            }
-            
-            onValueChanged: value => {
-                const realVal = value === I18n.tr("None") ? "" : value;
-                DisplayConfigState.setPendingChange(root.outputName, "mirror", realVal);
-            }
-        }
+
 
         DankDropdown {
             width: parent.width
