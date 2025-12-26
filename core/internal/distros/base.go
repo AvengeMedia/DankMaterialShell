@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
 )
 
@@ -581,12 +582,20 @@ func (b *BaseDistribution) WriteEnvironmentConfig(terminal deps.Terminal) error 
 		terminalCmd = "ghostty"
 	}
 
-	content := fmt.Sprintf(`QT_QPA_PLATFORM=wayland
+	// ! This deviates from master branch so it doesnt need a hotfix
+	var content string
+	if utils.CommandExists("plasmashell") || utils.CommandExists("plasma-session") || utils.CommandExists("plasma_session") {
+		content = fmt.Sprintf(`ELECTRON_OZONE_PLATFORM_HINT=auto
+TERMINAL=%s
+`, terminalCmd)
+	} else {
+		content = fmt.Sprintf(`QT_QPA_PLATFORM=wayland
 ELECTRON_OZONE_PLATFORM_HINT=auto
 QT_QPA_PLATFORMTHEME=gtk3
 QT_QPA_PLATFORMTHEME_QT6=gtk3
 TERMINAL=%s
 `, terminalCmd)
+	}
 
 	envFile := filepath.Join(envDir, "90-dms.conf")
 	if err := os.WriteFile(envFile, []byte(content), 0644); err != nil {
@@ -598,12 +607,6 @@ TERMINAL=%s
 }
 
 func (b *BaseDistribution) EnableDMSService(ctx context.Context, wm deps.WindowManager) error {
-	cmd := exec.CommandContext(ctx, "systemctl", "--user", "enable", "--now", "dms")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to enable dms service: %w", err)
-	}
-	b.log("Enabled dms systemd user service")
-
 	switch wm {
 	case deps.WindowManagerNiri:
 		if err := exec.CommandContext(ctx, "systemctl", "--user", "add-wants", "niri.service", "dms").Run(); err != nil {
