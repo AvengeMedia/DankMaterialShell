@@ -52,9 +52,12 @@ BasePill {
     property real touchpadThreshold: 100
 
     onWheel: function (wheelEvent) {
-        wheelEvent.accepted = true;
         if (!usePlayerVolume)
             return;
+        if (!SettingsData.audioScrollEnabled)
+            return;
+
+        wheelEvent.accepted = true;
 
         const deltaY = wheelEvent.angleDelta.y;
         const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;

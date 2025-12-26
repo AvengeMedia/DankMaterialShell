@@ -43,6 +43,13 @@ Item {
                     checked: SettingsData.audioVisualizerEnabled
                     onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
                 }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Scroll Wheel")
+                    description: I18n.tr("Scroll on widget changes media volume")
+                    checked: SettingsData.audioScrollEnabled
+                    onToggled: checked => SettingsData.set("audioScrollEnabled", checked)
+                }
             }
         }
     }

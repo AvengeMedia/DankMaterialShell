@@ -91,6 +91,7 @@ var SPEC = {
     waveProgressEnabled: { def: true },
     scrollTitleEnabled: { def: true },
     audioVisualizerEnabled: { def: true },
+    audioScrollEnabled: { def: true },
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
     runningAppsCompactMode: { def: true },
