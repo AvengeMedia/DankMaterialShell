@@ -70,7 +70,7 @@ Column {
             return DisplayConfigState.getHyprlandSetting(root.outputData, root.outputName, "colorManagement", "auto");
         }
         property bool isHdrMode: currentCm === "hdr" || currentCm === "hdredid"
-        
+
         DankDropdown {
             width: parent.width
             text: I18n.tr("Mirror Display")
@@ -85,7 +85,7 @@ Column {
                 return list;
             }
             options: otherOutputs
-            
+
             currentValue: {
                 DisplayConfigState.pendingChanges;
                 const pending = DisplayConfigState.getPendingValue(root.outputName, "mirror");
