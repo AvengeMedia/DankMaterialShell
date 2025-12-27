@@ -794,6 +794,27 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "reverseScrolling",
+    "label": "Reverse Scrolling Direction",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "active",
+      "contain",
+      "desktop",
+      "desktops",
+      "scroll", 
+      "scrolling", 
+      "reverse", 
+      "direction",
+      "windows",
+      "workspace",
+      "workspaces"
+    ],
+    "description": "Display only workspaces that contain windows",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "showWorkspaceApps",
     "label": "Show Workspace Apps",
     "tabIndex": 4,
