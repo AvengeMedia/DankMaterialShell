@@ -255,9 +255,9 @@ output_path = '%s'
 	if !opts.ShouldSkipTemplate("pywalfox") {
 		appendConfig(opts, cfgFile, "pywalfox", "pywalfox.toml")
 	}
-        if !opts.ShouldSkipTemplate("zenbrowser") {
-                appendConfig(opts, cfgFile, "zenbrowser", "zenbrowser.toml")
-        }
+    if !opts.ShouldSkipTemplate("zenbrowser") {
+        appendConfig(opts, cfgFile, "zenbrowser", "zenbrowser.toml")
+	}
 	if !opts.ShouldSkipTemplate("vesktop") {
 		appendConfig(opts, cfgFile, "vesktop", "vesktop.toml")
 	}
