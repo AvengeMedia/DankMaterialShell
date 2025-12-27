@@ -713,7 +713,7 @@ PanelWindow {
 
                             if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
                                 const isMouseWheel = Math.abs(deltaX) >= 120 && (Math.abs(deltaX) % 120) === 0;
-                                const direction = deltaX < 0 ? 1 : -1;
+                                const direction = deltaX * -SettingsData.reverseScrolling < 0 ? 1 : -1;
 
                                 if (isMouseWheel) {
                                     if (handleScrollAction(xBehavior, direction)) {
@@ -741,7 +741,7 @@ PanelWindow {
                             }
 
                             const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
-                            const direction = deltaY < 0 ? 1 : -1;
+                            const direction = deltaY * -SettingsData.reverseScrolling < 0 ? 1 : -1;
 
                             if (isMouseWheel) {
                                 if (handleScrollAction(yBehavior, direction)) {
