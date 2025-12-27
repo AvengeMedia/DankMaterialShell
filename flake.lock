@@ -1,25 +1,5 @@
 {
   "nodes": {
-    "dgop": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1765838956,
-        "narHash": "sha256-A3a2ZfvjirX8VIdIPI+nAyukWs6vx4vet3fU0mpr7lU=",
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "rev": "0ff697a4e3418966caa714c838fc73f1ef6ba59b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "AvengeMedia",
-        "repo": "dgop",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1766651565,
@@ -59,7 +39,6 @@
     },
     "root": {
       "inputs": {
-        "dgop": "dgop",
         "nixpkgs": "nixpkgs",
         "quickshell": "quickshell"
       }
