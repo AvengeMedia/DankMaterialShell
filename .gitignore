@@ -56,7 +56,8 @@ UNUSED
 
 CLAUDE-activeContext.md
 CLAUDE-temp.md
-
+_bmad*
+bmad*
 # Auto-generated theme files
 *.generated.*
 niri-colors.generated.kdl
@@ -108,3 +109,4 @@ bin/
 # direnv
 .envrc
 .direnv/
+core/dms
