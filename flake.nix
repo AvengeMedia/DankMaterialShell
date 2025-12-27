@@ -139,6 +139,8 @@
             }
           );
 
+          quickshell = quickshell.packages.${system}.default;
+
           default = self.packages.${system}.dms-shell;
         }
       );
