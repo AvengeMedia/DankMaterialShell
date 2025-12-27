@@ -803,16 +803,15 @@
       "contain",
       "desktop",
       "desktops",
-      "scroll", 
-      "scrolling", 
-      "reverse", 
+      "scroll",
+      "scrolling",
+      "reverse",
       "direction",
       "windows",
       "workspace",
       "workspaces"
     ],
-    "description": "Display only workspaces that contain windows",
-    "conditionKey": "isNiri"
+    "description": "Display only workspaces that contain windows"
   },
   {
     "section": "showWorkspaceApps",
