@@ -968,9 +968,17 @@ Item {
 
                     SettingsDropdownRow {
                         id: intervalDropdown
-                        property var intervalOptions: ["1 minute", "5 minutes", "15 minutes", "30 minutes", "1 hour", "1.5 hours", "2 hours", "3 hours", "4 hours", "6 hours", "8 hours", "12 hours"]
-                        property var intervalValues: [60, 300, 900, 1800, 3600, 5400, 7200, 10800, 14400, 21600, 28800, 43200]
+                        property var intervalOptions: [
+                            "5 seconds", "10 seconds", "15 seconds", "20 seconds", "25 seconds", "30 seconds",
+                            "35 seconds", "40 seconds", "45 seconds", "50 seconds", "55 seconds",
+                            "1 minute", "5 minutes", "15 minutes", "30 minutes", "1 hour", "1.5 hours", "2 hours",
+                            "3 hours", "4 hours", "6 hours", "8 hours", "12 hours"
+                        ]
 
+                        property var intervalValues: [
+                            5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60,
+                            300, 900, 1800, 3600, 5400, 7200, 10800, 14400, 21600, 28800, 43200
+                        ]
                         tab: "wallpaper"
                         tags: ["interval", "cycling", "time", "frequency"]
                         settingKey: "wallpaperCyclingInterval"
