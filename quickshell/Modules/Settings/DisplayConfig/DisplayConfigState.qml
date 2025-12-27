@@ -238,6 +238,11 @@ Singleton {
             if (sdrSaturationMatch)
                 sdrSaturation = parseFloat(sdrSaturationMatch[1]);
 
+            let mirror = "";
+            const mirrorMatch = rest.match(/,\s*mirror,\s*([^,\s]+)/);
+            if (mirrorMatch)
+                mirror = mirrorMatch[1];
+
             result[name] = {
                 "name": name,
                 "logical": {
@@ -261,7 +266,8 @@ Singleton {
                     "colorManagement": cm,
                     "sdrBrightness": sdrBrightness,
                     "sdrSaturation": sdrSaturation
-                }
+                },
+                "mirror": mirror
             };
         }
         return result;
@@ -573,6 +579,8 @@ Singleton {
                 result[outputName].logical.transform = changes.transform;
             if (changes.vrr !== undefined)
                 result[outputName].vrr_enabled = changes.vrr;
+            if (changes.mirror !== undefined)
+                result[outputName].mirror = changes.mirror;
         }
         return normalizeOutputPositions(result);
     }

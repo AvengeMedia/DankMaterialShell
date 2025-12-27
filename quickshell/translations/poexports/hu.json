@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 nyomtató(k)"
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 widget"
   },
@@ -432,7 +435,7 @@
     "Battery": "Akkumulátor"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "Akkumulátor töltési korlát"
   },
   "Battery and power management": {
     "Battery and power management": "Akku és energia menedzsment"
@@ -472,6 +475,9 @@
   },
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth nem elérhető"
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
   },
   "Blur on Overview": {
     "Blur on Overview": "Elmosás az áttekintésben"
@@ -513,7 +519,7 @@
     "Brightness Slider": "Fényerőszabályozó"
   },
   "Brightness Value": {
-    "Brightness Value": ""
+    "Brightness Value": "Fényerő értéke"
   },
   "Brightness control not available": {
     "Brightness control not available": "A fényerő-szabályozás nem elérhető"
@@ -2106,7 +2112,7 @@
     "Microphone Mute": "Mikrofon némítás"
   },
   "Microphone Volume": {
-    "Microphone Volume": ""
+    "Microphone Volume": "Mikrofon hangereje"
   },
   "Microphone settings": {
     "Microphone settings": "Mikrofonbeállítások"
@@ -2122,6 +2128,12 @@
   },
   "Minute": {
     "Minute": "Perc"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
   },
   "Mode": {
     "Mode": "Mód"
@@ -2229,7 +2241,7 @@
     "Niri Integration": "Niri integráció"
   },
   "Niri Layout Overrides": {
-    "Niri Layout Overrides": ""
+    "Niri Layout Overrides": "Niri elrendezés felülbírálásai"
   },
   "Niri compositor actions (focus, move, etc.)": {
     "Niri compositor actions (focus, move, etc.)": "Niri-kompozitorműveletek (fókusz, mozgatás, stb.)"
@@ -2346,7 +2358,7 @@
     "Not connected": "Nincs csatlakozva"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
-    "Note: this only changes the percentage, it does not actually limit charging.": ""
+    "Note: this only changes the percentage, it does not actually limit charging.": "Megjegyzés: ez csak a százalékot módosítja, ténylegesen nem korlátozza a töltést."
   },
   "Notepad": {
     "Notepad": "Jegyzettömb"
@@ -2460,10 +2472,10 @@
     "Override": "Felülírás"
   },
   "Override Corner Radius": {
-    "Override Corner Radius": ""
+    "Override Corner Radius": "Sarokkerekítés felülbírálása"
   },
   "Override Gaps": {
-    "Override Gaps": ""
+    "Override Gaps": "Térközök felülbírálása"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Globális elrendezési beállítások felülbírálása ehhez a kimenethez"
@@ -2826,7 +2838,7 @@
     "Root Filesystem": "Root fájlrendszer"
   },
   "Rounded corners for windows": {
-    "Rounded corners for windows": ""
+    "Rounded corners for windows": "Lekerekített sarkok az ablakoknál"
   },
   "Run DMS Templates": {
     "Run DMS Templates": "DMS-sablonok futtatása"
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Egérgörgő"
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": "Zeneszám címének görgetése"
@@ -3123,7 +3138,7 @@
     "Show on Last Display": "Megjelenítés az utolsó kijelzőn"
   },
   "Show on Overlay": {
-    "Show on Overlay": ""
+    "Show on Overlay": "Mutatás az átfedésen"
   },
   "Show on Overview": {
     "Show on Overview": "Megjelenítés az áttekintésben"
@@ -3222,7 +3237,7 @@
     "Sounds": "Hangok"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "Ablakok közötti hely"
   },
   "Spacer": {
     "Spacer": "Térköz"
@@ -3582,10 +3597,10 @@
     "Use custom command for update your system": "Egyéni parancs használata a rendszer frissítéséhez"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": ""
+    "Use custom gaps instead of bar spacing": "Egyedi térközök használata a sávközök helyett"
   },
   "Use custom window radius instead of theme radius": {
-    "Use custom window radius instead of theme radius": ""
+    "Use custom window radius instead of theme radius": "Egyedi ablaksugár használata a témasugár helyett"
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Ujjlenyomat-olvasó használata a zárolási képernyőn történő hitelesítéshez (regisztrált ujjlenyomatok szükségesek)"
@@ -3800,10 +3815,10 @@
     "Wind Speed": "Szélsebesség"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "Ablaksarok sugara"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "Ablak térközök"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "Ablakközök (px)"

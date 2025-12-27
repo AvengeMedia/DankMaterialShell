@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 yazıcı"
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 widget"
   },
@@ -432,7 +435,7 @@
     "Battery": "Batarya"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "Batarya Şarj Sınırı"
   },
   "Battery and power management": {
     "Battery and power management": "Batarya ve güç yönetimi"
@@ -472,6 +475,9 @@
   },
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth kullanılamıyor"
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
   },
   "Blur on Overview": {
     "Blur on Overview": "Genel Görünümde Bulanıklık"
@@ -513,7 +519,7 @@
     "Brightness Slider": "Parlaklık Kaydırıcı"
   },
   "Brightness Value": {
-    "Brightness Value": ""
+    "Brightness Value": "Parlaklık Değeri"
   },
   "Brightness control not available": {
     "Brightness control not available": "Parlaklık kontrolü kullanılamıyor"
@@ -2106,7 +2112,7 @@
     "Microphone Mute": "Microfon Sessiz"
   },
   "Microphone Volume": {
-    "Microphone Volume": ""
+    "Microphone Volume": "Mikrofon Ses Seviyesi"
   },
   "Microphone settings": {
     "Microphone settings": "Mikrofon ayarları"
@@ -2122,6 +2128,12 @@
   },
   "Minute": {
     "Minute": "Dakika"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
   },
   "Mode": {
     "Mode": "Mod"
@@ -2229,7 +2241,7 @@
     "Niri Integration": "Niri Entegrasyonu"
   },
   "Niri Layout Overrides": {
-    "Niri Layout Overrides": ""
+    "Niri Layout Overrides": "Niri Düzeni Geçersiz Kılmaları"
   },
   "Niri compositor actions (focus, move, etc.)": {
     "Niri compositor actions (focus, move, etc.)": "Niri kompozitör (focus, move, vb.)"
@@ -2346,7 +2358,7 @@
     "Not connected": "Bağlı değil"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
-    "Note: this only changes the percentage, it does not actually limit charging.": ""
+    "Note: this only changes the percentage, it does not actually limit charging.": "Not: Bu sadece yüzdeyi değiştirir, şarjı sınırlamaz."
   },
   "Notepad": {
     "Notepad": "Not Defteri"
@@ -2460,10 +2472,10 @@
     "Override": "Geçersiz Kıl"
   },
   "Override Corner Radius": {
-    "Override Corner Radius": ""
+    "Override Corner Radius": "Köşe Yarıçapını Değiştir"
   },
   "Override Gaps": {
-    "Override Gaps": ""
+    "Override Gaps": "Boşlukları Değiştir"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Bu çıkış için genel düzen ayarlarını geçersiz kıl"
@@ -2826,7 +2838,7 @@
     "Root Filesystem": "Kök Dosya Sistemi"
   },
   "Rounded corners for windows": {
-    "Rounded corners for windows": ""
+    "Rounded corners for windows": "Pencereler için yuvarlatılmış köşeler"
   },
   "Run DMS Templates": {
     "Run DMS Templates": "DMS Şablonlarını Çalıştır"
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Kaydırma Tekerleği"
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": "Şarkı başlığını kaydır"
@@ -3123,7 +3138,7 @@
     "Show on Last Display": "Son Ekranda Göster"
   },
   "Show on Overlay": {
-    "Show on Overlay": ""
+    "Show on Overlay": "Katmanda Göster"
   },
   "Show on Overview": {
     "Show on Overview": "Genel Görünümde Göster"
@@ -3222,7 +3237,7 @@
     "Sounds": "Sesler"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "Pencereler arası boşluk"
   },
   "Spacer": {
     "Spacer": "Boşluklandırıcı"
@@ -3582,10 +3597,10 @@
     "Use custom command for update your system": "Sistemi güncellemek için özel komut kullan"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": ""
+    "Use custom gaps instead of bar spacing": "Bar aralığı yerine özel boşluklar kullanın"
   },
   "Use custom window radius instead of theme radius": {
-    "Use custom window radius instead of theme radius": ""
+    "Use custom window radius instead of theme radius": "Tema yarıçapı yerine özel pencere yarıçapı kullanın"
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Kilit ekranı doğrulaması için parmak izi okuyucuyu kullan (kayıtlı parmak izleri gereklidir)"
@@ -3800,10 +3815,10 @@
     "Wind Speed": "Rüzgar hızı"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "Pencere Köşe Yarıçapı"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "Pencere Boşlukları"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "Pencere Boşlukları (px)"

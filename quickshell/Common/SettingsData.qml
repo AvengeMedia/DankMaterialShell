@@ -614,6 +614,26 @@ Singleton {
         saveSettings();
     }
 
+    function duplicateDesktopWidgetInstance(instanceId) {
+        const source = getDesktopWidgetInstance(instanceId);
+        if (!source)
+            return null;
+        const newId = "dw_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+        const instance = {
+            id: newId,
+            widgetType: source.widgetType,
+            name: source.name + " (Copy)",
+            enabled: source.enabled,
+            config: JSON.parse(JSON.stringify(source.config || {})),
+            positions: {}
+        };
+        const instances = JSON.parse(JSON.stringify(desktopWidgetInstances || []));
+        instances.push(instance);
+        desktopWidgetInstances = instances;
+        saveSettings();
+        return instance;
+    }
+
     function getDesktopWidgetInstance(instanceId) {
         return (desktopWidgetInstances || []).find(inst => inst.id === instanceId) || null;
     }

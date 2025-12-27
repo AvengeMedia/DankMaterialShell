@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 stampante/i"
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 widgets"
   },
@@ -432,7 +435,7 @@
     "Battery": "Batteria"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "Limite Carica della Batteria"
   },
   "Battery and power management": {
     "Battery and power management": "Gestione batteria e alimentazione"
@@ -472,6 +475,9 @@
   },
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth non disponibile"
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
   },
   "Blur on Overview": {
     "Blur on Overview": "Sfocatura su Panoramica"
@@ -513,7 +519,7 @@
     "Brightness Slider": "Slider Luminosità"
   },
   "Brightness Value": {
-    "Brightness Value": ""
+    "Brightness Value": "Valore di Luminosità"
   },
   "Brightness control not available": {
     "Brightness control not available": "Controllo luminosità non disponibile"
@@ -2106,7 +2112,7 @@
     "Microphone Mute": "Silenzia Microfono"
   },
   "Microphone Volume": {
-    "Microphone Volume": ""
+    "Microphone Volume": "Volume Microfono"
   },
   "Microphone settings": {
     "Microphone settings": "Impostazioni Microfono"
@@ -2122,6 +2128,12 @@
   },
   "Minute": {
     "Minute": "Minuti"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
   },
   "Mode": {
     "Mode": "Modalità"
@@ -2229,7 +2241,7 @@
     "Niri Integration": "Integrazione Niri"
   },
   "Niri Layout Overrides": {
-    "Niri Layout Overrides": ""
+    "Niri Layout Overrides": "Sovrascritture Layout di Niri"
   },
   "Niri compositor actions (focus, move, etc.)": {
     "Niri compositor actions (focus, move, etc.)": "Azioni del compositor Niri (focus, muovi, etc.)"
@@ -2346,7 +2358,7 @@
     "Not connected": "Non connesso"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
-    "Note: this only changes the percentage, it does not actually limit charging.": ""
+    "Note: this only changes the percentage, it does not actually limit charging.": "Nota: questa opzione modifica solo la percentuale visualizzata, non limita fisicamente la carica."
   },
   "Notepad": {
     "Notepad": "Notepad"
@@ -2460,10 +2472,10 @@
     "Override": "Sovrascrivi"
   },
   "Override Corner Radius": {
-    "Override Corner Radius": ""
+    "Override Corner Radius": "Sovrascrivi Raggio Angoli"
   },
   "Override Gaps": {
-    "Override Gaps": ""
+    "Override Gaps": "Sovrascrivi Spaziature"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "Sovrascrivi le impostazioni di layout globali per questa uscita"
@@ -2826,7 +2838,7 @@
     "Root Filesystem": "Filesystem root"
   },
   "Rounded corners for windows": {
-    "Rounded corners for windows": ""
+    "Rounded corners for windows": "Angoli arrotondati per le finestre"
   },
   "Run DMS Templates": {
     "Run DMS Templates": "Esegui Teplate DMS"
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": "Rotella di Scorrimento"
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": "Scorri Titolo Canzone"
@@ -3123,7 +3138,7 @@
     "Show on Last Display": "Mostra sull'ultimo display"
   },
   "Show on Overlay": {
-    "Show on Overlay": ""
+    "Show on Overlay": "Mostra in Sovraimpressione"
   },
   "Show on Overview": {
     "Show on Overview": "Mostra in Panoramica"
@@ -3222,7 +3237,7 @@
     "Sounds": "Suoni"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "Spazio tra le finestre"
   },
   "Spacer": {
     "Spacer": "Spaziatore"
@@ -3582,10 +3597,10 @@
     "Use custom command for update your system": "Usa comando personalizzato per aggiornare il sistema"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": ""
+    "Use custom gaps instead of bar spacing": "Usa spaziature personalizzate invece di quelle della barra"
   },
   "Use custom window radius instead of theme radius": {
-    "Use custom window radius instead of theme radius": ""
+    "Use custom window radius instead of theme radius": "Usa un raggio finestra personalizzato invece di quello del tema"
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "Usa impronte digitali per autenticazione blocco schermo\n(richiede impronte digitali registrate)"
@@ -3800,10 +3815,10 @@
     "Wind Speed": "Velocità Vento"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "Raggio Angoli Finestra"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "Spaziature Finestre"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "Spazi tra finestre (px)"

@@ -15,7 +15,6 @@ FloatingWindow {
     property bool keyboardNavigationActive: false
     property var parentModal: null
 
-    signal closed
     signal widgetAdded(string widgetType)
 
     function updateFilteredWidgets() {
@@ -87,7 +86,6 @@ FloatingWindow {
 
     function hide() {
         visible = false;
-        root.closed();
         if (!parentModal)
             return;
         parentModal.shouldHaveFocus = Qt.binding(() => parentModal.shouldBeVisible);

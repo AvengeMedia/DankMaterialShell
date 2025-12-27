@@ -112,6 +112,8 @@ Item {
                             root.expandedStates = states;
                         }
 
+                        onDuplicateRequested: SettingsData.duplicateDesktopWidgetInstance(instanceIdRef)
+
                         onDeleteRequested: {
                             SettingsData.removeDesktopWidgetInstance(instanceIdRef);
                             ToastService.showInfo(I18n.tr("Widget removed"));

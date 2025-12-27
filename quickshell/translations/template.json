@@ -56,6 +56,13 @@
     "comment": ""
   },
   {
+    "term": "%1 variants",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "%1 widgets",
     "translation": "",
     "context": "",
@@ -1107,6 +1114,13 @@
   },
   {
     "term": "Bluetooth not available",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Blur Wallpaper Layer",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5082,6 +5096,20 @@
     "comment": ""
   },
   {
+    "term": "Mirror Display",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Modal Background",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Mode",
     "translation": "",
     "context": "",
@@ -6909,6 +6937,13 @@
     "comment": ""
   },
   {
+    "term": "Scroll on widget changes media volume",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Scroll song title",
     "translation": "",
     "context": "",
@@ -7710,13 +7745,6 @@
     "term": "Some plugins require a newer version of DMS:",
     "translation": "",
     "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Soothing pastel theme based on Catppuccin",
-    "translation": "",
-    "context": "catppuccin theme description",
     "reference": "",
     "comment": ""
   },

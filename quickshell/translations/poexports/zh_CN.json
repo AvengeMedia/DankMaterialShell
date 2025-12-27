@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 个打印机"
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 小挂件"
   },
@@ -432,7 +435,7 @@
     "Battery": "电池"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "电池充电限制"
   },
   "Battery and power management": {
     "Battery and power management": "电池与电源管理"
@@ -472,6 +475,9 @@
   },
   "Bluetooth not available": {
     "Bluetooth not available": "蓝牙不可用"
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
   },
   "Blur on Overview": {
     "Blur on Overview": "在概览中模糊"
@@ -513,7 +519,7 @@
     "Brightness Slider": "亮度滑块"
   },
   "Brightness Value": {
-    "Brightness Value": ""
+    "Brightness Value": "亮度值"
   },
   "Brightness control not available": {
     "Brightness control not available": "亮度控制不可用"
@@ -2106,7 +2112,7 @@
     "Microphone Mute": "麦克风静音"
   },
   "Microphone Volume": {
-    "Microphone Volume": ""
+    "Microphone Volume": "麦克风音量"
   },
   "Microphone settings": {
     "Microphone settings": "麦克风设置"
@@ -2122,6 +2128,12 @@
   },
   "Minute": {
     "Minute": "分钟"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
   },
   "Mode": {
     "Mode": "模式"
@@ -2229,7 +2241,7 @@
     "Niri Integration": "Niri 集成"
   },
   "Niri Layout Overrides": {
-    "Niri Layout Overrides": ""
+    "Niri Layout Overrides": "Niri布局覆盖"
   },
   "Niri compositor actions (focus, move, etc.)": {
     "Niri compositor actions (focus, move, etc.)": "Niri 合成器操作（聚焦、移动等）"
@@ -2346,7 +2358,7 @@
     "Not connected": "未连接"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
-    "Note: this only changes the percentage, it does not actually limit charging.": ""
+    "Note: this only changes the percentage, it does not actually limit charging.": "注意：这只会改变百分比，而不会实际限制充电。"
   },
   "Notepad": {
     "Notepad": "便签"
@@ -2460,10 +2472,10 @@
     "Override": "覆盖"
   },
   "Override Corner Radius": {
-    "Override Corner Radius": ""
+    "Override Corner Radius": "覆盖角半径"
   },
   "Override Gaps": {
-    "Override Gaps": ""
+    "Override Gaps": "覆盖间隙"
   },
   "Override global layout settings for this output": {
     "Override global layout settings for this output": "为此输出覆盖全局布局设置"
@@ -2826,7 +2838,7 @@
     "Root Filesystem": "根文件系统"
   },
   "Rounded corners for windows": {
-    "Rounded corners for windows": ""
+    "Rounded corners for windows": "窗口圆角"
   },
   "Run DMS Templates": {
     "Run DMS Templates": "运行DMS模板"
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": "滚动滚轮"
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": "滚动歌曲标题"
@@ -3123,7 +3138,7 @@
     "Show on Last Display": "上一个显示器"
   },
   "Show on Overlay": {
-    "Show on Overlay": ""
+    "Show on Overlay": "在概览中显示"
   },
   "Show on Overview": {
     "Show on Overview": "概览中显示"
@@ -3222,7 +3237,7 @@
     "Sounds": "声音"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "窗口间空隙"
   },
   "Spacer": {
     "Spacer": "空白占位"
@@ -3582,10 +3597,10 @@
     "Use custom command for update your system": "使用自定义命令来更新系统"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": ""
+    "Use custom gaps instead of bar spacing": "使用自定义间隔替代状态栏空隙"
   },
   "Use custom window radius instead of theme radius": {
-    "Use custom window radius instead of theme radius": ""
+    "Use custom window radius instead of theme radius": "使用自定义窗口半径替代主题半径"
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "使用指纹识别进行锁屏验证（需要录入指纹）"
@@ -3800,10 +3815,10 @@
     "Wind Speed": "风速"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "窗口角半径"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "窗口间隙"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "窗口间隙（像素）"

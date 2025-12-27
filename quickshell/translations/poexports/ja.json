@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": ""
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 ウィジェット"
   },
@@ -472,6 +475,9 @@
   },
   "Bluetooth not available": {
     "Bluetooth not available": ""
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
   },
   "Blur on Overview": {
     "Blur on Overview": "概要でぼかす"
@@ -2123,6 +2129,12 @@
   "Minute": {
     "Minute": "分"
   },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
+  },
   "Mode": {
     "Mode": ""
   },
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": ""
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": ""

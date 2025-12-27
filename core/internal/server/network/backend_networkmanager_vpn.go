@@ -33,7 +33,7 @@ func (b *NetworkManagerBackend) ListVPNProfiles() ([]VPNProfile, error) {
 		return nil, fmt.Errorf("failed to get connections: %w", err)
 	}
 
-	var profiles []VPNProfile
+	profiles := []VPNProfile{}
 	for _, conn := range connections {
 		settings, err := conn.GetSettings()
 		if err != nil {
@@ -101,7 +101,7 @@ func (b *NetworkManagerBackend) ListActiveVPN() ([]VPNActive, error) {
 		return nil, fmt.Errorf("failed to get active connections: %w", err)
 	}
 
-	var active []VPNActive
+	active := []VPNActive{}
 	for _, activeConn := range activeConns {
 		connType, err := activeConn.GetPropertyType()
 		if err != nil {

@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import qs.Common
 import qs.Services
@@ -13,6 +14,7 @@ SettingsCard {
 
     required property var instanceData
     property bool isExpanded: false
+    property bool confirmingDelete: false
 
     readonly property string instanceId: instanceData?.id ?? ""
     readonly property string widgetType: instanceData?.widgetType ?? ""
@@ -20,6 +22,7 @@ SettingsCard {
     readonly property string widgetName: instanceData?.name ?? widgetDef?.name ?? widgetType
 
     signal deleteRequested
+    signal duplicateRequested
 
     property Component clockSettingsComponent: Component {
         DWS.ClockSettings {}
@@ -46,48 +49,125 @@ SettingsCard {
 
     onExpandedChanged: isExpanded = expanded
 
-    Row {
-        width: parent.width
-        spacing: Theme.spacingS
-
-        Item {
-            width: parent.width - toggleRow.width - deleteBtn.width - Theme.spacingS * 2
-            height: 1
-        }
-
-        Row {
-            id: toggleRow
-            spacing: Theme.spacingS
-
-            StyledText {
-                text: (instanceData?.enabled ?? true) ? I18n.tr("Enabled") : I18n.tr("Disabled")
-                font.pixelSize: Theme.fontSizeSmall
-                color: Theme.surfaceVariantText
-                anchors.verticalCenter: parent.verticalCenter
+    headerActions: [
+        DankToggle {
+            checked: instanceData?.enabled ?? true
+            onToggled: isChecked => {
+                if (!root.instanceId)
+                    return;
+                SettingsData.updateDesktopWidgetInstance(root.instanceId, {
+                    enabled: isChecked
+                });
             }
+        },
+        DankActionButton {
+            id: menuButton
+            iconName: "more_vert"
+            onClicked: actionsMenu.open()
 
-            DankToggle {
-                checked: instanceData?.enabled ?? true
-                onToggled: isChecked => {
-                    if (!root.instanceId)
-                        return;
-                    SettingsData.updateDesktopWidgetInstance(root.instanceId, {
-                        enabled: isChecked
-                    });
+            Popup {
+                id: actionsMenu
+                x: -width + parent.width
+                y: parent.height + Theme.spacingXS
+                width: 160
+                padding: Theme.spacingXS
+                modal: true
+                focus: true
+                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+                onClosed: root.confirmingDelete = false
+
+                background: Rectangle {
+                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                    radius: Theme.cornerRadius
+                    border.color: Theme.outlineLight
+                    border.width: 1
+                }
+
+                contentItem: Column {
+                    spacing: 2
+
+                    Rectangle {
+                        width: parent.width
+                        height: Theme.iconSizeLarge
+                        radius: Theme.cornerRadius
+                        color: duplicateArea.containsMouse ? Theme.primaryHover : "transparent"
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: "content_copy"
+                                size: Theme.iconSizeSmall
+                                color: Theme.surfaceText
+                            }
+
+                            StyledText {
+                                text: I18n.tr("Duplicate")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                            }
+                        }
+
+                        MouseArea {
+                            id: duplicateArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                actionsMenu.close();
+                                root.duplicateRequested();
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        width: parent.width
+                        height: Theme.iconSizeLarge
+                        radius: Theme.cornerRadius
+                        color: deleteArea.containsMouse ? Theme.errorHover : "transparent"
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: root.confirmingDelete ? "warning" : "delete"
+                                size: Theme.iconSizeSmall
+                                color: Theme.error
+                            }
+
+                            StyledText {
+                                text: root.confirmingDelete ? I18n.tr("Confirm Delete") : I18n.tr("Delete")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.error
+                            }
+                        }
+
+                        MouseArea {
+                            id: deleteArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.confirmingDelete) {
+                                    actionsMenu.close();
+                                    root.deleteRequested();
+                                    return;
+                                }
+                                root.confirmingDelete = true;
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        DankButton {
-            id: deleteBtn
-            iconName: "delete"
-            backgroundColor: "transparent"
-            textColor: Theme.error
-            buttonHeight: 32
-            horizontalPadding: 4
-            onClicked: root.deleteRequested()
-        }
-    }
+    ]
 
     Column {
         width: parent.width
@@ -101,8 +181,6 @@ SettingsCard {
                 easing.type: Theme.emphasizedEasing
             }
         }
-
-        SettingsDivider {}
 
         Item {
             width: parent.width

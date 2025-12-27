@@ -162,6 +162,7 @@ Singleton {
             const name = (app.name || "").toLowerCase()
             const genericName = (app.genericName || "").toLowerCase()
             const comment = (app.comment || "").toLowerCase()
+            const id = (app.id || "").toLowerCase()
             const keywords = app.keywords ? app.keywords.map(k => k.toLowerCase()) : []
 
             let textScore = 0
@@ -185,6 +186,9 @@ Singleton {
             } else if (genericName && genericName.includes(queryLower)) {
                 textScore = 400
                 matchType = "generic"
+            } else if (id && id.includes(queryLower)) {
+                textScore = 350
+                matchType = "id"
             }
 
             if (matchType === "none" && keywords.length > 0) {

@@ -21,6 +21,7 @@ StyledRect {
     property bool expanded: true
 
     default property alias content: contentColumn.children
+    property alias headerActions: headerActionsRow.children
 
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
 
@@ -137,7 +138,16 @@ StyledRect {
                 }
             }
 
+            Row {
+                id: headerActionsRow
+                anchors.right: caretIcon.left
+                anchors.rightMargin: root.collapsible ? Theme.spacingS : 0
+                anchors.verticalCenter: parent.verticalCenter
+                spacing: Theme.spacingXS
+            }
+
             DankIcon {
+                id: caretIcon
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 name: root.expanded ? "expand_less" : "expand_more"
@@ -147,12 +157,27 @@ StyledRect {
             }
 
             MouseArea {
-                anchors.fill: parent
+                anchors.left: parent.left
+                anchors.right: headerActionsRow.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
                 enabled: root.collapsible
                 cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
                 onClicked: {
-                    if (!root.collapsible)
-                        return;
+                    root.userToggledCollapse = true;
+                    root.expanded = !root.expanded;
+                }
+            }
+
+            MouseArea {
+                anchors.left: caretIcon.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.leftMargin: -Theme.spacingS
+                enabled: root.collapsible
+                cursorShape: root.collapsible ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
                     root.userToggledCollapse = true;
                     root.expanded = !root.expanded;
                 }

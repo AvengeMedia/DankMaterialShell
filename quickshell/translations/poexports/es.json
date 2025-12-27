@@ -23,6 +23,9 @@
   "%1 printer(s)": {
     "%1 printer(s)": "%1 impresora(s)"
   },
+  "%1 variants": {
+    "%1 variants": ""
+  },
   "%1 widgets": {
     "%1 widgets": "%1 widgets"
   },
@@ -60,7 +63,7 @@
     "15 seconds": "15 segundos"
   },
   "180°": {
-    "180°": ""
+    "180°": "180º"
   },
   "2 minutes": {
     "2 minutes": "2 minutos"
@@ -72,7 +75,7 @@
     "24-hour format": "Formato de 24 horas"
   },
   "270°": {
-    "270°": ""
+    "270°": "270º"
   },
   "3 days": {
     "3 days": "3 dias"
@@ -96,16 +99,16 @@
     "5 seconds": "5 segundos"
   },
   "7 days": {
-    "7 days": ""
+    "7 days": "7 días"
   },
   "8 seconds": {
     "8 seconds": "8 segundos"
   },
   "90 days": {
-    "90 days": ""
+    "90 days": "90 días"
   },
   "90°": {
-    "90°": ""
+    "90°": "90º"
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Un archivo con este nombre ya existe. ¿Quieres reemplazarlo?"
@@ -183,7 +186,7 @@
     "Add a border around the dock": "Añade un recuadro alrededor del dock"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": ""
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Añadir un prefijo personalizado a todas las aplicaciones que se ejecutan. Esto puede ser usado para cosas como 'uwsm-app', 'systemd-run', o otro comando envoltorio."
   },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": ""
@@ -192,7 +195,7 @@
     "Adjust the number of columns in grid view mode.": "Ajustar cuántas columnas se muestran en la cuadrícula."
   },
   "Advanced": {
-    "Advanced": ""
+    "Advanced": "Avanzado"
   },
   "Afternoon": {
     "Afternoon": "Tarde"
@@ -231,7 +234,7 @@
     "Amount": "Cantidad"
   },
   "Analog": {
-    "Analog": ""
+    "Analog": "Analogico"
   },
   "Animation Speed": {
     "Animation Speed": "Velocidad de animación"
@@ -297,7 +300,7 @@
     "Audio Output Switch": ""
   },
   "Audio Visualizer": {
-    "Audio Visualizer": ""
+    "Audio Visualizer": "Visualizador de audio"
   },
   "Audio volume control": {
     "Audio volume control": "Control del volumen de audio"
@@ -432,10 +435,10 @@
     "Battery": "Batería"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "Limite de carga de bateria"
   },
   "Battery and power management": {
-    "Battery and power management": ""
+    "Battery and power management": "Bateria y gestion de energia"
   },
   "Battery level and power management": {
     "Battery level and power management": "Nivel de batería y gestión de energía"
@@ -473,6 +476,9 @@
   "Bluetooth not available": {
     "Bluetooth not available": "Bluetooth no disponible"
   },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
+  },
   "Blur on Overview": {
     "Blur on Overview": "Desenfocar en la vista general"
   },
@@ -495,10 +501,10 @@
     "Bottom": "Abajo"
   },
   "Bottom Left": {
-    "Bottom Left": ""
+    "Bottom Left": "Abajo a la izquierda"
   },
   "Bottom Right": {
-    "Bottom Right": ""
+    "Bottom Right": "Abajo a la derecha"
   },
   "Bottom Section": {
     "Bottom Section": "Sección inferior"
@@ -528,7 +534,7 @@
     "CPU": "CPU"
   },
   "CPU Graph": {
-    "CPU Graph": ""
+    "CPU Graph": "Grafico de la CPU"
   },
   "CPU Temperature": {
     "CPU Temperature": "Temperatura de CPU"
@@ -708,7 +714,7 @@
     "Color Gamut": ""
   },
   "Color Management": {
-    "Color Management": ""
+    "Color Management": "Gestion de color"
   },
   "Color Mode": {
     "Color Mode": "Modo de color"
@@ -720,7 +726,7 @@
     "Color Picker": "Selector de color"
   },
   "Color Temperature": {
-    "Color Temperature": ""
+    "Color Temperature": "Temperatura de color"
   },
   "Color displayed on monitors without the lock screen": {
     "Color displayed on monitors without the lock screen": ""
@@ -735,7 +741,7 @@
     "Colorful mix of bright contrasting accents.": "Colores vivos con contrastes luminosos."
   },
   "Column": {
-    "Column": ""
+    "Column": "Columna"
   },
   "Command": {
     "Command": "Comando"
@@ -753,13 +759,13 @@
     "Compositor": "Compositor"
   },
   "Compositor Settings": {
-    "Compositor Settings": ""
+    "Compositor Settings": "Ajustes del compositor"
   },
   "Config Format": {
     "Config Format": "Formato de la configuracion"
   },
   "Config action: %1": {
-    "Config action: %1": ""
+    "Config action: %1": "Acción de configuración: %1"
   },
   "Config validation failed": {
     "Config validation failed": "Fallo en la validación de la configuracion"
@@ -876,7 +882,7 @@
     "Current Period": ""
   },
   "Current Status": {
-    "Current Status": ""
+    "Current Status": "Estado actual"
   },
   "Current Temp": {
     "Current Temp": ""
@@ -891,7 +897,7 @@
     "Current weather conditions and temperature": "Condiciones meteorológicas y temperatura actuales"
   },
   "Current: %1": {
-    "Current: %1": ""
+    "Current: %1": "Actual: %1"
   },
   "Custom": {
     "Custom": "Personal"
@@ -951,7 +957,7 @@
     "DMS out of date": "DMS desactualizado"
   },
   "DMS service is not connected. Clipboard settings are unavailable.": {
-    "DMS service is not connected. Clipboard settings are unavailable.": ""
+    "DMS service is not connected. Clipboard settings are unavailable.": "Servicio de DMS no está conectado. Los ajustes del portapapeles no están disponibles."
   },
   "DMS shell actions (launcher, clipboard, etc.)": {
     "DMS shell actions (launcher, clipboard, etc.)": "Acciones de DMS Shell (lanzador, portapapeles, etc.)"
@@ -1077,10 +1083,10 @@
     "Disable Autoconnect": "Desactivar conexión automática"
   },
   "Disable Clipboard Manager": {
-    "Disable Clipboard Manager": ""
+    "Disable Clipboard Manager": "Deshabilitar gestor del portapapeles"
   },
   "Disable History Persistence": {
-    "Disable History Persistence": ""
+    "Disable History Persistence": "Deshabilitar persistencia del historial"
   },
   "Disable Output": {
     "Disable Output": "Desabilitar salida"
@@ -1122,7 +1128,7 @@
     "Display Name Format": "Formato de nombre"
   },
   "Display Settings": {
-    "Display Settings": ""
+    "Display Settings": "Ajustes de monitor"
   },
   "Display a dock with pinned and running applications": {
     "Display a dock with pinned and running applications": ""
@@ -1155,7 +1161,7 @@
     "Display seconds in the clock": "Mostrar segundos en el reloj"
   },
   "Display the power system menu": {
-    "Display the power system menu": ""
+    "Display the power system menu": "Mostrar el menu de apagado de sistema"
   },
   "Display volume and brightness percentage values in OSD popups": {
     "Display volume and brightness percentage values in OSD popups": "Mostrar valores de porcentaje de brillo y volumen en las ventanas emergentes del OSD"
@@ -1194,10 +1200,10 @@
     "Domain (optional)": "Dominio (opcional)"
   },
   "Don't Change": {
-    "Don't Change": ""
+    "Don't Change": "No cambiar"
   },
   "Don't Save": {
-    "Don't Save": ""
+    "Don't Save": "No guardar"
   },
   "Door Open": {
     "Door Open": "Puera abierta"
@@ -1239,7 +1245,7 @@
     "Enable Bar": "Habilitar barra"
   },
   "Enable Desktop Clock": {
-    "Enable Desktop Clock": ""
+    "Enable Desktop Clock": "Habilitar reloj de escritorio"
   },
   "Enable Do Not Disturb": {
     "Enable Do Not Disturb": "Activar \"No Molestar\""
@@ -1272,7 +1278,7 @@
     "Enable loginctl lock integration": "Habilitar integración con loginctl"
   },
   "Enable password field display on the lock screen window": {
-    "Show Password Field": ""
+    "Show Password Field": "Mostrar campo de contraseña"
   },
   "Enable power action icon on the lock screen window": {
     "Show Power Actions": ""
@@ -1284,16 +1290,16 @@
     "Show System Date": "Mostrar fecha del sistema"
   },
   "Enable system status icons on the lock screen window": {
-    "Show System Icons": ""
+    "Show System Icons": "Mostrar iconos del sistema"
   },
   "Enable system time display on the lock screen window": {
-    "Show System Time": ""
+    "Show System Time": "Mostrar tiempo del sistema"
   },
   "Enabled": {
     "Enabled": "Habilitado"
   },
   "Enabling WiFi...": {
-    "Enabling WiFi...": ""
+    "Enabling WiFi...": "Habilitando WiFi..."
   },
   "End": {
     "End": "Final"
@@ -1380,7 +1386,7 @@
     "Failed to connect VPN": "Hubo un error al conectar con la VPN"
   },
   "Failed to connect to %1": {
-    "Failed to connect to %1": ""
+    "Failed to connect to %1": "Fallo al conectar a %1"
   },
   "Failed to copy entry": {
     "Failed to copy entry": "Fallo al copiar la entrada"
@@ -1554,13 +1560,13 @@
     "Flipped 90°": ""
   },
   "Focus at Startup": {
-    "Focus at Startup": ""
+    "Focus at Startup": "Centrarse en el inicio"
   },
   "Focused Window": {
     "Focused Window": "Ventana enfocada"
   },
   "Follow focus": {
-    "Follow focus": ""
+    "Follow focus": "Seguir foco"
   },
   "Font Family": {
     "Font Family": "Familia de tipografía"
@@ -1575,7 +1581,7 @@
     "Font Weight": "Grosor de fuente"
   },
   "Force HDR": {
-    "Force HDR": ""
+    "Force HDR": "Forzar HDR"
   },
   "Force Kill Process": {
     "Force Kill Process": "Forzar terminar el proceso"
@@ -1866,7 +1872,7 @@
     "Ko-fi": "Ko-fi"
   },
   "LED device": {
-    "LED device": ""
+    "LED device": "Dispositivo LED"
   },
   "Last launched %1": {
     "Last launched %1": "Usado hace %1"
@@ -2109,10 +2115,10 @@
     "Microphone Volume": ""
   },
   "Microphone settings": {
-    "Microphone settings": ""
+    "Microphone settings": "Ajustes de microfono"
   },
   "Microphone volume control": {
-    "Microphone volume control": ""
+    "Microphone volume control": "Control de volumen del microfono"
   },
   "Middle Section": {
     "Middle Section": "Sección central"
@@ -2122,6 +2128,12 @@
   },
   "Minute": {
     "Minute": "Minuto"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
   },
   "Mode": {
     "Mode": "Modo"
@@ -2136,7 +2148,7 @@
     "Modified": "Modificado"
   },
   "Monitor Configuration": {
-    "Monitor Configuration": ""
+    "Monitor Configuration": "Configuracion del monitor"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Seleccionar monitor que define los colores dinámicos"
@@ -2214,7 +2226,7 @@
     "New York, NY": "New York, NY"
   },
   "Next Transition": {
-    "Next Transition": ""
+    "Next Transition": "Siguiente transicion"
   },
   "Night": {
     "Night": "Noche"
@@ -2340,7 +2352,7 @@
     "Normal Priority": "Prioridad normal"
   },
   "Not available": {
-    "Not available": ""
+    "Not available": "No disponible"
   },
   "Not connected": {
     "Not connected": "No conectado"
@@ -2493,13 +2505,13 @@
     "Pair Bluetooth Device": "Emparejar dispositivo Bluetooth"
   },
   "Paired": {
-    "Paired": ""
+    "Paired": "Vinculado"
   },
   "Pairing failed": {
     "Pairing failed": "Emparejamiento fallido"
   },
   "Pairing...": {
-    "Pairing...": ""
+    "Pairing...": "Vinculando..."
   },
   "Passkey:": {
     "Passkey:": "Clave de acceso:"
@@ -2541,7 +2553,7 @@
     "Pin to Dock": "Fijar al dock"
   },
   "Pinned": {
-    "Pinned": ""
+    "Pinned": "Fijado"
   },
   "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
     "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "Pon aquí el directorio de complementos. Cada complemento debe tener un archivo plugin.json adjunto."
@@ -2631,7 +2643,7 @@
     "Power profile management available": ""
   },
   "Power source": {
-    "Power source": ""
+    "Power source": "Fuente de energia"
   },
   "Precipitation Chance": {
     "Precipitation Chance": "Probabilidad de lluvia"
@@ -2766,7 +2778,7 @@
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Requiere mantener pulsado el botón/tecla para confirmar apagar, reiniciar, suspender, hibernar y cerrar sesión"
   },
   "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": ""
+    "Requires 'dgop' tool": "Requiere la herramienta 'dgop'"
   },
   "Requires DMS %1": {
     "Requires DMS %1": "DMS Requiere %1"
@@ -2784,13 +2796,13 @@
     "Reset Position": "Reiniciar posicion"
   },
   "Reset Size": {
-    "Reset Size": ""
+    "Reset Size": "Reiniciar tamaño"
   },
   "Resize Widget": {
-    "Resize Widget": ""
+    "Resize Widget": "Redimensionar Widget"
   },
   "Resolution & Refresh": {
-    "Resolution & Refresh": ""
+    "Resolution & Refresh": "Resolución y refresco"
   },
   "Restart DMS": {
     "Restart DMS": "Reiniciar DMS"
@@ -2823,7 +2835,7 @@
     "Right-click bar widget to cycle": "Clic derecho en la barra para cambiar"
   },
   "Root Filesystem": {
-    "Root Filesystem": ""
+    "Root Filesystem": "Raíz del sistema de archivos"
   },
   "Rounded corners for windows": {
     "Rounded corners for windows": ""
@@ -2871,7 +2883,7 @@
     "Saved Configurations": "Configuraciones guardadas"
   },
   "Scale": {
-    "Scale": ""
+    "Scale": "Escala"
   },
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Escalar fuentes de la barra independientemente"
@@ -2896,6 +2908,9 @@
   },
   "Scroll Wheel": {
     "Scroll Wheel": ""
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
   },
   "Scroll song title": {
     "Scroll song title": ""
@@ -2931,7 +2946,7 @@
     "Searching...": "Buscando..."
   },
   "Secondary": {
-    "Secondary": ""
+    "Secondary": "Secundario"
   },
   "Secured": {
     "Secured": "Seguro"
@@ -3033,25 +3048,25 @@
     "Show All Tags": "Mostrar todas las etiquetas"
   },
   "Show CPU": {
-    "Show CPU": ""
+    "Show CPU": "Mostrar CPU"
   },
   "Show CPU Graph": {
-    "Show CPU Graph": ""
+    "Show CPU Graph": "Mostrar grafico de CPU"
   },
   "Show CPU Temp": {
-    "Show CPU Temp": ""
+    "Show CPU Temp": "Mostrar temperatura de CPU"
   },
   "Show Date": {
-    "Show Date": ""
+    "Show Date": "Mostrar fecha"
   },
   "Show Disk": {
-    "Show Disk": ""
+    "Show Disk": "Mostrar disco"
   },
   "Show Dock": {
     "Show Dock": "Mostrar dock"
   },
   "Show GPU Temperature": {
-    "Show GPU Temperature": ""
+    "Show GPU Temperature": "Mostrar temperatura de la GPU"
   },
   "Show Header": {
     "Show Header": ""
@@ -3072,16 +3087,16 @@
     "Show Log Out": "Mostrar Cerrar sesión"
   },
   "Show Memory": {
-    "Show Memory": ""
+    "Show Memory": "Mostrar memoria"
   },
   "Show Memory Graph": {
     "Show Memory Graph": ""
   },
   "Show Network": {
-    "Show Network": ""
+    "Show Network": "Mostrar red"
   },
   "Show Network Graph": {
-    "Show Network Graph": ""
+    "Show Network Graph": "Mostrar grafico de la red"
   },
   "Show Occupied Workspaces Only": {
     "Show Occupied Workspaces Only": "Mostrar solo espacios de trabajo ocupados"
@@ -3204,13 +3219,13 @@
     "Sizing": ""
   },
   "Some plugins require a newer version of DMS:": {
-    "Some plugins require a newer version of DMS:": ""
+    "Some plugins require a newer version of DMS:": "Algunos plugins requieren una version más nueva de DMS:"
   },
   "Sort Alphabetically": {
     "Sort Alphabetically": "Ordenar alfabéticamente"
   },
   "Sort By": {
-    "Sort By": ""
+    "Sort By": "Ordenar por"
   },
   "Sorting & Layout": {
     "Sorting & Layout": ""
@@ -3222,7 +3237,7 @@
     "Sounds": "Sonidos"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "Espacio entre ventanas"
   },
   "Spacer": {
     "Spacer": "Espaciador"
@@ -3231,7 +3246,7 @@
     "Spacing": "Espacio"
   },
   "Speaker settings": {
-    "Speaker settings": ""
+    "Speaker settings": "Ajustes del altavoz"
   },
   "Speed": {
     "Speed": "Velocidad"
@@ -3474,13 +3489,13 @@
     "Top Bar Format": "Formato en la barra superior"
   },
   "Top Left": {
-    "Top Left": ""
+    "Top Left": "Arriba a la izquierda"
   },
   "Top Processes": {
     "Top Processes": ""
   },
   "Top Right": {
-    "Top Right": ""
+    "Top Right": "Arriba a la derecha"
   },
   "Top Section": {
     "Top Section": "Sección superior"
@@ -3489,7 +3504,7 @@
     "Total Jobs": "Trabajos totales"
   },
   "Transform": {
-    "Transform": ""
+    "Transform": "Transformar"
   },
   "Transition Effect": {
     "Transition Effect": "Efecto de transición"
@@ -3507,7 +3522,7 @@
     "Typography": "Tipografía"
   },
   "Typography & Motion": {
-    "Typography & Motion": ""
+    "Typography & Motion": "Tipografia y movimiento"
   },
   "Unavailable": {
     "Unavailable": "No disponible"
@@ -3736,7 +3751,7 @@
     "Wi-Fi Password": "Contraseña Wi-Fi"
   },
   "Wi-Fi and Ethernet connection": {
-    "Wi-Fi and Ethernet connection": ""
+    "Wi-Fi and Ethernet connection": "Conexión Wi-Fi y Eternet"
   },
   "Wi-Fi not available": {
     "Wi-Fi not available": "Wi-Fi no disponible"
@@ -3781,7 +3796,7 @@
     "Widget Variants": ""
   },
   "Widget added": {
-    "Widget added": ""
+    "Widget added": "Widget añadido"
   },
   "Widget grid keyboard hints": {
     "G: grid • Z/X: size": ""
@@ -3791,7 +3806,7 @@
     "Grid: ON": "Cuadricula: ON"
   },
   "Widget removed": {
-    "Widget removed": ""
+    "Widget removed": "Widget eliminado"
   },
   "Wind": {
     "Wind": "Viento"
@@ -3800,13 +3815,13 @@
     "Wind Speed": "Velocidad del viento"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "Radio de la esquina de la ventana"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "Separacion de ventana"
   },
   "Window Gaps (px)": {
-    "Window Gaps (px)": ""
+    "Window Gaps (px)": "Separacion de ventanas (px)"
   },
   "Workspace": {
     "Workspace": "Espacio de trabajo"
@@ -3881,7 +3896,7 @@
     "days": "dias"
   },
   "dgop not available": {
-    "dgop not available": ""
+    "dgop not available": "dgop no disponible"
   },
   "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
     "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": ""
@@ -3908,10 +3923,10 @@
     "e.g., focus-workspace 3, resize-column -10": ""
   },
   "e.g., notify-send 'Hello' && sleep 1": {
-    "e.g., notify-send 'Hello' && sleep 1": ""
+    "e.g., notify-send 'Hello' && sleep 1": "e.j., notify-send 'Hola' && sleep 1"
   },
   "empty plugin list": {
-    "No plugins found": ""
+    "No plugins found": "No se han encontrado plugins"
   },
   "empty theme list": {
     "No themes found": ""
@@ -3944,7 +3959,7 @@
     "leave empty for default": "deja vacio para valor por defecto"
   },
   "loading indicator": {
-    "Loading...": ""
+    "Loading...": "Cargando..."
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl no disponible - integración requiere conexión al socket DMS"
@@ -3956,13 +3971,13 @@
     "Install matugen package for dynamic theming": "Instalar matugen para tematizacion dinamica"
   },
   "matugen not found status": {
-    "Matugen Missing": ""
+    "Matugen Missing": "Matugen perdido"
   },
   "minutes": {
     "minutes": "minutos"
   },
   "ms": {
-    "ms": ""
+    "ms": "ms"
   },
   "no custom theme file status": {
     "No custom theme file": ""
@@ -3983,7 +3998,7 @@
     "Browse Plugins": "Busqueda de plugins"
   },
   "plugin installation confirmation": {
-    "Install plugin '%1' from the DMS registry?": ""
+    "Install plugin '%1' from the DMS registry?": "¿Instalar plugin '%1' desde el registro de DMS?"
   },
   "plugin installation dialog title": {
     "Install Plugin": "Instalar complemento"
@@ -4004,16 +4019,16 @@
     "Settings": "Ajustes"
   },
   "settings_displays": {
-    "Widgets": ""
+    "Widgets": "Widgets"
   },
   "source code link": {
-    "source": ""
+    "source": "fuente"
   },
   "sysmon window title": {
     "System Monitor": "Monitor del sistema"
   },
   "theme browser description": {
-    "Install color themes from the DMS theme registry": ""
+    "Install color themes from the DMS theme registry": "Instalar tema de colores desde el repositorio de temas de DMS"
   },
   "theme installation confirmation": {
     "Install theme '%1' from the DMS registry?": ""
@@ -4064,7 +4079,7 @@
     "External Wallpaper Management": "Manejo externo del fondo de pantalla"
   },
   "wtype not available - install wtype for paste support": {
-    "wtype not available - install wtype for paste support": ""
+    "wtype not available - install wtype for paste support": "wtype no disponible - instala wtype para soporte de pegado"
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• Instalar solo desde fuentes confiables"

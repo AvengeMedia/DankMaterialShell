@@ -1,0 +1,4123 @@
+{
+  "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
+    "%1 DMS bind(s) may be overridden by config binds that come after the include.": ""
+  },
+  "%1 adapter(s), none connected": {
+    "%1 adapter(s), none connected": "%1 آداپتور، هیچکدام متصل نیستند"
+  },
+  "%1 characters": {
+    "%1 characters": "%1 حرف"
+  },
+  "%1 class(es)": {
+    "%1 class(es)": ""
+  },
+  "%1 connected": {
+    "%1 connected": "%1 متصل"
+  },
+  "%1 display(s)": {
+    "%1 display(s)": "%1 نمایشگر"
+  },
+  "%1 job(s)": {
+    "%1 job(s)": "%1 کار چاپ"
+  },
+  "%1 printer(s)": {
+    "%1 printer(s)": "%1 چاپگر"
+  },
+  "%1 variants": {
+    "%1 variants": ""
+  },
+  "%1 widgets": {
+    "%1 widgets": "%1 ابزارک"
+  },
+  "(Unnamed)": {
+    "(Unnamed)": "(بدون نام)"
+  },
+  "0 = square corners": {
+    "0 = square corners": "۰ = گوشه‌های مربعی"
+  },
+  "1 day": {
+    "1 day": "۱ روز"
+  },
+  "1 event": {
+    "1 event": "۱ رویداد"
+  },
+  "1 minute": {
+    "1 minute": "۱ دقیقه"
+  },
+  "1 second": {
+    "1 second": "۱ ثانیه"
+  },
+  "10 minutes": {
+    "10 minutes": "۱۰ دقیقه"
+  },
+  "10 seconds": {
+    "10 seconds": "۱۰ ثانیه"
+  },
+  "10-bit Color": {
+    "10-bit Color": "رنگ ۱۰ بیتی"
+  },
+  "14 days": {
+    "14 days": "۱۴ روز"
+  },
+  "15 seconds": {
+    "15 seconds": "۱۵ ثانیه"
+  },
+  "180°": {
+    "180°": "۱۸۰°"
+  },
+  "2 minutes": {
+    "2 minutes": "۲ دقیقه"
+  },
+  "24-Hour Format": {
+    "24-Hour Format": "قالب ۲۴ ساعته"
+  },
+  "24-hour format": {
+    "24-hour format": "قالب ۲۴ ساعته"
+  },
+  "270°": {
+    "270°": "۲۷۰°"
+  },
+  "3 days": {
+    "3 days": "۳ روز"
+  },
+  "3 seconds": {
+    "3 seconds": "۳ ثانیه"
+  },
+  "30 days": {
+    "30 days": "۳۰ روز"
+  },
+  "30 seconds": {
+    "30 seconds": "۳۰ ثانیه"
+  },
+  "3rd party": {
+    "3rd party": "شخص ثالث"
+  },
+  "5 minutes": {
+    "5 minutes": "‍۵ دقیقه"
+  },
+  "5 seconds": {
+    "5 seconds": "۵ ثانیه"
+  },
+  "7 days": {
+    "7 days": "۷ روز"
+  },
+  "8 seconds": {
+    "8 seconds": "۸ ثانیه"
+  },
+  "90 days": {
+    "90 days": "۹۰ روز"
+  },
+  "90°": {
+    "90°": "۹۰°"
+  },
+  "A file with this name already exists. Do you want to overwrite it?": {
+    "A file with this name already exists. Do you want to overwrite it?": "فایلی با این نام از قبل وجود دارد. آیا می‌خواهید آن را بازنویسی کنید؟"
+  },
+  "API": {
+    "API": "API"
+  },
+  "Aborted": {
+    "Aborted": "لغو شد"
+  },
+  "About": {
+    "About": "درباره"
+  },
+  "Accept Jobs": {
+    "Accept Jobs": "پذیرش کار‌های چاپ"
+  },
+  "Accepting": {
+    "Accepting": ""
+  },
+  "Access clipboard history": {
+    "Access clipboard history": "دسترسی به تاریخچه کلیپ‌بورد"
+  },
+  "Access to notifications and do not disturb": {
+    "Access to notifications and do not disturb": "دسترسی به اعلان‌ها و مزاحم نشوید"
+  },
+  "Access to system controls and settings": {
+    "Access to system controls and settings": "دسترسی به کنترل‌ها و تنظیمات سیستم"
+  },
+  "Action": {
+    "Action": "اقدام"
+  },
+  "Actions": {
+    "Actions": "اقدامات"
+  },
+  "Activate": {
+    "Activate": "فعال‌سازی"
+  },
+  "Active": {
+    "Active": "فعال"
+  },
+  "Active Lock Screen Monitor": {
+    "Active Lock Screen Monitor": "مانیتور فعال صفحه قفل"
+  },
+  "Active: %1": {
+    "Active: %1": "فعال: %1"
+  },
+  "Active: %1 +%2": {
+    "Active: %1 +%2": "فعال: %1 + %2"
+  },
+  "Active: None": {
+    "Active: None": "فعال: هیچکدام"
+  },
+  "Adapters": {
+    "Adapters": "آداپتور‌ها"
+  },
+  "Add": {
+    "Add": "افزودن"
+  },
+  "Add Bar": {
+    "Add Bar": "افزودن نوار"
+  },
+  "Add Desktop Widget": {
+    "Add Desktop Widget": "افزودن ابزارک دسکتاپ"
+  },
+  "Add Printer": {
+    "Add Printer": "افزودن چاپگر"
+  },
+  "Add Widget": {
+    "Add Widget": "افزودن ابزارک"
+  },
+  "Add Widget to %1 Section": {
+    "Add Widget to %1 Section": "افزودن ابزارک به بخش %1"
+  },
+  "Add a border around the dock": {
+    "Add a border around the dock": "افزودن یک حاشیه دور داک"
+  },
+  "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "یک پیشوند سفارشی به تمام برنامه‌های در حال اجرا اضافه کنید. این می‌تواند برای مواردی مانند 'uwsm-app'، 'systemd-run' یا سایر بسته‌بندی دستور‌ها استفاده شود."
+  },
+  "Add and configure widgets that appear on your desktop": {
+    "Add and configure widgets that appear on your desktop": "افزودن و پیکربندی ابزارک‌هایی که در دسکتاپ شما نمایان می‌شوند"
+  },
+  "Adjust the number of columns in grid view mode.": {
+    "Adjust the number of columns in grid view mode.": "تعداد ستون‌ها در حالت نمای جدولی را تنظیم کنید."
+  },
+  "Advanced": {
+    "Advanced": "پیشرفته"
+  },
+  "Afternoon": {
+    "Afternoon": "بعد از ظهر"
+  },
+  "All": {
+    "All": "همه"
+  },
+  "All Monitors": {
+    "All Monitors": "همه مانیتورها"
+  },
+  "All day": {
+    "All day": "کل روز"
+  },
+  "All displays": {
+    "All displays": "همه نمایشگر‌ها"
+  },
+  "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
+    "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: بازگشت • F1/I: اطلاعات فایل • F10: راهنما • Esc: بستن"
+  },
+  "Always Show Percentage": {
+    "Always Show Percentage": "همیشه درصد را نمایش بده"
+  },
+  "Always on icons": {
+    "Always on icons": "آیکون‌ها همیشه فعال"
+  },
+  "Always show a minimum of 3 workspaces, even if fewer are available": {
+    "Always show a minimum of 3 workspaces, even if fewer are available": "همیشه حداقل ۳ workspcae را نمایش بده، حتی اگر کمتر موجود بود"
+  },
+  "Always show the dock when niri's overview is open": {
+    "Always show the dock when niri's overview is open": "همیشه هنگامی که نمای کلی نیری باز است داک را نشان بده"
+  },
+  "Always show when there's only one connected display": {
+    "Always show when there's only one connected display": ""
+  },
+  "Amount": {
+    "Amount": "مقدار"
+  },
+  "Analog": {
+    "Analog": "آنالوگ"
+  },
+  "Animation Speed": {
+    "Animation Speed": "سرعت انیمیشن"
+  },
+  "Anonymous Identity": {
+    "Anonymous Identity": "هویت ناشناس"
+  },
+  "Anonymous Identity (optional)": {
+    "Anonymous Identity (optional)": "هویت ناشناس (اختیاری)"
+  },
+  "App Launcher": {
+    "App Launcher": "لانچر برنامه"
+  },
+  "Application Dock": {
+    "Application Dock": "داک برنامه"
+  },
+  "Applications": {
+    "Applications": "برنامه‌ها"
+  },
+  "Apply Changes": {
+    "Apply Changes": "اعمال تغییرات"
+  },
+  "Apply GTK Colors": {
+    "Apply GTK Colors": "اعمال رنگ‌های GTK"
+  },
+  "Apply Qt Colors": {
+    "Apply Qt Colors": "اعمال رنگ‌های Qt"
+  },
+  "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": {
+    "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "برای کاهش خستگی چشم دمای رنگ گرم را اعمال کن. از تنظیمات خودکارسازی پایین برای زمان فعال شدن آن استفاده کنید."
+  },
+  "Apps Icon": {
+    "Apps Icon": "آیکون برنامه‌ها"
+  },
+  "Apps are ordered by usage frequency, then last used, then alphabetically.": {
+    "Apps are ordered by usage frequency, then last used, then alphabetically.": "برنامه‌ها بر اساس دفعات استفاده، سپس آخرین استفاده و در نهایت بر اساس حروف الفبا مرتب شده‌اند."
+  },
+  "Arrange displays and configure resolution, refresh rate, and VRR": {
+    "Arrange displays and configure resolution, refresh rate, and VRR": "چیدمان نمایشگرها و پیکربندی وضوح، نرخ تازه‌سازی و VRR"
+  },
+  "Audio": {
+    "Audio": "صدا"
+  },
+  "Audio Codec": {
+    "Audio Codec": "کدک صوتی"
+  },
+  "Audio Codec Selection": {
+    "Audio Codec Selection": "انتخاب کدک صوتی"
+  },
+  "Audio Devices": {
+    "Audio Devices": "دستگاه‌های صوتی"
+  },
+  "Audio Input": {
+    "Audio Input": "ورودی صوتی"
+  },
+  "Audio Output": {
+    "Audio Output": "خروجی صوتی"
+  },
+  "Audio Output Devices (": {
+    "Audio Output Devices (": "دستگاه‌های خروجی صدا ("
+  },
+  "Audio Output Switch": {
+    "Audio Output Switch": ""
+  },
+  "Audio Visualizer": {
+    "Audio Visualizer": "مصورساز صوتی"
+  },
+  "Audio volume control": {
+    "Audio volume control": "کنترل حجم صدا"
+  },
+  "Auth": {
+    "Auth": "احراز هویت"
+  },
+  "Auth Type": {
+    "Auth Type": "نوع احراز هویت"
+  },
+  "Authenticate": {
+    "Authenticate": "احراز هویت"
+  },
+  "Authentication": {
+    "Authentication": "احراز هویت"
+  },
+  "Authentication Required": {
+    "Authentication Required": "احراز هویت نیاز است"
+  },
+  "Authentication failed, please try again": {
+    "Authentication failed, please try again": "احراز هویت ناموفق، لطفا دوباره تلاش کنید"
+  },
+  "Authorize": {
+    "Authorize": "اجازه دادن"
+  },
+  "Authorize pairing with ": {
+    "Authorize pairing with ": "اجازه جفت‌سازی با "
+  },
+  "Authorize service for ": {
+    "Authorize service for ": "اجازه سرویس برای "
+  },
+  "Auto": {
+    "Auto": "خودکار"
+  },
+  "Auto (Wide)": {
+    "Auto (Wide)": ""
+  },
+  "Auto Location": {
+    "Auto Location": "موقعیت مکانی خودکار"
+  },
+  "Auto Popup Gaps": {
+    "Auto Popup Gaps": "فاصله پاپ‌آپ خودکار"
+  },
+  "Auto-Clear After": {
+    "Auto-Clear After": "پاک‌کردن خودکار پس از"
+  },
+  "Auto-close Niri overview when launching apps.": {
+    "Auto-close Niri overview when launching apps.": ""
+  },
+  "Auto-hide": {
+    "Auto-hide": "پنهان کردن خودکار"
+  },
+  "Auto-hide Dock": {
+    "Auto-hide Dock": "پنهان کردن خودکار داک"
+  },
+  "Auto-saving...": {
+    "Auto-saving...": "درحال ذخیره خودکار..."
+  },
+  "Autoconnect": {
+    "Autoconnect": "اتصال خودکار"
+  },
+  "Autoconnect disabled": {
+    "Autoconnect disabled": "اتصال خودکار غیرفعال"
+  },
+  "Autoconnect enabled": {
+    "Autoconnect enabled": "اتصال خودکار فعال"
+  },
+  "Automatic Control": {
+    "Automatic Control": "کنترل خودکار"
+  },
+  "Automatic Cycling": {
+    "Automatic Cycling": "تغییر خودکار"
+  },
+  "Automatically cycle through wallpapers in the same folder": {
+    "Automatically cycle through wallpapers in the same folder": "تغییر خودکار تصاویر پس‌زمینه را در همان پوشه"
+  },
+  "Automatically delete entries older than this": {
+    "Automatically delete entries older than this": "پاک‌کردن خودکار ورودی‌های قدیمی‌تر از این"
+  },
+  "Automatically detect location based on IP address": {
+    "Automatically detect location based on IP address": "تشخیص خودکار موقعیت مکانی بر اساس آدرس IP"
+  },
+  "Automatically determine your location using your IP address": {
+    "Automatically determine your location using your IP address": "تشخیص خودکار موقعیت مکانی بر اساس آدرس IP شما"
+  },
+  "Automatically lock after": {
+    "Automatically lock after": "قفل خودکار پس از"
+  },
+  "Automatically lock the screen when the system prepares to suspend": {
+    "Automatically lock the screen when the system prepares to suspend": "قفل خودکار صفحه هنگام آماده‌شدن سیستم برای تعلیق"
+  },
+  "Available": {
+    "Available": "در دسترس"
+  },
+  "Available Layouts": {
+    "Available Layouts": "Layout‌های موجود"
+  },
+  "Available Networks": {
+    "Available Networks": "شبکه‌های در دسترس"
+  },
+  "Available Plugins": {
+    "Available Plugins": "افزونه‌های در دسترس"
+  },
+  "Available Screens (%1)": {
+    "Available Screens (%1)": "نمایشگر‌های در دسترس (%1)"
+  },
+  "BSSID": {
+    "BSSID": "BSSID"
+  },
+  "Back": {
+    "Back": "بازگشت"
+  },
+  "Backend": {
+    "Backend": "بک‌اند"
+  },
+  "Background Opacity": {
+    "Background Opacity": "شفافیت پس‌زمینه"
+  },
+  "Backlight device": {
+    "Backlight device": "دستگاه نور پس‌زمینه"
+  },
+  "Balanced palette with focused accents (default).": {
+    "Balanced palette with focused accents (default).": "پالت رنگی متعادل با رنگ تأکیدی متمرکز (پیش‌فرض)."
+  },
+  "Bar Configurations": {
+    "Bar Configurations": "پیکربندی نوار"
+  },
+  "Bar Transparency": {
+    "Bar Transparency": "شفافیت نوار"
+  },
+  "Battery": {
+    "Battery": "باتری"
+  },
+  "Battery Charge Limit": {
+    "Battery Charge Limit": ""
+  },
+  "Battery and power management": {
+    "Battery and power management": "مدیریت باتری و پاور"
+  },
+  "Battery level and power management": {
+    "Battery level and power management": "وضعیت باتری و مدیریت انرژی"
+  },
+  "Behavior": {
+    "Behavior": "رفتار"
+  },
+  "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": {
+    "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "صفحه قفل را به سیگنال dbus از loginctl متصل کن. در صورت استفاده از یک صفحه قفل خارجی غیر فعال کنید"
+  },
+  "Binds Include Missing": {
+    "Binds Include Missing": ""
+  },
+  "Binds include added": {
+    "Binds include added": ""
+  },
+  "Bit Depth": {
+    "Bit Depth": "عمق بیت"
+  },
+  "Block notifications": {
+    "Block notifications": "مسدود‌کردن اعلان‌ها"
+  },
+  "Blocked": {
+    "Blocked": "مسدود شده"
+  },
+  "Blue light filter": {
+    "Blue light filter": "فیلتر نور آبی"
+  },
+  "Bluetooth": {
+    "Bluetooth": "بلوتوث"
+  },
+  "Bluetooth Settings": {
+    "Bluetooth Settings": "تنظیمات بلوتوث"
+  },
+  "Bluetooth not available": {
+    "Bluetooth not available": "بلوتوث در دسترس نیست"
+  },
+  "Blur Wallpaper Layer": {
+    "Blur Wallpaper Layer": ""
+  },
+  "Blur on Overview": {
+    "Blur on Overview": "لایه مات در نمای کلی"
+  },
+  "Blur wallpaper when niri overview is open": {
+    "Blur wallpaper when niri overview is open": "هنگامی که نمای کلی niri باز است تصویر پس‌زمینه را مات کن"
+  },
+  "Border": {
+    "Border": "حاشیه"
+  },
+  "Border Color": {
+    "Border Color": "رنگ حاشیه"
+  },
+  "Border Opacity": {
+    "Border Opacity": "شفافیت حاشیه"
+  },
+  "Border Thickness": {
+    "Border Thickness": "ضخامت حاشیه"
+  },
+  "Bottom": {
+    "Bottom": "پایین"
+  },
+  "Bottom Left": {
+    "Bottom Left": "پایین چپ"
+  },
+  "Bottom Right": {
+    "Bottom Right": "پایین راست"
+  },
+  "Bottom Section": {
+    "Bottom Section": "بخش پایین"
+  },
+  "Bottom dock for pinned and running applications": {
+    "Bottom dock for pinned and running applications": "داک پایین برای برنامه‌های درحال اجرا یا سنجاق شده"
+  },
+  "Brightness": {
+    "Brightness": "روشنایی"
+  },
+  "Brightness Slider": {
+    "Brightness Slider": "اسلایدر روشنایی"
+  },
+  "Brightness Value": {
+    "Brightness Value": ""
+  },
+  "Brightness control not available": {
+    "Brightness control not available": "کنترل روشنایی در دسترس نیست"
+  },
+  "Browse": {
+    "Browse": "مرور کردن"
+  },
+  "Browse Plugins": {
+    "Browse Plugins": "مرور افزونه‌ها"
+  },
+  "CPU": {
+    "CPU": "CPU"
+  },
+  "CPU Graph": {
+    "CPU Graph": "نمودار CPU"
+  },
+  "CPU Temperature": {
+    "CPU Temperature": "دمای CPU"
+  },
+  "CPU Usage": {
+    "CPU Usage": "میزان مصرف CPU"
+  },
+  "CPU temperature display": {
+    "CPU temperature display": "نمایش دمای CPU"
+  },
+  "CPU usage indicator": {
+    "CPU usage indicator": "نشانگر میزان مصرف CPU"
+  },
+  "CUPS Insecure Filter Warning": {
+    "CUPS Insecure Filter Warning": "اخطار فیلتر ناایمن CUPS"
+  },
+  "CUPS Missing Filter Warning": {
+    "CUPS Missing Filter Warning": "اخطار نبود فیلتر CUPS"
+  },
+  "CUPS Print Server": {
+    "CUPS Print Server": "سرور چاپ CUPS"
+  },
+  "CUPS not available": {
+    "CUPS not available": "CUPS در دسترس نیست"
+  },
+  "Camera": {
+    "Camera": "دوربین"
+  },
+  "Cancel": {
+    "Cancel": "لغو"
+  },
+  "Canceled": {
+    "Canceled": "لغو شد"
+  },
+  "Cannot pair": {
+    "Cannot pair": "جفت‌سازی امکان‌پذیر نیست"
+  },
+  "Capabilities": {
+    "Capabilities": ""
+  },
+  "Capacity": {
+    "Capacity": "ظرفیت"
+  },
+  "Caps Lock": {
+    "Caps Lock": "قفل حروف بزرگ"
+  },
+  "Caps Lock Indicator": {
+    "Caps Lock Indicator": "نشانگر Caps Lock"
+  },
+  "Center Section": {
+    "Center Section": "بخش مرکزی"
+  },
+  "Center Single Column": {
+    "Center Single Column": "تک ستون مرکزی"
+  },
+  "Center Tiling": {
+    "Center Tiling": "تایلینگ مرکزی"
+  },
+  "Certificate Password": {
+    "Certificate Password": "گذرواژه گواهی"
+  },
+  "Change bar appearance": {
+    "Change bar appearance": "تغییر ظاهر نوار"
+  },
+  "Channel": {
+    "Channel": "کانال"
+  },
+  "Charging": {
+    "Charging": "درحال شارژ"
+  },
+  "Check for system updates": {
+    "Check for system updates": "بررسی برای بروزرسانی‌های سیستم"
+  },
+  "Choose Color": {
+    "Choose Color": "انتخاب رنگ"
+  },
+  "Choose Launcher Logo Color": {
+    "Choose Launcher Logo Color": "انتخاب رنگ لوگوی لانچر"
+  },
+  "Choose a color": {
+    "Choose a color": "یک رنگ انتخاب کنید"
+  },
+  "Choose colors from palette": {
+    "Choose colors from palette": "انتخاب رنگ‌ها از پالت رنگی"
+  },
+  "Choose icon": {
+    "Choose icon": "انتخاب آیکون"
+  },
+  "Choose the background color for widgets": {
+    "Choose the background color for widgets": "انتخاب رنگ پس‌زمینه برای ابزارک‌ها"
+  },
+  "Choose the border accent color": {
+    "Choose the border accent color": "انتخاب رنگ تأکیدی حاشیه"
+  },
+  "Choose the logo displayed on the launcher button in DankBar": {
+    "Choose the logo displayed on the launcher button in DankBar": "لوگوی نمایش‌داده شده بر دکمه‌ی لانچر در DankBar را انتخاب کنید"
+  },
+  "Choose where notification popups appear on screen": {
+    "Choose where notification popups appear on screen": "انتخاب کنید پاپ‌آپ اعلان کجای صفحه ظاهر شود"
+  },
+  "Choose where on-screen displays appear on screen": {
+    "Choose where on-screen displays appear on screen": ""
+  },
+  "Choose which displays show this widget": {
+    "Choose which displays show this widget": "انتخاب کنید که کدام نمایشگر‌ها این ابزارک را نشان دهند"
+  },
+  "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
+    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "انتخاب کنید که کدام مانیتور رابط صفحه قفل را نشان دهد. مانیتورهای دیگر برای محافظت در برابر سوختگی OLED، رنگ ثابتی را نمایش می‌دهند."
+  },
+  "Cipher": {
+    "Cipher": "رمزگذار"
+  },
+  "Clear": {
+    "Clear": "پاک‌کردن"
+  },
+  "Clear All": {
+    "Clear All": "پاک‌کردن همه"
+  },
+  "Clear All History?": {
+    "Clear All History?": "تمام تاریخچه پاک شود؟"
+  },
+  "Clear All Jobs": {
+    "Clear All Jobs": "پاک‌کردن همه کار‌های چاپ"
+  },
+  "Clear all history when server starts": {
+    "Clear all history when server starts": "هنگام راه‌اندازی سرور تمام تاریخچه را پاک کن"
+  },
+  "Clear at Startup": {
+    "Clear at Startup": "پاک‌کردن در هنگام راه‌اندازی"
+  },
+  "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": {
+    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": ""
+  },
+  "Click 'Setup' to create the outputs config and add include to your compositor config.": {
+    "Click 'Setup' to create the outputs config and add include to your compositor config.": ""
+  },
+  "Click Import to add a .ovpn or .conf": {
+    "Click Import to add a .ovpn or .conf": "برای افزودن یک فایل .conf یا .ovpn کلیک کنید"
+  },
+  "Click any shortcut to edit. Changes save to dms/binds.kdl": {
+    "Click any shortcut to edit. Changes save to dms/binds.kdl": "برای ویرایش، روی هر میانبری کلیک کنید. تغییرات در dms/binds.kdl ذخیره می‌شوند"
+  },
+  "Click to capture": {
+    "Click to capture": "برای ضبط کلیک کنید"
+  },
+  "Clipboard": {
+    "Clipboard": "کلیپ‌بورد"
+  },
+  "Clipboard History": {
+    "Clipboard History": "تاریخچه کلیپ‌بورد"
+  },
+  "Clipboard Manager": {
+    "Clipboard Manager": "مدیریت کلیپ‌بورد"
+  },
+  "Clipboard service not available": {
+    "Clipboard service not available": "سرویس کلیپ‌بورد در دسترس نیست"
+  },
+  "Clipboard works but nothing saved to disk": {
+    "Clipboard works but nothing saved to disk": "کلیپ‌بورد کار می‌کند اما چیزی در دیسک ذخیره نمی‌شود"
+  },
+  "Clock": {
+    "Clock": "ساعت"
+  },
+  "Clock Style": {
+    "Clock Style": "استایل ساعت"
+  },
+  "Close": {
+    "Close": "بستن"
+  },
+  "Close Overview on Launch": {
+    "Close Overview on Launch": "بستن نمای کلی هنگام اجرا"
+  },
+  "Color": {
+    "Color": "رنگ"
+  },
+  "Color Gamut": {
+    "Color Gamut": "طیف رنگ"
+  },
+  "Color Management": {
+    "Color Management": "مدیریت رنگ"
+  },
+  "Color Mode": {
+    "Color Mode": "حالت رنگ"
+  },
+  "Color Override": {
+    "Color Override": "جایگزینی رنگ"
+  },
+  "Color Picker": {
+    "Color Picker": "انتخابگر رنگ"
+  },
+  "Color Temperature": {
+    "Color Temperature": "دمای رنگ"
+  },
+  "Color displayed on monitors without the lock screen": {
+    "Color displayed on monitors without the lock screen": ""
+  },
+  "Color temperature for day time": {
+    "Color temperature for day time": "دمای رنگ برای زمان روز"
+  },
+  "Color temperature for night mode": {
+    "Color temperature for night mode": "دمای رنگ برای حالت شب"
+  },
+  "Colorful mix of bright contrasting accents.": {
+    "Colorful mix of bright contrasting accents.": "ترکیب رنگارنگ از رنگ‌های تأکیدی متضاد."
+  },
+  "Column": {
+    "Column": "ستون"
+  },
+  "Command": {
+    "Command": "دستور"
+  },
+  "Communication": {
+    "Communication": "ارتباطات"
+  },
+  "Compact Mode": {
+    "Compact Mode": "حالت فشرده"
+  },
+  "Completed": {
+    "Completed": "کامل شد"
+  },
+  "Compositor": {
+    "Compositor": "کامپازیتور"
+  },
+  "Compositor Settings": {
+    "Compositor Settings": "تنظیمات کامپازیتور"
+  },
+  "Config Format": {
+    "Config Format": "تنظیم قالب"
+  },
+  "Config action: %1": {
+    "Config action: %1": ""
+  },
+  "Config validation failed": {
+    "Config validation failed": "اعتبارسنجی پیکربندی ناموفق"
+  },
+  "Configuration": {
+    "Configuration": "پیکربندی"
+  },
+  "Configuration activated": {
+    "Configuration activated": "پیکربندی فعال شد"
+  },
+  "Configuration will be preserved when this display reconnects": {
+    "Configuration will be preserved when this display reconnects": ""
+  },
+  "Configure a new printer": {
+    "Configure a new printer": "پیکربندی یک چاپگر جدید"
+  },
+  "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
+    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "آیکون‌ها را برای workspcae‌های نام‌دار تنظیم کنید. آیکون‌ها بر شماره‌ها هنگامی که هر دو فعال باشند اولویت دارد."
+  },
+  "Configure which displays show shell components": {
+    "Configure which displays show shell components": "تنظیم کنید که کدام نمایشگر‌ها اجزای پوسته را نمایش دهند"
+  },
+  "Confirm": {
+    "Confirm": "تأیید"
+  },
+  "Confirm Display Changes": {
+    "Confirm Display Changes": "تأیید تغییرات نمایشگر"
+  },
+  "Confirm passkey for ": {
+    "Confirm passkey for ": "تأیید کلید عبور برای "
+  },
+  "Conflicts with: %1": {
+    "Conflicts with: %1": "تداخل با: %1"
+  },
+  "Connect": {
+    "Connect": "اتصال"
+  },
+  "Connect to VPN": {
+    "Connect to VPN": "اتصال به VPN"
+  },
+  "Connect to Wi-Fi": {
+    "Connect to Wi-Fi": "اتصال به Wi-Fi"
+  },
+  "Connected": {
+    "Connected": "متصل"
+  },
+  "Connected Displays": {
+    "Connected Displays": "نمایشگر‌های متصل"
+  },
+  "Connecting to Device": {
+    "Connecting to Device": "درحال اتصال به دستگاه"
+  },
+  "Connecting...": {
+    "Connecting...": "درحال اتصال..."
+  },
+  "Contrast": {
+    "Contrast": "کنتراست"
+  },
+  "Control Center": {
+    "Control Center": "مرکز کنترل"
+  },
+  "Control currently playing media": {
+    "Control currently playing media": "کنترل رسانه درحال پخش"
+  },
+  "Control workspaces and columns by scrolling on the bar": {
+    "Control workspaces and columns by scrolling on the bar": ""
+  },
+  "Controls opacity of all popouts, modals, and their content layers": {
+    "Controls opacity of all popouts, modals, and their content layers": ""
+  },
+  "Cooldown": {
+    "Cooldown": "زمان باقی مانده"
+  },
+  "Copied to clipboard": {
+    "Copied to clipboard": "در کلیپ‌بورد کپی شد"
+  },
+  "Copied!": {
+    "Copied!": "کپی شد!"
+  },
+  "Copy PID": {
+    "Copy PID": "کپی PID"
+  },
+  "Copy Process Name": {
+    "Copy Process Name": "کپی نام فرایند"
+  },
+  "Corner Radius": {
+    "Corner Radius": "شعاع گوشه"
+  },
+  "Corner Radius Override": {
+    "Corner Radius Override": "بازنویسی شعاع گوشه‌ها"
+  },
+  "Corners & Background": {
+    "Corners & Background": "گوشه‌ها و پس‌زمینه"
+  },
+  "Cover Open": {
+    "Cover Open": "درپوش باز"
+  },
+  "Create Dir": {
+    "Create Dir": "ایجاد دایرکتوری"
+  },
+  "Create Printer": {
+    "Create Printer": "ایجاد چاپگر"
+  },
+  "Creating...": {
+    "Creating...": "درحال ایجاد..."
+  },
+  "Critical Priority": {
+    "Critical Priority": "اولویت بحرانی"
+  },
+  "Current Items": {
+    "Current Items": "آیتم‌های کنونی"
+  },
+  "Current Period": {
+    "Current Period": ""
+  },
+  "Current Status": {
+    "Current Status": "وضعیت کنونی"
+  },
+  "Current Temp": {
+    "Current Temp": "دمای فعلی"
+  },
+  "Current Weather": {
+    "Current Weather": "آب و هوای کنونی"
+  },
+  "Current time and date display": {
+    "Current time and date display": "نمایش زمان و تاریخ کنونی"
+  },
+  "Current weather conditions and temperature": {
+    "Current weather conditions and temperature": "وضعیت آب و هوا و دمای کنونی"
+  },
+  "Current: %1": {
+    "Current: %1": "کنونی: %1"
+  },
+  "Custom": {
+    "Custom": "سفارشی"
+  },
+  "Custom Duration": {
+    "Custom Duration": "مدت زمان سفارشی"
+  },
+  "Custom Hibernate Command": {
+    "Custom Hibernate Command": "دستور هایبرنیت سفارشی"
+  },
+  "Custom Location": {
+    "Custom Location": "موقعیت مکانی سفارشی"
+  },
+  "Custom Lock Command": {
+    "Custom Lock Command": "دستور قفل سفارشی"
+  },
+  "Custom Logout Command": {
+    "Custom Logout Command": "دستور خروج سفارشی"
+  },
+  "Custom Power Actions": {
+    "Custom Power Actions": "اقدام‌های پاور سفارشی"
+  },
+  "Custom Power Off Command": {
+    "Custom Power Off Command": "دستور خاموش‌کردن سفارشی"
+  },
+  "Custom Reboot Command": {
+    "Custom Reboot Command": "دستور راه‌اندازی مجدد سفارشی"
+  },
+  "Custom Suspend Command": {
+    "Custom Suspend Command": "دستور تعلیق سفارشی"
+  },
+  "Custom Transparency": {
+    "Custom Transparency": "شفافیت سفارشی"
+  },
+  "Custom...": {
+    "Custom...": "سفارشی..."
+  },
+  "Custom: ": {
+    "Custom: ": "سفارشی: "
+  },
+  "Customizable empty space": {
+    "Customizable empty space": "فضای خالی قابل تنظیم"
+  },
+  "Customize which actions appear in the power menu": {
+    "Customize which actions appear in the power menu": "سفارشی‌سازی نمایش اقدامات در منوی پاور"
+  },
+  "DDC/CI monitor": {
+    "DDC/CI monitor": "مانیتور DDC/CI"
+  },
+  "DEMO MODE - Click anywhere to exit": {
+    "DEMO MODE - Click anywhere to exit": "حالت آزمایشی - برای خروج هر‌جایی کلیک کنید"
+  },
+  "DMS Plugin Manager Unavailable": {
+    "DMS Plugin Manager Unavailable": "مدیریت افزونه DMS در دسترس نیست"
+  },
+  "DMS out of date": {
+    "DMS out of date": "DMS بروز نیست"
+  },
+  "DMS service is not connected. Clipboard settings are unavailable.": {
+    "DMS service is not connected. Clipboard settings are unavailable.": "سرویس DMS قطع می‌باشد. تنظیمات کلیپ‌بورد در دسترس نیست."
+  },
+  "DMS shell actions (launcher, clipboard, etc.)": {
+    "DMS shell actions (launcher, clipboard, etc.)": "اقدام‌های شِل DMS (لانچر، کلیپ‌بورد و غیره)"
+  },
+  "DMS_SOCKET not available": {
+    "DMS_SOCKET not available": "DMS_SOCKET در دسترس نیست"
+  },
+  "DWL service not available": {
+    "DWL service not available": "سرویس DWL در دسترس نیست"
+  },
+  "Daily Forecast": {
+    "Daily Forecast": "پیش‌بینی روزانه"
+  },
+  "Daily at:": {
+    "Daily at:": "روزانه در:"
+  },
+  "Dank": {
+    "Dank": "Dank"
+  },
+  "Dank Bar": {
+    "Dank Bar": "Dank Bar"
+  },
+  "DankSearch not available": {
+    "DankSearch not available": "DankSearch در دسترس نیست"
+  },
+  "DankShell & System Icons (requires restart)": {
+    "DankShell & System Icons (requires restart)": "آیکون‌های DankShell و سیستم (نیازمند راه‌اندازی مجدد)"
+  },
+  "Dark Mode": {
+    "Dark Mode": "حالت تاریک"
+  },
+  "Darken Modal Background": {
+    "Darken Modal Background": "تیره‌کردن پس‌زمینه مودال"
+  },
+  "Date Format": {
+    "Date Format": "قالب تاریخ"
+  },
+  "Dawn (Astronomical Twilight)": {
+    "Dawn (Astronomical Twilight)": "سپیده دم (گرگ و میش نجومی)"
+  },
+  "Dawn (Civil Twilight)": {
+    "Dawn (Civil Twilight)": "سپیده دم (گرگ و میش مدنی)"
+  },
+  "Dawn (Nautical Twilight)": {
+    "Dawn (Nautical Twilight)": "سپیده دم (گرگ و میش دریایی)"
+  },
+  "Day Temperature": {
+    "Day Temperature": "دمای روز"
+  },
+  "Daytime": {
+    "Daytime": "روز"
+  },
+  "Deck": {
+    "Deck": "Deck"
+  },
+  "Default": {
+    "Default": "پیش‌فرض"
+  },
+  "Default Width (%)": {
+    "Default Width (%)": "طول پیش‌فرض (%)"
+  },
+  "Default selected action": {
+    "Default selected action": "اقدام انتخابی پیش‌فرض"
+  },
+  "Defaults": {
+    "Defaults": "پیش‌فرض‌ها"
+  },
+  "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
+    "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: پاک‌کردن • Shift+Del: پاک‌کردن همه • 1-9: اقدامات • F10: راهنما • Esc: بستن"
+  },
+  "Delete": {
+    "Delete": "حذف"
+  },
+  "Delete Class": {
+    "Delete Class": "حذف کلاس"
+  },
+  "Delete Printer": {
+    "Delete Printer": "حذف چاپگر"
+  },
+  "Delete VPN": {
+    "Delete VPN": "حذف VPN"
+  },
+  "Derives colors that closely match the underlying image.": {
+    "Derives colors that closely match the underlying image.": "رنگ‌هایی را استخراج می‌کند که با تصویر زیرین مطابقت نزدیکی دارند."
+  },
+  "Description": {
+    "Description": "توضیحات"
+  },
+  "Desktop Clock": {
+    "Desktop Clock": "ساعت دسکتاپ"
+  },
+  "Desktop Widget": {
+    "Desktop Widget": "ابزارک دسکتاپ"
+  },
+  "Desktop Widgets": {
+    "Desktop Widgets": "ابزارک‌های دسکتاپ"
+  },
+  "Desktop background images": {
+    "Desktop background images": "تصاویر پس‌زمینه دسکتاپ"
+  },
+  "Desktop clock widget description": {
+    "Analog, digital, or stacked clock display": "نمایش ساعت آنالوگ، دیجیتال یا انباشته"
+  },
+  "Desktop clock widget name": {
+    "Desktop Clock": "ساعت دسکتاپ"
+  },
+  "Development": {
+    "Development": "توسعه"
+  },
+  "Device": {
+    "Device": "دستگاه"
+  },
+  "Device connections": {
+    "Device connections": "اتصال‌های دستگاه"
+  },
+  "Device paired": {
+    "Device paired": "دستگاه جفت شد"
+  },
+  "Digital": {
+    "Digital": "دیجیتال"
+  },
+  "Disable Autoconnect": {
+    "Disable Autoconnect": "غیرفعال کردن اتصال خودکار"
+  },
+  "Disable Clipboard Manager": {
+    "Disable Clipboard Manager": "غیرفعال کردن مدیریت کلیپ‌بورد"
+  },
+  "Disable History Persistence": {
+    "Disable History Persistence": "غیرفعال کردن ماندگاری تاریخچه"
+  },
+  "Disable Output": {
+    "Disable Output": "غیرفعال‌کردن خروجی"
+  },
+  "Disable clipboard manager entirely (requires restart)": {
+    "Disable clipboard manager entirely (requires restart)": "غیرفعال کردن کامل مدیریت کلیپ‌بورد (نیازمند راه‌اندازی مجدد)"
+  },
+  "Disabled": {
+    "Disabled": "غیرفعال"
+  },
+  "Disabling WiFi...": {
+    "Disabling WiFi...": "غیرفعال‌سازی WiFi..."
+  },
+  "Discard": {
+    "Discard": "نادیده‌گرفتن"
+  },
+  "Disconnect": {
+    "Disconnect": "قطع اتصال"
+  },
+  "Disconnected": {
+    "Disconnected": "غیر متصل"
+  },
+  "Disconnected from WiFi": {
+    "Disconnected from WiFi": "اتصال از WiFi قطع شد"
+  },
+  "Disk": {
+    "Disk": "دیسک"
+  },
+  "Disk Usage": {
+    "Disk Usage": "میزان مصرف دیسک"
+  },
+  "Dismiss": {
+    "Dismiss": "رد کردن"
+  },
+  "Display Assignment": {
+    "Display Assignment": "تنظیم نمایشگر"
+  },
+  "Display Name Format": {
+    "Display Name Format": "قالب نمایش نام"
+  },
+  "Display Settings": {
+    "Display Settings": "تنظیمات نمایشگر"
+  },
+  "Display a dock with pinned and running applications": {
+    "Display a dock with pinned and running applications": "نمایش یک داک با برنامه‌های سنجاق‌شده و درحال اجرا"
+  },
+  "Display all priorities over fullscreen apps": {
+    "Display all priorities over fullscreen apps": "نمایش همه اولویت‌ها روی برنامه‌های تمام‌صفحه"
+  },
+  "Display and switch DWL layouts": {
+    "Display and switch DWL layouts": "نمایش و تغییر Layout‌های DWL"
+  },
+  "Display application icons in workspace indicators": {
+    "Display application icons in workspace indicators": "نمایش آیکون برنامه‌ها در نشانگر‌های workspace"
+  },
+  "Display brightness control": {
+    "Display brightness control": "کنترل روشنایی نمایشگر"
+  },
+  "Display configuration is not available. WLR output management protocol not supported.": {
+    "Display configuration is not available. WLR output management protocol not supported.": ""
+  },
+  "Display currently focused application title": {
+    "Display currently focused application title": "نمایش عنوان برنامه متمرکز‌شده کنونی"
+  },
+  "Display only workspaces that contain windows": {
+    "Display only workspaces that contain windows": "نمایش تنها workspace‌هایی که شامل پنجره هستند"
+  },
+  "Display power menu actions in a grid instead of a list": {
+    "Display power menu actions in a grid instead of a list": "نمایش اقدامات منوی پاور در جدول به جای فهرست"
+  },
+  "Display seconds in the clock": {
+    "Display seconds in the clock": "نمایش ثانیه در ساعت"
+  },
+  "Display the power system menu": {
+    "Display the power system menu": "نمایش منوی پاور سیستم"
+  },
+  "Display volume and brightness percentage values in OSD popups": {
+    "Display volume and brightness percentage values in OSD popups": "نمایش مقدار درصد حجم صدا و روشنایی صفحه در پاپ‌آپ‌های OSD"
+  },
+  "Displays": {
+    "Displays": "نمایشگر‌ها"
+  },
+  "Displays the active keyboard layout and allows switching": {
+    "Displays the active keyboard layout and allows switching": "جانمایی صفحه‌کلید فعال را نمایش می‌دهد و امکان را فراهم می‌کند"
+  },
+  "Diverse palette spanning the full spectrum.": {
+    "Diverse palette spanning the full spectrum.": "پالت رنگی متنوع که طیف کاملی از رنگ‌ها را در بر می‌گیرد."
+  },
+  "Do Not Disturb": {
+    "Do Not Disturb": "مزاحم نشوید"
+  },
+  "Dock": {
+    "Dock": "داک"
+  },
+  "Dock & Launcher": {
+    "Dock & Launcher": "داک و لانچر"
+  },
+  "Dock Position": {
+    "Dock Position": "محل داک"
+  },
+  "Dock Transparency": {
+    "Dock Transparency": "شفافیت داک"
+  },
+  "Dock Visibility": {
+    "Dock Visibility": "وضعیت نمایش داک"
+  },
+  "Docs": {
+    "Docs": "اسناد"
+  },
+  "Domain (optional)": {
+    "Domain (optional)": "دامنه (اختیاری)"
+  },
+  "Don't Change": {
+    "Don't Change": "تغییر نده"
+  },
+  "Don't Save": {
+    "Don't Save": "ذخیره نکن"
+  },
+  "Door Open": {
+    "Door Open": "درب باز"
+  },
+  "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
+    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "برای مرتب‌سازی مجدد ابزارک‌ها میان بخش‌ها، آنها را بکشید. از نماد چشم برای مخفی کردن/نمایش ویجت‌ها (حفظ فاصله) یا از X برای حذف کامل آنها استفاده کنید."
+  },
+  "Driver": {
+    "Driver": "درایور"
+  },
+  "Duplicate Wallpaper with Blur": {
+    "Duplicate Wallpaper with Blur": "تصویر پس‌زمینه تکراری با تاری"
+  },
+  "Dusk (Astronomical Twilight)": {
+    "Dusk (Astronomical Twilight)": "غروب (گرگ و میش نجومی)"
+  },
+  "Dusk (Civil Twighlight)": {
+    "Dusk (Civil Twighlight)": "غروب (گرگ و میش مدنی)"
+  },
+  "Dusk (Nautical Twilight)": {
+    "Dusk (Nautical Twilight)": "غروب (گرگ و میش دریایی)"
+  },
+  "Edge Spacing": {
+    "Edge Spacing": "فاصله لبه"
+  },
+  "Education": {
+    "Education": "آموزش"
+  },
+  "Empty": {
+    "Empty": "خالی"
+  },
+  "Enable 10-bit color depth for wider color gamut and HDR support": {
+    "Enable 10-bit color depth for wider color gamut and HDR support": "فعال‌کردن عمق رنگ ۱۰ بیت برای طیف رنگ عریض‌تر و پشتیبانی HDR"
+  },
+  "Enable Autoconnect": {
+    "Enable Autoconnect": "فعال‌کردن اتصال خودکار"
+  },
+  "Enable Bar": {
+    "Enable Bar": "فعال‌کردن نوار"
+  },
+  "Enable Desktop Clock": {
+    "Enable Desktop Clock": "فعال‌کردن ساعت دسکتاپ"
+  },
+  "Enable Do Not Disturb": {
+    "Enable Do Not Disturb": "فعال‌کردن مزاحم نشوید"
+  },
+  "Enable GPU Temperature": {
+    "Enable GPU Temperature": "فعال کردن دمای GPU"
+  },
+  "Enable Overview Overlay": {
+    "Enable Overview Overlay": "فعال‌کردن overlay نمای کلی"
+  },
+  "Enable System Monitor": {
+    "Enable System Monitor": "فعال‌کردن ناظر سیستم"
+  },
+  "Enable System Sounds": {
+    "Enable System Sounds": "فعال‌کردن صدای سیستم"
+  },
+  "Enable Weather": {
+    "Enable Weather": "فعال کردن آب و هوا"
+  },
+  "Enable WiFi": {
+    "Enable WiFi": "فعال کردن WiFi"
+  },
+  "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": {
+    "Enable compositor-targetable blur layer (namespace: dms:blurwallpaper). Requires manual niri configuration.": "فعال‌سازی لایه مات قابل کنترل توسط کامپازیتور (namespace: dms:blurwallpaper). نیازمند پیکربندی دستی niri است."
+  },
+  "Enable fingerprint authentication": {
+    "Enable fingerprint authentication": "فعال‌کردن احراز هویت با اثر انگشت"
+  },
+  "Enable loginctl lock integration": {
+    "Enable loginctl lock integration": "فعال‌کردن یکپارچه‌سازی قفل loginctl"
+  },
+  "Enable password field display on the lock screen window": {
+    "Show Password Field": "نمایش فیلد گذرواژه"
+  },
+  "Enable power action icon on the lock screen window": {
+    "Show Power Actions": "نمایش اقدام‌های پاور"
+  },
+  "Enable profile image display on the lock screen window": {
+    "Show Profile Image": "نمایش تصویر نمایه"
+  },
+  "Enable system date display on the lock screen window": {
+    "Show System Date": "نمایش تاریخ سیستم"
+  },
+  "Enable system status icons on the lock screen window": {
+    "Show System Icons": "نمایش آیکون‌های سیستم"
+  },
+  "Enable system time display on the lock screen window": {
+    "Show System Time": "نمایش زمان سیستم"
+  },
+  "Enabled": {
+    "Enabled": "فعال"
+  },
+  "Enabling WiFi...": {
+    "Enabling WiFi...": "فعال‌سازی WiFi..."
+  },
+  "End": {
+    "End": "پایان"
+  },
+  "Enter 6-digit passkey": {
+    "Enter 6-digit passkey": "کلید عبور ۶ رقمی را وارد کنید"
+  },
+  "Enter PIN": {
+    "Enter PIN": "PIN را وارد کنید"
+  },
+  "Enter PIN for ": {
+    "Enter PIN for ": "ورود PIN برای "
+  },
+  "Enter a search query": {
+    "Enter a search query": "یک عبارت جستجو وارد کنید"
+  },
+  "Enter credentials for ": {
+    "Enter credentials for ": "ورود اعتبارنامه‌ها برای "
+  },
+  "Enter custom lock screen format (e.g., dddd, MMMM d)": {
+    "Enter custom lock screen format (e.g., dddd, MMMM d)": "قالب سفارشی صفحه قفل را وارد کنید (مانند dddd, MMMM d)"
+  },
+  "Enter custom top bar format (e.g., ddd MMM d)": {
+    "Enter custom top bar format (e.g., ddd MMM d)": "قالب سفارشی نوار بالا را وارد کنید (مانند ddd MMM d)"
+  },
+  "Enter filename...": {
+    "Enter filename...": "نام فایل را وارد کنید..."
+  },
+  "Enter launch prefix (e.g., 'uwsm-app')": {
+    "Enter launch prefix (e.g., 'uwsm-app')": "پیشوند اجرا را وارد کنید (مانند 'uwsm-app')"
+  },
+  "Enter passkey for ": {
+    "Enter passkey for ": "ورود کلید عبور برای "
+  },
+  "Enter password for ": {
+    "Enter password for ": "ورود گذرواژه برای "
+  },
+  "Enter this passkey on ": {
+    "Enter this passkey on ": "ورود این کلید عبور در "
+  },
+  "Enterprise": {
+    "Enterprise": "شرکت"
+  },
+  "Error": {
+    "Error": "خطا"
+  },
+  "Ethernet": {
+    "Ethernet": "اترنت"
+  },
+  "Exclusive Zone Offset": {
+    "Exclusive Zone Offset": "آفست ناحیه انحصاری"
+  },
+  "Experimental Feature": {
+    "Experimental Feature": "قابلیت آزمایشی"
+  },
+  "Exponential": {
+    "Exponential": "نمایی"
+  },
+  "F1/I: Toggle • F10: Help": {
+    "F1/I: Toggle • F10: Help": "F1/I: تغییر حالت • F10: راهنما"
+  },
+  "Fade grace period": {
+    "Fade grace period": "مدت زمان محو تدریجی"
+  },
+  "Fade to lock screen": {
+    "Fade to lock screen": "محو شدن برای قفل صفحه"
+  },
+  "Failed to activate configuration": {
+    "Failed to activate configuration": "فعال‌سازی پیکربندی ناموفق"
+  },
+  "Failed to add binds include": {
+    "Failed to add binds include": ""
+  },
+  "Failed to add printer to class": {
+    "Failed to add printer to class": "افزودن چاپگر به کلاس ناموفق"
+  },
+  "Failed to cancel all jobs": {
+    "Failed to cancel all jobs": "لغو همه کار‌های چاپ ناموفق"
+  },
+  "Failed to cancel selected job": {
+    "Failed to cancel selected job": "لغو کار چاپ انتخاب شده ناموفق"
+  },
+  "Failed to connect VPN": {
+    "Failed to connect VPN": "اتصال به VPN ناموفق"
+  },
+  "Failed to connect to %1": {
+    "Failed to connect to %1": "اتصال به %1 ناموفق"
+  },
+  "Failed to copy entry": {
+    "Failed to copy entry": "کپی ورودی ناموفق"
+  },
+  "Failed to create printer": {
+    "Failed to create printer": "ایجاد چاپگر ناموفق"
+  },
+  "Failed to delete VPN": {
+    "Failed to delete VPN": "حذف VPN ناموفق"
+  },
+  "Failed to delete class": {
+    "Failed to delete class": "حذف کلاس ناموفق"
+  },
+  "Failed to delete printer": {
+    "Failed to delete printer": "حذف چاپگر ناموفق"
+  },
+  "Failed to disable job acceptance": {
+    "Failed to disable job acceptance": "غیرفعال‌سازی پذیرش کارهای چاپ ناموفق"
+  },
+  "Failed to disable night mode": {
+    "Failed to disable night mode": "غیرفعال‌کردن حال شب ناموفق"
+  },
+  "Failed to disconnect VPN": {
+    "Failed to disconnect VPN": "قطع اتصال از VPN ناموفق"
+  },
+  "Failed to disconnect VPNs": {
+    "Failed to disconnect VPNs": "قطع اتصال از VPN‌ها ناموفق"
+  },
+  "Failed to disconnect WiFi": {
+    "Failed to disconnect WiFi": "قطع اتصال WiFi ناموفق"
+  },
+  "Failed to enable IP location": {
+    "Failed to enable IP location": "فعال‌کردن موقعیت مکانی IP ناموفق"
+  },
+  "Failed to enable WiFi": {
+    "Failed to enable WiFi": "فعال‌کردن WiFi ناموفق"
+  },
+  "Failed to enable job acceptance": {
+    "Failed to enable job acceptance": "فعال‌سازی پذیرش کارهای چاپ ناموفق"
+  },
+  "Failed to enable night mode": {
+    "Failed to enable night mode": "فعال‌کردن حالت شب ناموفق"
+  },
+  "Failed to hold job": {
+    "Failed to hold job": "نگه‌داشتن کار چاپ ناموفق"
+  },
+  "Failed to import VPN": {
+    "Failed to import VPN": "وارد کردن VPN ناموفق"
+  },
+  "Failed to load VPN config": {
+    "Failed to load VPN config": "بارگذاری پیکربندی VPN ناموفق"
+  },
+  "Failed to load clipboard configuration.": {
+    "Failed to load clipboard configuration.": "بارگیری پیکربندی کلیپ‌بورد ناموفق بود."
+  },
+  "Failed to move job": {
+    "Failed to move job": "انتقال کار چاپ ناموفق"
+  },
+  "Failed to pause printer": {
+    "Failed to pause printer": "توقف چاپگر ناموفق"
+  },
+  "Failed to print test page": {
+    "Failed to print test page": "چاپ صفحه تست ناموفق"
+  },
+  "Failed to remove device": {
+    "Failed to remove device": "حذف دستگاه ناموفق"
+  },
+  "Failed to remove keybind": {
+    "Failed to remove keybind": "حذف کلید میانبر ناموفق"
+  },
+  "Failed to remove printer from class": {
+    "Failed to remove printer from class": ""
+  },
+  "Failed to restart job": {
+    "Failed to restart job": "شروع مجدد کار چاپ ناموفق"
+  },
+  "Failed to resume printer": {
+    "Failed to resume printer": "ازسرگیری چاپگر ناموفق"
+  },
+  "Failed to save clipboard setting": {
+    "Failed to save clipboard setting": "ذخیره تنظیمات کلیپ‌بورد ناموفق"
+  },
+  "Failed to save keybind": {
+    "Failed to save keybind": "ذخیره کلید‌ میانبر ناموفق"
+  },
+  "Failed to set brightness": {
+    "Failed to set brightness": "تنظیم روشنایی ناموفق"
+  },
+  "Failed to set night mode location": {
+    "Failed to set night mode location": "تنظیم مکان حالت شب ناموفق"
+  },
+  "Failed to set night mode schedule": {
+    "Failed to set night mode schedule": "تنظیم زمان‌بندی حالت شب ناموفق"
+  },
+  "Failed to set night mode temperature": {
+    "Failed to set night mode temperature": "تنظیم دمای حالت شب ناموفق"
+  },
+  "Failed to set profile image": {
+    "Failed to set profile image": "تنظیم تصویر نمایه ناموفق"
+  },
+  "Failed to set profile image: %1": {
+    "Failed to set profile image: %1": "تنظیم تصویر نمایه ناموفق: %1"
+  },
+  "Failed to start connection to %1": {
+    "Failed to start connection to %1": "شروع اتصال به %1 ناموفق"
+  },
+  "Failed to update VPN": {
+    "Failed to update VPN": "بروزرسانی VPN ناموفق"
+  },
+  "Failed to update autoconnect": {
+    "Failed to update autoconnect": "بروزرسانی اتصال خودکار ناموفق"
+  },
+  "Failed to update description": {
+    "Failed to update description": "بروزرسانی توضیحات ناموفق"
+  },
+  "Failed to update location": {
+    "Failed to update location": ""
+  },
+  "Failed to update sharing": {
+    "Failed to update sharing": ""
+  },
+  "Failed to write temp file for validation": {
+    "Failed to write temp file for validation": ""
+  },
+  "Feels Like": {
+    "Feels Like": "احساس می‌شود"
+  },
+  "File": {
+    "File": "فایل"
+  },
+  "File Already Exists": {
+    "File Already Exists": "فایل از قبل وجود دارد"
+  },
+  "File Information": {
+    "File Information": "اطلاعات فایل"
+  },
+  "Files": {
+    "Files": "فایل‌ها"
+  },
+  "Filesystem usage monitoring": {
+    "Filesystem usage monitoring": "نظارت بر استفاده از سیستم فایل"
+  },
+  "Find in Text": {
+    "Find in Text": "یافتن در متن"
+  },
+  "Find in note...": {
+    "Find in note...": "یافتن در یادداشت..."
+  },
+  "Fine-tune animation timing in milliseconds": {
+    "Fine-tune animation timing in milliseconds": "تنظیم دقیق زمان انیمیشن بر حسب میلی ثانیه"
+  },
+  "First Time Setup": {
+    "First Time Setup": "راه‌اندازی اولیه"
+  },
+  "Fix Now": {
+    "Fix Now": ""
+  },
+  "Fixing...": {
+    "Fixing...": ""
+  },
+  "Flipped": {
+    "Flipped": ""
+  },
+  "Flipped 180°": {
+    "Flipped 180°": ""
+  },
+  "Flipped 270°": {
+    "Flipped 270°": ""
+  },
+  "Flipped 90°": {
+    "Flipped 90°": ""
+  },
+  "Focus at Startup": {
+    "Focus at Startup": ""
+  },
+  "Focused Window": {
+    "Focused Window": "پنجره متمرکز شده"
+  },
+  "Follow focus": {
+    "Follow focus": ""
+  },
+  "Font Family": {
+    "Font Family": "خانواده فونت"
+  },
+  "Font Scale": {
+    "Font Scale": "بزرگنمایی فونت"
+  },
+  "Font Size": {
+    "Font Size": "اندازه فونت"
+  },
+  "Font Weight": {
+    "Font Weight": "وزن فونت"
+  },
+  "Force HDR": {
+    "Force HDR": "اجبار HDR"
+  },
+  "Force Kill Process": {
+    "Force Kill Process": "بستن اجباری فرایند"
+  },
+  "Force Wide Color": {
+    "Force Wide Color": "اجبار رنگ عریض"
+  },
+  "Force terminal applications to always use dark color schemes": {
+    "Force terminal applications to always use dark color schemes": "اجبار برنامه‌های ترمینال به استفاده از رنگ‌های تاریک"
+  },
+  "Forecast Not Available": {
+    "Forecast Not Available": "پیش‌بینی موجود نیست"
+  },
+  "Forget": {
+    "Forget": "فراموش کردن"
+  },
+  "Forget Device": {
+    "Forget Device": "فراموش‌کردن دستگاه"
+  },
+  "Forget Network": {
+    "Forget Network": "فراموش‌کردن شبکه"
+  },
+  "Forgot network %1": {
+    "Forgot network %1": "فراموشی شبکه %1"
+  },
+  "Format Legend": {
+    "Format Legend": "قالب فهرست علائم"
+  },
+  "Frequency": {
+    "Frequency": "فرکانس"
+  },
+  "Fun": {
+    "Fun": "سرگرمی"
+  },
+  "GPU": {
+    "GPU": "GPU"
+  },
+  "GPU Temperature": {
+    "GPU Temperature": "دمای GPU"
+  },
+  "Games": {
+    "Games": "بازی‌ها"
+  },
+  "Gamma Control": {
+    "Gamma Control": "کنترل گاما"
+  },
+  "Gamma control not available. Requires DMS API v6+.": {
+    "Gamma control not available. Requires DMS API v6+.": "کنترل گاما در دسترس نیست. نیاز به DMS API نسخه ۶ به بالا دارد."
+  },
+  "GitHub": {
+    "GitHub": "گیت‌هاب"
+  },
+  "Golden Hour": {
+    "Golden Hour": "ساعت طلایی"
+  },
+  "Good": {
+    "Good": "خوب"
+  },
+  "Goth Corner Radius": {
+    "Goth Corner Radius": "شعاع گوشه‌های گوتیک"
+  },
+  "Goth Corners": {
+    "Goth Corners": "گوشه‌های گوتیک"
+  },
+  "Gradually fade the screen before locking with a configurable grace period": {
+    "Gradually fade the screen before locking with a configurable grace period": "قبل از قفل شدن صفحه نمایش را با یک دوره زمانی قابل تنظیم به تدریج محو کن"
+  },
+  "Graph Time Range": {
+    "Graph Time Range": "بازه زمانی نمودار"
+  },
+  "Graphics": {
+    "Graphics": "گرافیک"
+  },
+  "Grid": {
+    "Grid": "جدولی"
+  },
+  "Grid Columns": {
+    "Grid Columns": "ستون‌های جدول"
+  },
+  "Group by App": {
+    "Group by App": "گروه‌بندی بر اساس برنامه"
+  },
+  "Group multiple windows of the same app together with a window count indicator": {
+    "Group multiple windows of the same app together with a window count indicator": "گروه‌بندی چندین پنجره از برنامه یکسان با نشانگر تعداد پنجره‌ها"
+  },
+  "HDR (EDID)": {
+    "HDR (EDID)": ""
+  },
+  "HDR Tone Mapping": {
+    "HDR Tone Mapping": ""
+  },
+  "HDR mode is experimental. Verify your monitor supports HDR before enabling.": {
+    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": ""
+  },
+  "HSV": {
+    "HSV": "HSV"
+  },
+  "Health": {
+    "Health": "سلامت"
+  },
+  "Held": {
+    "Held": "نگه‌داشتن"
+  },
+  "Help": {
+    "Help": "راهنما"
+  },
+  "Hex": {
+    "Hex": "Hex"
+  },
+  "Hibernate": {
+    "Hibernate": "هایبرنیت"
+  },
+  "Hide Delay": {
+    "Hide Delay": "تأخیر پنهان‌شدن"
+  },
+  "Hide When Windows Open": {
+    "Hide When Windows Open": ""
+  },
+  "Hide the dock when not in use and reveal it when hovering near the dock area": {
+    "Hide the dock when not in use and reveal it when hovering near the dock area": "داک را هنگامی که استفاده نمی‌شود پنهان کن و هنگامی که موشواره نزدیک آن است نشان بده"
+  },
+  "High-fidelity palette that preserves source hues.": {
+    "High-fidelity palette that preserves source hues.": "پالت رنگی با دقت بالا که رنگ‌های اصلی را حفظ می‌کند."
+  },
+  "History Settings": {
+    "History Settings": "تنظیمات تاریخچه"
+  },
+  "Hold Duration": {
+    "Hold Duration": "مدت زمان نگه‌داشتن"
+  },
+  "Hold longer to confirm": {
+    "Hold longer to confirm": "برای تأیید بیشتر نگه‌دارید"
+  },
+  "Hold to Confirm Power Actions": {
+    "Hold to Confirm Power Actions": "نگه‌داشتن برای تأیید اقدام پاور"
+  },
+  "Hold to confirm (%1 ms)": {
+    "Hold to confirm (%1 ms)": "نگه‌داشتن برای تأیید (%1 ms)"
+  },
+  "Hold to confirm (%1s)": {
+    "Hold to confirm (%1s)": "برای تأیید نگه‌دارید (%1 ثانیه)"
+  },
+  "Hot Corners": {
+    "Hot Corners": "گوشه‌های فعال"
+  },
+  "Hotkey overlay title (optional)": {
+    "Hotkey overlay title (optional)": ""
+  },
+  "Hour": {
+    "Hour": "ساعت"
+  },
+  "Hourly Forecast": {
+    "Hourly Forecast": "پیش‌بینی ساعتی"
+  },
+  "How often to change wallpaper": {
+    "How often to change wallpaper": "چند وقت یکبار تصویر پس‌زمینه تغییر کند"
+  },
+  "Humidity": {
+    "Humidity": "رطوبت"
+  },
+  "I Understand": {
+    "I Understand": "متوجه شدم"
+  },
+  "IP": {
+    "IP": "IP"
+  },
+  "IP Address:": {
+    "IP Address:": "آدرس IP:"
+  },
+  "Icon Size": {
+    "Icon Size": "اندازه آیکون"
+  },
+  "Icon Theme": {
+    "Icon Theme": "تم آیکون"
+  },
+  "Idle": {
+    "Idle": "بیکار"
+  },
+  "Idle Inhibitor": {
+    "Idle Inhibitor": "جلوگیری از بیکاری سیستم"
+  },
+  "Idle Settings": {
+    "Idle Settings": "تنظیمات بیکاری سیستم"
+  },
+  "Idle monitoring not supported - requires newer Quickshell version": {
+    "Idle monitoring not supported - requires newer Quickshell version": "نظارت بر بیکاری سیستم پشتیبانی نمی‌شود - به نسخه بروزتر Quickshell نیاز است"
+  },
+  "If the field is hidden, it will appear as soon as a key is pressed.": {
+    "If the field is hidden, it will appear as soon as a key is pressed.": "اگر فیلد پنهان باشد، به محض فشردن کلید پدیدار می‌شود."
+  },
+  "Image": {
+    "Image": "تصویر"
+  },
+  "Image copied to clipboard": {
+    "Image copied to clipboard": "تصویر در کلیپ‌بورد کپی شد"
+  },
+  "Import": {
+    "Import": "وارد کردن"
+  },
+  "Import VPN": {
+    "Import VPN": "وارد کردن VPN"
+  },
+  "Inactive Monitor Color": {
+    "Inactive Monitor Color": "رنگ مانیتور غیر‌فعال"
+  },
+  "Include Transitions": {
+    "Include Transitions": "اضافه‌کردن افکت‌های تغییر"
+  },
+  "Incompatible Plugins Loaded": {
+    "Incompatible Plugins Loaded": ""
+  },
+  "Incorrect password": {
+    "Incorrect password": "گذرواژه نادرست"
+  },
+  "Indicator Style": {
+    "Indicator Style": "استایل نشانگر"
+  },
+  "Individual Batteries": {
+    "Individual Batteries": "باتری‌های جداگانه"
+  },
+  "Individual bar configuration": {
+    "Individual bar configuration": "پیکربندی جداگانه نوار‌ها"
+  },
+  "Inherit": {
+    "Inherit": ""
+  },
+  "Input Devices": {
+    "Input Devices": "دستگاه‌های ورودی"
+  },
+  "Input Volume Slider": {
+    "Input Volume Slider": "اسلایدر حجم صدای ورودی"
+  },
+  "Install plugins from the DMS plugin registry": {
+    "Install plugins from the DMS plugin registry": "نصب افزونه‌ها از مخزن افزونه DMS"
+  },
+  "Interface:": {
+    "Interface:": "اینترفیس:"
+  },
+  "Interlock Open": {
+    "Interlock Open": "قفل داخلی باز"
+  },
+  "Internet": {
+    "Internet": "اینترنت"
+  },
+  "Interval": {
+    "Interval": "وقفه"
+  },
+  "Invalid configuration": {
+    "Invalid configuration": "پیکربندی نامعتبر"
+  },
+  "Invert on mode change": {
+    "Invert on mode change": "معکوس هنگام تغییر حالت"
+  },
+  "Isolate Displays": {
+    "Isolate Displays": "ایزوله‌کردن نمایشگر‌ها"
+  },
+  "Jobs": {
+    "Jobs": "کار‌های چاپ"
+  },
+  "Jobs: ": {
+    "Jobs: ": "کار‌های چاپ: "
+  },
+  "Keep Awake": {
+    "Keep Awake": "بیدار نگه‌ دار"
+  },
+  "Keep Changes": {
+    "Keep Changes": "حفظ تغییرات"
+  },
+  "Keeping Awake": {
+    "Keeping Awake": "بیدار نگه داشتن"
+  },
+  "Key": {
+    "Key": "کلید"
+  },
+  "Keyboard Layout Name": {
+    "Keyboard Layout Name": "نام جانمایی صفحه‌کلید"
+  },
+  "Keyboard Shortcuts": {
+    "Keyboard Shortcuts": "میانبر‌های صفحه‌کلید"
+  },
+  "Keys": {
+    "Keys": "کلیدها"
+  },
+  "Kill Process": {
+    "Kill Process": "بستن فرایند"
+  },
+  "Ko-fi": {
+    "Ko-fi": "Ko-fi"
+  },
+  "LED device": {
+    "LED device": "دستگاه LED"
+  },
+  "Last launched %1": {
+    "Last launched %1": "آخرین اجرا %1"
+  },
+  "Last launched %1 day%2 ago": {
+    "Last launched %1 day%2 ago": "آخرین اجرا %1 روز پیش"
+  },
+  "Last launched %1 hour%2 ago": {
+    "Last launched %1 hour%2 ago": "آخرین اجرا %1 ساعت پیش"
+  },
+  "Last launched %1 minute%2 ago": {
+    "Last launched %1 minute%2 ago": "آخرین اجرا %1 دقیقه پیش"
+  },
+  "Last launched just now": {
+    "Last launched just now": "آخرین اجرا به تازگی"
+  },
+  "Latitude": {
+    "Latitude": "عرض جغرافیایی"
+  },
+  "Launch": {
+    "Launch": "اجرا"
+  },
+  "Launch Prefix": {
+    "Launch Prefix": "پیشوند اجرا"
+  },
+  "Launch on dGPU": {
+    "Launch on dGPU": "اجرا با dGPU"
+  },
+  "Launcher": {
+    "Launcher": "لانچر"
+  },
+  "Launcher Button Logo": {
+    "Launcher Button Logo": "لوگوی دکمه لانچر"
+  },
+  "Layout": {
+    "Layout": "Layout"
+  },
+  "Layout Overrides": {
+    "Layout Overrides": ""
+  },
+  "Left": {
+    "Left": "چپ"
+  },
+  "Left Section": {
+    "Left Section": "بخش چپ"
+  },
+  "Light Mode": {
+    "Light Mode": "حالت روشن"
+  },
+  "Linear": {
+    "Linear": "خطی"
+  },
+  "Lines: %1": {
+    "Lines: %1": "خط: %1"
+  },
+  "List": {
+    "List": "فهرست"
+  },
+  "Lively palette with saturated accents.": {
+    "Lively palette with saturated accents.": "پالت رنگی زنده با رنگ‌های تأکیدی اشباع شده."
+  },
+  "Loading codecs...": {
+    "Loading codecs...": "بارگذاری کدک‌ها..."
+  },
+  "Loading keybinds...": {
+    "Loading keybinds...": "بارگذاری کلید‌های میانبر..."
+  },
+  "Loading plugins...": {
+    "Loading plugins...": "آماده‌سازی افزونه‌ها..."
+  },
+  "Loading...": {
+    "Loading...": "درحال بارگذاری..."
+  },
+  "Local": {
+    "Local": "محلی"
+  },
+  "Location": {
+    "Location": "موقعیت مکانی"
+  },
+  "Location Search": {
+    "Location Search": "جستجوی موقعیت مکانی"
+  },
+  "Lock": {
+    "Lock": "قفل"
+  },
+  "Lock Screen": {
+    "Lock Screen": "صفحه قفل"
+  },
+  "Lock Screen Display": {
+    "Lock Screen Display": "نمایشگر صفحه قفل"
+  },
+  "Lock Screen Format": {
+    "Lock Screen Format": "قالب صفحه قفل"
+  },
+  "Lock Screen behaviour": {
+    "Lock Screen behaviour": "رفتار صفحه قفل"
+  },
+  "Lock Screen layout": {
+    "Lock Screen layout": "طرح صفحه قفل"
+  },
+  "Lock before suspend": {
+    "Lock before suspend": "قفل‌کردن قبل از تعلیق"
+  },
+  "Log Out": {
+    "Log Out": "خروج"
+  },
+  "Long": {
+    "Long": "طولانی"
+  },
+  "Long Text": {
+    "Long Text": "متن طولانی"
+  },
+  "Longitude": {
+    "Longitude": "طول جغرافیایی"
+  },
+  "Low Priority": {
+    "Low Priority": "اولویت پایین"
+  },
+  "MAC": {
+    "MAC": "MAC"
+  },
+  "MTU": {
+    "MTU": "MTU"
+  },
+  "Manage and configure plugins for extending DMS functionality": {
+    "Manage and configure plugins for extending DMS functionality": "مدیریت و پیکربندی افزونه‌ها برای گسترش کارایی DMS"
+  },
+  "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": {
+    "Manage up to 4 independent bar configurations. Each bar has its own position, widgets, styling, and display assignment.": "مدیریت حداکثر ۴ پیکربندی مستقل برای نوارها. هر نوار موقعیت، ابزارک‌ها، استایل و نحوه نمایش خاص خود را دارد."
+  },
+  "Management": {
+    "Management": "مدیریت"
+  },
+  "Manual Coordinates": {
+    "Manual Coordinates": "مختصات دستی"
+  },
+  "Manual Gap Size": {
+    "Manual Gap Size": "اندازه فاصله دستی"
+  },
+  "Manual Show/Hide": {
+    "Manual Show/Hide": "نمایش/پنهان دستی"
+  },
+  "Margin": {
+    "Margin": "فاصله بیرونی"
+  },
+  "Marker Supply Empty": {
+    "Marker Supply Empty": "مخزن مارکر خالی است"
+  },
+  "Marker Supply Low": {
+    "Marker Supply Low": "مخزن مارکر کم است"
+  },
+  "Marker Waste Almost Full": {
+    "Marker Waste Almost Full": "ضایعات مارکر تقریبا پر است"
+  },
+  "Marker Waste Full": {
+    "Marker Waste Full": "ضایعات مارکر پر است"
+  },
+  "Material Colors": {
+    "Material Colors": "رنگ‌های Material"
+  },
+  "Matugen Palette": {
+    "Matugen Palette": "پالت رنگی Mutagen"
+  },
+  "Matugen Target Monitor": {
+    "Matugen Target Monitor": "مانیتور هدف Mutagen"
+  },
+  "Matugen Templates": {
+    "Matugen Templates": "قالب‌های Mutagen"
+  },
+  "Max apps to show": {
+    "Max apps to show": "حداکثر برنامه‌ها برای نمایش"
+  },
+  "Maximize Detection": {
+    "Maximize Detection": "تشخیص بزرگ‌شدن پنجره"
+  },
+  "Maximum Entry Size": {
+    "Maximum Entry Size": "حداکثر اندازه ورودی"
+  },
+  "Maximum History": {
+    "Maximum History": "حداکثر تاریخچه"
+  },
+  "Maximum number of clipboard entries to keep": {
+    "Maximum number of clipboard entries to keep": "بیشینه تعداد ورودی‌های کلیپ‌بورد برای نگه‌داری"
+  },
+  "Maximum size per clipboard entry": {
+    "Maximum size per clipboard entry": "بیشینه اندازه برای هر ورودی کلیپ‌بورد"
+  },
+  "Media": {
+    "Media": "رسانه"
+  },
+  "Media Controls": {
+    "Media Controls": "کنترل‌های رسانه"
+  },
+  "Media Empty": {
+    "Media Empty": "مدیا خالی است"
+  },
+  "Media Jam": {
+    "Media Jam": "مدیا مسدود شده است"
+  },
+  "Media Low": {
+    "Media Low": "مدیا کم است"
+  },
+  "Media Needed": {
+    "Media Needed": "مدیا مورد نیاز است"
+  },
+  "Media Player": {
+    "Media Player": "پخش‌کنند رسانه"
+  },
+  "Media Player Settings": {
+    "Media Player Settings": "تنظیمات پخش‌کننده رسانه"
+  },
+  "Media Players (": {
+    "Media Players (": "پخش‌کننده‌های رسانه ("
+  },
+  "Media Volume": {
+    "Media Volume": "حجم صدای رسانه"
+  },
+  "Medium": {
+    "Medium": "متوسط"
+  },
+  "Memory": {
+    "Memory": "حافظه"
+  },
+  "Memory Graph": {
+    "Memory Graph": "نمودار حافظه"
+  },
+  "Memory Usage": {
+    "Memory Usage": "میزان مصرف حافظه"
+  },
+  "Memory usage indicator": {
+    "Memory usage indicator": "نشانگر میزان مصرف حافظه"
+  },
+  "Microphone": {
+    "Microphone": "میکروفون"
+  },
+  "Microphone Mute": {
+    "Microphone Mute": "میکروفون بی‌صدا"
+  },
+  "Microphone Volume": {
+    "Microphone Volume": ""
+  },
+  "Microphone settings": {
+    "Microphone settings": "تنظیمات میکروفون"
+  },
+  "Microphone volume control": {
+    "Microphone volume control": "کنترل حجم صدای میکروفون"
+  },
+  "Middle Section": {
+    "Middle Section": "بخش میانی"
+  },
+  "Minimal palette built around a single hue.": {
+    "Minimal palette built around a single hue.": "پالت رنگی مینیمال ساخته‌شده حول یک رنگ."
+  },
+  "Minute": {
+    "Minute": "دقیقه"
+  },
+  "Mirror Display": {
+    "Mirror Display": ""
+  },
+  "Modal Background": {
+    "Modal Background": ""
+  },
+  "Mode": {
+    "Mode": "حالت"
+  },
+  "Mode:": {
+    "Mode:": "حالت:"
+  },
+  "Model": {
+    "Model": "مدل"
+  },
+  "Modified": {
+    "Modified": ""
+  },
+  "Monitor Configuration": {
+    "Monitor Configuration": "پیکربندی مانیتور"
+  },
+  "Monitor whose wallpaper drives dynamic theming colors": {
+    "Monitor whose wallpaper drives dynamic theming colors": "مانیتوری که تصویر پس‌زمینه آن رنگ‌های تم پویا را تعیین می‌کند"
+  },
+  "Monocle": {
+    "Monocle": "Monocle"
+  },
+  "Monospace Font": {
+    "Monospace Font": "فونت monospace"
+  },
+  "Morning": {
+    "Morning": "صبح"
+  },
+  "Mount": {
+    "Mount": "نصب‌کردن"
+  },
+  "Move Widget": {
+    "Move Widget": "انتقال ابزارک"
+  },
+  "Moving to Paused": {
+    "Moving to Paused": "انتقال به حالت متوقف شده"
+  },
+  "Muted palette with subdued, calming tones.": {
+    "Muted palette with subdued, calming tones.": "پالت رنگی ساکت با تن‌های ملایم و آرامش‌بخش."
+  },
+  "NM not supported": {
+    "NM not supported": "NM پشتیبانی نمی‌شود"
+  },
+  "Name": {
+    "Name": "نام"
+  },
+  "Named Workspace Icons": {
+    "Named Workspace Icons": "آیکون‌های workspace‌های نام‌دار"
+  },
+  "Navigation": {
+    "Navigation": "مسیریابی"
+  },
+  "Network": {
+    "Network": "شبکه"
+  },
+  "Network Graph": {
+    "Network Graph": "نمودار شبکه"
+  },
+  "Network Info": {
+    "Network Info": "اطلاعات شبکه"
+  },
+  "Network Information": {
+    "Network Information": "اطلاعات شبکه"
+  },
+  "Network Speed Monitor": {
+    "Network Speed Monitor": "نمایشگر سرعت شبکه"
+  },
+  "Network Status": {
+    "Network Status": "وضعیت شبکه"
+  },
+  "Network download and upload speed display": {
+    "Network download and upload speed display": "نمایش سرعت بارگیری و بارگذاری شبکه"
+  },
+  "Never": {
+    "Never": "هرگز"
+  },
+  "New": {
+    "New": "جدید"
+  },
+  "New Key": {
+    "New Key": "کلید جدید"
+  },
+  "New Keybind": {
+    "New Keybind": "کلید میانبر جدید"
+  },
+  "New Notification": {
+    "New Notification": "اعلان جدید"
+  },
+  "New York, NY": {
+    "New York, NY": "New York, NY"
+  },
+  "Next Transition": {
+    "Next Transition": ""
+  },
+  "Night": {
+    "Night": "شب"
+  },
+  "Night Mode": {
+    "Night Mode": "حالت شب"
+  },
+  "Night Temperature": {
+    "Night Temperature": "دمای شب"
+  },
+  "Niri Integration": {
+    "Niri Integration": "همگام‌سازی نیری"
+  },
+  "Niri Layout Overrides": {
+    "Niri Layout Overrides": ""
+  },
+  "Niri compositor actions (focus, move, etc.)": {
+    "Niri compositor actions (focus, move, etc.)": "اقدام‌های کامپازیتور نیری (focus، move و غیره)"
+  },
+  "No": {
+    "No": "خیر"
+  },
+  "No Active Players": {
+    "No Active Players": "پخش‌کننده فعالی یافت نشد"
+  },
+  "No Background": {
+    "No Background": "بدون پس‌زمینه"
+  },
+  "No Bluetooth adapter found": {
+    "No Bluetooth adapter found": "آداپتور بلوتوثی یافت نشد"
+  },
+  "No GPU detected": {
+    "No GPU detected": "GPU شناسایی نشد"
+  },
+  "No Media": {
+    "No Media": "رسانه‌ای یافت نشد"
+  },
+  "No VPN profiles": {
+    "No VPN profiles": "پروفایل VPN یافت نشد"
+  },
+  "No Weather Data Available": {
+    "No Weather Data Available": "داده آب و هوا در دسترس نیست"
+  },
+  "No action": {
+    "No action": "بدون اقدام"
+  },
+  "No adapters": {
+    "No adapters": "آداپتوری یافت نشد"
+  },
+  "No battery": {
+    "No battery": "بدون باتری"
+  },
+  "No brightness devices available": {
+    "No brightness devices available": "هیچ دستگاه روشنایی موجود نیست"
+  },
+  "No changes": {
+    "No changes": "بدون تغییرات"
+  },
+  "No clipboard entries found": {
+    "No clipboard entries found": "ورودی کلیپ‌بوردی پیدا نشد"
+  },
+  "No devices found": {
+    "No devices found": "دستگاهی یافت نشد"
+  },
+  "No disk data": {
+    "No disk data": "بدون داده دیسک"
+  },
+  "No disk data available": {
+    "No disk data available": "داده دیسک در دسترس نیست"
+  },
+  "No drivers found": {
+    "No drivers found": "درایوری یافت نشد"
+  },
+  "No features enabled": {
+    "No features enabled": ""
+  },
+  "No files found": {
+    "No files found": "هیچ فایلی یافت نشد"
+  },
+  "No items added yet": {
+    "No items added yet": "هنوز آیتمی اضافه نشده"
+  },
+  "No keybinds found": {
+    "No keybinds found": "هیچ کلید میانبری یافت نشد"
+  },
+  "No matches": {
+    "No matches": "موردی پیدا نشد"
+  },
+  "No plugins found": {
+    "No plugins found": "افزونه‌ای یافت نشد"
+  },
+  "No plugins found.": {
+    "No plugins found.": "افزونه‌ای یافت نشد."
+  },
+  "No printer found": {
+    "No printer found": "چاپگری یافت نشد"
+  },
+  "No printers configured": {
+    "No printers configured": "هیچ چاپگری پیکربندی نشده است"
+  },
+  "No printers found": {
+    "No printers found": "چاپگری یافت نشد"
+  },
+  "No variants created. Click Add to create a new monitor widget.": {
+    "No variants created. Click Add to create a new monitor widget.": ""
+  },
+  "No widgets available": {
+    "No widgets available": "هیچ ابزارکی موجود نیست"
+  },
+  "No widgets match your search": {
+    "No widgets match your search": "هیچ ابزارکی با جستجوی شما مطابقت ندارد"
+  },
+  "None": {
+    "None": "هیچکدام"
+  },
+  "Normal": {
+    "Normal": "عادی"
+  },
+  "Normal Font": {
+    "Normal Font": "فونت معمولی"
+  },
+  "Normal Priority": {
+    "Normal Priority": "اولویت عادی"
+  },
+  "Not available": {
+    "Not available": "در دسترس نیست"
+  },
+  "Not connected": {
+    "Not connected": "متصل نیست"
+  },
+  "Note: this only changes the percentage, it does not actually limit charging.": {
+    "Note: this only changes the percentage, it does not actually limit charging.": ""
+  },
+  "Notepad": {
+    "Notepad": "دفترچه یادداشت"
+  },
+  "Notepad Font Settings": {
+    "Notepad Font Settings": "تنظیمات دفترچه یادداشت"
+  },
+  "Notepad Slideout": {
+    "Notepad Slideout": "دفترچه یادداشت کشویی"
+  },
+  "Nothing to see here": {
+    "Nothing to see here": "چیزی برای مشاهده نیست"
+  },
+  "Notification Center": {
+    "Notification Center": "مرکز اعلانات"
+  },
+  "Notification Overlay": {
+    "Notification Overlay": "نمایش اعلان‌ها بر overlay"
+  },
+  "Notification Popups": {
+    "Notification Popups": "پاپ‌آپ اعلان‌ها"
+  },
+  "Notification Settings": {
+    "Notification Settings": "تنظیمات اعلان‌ها"
+  },
+  "Notification Timeouts": {
+    "Notification Timeouts": "مدت نمایش اعلان‌ها"
+  },
+  "Notification toast popups": {
+    "Notification toast popups": "پاپ‌آپ‌های اعلان به صورت تُست"
+  },
+  "Notifications": {
+    "Notifications": "اعلانات"
+  },
+  "Numbers": {
+    "Numbers": "شماره‌ها"
+  },
+  "OS Logo": {
+    "OS Logo": "لوگوی OS"
+  },
+  "OSD Position": {
+    "OSD Position": "موقعیت OSD"
+  },
+  "Off": {
+    "Off": "خاموش"
+  },
+  "Office": {
+    "Office": "اداری"
+  },
+  "Offline Report": {
+    "Offline Report": "گزارش آفلاین"
+  },
+  "On-Screen Displays": {
+    "On-Screen Displays": "نمایشگر‌های روی صفحه"
+  },
+  "On-screen Displays": {
+    "On-screen Displays": "نمایشگر‌های بر صفحه (OSD)"
+  },
+  "Only adjust gamma based on time or location rules.": {
+    "Only adjust gamma based on time or location rules.": "گاما را فقط بر اساس قوانین زمانی یا مکانی تنظیم کن."
+  },
+  "Only show windows from the current monitor on each dock": {
+    "Only show windows from the current monitor on each dock": "تنها پنجره‌ها در مانیتور کنونی را در هر داک نمایش بده"
+  },
+  "Only visible if hibernate is supported by your system": {
+    "Only visible if hibernate is supported by your system": "تنها در صورتی قابل مشاهده است که سیستم شما از هایبرنیت پشتیبانی کند"
+  },
+  "Opacity": {
+    "Opacity": "شفافیت"
+  },
+  "Open": {
+    "Open": "باز‌کردن"
+  },
+  "Open Notepad File": {
+    "Open Notepad File": "باز‌کردن فایل دفترچه یادداشت"
+  },
+  "Open search bar to find text": {
+    "Open search bar to find text": "باز‌کردن نوار جستجو برای یافتن متن"
+  },
+  "Open with...": {
+    "Open with...": "باز کردن با..."
+  },
+  "Optional description": {
+    "Optional description": "توضیحات اختیاری"
+  },
+  "Optional location": {
+    "Optional location": ""
+  },
+  "Options": {
+    "Options": "گزینه‌ها"
+  },
+  "Other": {
+    "Other": "دیگر"
+  },
+  "Output Area Almost Full": {
+    "Output Area Almost Full": "محل خروج تقریبا پر است"
+  },
+  "Output Area Full": {
+    "Output Area Full": "محل خروج پر است"
+  },
+  "Output Tray Missing": {
+    "Output Tray Missing": "سینی خروج موجود نیست"
+  },
+  "Outputs Include Missing": {
+    "Outputs Include Missing": ""
+  },
+  "Overridden by config": {
+    "Overridden by config": ""
+  },
+  "Override": {
+    "Override": "جایگزینی"
+  },
+  "Override Corner Radius": {
+    "Override Corner Radius": ""
+  },
+  "Override Gaps": {
+    "Override Gaps": ""
+  },
+  "Override global layout settings for this output": {
+    "Override global layout settings for this output": ""
+  },
+  "Overrides": {
+    "Overrides": "جایگزینی‌ها"
+  },
+  "Overview": {
+    "Overview": "نمای کلی"
+  },
+  "Overview of your network connections": {
+    "Overview of your network connections": "نمای کلی از اتصالات شبکه شما"
+  },
+  "Overwrite": {
+    "Overwrite": "بازنویسی"
+  },
+  "PIN": {
+    "PIN": "PIN"
+  },
+  "Padding": {
+    "Padding": "فاصله درونی"
+  },
+  "Pair": {
+    "Pair": "جفت‌سازی"
+  },
+  "Pair Bluetooth Device": {
+    "Pair Bluetooth Device": "جفت‌سازی دستگاه بلوتوثی"
+  },
+  "Paired": {
+    "Paired": "جفت شده"
+  },
+  "Pairing failed": {
+    "Pairing failed": "جفت‌سازی ناموفق"
+  },
+  "Pairing...": {
+    "Pairing...": "درحال جفت شدن..."
+  },
+  "Passkey:": {
+    "Passkey:": "کلید عبور:"
+  },
+  "Password": {
+    "Password": "گذرواژه"
+  },
+  "Pause": {
+    "Pause": "توقف"
+  },
+  "Paused": {
+    "Paused": "متوقف شده"
+  },
+  "Pending": {
+    "Pending": "در حال بررسی"
+  },
+  "Per-Mode Wallpapers": {
+    "Per-Mode Wallpapers": "تصاویر پس‌زمینه اختصاصی هر حالت"
+  },
+  "Per-Monitor Wallpapers": {
+    "Per-Monitor Wallpapers": "تصویر پس‌زمینه برای هر مانیتور"
+  },
+  "Per-Monitor Workspaces": {
+    "Per-Monitor Workspaces": "Workspace برای هر مانیتور"
+  },
+  "Percentage": {
+    "Percentage": "درصد"
+  },
+  "Permission denied to set profile image.": {
+    "Permission denied to set profile image.": "اجازه تنظیم تصویر نمایه داده نشد."
+  },
+  "Personalization": {
+    "Personalization": "شخصی‌سازی"
+  },
+  "Pin": {
+    "Pin": "سنجاق"
+  },
+  "Pin to Dock": {
+    "Pin to Dock": "سنجاق به داک"
+  },
+  "Pinned": {
+    "Pinned": "سنجاق شده"
+  },
+  "Place plugin directories here. Each plugin should have a plugin.json manifest file.": {
+    "Place plugin directories here. Each plugin should have a plugin.json manifest file.": "دایرکتوری افزونه‌ها را اینجا قرار دهید. هر افزونه باید فایل مشخصات plugins.json داشته باشد."
+  },
+  "Place plugins in %1": {
+    "Place plugins in %1": "افزونه‌ها را در %1 قرار بده"
+  },
+  "Play sound when new notification arrives": {
+    "Play sound when new notification arrives": "پخش صدا هنگام ورود اعلان جدید"
+  },
+  "Play sound when power cable is connected": {
+    "Play sound when power cable is connected": "پخش صدا هنگام اتصال کابل شارژر"
+  },
+  "Play sound when volume is adjusted": {
+    "Play sound when volume is adjusted": "پخش صدا هنگام تنظیم حجم صدا"
+  },
+  "Play sounds for system events": {
+    "Play sounds for system events": "پخش صدا هنگام رویداد‌های سیستمی"
+  },
+  "Playback": {
+    "Playback": "پخش"
+  },
+  "Plugged In": {
+    "Plugged In": "اتصال شارژر"
+  },
+  "Plugged in": {
+    "Plugged in": "وصل شد"
+  },
+  "Plugin": {
+    "Plugin": "افزونه"
+  },
+  "Plugin Directory": {
+    "Plugin Directory": "دایرکتوری افزونه"
+  },
+  "Plugin Management": {
+    "Plugin Management": "مدیریت افزونه"
+  },
+  "Plugin is disabled - enable in Plugins settings to use": {
+    "Plugin is disabled - enable in Plugins settings to use": "افزونه غیرفعال است - برای استفاده آن را در تنظیمات افزونه‌ها فعال کنید"
+  },
+  "Plugins": {
+    "Plugins": "افزونه‌ها"
+  },
+  "Pointer": {
+    "Pointer": "اشاره‌گر"
+  },
+  "Popup Position": {
+    "Popup Position": "موقعیت پاپ‌آپ"
+  },
+  "Popup Transparency": {
+    "Popup Transparency": "شفافیت پاپ‌آپ"
+  },
+  "Position": {
+    "Position": "موقعیت"
+  },
+  "Possible Override Conflicts": {
+    "Possible Override Conflicts": ""
+  },
+  "Power": {
+    "Power": "پاور"
+  },
+  "Power & Security": {
+    "Power & Security": "پاور و امنیت"
+  },
+  "Power & Sleep": {
+    "Power & Sleep": "پاور و خواب"
+  },
+  "Power Action Confirmation": {
+    "Power Action Confirmation": "تأیید اقدام پاور"
+  },
+  "Power Menu Customization": {
+    "Power Menu Customization": "سفارشی‌سازی منوی پاور"
+  },
+  "Power Off": {
+    "Power Off": "خاموش کردن"
+  },
+  "Power Options": {
+    "Power Options": "گزینه‌های پاور"
+  },
+  "Power Profile": {
+    "Power Profile": "پروفایل پاور"
+  },
+  "Power Profile Degradation": {
+    "Power Profile Degradation": "تنزل‌دادن پروفایل پاور"
+  },
+  "Power profile management available": {
+    "Power profile management available": "مدیریت پروفایل پاور در دسترس"
+  },
+  "Power source": {
+    "Power source": "منبع پاور"
+  },
+  "Precipitation Chance": {
+    "Precipitation Chance": "احتمال بارش"
+  },
+  "Preference": {
+    "Preference": "تنظیمات"
+  },
+  "Preset Widths (%)": {
+    "Preset Widths (%)": ""
+  },
+  "Press key...": {
+    "Press key...": "کلید را فشار دهید..."
+  },
+  "Pressure": {
+    "Pressure": "فشار"
+  },
+  "Prevent screen timeout": {
+    "Prevent screen timeout": "جلوگیری از خاموش‌شدن صفحه"
+  },
+  "Primary": {
+    "Primary": "اصلی"
+  },
+  "Print Server Management": {
+    "Print Server Management": "مدیریت سرور چاپ"
+  },
+  "Print Server not available": {
+    "Print Server not available": "سرور چاپ در دسترس نیست"
+  },
+  "Printer": {
+    "Printer": "چاپگر"
+  },
+  "Printer Classes": {
+    "Printer Classes": "کلاس‌های چاپگر"
+  },
+  "Printer created successfully": {
+    "Printer created successfully": "چاپگر با موفقیت ایجاد شد"
+  },
+  "Printer deleted": {
+    "Printer deleted": "چاپگر حذف شد"
+  },
+  "Printer name (no spaces)": {
+    "Printer name (no spaces)": "نام چاپگر (بدون فاصله)"
+  },
+  "Printers": {
+    "Printers": "چاپگر‌ها"
+  },
+  "Printers: ": {
+    "Printers: ": "چاپگر‌ها: "
+  },
+  "Privacy Indicator": {
+    "Privacy Indicator": "نشانگر حریم خصوصی"
+  },
+  "Private Key Password": {
+    "Private Key Password": "کلید خصوصی گذرواژه"
+  },
+  "Process": {
+    "Process": "فرایند"
+  },
+  "Process Count": {
+    "Process Count": "تعداد فرایند‌ها"
+  },
+  "Processing": {
+    "Processing": "درحال پردازش"
+  },
+  "Profile Image Error": {
+    "Profile Image Error": "خطای تصویر نمایه"
+  },
+  "Profile image is too large. Please use a smaller image.": {
+    "Profile image is too large. Please use a smaller image.": "تصویر پروفایل بیش‌از حد بزرگ است. لطفا از تصویر کوچکتر استفاده کنید."
+  },
+  "Protocol": {
+    "Protocol": "پروتکل"
+  },
+  "Quick access to application launcher": {
+    "Quick access to application launcher": "دسترسی سریع به لانچر برنامه"
+  },
+  "Quick access to color picker": {
+    "Quick access to color picker": "دسترسی سریع به انتخابگر رنگ"
+  },
+  "Quick access to notepad": {
+    "Quick access to notepad": "دسترسی سریع به دفترچه یادداشت"
+  },
+  "Quick note-taking slideout panel": {
+    "Quick note-taking slideout panel": "پنل کشویی یادداشت‌برداری سریع"
+  },
+  "RGB": {
+    "RGB": "RGB"
+  },
+  "Rain Chance": {
+    "Rain Chance": "احتمال بارش"
+  },
+  "Rate": {
+    "Rate": "نرخ انتقال"
+  },
+  "Reason": {
+    "Reason": "علت"
+  },
+  "Reboot": {
+    "Reboot": "راه‌اندازی مجدد"
+  },
+  "Recent Colors": {
+    "Recent Colors": "رنگ‌های اخیر"
+  },
+  "Recently Used Apps": {
+    "Recently Used Apps": "برنامه‌های استفاده‌شده اخیر"
+  },
+  "Recommended available": {
+    "Recommended available": "پیشنهادی موجود است"
+  },
+  "Refresh": {
+    "Refresh": "تازه‌سازی"
+  },
+  "Refresh Weather": {
+    "Refresh Weather": "تازه‌سازی آب و هوا"
+  },
+  "Reject Jobs": {
+    "Reject Jobs": "ردکردن کارهای چاپ"
+  },
+  "Reload Plugin": {
+    "Reload Plugin": "بارگیری مجدد افزونه"
+  },
+  "Remove": {
+    "Remove": "حذف"
+  },
+  "Remove gaps and border when windows are maximized": {
+    "Remove gaps and border when windows are maximized": "حذف فاصله‌ها و حاشیه هنگام بزرگ‌کردن پنجره‌ها"
+  },
+  "Report": {
+    "Report": "گزارش"
+  },
+  "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
+    "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": ""
+  },
+  "Requires 'dgop' tool": {
+    "Requires 'dgop' tool": "به ابزار 'dgop' نیاز دارد"
+  },
+  "Requires DMS %1": {
+    "Requires DMS %1": "به DMS %1 نیاز دارد"
+  },
+  "Requires DWL compositor": {
+    "Requires DWL compositor": "به کامپازیتور DWL نیاز دارد"
+  },
+  "Requires night mode support": {
+    "Requires night mode support": "به پشتیبانی حالت شب نیاز دارد"
+  },
+  "Reset": {
+    "Reset": "تنظیم مجدد"
+  },
+  "Reset Position": {
+    "Reset Position": "تنظیم مجدد موقعیت"
+  },
+  "Reset Size": {
+    "Reset Size": "تنظیم مجدد اندازه"
+  },
+  "Resize Widget": {
+    "Resize Widget": "تغییر اندازه ابزارک"
+  },
+  "Resolution & Refresh": {
+    "Resolution & Refresh": "وضوح و تازه‌سازی"
+  },
+  "Restart DMS": {
+    "Restart DMS": "راه‌اندازی مجدد DMS"
+  },
+  "Restart the DankMaterialShell": {
+    "Restart the DankMaterialShell": "راه‌اندازی مجدد DankMaterialShell"
+  },
+  "Resume": {
+    "Resume": "ازسرگیری"
+  },
+  "Revert": {
+    "Revert": "برگرداندن"
+  },
+  "Right": {
+    "Right": "راست"
+  },
+  "Right Section": {
+    "Right Section": "بخش راست"
+  },
+  "Right Tiling": {
+    "Right Tiling": "تایلینگ راست"
+  },
+  "Right-click and drag anywhere on the widget": {
+    "Right-click and drag anywhere on the widget": ""
+  },
+  "Right-click and drag the bottom-right corner": {
+    "Right-click and drag the bottom-right corner": ""
+  },
+  "Right-click bar widget to cycle": {
+    "Right-click bar widget to cycle": ""
+  },
+  "Root Filesystem": {
+    "Root Filesystem": "سیستم‌فایل ریشه"
+  },
+  "Rounded corners for windows": {
+    "Rounded corners for windows": ""
+  },
+  "Run DMS Templates": {
+    "Run DMS Templates": "اجرای قالب‌های DMS"
+  },
+  "Run User Templates": {
+    "Run User Templates": "اجرای قالب‌های کاربر"
+  },
+  "Run a program (e.g., firefox, kitty)": {
+    "Run a program (e.g., firefox, kitty)": "اجرای یک برنامه (مانند firefox، kitty)"
+  },
+  "Run a shell command (e.g., notify-send)": {
+    "Run a shell command (e.g., notify-send)": "اجرای یک دستور شِل (مانند notify-send)"
+  },
+  "Running Apps": {
+    "Running Apps": "برنامه‌های درحال اجرا"
+  },
+  "Running Apps Only In Current Workspace": {
+    "Running Apps Only In Current Workspace": "برنامه‌های درحال اجرا تنها در workspace کنونی"
+  },
+  "Running Apps Settings": {
+    "Running Apps Settings": "تنظیمات برنامه‌های درحال اجرا"
+  },
+  "SDR Brightness": {
+    "SDR Brightness": "روشنایی SDR"
+  },
+  "SDR Saturation": {
+    "SDR Saturation": "اشباع رنگ SDR"
+  },
+  "Save": {
+    "Save": "ذخیره"
+  },
+  "Save Notepad File": {
+    "Save Notepad File": "ذخیره فایل دفترچه یادداشت"
+  },
+  "Save password": {
+    "Save password": "ذخیره گذرواژه"
+  },
+  "Saved": {
+    "Saved": "ذخیره شد"
+  },
+  "Saved Configurations": {
+    "Saved Configurations": "پیکربندی‌های ذخیره شده"
+  },
+  "Scale": {
+    "Scale": "بزرگنمایی"
+  },
+  "Scale DankBar font sizes independently": {
+    "Scale DankBar font sizes independently": "بزرگنمایی اندازه فونت DankBar به صورت مستقل"
+  },
+  "Scale all font sizes throughout the shell": {
+    "Scale all font sizes throughout the shell": "بزرگنمایی تمام اندازه‌های فونت در سراسر شِل"
+  },
+  "Scan": {
+    "Scan": "اسکن"
+  },
+  "Scanning": {
+    "Scanning": "درحال اسکن"
+  },
+  "Scanning...": {
+    "Scanning...": "درحال اسکن..."
+  },
+  "Science": {
+    "Science": "علمی"
+  },
+  "Screen sharing": {
+    "Screen sharing": "اشتراک‌گذاری صفحه"
+  },
+  "Scroll Wheel": {
+    "Scroll Wheel": ""
+  },
+  "Scroll on widget changes media volume": {
+    "Scroll on widget changes media volume": ""
+  },
+  "Scroll song title": {
+    "Scroll song title": "حرکت عنوان آهنگ"
+  },
+  "Scroll title if it doesn't fit in widget": {
+    "Scroll title if it doesn't fit in widget": "اگر عنوان در ابزارک جا نشد آن را حرکت بده"
+  },
+  "Scrolling": {
+    "Scrolling": ""
+  },
+  "Search file contents": {
+    "Search file contents": "جستجو در محتوای فایل"
+  },
+  "Search filenames": {
+    "Search filenames": "جستجو در نام فایل‌ها"
+  },
+  "Search for a location...": {
+    "Search for a location...": "جستجو برای موقعیت مکانی..."
+  },
+  "Search keybinds...": {
+    "Search keybinds...": "جستجو در کلید‌های میانبر..."
+  },
+  "Search plugins...": {
+    "Search plugins...": "جستجوی افزونه‌ها..."
+  },
+  "Search widgets...": {
+    "Search widgets...": "جستجوی ابزارک‌ها..."
+  },
+  "Search...": {
+    "Search...": "جستجو..."
+  },
+  "Searching...": {
+    "Searching...": "درحال جستجو..."
+  },
+  "Secondary": {
+    "Secondary": "ثانویه"
+  },
+  "Secured": {
+    "Secured": "ایمن"
+  },
+  "Security": {
+    "Security": "امنیت"
+  },
+  "Select Application": {
+    "Select Application": "انتخاب برنامه"
+  },
+  "Select Bar": {
+    "Select Bar": "انتخاب نوار"
+  },
+  "Select Launcher Logo": {
+    "Select Launcher Logo": "انتخاب لوگوی لانچر"
+  },
+  "Select a color from the palette or use custom sliders": {
+    "Select a color from the palette or use custom sliders": "انتخاب رنگ از پالت رنگی یا اسلایدر‌های سفارشی"
+  },
+  "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
+    "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": ""
+  },
+  "Select a widget to add. You can add multiple instances of the same widget if needed.": {
+    "Select a widget to add. You can add multiple instances of the same widget if needed.": ""
+  },
+  "Select an image file...": {
+    "Select an image file...": "انتخاب فایل تصویر..."
+  },
+  "Select device...": {
+    "Select device...": "انتخاب دستگاه..."
+  },
+  "Select driver...": {
+    "Select driver...": "انتخاب درایور..."
+  },
+  "Select font weight for UI text": {
+    "Select font weight for UI text": "انتخاب وزن فونت برای متن UI"
+  },
+  "Select monitor to configure wallpaper": {
+    "Select monitor to configure wallpaper": "انتخاب مانیتور برای پیکربندی تصویر پس‌زمینه"
+  },
+  "Select monospace font for process list and technical displays": {
+    "Select monospace font for process list and technical displays": "انتخاب فونت monospace برای فهرست فرایند‌ها و نمایشگر‌های فنی"
+  },
+  "Select system sound theme": {
+    "Select system sound theme": "انتخاب تم صدای سیستم"
+  },
+  "Select the font family for UI text": {
+    "Select the font family for UI text": "انتخاب خانواده فونت برای متن UI"
+  },
+  "Select the palette algorithm used for wallpaper-based colors": {
+    "Select the palette algorithm used for wallpaper-based colors": "انتخاب الگوریتم پالت رنگی استفاده شده برای رنگ‌های بر اساس تصویر پس‌زمینه"
+  },
+  "Select which transitions to include in randomization": {
+    "Select which transitions to include in randomization": "انتخاب کنید کدام افکت‌های تغییر در تصادفی‌سازی باشند"
+  },
+  "Select...": {
+    "Select...": "انتخاب..."
+  },
+  "Selected image file not found.": {
+    "Selected image file not found.": "فایل تصویر انتخاب شده یافت نشد."
+  },
+  "Separator": {
+    "Separator": "جداکننده"
+  },
+  "Server": {
+    "Server": "سرور"
+  },
+  "Set different wallpapers for each connected monitor": {
+    "Set different wallpapers for each connected monitor": "تنظیم تصاویر پس‌زمینه مختلف برای هر مانیتور متصل"
+  },
+  "Set different wallpapers for light and dark mode": {
+    "Set different wallpapers for light and dark mode": "تنظیم تصاویر پس‌زمینه مختلف برای حالت روشن و تاریک"
+  },
+  "Set key and action to save": {
+    "Set key and action to save": "کلید و اقدام را برای ذخیره تنظیم کنید"
+  },
+  "Setup": {
+    "Setup": "راه‌اندازی"
+  },
+  "Shell": {
+    "Shell": "شِل"
+  },
+  "Shift+Del: Clear All • Esc: Close": {
+    "Shift+Del: Clear All • Esc: Close": "Shift+Del: پاک‌کردن همه • Esc: بستن"
+  },
+  "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": {
+    "Shift+Enter: Paste • Shift+Del: Clear All • Esc: Close": "Shift+Enter: الصاق • Shift+Del: پاک‌کردن همه • Esc: بستن"
+  },
+  "Short": {
+    "Short": "کوتاه"
+  },
+  "Shortcuts": {
+    "Shortcuts": "میانبرها"
+  },
+  "Shortcuts (%1)": {
+    "Shortcuts (%1)": "میانبر‌ها (%1)"
+  },
+  "Show All Tags": {
+    "Show All Tags": "نمایش همه برچسب‌ها"
+  },
+  "Show CPU": {
+    "Show CPU": "نمایش CPU"
+  },
+  "Show CPU Graph": {
+    "Show CPU Graph": "نمایش نمودار CPU"
+  },
+  "Show CPU Temp": {
+    "Show CPU Temp": "نمایش دمای CPU"
+  },
+  "Show Date": {
+    "Show Date": "نمایش تاریخ"
+  },
+  "Show Disk": {
+    "Show Disk": "نمایش دیسک"
+  },
+  "Show Dock": {
+    "Show Dock": "نمایش داک"
+  },
+  "Show GPU Temperature": {
+    "Show GPU Temperature": "نمایش دمای GPU"
+  },
+  "Show Header": {
+    "Show Header": "نمایش سربرگ"
+  },
+  "Show Hibernate": {
+    "Show Hibernate": "نمایش هایبرنیت"
+  },
+  "Show Hour Numbers": {
+    "Show Hour Numbers": "نمایش شماره‌های ساعت"
+  },
+  "Show Line Numbers": {
+    "Show Line Numbers": "نمایش شماره خطوط"
+  },
+  "Show Lock": {
+    "Show Lock": "نمایش قفل"
+  },
+  "Show Log Out": {
+    "Show Log Out": "نمایش خروج"
+  },
+  "Show Memory": {
+    "Show Memory": "نمایش حافظه"
+  },
+  "Show Memory Graph": {
+    "Show Memory Graph": "نمایش نمودار حافظه"
+  },
+  "Show Network": {
+    "Show Network": "نمایش شبکه"
+  },
+  "Show Network Graph": {
+    "Show Network Graph": "نمایش نمودار شبکه"
+  },
+  "Show Occupied Workspaces Only": {
+    "Show Occupied Workspaces Only": "نمایش تنها workspaceهای اشغال شده"
+  },
+  "Show Power Off": {
+    "Show Power Off": "نمایش خاموش‌کردن"
+  },
+  "Show Reboot": {
+    "Show Reboot": "نمایش راه‌اندازی مجدد"
+  },
+  "Show Restart DMS": {
+    "Show Restart DMS": "نمایش راه‌اندازی مجدد DMS"
+  },
+  "Show Seconds": {
+    "Show Seconds": "نمایش ثانیه‌ها"
+  },
+  "Show Suspend": {
+    "Show Suspend": "نمایش تعلیق"
+  },
+  "Show Top Processes": {
+    "Show Top Processes": "نمایش فرایند‌های مهم"
+  },
+  "Show Workspace Apps": {
+    "Show Workspace Apps": "نمایش برنامه‌های workspace"
+  },
+  "Show all 9 tags instead of only occupied tags (DWL only)": {
+    "Show all 9 tags instead of only occupied tags (DWL only)": "نمایش کل ۹ برچسب به جای تنها برچسب‌های اشغال شده (تنها DWL)"
+  },
+  "Show cava audio visualizer in media widget": {
+    "Show cava audio visualizer in media widget": "نمایش مصورساز صوتی cava در ابزارک رسانه"
+  },
+  "Show darkened overlay behind modal dialogs": {
+    "Show darkened overlay behind modal dialogs": "نمایش روکش تیره پشت پنجره مودال"
+  },
+  "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
+    "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "overlay لانچر را هنگام تایپ در نمای کلی نیری نمایش بده. برای استفاده از لانچر دیگری غیرفعال کنید."
+  },
+  "Show on Last Display": {
+    "Show on Last Display": "نمایش در آخرین نمایشگر"
+  },
+  "Show on Overlay": {
+    "Show on Overlay": ""
+  },
+  "Show on Overview": {
+    "Show on Overview": "نمایش روی نمای کلی"
+  },
+  "Show on all connected displays": {
+    "Show on all connected displays": "نمایش همه نمایشگر‌های متصل"
+  },
+  "Show on screens:": {
+    "Show on screens:": "نمایش روی صفحات:"
+  },
+  "Show on-screen display when brightness changes": {
+    "Show on-screen display when brightness changes": "نمایش OSD هنگام تغییر روشنایی صفحه"
+  },
+  "Show on-screen display when caps lock state changes": {
+    "Show on-screen display when caps lock state changes": ""
+  },
+  "Show on-screen display when cycling audio output devices": {
+    "Show on-screen display when cycling audio output devices": ""
+  },
+  "Show on-screen display when idle inhibitor state changes": {
+    "Show on-screen display when idle inhibitor state changes": ""
+  },
+  "Show on-screen display when media player volume changes": {
+    "Show on-screen display when media player volume changes": ""
+  },
+  "Show on-screen display when microphone is muted/unmuted": {
+    "Show on-screen display when microphone is muted/unmuted": ""
+  },
+  "Show on-screen display when power profile changes": {
+    "Show on-screen display when power profile changes": ""
+  },
+  "Show on-screen display when volume changes": {
+    "Show on-screen display when volume changes": ""
+  },
+  "Show only apps running in current workspace": {
+    "Show only apps running in current workspace": "نمایش تنها برنامه‌های درحال اجرا در workspace کنونی"
+  },
+  "Show only workspaces belonging to each specific monitor.": {
+    "Show only workspaces belonging to each specific monitor.": "نمایش تنها workspace‌هایی که به هر مانیتور خاص تعلق دارند."
+  },
+  "Show password": {
+    "Show password": "نمایش گذرواژه"
+  },
+  "Show weather information in top bar and control center": {
+    "Show weather information in top bar and control center": "نمایش اطلاعات آب و هوا در نوار بالا و مرکز کنترل"
+  },
+  "Show workspace index numbers in the top bar workspace switcher": {
+    "Show workspace index numbers in the top bar workspace switcher": "نمایش شماره شاخص workspace در تغییردهنده workspace نوار بالا"
+  },
+  "Shows all running applications with focus indication": {
+    "Shows all running applications with focus indication": "همه برنامه‌های درحال اجرا را با نشانگر متمرکز نمایش می‌دهد"
+  },
+  "Shows current workspace and allows switching": {
+    "Shows current workspace and allows switching": "Workspace کنونی را نمایش می‌دهد و امکان تغییر را فراهم می‌کند"
+  },
+  "Shows when caps lock is active": {
+    "Shows when caps lock is active": "زمانی که caps lock فعال است نمایش داده می‌شود"
+  },
+  "Shows when microphone, camera, or screen sharing is active": {
+    "Shows when microphone, camera, or screen sharing is active": "هنگامی که میکروفون، دوربین یا اشتراک‌گذاری صفحه فعال باشد نشان داده می‌شود"
+  },
+  "Shutdown": {
+    "Shutdown": "خاموش‌کردن"
+  },
+  "Signal": {
+    "Signal": "سیگنال"
+  },
+  "Signal:": {
+    "Signal:": "سیگنال:"
+  },
+  "Size": {
+    "Size": "اندازه"
+  },
+  "Size Offset": {
+    "Size Offset": "آفست اندازه"
+  },
+  "Sizing": {
+    "Sizing": "اندازه‌دهی"
+  },
+  "Some plugins require a newer version of DMS:": {
+    "Some plugins require a newer version of DMS:": "برخی افزونه‌ها نیازمند نسخه جدیدتر DMS هستند:"
+  },
+  "Sort Alphabetically": {
+    "Sort Alphabetically": "مرتب‌سازی بر اساس حروف الفبا"
+  },
+  "Sort By": {
+    "Sort By": "مرتب‌سازی براساس"
+  },
+  "Sorting & Layout": {
+    "Sorting & Layout": "مرتب‌سازی و طرح"
+  },
+  "Sound Theme": {
+    "Sound Theme": "تم صدا"
+  },
+  "Sounds": {
+    "Sounds": "صدا‌ها"
+  },
+  "Space between windows": {
+    "Space between windows": ""
+  },
+  "Spacer": {
+    "Spacer": "فاصله دهنده"
+  },
+  "Spacing": {
+    "Spacing": "فاصله گذاری"
+  },
+  "Speaker settings": {
+    "Speaker settings": "تنظیمات بلندگو"
+  },
+  "Speed": {
+    "Speed": "سرعت"
+  },
+  "Spool Area Full": {
+    "Spool Area Full": "فضای صف چاپ پر است"
+  },
+  "Square Corners": {
+    "Square Corners": "گوشه‌های مربعی"
+  },
+  "Stacked": {
+    "Stacked": "انباشته"
+  },
+  "Start": {
+    "Start": "شروع"
+  },
+  "Start typing your notes here...": {
+    "Start typing your notes here...": "تایپ‌کردن یادداشت‌هایتان را اینجا شروع کنید..."
+  },
+  "State": {
+    "State": "وضعیت"
+  },
+  "Status": {
+    "Status": "وضعیت"
+  },
+  "Stopped": {
+    "Stopped": "متوقف شد"
+  },
+  "Stopped Partly": {
+    "Stopped Partly": "تا حدی متوقف شد"
+  },
+  "Stopping": {
+    "Stopping": "درحال توقف"
+  },
+  "Storage & Disks": {
+    "Storage & Disks": "محل ذخیره و دیسک‌ها"
+  },
+  "Sunrise": {
+    "Sunrise": "طلوع"
+  },
+  "Sunset": {
+    "Sunset": "غروب"
+  },
+  "Suppress notification popups while enabled": {
+    "Suppress notification popups while enabled": ""
+  },
+  "Surface": {
+    "Surface": "سطح"
+  },
+  "Suspend": {
+    "Suspend": "تعلیق"
+  },
+  "Suspend behavior": {
+    "Suspend behavior": "رفتار تعلیق"
+  },
+  "Suspend system after": {
+    "Suspend system after": "تعلیق پس از"
+  },
+  "Swap": {
+    "Swap": "سواپ"
+  },
+  "Switch User": {
+    "Switch User": "تغییر کاربر"
+  },
+  "Switch to power profile": {
+    "Switch to power profile": "تغییر به پروفایل پاور"
+  },
+  "Sync Mode with Portal": {
+    "Sync Mode with Portal": "همگام‌سازی حالت با پورتال"
+  },
+  "Sync dark mode with settings portals for system-wide theme hints": {
+    "Sync dark mode with settings portals for system-wide theme hints": "همگام‌سازی حالت تاریک با پورتال سیستم برای هماهنگی تم در سطح سیستم"
+  },
+  "System": {
+    "System": "سیستم"
+  },
+  "System App Theming": {
+    "System App Theming": "تم‌دادن برنامه‌ سیستمی"
+  },
+  "System Monitor Unavailable": {
+    "System Monitor Unavailable": "ناظر سیستم در دسترس نیست"
+  },
+  "System Sounds": {
+    "System Sounds": "صدا‌های سیستمی"
+  },
+  "System Tray": {
+    "System Tray": "سینی سیستم"
+  },
+  "System Update": {
+    "System Update": "بروزرسانی سیستم"
+  },
+  "System Updater": {
+    "System Updater": "بروزرسان سیستم"
+  },
+  "System Updates": {
+    "System Updates": "بروزرسانی‌های سیستم"
+  },
+  "System monitor widget description": {
+    "CPU, memory, network, and disk monitoring": "ناظر CPU، حافظه، شبکه و دیسک"
+  },
+  "System monitor widget name | sysmon window title": {
+    "System Monitor": ""
+  },
+  "System notification area icons": {
+    "System notification area icons": "آیکون های ناحیه اعلان‌های سیستم"
+  },
+  "System sounds are not available. Install canberra-gtk-play for sound support.": {
+    "System sounds are not available. Install canberra-gtk-play for sound support.": ""
+  },
+  "System theme toggle": {
+    "System theme toggle": "تغییر تم سیستم"
+  },
+  "System toast notifications": {
+    "System toast notifications": "اعلانات سیستم به صورت تُست"
+  },
+  "System update custom command": {
+    "System update custom command": "دستور سفارشی بروزرسانی سیستم"
+  },
+  "Tab": {
+    "Tab": "تب"
+  },
+  "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": {
+    "Tab/Shift+Tab: Nav • ←→↑↓: Grid Nav • Enter/Space: Select": "Tab/Shift+Tab: پیمایش • ←→↑↓: پیمایش جدولی • Enter/Space: انتخاب"
+  },
+  "Terminal custom additional parameters": {
+    "Terminal custom additional parameters": "پارامتر‌های اضافی سفارشی ترمینال"
+  },
+  "Terminals - Always use Dark Theme": {
+    "Terminals - Always use Dark Theme": "ترمینال‌ها - همیشه از تم تاریک استفاده کن"
+  },
+  "Test Page": {
+    "Test Page": "صفحه تست"
+  },
+  "Test page sent to printer": {
+    "Test page sent to printer": "صفحه تست به چاپگر ارسال شد"
+  },
+  "Text": {
+    "Text": "متن"
+  },
+  "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": {
+    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": ""
+  },
+  "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
+    "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "متغیر محیطی DMS_SOCKET تنظیم نشده یا سوکت موجود نیست. مدیریت افزونه خودکار به DMS_SOCKET نیاز دارد."
+  },
+  "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": {
+    "The below settings will modify your GTK and Qt settings. If you wish to preserve your current configurations, please back them up (qt5ct.conf|qt6ct.conf and ~/.config/gtk-3.0|gtk-4.0).": "تنظیمات پایین، تنظیمات Qt و GTK شما را تغییر می‌دهند. اگر می‌خواهید تنظیمات کنونی خود را نگه دارید، لطفا از آنها نسخه پشتیبان تهیه کنید (qt5ctl.conf |qt6ctl.conf و ~/.config/gtk-3.0|gtk-4.0)"
+  },
+  "The job queue of this printer is empty": {
+    "The job queue of this printer is empty": "صف کار چاپگر خالی است"
+  },
+  "Theme & Colors": {
+    "Theme & Colors": "تم و رنگ‌ها"
+  },
+  "Theme Color": {
+    "Theme Color": "رنگ تم"
+  },
+  "Thickness": {
+    "Thickness": "ضخامت"
+  },
+  "Third-Party Plugin Warning": {
+    "Third-Party Plugin Warning": "اخطار افزونه شخص ثالث"
+  },
+  "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": {
+    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "افزونه‌های شخص ثالث توسط کامیونیتی ایجاد شده و به طور رسمی توسط DankMaterialShell پشتیبانی نمی‌شوند.\\n\\nاین افزونه‌ها ممکن است خطرات امنیتی و حریم خصوصی ایجاد کنند - با مسئولیت خودتان نصب کنید."
+  },
+  "This bind is overridden by config.kdl": {
+    "This bind is overridden by config.kdl": ""
+  },
+  "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
+    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "این ابزارک از حالت‌های خاموش شدن GPU جلوگیری می‌کند، که ​​می‌تواند به طور قابل توجهی بر عمر باتری لپ‌تاپ‌ها تأثیر بگذارد. استفاده از این ابزارک در لپ‌تاپ‌هایی با گرافیک هیبریدی توصیه نمی‌شود."
+  },
+  "This will permanently delete all clipboard history.": {
+    "This will permanently delete all clipboard history.": "این کار تمام تاریخچه کلیپ‌بورد را برای همیشه حذف می‌کند."
+  },
+  "Tiling": {
+    "Tiling": "تایلینگ"
+  },
+  "Time & Weather": {
+    "Time & Weather": "زمان و آب و هوا"
+  },
+  "Time Format": {
+    "Time Format": "قالب زمان"
+  },
+  "Time remaining: %1": {
+    "Time remaining: %1": "زمان باقی‌مانده: %1"
+  },
+  "Time until full: %1": {
+    "Time until full: %1": "زمان تا پر شدن:‌ %1"
+  },
+  "Timed Out": {
+    "Timed Out": "زمان تمام شد"
+  },
+  "Timeout for critical priority notifications": {
+    "Timeout for critical priority notifications": ""
+  },
+  "Timeout for low priority notifications": {
+    "Timeout for low priority notifications": ""
+  },
+  "Timeout for normal priority notifications": {
+    "Timeout for normal priority notifications": ""
+  },
+  "Title": {
+    "Title": "عنوان"
+  },
+  "To Full": {
+    "To Full": "تا پر شدن"
+  },
+  "To update, run the following command:": {
+    "To update, run the following command:": "برای بروزرسانی، دستور زیر را اجرا کن:"
+  },
+  "To use this DMS bind, remove or change the keybind in your config.kdl": {
+    "To use this DMS bind, remove or change the keybind in your config.kdl": ""
+  },
+  "Toast Messages": {
+    "Toast Messages": "پیام‌های تًست"
+  },
+  "Today": {
+    "Today": "امروز"
+  },
+  "Toggle visibility of this bar configuration": {
+    "Toggle visibility of this bar configuration": ""
+  },
+  "Toggling...": {
+    "Toggling...": ""
+  },
+  "Tomorrow": {
+    "Tomorrow": "فردا"
+  },
+  "Toner Empty": {
+    "Toner Empty": "تونر خالی است"
+  },
+  "Toner Low": {
+    "Toner Low": "تونر کم است"
+  },
+  "Top": {
+    "Top": "بالا"
+  },
+  "Top Bar Format": {
+    "Top Bar Format": "قالب نوار بالا"
+  },
+  "Top Left": {
+    "Top Left": "بالا چپ"
+  },
+  "Top Processes": {
+    "Top Processes": "فرایند‌های مهم"
+  },
+  "Top Right": {
+    "Top Right": "بالا راست"
+  },
+  "Top Section": {
+    "Top Section": "بخش بالا"
+  },
+  "Total Jobs": {
+    "Total Jobs": "تمام کار‌های چاپ"
+  },
+  "Transform": {
+    "Transform": "تبدیل"
+  },
+  "Transition Effect": {
+    "Transition Effect": "افکت تغییر"
+  },
+  "Transparency": {
+    "Transparency": "شفافیت"
+  },
+  "Turn off monitors after": {
+    "Turn off monitors after": "خاموش‌کردن مانیتور پس از"
+  },
+  "Type": {
+    "Type": "نوع"
+  },
+  "Typography": {
+    "Typography": "تایپوگرافی"
+  },
+  "Typography & Motion": {
+    "Typography & Motion": "تایپوگرافی و حرکت"
+  },
+  "Unavailable": {
+    "Unavailable": "ناموجود"
+  },
+  "Uninstall Plugin": {
+    "Uninstall Plugin": "حذف افزونه"
+  },
+  "Unknown": {
+    "Unknown": "ناشناخته"
+  },
+  "Unknown Config": {
+    "Unknown Config": "پیکربندی ناشناخته"
+  },
+  "Unknown Device": {
+    "Unknown Device": "دستگاه ناشناخته"
+  },
+  "Unknown Monitor": {
+    "Unknown Monitor": "مانیتور ناشناخته"
+  },
+  "Unknown Network": {
+    "Unknown Network": "شبکه ناشناخته"
+  },
+  "Unpin from Dock": {
+    "Unpin from Dock": "جداکردن از داک"
+  },
+  "Unsaved Changes": {
+    "Unsaved Changes": "تغییرات ذخیره نشده"
+  },
+  "Unsaved changes": {
+    "Unsaved changes": "تغییرات ذخیره نشده"
+  },
+  "Unsaved note...": {
+    "Unsaved note...": "یادداشت ذخیره نشده..."
+  },
+  "Untitled": {
+    "Untitled": "بدون عنوان"
+  },
+  "Update All": {
+    "Update All": "بروزرسانی همه"
+  },
+  "Update Plugin": {
+    "Update Plugin": "بروزرسانی افزونه"
+  },
+  "Use 24-hour time format instead of 12-hour AM/PM": {
+    "Use 24-hour time format instead of 12-hour AM/PM": "استفاده از قالب 24 ساعته به جای 12 ساعته AM/PM"
+  },
+  "Use Custom Command": {
+    "Use Custom Command": "استفاده از دستور سفارشی"
+  },
+  "Use Grid Layout": {
+    "Use Grid Layout": "استفاده از نمای جدولی"
+  },
+  "Use IP Location": {
+    "Use IP Location": "استفاده از موقعیت مکانی IP"
+  },
+  "Use Imperial Units": {
+    "Use Imperial Units": "استفاده از واحد‌های بریتانیایی"
+  },
+  "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": {
+    "Use Imperial units (°F, mph, inHg) instead of Metric (°C, km/h, hPa)": "استفاده از واحد‌های بریتانیایی  (°F, mph, inHg) به جای واحد‌های متریک (°C, km/h, hPa)"
+  },
+  "Use Monospace Font": {
+    "Use Monospace Font": "استفاده از فونت monospace"
+  },
+  "Use System Theme": {
+    "Use System Theme": "استفاده از تم سیستم"
+  },
+  "Use animated wave progress bars for media playback": {
+    "Use animated wave progress bars for media playback": "استفاده از نوارهای پیشرفت موجی متحرک برای پخش رسانه"
+  },
+  "Use custom command for update your system": {
+    "Use custom command for update your system": "استفاده از دستور سفارشی برای بروزرسانی سیستم شما"
+  },
+  "Use custom gaps instead of bar spacing": {
+    "Use custom gaps instead of bar spacing": ""
+  },
+  "Use custom window radius instead of theme radius": {
+    "Use custom window radius instead of theme radius": ""
+  },
+  "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
+    "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "استفاده از اثر انگشت خوان برای احراز هویت صفحه قفل (نیاز به اثر انگشت ثبت شده دارد)"
+  },
+  "Use light theme instead of dark theme": {
+    "Use light theme instead of dark theme": "استفاده از تم روشن به جای تم تاریک"
+  },
+  "Use sound theme from system settings": {
+    "Use sound theme from system settings": "استفاده از تم صدا در تنظیمات سیستم"
+  },
+  "Use%": {
+    "Use%": "استفاده%"
+  },
+  "Used": {
+    "Used": "استفاده شده"
+  },
+  "User": {
+    "User": "کاربر"
+  },
+  "Username": {
+    "Username": "نام کاربری"
+  },
+  "Uses sunrise/sunset times to automatically adjust night mode based on your location.": {
+    "Uses sunrise/sunset times to automatically adjust night mode based on your location.": "از زمان طلوع/غروب خورشید برای تنظیم خودکار حالت شب بر اساس موقعیت مکانی شما استفاده می‌کند."
+  },
+  "Utilities": {
+    "Utilities": "برنامه‌های کمکی"
+  },
+  "VPN": {
+    "VPN": "VPN"
+  },
+  "VPN Connections": {
+    "VPN Connections": "اتصال‌های VPN"
+  },
+  "VPN Password": {
+    "VPN Password": "گذرواژه VPN"
+  },
+  "VPN configuration updated": {
+    "VPN configuration updated": "گذرواژه VPN بروز شد"
+  },
+  "VPN connections": {
+    "VPN connections": "اتصالات VPN"
+  },
+  "VPN deleted": {
+    "VPN deleted": "VPN حذف شد"
+  },
+  "VPN imported: %1": {
+    "VPN imported: %1": "VPN وارد شد:‌ %1"
+  },
+  "VPN not available": {
+    "VPN not available": "VPN موجود نیست"
+  },
+  "VPN status and quick connect": {
+    "VPN status and quick connect": "وضعیت VPN و اتصال سریع"
+  },
+  "VRR": {
+    "VRR": "VRR"
+  },
+  "VRR On-Demand": {
+    "VRR On-Demand": "VRR بر اساس تقاضا"
+  },
+  "VRR activates only when applications request it": {
+    "VRR activates only when applications request it": "VRR تنها زمانی فعال می‌شود که برنامه‌ها آن را درخواست کنند"
+  },
+  "Variable Refresh Rate": {
+    "Variable Refresh Rate": "نرخ تازه‌سازی متغیر"
+  },
+  "Variant created - expand to configure": {
+    "Variant created - expand to configure": "نوع ایجاد شد - برای پیکربندی گسترش دهید"
+  },
+  "Variant removed": {
+    "Variant removed": "نوع حذف شد"
+  },
+  "Version": {
+    "Version": "نسخه"
+  },
+  "Vertical Deck": {
+    "Vertical Deck": ""
+  },
+  "Vertical Grid": {
+    "Vertical Grid": "جدول عمودی"
+  },
+  "Vertical Scrolling": {
+    "Vertical Scrolling": ""
+  },
+  "Vertical Tiling": {
+    "Vertical Tiling": "تایلینگ عمودی"
+  },
+  "Vibrant palette with playful saturation.": {
+    "Vibrant palette with playful saturation.": "پالتر رنگی پر جنب و جوش با اشباع رنگی سرزنده."
+  },
+  "Visibility": {
+    "Visibility": "دید"
+  },
+  "Visual divider between widgets": {
+    "Visual divider between widgets": "جداکننده بصری بین ابزارک‌ها"
+  },
+  "Visual effect used when wallpaper changes": {
+    "Visual effect used when wallpaper changes": "افکت بصری مورد استفاده هنگام تغییر تصویر زمینه"
+  },
+  "Volume": {
+    "Volume": "حجم صدا"
+  },
+  "Volume Changed": {
+    "Volume Changed": "حجم صدا تغییر کرد"
+  },
+  "Volume Slider": {
+    "Volume Slider": "اسلایدر حجم صدا"
+  },
+  "Volume, brightness, and other system OSDs": {
+    "Volume, brightness, and other system OSDs": "OSD‌های حجم صدا، روشنایی و سیستمی"
+  },
+  "WPA/WPA2": {
+    "WPA/WPA2": "WPA/WPA2"
+  },
+  "Wallpaper": {
+    "Wallpaper": "تصویر پس‌زمینه"
+  },
+  "Wallpaper Monitor": {
+    "Wallpaper Monitor": "مانیتور تصویر پس‌زمینه"
+  },
+  "Wallpapers": {
+    "Wallpapers": "تصاویر پس‌زمینه"
+  },
+  "Warm color temperature to apply": {
+    "Warm color temperature to apply": "دمای رنگ گرم برای اعمال"
+  },
+  "Warning": {
+    "Warning": "اخطار"
+  },
+  "Wave Progress Bars": {
+    "Wave Progress Bars": "نوار‌های پیشرفت موجی"
+  },
+  "Weather": {
+    "Weather": "آب و هوا"
+  },
+  "Weather Widget": {
+    "Weather Widget": "ابزارک آب و هوا"
+  },
+  "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
+    "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "هنگام فعال بودن، برنامه‌ها بر اساس حروف الفبا مرتب می‌شوند. هنگام غیرفعال بودن، برنامه ها بر اساس دفعات استفاده مرتب می‌شوند."
+  },
+  "When updater widget is used, then hide it if no update found": {
+    "Hide Updater Widget": "پنهان‌کردن ابزارک بروزرسان",
+    "When updater widget is used, then hide it if no update found": "وقتی از ابزارک بروزرسان استفاده می‌شود، اگر بروزرسانی یافت نشد، آن را پنهان کن"
+  },
+  "Wi-Fi Password": {
+    "Wi-Fi Password": "گذرواژه Wi-Fi"
+  },
+  "Wi-Fi and Ethernet connection": {
+    "Wi-Fi and Ethernet connection": "اتصالات Wi-Fi و اترنت"
+  },
+  "Wi-Fi not available": {
+    "Wi-Fi not available": "Wi-Fi در دسترس نیست"
+  },
+  "WiFi": {
+    "WiFi": "WiFi"
+  },
+  "WiFi Device": {
+    "WiFi Device": "دستگاه WiFi"
+  },
+  "WiFi disabled": {
+    "WiFi disabled": "WiFi غیرفعال"
+  },
+  "WiFi enabled": {
+    "WiFi enabled": "WiFi فعال"
+  },
+  "WiFi is off": {
+    "WiFi is off": "WiFi خاموش است"
+  },
+  "Wide (BT2020)": {
+    "Wide (BT2020)": "عریض (BT2020)"
+  },
+  "Widget Background Color": {
+    "Widget Background Color": "رنگ پس‌زمینه ابزارک"
+  },
+  "Widget Management": {
+    "Widget Management": "مدیریت ابزارک‌ها"
+  },
+  "Widget Outline": {
+    "Widget Outline": "خط بیرونی ابزارک"
+  },
+  "Widget Style": {
+    "Widget Style": "استایل ابزارک"
+  },
+  "Widget Styling": {
+    "Widget Styling": "استایل ابزارک‌ها"
+  },
+  "Widget Transparency": {
+    "Widget Transparency": "شفافیت ابزارک"
+  },
+  "Widget Variants": {
+    "Widget Variants": "انواع ابزارک"
+  },
+  "Widget added": {
+    "Widget added": ""
+  },
+  "Widget grid keyboard hints": {
+    "G: grid • Z/X: size": "G: جدول • Z/X: اندازه"
+  },
+  "Widget grid snap status": {
+    "Grid: OFF": "جدول:‌ خاموش",
+    "Grid: ON": "جدول:‌ روشن"
+  },
+  "Widget removed": {
+    "Widget removed": ""
+  },
+  "Wind": {
+    "Wind": "باد"
+  },
+  "Wind Speed": {
+    "Wind Speed": "سرعت باد"
+  },
+  "Window Corner Radius": {
+    "Window Corner Radius": ""
+  },
+  "Window Gaps": {
+    "Window Gaps": ""
+  },
+  "Window Gaps (px)": {
+    "Window Gaps (px)": "فاصله پنجره‌ها (px)"
+  },
+  "Workspace": {
+    "Workspace": "Workspace"
+  },
+  "Workspace Index Numbers": {
+    "Workspace Index Numbers": "شماره شاخص workspace"
+  },
+  "Workspace Padding": {
+    "Workspace Padding": "فاصله درونی workspace"
+  },
+  "Workspace Settings": {
+    "Workspace Settings": "تنظیمات workspace"
+  },
+  "Workspace Switcher": {
+    "Workspace Switcher": "تغییردهنده workspace"
+  },
+  "Workspaces": {
+    "Workspaces": "Workspaceها"
+  },
+  "Workspaces & Widgets": {
+    "Workspaces & Widgets": "Workspaceها و ابزارک‌ها"
+  },
+  "X Axis": {
+    "X Axis": "محور X"
+  },
+  "Y Axis": {
+    "Y Axis": "محور Y"
+  },
+  "Yes": {
+    "Yes": "بله"
+  },
+  "You have unsaved changes. Save before closing this tab?": {
+    "You have unsaved changes. Save before closing this tab?": "شما تغییرات ذخیره نشده‌ دارید. آیا پیش از بستن این برگه ذخیره شود؟"
+  },
+  "You have unsaved changes. Save before continuing?": {
+    "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شود؟"
+  },
+  "You have unsaved changes. Save before creating a new file?": {
+    "You have unsaved changes. Save before creating a new file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ایجاد فایل جدید، ذخیره شود؟"
+  },
+  "You have unsaved changes. Save before opening a file?": {
+    "You have unsaved changes. Save before opening a file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از باز کردن فایل، ذخیره شود؟"
+  },
+  "apps": {
+    "apps": "برنامه"
+  },
+  "author attribution": {
+    "by %1": ""
+  },
+  "browse themes button | theme browser header | theme browser window title": {
+    "Browse Themes": "مرور تم‌ها"
+  },
+  "catppuccin theme description": {
+    "Soothing pastel theme based on Catppuccin": ""
+  },
+  "current theme label": {
+    "Current Theme: %1": "تم کنونی: %1"
+  },
+  "custom theme description": {
+    "Custom theme loaded from JSON file": "تم سفارشی از فایل JSON بارگذاری شد"
+  },
+  "custom theme file browser title": {
+    "Select Custom Theme": "انتخاب تم سفارشی"
+  },
+  "custom theme file hint": {
+    "Click to select a custom theme JSON file": "برای انتخاب یک فایل JSON قالب سفارشی کلیک کنید"
+  },
+  "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
+    "Select Wallpaper": "انتخاب تصویر پس‌زمینه"
+  },
+  "days": {
+    "days": "روز"
+  },
+  "dgop not available": {
+    "dgop not available": "dgop در دسترس نیست"
+  },
+  "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
+    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": ""
+  },
+  "dms/binds.kdl is now included in config.kdl": {
+    "dms/binds.kdl is now included in config.kdl": "dms/binds.kdl اکنون در config.kdl گنجانده شده است"
+  },
+  "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
+    "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": ""
+  },
+  "dynamic colors description": {
+    "Dynamic colors from wallpaper": "رنگ‌های پویا از تصویر پس‌زمینه"
+  },
+  "dynamic theme description": {
+    "Material colors generated from wallpaper": "رنگ‌های متریال گرفته شده از تصویر پس‌زمینه"
+  },
+  "dynamic theme name": {
+    "Dynamic": "پویا"
+  },
+  "e.g., firefox, kitty --title foo": {
+    "e.g., firefox, kitty --title foo": "مانند firefox، kitty --title foo"
+  },
+  "e.g., focus-workspace 3, resize-column -10": {
+    "e.g., focus-workspace 3, resize-column -10": "مانند focus-workspace 3، resize-column -10"
+  },
+  "e.g., notify-send 'Hello' && sleep 1": {
+    "e.g., notify-send 'Hello' && sleep 1": "مانند notify-send 'Hello' && sleep 1"
+  },
+  "empty plugin list": {
+    "No plugins found": "هیچ افزونه‌ای یافت نشد"
+  },
+  "empty theme list": {
+    "No themes found": "هیچ تمی یافت نشد"
+  },
+  "events": {
+    "events": "رویداد‌ها"
+  },
+  "files": {
+    "files": "فایل"
+  },
+  "generic theme description": {
+    "Material Design inspired color themes": ""
+  },
+  "install action button": {
+    "Install": "نصب"
+  },
+  "installation error": {
+    "Install failed: %1": "نصب ناموفق:‌ %1"
+  },
+  "installation progress": {
+    "Installing: %1": "درحال نصب: %1"
+  },
+  "installation success": {
+    "Installed: %1": "نصب شده: %1"
+  },
+  "installed status": {
+    "Installed": "نصب شده"
+  },
+  "leave empty for default": {
+    "leave empty for default": "برای پیش‌فرض خالی رها کنید"
+  },
+  "loading indicator": {
+    "Loading...": "درحال بارگذاری..."
+  },
+  "loginctl not available - lock integration requires DMS socket connection": {
+    "loginctl not available - lock integration requires DMS socket connection": "loginctl در دسترس نیست - یکپارچه‌سازی قفل به اتصال سوکت DMS نیاز دارد"
+  },
+  "matugen error": {
+    "matugen not found - install matugen package for dynamic theming": ""
+  },
+  "matugen installation hint": {
+    "Install matugen package for dynamic theming": "نصب بسته matugen برای تم پویا"
+  },
+  "matugen not found status": {
+    "Matugen Missing": "Matugen یافت نشد"
+  },
+  "minutes": {
+    "minutes": "دقیقه"
+  },
+  "ms": {
+    "ms": "ms"
+  },
+  "no custom theme file status": {
+    "No custom theme file": "هیچ تم سفارشی یافت نشد"
+  },
+  "no registry themes installed hint": {
+    "No themes installed. Browse themes to install from the registry.": "هیچ تمی نصب نشده. تم‌ها را برای نصب از مخزن مرور کنید."
+  },
+  "no wallpaper status": {
+    "No wallpaper selected": "هیچ تصویر پس‌زمینه‌ای انتخاب نشده"
+  },
+  "official": {
+    "official": "رسمی"
+  },
+  "plugin browser description": {
+    "Install plugins from the DMS plugin registry": "نصب افزونه‌ها از مخزن افزونه DMS"
+  },
+  "plugin browser header | plugin browser window title": {
+    "Browse Plugins": "مرور افزونه‌ها"
+  },
+  "plugin installation confirmation": {
+    "Install plugin '%1' from the DMS registry?": "آیا می‌خواهید افزونه '%1' را از مخزن DMS نصب کنید؟"
+  },
+  "plugin installation dialog title": {
+    "Install Plugin": "نصب افزونه"
+  },
+  "plugin search placeholder": {
+    "Search plugins...": ""
+  },
+  "profile image file browser title": {
+    "Select Profile Image": "انتخاب تصویر نمایه"
+  },
+  "registry theme description": {
+    "Color theme from DMS registry": "رنگ تم از مخزن DMS"
+  },
+  "seconds": {
+    "seconds": "ثانیه"
+  },
+  "settings window title": {
+    "Settings": "تنظیمات"
+  },
+  "settings_displays": {
+    "Widgets": "ابزارک‌ها"
+  },
+  "source code link": {
+    "source": ""
+  },
+  "sysmon window title": {
+    "System Monitor": "ناظر سیستم"
+  },
+  "theme browser description": {
+    "Install color themes from the DMS theme registry": "نصب تم رنگ‌ها از مخزن تم DMS"
+  },
+  "theme installation confirmation": {
+    "Install theme '%1' from the DMS registry?": "آیا می‌خواهید تم '%1' را از مخزن DMS نصب کنید؟"
+  },
+  "theme installation dialog title": {
+    "Install Theme": "نصب تم"
+  },
+  "theme search placeholder": {
+    "Search themes...": ""
+  },
+  "uninstall action button": {
+    "Uninstall": ""
+  },
+  "uninstallation error": {
+    "Uninstall failed: %1": ""
+  },
+  "uninstallation progress": {
+    "Uninstalling: %1": ""
+  },
+  "uninstallation success": {
+    "Uninstalled: %1": ""
+  },
+  "unknown author": {
+    "Unknown": ""
+  },
+  "update dms for NM integration.": {
+    "update dms for NM integration.": "DMS را برای یکپارچه‌سازی NM بروز کنید."
+  },
+  "wallpaper directory file browser title": {
+    "Select Wallpaper Directory": "انتخاب دایرکتوری تصاویر پس‌زمینه"
+  },
+  "wallpaper error": {
+    "Wallpaper processing failed - check wallpaper path": ""
+  },
+  "wallpaper error status": {
+    "Wallpaper Error": ""
+  },
+  "wallpaper processing error": {
+    "Wallpaper processing failed": ""
+  },
+  "wallpaper settings disable description": {
+    "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "از مدیریت تصویر پس‌زمینه خارجی مانند swww، hyprpaper یا swaybg استفاده کن."
+  },
+  "wallpaper settings disable toggle": {
+    "Disable Built-in Wallpapers": "غیرفعال کردن تصاویر پس‌زمینه داخلی"
+  },
+  "wallpaper settings external management": {
+    "External Wallpaper Management": "مدیریت تصویر پس‌زمینه خارجی"
+  },
+  "wtype not available - install wtype for paste support": {
+    "wtype not available - install wtype for paste support": "wtype در دسترس نیست - wtype را برای پشتیبانی از الصاق نصب کنید"
+  },
+  "• Install only from trusted sources": {
+    "• Install only from trusted sources": "نصب تنها از منابع معتبر"
+  },
+  "• M - Month (1-12)": {
+    "• M - Month (1-12)": "• M - ماه (1-12)"
+  },
+  "• MM - Month (01-12)": {
+    "• MM - Month (01-12)": "• MM - ماه (01-12)"
+  },
+  "• MMM - Month (Jan)": {
+    "• MMM - Month (Jan)": "• MMM - ماه (Jan)"
+  },
+  "• MMMM - Month (January)": {
+    "• MMMM - Month (January)": "• MMMM - ماه (January)"
+  },
+  "• Plugins may contain bugs or security issues": {
+    "• Plugins may contain bugs or security issues": "• افزونه ممکن است باگ یا مشکلات امنیتی داشته باشد"
+  },
+  "• Review code before installation when possible": {
+    "• Review code before installation when possible": "• پیش از نصب در صورت امکان کد را بررسی کنید"
+  },
+  "• d - Day (1-31)": {
+    "• d - Day (1-31)": "• d - روز (1-31)"
+  },
+  "• dd - Day (01-31)": {
+    "• dd - Day (01-31)": "• dd - روز (01-31)"
+  },
+  "• ddd - Day name (Mon)": {
+    "• ddd - Day name (Mon)": "• ddd - نام روز (Mon)"
+  },
+  "• dddd - Day name (Monday)": {
+    "• dddd - Day name (Monday)": "• dddd - نام روز (Monday)"
+  },
+  "• yy - Year (24)": {
+    "• yy - Year (24)": "• yy - سال (24)"
+  },
+  "• yyyy - Year (2024)": {
+    "• yyyy - Year (2024)": "• yyyy - سال (2024)"
+  }
+}

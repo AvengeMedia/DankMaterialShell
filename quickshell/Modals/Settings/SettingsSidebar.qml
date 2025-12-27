@@ -666,6 +666,7 @@ Rectangle {
                                     color: root.searchSelectedIndex === resultDelegate.index ? Theme.primaryText : Theme.surfaceText
                                     width: parent.width
                                     wrapMode: Text.Wrap
+                                    horizontalAlignment: Text.AlignLeft
                                 }
 
                                 StyledText {
@@ -674,6 +675,7 @@ Rectangle {
                                     color: root.searchSelectedIndex === resultDelegate.index ? Theme.withAlpha(Theme.primaryText, 0.7) : Theme.surfaceVariantText
                                     width: parent.width
                                     wrapMode: Text.Wrap
+                                    horizontalAlignment: Text.AlignLeft
                                 }
                             }
                         }
@@ -782,6 +784,7 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width - Theme.iconSize - Theme.spacingM - (categoryDelegate.modelData.children ? expandIcon.width + Theme.spacingS : 0)
                                 elide: Text.ElideRight
+                                horizontalAlignment: Text.AlignLeft
                             }
 
                             DankIcon {
