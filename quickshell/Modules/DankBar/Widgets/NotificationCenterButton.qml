@@ -33,4 +33,13 @@ BasePill {
             }
         }
     }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        cursorShape: Qt.PointingHandCursor
+        onClicked: {
+            SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
+        }
+    }
 }
