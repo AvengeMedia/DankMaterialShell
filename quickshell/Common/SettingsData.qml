@@ -288,6 +288,7 @@ Singleton {
     property bool matugenTemplateQt6ct: true
     property bool matugenTemplateFirefox: true
     property bool matugenTemplatePywalfox: true
+    property bool matugenTemplateZenBrowser: true
     property bool matugenTemplateVesktop: true
     property bool matugenTemplateEquibop: true
     property bool matugenTemplateGhostty: true

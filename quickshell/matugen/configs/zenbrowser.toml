@@ -1,0 +1,3 @@
+[templates.dmszenbrowser]
+input_path = 'SHELL_DIR/matugen/templates/zenbrowser.css'
+output_path = '~/.cache/dms/dank-zenbrowser.css'
