@@ -1191,8 +1191,6 @@ Singleton {
                 kdlContent += `    backdrop-color "${niriSettings.backdropColor}"\n`;
             }
 
-
-
             kdlContent += generateHotCornersBlock(niriSettings);
             kdlContent += generateLayoutBlock(niriSettings);
 

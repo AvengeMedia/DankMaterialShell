@@ -72,8 +72,6 @@ Column {
             onToggled: checked => DisplayConfigState.setNiriSetting(root.outputData, root.outputName, "focusAtStartup", checked)
         }
 
-
-
         DankDropdown {
             width: parent.width
             text: I18n.tr("Hot Corners")
