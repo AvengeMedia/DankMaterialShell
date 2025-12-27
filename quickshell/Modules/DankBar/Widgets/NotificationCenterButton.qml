@@ -33,4 +33,8 @@ BasePill {
             }
         }
     }
+
+    onRightClicked: {
+        SessionData.setDoNotDisturb(!SessionData.doNotDisturb)
+    }
 }
