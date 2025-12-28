@@ -169,12 +169,22 @@ func readOSRelease() map[string]string {
 }
 
 func checkVersions(qsMissingFeatures bool) []checkResult {
-	results := []checkResult{
-		{catVersions, "DMS CLI", "info", formatVersion(Version), ""},
+	dmsCliPath, _ := os.Executable()
+	dmsCliDetails := ""
+	if doctorVerbose {
+		dmsCliDetails = dmsCliPath
 	}
 
-	qsVersion, qsStatus := getQuickshellVersionInfo(qsMissingFeatures)
-	results = append(results, checkResult{catVersions, "Quickshell", qsStatus, qsVersion, ""})
+	results := []checkResult{
+		{catVersions, "DMS CLI", "ok", formatVersion(Version), dmsCliDetails},
+	}
+
+	qsVersion, qsStatus, qsPath := getQuickshellVersionInfo(qsMissingFeatures)
+	qsDetails := ""
+	if doctorVerbose && qsPath != "" {
+		qsDetails = qsPath
+	}
+	results = append(results, checkResult{catVersions, "Quickshell", qsStatus, qsVersion, qsDetails})
 
 	dmsVersion, dmsPath := getDMSShellVersion()
 	if dmsVersion != "" {
@@ -206,28 +216,30 @@ func getDMSShellVersion() (version, path string) {
 	return "", ""
 }
 
-func getQuickshellVersionInfo(missingFeatures bool) (string, string) {
+func getQuickshellVersionInfo(missingFeatures bool) (string, string, string) {
 	if !utils.CommandExists("qs") {
-		return "Not installed", "error"
+		return "Not installed", "error", ""
 	}
+
+	qsPath, _ := exec.LookPath("qs")
 
 	output, err := exec.Command("qs", "--version").Output()
 	if err != nil {
-		return "Installed (version check failed)", "warn"
+		return "Installed (version check failed)", "warn", qsPath
 	}
 
 	fullVersion := strings.TrimSpace(string(output))
 	if matches := regexp.MustCompile(`quickshell (\d+\.\d+\.\d+)`).FindStringSubmatch(fullVersion); len(matches) >= 2 {
 		if version.CompareVersions(matches[1], "0.2.0") < 0 {
-			return fmt.Sprintf("%s (needs >= 0.2.0)", fullVersion), "error"
+			return fmt.Sprintf("%s (needs >= 0.2.0)", fullVersion), "error", qsPath
 		}
 		if missingFeatures {
-			return fullVersion, "warn"
+			return fullVersion, "warn", qsPath
 		}
-		return fullVersion, "ok"
+		return fullVersion, "ok", qsPath
 	}
 
-	return fullVersion, "warn"
+	return fullVersion, "warn", qsPath
 }
 
 func checkDMSInstallation() []checkResult {
@@ -287,9 +299,20 @@ func checkWindowManagers() []checkResult {
 	for _, c := range compositors {
 		if slices.ContainsFunc(c.commands, utils.CommandExists) {
 			foundAny = true
+			var compositorPath string
+			for _, cmd := range c.commands {
+				if path, err := exec.LookPath(cmd); err == nil {
+					compositorPath = path
+					break
+				}
+			}
+			details := ""
+			if doctorVerbose && compositorPath != "" {
+				details = compositorPath
+			}
 			results = append(results, checkResult{
 				catCompositor, c.name, "ok",
-				getVersionFromCommand(c.versionCmd, c.versionArg, c.versionRe), "",
+				getVersionFromCommand(c.versionCmd, c.versionArg, c.versionRe), details,
 			})
 		}
 	}
