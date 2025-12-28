@@ -388,10 +388,10 @@ ShellRoot {
 				testItem.destroy()
 			} catch (e) {}
 
-			console.log(root.polkitAvailable ? "FEATURE:Polkit:OK" : "FEATURE:Polkit:UNAVAILABLE")
-			console.log(root.idleMonitorAvailable ? "FEATURE:IdleMonitor:OK" : "FEATURE:IdleMonitor:UNAVAILABLE")
-			console.log(root.idleInhibitorAvailable ? "FEATURE:IdleInhibitor:OK" : "FEATURE:IdleInhibitor:UNAVAILABLE")
-			console.log(root.shortcutInhibitorAvailable ? "FEATURE:ShortcutInhibitor:OK" : "FEATURE:ShortcutInhibitor:UNAVAILABLE")
+			console.warn(root.polkitAvailable ? "FEATURE:Polkit:OK" : "FEATURE:Polkit:UNAVAILABLE")
+			console.warn(root.idleMonitorAvailable ? "FEATURE:IdleMonitor:OK" : "FEATURE:IdleMonitor:UNAVAILABLE")
+			console.warn(root.idleInhibitorAvailable ? "FEATURE:IdleInhibitor:OK" : "FEATURE:IdleInhibitor:UNAVAILABLE")
+			console.warn(root.shortcutInhibitorAvailable ? "FEATURE:ShortcutInhibitor:OK" : "FEATURE:ShortcutInhibitor:UNAVAILABLE")
 
 			Quickshell.execDetached(["kill", "-TERM", String(Quickshell.processId)])
 		}
