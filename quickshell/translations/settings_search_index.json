@@ -1566,6 +1566,24 @@
     ]
   },
   {
+    "section": "matugenTemplateZenBrowser",
+    "label": "Zen Browser",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "zen",
+      "zenbrowser",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme"
+    ]
+  },
+  {
     "section": "matugenTemplateGtk",
     "label": "GTK",
     "tabIndex": 10,
