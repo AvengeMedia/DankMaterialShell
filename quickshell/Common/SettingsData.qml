@@ -1,5 +1,5 @@
 pragma Singleton
-pragma ComponentBehavior
+pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick
@@ -52,10 +52,13 @@ Singleton {
     readonly property string _configUrl: StandardPaths.writableLocation(StandardPaths.ConfigLocation)
     readonly property string _configDir: Paths.strip(_configUrl)
     readonly property string pluginSettingsPath: _configDir + "/DankMaterialShell/plugin_settings.json"
+    readonly property string settingsPath: _configDir + "/DankMaterialShell/settings.json"
+    readonly property string guiSettingsPath: _configDir + "/DankMaterialShell/gui_settings.json"
 
     property bool _loading: false
     property bool _pluginSettingsLoading: false
-    property bool hasTriedDefaultSettings: false
+    property bool settingsFileReadOnly: false
+    property bool useGuiSettings: false
     property var pluginSettings: ({})
 
     property alias dankBarLeftWidgetsModel: leftWidgetsModel
@@ -655,6 +658,7 @@ Singleton {
     Component.onCompleted: {
         if (!isGreeterMode) {
             Processes.settingsRoot = root;
+            Processes.checkSettingsReadOnly();
             loadSettings();
             initializeListModels();
             Processes.detectFprintd();
@@ -773,14 +777,28 @@ Singleton {
     function loadSettings() {
         _loading = true;
         try {
-            const txt = settingsFile.text();
-            let obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
+            let txt = "";
+            let obj = null;
+
+            if (settingsFileReadOnly && guiSettingsFile.exists) {
+                txt = guiSettingsFile.text();
+                useGuiSettings = true;
+            } else {
+                txt = settingsFile.text();
+                useGuiSettings = false;
+            }
+
+            obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
 
             const oldVersion = obj?.configVersion ?? 0;
             if (oldVersion < settingsConfigVersion) {
                 const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
                 if (migrated) {
-                    settingsFile.setText(JSON.stringify(migrated, null, 2));
+                    if (!settingsFileReadOnly) {
+                        settingsFile.setText(JSON.stringify(migrated, null, 2));
+                    } else {
+                        guiSettingsFile.setText(JSON.stringify(migrated, null, 2));
+                    }
                     obj = migrated;
                 }
             }
@@ -824,7 +842,14 @@ Singleton {
     function saveSettings() {
         if (_loading)
             return;
-        settingsFile.setText(JSON.stringify(Store.toJson(root), null, 2));
+        
+        const jsonData = JSON.stringify(Store.toJson(root), null, 2);
+        
+        if (settingsFileReadOnly || useGuiSettings) {
+            guiSettingsFile.setText(jsonData);
+        } else {
+            settingsFile.setText(jsonData);
+        }
     }
 
     function savePluginSettings() {
@@ -1775,17 +1800,18 @@ Singleton {
     }
 
     property alias settingsFile: settingsFile
+    property alias guiSettingsFile: guiSettingsFile
 
     FileView {
         id: settingsFile
 
-        path: isGreeterMode ? "" : StandardPaths.writableLocation(StandardPaths.ConfigLocation) + "/DankMaterialShell/settings.json"
+        path: isGreeterMode ? "" : settingsPath
         blockLoading: true
         blockWrites: true
         atomicWrites: true
-        watchChanges: !isGreeterMode
+        watchChanges: !isGreeterMode && !settingsFileReadOnly
         onLoaded: {
-            if (!isGreeterMode) {
+            if (!isGreeterMode && !settingsFileReadOnly) {
                 try {
                     const txt = settingsFile.text();
                     const obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
@@ -1795,15 +1821,34 @@ Singleton {
                 } catch (e) {
                     console.warn("SettingsData: Failed to reload settings:", e.message);
                 }
-                hasTriedDefaultSettings = false;
             }
         }
         onLoadFailed: error => {
-            if (!isGreeterMode && !hasTriedDefaultSettings) {
-                hasTriedDefaultSettings = true;
-                Processes.checkDefaultSettings();
-            } else if (!isGreeterMode) {
+            if (!isGreeterMode) {
                 applyStoredTheme();
+            }
+        }
+    }
+
+    FileView {
+        id: guiSettingsFile
+
+        path: isGreeterMode ? "" : guiSettingsPath
+        blockLoading: true
+        blockWrites: true
+        atomicWrites: true
+        watchChanges: !isGreeterMode && settingsFileReadOnly
+        onLoaded: {
+            if (!isGreeterMode && settingsFileReadOnly) {
+                try {
+                    const txt = guiSettingsFile.text();
+                    const obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
+                    Store.parse(root, obj);
+                    applyStoredTheme();
+                    applyStoredIconTheme();
+                } catch (e) {
+                    console.warn("SettingsData: Failed to reload gui_settings:", e.message);
+                }
             }
         }
     }

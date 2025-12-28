@@ -1,5 +1,5 @@
 pragma Singleton
-pragma ComponentBehavior
+pragma ComponentBehavior: Bound
 
 import QtCore
 import QtQuick

@@ -22,8 +22,8 @@ Singleton {
         pluginSettingsCheckProcess.running = true;
     }
 
-    function checkDefaultSettings() {
-        defaultSettingsCheckProcess.running = true;
+    function checkSettingsReadOnly() {
+        settingsReadOnlyCheckProcess.running = true;
     }
 
     property var qtToolsDetectionProcess: Process {
@@ -51,24 +51,30 @@ Singleton {
         }
     }
 
-    property var defaultSettingsCheckProcess: Process {
-        command: ["sh", "-c", "CONFIG_DIR=\"" + (settingsRoot?._configDir || "") + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-settings.json\" ] && [ ! -f \"$CONFIG_DIR/settings.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-settings.json\" \"$CONFIG_DIR/settings.json\" && echo 'copied'; else echo 'not_found'; fi"]
+    property var settingsReadOnlyCheckProcess: Process {
+        command: ["sh", "-c", "CONFIG_DIR=\"" + (settingsRoot?._configDir || "") + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/settings.json\" ] && [ ! -w \"$CONFIG_DIR/settings.json\" ]; then echo 'read_only'; else echo 'writable'; fi"]
         running: false
-        onExited: function (exitCode) {
-            if (!settingsRoot)
-                return;
-            if (exitCode === 0) {
-                console.info("Copied default-settings.json to settings.json");
+        
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (!settingsRoot)
+                    return;
+                if (text && text.trim() === 'read_only') {
+                    console.warn("settings.json is read-only");
+                    settingsRoot.settingsFileReadOnly = true;
+                } else {
+                    settingsRoot.settingsFileReadOnly = false;
+                }
                 if (settingsRoot.settingsFile) {
                     settingsRoot.settingsFile.reload();
                 }
-            } else {
                 if (typeof ThemeApplier !== "undefined") {
                     ThemeApplier.applyStoredTheme(settingsRoot);
                 }
             }
         }
     }
+
 
     property var fprintdDetectionProcess: Process {
         command: ["sh", "-c", "command -v fprintd-list >/dev/null 2>&1"]
