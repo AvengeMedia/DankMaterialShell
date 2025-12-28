@@ -37,7 +37,7 @@ in
     };
 
     dgop = {
-      package = lib.mkPackageOption pkgs "dgop";
+      package = lib.mkPackageOption pkgs "dgop" {};
     };
 
     enableSystemMonitoring = lib.mkOption {
