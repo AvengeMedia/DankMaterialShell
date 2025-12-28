@@ -217,7 +217,7 @@ Item {
                 spacing: 0
 
                 property string fullTimeStr: {
-                    const format = GreetdSettings.use24HourClock ? (GreetdSettings.showSeconds ? "HH:mm:ss" : "HH:mm") : (GreetdSettings.showSeconds ? "h:mm:ss AP" : "h:mm AP");
+                    const format = GreetdSettings.getEffectiveTimeFormat();
                     return systemClock.date.toLocaleTimeString(Qt.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
