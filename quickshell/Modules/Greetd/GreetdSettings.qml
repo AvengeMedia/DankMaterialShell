@@ -91,6 +91,14 @@ Singleton {
         }
     }
 
+    function getEffectiveTimeFormat() {
+        if (use24HourClock) {
+            return showSeconds ? "hh:mm:ss" : "hh:mm";
+        } else {
+            return showSeconds ? "hh:mm:ss AP" : "hh:mm AP";
+        }
+    }
+
     function getEffectiveLockDateFormat() {
         return lockDateFormat && lockDateFormat.length > 0 ? lockDateFormat : Locale.LongFormat;
     }
