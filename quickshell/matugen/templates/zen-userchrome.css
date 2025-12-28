@@ -1,6 +1,6 @@
 /* DMS Matugen Zen Browser Theme */
 :root {
-  --zen-primary-color: {{colors.primary.default.hex}} !important;
+  --zen-primary-color: {{colors.primary_container.default.hex}} !important;
   --toolbarbutton-icon-fill: {{colors.primary.default.hex}} !important;
   --toolbar-field-color: {{colors.on_background.default.hex}} !important;
   --tab-selected-textcolor: {{colors.primary.default.hex}} !important;
@@ -25,6 +25,11 @@
 
 .urlbar-background {
   background-color: {{colors.surface_container.default.hex}} !important;
+}
+
+.urlbar-input::selection {
+  color: {{colors.on_primary.default.hex}} !important;
+  background-color: {{colors.primary.default.hex}} !important; /* Background color of highlighted selection */
 }
 
 .urlbarView-url {
