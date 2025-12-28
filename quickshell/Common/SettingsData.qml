@@ -1255,7 +1255,7 @@ Singleton {
         if (use24HourClock) {
             return showSeconds ? "hh:mm:ss" : "hh:mm";
         } else {
-            return showSeconds ? "h:mm:ss AP" : "h:mm AP";
+            return showSeconds ? "hh:mm:ss AP" : "hh:mm AP";
         }
     }
 
