@@ -377,7 +377,7 @@ func updateDMSBinary() error {
 	}
 
 	version := ""
-	for _, line := range strings.Split(string(output), "\n") {
+	for line := range strings.SplitSeq(string(output), "\n") {
 		if strings.Contains(line, "\"tag_name\"") {
 			parts := strings.Split(line, "\"")
 			if len(parts) >= 4 {
@@ -443,7 +443,7 @@ func updateDMSBinary() error {
 
 	decompressedPath := filepath.Join(tempDir, "dms")
 
-	if err := os.Chmod(decompressedPath, 0755); err != nil {
+	if err := os.Chmod(decompressedPath, 0o755); err != nil {
 		return fmt.Errorf("failed to make binary executable: %w", err)
 	}
 

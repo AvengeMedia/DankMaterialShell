@@ -1157,7 +1157,7 @@ func drawGlyph(data []byte, stride, width, height, x, y int, r rune, col Color, 
 		rOff, bOff = 2, 0
 	}
 
-	for row := 0; row < fontH; row++ {
+	for row := range fontH {
 		yy := y + row
 		if yy < 0 || yy >= height {
 			continue
@@ -1165,7 +1165,7 @@ func drawGlyph(data []byte, stride, width, height, x, y int, r rune, col Color, 
 		rowPattern := g[row]
 		dstRowOff := yy * stride
 
-		for colIdx := 0; colIdx < fontW; colIdx++ {
+		for colIdx := range fontW {
 			if (rowPattern & (1 << (fontW - 1 - colIdx))) == 0 {
 				continue
 			}

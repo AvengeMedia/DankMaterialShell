@@ -221,10 +221,7 @@ func (p *Picker) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case client.OutputInterfaceName:
 		output := client.NewOutput(p.ctx)
-		version := e.Version
-		if version > 4 {
-			version = 4
-		}
+		version := min(e.Version, 4)
 		if err := p.registry.Bind(e.Name, e.Interface, version, output); err == nil {
 			p.outputsMu.Lock()
 			p.outputs[e.Name] = &Output{
@@ -239,20 +236,14 @@ func (p *Picker) handleGlobal(e client.RegistryGlobalEvent) {
 
 	case wlr_layer_shell.ZwlrLayerShellV1InterfaceName:
 		layerShell := wlr_layer_shell.NewZwlrLayerShellV1(p.ctx)
-		version := e.Version
-		if version > 4 {
-			version = 4
-		}
+		version := min(e.Version, 4)
 		if err := p.registry.Bind(e.Name, e.Interface, version, layerShell); err == nil {
 			p.layerShell = layerShell
 		}
 
 	case wlr_screencopy.ZwlrScreencopyManagerV1InterfaceName:
 		screencopy := wlr_screencopy.NewZwlrScreencopyManagerV1(p.ctx)
-		version := e.Version
-		if version > 3 {
-			version = 3
-		}
+		version := min(e.Version, 3)
 		if err := p.registry.Bind(e.Name, e.Interface, version, screencopy); err == nil {
 			p.screencopy = screencopy
 		}

@@ -211,8 +211,8 @@ func checkGroupExists(groupName string) bool {
 		return false
 	}
 
-	lines := strings.Split(string(data), "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(string(data), "\n")
+	for line := range lines {
 		if strings.HasPrefix(line, groupName+":") {
 			return true
 		}
@@ -521,7 +521,7 @@ func enableGreeter() error {
 	newConfig := strings.Join(finalLines, "\n")
 
 	tmpFile := "/tmp/greetd-config.toml"
-	if err := os.WriteFile(tmpFile, []byte(newConfig), 0644); err != nil {
+	if err := os.WriteFile(tmpFile, []byte(newConfig), 0o644); err != nil {
 		return fmt.Errorf("failed to write temp config: %w", err)
 	}
 
@@ -592,8 +592,8 @@ func checkGreeterStatus() error {
 	if data, err := os.ReadFile(configPath); err == nil {
 		configContent := string(data)
 		if strings.Contains(configContent, "dms-greeter") {
-			lines := strings.Split(configContent, "\n")
-			for _, line := range lines {
+			lines := strings.SplitSeq(configContent, "\n")
+			for line := range lines {
 				trimmed := strings.TrimSpace(line)
 				if strings.HasPrefix(trimmed, "command =") || strings.HasPrefix(trimmed, "command=") {
 					parts := strings.SplitN(trimmed, "=", 2)
