@@ -368,6 +368,7 @@ Item {
                             return PortalService.profileImage;
                         }
                         fallbackIcon: "person"
+                        visible: GreetdSettings.lockScreenShowProfileImage
                     }
 
                     Rectangle {
