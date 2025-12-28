@@ -60,21 +60,15 @@ Singleton {
                 if (!settingsRoot)
                     return;
                 if (text && text.trim() === 'read_only') {
-                    console.warn("settings.json is read-only");
+                    console.warn("settings.json is read-only, using gui_settings.json");
                     settingsRoot.settingsFileReadOnly = true;
                 } else {
                     settingsRoot.settingsFileReadOnly = false;
                 }
-                if (settingsRoot.settingsFile) {
-                    settingsRoot.settingsFile.reload();
-                }
-                if (typeof ThemeApplier !== "undefined") {
-                    ThemeApplier.applyStoredTheme(settingsRoot);
-                }
+                settingsRoot.loadSettings();
             }
         }
     }
-
 
     property var fprintdDetectionProcess: Process {
         command: ["sh", "-c", "command -v fprintd-list >/dev/null 2>&1"]

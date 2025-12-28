@@ -659,7 +659,6 @@ Singleton {
         if (!isGreeterMode) {
             Processes.settingsRoot = root;
             Processes.checkSettingsReadOnly();
-            loadSettings();
             initializeListModels();
             Processes.detectFprintd();
             Processes.checkPluginSettings();
@@ -779,30 +778,41 @@ Singleton {
         try {
             let txt = "";
             let obj = null;
-
-            if (settingsFileReadOnly && guiSettingsFile.exists) {
-                txt = guiSettingsFile.text();
-                useGuiSettings = true;
+    
+            if (settingsFileReadOnly) {
+                const guiText = guiSettingsFile.text();
+                if (guiText && guiText.trim()) {
+                    txt = guiText;
+                    useGuiSettings = true;
+                    console.info("SettingsData: Using gui_settings.json (settings.json is read-only)");
+                } else {
+                    txt = settingsFile.text();
+                    if (txt && txt.trim()) {
+                        guiSettingsFile.setText(txt);
+                        useGuiSettings = true;
+                        console.info("SettingsData: Created gui_settings.json from read-only settings.json");
+                    }
+                }
             } else {
                 txt = settingsFile.text();
                 useGuiSettings = false;
             }
-
+    
             obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
-
+    
             const oldVersion = obj?.configVersion ?? 0;
             if (oldVersion < settingsConfigVersion) {
                 const migrated = Store.migrateToVersion(obj, settingsConfigVersion);
                 if (migrated) {
-                    if (!settingsFileReadOnly) {
-                        settingsFile.setText(JSON.stringify(migrated, null, 2));
-                    } else {
+                    if (settingsFileReadOnly || useGuiSettings) {
                         guiSettingsFile.setText(JSON.stringify(migrated, null, 2));
+                    } else {
+                        settingsFile.setText(JSON.stringify(migrated, null, 2));
                     }
                     obj = migrated;
                 }
             }
-
+    
             Store.parse(root, obj);
             applyStoredTheme();
             applyStoredIconTheme();
