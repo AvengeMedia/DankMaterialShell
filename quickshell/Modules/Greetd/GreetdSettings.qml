@@ -39,6 +39,7 @@ Singleton {
     property string widgetBackgroundColor: "sch"
     property string lockDateFormat: ""
     property bool lockScreenShowPowerActions: true
+    property bool lockScreenShowProfileImage: true
     property var screenPreferences: ({})
     property int animationSpeed: 2
     property string wallpaperFillMode: "Fill"
@@ -71,6 +72,7 @@ Singleton {
                 widgetBackgroundColor = settings.widgetBackgroundColor !== undefined ? settings.widgetBackgroundColor : "sch";
                 lockDateFormat = settings.lockDateFormat !== undefined ? settings.lockDateFormat : "";
                 lockScreenShowPowerActions = settings.lockScreenShowPowerActions !== undefined ? settings.lockScreenShowPowerActions : true;
+                lockScreenShowProfileImage = settings.lockScreenShowProfileImage !== undefined ? settings.lockScreenShowProfileImage : true;
                 screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({});
                 animationSpeed = settings.animationSpeed !== undefined ? settings.animationSpeed : 2;
                 wallpaperFillMode = settings.wallpaperFillMode !== undefined ? settings.wallpaperFillMode : "Fill";
