@@ -29,7 +29,7 @@
 
 .urlbar-input::selection {
   color: {{colors.on_primary.default.hex}} !important;
-  background-color: {{colors.primary.default.hex}} !important; /* Background color of highlighted selection */
+  background-color: {{colors.primary.default.hex}} !important;
 }
 
 .urlbarView-url {
