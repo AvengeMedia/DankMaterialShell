@@ -1,31 +1,14 @@
 /* DMS Matugen Zen Browser Theme */
 :root {
-  --zen-colors-primary: {{colors.surface.default.hex}} !important;
   --zen-primary-color: {{colors.primary.default.hex}} !important;
-  --zen-colors-secondary: {{colors.surface.default.hex}} !important;
-  --zen-colors-tertiary: {{colors.surface.default.hex}} !important;
-  --zen-colors-border: {{colors.primary.default.hex}} !important;
   --toolbarbutton-icon-fill: {{colors.primary.default.hex}} !important;
-  --lwt-text-color: {{colors.on_surface.default.hex}} !important;
-  --toolbar-field-color: {{colors.on_surface.default.hex}} !important;
+  --toolbar-field-color: {{colors.on_background.default.hex}} !important;
   --tab-selected-textcolor: {{colors.primary.default.hex}} !important;
-  --toolbar-field-focus-color: {{colors.on_surface.default.hex}} !important;
-  --toolbar-color: {{colors.on_surface.default.hex}} !important;
-  --newtab-text-primary-color: {{colors.on_surface.default.hex}} !important;
+  --toolbar-color: {{colors.on_background.default.hex}} !important;
   --arrowpanel-color: {{colors.on_surface.default.hex}} !important;
   --arrowpanel-background: {{colors.surface_container.default.hex}} !important;
-  --sidebar-text-color: {{colors.on_surface.default.hex}} !important;
-  --lwt-sidebar-text-color: {{colors.on_surface.default.hex}} !important;
-  --lwt-sidebar-background-color: {{colors.background.default.hex}} !important;
-  --toolbar-bgcolor: {{colors.surface.default.hex}} !important;
-  --newtab-background-color: {{colors.surface_container.default.hex}} !important;
-  --zen-themed-toolbar-bg: {{colors.surface.default.hex}} !important;
-  --zen-main-browser-background: {{colors.surface.default.hex}} !important;
-  --toolbox-bgcolor-inactive: {{colors.surface.default.hex}} !important;
-}
-
-#permissions-granted-icon {
-  color: {{colors.surface.default.hex}} !important;
+  --sidebar-text-color: {{colors.on_background.default.hex}} !important;
+  --zen-main-browser-background: {{colors.background.default.hex}} !important;
 }
 
 .sidebar-placesTree {
@@ -33,36 +16,19 @@
 }
 
 #zen-workspaces-button {
-  background-color: {{colors.surface_container.default.hex}} !important;
+  background-color: {{colors.on_surface_variant.default.hex}} !important;
 }
 
 #TabsToolbar {
-  background-color: {{colors.surface_container.default.hex}} !important;
+  background-color: {{colors.background.default.hex}} !important;
 }
 
 .urlbar-background {
-  background-color: {{colors.surface_container_high.default.hex}} !important;
-}
-
-.content-shortcuts {
   background-color: {{colors.surface_container.default.hex}} !important;
-  border-color: {{colors.primary.default.hex}} !important;
 }
 
 .urlbarView-url {
-  color: {{colors.primary.default.hex}} !important;
-}
-
-#zenEditBookmarkPanelFaviconContainer {
-  background: {{colors.background.default.hex}} !important;
-}
-
-#zen-media-controls-toolbar {
-  & #zen-media-progress-bar {
-    &::-moz-range-track {
-      background: {{colors.surface.default.hex}} !important;
-    }
-  }
+  color: {{colors.on_surface_variant.default.hex}} !important;
 }
 
 toolbar .toolbarbutton-1 {
@@ -73,7 +39,7 @@ toolbar .toolbarbutton-1 {
         .toolbarbutton-text,
         .toolbarbutton-badge-stack
       ) {
-      fill: {{colors.background.default.hex}};
+      fill: {{colors.primary.default.hex}}
     }
   }
 }
@@ -118,10 +84,6 @@ toolbar .toolbarbutton-1 {
   --identity-icon-color: {{dank16.color5.default.hex}} !important;
 }
 
-hbox#titlebar {
-  background-color: {{colors.surface.default.hex}} !important;
-}
-
 #zen-appcontent-navbar-container {
-  background-color: {{colors.surface.default.hex}} !important;
+  background-color: {{colors.background.default.hex}} !important;
 }
