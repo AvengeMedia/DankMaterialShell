@@ -141,7 +141,7 @@ func (r *RegionSelector) setupKeyboardHandlers() {
 			for _, os := range r.surfaces {
 				r.redrawSurface(os)
 			}
-		case 28, 57:
+		case 28, 57, 96:
 			if r.selection.hasSelection {
 				r.finishSelection()
 			}
