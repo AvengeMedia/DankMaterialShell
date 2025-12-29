@@ -21,7 +21,7 @@ func LocateDMSConfig() (string, error) {
 		dataDirs = "/usr/local/share:/usr/share"
 	}
 
-	for _, dir := range strings.Split(dataDirs, ":") {
+	for dir := range strings.SplitSeq(dataDirs, ":") {
 		if dir != "" {
 			primaryPaths = append(primaryPaths, filepath.Join(dir, "quickshell", "dms"))
 		}
@@ -33,7 +33,7 @@ func LocateDMSConfig() (string, error) {
 		configDirs = "/etc/xdg"
 	}
 
-	for _, dir := range strings.Split(configDirs, ":") {
+	for dir := range strings.SplitSeq(configDirs, ":") {
 		if dir != "" {
 			primaryPaths = append(primaryPaths, filepath.Join(dir, "quickshell", "dms"))
 		}

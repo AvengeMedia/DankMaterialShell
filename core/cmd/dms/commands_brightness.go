@@ -179,7 +179,7 @@ func runBrightnessList(cmd *cobra.Command, args []string) {
 	fmt.Printf("%-*s  %-12s  %-*s  %s\n", idPad, "Device", "Class", namePad, "Name", "Brightness")
 
 	sepLen := idPad + 2 + 12 + 2 + namePad + 2 + 15
-	for i := 0; i < sepLen; i++ {
+	for range sepLen {
 		fmt.Print("─")
 	}
 	fmt.Println()

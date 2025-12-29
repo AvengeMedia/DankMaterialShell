@@ -658,7 +658,7 @@ func TestContrastAlgorithmComparison(t *testing.T) {
 	}
 
 	differentCount := 0
-	for i := 0; i < 16; i++ {
+	for i := range 16 {
 		if wcagColors[i].Hex != dpsColors[i].Hex {
 			differentCount++
 		}

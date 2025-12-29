@@ -87,20 +87,14 @@ func newDPMSClient() (*dpmsClient, error) {
 		switch e.Interface {
 		case wlr_output_power.ZwlrOutputPowerManagerV1InterfaceName:
 			powerMgr := wlr_output_power.NewZwlrOutputPowerManagerV1(c.ctx)
-			version := e.Version
-			if version > 1 {
-				version = 1
-			}
+			version := min(e.Version, 1)
 			if err := registry.Bind(e.Name, e.Interface, version, powerMgr); err == nil {
 				c.powerMgr = powerMgr
 			}
 
 		case "wl_output":
 			output := wlclient.NewOutput(c.ctx)
-			version := e.Version
-			if version > 4 {
-				version = 4
-			}
+			version := min(e.Version, 4)
 			if err := registry.Bind(e.Name, e.Interface, version, output); err == nil {
 				outputID := fmt.Sprintf("output-%d", output.ID())
 				state := &outputState{

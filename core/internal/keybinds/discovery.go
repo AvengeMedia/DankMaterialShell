@@ -23,7 +23,7 @@ func DefaultDiscoveryConfig() *DiscoveryConfig {
 
 	configDirs := os.Getenv("XDG_CONFIG_DIRS")
 	if configDirs != "" {
-		for _, dir := range strings.Split(configDirs, ":") {
+		for dir := range strings.SplitSeq(configDirs, ":") {
 			if dir != "" {
 				searchPaths = append(searchPaths, filepath.Join(dir, "DankMaterialShell", "cheatsheets"))
 			}
