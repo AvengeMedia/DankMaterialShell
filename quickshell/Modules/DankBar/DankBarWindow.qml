@@ -708,18 +708,22 @@ PanelWindow {
 
                             const deltaY = wheel.angleDelta.y;
                             const deltaX = wheel.angleDelta.x;
+                            const hasPixelY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
+                            const hasPixelX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
                             const xBehavior = barConfig?.scrollXBehavior ?? "column";
                             const yBehavior = barConfig?.scrollYBehavior ?? "workspace";
 
                             if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-                                const isMouseWheel = Math.abs(deltaX) >= 120 && (Math.abs(deltaX) % 120) === 0;
+                                const isTraditionalMouse = !hasPixelX && Math.abs(deltaX) >= 120 && (Math.abs(deltaX) % 120) === 0;
+                                const isHighDpiMouse = !hasPixelX && !isTraditionalMouse && deltaX !== 0;
                                 const reverse = SettingsData.reverseScrolling ? -1 : 1;
                                 const direction = deltaX * reverse < 0 ? 1 : -1;
 
-                                if (isMouseWheel) {
+                                if (isTraditionalMouse || isHighDpiMouse) {
                                     if (handleScrollAction(xBehavior, direction)) {
                                         actionInProgress = true;
                                         cooldownTimer.restart();
+                                        scrollAccumulatorX = 0;
                                     }
                                 } else {
                                     scrollAccumulatorX += deltaX;
@@ -741,14 +745,16 @@ PanelWindow {
                                 return;
                             }
 
-                            const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+                            const isTraditionalMouse = !hasPixelY && Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+                            const isHighDpiMouse = !hasPixelY && !isTraditionalMouse && deltaY !== 0;
                             const reverse = SettingsData.reverseScrolling ? -1 : 1;
                             const direction = deltaY * reverse < 0 ? 1 : -1;
 
-                            if (isMouseWheel) {
+                            if (isTraditionalMouse || isHighDpiMouse) {
                                 if (handleScrollAction(yBehavior, direction)) {
                                     actionInProgress = true;
                                     cooldownTimer.restart();
+                                    scrollAccumulatorY = 0;
                                 }
                             } else {
                                 scrollAccumulatorY += deltaY;
