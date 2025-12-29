@@ -55,6 +55,8 @@ Singleton {
 
     property bool _loading: false
     property bool _pluginSettingsLoading: false
+    property bool _parseError: false
+    property bool _pluginParseError: false
     property bool hasTriedDefaultSettings: false
     property var pluginSettings: ({})
 
@@ -772,6 +774,7 @@ Singleton {
 
     function loadSettings() {
         _loading = true;
+        _parseError = false;
         try {
             const txt = settingsFile.text();
             let obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
@@ -790,7 +793,8 @@ Singleton {
             applyStoredIconTheme();
             Processes.detectQtTools();
         } catch (e) {
-            console.warn("SettingsData: Failed to load settings:", e.message);
+            _parseError = true;
+            console.error("SettingsData: Failed to parse settings.json - file will not be overwritten. Error:", e.message);
             applyStoredTheme();
             applyStoredIconTheme();
         } finally {
@@ -807,6 +811,7 @@ Singleton {
 
     function parsePluginSettings(content) {
         _pluginSettingsLoading = true;
+        _pluginParseError = false;
         try {
             if (content && content.trim()) {
                 pluginSettings = JSON.parse(content);
@@ -814,7 +819,8 @@ Singleton {
                 pluginSettings = {};
             }
         } catch (e) {
-            console.warn("SettingsData: Failed to parse plugin settings:", e.message);
+            _pluginParseError = true;
+            console.error("SettingsData: Failed to parse plugin_settings.json - file will not be overwritten. Error:", e.message);
             pluginSettings = {};
         } finally {
             _pluginSettingsLoading = false;
@@ -822,13 +828,13 @@ Singleton {
     }
 
     function saveSettings() {
-        if (_loading)
+        if (_loading || _parseError)
             return;
         settingsFile.setText(JSON.stringify(Store.toJson(root), null, 2));
     }
 
     function savePluginSettings() {
-        if (_pluginSettingsLoading)
+        if (_pluginSettingsLoading || _pluginParseError)
             return;
         pluginSettingsFile.setText(JSON.stringify(pluginSettings, null, 2));
     }
@@ -1785,18 +1791,23 @@ Singleton {
         atomicWrites: true
         watchChanges: !isGreeterMode
         onLoaded: {
-            if (!isGreeterMode) {
-                try {
-                    const txt = settingsFile.text();
-                    const obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
-                    Store.parse(root, obj);
-                    applyStoredTheme();
-                    applyStoredIconTheme();
-                } catch (e) {
-                    console.warn("SettingsData: Failed to reload settings:", e.message);
-                }
-                hasTriedDefaultSettings = false;
+            if (isGreeterMode)
+                return;
+            _loading = true;
+            try {
+                const txt = settingsFile.text();
+                const obj = (txt && txt.trim()) ? JSON.parse(txt) : null;
+                _parseError = false;
+                Store.parse(root, obj);
+                applyStoredTheme();
+                applyStoredIconTheme();
+            } catch (e) {
+                _parseError = true;
+                console.error("SettingsData: Failed to reload settings.json - file will not be overwritten. Error:", e.message);
+            } finally {
+                _loading = false;
             }
+            hasTriedDefaultSettings = false;
         }
         onLoadFailed: error => {
             if (!isGreeterMode && !hasTriedDefaultSettings) {
