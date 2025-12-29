@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -36,13 +37,7 @@ func checkSystemdServiceEnabled(serviceName string) (string, bool, error) {
 
 	if err != nil {
 		knownStates := []string{"disabled", "masked", "masked-runtime", "not-found", "enabled", "enabled-runtime", "static", "indirect", "alias"}
-		isKnownState := false
-		for _, known := range knownStates {
-			if stateStr == known {
-				isKnownState = true
-				break
-			}
-		}
+		isKnownState := slices.Contains(knownStates, stateStr)
 
 		if !isKnownState {
 			return stateStr, false, fmt.Errorf("systemctl is-enabled failed: %w (output: %s)", err, stateStr)

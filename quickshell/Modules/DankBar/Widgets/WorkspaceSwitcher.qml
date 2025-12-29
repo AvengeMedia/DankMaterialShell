@@ -675,7 +675,8 @@ Item {
 
             const delta = wheel.angleDelta.y;
             const isMouseWheel = Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
-            const direction = delta * -SettingsData.reverseScrolling < 0 ? 1 : -1;
+            const reverse = SettingsData.reverseScrolling ? -1 : 1;
+            const direction = delta * reverse < 0 ? 1 : -1;
 
             if (isMouseWheel) {
                 root.switchWorkspace(direction);

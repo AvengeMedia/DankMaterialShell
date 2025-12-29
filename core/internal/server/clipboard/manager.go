@@ -11,14 +11,16 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"syscall"
 	"time"
 
+	"hash/fnv"
+
 	"github.com/fsnotify/fsnotify"
 	_ "golang.org/x/image/bmp"
 	_ "golang.org/x/image/tiff"
-	"hash/fnv"
 
 	bolt "go.etcd.io/bbolt"
 
@@ -27,6 +29,11 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wlcontext"
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
+
+// These mime types wont be stored in history
+var sensitiveMimeTypes = []string{
+	"x-kde-passwordManagerHint",
+}
 
 func NewManager(wlCtx wlcontext.WaylandContext, config Config) (*Manager, error) {
 	if config.Disabled {
@@ -250,6 +257,10 @@ func (m *Manager) setupDataDeviceSync() {
 		m.mimeTypes = mimes
 
 		if len(mimes) == 0 {
+			return
+		}
+
+		if m.hasSensitiveMimeType(mimes) {
 			return
 		}
 
@@ -490,6 +501,12 @@ func extractHash(data []byte) uint64 {
 		return 0
 	}
 	return binary.BigEndian.Uint64(data[len(data)-8:])
+}
+
+func (m *Manager) hasSensitiveMimeType(mimes []string) bool {
+	return slices.ContainsFunc(mimes, func(mime string) bool {
+		return slices.Contains(sensitiveMimeTypes, mime)
+	})
 }
 
 func (m *Manager) selectMimeType(mimes []string) string {

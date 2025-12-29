@@ -18,8 +18,8 @@ type ManualPackageInstaller struct {
 
 // parseLatestTagFromGitOutput parses git ls-remote output and returns the latest tag
 func (m *ManualPackageInstaller) parseLatestTagFromGitOutput(output string) string {
-	lines := strings.Split(output, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(output, "\n")
+	for line := range lines {
 		if strings.Contains(line, "refs/tags/") && !strings.Contains(line, "^{}") {
 			parts := strings.Split(line, "refs/tags/")
 			if len(parts) > 1 {
@@ -103,12 +103,12 @@ func (m *ManualPackageInstaller) installDgop(ctx context.Context, sudoPassword s
 	}
 
 	cacheDir := filepath.Join(homeDir, ".cache", "dankinstall")
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
 	tmpDir := filepath.Join(cacheDir, "dgop-build")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -160,10 +160,10 @@ func (m *ManualPackageInstaller) installNiri(ctx context.Context, sudoPassword s
 	homeDir, _ := os.UserHomeDir()
 	buildDir := filepath.Join(homeDir, ".cache", "dankinstall", "niri-build")
 	tmpDir := filepath.Join(homeDir, ".cache", "dankinstall", "tmp")
-	if err := os.MkdirAll(buildDir, 0755); err != nil {
+	if err := os.MkdirAll(buildDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create build directory: %w", err)
 	}
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer func() {
@@ -237,12 +237,12 @@ func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, variant 
 	}
 
 	cacheDir := filepath.Join(homeDir, ".cache", "dankinstall")
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
 	tmpDir := filepath.Join(cacheDir, "quickshell-build")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -273,7 +273,7 @@ func (m *ManualPackageInstaller) installQuickshell(ctx context.Context, variant 
 	}
 
 	buildDir := tmpDir + "/build"
-	if err := os.MkdirAll(buildDir, 0755); err != nil {
+	if err := os.MkdirAll(buildDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create build directory: %w", err)
 	}
 
@@ -343,12 +343,12 @@ func (m *ManualPackageInstaller) installHyprland(ctx context.Context, sudoPasswo
 	}
 
 	cacheDir := filepath.Join(homeDir, ".cache", "dankinstall")
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
 	tmpDir := filepath.Join(cacheDir, "hyprland-build")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -406,12 +406,12 @@ func (m *ManualPackageInstaller) installGhostty(ctx context.Context, sudoPasswor
 	}
 
 	cacheDir := filepath.Join(homeDir, ".cache", "dankinstall")
-	if err := os.MkdirAll(cacheDir, 0755); err != nil {
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
 	tmpDir := filepath.Join(cacheDir, "ghostty-build")
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create temp directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
@@ -528,7 +528,7 @@ func (m *ManualPackageInstaller) installDankMaterialShell(ctx context.Context, v
 		}
 
 		configDir := filepath.Dir(dmsPath)
-		if err := os.MkdirAll(configDir, 0755); err != nil {
+		if err := os.MkdirAll(configDir, 0o755); err != nil {
 			return fmt.Errorf("failed to create quickshell config directory: %w", err)
 		}
 

@@ -3,12 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    dgop = {
-      url = "github:AvengeMedia/dgop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     quickshell = {
-      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=3918290c1bcd93ed81291844d9f1ed146672dbfc";
+      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=41828c4180fb921df7992a5405f5ff05d2ac2fff";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -17,7 +13,6 @@
     {
       self,
       nixpkgs,
-      dgop,
       quickshell,
       ...
     }:
@@ -29,15 +24,14 @@
         );
       buildDmsPkgs = pkgs: {
         dms-shell = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        inherit (dgop.packages.${pkgs.stdenv.hostPlatform.system}) dgop;
         quickshell = quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default;
       };
       mkModuleWithDmsPkgs =
-        path:
+        modulePath:
         args@{ pkgs, ... }:
         {
           imports = [
-            (import path (args // { dmsPkgs = buildDmsPkgs pkgs; }))
+            (import modulePath (args // { dmsPkgs = buildDmsPkgs pkgs; }))
           ];
         };
       mkQmlImportPath =
@@ -144,6 +138,8 @@
               };
             }
           );
+
+          quickshell = quickshell.packages.${system}.default;
 
           default = self.packages.${system}.dms-shell;
         }

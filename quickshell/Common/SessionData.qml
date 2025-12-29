@@ -15,6 +15,7 @@ Singleton {
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
     property bool hasTriedDefaultSession: false
+    property bool _parseError: false
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
@@ -108,96 +109,98 @@ Singleton {
     }
 
     function parseSettings(content) {
+        _parseError = false;
         try {
-            if (content && content.trim()) {
-                var settings = JSON.parse(content);
-                isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false;
+            if (!content || !content.trim())
+                return;
+            var settings = JSON.parse(content);
+            isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false;
 
-                if (settings.wallpaperPath && settings.wallpaperPath.startsWith("we:")) {
-                    console.warn("WallpaperEngine wallpaper detected, resetting wallpaper");
-                    wallpaperPath = "";
-                    Quickshell.execDetached(["notify-send", "-u", "critical", "-a", "DMS", "-i", "dialog-warning", "WallpaperEngine Support Moved", "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."]);
-                } else {
-                    wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : "";
-                }
-                perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false;
-                monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {};
-                perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false;
-                wallpaperPathLight = settings.wallpaperPathLight !== undefined ? settings.wallpaperPathLight : "";
-                wallpaperPathDark = settings.wallpaperPathDark !== undefined ? settings.wallpaperPathDark : "";
-                monitorWallpapersLight = settings.monitorWallpapersLight !== undefined ? settings.monitorWallpapersLight : {};
-                monitorWallpapersDark = settings.monitorWallpapersDark !== undefined ? settings.monitorWallpapersDark : {};
-                brightnessExponentialDevices = settings.brightnessExponentialDevices !== undefined ? settings.brightnessExponentialDevices : (settings.brightnessLogarithmicDevices || {});
-                brightnessUserSetValues = settings.brightnessUserSetValues !== undefined ? settings.brightnessUserSetValues : {};
-                brightnessExponentValues = settings.brightnessExponentValues !== undefined ? settings.brightnessExponentValues : {};
-                doNotDisturb = settings.doNotDisturb !== undefined ? settings.doNotDisturb : false;
-                nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
-                nightModeTemperature = settings.nightModeTemperature !== undefined ? settings.nightModeTemperature : 4500;
-                nightModeHighTemperature = settings.nightModeHighTemperature !== undefined ? settings.nightModeHighTemperature : 6500;
-                nightModeAutoEnabled = settings.nightModeAutoEnabled !== undefined ? settings.nightModeAutoEnabled : false;
-                nightModeAutoMode = settings.nightModeAutoMode !== undefined ? settings.nightModeAutoMode : "time";
-                if (settings.nightModeStartTime !== undefined) {
-                    const parts = settings.nightModeStartTime.split(":");
-                    nightModeStartHour = parseInt(parts[0]) || 18;
-                    nightModeStartMinute = parseInt(parts[1]) || 0;
-                } else {
-                    nightModeStartHour = settings.nightModeStartHour !== undefined ? settings.nightModeStartHour : 18;
-                    nightModeStartMinute = settings.nightModeStartMinute !== undefined ? settings.nightModeStartMinute : 0;
-                }
-                if (settings.nightModeEndTime !== undefined) {
-                    const parts = settings.nightModeEndTime.split(":");
-                    nightModeEndHour = parseInt(parts[0]) || 6;
-                    nightModeEndMinute = parseInt(parts[1]) || 0;
-                } else {
-                    nightModeEndHour = settings.nightModeEndHour !== undefined ? settings.nightModeEndHour : 6;
-                    nightModeEndMinute = settings.nightModeEndMinute !== undefined ? settings.nightModeEndMinute : 0;
-                }
-                latitude = settings.latitude !== undefined ? settings.latitude : 0.0;
-                longitude = settings.longitude !== undefined ? settings.longitude : 0.0;
-                nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false;
-                nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : "";
-                pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : [];
-                hiddenTrayIds = settings.hiddenTrayIds !== undefined ? settings.hiddenTrayIds : [];
-                selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0;
-                nvidiaGpuTempEnabled = settings.nvidiaGpuTempEnabled !== undefined ? settings.nvidiaGpuTempEnabled : false;
-                nonNvidiaGpuTempEnabled = settings.nonNvidiaGpuTempEnabled !== undefined ? settings.nonNvidiaGpuTempEnabled : false;
-                enabledGpuPciIds = settings.enabledGpuPciIds !== undefined ? settings.enabledGpuPciIds : [];
-                wifiDeviceOverride = settings.wifiDeviceOverride !== undefined ? settings.wifiDeviceOverride : "";
-                weatherHourlyDetailed = settings.weatherHourlyDetailed !== undefined ? settings.weatherHourlyDetailed : true;
-                wallpaperCyclingEnabled = settings.wallpaperCyclingEnabled !== undefined ? settings.wallpaperCyclingEnabled : false;
-                wallpaperCyclingMode = settings.wallpaperCyclingMode !== undefined ? settings.wallpaperCyclingMode : "interval";
-                wallpaperCyclingInterval = settings.wallpaperCyclingInterval !== undefined ? settings.wallpaperCyclingInterval : 300;
-                wallpaperCyclingTime = settings.wallpaperCyclingTime !== undefined ? settings.wallpaperCyclingTime : "06:00";
-                monitorCyclingSettings = settings.monitorCyclingSettings !== undefined ? settings.monitorCyclingSettings : {};
-                lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : "";
-                launchPrefix = settings.launchPrefix !== undefined ? settings.launchPrefix : "";
-                wallpaperTransition = settings.wallpaperTransition !== undefined ? settings.wallpaperTransition : "fade";
-                includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none");
-                recentColors = settings.recentColors !== undefined ? settings.recentColors : [];
-                showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false;
-
-                if (settings.configVersion === undefined) {
-                    migrateFromUndefinedToV1(settings);
-                    saveSettings();
-                } else if (settings.configVersion === sessionConfigVersion) {
-                    cleanupUnusedKeys();
-                }
-
-                if (!isGreeterMode) {
-                    if (typeof Theme !== "undefined") {
-                        Theme.generateSystemThemesFromCurrentTheme();
-                    }
-                }
-
-                if (typeof WallpaperCyclingService !== "undefined") {
-                    WallpaperCyclingService.updateCyclingState();
-                }
+            if (settings.wallpaperPath && settings.wallpaperPath.startsWith("we:")) {
+                console.warn("WallpaperEngine wallpaper detected, resetting wallpaper");
+                wallpaperPath = "";
+                Quickshell.execDetached(["notify-send", "-u", "critical", "-a", "DMS", "-i", "dialog-warning", "WallpaperEngine Support Moved", "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."]);
+            } else {
+                wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : "";
             }
-        } catch (e) {}
+            perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false;
+            monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {};
+            perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false;
+            wallpaperPathLight = settings.wallpaperPathLight !== undefined ? settings.wallpaperPathLight : "";
+            wallpaperPathDark = settings.wallpaperPathDark !== undefined ? settings.wallpaperPathDark : "";
+            monitorWallpapersLight = settings.monitorWallpapersLight !== undefined ? settings.monitorWallpapersLight : {};
+            monitorWallpapersDark = settings.monitorWallpapersDark !== undefined ? settings.monitorWallpapersDark : {};
+            brightnessExponentialDevices = settings.brightnessExponentialDevices !== undefined ? settings.brightnessExponentialDevices : (settings.brightnessLogarithmicDevices || {});
+            brightnessUserSetValues = settings.brightnessUserSetValues !== undefined ? settings.brightnessUserSetValues : {};
+            brightnessExponentValues = settings.brightnessExponentValues !== undefined ? settings.brightnessExponentValues : {};
+            doNotDisturb = settings.doNotDisturb !== undefined ? settings.doNotDisturb : false;
+            nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
+            nightModeTemperature = settings.nightModeTemperature !== undefined ? settings.nightModeTemperature : 4500;
+            nightModeHighTemperature = settings.nightModeHighTemperature !== undefined ? settings.nightModeHighTemperature : 6500;
+            nightModeAutoEnabled = settings.nightModeAutoEnabled !== undefined ? settings.nightModeAutoEnabled : false;
+            nightModeAutoMode = settings.nightModeAutoMode !== undefined ? settings.nightModeAutoMode : "time";
+            if (settings.nightModeStartTime !== undefined) {
+                const parts = settings.nightModeStartTime.split(":");
+                nightModeStartHour = parseInt(parts[0]) || 18;
+                nightModeStartMinute = parseInt(parts[1]) || 0;
+            } else {
+                nightModeStartHour = settings.nightModeStartHour !== undefined ? settings.nightModeStartHour : 18;
+                nightModeStartMinute = settings.nightModeStartMinute !== undefined ? settings.nightModeStartMinute : 0;
+            }
+            if (settings.nightModeEndTime !== undefined) {
+                const parts = settings.nightModeEndTime.split(":");
+                nightModeEndHour = parseInt(parts[0]) || 6;
+                nightModeEndMinute = parseInt(parts[1]) || 0;
+            } else {
+                nightModeEndHour = settings.nightModeEndHour !== undefined ? settings.nightModeEndHour : 6;
+                nightModeEndMinute = settings.nightModeEndMinute !== undefined ? settings.nightModeEndMinute : 0;
+            }
+            latitude = settings.latitude !== undefined ? settings.latitude : 0.0;
+            longitude = settings.longitude !== undefined ? settings.longitude : 0.0;
+            nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false;
+            nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : "";
+            pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : [];
+            hiddenTrayIds = settings.hiddenTrayIds !== undefined ? settings.hiddenTrayIds : [];
+            selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0;
+            nvidiaGpuTempEnabled = settings.nvidiaGpuTempEnabled !== undefined ? settings.nvidiaGpuTempEnabled : false;
+            nonNvidiaGpuTempEnabled = settings.nonNvidiaGpuTempEnabled !== undefined ? settings.nonNvidiaGpuTempEnabled : false;
+            enabledGpuPciIds = settings.enabledGpuPciIds !== undefined ? settings.enabledGpuPciIds : [];
+            wifiDeviceOverride = settings.wifiDeviceOverride !== undefined ? settings.wifiDeviceOverride : "";
+            weatherHourlyDetailed = settings.weatherHourlyDetailed !== undefined ? settings.weatherHourlyDetailed : true;
+            wallpaperCyclingEnabled = settings.wallpaperCyclingEnabled !== undefined ? settings.wallpaperCyclingEnabled : false;
+            wallpaperCyclingMode = settings.wallpaperCyclingMode !== undefined ? settings.wallpaperCyclingMode : "interval";
+            wallpaperCyclingInterval = settings.wallpaperCyclingInterval !== undefined ? settings.wallpaperCyclingInterval : 300;
+            wallpaperCyclingTime = settings.wallpaperCyclingTime !== undefined ? settings.wallpaperCyclingTime : "06:00";
+            monitorCyclingSettings = settings.monitorCyclingSettings !== undefined ? settings.monitorCyclingSettings : {};
+            lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : "";
+            launchPrefix = settings.launchPrefix !== undefined ? settings.launchPrefix : "";
+            wallpaperTransition = settings.wallpaperTransition !== undefined ? settings.wallpaperTransition : "fade";
+            includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none");
+            recentColors = settings.recentColors !== undefined ? settings.recentColors : [];
+            showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false;
+
+            if (settings.configVersion === undefined) {
+                migrateFromUndefinedToV1(settings);
+                saveSettings();
+            } else if (settings.configVersion === sessionConfigVersion) {
+                cleanupUnusedKeys();
+            }
+
+            if (!isGreeterMode && typeof Theme !== "undefined") {
+                Theme.generateSystemThemesFromCurrentTheme();
+            }
+
+            if (typeof WallpaperCyclingService !== "undefined") {
+                WallpaperCyclingService.updateCyclingState();
+            }
+        } catch (e) {
+            _parseError = true;
+            console.error("SessionData: Failed to parse session.json - file will not be overwritten. Error:", e.message);
+        }
     }
 
     function saveSettings() {
-        if (isGreeterMode)
+        if (isGreeterMode || _parseError)
             return;
         settingsFile.setText(JSON.stringify({
             "isLightMode": isLightMode,

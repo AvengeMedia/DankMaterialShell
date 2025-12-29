@@ -345,7 +345,7 @@ func EnsureContrastDPSLstar(hexColor, hexBg string, minLc float64, isLightMode b
 	}
 
 	step := 0.5
-	for i := 0; i < 120; i++ {
+	for range 120 {
 		Lf = math.Max(0, math.Min(100, Lf+dir*step))
 		cand := labToHex(Lf, af, bf)
 		if DeltaPhiStarContrast(cand, hexBg, isLightMode) >= minLc {

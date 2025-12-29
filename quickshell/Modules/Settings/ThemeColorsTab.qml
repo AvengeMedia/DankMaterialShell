@@ -1129,6 +1129,17 @@ Item {
 
                 SettingsToggleRow {
                     tab: "theme"
+                    tags: ["matugen", "zenbrowser", "template"]
+                    settingKey: "matugenTemplateZenBrowser"
+                    text: "zenbrowser"
+                    description: ""
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateZenBrowser
+                    onToggled: checked => SettingsData.set("matugenTemplateZenBrowser", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
                     tags: ["matugen", "vesktop", "discord", "template"]
                     settingKey: "matugenTemplateVesktop"
                     text: "vesktop"

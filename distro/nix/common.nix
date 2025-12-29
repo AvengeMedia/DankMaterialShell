@@ -12,7 +12,7 @@ in
   packages = [
     dmsPkgs.dms-shell
   ]
-  ++ lib.optional cfg.enableSystemMonitoring dmsPkgs.dgop
+  ++ lib.optional cfg.enableSystemMonitoring cfg.dgop.package
   ++ lib.optionals cfg.enableVPN [
     pkgs.glib
     pkgs.networkmanager
