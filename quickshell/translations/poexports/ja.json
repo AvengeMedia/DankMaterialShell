@@ -791,6 +791,9 @@
   "Confirm": {
     "Confirm": "確認"
   },
+  "Confirm Delete": {
+    "Confirm Delete": ""
+  },
   "Confirm Display Changes": {
     "Confirm Display Changes": "表示変更を確認"
   },
@@ -1214,6 +1217,9 @@
   "Driver": {
     "Driver": ""
   },
+  "Duplicate": {
+    "Duplicate": ""
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "ぼかしで壁紙を複製"
   },
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": ""
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "プリンターの一時中断に失敗しました"
@@ -2812,6 +2827,12 @@
   },
   "Resume": {
     "Resume": "レジュメ"
+  },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
   },
   "Revert": {
     "Revert": "戻す"

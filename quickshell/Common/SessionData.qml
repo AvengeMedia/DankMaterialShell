@@ -195,7 +195,9 @@ Singleton {
             }
         } catch (e) {
             _parseError = true;
-            console.error("SessionData: Failed to parse session.json - file will not be overwritten. Error:", e.message);
+            const msg = e.message;
+            console.error("SessionData: Failed to parse session.json - file will not be overwritten. Error:", msg);
+            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse session.json"), msg));
         }
     }
 

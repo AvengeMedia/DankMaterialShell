@@ -111,7 +111,7 @@ Singleton {
     property bool controlCenterShowNetworkIcon: true
     property bool controlCenterShowBluetoothIcon: true
     property bool controlCenterShowAudioIcon: true
-    property bool controlCenterShowAudioPercent: true
+    property bool controlCenterShowAudioPercent: false
     property bool controlCenterShowVpnIcon: true
     property bool controlCenterShowBrightnessIcon: false
     property bool controlCenterShowBrightnessPercent: false
@@ -794,7 +794,9 @@ Singleton {
             Processes.detectQtTools();
         } catch (e) {
             _parseError = true;
-            console.error("SettingsData: Failed to parse settings.json - file will not be overwritten. Error:", e.message);
+            const msg = e.message;
+            console.error("SettingsData: Failed to parse settings.json - file will not be overwritten. Error:", msg);
+            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             applyStoredTheme();
             applyStoredIconTheme();
         } finally {
@@ -820,7 +822,9 @@ Singleton {
             }
         } catch (e) {
             _pluginParseError = true;
-            console.error("SettingsData: Failed to parse plugin_settings.json - file will not be overwritten. Error:", e.message);
+            const msg = e.message;
+            console.error("SettingsData: Failed to parse plugin_settings.json - file will not be overwritten. Error:", msg);
+            Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse plugin_settings.json"), msg));
             pluginSettings = {};
         } finally {
             _pluginSettingsLoading = false;
@@ -1803,7 +1807,9 @@ Singleton {
                 applyStoredIconTheme();
             } catch (e) {
                 _parseError = true;
-                console.error("SettingsData: Failed to reload settings.json - file will not be overwritten. Error:", e.message);
+                const msg = e.message;
+                console.error("SettingsData: Failed to reload settings.json - file will not be overwritten. Error:", msg);
+                Qt.callLater(() => ToastService.showError(I18n.tr("Failed to parse settings.json"), msg));
             } finally {
                 _loading = false;
             }

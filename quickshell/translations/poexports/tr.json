@@ -24,7 +24,7 @@
     "%1 printer(s)": "%1 yazıcı"
   },
   "%1 variants": {
-    "%1 variants": ""
+    "%1 variants": "%1 varyant"
   },
   "%1 widgets": {
     "%1 widgets": "%1 widget"
@@ -477,7 +477,7 @@
     "Bluetooth not available": "Bluetooth kullanılamıyor"
   },
   "Blur Wallpaper Layer": {
-    "Blur Wallpaper Layer": ""
+    "Blur Wallpaper Layer": "Bulanık Duvar Kağıdı Katmanı"
   },
   "Blur on Overview": {
     "Blur on Overview": "Genel Görünümde Bulanıklık"
@@ -790,6 +790,9 @@
   },
   "Confirm": {
     "Confirm": "Onayla"
+  },
+  "Confirm Delete": {
+    "Confirm Delete": ""
   },
   "Confirm Display Changes": {
     "Confirm Display Changes": "Ekran Değişikliklerini Onaylayın"
@@ -1214,6 +1217,9 @@
   "Driver": {
     "Driver": "Sürücü"
   },
+  "Duplicate": {
+    "Duplicate": ""
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "Duvar kağıdını bulanıklık ile çoğalt"
   },
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": "İş taşınamadı"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "Yazıcıyı duraklatma başarısız"
@@ -2130,10 +2145,10 @@
     "Minute": "Dakika"
   },
   "Mirror Display": {
-    "Mirror Display": ""
+    "Mirror Display": "Ekran Yansıt"
   },
   "Modal Background": {
-    "Modal Background": ""
+    "Modal Background": "Modal Arkaplanı"
   },
   "Mode": {
     "Mode": "Mod"
@@ -2813,6 +2828,12 @@
   "Resume": {
     "Resume": "Sürdür"
   },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
+  },
   "Revert": {
     "Revert": "Geri Al"
   },
@@ -2910,7 +2931,7 @@
     "Scroll Wheel": "Kaydırma Tekerleği"
   },
   "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": ""
+    "Scroll on widget changes media volume": "Widget üzerinde kaydırma, medya ses seviyesini değiştirir"
   },
   "Scroll song title": {
     "Scroll song title": "Şarkı başlığını kaydır"

@@ -791,6 +791,9 @@
   "Confirm": {
     "Confirm": "Potwierdź"
   },
+  "Confirm Delete": {
+    "Confirm Delete": ""
+  },
   "Confirm Display Changes": {
     "Confirm Display Changes": "Potwierdź zmiany wyświetlania"
   },
@@ -1214,6 +1217,9 @@
   "Driver": {
     "Driver": "Sterownik"
   },
+  "Duplicate": {
+    "Duplicate": ""
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "Powiel tapetę z rozmyciem"
   },
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": "Nie udało się przenieść zadania"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "Wstrzymanie drukarki nie powiodło się"
@@ -2812,6 +2827,12 @@
   },
   "Resume": {
     "Resume": "Wznów"
+  },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
   },
   "Revert": {
     "Revert": "Odwracać"

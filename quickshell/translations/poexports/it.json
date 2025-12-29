@@ -24,7 +24,7 @@
     "%1 printer(s)": "%1 stampante/i"
   },
   "%1 variants": {
-    "%1 variants": ""
+    "%1 variants": "%1 varianti"
   },
   "%1 widgets": {
     "%1 widgets": "%1 widgets"
@@ -477,7 +477,7 @@
     "Bluetooth not available": "Bluetooth non disponibile"
   },
   "Blur Wallpaper Layer": {
-    "Blur Wallpaper Layer": ""
+    "Blur Wallpaper Layer": "Sfoca il Livello dello Sfondo"
   },
   "Blur on Overview": {
     "Blur on Overview": "Sfocatura su Panoramica"
@@ -790,6 +790,9 @@
   },
   "Confirm": {
     "Confirm": "Conferma"
+  },
+  "Confirm Delete": {
+    "Confirm Delete": ""
   },
   "Confirm Display Changes": {
     "Confirm Display Changes": "Conferma Modifiche Display"
@@ -1214,6 +1217,9 @@
   "Driver": {
     "Driver": "Driver"
   },
+  "Duplicate": {
+    "Duplicate": ""
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "Duplica Sfondo con Sfocatura"
   },
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": "Impossibile spostare il lavoro"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "Impossibile mettere in pausa la stampante"
@@ -2130,10 +2145,10 @@
     "Minute": "Minuti"
   },
   "Mirror Display": {
-    "Mirror Display": ""
+    "Mirror Display": "Duplica Schermo"
   },
   "Modal Background": {
-    "Modal Background": ""
+    "Modal Background": "Sfondo Modale"
   },
   "Mode": {
     "Mode": "Modalità"
@@ -2813,6 +2828,12 @@
   "Resume": {
     "Resume": "Riprendi"
   },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
+  },
   "Revert": {
     "Revert": "Ripristina"
   },
@@ -2910,7 +2931,7 @@
     "Scroll Wheel": "Rotella di Scorrimento"
   },
   "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": ""
+    "Scroll on widget changes media volume": "Lo scorrimento sul widget modifica il volume media"
   },
   "Scroll song title": {
     "Scroll song title": "Scorri Titolo Canzone"
