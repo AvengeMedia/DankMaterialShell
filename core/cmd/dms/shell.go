@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -371,13 +372,7 @@ func killShell() {
 
 func runShellDaemon(session bool) {
 	isSessionManaged = session
-	isDaemonChild := false
-	for _, arg := range os.Args {
-		if arg == "--daemon-child" {
-			isDaemonChild = true
-			break
-		}
-	}
+	isDaemonChild := slices.Contains(os.Args, "--daemon-child")
 
 	if !isDaemonChild {
 		fmt.Fprintf(os.Stderr, "dms %s\n", Version)
@@ -534,9 +529,9 @@ func runShellDaemon(session bool) {
 func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 	targets := make(ipcTargets)
 	var currentTarget string
-	for _, line := range strings.Split(output, "\n") {
-		if strings.HasPrefix(line, "target ") {
-			currentTarget = strings.TrimSpace(strings.TrimPrefix(line, "target "))
+	for line := range strings.SplitSeq(output, "\n") {
+		if after, ok := strings.CutPrefix(line, "target "); ok {
+			currentTarget = strings.TrimSpace(after)
 			targets[currentTarget] = make(map[string][]string)
 		}
 		if strings.HasPrefix(line, "  function") && currentTarget != "" {

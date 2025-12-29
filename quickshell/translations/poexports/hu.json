@@ -1,6 +1,6 @@
 {
   "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
-    "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 DMS-billentyű felülíródhat azokkal a konfigurációs billentyűkkel, amelyek az include-fájl után következnek."
+    "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 DMS-billentyű felülíródhat azokkal a konfigurációs billentyűkkel, amelyek az include bejegyzés után következnek."
   },
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 adapter, egy sincs csatlakoztatva"
@@ -24,7 +24,7 @@
     "%1 printer(s)": "%1 nyomtató(k)"
   },
   "%1 variants": {
-    "%1 variants": ""
+    "%1 variants": "%1 variáns"
   },
   "%1 widgets": {
     "%1 widgets": "%1 widget"
@@ -186,7 +186,7 @@
     "Add a border around the dock": "Szegély hozzáadása a dokk körül"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Adj meg egy egyedi előtagot minden alkalmazás indításához. Ez használható például 'uwsm-app', 'systemd-run' vagy más parancscsomagolókhoz."
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "Adj meg egy egyedi előtagot minden alkalmazás indításához. Ez használható például „uwsm-app”, „systemd-run” vagy más parancscsomagolókhoz."
   },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "Asztali widgetek hozzáadása és konfigurálása"
@@ -195,7 +195,7 @@
     "Adjust the number of columns in grid view mode.": "Oszlopok számának beállítása rácsnézet módban."
   },
   "Advanced": {
-    "Advanced": "Haladó"
+    "Advanced": "Speciális"
   },
   "Afternoon": {
     "Afternoon": "Délután"
@@ -450,10 +450,10 @@
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "A zárolási képernyő kötése a loginctl dbus jeleihez. Kapcsold ki, ha külső zárolási képernyőt használsz"
   },
   "Binds Include Missing": {
-    "Binds Include Missing": "A billentyűket tartalmazó include-fájl hiányzik"
+    "Binds Include Missing": "A binds include bejegyzés hiányzik"
   },
   "Binds include added": {
-    "Binds include added": "A billentyűket tartalmazó include-fájl hozzáadva"
+    "Binds include added": "A binds include bejegyzés hozzáadva"
   },
   "Bit Depth": {
     "Bit Depth": "Színmélység"
@@ -477,7 +477,7 @@
     "Bluetooth not available": "Bluetooth nem elérhető"
   },
   "Blur Wallpaper Layer": {
-    "Blur Wallpaper Layer": ""
+    "Blur Wallpaper Layer": "Háttérkép elmosási réteg"
   },
   "Blur on Overview": {
     "Blur on Overview": "Elmosás az áttekintésben"
@@ -666,16 +666,16 @@
     "Clear at Startup": "Törlés indításkor"
   },
   "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": {
-    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": "Kattints a 'Beállítás' gombra a dms/binds.kdl létrehozásához, és add hozzá az include-fájlt a config.kdl-hez."
+    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": "Kattints a „Beállítás” gombra a dms/binds.kdl létrehozásához és az include bejegyzés hozzádásához a config.kdl fájlhoz."
   },
   "Click 'Setup' to create the outputs config and add include to your compositor config.": {
-    "Click 'Setup' to create the outputs config and add include to your compositor config.": "Kattints a 'Beállítás' gombra a kimenetek konfig létrehozásához, és add hozzá az 'include'-ot a kompozitorod konfigurációjához."
+    "Click 'Setup' to create the outputs config and add include to your compositor config.": "Kattints a „Beállítás” gombra a kimenetek konfig létrehozásához és az include bejegyzés hozzáadásához a kompozitorod konfigurációjához."
   },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "Kattints az importálás gombra .ovpn vagy .conf fájl hozzáadásához"
   },
   "Click any shortcut to edit. Changes save to dms/binds.kdl": {
-    "Click any shortcut to edit. Changes save to dms/binds.kdl": "Kattints bármely billentyűparancsra a szerkesztéshez. A változtatások a dms/binds.kdl fájlba mentődnek"
+    "Click any shortcut to edit. Changes save to dms/binds.kdl": "Kattints bármely gyorsbillentyűre a szerkesztéshez. A változtatások a dms/binds.kdl fájlba mentődnek"
   },
   "Click to capture": {
     "Click to capture": "Kattints a rögzítéshez"
@@ -791,6 +791,9 @@
   "Confirm": {
     "Confirm": "Megerősítés"
   },
+  "Confirm Delete": {
+    "Confirm Delete": ""
+  },
   "Confirm Display Changes": {
     "Confirm Display Changes": "Kijelzőváltoztatások megerősítése"
   },
@@ -810,7 +813,7 @@
     "Connect to Wi-Fi": "Csatlakozás a Wi-Fi-hez"
   },
   "Connected": {
-    "Connected": "Csatlakozva"
+    "Connected": "Csatlakoztatva"
   },
   "Connected Displays": {
     "Connected Displays": "Csatlakoztatott kijelzők"
@@ -1214,6 +1217,9 @@
   "Driver": {
     "Driver": "Illesztőprogram"
   },
+  "Duplicate": {
+    "Duplicate": ""
+  },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "Háttérkép megkettőzése elmosással"
   },
@@ -1257,7 +1263,7 @@
     "Enable Overview Overlay": "Áttekintő fedvény engedélyezése"
   },
   "Enable System Monitor": {
-    "Enable System Monitor": "Rendszermonitor engedélyezése"
+    "Enable System Monitor": "Rendszerfigyelő engedélyezése"
   },
   "Enable System Sounds": {
     "Enable System Sounds": "Rendszerhangok engedélyezése"
@@ -1329,7 +1335,7 @@
     "Enter filename...": "Adj meg egy fájlnevet..."
   },
   "Enter launch prefix (e.g., 'uwsm-app')": {
-    "Enter launch prefix (e.g., 'uwsm-app')": "Írd be az indítási előtagot (pl. 'uwsm-app')"
+    "Enter launch prefix (e.g., 'uwsm-app')": "Írd be az indítási előtagot (pl. „uwsm-app”)"
   },
   "Enter passkey for ": {
     "Enter passkey for ": "Jelszó megadása ehhez: "
@@ -1371,7 +1377,7 @@
     "Failed to activate configuration": "A konfiguráció aktiválása sikertelen"
   },
   "Failed to add binds include": {
-    "Failed to add binds include": "Nem sikerült hozzáadni a billentyűparancsokat tartalmazó include-fájlt"
+    "Failed to add binds include": "Nem sikerült hozzáadni a binds include bejegyzést"
   },
   "Failed to add printer to class": {
     "Failed to add printer to class": "A nyomtató osztályhoz adása sikertelen"
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": "A feladat áthelyezése sikertelen"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "Sikertelen a nyomtató szüneteltetése"
@@ -1860,7 +1875,7 @@
     "Keyboard Layout Name": "Billentyűzetkiosztás neve"
   },
   "Keyboard Shortcuts": {
-    "Keyboard Shortcuts": "Billentyűparancsok"
+    "Keyboard Shortcuts": "Gyorsbillentyűk"
   },
   "Keys": {
     "Keys": "Billentyűk"
@@ -1938,7 +1953,7 @@
     "Loading codecs...": "Kodekek betöltése..."
   },
   "Loading keybinds...": {
-    "Loading keybinds...": "Billentyűparancsok betöltése..."
+    "Loading keybinds...": "Gyorsbillentyűk betöltése..."
   },
   "Loading plugins...": {
     "Loading plugins...": "Bővítmények betöltése..."
@@ -2130,10 +2145,10 @@
     "Minute": "Perc"
   },
   "Mirror Display": {
-    "Mirror Display": ""
+    "Mirror Display": "Kijelző tükrözése"
   },
   "Modal Background": {
-    "Modal Background": ""
+    "Modal Background": "Modális háttér"
   },
   "Mode": {
     "Mode": "Mód"
@@ -2463,7 +2478,7 @@
     "Output Tray Missing": "Kimeneti tálca hiányzik"
   },
   "Outputs Include Missing": {
-    "Outputs Include Missing": "A kimenetek include-fájl hiányzik"
+    "Outputs Include Missing": "Az outputs include bejegyzés hiányzik"
   },
   "Overridden by config": {
     "Overridden by config": "Felülírta a konfiguráció"
@@ -2778,7 +2793,7 @@
     "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "Megköveteli a gomb/billentyű nyomva tartását a kikapcsolás, újraindítás, felfüggesztés, hibernálás és kijelentkezés megerősítéséhez"
   },
   "Requires 'dgop' tool": {
-    "Requires 'dgop' tool": "Szükséges a 'dgop' eszköz"
+    "Requires 'dgop' tool": "Szükséges a „dgop” eszköz"
   },
   "Requires DMS %1": {
     "Requires DMS %1": "Szükséges DMS %1"
@@ -2812,6 +2827,12 @@
   },
   "Resume": {
     "Resume": "Folytatás"
+  },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
   },
   "Revert": {
     "Revert": "Visszaállítás"
@@ -2910,7 +2931,7 @@
     "Scroll Wheel": "Egérgörgő"
   },
   "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": ""
+    "Scroll on widget changes media volume": "Görgetés a widgeten módosítja a média hangerejét"
   },
   "Scroll song title": {
     "Scroll song title": "Zeneszám címének görgetése"
@@ -3039,10 +3060,10 @@
     "Short": "Rövid"
   },
   "Shortcuts": {
-    "Shortcuts": "Parancsikonok"
+    "Shortcuts": "Gyoesbillentyűk"
   },
   "Shortcuts (%1)": {
-    "Shortcuts (%1)": "Billentyűparancsok (%1)"
+    "Shortcuts (%1)": "Gyorsbillentyűk (%1)"
   },
   "Show All Tags": {
     "Show All Tags": "Összes címke megjelenítése"
@@ -3327,7 +3348,7 @@
     "System App Theming": "Rendszeralkalmazás témázása"
   },
   "System Monitor Unavailable": {
-    "System Monitor Unavailable": "Rendszermonitor nem elérhető"
+    "System Monitor Unavailable": "Rendszerfigyelő nem elérhető"
   },
   "System Sounds": {
     "System Sounds": "Rendszerhangok"
@@ -3348,7 +3369,7 @@
     "CPU, memory, network, and disk monitoring": "CPU, memória, hálózat és lemez figyelése"
   },
   "System monitor widget name | sysmon window title": {
-    "System Monitor": "Rendszermonitor"
+    "System Monitor": "Rendszerfigyelő"
   },
   "System notification area icons": {
     "System notification area icons": "Rendszer értesítési terület ikonjai"
@@ -3387,7 +3408,7 @@
     "Text": "Szöveg"
   },
   "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": "A 'dgop' eszköz szükséges a rendszerfigyeléshez.\nTelepítsd a dgop-ot a funkció használatához."
+    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": "A „dgop” eszköz szükséges a rendszerfigyeléshez.\\nTelepítsd a dgop eszközt a funkció használatához."
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "A DMS_SOCKET környezeti változó nincs beállítva, vagy a socket nem elérhető. Az automatizált bővítménykezeléshez a DMS_SOCKET szükséges."
@@ -3597,7 +3618,7 @@
     "Use custom command for update your system": "Egyéni parancs használata a rendszer frissítéséhez"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": "Egyedi térközök használata a sávközök helyett"
+    "Use custom gaps instead of bar spacing": "Egyéni térközök használata a sáv térközei helyett"
   },
   "Use custom window radius instead of theme radius": {
     "Use custom window radius instead of theme radius": "Egyedi ablaksugár használata a témasugár helyett"
@@ -3899,7 +3920,7 @@
     "dgop not available": "dgop nem elérhető"
   },
   "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
-    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "A dms/binds.kdl létezik, de nincs benne a config.kdl-ben. Az egyéni billentyűparancsok nem fognak működni, amíg ez nincs javítva."
+    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "A dms/binds.kdl létezik, de nincs benne a config.kdl-ben. Az egyéni gyorsbillentyűk nem fognak működni, amíg ez nincs javítva."
   },
   "dms/binds.kdl is now included in config.kdl": {
     "dms/binds.kdl is now included in config.kdl": "A dms/binds.kdl most már szerepel a config.kdl fájlban"
@@ -3923,7 +3944,7 @@
     "e.g., focus-workspace 3, resize-column -10": "pl.: focus-workspace 3, resize-column -10"
   },
   "e.g., notify-send 'Hello' && sleep 1": {
-    "e.g., notify-send 'Hello' && sleep 1": "pl. notify-send 'Hello' && sleep 1"
+    "e.g., notify-send 'Hello' && sleep 1": "pl. notify-send „Hello” && sleep 1"
   },
   "empty plugin list": {
     "No plugins found": "Nem található bővítmény"
@@ -3998,7 +4019,7 @@
     "Browse Plugins": "Bővítmények böngészése"
   },
   "plugin installation confirmation": {
-    "Install plugin '%1' from the DMS registry?": "Telepíted a(z) '%1' bővítményt a DMS regiszterből?"
+    "Install plugin '%1' from the DMS registry?": "Telepíted a(z) „%1” bővítményt a DMS regiszterből?"
   },
   "plugin installation dialog title": {
     "Install Plugin": "Bővítmény telepítése"
@@ -4025,13 +4046,13 @@
     "source": "forrás"
   },
   "sysmon window title": {
-    "System Monitor": "Rendszermonitor"
+    "System Monitor": "Rendszerfigyelő"
   },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "Színtémák telepítése a DMS téma-regiszterből"
   },
   "theme installation confirmation": {
-    "Install theme '%1' from the DMS registry?": "Telepíted a(z) '%1' témát a DMS regiszterből?"
+    "Install theme '%1' from the DMS registry?": "Telepíted a(z) „%1” témát a DMS regiszterből?"
   },
   "theme installation dialog title": {
     "Install Theme": "Téma telepítése"

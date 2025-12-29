@@ -674,23 +674,27 @@ Item {
                 return;
 
             const delta = wheel.angleDelta.y;
-            const isMouseWheel = Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
+            const hasPixel = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
+            const isTraditionalMouse = !hasPixel && Math.abs(delta) >= 120 && (Math.abs(delta) % 120) === 0;
+            const isHighDpiMouse = !hasPixel && !isTraditionalMouse && delta !== 0;
             const reverse = SettingsData.reverseScrolling ? -1 : 1;
             const direction = delta * reverse < 0 ? 1 : -1;
 
-            if (isMouseWheel) {
+            if (isTraditionalMouse || isHighDpiMouse) {
                 root.switchWorkspace(direction);
                 scrollInProgress = true;
                 scrollCooldown.restart();
-            } else {
-                scrollAccumulator += delta;
-                if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
-                    const touchDirection = scrollAccumulator < 0 ? 1 : -1;
-                    root.switchWorkspace(touchDirection);
-                    scrollInProgress = true;
-                    scrollCooldown.restart();
-                    scrollAccumulator = 0;
-                }
+                scrollAccumulator = 0;
+                return;
+            }
+
+            scrollAccumulator += delta;
+            if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
+                const touchDirection = scrollAccumulator < 0 ? 1 : -1;
+                root.switchWorkspace(touchDirection);
+                scrollInProgress = true;
+                scrollCooldown.restart();
+                scrollAccumulator = 0;
             }
         }
     }

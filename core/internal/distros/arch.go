@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
@@ -514,12 +515,9 @@ func (a *ArchDistribution) reorderAURPackages(packages []string) []string {
 			dmsShell = append(dmsShell, pkg)
 		} else {
 			isDep := false
-			for _, dep := range dmsDepencies {
-				if pkg == dep {
-					deps = append(deps, pkg)
-					isDep = true
-					break
-				}
+			if slices.Contains(dmsDepencies, pkg) {
+				deps = append(deps, pkg)
+				isDep = true
 			}
 			if !isDep {
 				others = append(others, pkg)
@@ -545,7 +543,7 @@ func (a *ArchDistribution) installSingleAURPackage(ctx context.Context, pkg, sud
 		a.log(fmt.Sprintf("Warning: failed to clean existing cache for %s: %v", pkg, err))
 	}
 
-	if err := os.MkdirAll(buildDir, 0755); err != nil {
+	if err := os.MkdirAll(buildDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create build directory: %w", err)
 	}
 	defer func() {

@@ -1,6 +1,6 @@
 {
   "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
-    "%1 DMS bind(s) may be overridden by config binds that come after the include.": ""
+    "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 نگاشت DMS ممکن است توسط نگاشت‌های پیکربندی که پس از include می‌آیند، لغو شوند."
   },
   "%1 adapter(s), none connected": {
     "%1 adapter(s), none connected": "%1 آداپتور، هیچکدام متصل نیستند"
@@ -9,7 +9,7 @@
     "%1 characters": "%1 حرف"
   },
   "%1 class(es)": {
-    "%1 class(es)": ""
+    "%1 class(es)": "%1 کلاس"
   },
   "%1 connected": {
     "%1 connected": "%1 متصل"
@@ -24,7 +24,7 @@
     "%1 printer(s)": "%1 چاپگر"
   },
   "%1 variants": {
-    "%1 variants": ""
+    "%1 variants": "%1 نوع"
   },
   "%1 widgets": {
     "%1 widgets": "%1 ابزارک"
@@ -126,7 +126,7 @@
     "Accept Jobs": "پذیرش کار‌های چاپ"
   },
   "Accepting": {
-    "Accepting": ""
+    "Accepting": "پذیرش"
   },
   "Access clipboard history": {
     "Access clipboard history": "دسترسی به تاریخچه کلیپ‌بورد"
@@ -141,7 +141,7 @@
     "Action": "اقدام"
   },
   "Actions": {
-    "Actions": "اقدامات"
+    "Actions": "اقدام‌ها"
   },
   "Activate": {
     "Activate": "فعال‌سازی"
@@ -186,7 +186,7 @@
     "Add a border around the dock": "افزودن یک حاشیه دور داک"
   },
   "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": {
-    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "یک پیشوند سفارشی به تمام برنامه‌های در حال اجرا اضافه کنید. این می‌تواند برای مواردی مانند 'uwsm-app'، 'systemd-run' یا سایر بسته‌بندی دستور‌ها استفاده شود."
+    "Add a custom prefix to all application launches. This can be used for things like 'uwsm-app', 'systemd-run', or other command wrappers.": "یک پیشوند سفارشی به تمام برنامه‌های در حال اجرا اضافه کنید. این می‌تواند برای مواردی مانند «uwsm-app»، «systemd-run» یا سایر بسته‌بندی دستور‌ها استفاده شود."
   },
   "Add and configure widgets that appear on your desktop": {
     "Add and configure widgets that appear on your desktop": "افزودن و پیکربندی ابزارک‌هایی که در دسکتاپ شما نمایان می‌شوند"
@@ -216,7 +216,7 @@
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: بازگشت • F1/I: اطلاعات فایل • F10: راهنما • Esc: بستن"
   },
   "Always Show Percentage": {
-    "Always Show Percentage": "همیشه درصد را نمایش بده"
+    "Always Show Percentage": "همیشه درصد را نشان بده"
   },
   "Always on icons": {
     "Always on icons": "آیکون‌ها همیشه فعال"
@@ -228,7 +228,7 @@
     "Always show the dock when niri's overview is open": "همیشه هنگامی که نمای کلی نیری باز است داک را نشان بده"
   },
   "Always show when there's only one connected display": {
-    "Always show when there's only one connected display": ""
+    "Always show when there's only one connected display": "همیشه وقتی فقط یک نمایشگر متصل وجود دارد، نشان بده"
   },
   "Amount": {
     "Amount": "مقدار"
@@ -294,10 +294,10 @@
     "Audio Output": "خروجی صوتی"
   },
   "Audio Output Devices (": {
-    "Audio Output Devices (": "دستگاه‌های خروجی صدا ("
+    "Audio Output Devices (": "دستگاه‌های خروجی صوتی ("
   },
   "Audio Output Switch": {
-    "Audio Output Switch": ""
+    "Audio Output Switch": "تغییر خروجی صوتی"
   },
   "Audio Visualizer": {
     "Audio Visualizer": "مصورساز صوتی"
@@ -321,7 +321,7 @@
     "Authentication Required": "احراز هویت نیاز است"
   },
   "Authentication failed, please try again": {
-    "Authentication failed, please try again": "احراز هویت ناموفق، لطفا دوباره تلاش کنید"
+    "Authentication failed, please try again": "احراز هویت ناموفق بود، لطفا دوباره تلاش کنید"
   },
   "Authorize": {
     "Authorize": "اجازه دادن"
@@ -336,7 +336,7 @@
     "Auto": "خودکار"
   },
   "Auto (Wide)": {
-    "Auto (Wide)": ""
+    "Auto (Wide)": "خودکار (عریض)"
   },
   "Auto Location": {
     "Auto Location": "موقعیت مکانی خودکار"
@@ -348,7 +348,7 @@
     "Auto-Clear After": "پاک‌کردن خودکار پس از"
   },
   "Auto-close Niri overview when launching apps.": {
-    "Auto-close Niri overview when launching apps.": ""
+    "Auto-close Niri overview when launching apps.": "هنگام اجرای برنامه‌ها نمای کلی نیری را خودکار ببند."
   },
   "Auto-hide": {
     "Auto-hide": "پنهان کردن خودکار"
@@ -435,7 +435,7 @@
     "Battery": "باتری"
   },
   "Battery Charge Limit": {
-    "Battery Charge Limit": ""
+    "Battery Charge Limit": "محدودیت شارژ باتری"
   },
   "Battery and power management": {
     "Battery and power management": "مدیریت باتری و پاور"
@@ -450,10 +450,10 @@
     "Bind lock screen to dbus signals from loginctl. Disable if using an external lock screen": "صفحه قفل را به سیگنال dbus از loginctl متصل کن. در صورت استفاده از یک صفحه قفل خارجی غیر فعال کنید"
   },
   "Binds Include Missing": {
-    "Binds Include Missing": ""
+    "Binds Include Missing": "Include نگاشت‌ها یافت نشد"
   },
   "Binds include added": {
-    "Binds include added": ""
+    "Binds include added": "Include نگاشت‌ها اضافه شد"
   },
   "Bit Depth": {
     "Bit Depth": "عمق بیت"
@@ -477,7 +477,7 @@
     "Bluetooth not available": "بلوتوث در دسترس نیست"
   },
   "Blur Wallpaper Layer": {
-    "Blur Wallpaper Layer": ""
+    "Blur Wallpaper Layer": "مات‌کردن لایه تصویر پس‌زمینه"
   },
   "Blur on Overview": {
     "Blur on Overview": "لایه مات در نمای کلی"
@@ -519,13 +519,13 @@
     "Brightness Slider": "اسلایدر روشنایی"
   },
   "Brightness Value": {
-    "Brightness Value": ""
+    "Brightness Value": "مقدار روشنایی"
   },
   "Brightness control not available": {
     "Brightness control not available": "کنترل روشنایی در دسترس نیست"
   },
   "Browse": {
-    "Browse": "مرور کردن"
+    "Browse": "مرور"
   },
   "Browse Plugins": {
     "Browse Plugins": "مرور افزونه‌ها"
@@ -573,7 +573,7 @@
     "Cannot pair": "جفت‌سازی امکان‌پذیر نیست"
   },
   "Capabilities": {
-    "Capabilities": ""
+    "Capabilities": "قابلیت‌ها"
   },
   "Capacity": {
     "Capacity": "ظرفیت"
@@ -636,7 +636,7 @@
     "Choose where notification popups appear on screen": "انتخاب کنید پاپ‌آپ اعلان کجای صفحه ظاهر شود"
   },
   "Choose where on-screen displays appear on screen": {
-    "Choose where on-screen displays appear on screen": ""
+    "Choose where on-screen displays appear on screen": "انتخاب کنید که کدام نمایشگر‌های بر صفحه نمایان شوند"
   },
   "Choose which displays show this widget": {
     "Choose which displays show this widget": "انتخاب کنید که کدام نمایشگر‌ها این ابزارک را نشان دهند"
@@ -666,10 +666,10 @@
     "Clear at Startup": "پاک‌کردن در هنگام راه‌اندازی"
   },
   "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": {
-    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": ""
+    "Click 'Setup' to create dms/binds.kdl and add include to config.kdl.": "برای ایجاد dms/binds.kdl و افزودن include به config.kdl، روی «راه‌اندازی» کلیک کنید."
   },
   "Click 'Setup' to create the outputs config and add include to your compositor config.": {
-    "Click 'Setup' to create the outputs config and add include to your compositor config.": ""
+    "Click 'Setup' to create the outputs config and add include to your compositor config.": "برای ایجاد پیکربندی خروجی‌ها و افزودن include به پیکربندی کامپوزیتور خود، روی «راه‌اندازی» کلیک کنید."
   },
   "Click Import to add a .ovpn or .conf": {
     "Click Import to add a .ovpn or .conf": "برای افزودن یک فایل .conf یا .ovpn کلیک کنید"
@@ -720,7 +720,7 @@
     "Color Mode": "حالت رنگ"
   },
   "Color Override": {
-    "Color Override": "جایگزینی رنگ"
+    "Color Override": "رنگ جایگزین"
   },
   "Color Picker": {
     "Color Picker": "انتخابگر رنگ"
@@ -729,7 +729,7 @@
     "Color Temperature": "دمای رنگ"
   },
   "Color displayed on monitors without the lock screen": {
-    "Color displayed on monitors without the lock screen": ""
+    "Color displayed on monitors without the lock screen": "رنگ نمایش داده شده در مانیتورهای بدون صفحه قفل"
   },
   "Color temperature for day time": {
     "Color temperature for day time": "دمای رنگ برای زمان روز"
@@ -753,7 +753,7 @@
     "Compact Mode": "حالت فشرده"
   },
   "Completed": {
-    "Completed": "کامل شد"
+    "Completed": "کامل شده"
   },
   "Compositor": {
     "Compositor": "کامپازیتور"
@@ -765,10 +765,10 @@
     "Config Format": "تنظیم قالب"
   },
   "Config action: %1": {
-    "Config action: %1": ""
+    "Config action: %1": "اقدام پیکربندی: %1"
   },
   "Config validation failed": {
-    "Config validation failed": "اعتبارسنجی پیکربندی ناموفق"
+    "Config validation failed": "اعتبارسنجی پیکربندی ناموفق بود"
   },
   "Configuration": {
     "Configuration": "پیکربندی"
@@ -777,19 +777,22 @@
     "Configuration activated": "پیکربندی فعال شد"
   },
   "Configuration will be preserved when this display reconnects": {
-    "Configuration will be preserved when this display reconnects": ""
+    "Configuration will be preserved when this display reconnects": "وقتی این نمایشگر دوباره وصل شود، پیکربندی حفظ خواهد شد"
   },
   "Configure a new printer": {
     "Configure a new printer": "پیکربندی یک چاپگر جدید"
   },
   "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": {
-    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "آیکون‌ها را برای workspcae‌های نام‌دار تنظیم کنید. آیکون‌ها بر شماره‌ها هنگامی که هر دو فعال باشند اولویت دارد."
+    "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "آیکون‌ها را برای workspcae‌های نام‌دار تنظیم کنید. آیکون‌ها بر شماره‌ها هنگامی که هر دو فعال باشند اولویت دارند."
   },
   "Configure which displays show shell components": {
     "Configure which displays show shell components": "تنظیم کنید که کدام نمایشگر‌ها اجزای پوسته را نمایش دهند"
   },
   "Confirm": {
     "Confirm": "تأیید"
+  },
+  "Confirm Delete": {
+    "Confirm Delete": ""
   },
   "Confirm Display Changes": {
     "Confirm Display Changes": "تأیید تغییرات نمایشگر"
@@ -831,10 +834,10 @@
     "Control currently playing media": "کنترل رسانه درحال پخش"
   },
   "Control workspaces and columns by scrolling on the bar": {
-    "Control workspaces and columns by scrolling on the bar": ""
+    "Control workspaces and columns by scrolling on the bar": "کنترل workspaceها و ستون‌ها با اسکرول روی نوار"
   },
   "Controls opacity of all popouts, modals, and their content layers": {
-    "Controls opacity of all popouts, modals, and their content layers": ""
+    "Controls opacity of all popouts, modals, and their content layers": "میزان شفافیت همه پاپ‌آپ‌ها، مودال‌ها و لایه‌های محتوای آنها را کنترل می‌کند"
   },
   "Cooldown": {
     "Cooldown": "زمان باقی مانده"
@@ -855,7 +858,7 @@
     "Corner Radius": "شعاع گوشه"
   },
   "Corner Radius Override": {
-    "Corner Radius Override": "بازنویسی شعاع گوشه‌ها"
+    "Corner Radius Override": "جایگزینی شعاع گوشه‌ها"
   },
   "Corners & Background": {
     "Corners & Background": "گوشه‌ها و پس‌زمینه"
@@ -879,13 +882,13 @@
     "Current Items": "آیتم‌های کنونی"
   },
   "Current Period": {
-    "Current Period": ""
+    "Current Period": "بازه‌ی کنونی"
   },
   "Current Status": {
     "Current Status": "وضعیت کنونی"
   },
   "Current Temp": {
-    "Current Temp": "دمای فعلی"
+    "Current Temp": "دمای کنونی"
   },
   "Current Weather": {
     "Current Weather": "آب و هوای کنونی"
@@ -948,7 +951,7 @@
     "DDC/CI monitor": "مانیتور DDC/CI"
   },
   "DEMO MODE - Click anywhere to exit": {
-    "DEMO MODE - Click anywhere to exit": "حالت آزمایشی - برای خروج هر‌جایی کلیک کنید"
+    "DEMO MODE - Click anywhere to exit": "حالت آزمایشی - برای خروج بر هر‌جایی کلیک کنید"
   },
   "DMS Plugin Manager Unavailable": {
     "DMS Plugin Manager Unavailable": "مدیریت افزونه DMS در دسترس نیست"
@@ -1011,7 +1014,7 @@
     "Daytime": "روز"
   },
   "Deck": {
-    "Deck": "Deck"
+    "Deck": "دک"
   },
   "Default": {
     "Default": "پیش‌فرض"
@@ -1146,10 +1149,10 @@
     "Display brightness control": "کنترل روشنایی نمایشگر"
   },
   "Display configuration is not available. WLR output management protocol not supported.": {
-    "Display configuration is not available. WLR output management protocol not supported.": ""
+    "Display configuration is not available. WLR output management protocol not supported.": "پیکربندی نمایشگر در دسترس نیست. پروتکل مدیریت خروجی WLR پشتیبانی نمی‌شود."
   },
   "Display currently focused application title": {
-    "Display currently focused application title": "نمایش عنوان برنامه متمرکز‌شده کنونی"
+    "Display currently focused application title": "نمایش عنوان برنامه فوکوس‌شده کنونی"
   },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "نمایش تنها workspace‌هایی که شامل پنجره هستند"
@@ -1194,7 +1197,7 @@
     "Dock Visibility": "وضعیت نمایش داک"
   },
   "Docs": {
-    "Docs": "اسناد"
+    "Docs": "مستندات"
   },
   "Domain (optional)": {
     "Domain (optional)": "دامنه (اختیاری)"
@@ -1213,6 +1216,9 @@
   },
   "Driver": {
     "Driver": "درایور"
+  },
+  "Duplicate": {
+    "Duplicate": ""
   },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "تصویر پس‌زمینه تکراری با تاری"
@@ -1368,148 +1374,157 @@
     "Fade to lock screen": "محو شدن برای قفل صفحه"
   },
   "Failed to activate configuration": {
-    "Failed to activate configuration": "فعال‌سازی پیکربندی ناموفق"
+    "Failed to activate configuration": "فعال‌سازی پیکربندی ناموفق بود"
   },
   "Failed to add binds include": {
-    "Failed to add binds include": ""
+    "Failed to add binds include": "افزودن include نگاشت‌ها ناموفق بود"
   },
   "Failed to add printer to class": {
-    "Failed to add printer to class": "افزودن چاپگر به کلاس ناموفق"
+    "Failed to add printer to class": "افزودن چاپگر به کلاس ناموفق بود"
   },
   "Failed to cancel all jobs": {
-    "Failed to cancel all jobs": "لغو همه کار‌های چاپ ناموفق"
+    "Failed to cancel all jobs": "لغو همه کار‌های چاپ ناموفق بود"
   },
   "Failed to cancel selected job": {
-    "Failed to cancel selected job": "لغو کار چاپ انتخاب شده ناموفق"
+    "Failed to cancel selected job": "لغو کار چاپ انتخاب شده ناموفق بود"
   },
   "Failed to connect VPN": {
-    "Failed to connect VPN": "اتصال به VPN ناموفق"
+    "Failed to connect VPN": "اتصال به VPN ناموفق بود"
   },
   "Failed to connect to %1": {
-    "Failed to connect to %1": "اتصال به %1 ناموفق"
+    "Failed to connect to %1": "اتصال به %1 ناموفق بود"
   },
   "Failed to copy entry": {
-    "Failed to copy entry": "کپی ورودی ناموفق"
+    "Failed to copy entry": "کپی ورودی ناموفق بود"
   },
   "Failed to create printer": {
-    "Failed to create printer": "ایجاد چاپگر ناموفق"
+    "Failed to create printer": "ایجاد چاپگر ناموفق بود"
   },
   "Failed to delete VPN": {
-    "Failed to delete VPN": "حذف VPN ناموفق"
+    "Failed to delete VPN": "حذف VPN ناموفق بود"
   },
   "Failed to delete class": {
-    "Failed to delete class": "حذف کلاس ناموفق"
+    "Failed to delete class": "حذف کلاس ناموفق بود"
   },
   "Failed to delete printer": {
-    "Failed to delete printer": "حذف چاپگر ناموفق"
+    "Failed to delete printer": "حذف چاپگر ناموفق بود"
   },
   "Failed to disable job acceptance": {
-    "Failed to disable job acceptance": "غیرفعال‌سازی پذیرش کارهای چاپ ناموفق"
+    "Failed to disable job acceptance": "غیرفعال‌سازی پذیرش کارهای چاپ ناموفق بود"
   },
   "Failed to disable night mode": {
-    "Failed to disable night mode": "غیرفعال‌کردن حال شب ناموفق"
+    "Failed to disable night mode": "غیرفعال‌کردن حال شب ناموفق بود"
   },
   "Failed to disconnect VPN": {
-    "Failed to disconnect VPN": "قطع اتصال از VPN ناموفق"
+    "Failed to disconnect VPN": "قطع اتصال از VPN ناموفق بود"
   },
   "Failed to disconnect VPNs": {
-    "Failed to disconnect VPNs": "قطع اتصال از VPN‌ها ناموفق"
+    "Failed to disconnect VPNs": "قطع اتصال از VPN‌ها ناموفق بود"
   },
   "Failed to disconnect WiFi": {
-    "Failed to disconnect WiFi": "قطع اتصال WiFi ناموفق"
+    "Failed to disconnect WiFi": "قطع اتصال WiFi ناموفق بود"
   },
   "Failed to enable IP location": {
-    "Failed to enable IP location": "فعال‌کردن موقعیت مکانی IP ناموفق"
+    "Failed to enable IP location": "فعال‌کردن موقعیت مکانی IP ناموفق بود"
   },
   "Failed to enable WiFi": {
-    "Failed to enable WiFi": "فعال‌کردن WiFi ناموفق"
+    "Failed to enable WiFi": "فعال‌کردن WiFi ناموفق بود"
   },
   "Failed to enable job acceptance": {
-    "Failed to enable job acceptance": "فعال‌سازی پذیرش کارهای چاپ ناموفق"
+    "Failed to enable job acceptance": "فعال‌سازی پذیرش کارهای چاپ ناموفق بود"
   },
   "Failed to enable night mode": {
-    "Failed to enable night mode": "فعال‌کردن حالت شب ناموفق"
+    "Failed to enable night mode": "فعال‌کردن حالت شب ناموفق بود"
   },
   "Failed to hold job": {
-    "Failed to hold job": "نگه‌داشتن کار چاپ ناموفق"
+    "Failed to hold job": "نگه‌داشتن کار چاپ ناموفق بود"
   },
   "Failed to import VPN": {
-    "Failed to import VPN": "وارد کردن VPN ناموفق"
+    "Failed to import VPN": "وارد کردن VPN ناموفق بود"
   },
   "Failed to load VPN config": {
-    "Failed to load VPN config": "بارگذاری پیکربندی VPN ناموفق"
+    "Failed to load VPN config": "بارگذاری پیکربندی VPN ناموفق بود"
   },
   "Failed to load clipboard configuration.": {
     "Failed to load clipboard configuration.": "بارگیری پیکربندی کلیپ‌بورد ناموفق بود."
   },
   "Failed to move job": {
-    "Failed to move job": "انتقال کار چاپ ناموفق"
+    "Failed to move job": "انتقال کار چاپ ناموفق بود"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
-    "Failed to pause printer": "توقف چاپگر ناموفق"
+    "Failed to pause printer": "توقف چاپگر ناموفق بود"
   },
   "Failed to print test page": {
-    "Failed to print test page": "چاپ صفحه تست ناموفق"
+    "Failed to print test page": "چاپ صفحه تست ناموفق بود"
   },
   "Failed to remove device": {
-    "Failed to remove device": "حذف دستگاه ناموفق"
+    "Failed to remove device": "حذف دستگاه ناموفق بود"
   },
   "Failed to remove keybind": {
-    "Failed to remove keybind": "حذف کلید میانبر ناموفق"
+    "Failed to remove keybind": "حذف کلید میانبر ناموفق بود"
   },
   "Failed to remove printer from class": {
-    "Failed to remove printer from class": ""
+    "Failed to remove printer from class": "حذف چاپگر از کلاس ناموفق بود"
   },
   "Failed to restart job": {
-    "Failed to restart job": "شروع مجدد کار چاپ ناموفق"
+    "Failed to restart job": "شروع مجدد کار چاپ ناموفق بود"
   },
   "Failed to resume printer": {
-    "Failed to resume printer": "ازسرگیری چاپگر ناموفق"
+    "Failed to resume printer": "ازسرگیری چاپگر ناموفق بود"
   },
   "Failed to save clipboard setting": {
-    "Failed to save clipboard setting": "ذخیره تنظیمات کلیپ‌بورد ناموفق"
+    "Failed to save clipboard setting": "ذخیره تنظیمات کلیپ‌بورد ناموفق بود"
   },
   "Failed to save keybind": {
-    "Failed to save keybind": "ذخیره کلید‌ میانبر ناموفق"
+    "Failed to save keybind": "ذخیره کلید‌ میانبر ناموفق بود"
   },
   "Failed to set brightness": {
-    "Failed to set brightness": "تنظیم روشنایی ناموفق"
+    "Failed to set brightness": "تنظیم روشنایی ناموفق بود"
   },
   "Failed to set night mode location": {
-    "Failed to set night mode location": "تنظیم مکان حالت شب ناموفق"
+    "Failed to set night mode location": "تنظیم مکان حالت شب ناموفق بود"
   },
   "Failed to set night mode schedule": {
-    "Failed to set night mode schedule": "تنظیم زمان‌بندی حالت شب ناموفق"
+    "Failed to set night mode schedule": "تنظیم زمان‌بندی حالت شب ناموفق بود"
   },
   "Failed to set night mode temperature": {
-    "Failed to set night mode temperature": "تنظیم دمای حالت شب ناموفق"
+    "Failed to set night mode temperature": "تنظیم دمای حالت شب ناموفق بود"
   },
   "Failed to set profile image": {
-    "Failed to set profile image": "تنظیم تصویر نمایه ناموفق"
+    "Failed to set profile image": "تنظیم تصویر نمایه ناموفق بود"
   },
   "Failed to set profile image: %1": {
-    "Failed to set profile image: %1": "تنظیم تصویر نمایه ناموفق: %1"
+    "Failed to set profile image: %1": "تنظیم تصویر نمایه ناموفق بود: %1"
   },
   "Failed to start connection to %1": {
-    "Failed to start connection to %1": "شروع اتصال به %1 ناموفق"
+    "Failed to start connection to %1": "شروع اتصال به %1 ناموفق بود"
   },
   "Failed to update VPN": {
-    "Failed to update VPN": "بروزرسانی VPN ناموفق"
+    "Failed to update VPN": "بروزرسانی VPN ناموفق بود"
   },
   "Failed to update autoconnect": {
-    "Failed to update autoconnect": "بروزرسانی اتصال خودکار ناموفق"
+    "Failed to update autoconnect": "بروزرسانی اتصال خودکار ناموفق بود"
   },
   "Failed to update description": {
-    "Failed to update description": "بروزرسانی توضیحات ناموفق"
+    "Failed to update description": "بروزرسانی توضیحات ناموفق بود"
   },
   "Failed to update location": {
-    "Failed to update location": ""
+    "Failed to update location": "بروزرسانی مکان ناموفق بود"
   },
   "Failed to update sharing": {
-    "Failed to update sharing": ""
+    "Failed to update sharing": "بروزرسانی اشتراک‌گذاری ناموفق بود"
   },
   "Failed to write temp file for validation": {
-    "Failed to write temp file for validation": ""
+    "Failed to write temp file for validation": "نوشتن فایل موقت برای اعتبارسنجی ناموفق بود"
   },
   "Feels Like": {
     "Feels Like": "احساس می‌شود"
@@ -1542,31 +1557,31 @@
     "First Time Setup": "راه‌اندازی اولیه"
   },
   "Fix Now": {
-    "Fix Now": ""
+    "Fix Now": "رفع فوری"
   },
   "Fixing...": {
-    "Fixing...": ""
+    "Fixing...": "درحال رفع..."
   },
   "Flipped": {
-    "Flipped": ""
+    "Flipped": "وارونه"
   },
   "Flipped 180°": {
-    "Flipped 180°": ""
+    "Flipped 180°": "وارونه ۱۸۰°"
   },
   "Flipped 270°": {
-    "Flipped 270°": ""
+    "Flipped 270°": "وارونه ۲۷۰°"
   },
   "Flipped 90°": {
-    "Flipped 90°": ""
+    "Flipped 90°": "وارونه ۹۰°"
   },
   "Focus at Startup": {
-    "Focus at Startup": ""
+    "Focus at Startup": "فوکوس در هنگام راه‌اندازی"
   },
   "Focused Window": {
-    "Focused Window": "پنجره متمرکز شده"
+    "Focused Window": "پنجره فوکوس‌شده"
   },
   "Follow focus": {
-    "Follow focus": ""
+    "Follow focus": "پیروی از فوکوس"
   },
   "Font Family": {
     "Font Family": "خانواده فونت"
@@ -1668,13 +1683,13 @@
     "Group multiple windows of the same app together with a window count indicator": "گروه‌بندی چندین پنجره از برنامه یکسان با نشانگر تعداد پنجره‌ها"
   },
   "HDR (EDID)": {
-    "HDR (EDID)": ""
+    "HDR (EDID)": "HDR (EDID)"
   },
   "HDR Tone Mapping": {
-    "HDR Tone Mapping": ""
+    "HDR Tone Mapping": "نگاشت تُن HDR"
   },
   "HDR mode is experimental. Verify your monitor supports HDR before enabling.": {
-    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": ""
+    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": "حالت HDR آزمایشی است. قبل از فعال کردن، مطمئن شوید که مانیتور شما از HDR پشتیبانی می‌کند."
   },
   "HSV": {
     "HSV": "HSV"
@@ -1698,7 +1713,7 @@
     "Hide Delay": "تأخیر پنهان‌شدن"
   },
   "Hide When Windows Open": {
-    "Hide When Windows Open": ""
+    "Hide When Windows Open": "وقتی پنجره‌ها باز هستند پنهان کن"
   },
   "Hide the dock when not in use and reveal it when hovering near the dock area": {
     "Hide the dock when not in use and reveal it when hovering near the dock area": "داک را هنگامی که استفاده نمی‌شود پنهان کن و هنگامی که موشواره نزدیک آن است نشان بده"
@@ -1719,16 +1734,16 @@
     "Hold to Confirm Power Actions": "نگه‌داشتن برای تأیید اقدام پاور"
   },
   "Hold to confirm (%1 ms)": {
-    "Hold to confirm (%1 ms)": "نگه‌داشتن برای تأیید (%1 ms)"
+    "Hold to confirm (%1 ms)": "برای تأیید نگه‌دارید (%1 ms)"
   },
   "Hold to confirm (%1s)": {
-    "Hold to confirm (%1s)": "برای تأیید نگه‌دارید (%1 ثانیه)"
+    "Hold to confirm (%1s)": "برای تأیید نگه‌دارید (%1s)"
   },
   "Hot Corners": {
     "Hot Corners": "گوشه‌های فعال"
   },
   "Hotkey overlay title (optional)": {
-    "Hotkey overlay title (optional)": ""
+    "Hotkey overlay title (optional)": "عنوان کلید میانبر overlay (اختیاری)"
   },
   "Hour": {
     "Hour": "ساعت"
@@ -1761,7 +1776,7 @@
     "Idle": "بیکار"
   },
   "Idle Inhibitor": {
-    "Idle Inhibitor": "جلوگیری از بیکاری سیستم"
+    "Idle Inhibitor": "مهارگر بیکاری"
   },
   "Idle Settings": {
     "Idle Settings": "تنظیمات بیکاری سیستم"
@@ -1788,10 +1803,10 @@
     "Inactive Monitor Color": "رنگ مانیتور غیر‌فعال"
   },
   "Include Transitions": {
-    "Include Transitions": "اضافه‌کردن افکت‌های تغییر"
+    "Include Transitions": "اضافه‌کردن گذارها"
   },
   "Incompatible Plugins Loaded": {
-    "Incompatible Plugins Loaded": ""
+    "Incompatible Plugins Loaded": "افزونه‌های ناسازگار بارگذاری شده‌اند"
   },
   "Incorrect password": {
     "Incorrect password": "گذرواژه نادرست"
@@ -1806,7 +1821,7 @@
     "Individual bar configuration": "پیکربندی جداگانه نوار‌ها"
   },
   "Inherit": {
-    "Inherit": ""
+    "Inherit": "ارث‌بردن"
   },
   "Input Devices": {
     "Input Devices": "دستگاه‌های ورودی"
@@ -1911,7 +1926,7 @@
     "Layout": "Layout"
   },
   "Layout Overrides": {
-    "Layout Overrides": ""
+    "Layout Overrides": "جایگزینی layoutها"
   },
   "Left": {
     "Left": "چپ"
@@ -1950,7 +1965,7 @@
     "Local": "محلی"
   },
   "Location": {
-    "Location": "موقعیت مکانی"
+    "Location": "مکان"
   },
   "Location Search": {
     "Location Search": "جستجوی موقعیت مکانی"
@@ -2034,13 +2049,13 @@
     "Material Colors": "رنگ‌های Material"
   },
   "Matugen Palette": {
-    "Matugen Palette": "پالت رنگی Mutagen"
+    "Matugen Palette": "پالت رنگی Matugen"
   },
   "Matugen Target Monitor": {
-    "Matugen Target Monitor": "مانیتور هدف Mutagen"
+    "Matugen Target Monitor": "مانیتور هدف Matugen"
   },
   "Matugen Templates": {
-    "Matugen Templates": "قالب‌های Mutagen"
+    "Matugen Templates": "قالب‌های Matugen"
   },
   "Max apps to show": {
     "Max apps to show": "حداکثر برنامه‌ها برای نمایش"
@@ -2112,7 +2127,7 @@
     "Microphone Mute": "میکروفون بی‌صدا"
   },
   "Microphone Volume": {
-    "Microphone Volume": ""
+    "Microphone Volume": "حجم صدای میکروفون"
   },
   "Microphone settings": {
     "Microphone settings": "تنظیمات میکروفون"
@@ -2130,10 +2145,10 @@
     "Minute": "دقیقه"
   },
   "Mirror Display": {
-    "Mirror Display": ""
+    "Mirror Display": "آینه‌کردن نمایشگر"
   },
   "Modal Background": {
-    "Modal Background": ""
+    "Modal Background": "پس‌زمینه مودال"
   },
   "Mode": {
     "Mode": "حالت"
@@ -2145,7 +2160,7 @@
     "Model": "مدل"
   },
   "Modified": {
-    "Modified": ""
+    "Modified": "اصلاح‌شده"
   },
   "Monitor Configuration": {
     "Monitor Configuration": "پیکربندی مانیتور"
@@ -2226,7 +2241,7 @@
     "New York, NY": "New York, NY"
   },
   "Next Transition": {
-    "Next Transition": ""
+    "Next Transition": "گذار بعدی"
   },
   "Night": {
     "Night": "شب"
@@ -2241,7 +2256,7 @@
     "Niri Integration": "همگام‌سازی نیری"
   },
   "Niri Layout Overrides": {
-    "Niri Layout Overrides": ""
+    "Niri Layout Overrides": "جایگزینی layoutهای نیری"
   },
   "Niri compositor actions (focus, move, etc.)": {
     "Niri compositor actions (focus, move, etc.)": "اقدام‌های کامپازیتور نیری (focus، move و غیره)"
@@ -2301,7 +2316,7 @@
     "No drivers found": "درایوری یافت نشد"
   },
   "No features enabled": {
-    "No features enabled": ""
+    "No features enabled": "هیچ قابلیتی فعال نشده"
   },
   "No files found": {
     "No files found": "هیچ فایلی یافت نشد"
@@ -2331,7 +2346,7 @@
     "No printers found": "چاپگری یافت نشد"
   },
   "No variants created. Click Add to create a new monitor widget.": {
-    "No variants created. Click Add to create a new monitor widget.": ""
+    "No variants created. Click Add to create a new monitor widget.": "هیچ گونه‌ی دیگری ایجاد نشد. برای ایجاد یک ابزارک مانیتور جدید، روی افزودن کلیک کنید."
   },
   "No widgets available": {
     "No widgets available": "هیچ ابزارکی موجود نیست"
@@ -2358,7 +2373,7 @@
     "Not connected": "متصل نیست"
   },
   "Note: this only changes the percentage, it does not actually limit charging.": {
-    "Note: this only changes the percentage, it does not actually limit charging.": ""
+    "Note: this only changes the percentage, it does not actually limit charging.": "نکته: این تنها درصد را تغییر می‌دهد، به طور واقعی محدودیت روی شارژ کردن اعمال نمی‌کند."
   },
   "Notepad": {
     "Notepad": "دفترچه یادداشت"
@@ -2412,7 +2427,7 @@
     "Offline Report": "گزارش آفلاین"
   },
   "On-Screen Displays": {
-    "On-Screen Displays": "نمایشگر‌های روی صفحه"
+    "On-Screen Displays": "نمایشگر‌های بر صفحه"
   },
   "On-screen Displays": {
     "On-screen Displays": "نمایشگر‌های بر صفحه (OSD)"
@@ -2445,7 +2460,7 @@
     "Optional description": "توضیحات اختیاری"
   },
   "Optional location": {
-    "Optional location": ""
+    "Optional location": "مکان اختیاری"
   },
   "Options": {
     "Options": "گزینه‌ها"
@@ -2463,25 +2478,25 @@
     "Output Tray Missing": "سینی خروج موجود نیست"
   },
   "Outputs Include Missing": {
-    "Outputs Include Missing": ""
+    "Outputs Include Missing": "Include خروجی‌ها یافت نشد"
   },
   "Overridden by config": {
-    "Overridden by config": ""
+    "Overridden by config": "جایگزین‌شده توسط پیکربندی"
   },
   "Override": {
-    "Override": "جایگزینی"
+    "Override": "جایگزین"
   },
   "Override Corner Radius": {
-    "Override Corner Radius": ""
+    "Override Corner Radius": "جایگزینی شعاع گوشه‌ها"
   },
   "Override Gaps": {
-    "Override Gaps": ""
+    "Override Gaps": "جایگزینی فاصله‌ها"
   },
   "Override global layout settings for this output": {
-    "Override global layout settings for this output": ""
+    "Override global layout settings for this output": "تنظیمات global layout را برای این خروجی جایگزین کن"
   },
   "Overrides": {
-    "Overrides": "جایگزینی‌ها"
+    "Overrides": "جایگزین‌ها"
   },
   "Overview": {
     "Overview": "نمای کلی"
@@ -2508,7 +2523,7 @@
     "Paired": "جفت شده"
   },
   "Pairing failed": {
-    "Pairing failed": "جفت‌سازی ناموفق"
+    "Pairing failed": "جفت‌سازی ناموفق بود"
   },
   "Pairing...": {
     "Pairing...": "درحال جفت شدن..."
@@ -2610,7 +2625,7 @@
     "Position": "موقعیت"
   },
   "Possible Override Conflicts": {
-    "Possible Override Conflicts": ""
+    "Possible Override Conflicts": "امکان تداخل جایگزین‌ها"
   },
   "Power": {
     "Power": "پاور"
@@ -2652,7 +2667,7 @@
     "Preference": "تنظیمات"
   },
   "Preset Widths (%)": {
-    "Preset Widths (%)": ""
+    "Preset Widths (%)": "عرض‌های از پیش تعیین‌شده (%)"
   },
   "Press key...": {
     "Press key...": "کلید را فشار دهید..."
@@ -2775,7 +2790,7 @@
     "Report": "گزارش"
   },
   "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": {
-    "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": ""
+    "Require holding button/key to confirm power off, restart, suspend, hibernate and logout": "برای تأیید خاموش کردن، راه‌اندازی مجدد، تعلیق، هایبرنیت و خروج، نگه داشتن دکمه/کلید را الزام کن"
   },
   "Requires 'dgop' tool": {
     "Requires 'dgop' tool": "به ابزار 'dgop' نیاز دارد"
@@ -2793,7 +2808,7 @@
     "Reset": "تنظیم مجدد"
   },
   "Reset Position": {
-    "Reset Position": "تنظیم مجدد موقعیت"
+    "Reset Position": "تنظیم مجدد مکان"
   },
   "Reset Size": {
     "Reset Size": "تنظیم مجدد اندازه"
@@ -2813,6 +2828,12 @@
   "Resume": {
     "Resume": "ازسرگیری"
   },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
+  },
   "Revert": {
     "Revert": "برگرداندن"
   },
@@ -2826,19 +2847,19 @@
     "Right Tiling": "تایلینگ راست"
   },
   "Right-click and drag anywhere on the widget": {
-    "Right-click and drag anywhere on the widget": ""
+    "Right-click and drag anywhere on the widget": "راست‌کلیک کرده و بر هر جایی از ابزارک بکشید"
   },
   "Right-click and drag the bottom-right corner": {
-    "Right-click and drag the bottom-right corner": ""
+    "Right-click and drag the bottom-right corner": "راست‌کلیک کرده و گوشه پایین سمت راست را بکشید"
   },
   "Right-click bar widget to cycle": {
-    "Right-click bar widget to cycle": ""
+    "Right-click bar widget to cycle": "برای تغییر چیدمان، روی ابزارک نوار راست‌کلیک کنید"
   },
   "Root Filesystem": {
     "Root Filesystem": "سیستم‌فایل ریشه"
   },
   "Rounded corners for windows": {
-    "Rounded corners for windows": ""
+    "Rounded corners for windows": "گوشه‌های گرد برای پنجره‌ها"
   },
   "Run DMS Templates": {
     "Run DMS Templates": "اجرای قالب‌های DMS"
@@ -2907,10 +2928,10 @@
     "Screen sharing": "اشتراک‌گذاری صفحه"
   },
   "Scroll Wheel": {
-    "Scroll Wheel": ""
+    "Scroll Wheel": "چرخ اسکرول"
   },
   "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": ""
+    "Scroll on widget changes media volume": "اسکرول روی ابزارک، میزان صدای رسانه را تغییر می‌دهد"
   },
   "Scroll song title": {
     "Scroll song title": "حرکت عنوان آهنگ"
@@ -2919,7 +2940,7 @@
     "Scroll title if it doesn't fit in widget": "اگر عنوان در ابزارک جا نشد آن را حرکت بده"
   },
   "Scrolling": {
-    "Scrolling": ""
+    "Scrolling": "اسکرولینگ"
   },
   "Search file contents": {
     "Search file contents": "جستجو در محتوای فایل"
@@ -2967,10 +2988,10 @@
     "Select a color from the palette or use custom sliders": "انتخاب رنگ از پالت رنگی یا اسلایدر‌های سفارشی"
   },
   "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": {
-    "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": ""
+    "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "یک ابزارک برای افزودن به دسکتاپ خود انتخاب کنید. هر ابزارک یک نمونه جداگانه با تنظیمات خاص خود است."
   },
   "Select a widget to add. You can add multiple instances of the same widget if needed.": {
-    "Select a widget to add. You can add multiple instances of the same widget if needed.": ""
+    "Select a widget to add. You can add multiple instances of the same widget if needed.": "یک ابزارک برای افزودن انتخاب کنید. در صورت نیاز می‌توانید چندین نمونه از یک ابزارک را اضافه کنید."
   },
   "Select an image file...": {
     "Select an image file...": "انتخاب فایل تصویر..."
@@ -3000,7 +3021,7 @@
     "Select the palette algorithm used for wallpaper-based colors": "انتخاب الگوریتم پالت رنگی استفاده شده برای رنگ‌های بر اساس تصویر پس‌زمینه"
   },
   "Select which transitions to include in randomization": {
-    "Select which transitions to include in randomization": "انتخاب کنید کدام افکت‌های تغییر در تصادفی‌سازی باشند"
+    "Select which transitions to include in randomization": "انتخاب کنید کدام گذارها در تصادفی‌سازی باشند"
   },
   "Select...": {
     "Select...": "انتخاب..."
@@ -3129,7 +3150,7 @@
     "Show cava audio visualizer in media widget": "نمایش مصورساز صوتی cava در ابزارک رسانه"
   },
   "Show darkened overlay behind modal dialogs": {
-    "Show darkened overlay behind modal dialogs": "نمایش روکش تیره پشت پنجره مودال"
+    "Show darkened overlay behind modal dialogs": "نمایش overlay تیره پشت پنجره مودال"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "overlay لانچر را هنگام تایپ در نمای کلی نیری نمایش بده. برای استفاده از لانچر دیگری غیرفعال کنید."
@@ -3138,7 +3159,7 @@
     "Show on Last Display": "نمایش در آخرین نمایشگر"
   },
   "Show on Overlay": {
-    "Show on Overlay": ""
+    "Show on Overlay": "نمایش بر overlay"
   },
   "Show on Overview": {
     "Show on Overview": "نمایش روی نمای کلی"
@@ -3150,31 +3171,31 @@
     "Show on screens:": "نمایش روی صفحات:"
   },
   "Show on-screen display when brightness changes": {
-    "Show on-screen display when brightness changes": "نمایش OSD هنگام تغییر روشنایی صفحه"
+    "Show on-screen display when brightness changes": "نمایش OSD هنگام تغییر روشنایی"
   },
   "Show on-screen display when caps lock state changes": {
-    "Show on-screen display when caps lock state changes": ""
+    "Show on-screen display when caps lock state changes": "نمایش نمایشگر بر صفحه هنگام تغییر وضعیت قفل حروف بزرگ"
   },
   "Show on-screen display when cycling audio output devices": {
-    "Show on-screen display when cycling audio output devices": ""
+    "Show on-screen display when cycling audio output devices": "نمایش نمایشگر بر صفحه هنگام تغییر دستگاه‌های خروجی صوتی"
   },
   "Show on-screen display when idle inhibitor state changes": {
-    "Show on-screen display when idle inhibitor state changes": ""
+    "Show on-screen display when idle inhibitor state changes": "نمایش نمایشگر بر صفحه هنگام تغیر وضعیت مهارگر بیکاری"
   },
   "Show on-screen display when media player volume changes": {
-    "Show on-screen display when media player volume changes": ""
+    "Show on-screen display when media player volume changes": "نمایش نمایشگر بر صفحه هنگام تغییر حجم صدای پخش‌کننده رسانه"
   },
   "Show on-screen display when microphone is muted/unmuted": {
-    "Show on-screen display when microphone is muted/unmuted": ""
+    "Show on-screen display when microphone is muted/unmuted": "نمایش نمایشگر بر صفحه هنگام بی‌صدا/صدادار شدن میکروفون"
   },
   "Show on-screen display when power profile changes": {
-    "Show on-screen display when power profile changes": ""
+    "Show on-screen display when power profile changes": "نمایش نمایشگر بر صفحه هنگام تغییر پروفایل پاور"
   },
   "Show on-screen display when volume changes": {
-    "Show on-screen display when volume changes": ""
+    "Show on-screen display when volume changes": "نمایش نمایشگر بر صفحه هنگام تغییر حجم صدا"
   },
   "Show only apps running in current workspace": {
-    "Show only apps running in current workspace": "نمایش تنها برنامه‌های درحال اجرا در workspace کنونی"
+    "Show only apps running in current workspace": "تنها برنامه‌های درحال اجرا را در workspace کنونی نمایش بده"
   },
   "Show only workspaces belonging to each specific monitor.": {
     "Show only workspaces belonging to each specific monitor.": "نمایش تنها workspace‌هایی که به هر مانیتور خاص تعلق دارند."
@@ -3237,7 +3258,7 @@
     "Sounds": "صدا‌ها"
   },
   "Space between windows": {
-    "Space between windows": ""
+    "Space between windows": "فاصله بین پنجره‌ها"
   },
   "Spacer": {
     "Spacer": "فاصله دهنده"
@@ -3291,7 +3312,7 @@
     "Sunset": "غروب"
   },
   "Suppress notification popups while enabled": {
-    "Suppress notification popups while enabled": ""
+    "Suppress notification popups while enabled": "هنگام فعال‌ بودن پاپ‌آپ‌های اعلان را مسدود می‌کند"
   },
   "Surface": {
     "Surface": "سطح"
@@ -3348,13 +3369,13 @@
     "CPU, memory, network, and disk monitoring": "ناظر CPU، حافظه، شبکه و دیسک"
   },
   "System monitor widget name | sysmon window title": {
-    "System Monitor": ""
+    "System Monitor": "ناظر سیستم"
   },
   "System notification area icons": {
     "System notification area icons": "آیکون های ناحیه اعلان‌های سیستم"
   },
   "System sounds are not available. Install canberra-gtk-play for sound support.": {
-    "System sounds are not available. Install canberra-gtk-play for sound support.": ""
+    "System sounds are not available. Install canberra-gtk-play for sound support.": "صدا‌های سیستمی در دسترس نیستند. canberra-gtk-play را برای پشتیبانی صدا نصب کنید."
   },
   "System theme toggle": {
     "System theme toggle": "تغییر تم سیستم"
@@ -3387,7 +3408,7 @@
     "Text": "متن"
   },
   "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": {
-    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": ""
+    "The 'dgop' tool is required for system monitoring.\\nPlease install dgop to use this feature.": "ابزار 'dgop' برای نظارت سیستم نیاز است.\\nلطفا dgop را برای استفاده از این قابلیت نصب کنید."
   },
   "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": {
     "The DMS_SOCKET environment variable is not set or the socket is unavailable. Automated plugin management requires the DMS_SOCKET.": "متغیر محیطی DMS_SOCKET تنظیم نشده یا سوکت موجود نیست. مدیریت افزونه خودکار به DMS_SOCKET نیاز دارد."
@@ -3414,7 +3435,7 @@
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "افزونه‌های شخص ثالث توسط کامیونیتی ایجاد شده و به طور رسمی توسط DankMaterialShell پشتیبانی نمی‌شوند.\\n\\nاین افزونه‌ها ممکن است خطرات امنیتی و حریم خصوصی ایجاد کنند - با مسئولیت خودتان نصب کنید."
   },
   "This bind is overridden by config.kdl": {
-    "This bind is overridden by config.kdl": ""
+    "This bind is overridden by config.kdl": "این نگاشت توسط config.kdl بازنویسی شده"
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "این ابزارک از حالت‌های خاموش شدن GPU جلوگیری می‌کند، که ​​می‌تواند به طور قابل توجهی بر عمر باتری لپ‌تاپ‌ها تأثیر بگذارد. استفاده از این ابزارک در لپ‌تاپ‌هایی با گرافیک هیبریدی توصیه نمی‌شود."
@@ -3441,13 +3462,13 @@
     "Timed Out": "زمان تمام شد"
   },
   "Timeout for critical priority notifications": {
-    "Timeout for critical priority notifications": ""
+    "Timeout for critical priority notifications": "مدت نمایش اعلان‌ها با اولویت بحرانی"
   },
   "Timeout for low priority notifications": {
-    "Timeout for low priority notifications": ""
+    "Timeout for low priority notifications": "مدت نمایش اعلان‌ها با اولویت پایین"
   },
   "Timeout for normal priority notifications": {
-    "Timeout for normal priority notifications": ""
+    "Timeout for normal priority notifications": "مدت نمایش اعلان‌ها با اولویت عادی"
   },
   "Title": {
     "Title": "عنوان"
@@ -3459,7 +3480,7 @@
     "To update, run the following command:": "برای بروزرسانی، دستور زیر را اجرا کن:"
   },
   "To use this DMS bind, remove or change the keybind in your config.kdl": {
-    "To use this DMS bind, remove or change the keybind in your config.kdl": ""
+    "To use this DMS bind, remove or change the keybind in your config.kdl": "برای استفاده از این نگاشت DMS، نگاشت کلید را در config.kdl خود حذف کنید یا تغییر دهید"
   },
   "Toast Messages": {
     "Toast Messages": "پیام‌های تًست"
@@ -3468,10 +3489,10 @@
     "Today": "امروز"
   },
   "Toggle visibility of this bar configuration": {
-    "Toggle visibility of this bar configuration": ""
+    "Toggle visibility of this bar configuration": "پیکربندی تغییر نمایش این نوار"
   },
   "Toggling...": {
-    "Toggling...": ""
+    "Toggling...": "در حال تغییر وضعیت..."
   },
   "Tomorrow": {
     "Tomorrow": "فردا"
@@ -3507,7 +3528,7 @@
     "Transform": "تبدیل"
   },
   "Transition Effect": {
-    "Transition Effect": "افکت تغییر"
+    "Transition Effect": "افکت گذار"
   },
   "Transparency": {
     "Transparency": "شفافیت"
@@ -3567,7 +3588,7 @@
     "Update Plugin": "بروزرسانی افزونه"
   },
   "Use 24-hour time format instead of 12-hour AM/PM": {
-    "Use 24-hour time format instead of 12-hour AM/PM": "استفاده از قالب 24 ساعته به جای 12 ساعته AM/PM"
+    "Use 24-hour time format instead of 12-hour AM/PM": "استفاده از قالب 24 ساعته به جای 12 ساعته ق.ظ/ب.ظ"
   },
   "Use Custom Command": {
     "Use Custom Command": "استفاده از دستور سفارشی"
@@ -3597,10 +3618,10 @@
     "Use custom command for update your system": "استفاده از دستور سفارشی برای بروزرسانی سیستم شما"
   },
   "Use custom gaps instead of bar spacing": {
-    "Use custom gaps instead of bar spacing": ""
+    "Use custom gaps instead of bar spacing": "استفاده از فاصله سفارشی به جای فاصله نوار"
   },
   "Use custom window radius instead of theme radius": {
-    "Use custom window radius instead of theme radius": ""
+    "Use custom window radius instead of theme radius": "استفاده از شعاع پنجره سفارشی به جای شعاع تم"
   },
   "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": {
     "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)": "استفاده از اثر انگشت خوان برای احراز هویت صفحه قفل (نیاز به اثر انگشت ثبت شده دارد)"
@@ -3678,13 +3699,13 @@
     "Version": "نسخه"
   },
   "Vertical Deck": {
-    "Vertical Deck": ""
+    "Vertical Deck": "دک عمودی"
   },
   "Vertical Grid": {
     "Vertical Grid": "جدول عمودی"
   },
   "Vertical Scrolling": {
-    "Vertical Scrolling": ""
+    "Vertical Scrolling": "اسکرولینگ عمودی"
   },
   "Vertical Tiling": {
     "Vertical Tiling": "تایلینگ عمودی"
@@ -3787,7 +3808,7 @@
     "Widget Style": "استایل ابزارک"
   },
   "Widget Styling": {
-    "Widget Styling": "استایل ابزارک‌ها"
+    "Widget Styling": "استایل‌‌دهی ابزارک‌"
   },
   "Widget Transparency": {
     "Widget Transparency": "شفافیت ابزارک"
@@ -3796,7 +3817,7 @@
     "Widget Variants": "انواع ابزارک"
   },
   "Widget added": {
-    "Widget added": ""
+    "Widget added": "ابزارک اضافه شد"
   },
   "Widget grid keyboard hints": {
     "G: grid • Z/X: size": "G: جدول • Z/X: اندازه"
@@ -3806,7 +3827,7 @@
     "Grid: ON": "جدول:‌ روشن"
   },
   "Widget removed": {
-    "Widget removed": ""
+    "Widget removed": "ابزارک حذف شد"
   },
   "Wind": {
     "Wind": "باد"
@@ -3815,10 +3836,10 @@
     "Wind Speed": "سرعت باد"
   },
   "Window Corner Radius": {
-    "Window Corner Radius": ""
+    "Window Corner Radius": "شعاع گوشه پنجره‌ها"
   },
   "Window Gaps": {
-    "Window Gaps": ""
+    "Window Gaps": "فاصله پنجره‌ها"
   },
   "Window Gaps (px)": {
     "Window Gaps (px)": "فاصله پنجره‌ها (px)"
@@ -3854,28 +3875,28 @@
     "Yes": "بله"
   },
   "You have unsaved changes. Save before closing this tab?": {
-    "You have unsaved changes. Save before closing this tab?": "شما تغییرات ذخیره نشده‌ دارید. آیا پیش از بستن این برگه ذخیره شود؟"
+    "You have unsaved changes. Save before closing this tab?": "شما تغییرات ذخیره نشده‌ دارید. آیا پیش از بستن این برگه ذخیره شوند؟"
   },
   "You have unsaved changes. Save before continuing?": {
-    "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شود؟"
+    "You have unsaved changes. Save before continuing?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ادامه ذخیره شوند؟"
   },
   "You have unsaved changes. Save before creating a new file?": {
-    "You have unsaved changes. Save before creating a new file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ایجاد فایل جدید، ذخیره شود؟"
+    "You have unsaved changes. Save before creating a new file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از ایجاد فایل جدید، ذخیره شوند؟"
   },
   "You have unsaved changes. Save before opening a file?": {
-    "You have unsaved changes. Save before opening a file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از باز کردن فایل، ذخیره شود؟"
+    "You have unsaved changes. Save before opening a file?": "شما تغییرات ذخیره نشده‌ دارید. پیش از باز کردن فایل، ذخیره شوند؟"
   },
   "apps": {
     "apps": "برنامه"
   },
   "author attribution": {
-    "by %1": ""
+    "by %1": "توسط %1"
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "مرور تم‌ها"
   },
   "catppuccin theme description": {
-    "Soothing pastel theme based on Catppuccin": ""
+    "Soothing pastel theme based on Catppuccin": "تم پاستلی آرامش‌بخش بر اساس Catppuccin"
   },
   "current theme label": {
     "Current Theme: %1": "تم کنونی: %1"
@@ -3899,13 +3920,13 @@
     "dgop not available": "dgop در دسترس نیست"
   },
   "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": {
-    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": ""
+    "dms/binds.kdl exists but is not included in config.kdl. Custom keybinds will not work until this is fixed.": "فایل dms/binds.kdl وجود دارد اما در config.kdl گنجانده نشده است. کلیدهای ترکیبی سفارشی تا زمانی که این مشکل برطرف نشود، کار نخواهند کرد."
   },
   "dms/binds.kdl is now included in config.kdl": {
     "dms/binds.kdl is now included in config.kdl": "dms/binds.kdl اکنون در config.kdl گنجانده شده است"
   },
   "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": {
-    "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": ""
+    "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "پیکربندی dms/outputs وجود دارد اما در پیکربندی کامپوزیتور شما گنجانده نشده است. تغییرات نمایشگر پایدار نخواهند بود."
   },
   "dynamic colors description": {
     "Dynamic colors from wallpaper": "رنگ‌های پویا از تصویر پس‌زمینه"
@@ -3938,13 +3959,13 @@
     "files": "فایل"
   },
   "generic theme description": {
-    "Material Design inspired color themes": ""
+    "Material Design inspired color themes": "رنگ‌های تم الهام گرفته شده از متریال دیزاین"
   },
   "install action button": {
     "Install": "نصب"
   },
   "installation error": {
-    "Install failed: %1": "نصب ناموفق:‌ %1"
+    "Install failed: %1": "نصب ناموفق بود:‌ %1"
   },
   "installation progress": {
     "Installing: %1": "درحال نصب: %1"
@@ -3965,7 +3986,7 @@
     "loginctl not available - lock integration requires DMS socket connection": "loginctl در دسترس نیست - یکپارچه‌سازی قفل به اتصال سوکت DMS نیاز دارد"
   },
   "matugen error": {
-    "matugen not found - install matugen package for dynamic theming": ""
+    "matugen not found - install matugen package for dynamic theming": "matugen یافت نشد - بسته matugen را برای تم پویا نصب کنید"
   },
   "matugen installation hint": {
     "Install matugen package for dynamic theming": "نصب بسته matugen برای تم پویا"
@@ -4004,7 +4025,7 @@
     "Install Plugin": "نصب افزونه"
   },
   "plugin search placeholder": {
-    "Search plugins...": ""
+    "Search plugins...": "جستجوی افزونه‌ها..."
   },
   "profile image file browser title": {
     "Select Profile Image": "انتخاب تصویر نمایه"
@@ -4022,7 +4043,7 @@
     "Widgets": "ابزارک‌ها"
   },
   "source code link": {
-    "source": ""
+    "source": "منبع"
   },
   "sysmon window title": {
     "System Monitor": "ناظر سیستم"
@@ -4037,22 +4058,22 @@
     "Install Theme": "نصب تم"
   },
   "theme search placeholder": {
-    "Search themes...": ""
+    "Search themes...": "جستجوی تم‌ها..."
   },
   "uninstall action button": {
-    "Uninstall": ""
+    "Uninstall": "حذف"
   },
   "uninstallation error": {
-    "Uninstall failed: %1": ""
+    "Uninstall failed: %1": "حذف ناموفق بود: %1"
   },
   "uninstallation progress": {
-    "Uninstalling: %1": ""
+    "Uninstalling: %1": "درحال حذف: %1"
   },
   "uninstallation success": {
-    "Uninstalled: %1": ""
+    "Uninstalled: %1": "حذف شده: %1"
   },
   "unknown author": {
-    "Unknown": ""
+    "Unknown": "ناشناخته"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "DMS را برای یکپارچه‌سازی NM بروز کنید."
@@ -4061,13 +4082,13 @@
     "Select Wallpaper Directory": "انتخاب دایرکتوری تصاویر پس‌زمینه"
   },
   "wallpaper error": {
-    "Wallpaper processing failed - check wallpaper path": ""
+    "Wallpaper processing failed - check wallpaper path": "پردازش تصویر پس‌زمینه ناموفق بود - مسیر تصویر پس‌زمینه را بررسی کنید"
   },
   "wallpaper error status": {
-    "Wallpaper Error": ""
+    "Wallpaper Error": "خطای تصویر پس‌زمینه"
   },
   "wallpaper processing error": {
-    "Wallpaper processing failed": ""
+    "Wallpaper processing failed": "پردازش تصویر پس‌زمینه ناموفق بود"
   },
   "wallpaper settings disable description": {
     "Use an external wallpaper manager like swww, hyprpaper, or swaybg.": "از مدیریت تصویر پس‌زمینه خارجی مانند swww، hyprpaper یا swaybg استفاده کن."

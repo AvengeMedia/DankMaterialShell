@@ -24,10 +24,10 @@
     "%1 printer(s)": "%1 个打印机"
   },
   "%1 variants": {
-    "%1 variants": ""
+    "%1 variants": "%1变体"
   },
   "%1 widgets": {
-    "%1 widgets": "%1 小挂件"
+    "%1 widgets": "%1 部件"
   },
   "(Unnamed)": {
     "(Unnamed)": "(未命名)"
@@ -177,10 +177,10 @@
     "Add Printer": "添加打印机"
   },
   "Add Widget": {
-    "Add Widget": "添加小组件"
+    "Add Widget": "添加部件"
   },
   "Add Widget to %1 Section": {
-    "Add Widget to %1 Section": "将小组件添加到 %1 部分"
+    "Add Widget to %1 Section": "将部件添加到 %1 部分"
   },
   "Add a border around the dock": {
     "Add a border around the dock": "在程序坞周围添加边框"
@@ -477,7 +477,7 @@
     "Bluetooth not available": "蓝牙不可用"
   },
   "Blur Wallpaper Layer": {
-    "Blur Wallpaper Layer": ""
+    "Blur Wallpaper Layer": "模糊壁纸层"
   },
   "Blur on Overview": {
     "Blur on Overview": "在概览中模糊"
@@ -624,7 +624,7 @@
     "Choose icon": "选择图标"
   },
   "Choose the background color for widgets": {
-    "Choose the background color for widgets": "选择小组件背景色"
+    "Choose the background color for widgets": "选择部件背景色"
   },
   "Choose the border accent color": {
     "Choose the border accent color": "选择边框强调色"
@@ -786,10 +786,13 @@
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "为已命名工作区配置图标。当数字和图标同时启用时，图标优先生效。"
   },
   "Configure which displays show shell components": {
-    "Configure which displays show shell components": "配置哪些显示器显示各类组件"
+    "Configure which displays show shell components": "配置哪些显示器显示各类部件"
   },
   "Confirm": {
     "Confirm": "确认"
+  },
+  "Confirm Delete": {
+    "Confirm Delete": ""
   },
   "Confirm Display Changes": {
     "Confirm Display Changes": "确认显示更改"
@@ -1053,7 +1056,7 @@
     "Desktop Widget": "桌面部件"
   },
   "Desktop Widgets": {
-    "Desktop Widgets": "桌面挂件"
+    "Desktop Widgets": "桌面部件"
   },
   "Desktop background images": {
     "Desktop background images": "桌面壁纸"
@@ -1209,10 +1212,13 @@
     "Door Open": "打印机维护口已打开"
   },
   "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": {
-    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "拖动组件以在各区块内重新排序。点击眼睛图标可隐藏/显示组件（保留间距），点击 X 可彻底移除。"
+    "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.": "拖动部件以在各区块内重新排序。点击眼睛图标可隐藏/显示部件（保留间距），点击 X 可彻底移除。"
   },
   "Driver": {
     "Driver": "驱动程序"
+  },
+  "Duplicate": {
+    "Duplicate": ""
   },
   "Duplicate Wallpaper with Blur": {
     "Duplicate Wallpaper with Blur": "带模糊效果的壁纸复本"
@@ -1444,6 +1450,15 @@
   },
   "Failed to move job": {
     "Failed to move job": "移动任务失败"
+  },
+  "Failed to parse plugin_settings.json": {
+    "Failed to parse plugin_settings.json": ""
+  },
+  "Failed to parse session.json": {
+    "Failed to parse session.json": ""
+  },
+  "Failed to parse settings.json": {
+    "Failed to parse settings.json": ""
   },
   "Failed to pause printer": {
     "Failed to pause printer": "无法暂停打印机"
@@ -2130,10 +2145,10 @@
     "Minute": "分钟"
   },
   "Mirror Display": {
-    "Mirror Display": ""
+    "Mirror Display": "镜像显示"
   },
   "Modal Background": {
-    "Modal Background": ""
+    "Modal Background": "模态背景"
   },
   "Mode": {
     "Mode": "模式"
@@ -2166,7 +2181,7 @@
     "Mount": "挂载"
   },
   "Move Widget": {
-    "Move Widget": "移动挂件"
+    "Move Widget": "移动部件"
   },
   "Moving to Paused": {
     "Moving to Paused": "正在暂停打印机"
@@ -2799,7 +2814,7 @@
     "Reset Size": "重置尺寸"
   },
   "Resize Widget": {
-    "Resize Widget": "调整挂件大小"
+    "Resize Widget": "调整部件大小"
   },
   "Resolution & Refresh": {
     "Resolution & Refresh": "分辨率与刷新率"
@@ -2812,6 +2827,12 @@
   },
   "Resume": {
     "Resume": "恢复"
+  },
+  "Reverse Scrolling Direction": {
+    "Reverse Scrolling Direction": ""
+  },
+  "Reverse workspace switch direction when scrolling over the bar": {
+    "Reverse workspace switch direction when scrolling over the bar": ""
   },
   "Revert": {
     "Revert": "恢复: "
@@ -2826,7 +2847,7 @@
     "Right Tiling": "右侧平铺"
   },
   "Right-click and drag anywhere on the widget": {
-    "Right-click and drag anywhere on the widget": "在挂件上右键点击并拖拽任意位置"
+    "Right-click and drag anywhere on the widget": "在部件上右键点击并拖拽任意位置"
   },
   "Right-click and drag the bottom-right corner": {
     "Right-click and drag the bottom-right corner": "右键点击并拖拽右下角"
@@ -2910,13 +2931,13 @@
     "Scroll Wheel": "滚动滚轮"
   },
   "Scroll on widget changes media volume": {
-    "Scroll on widget changes media volume": ""
+    "Scroll on widget changes media volume": "在部件上滚动以调整音量"
   },
   "Scroll song title": {
     "Scroll song title": "滚动歌曲标题"
   },
   "Scroll title if it doesn't fit in widget": {
-    "Scroll title if it doesn't fit in widget": "如果在挂件中标题不适配，则可以滚动标题"
+    "Scroll title if it doesn't fit in widget": "如果在部件中标题不适配，则可以滚动标题"
   },
   "Scrolling": {
     "Scrolling": "滚动"
@@ -2937,7 +2958,7 @@
     "Search plugins...": "搜索插件中..."
   },
   "Search widgets...": {
-    "Search widgets...": "搜索小组件..."
+    "Search widgets...": "搜索部件..."
   },
   "Search...": {
     "Search...": "搜索中..."
@@ -2970,7 +2991,7 @@
     "Select a widget to add to your desktop. Each widget is a separate instance with its own settings.": "选择要添加至桌面的部件。每个部件均为独立实例，拥有自己的设置。"
   },
   "Select a widget to add. You can add multiple instances of the same widget if needed.": {
-    "Select a widget to add. You can add multiple instances of the same widget if needed.": "选择要添加的小组件。如果需要，您可以添加同一小组件的多个实例。"
+    "Select a widget to add. You can add multiple instances of the same widget if needed.": "选择要添加的部件。如果需要，您可以添加同一部件的多个实例。"
   },
   "Select an image file...": {
     "Select an image file...": "选择一张图片..."
@@ -3126,7 +3147,7 @@
     "Show all 9 tags instead of only occupied tags (DWL only)": "显示所有 9 个标签，而非仅占用的标签（仅限 DWL）"
   },
   "Show cava audio visualizer in media widget": {
-    "Show cava audio visualizer in media widget": "在多媒体小组件中显示cava音频可视化"
+    "Show cava audio visualizer in media widget": "在多媒体部件中显示cava音频可视化"
   },
   "Show darkened overlay behind modal dialogs": {
     "Show darkened overlay behind modal dialogs": "在对话框后显示暗色遮罩"
@@ -3138,7 +3159,7 @@
     "Show on Last Display": "上一个显示器"
   },
   "Show on Overlay": {
-    "Show on Overlay": "在概览中显示"
+    "Show on Overlay": "保持前台显示"
   },
   "Show on Overview": {
     "Show on Overview": "概览中显示"
@@ -3417,7 +3438,7 @@
     "This bind is overridden by config.kdl": "此绑定已被 config.kdl 覆盖"
   },
   "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": {
-    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "此组件会阻止 GPU 进入省电状态，可能会显著影响笔记本的电池续航。不建议在配备混合显卡的笔记本上使用。"
+    "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "此部件会阻止 GPU 进入省电状态，可能会显著影响笔记本的电池续航。不建议在配备混合显卡的笔记本上使用。"
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "此操作会清空剪贴板历史，且无法恢复。"
@@ -3696,7 +3717,7 @@
     "Visibility": "能见度"
   },
   "Visual divider between widgets": {
-    "Visual divider between widgets": "组件分隔线"
+    "Visual divider between widgets": "部件分隔线"
   },
   "Visual effect used when wallpaper changes": {
     "Visual effect used when wallpaper changes": "壁纸切换时的动画效果"
@@ -3738,14 +3759,14 @@
     "Weather": "天气"
   },
   "Weather Widget": {
-    "Weather Widget": "天气小组件"
+    "Weather Widget": "天气部件"
   },
   "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": {
     "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.": "启用后，应用按字母顺序排序；禁用则按使用频率排序"
   },
   "When updater widget is used, then hide it if no update found": {
-    "Hide Updater Widget": "隐藏更新器小挂件",
-    "When updater widget is used, then hide it if no update found": "当使用更新器小挂件时，如果找不到更新就隐藏它"
+    "Hide Updater Widget": "隐藏更新器部件",
+    "When updater widget is used, then hide it if no update found": "当使用更新器部件时，如果找不到更新就隐藏它"
   },
   "Wi-Fi Password": {
     "Wi-Fi Password": "Wi-Fi 密码"
@@ -3775,25 +3796,25 @@
     "Wide (BT2020)": "广色域（BT2020）"
   },
   "Widget Background Color": {
-    "Widget Background Color": "小挂件背景色"
+    "Widget Background Color": "部件背景色"
   },
   "Widget Management": {
-    "Widget Management": "小组件管理"
+    "Widget Management": "部件管理"
   },
   "Widget Outline": {
-    "Widget Outline": "小组件轮廓"
+    "Widget Outline": "部件轮廓"
   },
   "Widget Style": {
-    "Widget Style": "小挂件风格"
+    "Widget Style": "部件风格"
   },
   "Widget Styling": {
-    "Widget Styling": "小组件样式"
+    "Widget Styling": "部件样式"
   },
   "Widget Transparency": {
-    "Widget Transparency": "小挂件透明度"
+    "Widget Transparency": "部件透明度"
   },
   "Widget Variants": {
-    "Widget Variants": "挂件变体"
+    "Widget Variants": "部件变体"
   },
   "Widget added": {
     "Widget added": "部件已添加"
@@ -3842,7 +3863,7 @@
     "Workspaces": "工作区"
   },
   "Workspaces & Widgets": {
-    "Workspaces & Widgets": "工作区与小组件"
+    "Workspaces & Widgets": "工作区与部件"
   },
   "X Axis": {
     "X Axis": "X轴"
@@ -4019,7 +4040,7 @@
     "Settings": "设置"
   },
   "settings_displays": {
-    "Widgets": "挂件"
+    "Widgets": "部件"
   },
   "source code link": {
     "source": "源"

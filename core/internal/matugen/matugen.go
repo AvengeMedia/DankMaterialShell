@@ -234,61 +234,61 @@ output_path = '%s'
 	if !opts.ShouldSkipTemplate("gtk") {
 		switch opts.Mode {
 		case "light":
-			appendConfig(opts, cfgFile, "skip", "gtk3-light.toml")
+			appendConfig(opts, cfgFile, nil, "gtk3-light.toml")
 		default:
-			appendConfig(opts, cfgFile, "skip", "gtk3-dark.toml")
+			appendConfig(opts, cfgFile, nil, "gtk3-dark.toml")
 		}
 	}
 
 	if !opts.ShouldSkipTemplate("niri") {
-		appendConfig(opts, cfgFile, "niri", "niri.toml")
+		appendConfig(opts, cfgFile, []string{"niri"}, "niri.toml")
 	}
 	if !opts.ShouldSkipTemplate("qt5ct") {
-		appendConfig(opts, cfgFile, "qt5ct", "qt5ct.toml")
+		appendConfig(opts, cfgFile, []string{"qt5ct"}, "qt5ct.toml")
 	}
 	if !opts.ShouldSkipTemplate("qt6ct") {
-		appendConfig(opts, cfgFile, "qt6ct", "qt6ct.toml")
+		appendConfig(opts, cfgFile, []string{"qt6ct"}, "qt6ct.toml")
 	}
 	if !opts.ShouldSkipTemplate("firefox") {
-		appendConfig(opts, cfgFile, "firefox", "firefox.toml")
+		appendConfig(opts, cfgFile, []string{"firefox"}, "firefox.toml")
 	}
 	if !opts.ShouldSkipTemplate("pywalfox") {
-		appendConfig(opts, cfgFile, "pywalfox", "pywalfox.toml")
+		appendConfig(opts, cfgFile, []string{"pywalfox"}, "pywalfox.toml")
 	}
 	if !opts.ShouldSkipTemplate("zenbrowser") {
-		appendConfig(opts, cfgFile, "zen", "zenbrowser.toml")
+		appendConfig(opts, cfgFile, []string{"zen", "zen-browser"}, "zenbrowser.toml")
 	}
 	if !opts.ShouldSkipTemplate("vesktop") {
-		appendConfig(opts, cfgFile, "vesktop", "vesktop.toml")
+		appendConfig(opts, cfgFile, []string{"vesktop"}, "vesktop.toml")
 	}
 	if !opts.ShouldSkipTemplate("equibop") {
-		appendConfig(opts, cfgFile, "equibop", "equibop.toml")
+		appendConfig(opts, cfgFile, []string{"equibop"}, "equibop.toml")
 	}
 	if !opts.ShouldSkipTemplate("ghostty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "ghostty", "ghostty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"ghostty"}, "ghostty.toml")
 	}
 	if !opts.ShouldSkipTemplate("kitty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "kitty", "kitty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"kitty"}, "kitty.toml")
 	}
 	if !opts.ShouldSkipTemplate("foot") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "foot", "foot.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"foot"}, "foot.toml")
 	}
 	if !opts.ShouldSkipTemplate("alacritty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "alacritty", "alacritty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"alacritty"}, "alacritty.toml")
 	}
 	if !opts.ShouldSkipTemplate("wezterm") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "wezterm", "wezterm.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"wezterm"}, "wezterm.toml")
 	}
 	if !opts.ShouldSkipTemplate("nvim") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, "nvim", "neovim.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"nvim"}, "neovim.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("dgop") {
-		appendConfig(opts, cfgFile, "dgop", "dgop.toml")
+		appendConfig(opts, cfgFile, []string{"dgop"}, "dgop.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("kcolorscheme") {
-		appendConfig(opts, cfgFile, "skip", "kcolorscheme.toml")
+		appendConfig(opts, cfgFile, nil, "kcolorscheme.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("vscode") {
@@ -326,12 +326,12 @@ output_path = '%s'
 	return nil
 }
 
-func appendConfig(opts *Options, cfgFile *os.File, checkCmd, fileName string) {
+func appendConfig(opts *Options, cfgFile *os.File, checkCmd []string, fileName string) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if checkCmd != "skip" && !utils.CommandExists(checkCmd) {
+	if !utils.AnyCommandExists(checkCmd...) {
 		return
 	}
 	data, err := os.ReadFile(configPath)
@@ -342,12 +342,12 @@ func appendConfig(opts *Options, cfgFile *os.File, checkCmd, fileName string) {
 	cfgFile.WriteString("\n")
 }
 
-func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir, checkCmd, fileName string) {
+func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkCmd []string, fileName string) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if checkCmd != "skip" && !utils.CommandExists(checkCmd) {
+	if !utils.AnyCommandExists(checkCmd...) {
 		return
 	}
 	data, err := os.ReadFile(configPath)

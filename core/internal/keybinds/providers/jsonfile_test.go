@@ -12,7 +12,7 @@ func TestNewJSONFileProvider(t *testing.T) {
 	tmpDir := t.TempDir()
 	testFile := filepath.Join(tmpDir, "test.json")
 
-	if err := os.WriteFile(testFile, []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("{}"), 0o644); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
@@ -81,7 +81,7 @@ func TestJSONFileProviderGetCheatSheet(t *testing.T) {
   }
 }`
 
-	if err := os.WriteFile(testFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte(content), 0o644); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 
@@ -135,7 +135,7 @@ func TestJSONFileProviderGetCheatSheetNoProvider(t *testing.T) {
   "binds": {}
 }`
 
-	if err := os.WriteFile(testFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte(content), 0o644); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 
@@ -181,7 +181,7 @@ func TestJSONFileProviderFlatArrayBackwardsCompat(t *testing.T) {
   ]
 }`
 
-	if err := os.WriteFile(testFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte(content), 0o644); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 
@@ -216,7 +216,7 @@ func TestJSONFileProviderInvalidJSON(t *testing.T) {
 	tmpDir := t.TempDir()
 	testFile := filepath.Join(tmpDir, "invalid.json")
 
-	if err := os.WriteFile(testFile, []byte("not valid json"), 0644); err != nil {
+	if err := os.WriteFile(testFile, []byte("not valid json"), 0o644); err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
 

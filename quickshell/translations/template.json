@@ -1883,6 +1883,13 @@
     "comment": ""
   },
   {
+    "term": "Confirm Delete",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Confirm Display Changes",
     "translation": "",
     "context": "",
@@ -2877,6 +2884,13 @@
     "comment": ""
   },
   {
+    "term": "Duplicate",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Duplicate Wallpaper with Blur",
     "translation": "",
     "context": "",
@@ -3375,6 +3389,27 @@
   },
   {
     "term": "Failed to move job",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to parse plugin_settings.json",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to parse session.json",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Failed to parse settings.json",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6707,6 +6742,20 @@
   },
   {
     "term": "Resume",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reverse Scrolling Direction",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Reverse workspace switch direction when scrolling over the bar",
     "translation": "",
     "context": "",
     "reference": "",
