@@ -25,6 +25,8 @@ Singleton {
     property var powerUnplugSound: null
     property var normalNotificationSound: null
     property var criticalNotificationSound: null
+    property real notificationsVolume: 1.0
+    property bool notificationsAudioMuted: false
 
     property var mediaDevices: null
     property var mediaDevicesConnections: null
@@ -343,7 +345,7 @@ Singleton {
                 MediaPlayer {
                     source: "${volumeChangePath}"
                     audioOutput: AudioOutput {
-                        ${deviceProperty}volume: 1.0
+                        ${deviceProperty}volume: notificationsVolume
                     }
                 }
             `, root, "AudioService.VolumeChangeSound");
@@ -355,7 +357,7 @@ Singleton {
                 MediaPlayer {
                     source: "${powerPlugPath}"
                     audioOutput: AudioOutput {
-                        ${deviceProperty}volume: 1.0
+                        ${deviceProperty}volume: notificationsVolume
                     }
                 }
             `, root, "AudioService.PowerPlugSound");
@@ -367,7 +369,7 @@ Singleton {
                 MediaPlayer {
                     source: "${powerUnplugPath}"
                     audioOutput: AudioOutput {
-                        ${deviceProperty}volume: 1.0
+                        ${deviceProperty}volume: notificationsVolume
                     }
                 }
             `, root, "AudioService.PowerUnplugSound");
@@ -379,7 +381,7 @@ Singleton {
                 MediaPlayer {
                     source: "${messagePath}"
                     audioOutput: AudioOutput {
-                        ${deviceProperty}volume: 1.0
+                        ${deviceProperty}volume: notificationsVolume
                     }
                 }
             `, root, "AudioService.NormalNotificationSound");
@@ -391,7 +393,7 @@ Singleton {
                 MediaPlayer {
                     source: "${messageNewInstantPath}"
                     audioOutput: AudioOutput {
-                        ${deviceProperty}volume: 1.0
+                        ${deviceProperty}volume: notificationsVolume
                     }
                 }
             `, root, "AudioService.CriticalNotificationSound");
@@ -401,37 +403,37 @@ Singleton {
     }
 
     function playVolumeChangeSound() {
-        if (soundsAvailable && volumeChangeSound) {
+        if (soundsAvailable && volumeChangeSound && !notificationsAudioMuted) {
             volumeChangeSound.play();
         }
     }
 
     function playPowerPlugSound() {
-        if (soundsAvailable && powerPlugSound) {
+        if (soundsAvailable && powerPlugSound && !notificationsAudioMuted) {
             powerPlugSound.play();
         }
     }
 
     function playPowerUnplugSound() {
-        if (soundsAvailable && powerUnplugSound) {
+        if (soundsAvailable && powerUnplugSound && !notificationsAudioMuted) {
             powerUnplugSound.play();
         }
     }
 
     function playNormalNotificationSound() {
-        if (soundsAvailable && normalNotificationSound && !SessionData.doNotDisturb) {
+        if (soundsAvailable && normalNotificationSound && !SessionData.doNotDisturb && !notificationsAudioMuted) {
             normalNotificationSound.play();
         }
     }
 
     function playCriticalNotificationSound() {
-        if (soundsAvailable && criticalNotificationSound && !SessionData.doNotDisturb) {
+        if (soundsAvailable && criticalNotificationSound && !SessionData.doNotDisturb && !notificationsAudioMuted) {
             criticalNotificationSound.play();
         }
     }
 
     function playVolumeChangeSoundIfEnabled() {
-        if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged) {
+        if (SettingsData.soundsEnabled && SettingsData.soundVolumeChanged && !notificationsAudioMuted) {
             playVolumeChangeSound();
         }
     }
