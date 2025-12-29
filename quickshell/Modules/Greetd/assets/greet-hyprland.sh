@@ -9,8 +9,7 @@ CURRENT_VERSION=$(hyprctl version | grep "Tag:" | awk '{print $2}' | tr -d 'v,')
 MINIMUM_VERSION="0.53.0"
 
 if [ "$(printf '%s\n%s' "$MINIMUM_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" = "$MINIMUM_VERSION" ]; then
-    exec start-hyprland -- --config /etc/greetd/dms-hypr.conf
-    # Tu comando aquí
+    exec start-hyprland -- -c /etc/greetd/dms-hypr.conf
 else
     exec Hyprland -c /etc/greetd/dms-hypr.conf
 fi
