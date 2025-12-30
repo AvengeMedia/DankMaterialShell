@@ -666,9 +666,10 @@ PanelWindow {
                         propagateComposedEvents: true
                         z: -1
 
-                        property real scrollAccumulatorY: 0
-                        property real scrollAccumulatorX: 0
-                        property real touchpadThreshold: 500
+                        property real touchpadAccumulatorY: 0
+                        property real touchpadAccumulatorX: 0
+                        property real mouseAccumulatorY: 0
+                        property real mouseAccumulatorX: 0
                         property bool actionInProgress: false
 
                         Timer {
@@ -696,44 +697,39 @@ PanelWindow {
                         }
 
                         onWheel: wheel => {
-                            if (!(barConfig?.scrollEnabled ?? true)) {
-                                wheel.accepted = false;
-                                return;
-                            }
-
-                            if (actionInProgress) {
+                            if (!(barConfig?.scrollEnabled ?? true) || actionInProgress) {
                                 wheel.accepted = false;
                                 return;
                             }
 
                             const deltaY = wheel.angleDelta.y;
                             const deltaX = wheel.angleDelta.x;
-                            const hasPixelY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
-                            const hasPixelX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
+                            const isTouchpadY = wheel.pixelDelta && wheel.pixelDelta.y !== 0;
+                            const isTouchpadX = wheel.pixelDelta && wheel.pixelDelta.x !== 0;
                             const xBehavior = barConfig?.scrollXBehavior ?? "column";
                             const yBehavior = barConfig?.scrollYBehavior ?? "workspace";
+                            const reverse = SettingsData.reverseScrolling ? -1 : 1;
 
                             if (CompositorService.isNiri && xBehavior !== "none" && Math.abs(deltaX) > Math.abs(deltaY)) {
-                                const isTraditionalMouse = !hasPixelX && Math.abs(deltaX) >= 120 && (Math.abs(deltaX) % 120) === 0;
-                                const isHighDpiMouse = !hasPixelX && !isTraditionalMouse && deltaX !== 0;
-                                const reverse = SettingsData.reverseScrolling ? -1 : 1;
-                                const direction = deltaX * reverse < 0 ? 1 : -1;
-
-                                if (isTraditionalMouse || isHighDpiMouse) {
-                                    if (handleScrollAction(xBehavior, direction)) {
-                                        actionInProgress = true;
-                                        cooldownTimer.restart();
-                                        scrollAccumulatorX = 0;
-                                    }
-                                } else {
-                                    scrollAccumulatorX += deltaX;
-                                    if (Math.abs(scrollAccumulatorX) >= touchpadThreshold) {
-                                        const touchDirection = scrollAccumulatorX < 0 ? 1 : -1;
-                                        if (handleScrollAction(xBehavior, touchDirection)) {
+                                if (isTouchpadX) {
+                                    touchpadAccumulatorX += deltaX;
+                                    if (Math.abs(touchpadAccumulatorX) >= 500) {
+                                        const direction = touchpadAccumulatorX * reverse < 0 ? 1 : -1;
+                                        if (handleScrollAction(xBehavior, direction)) {
                                             actionInProgress = true;
                                             cooldownTimer.restart();
                                         }
-                                        scrollAccumulatorX = 0;
+                                        touchpadAccumulatorX = 0;
+                                    }
+                                } else {
+                                    mouseAccumulatorX += deltaX;
+                                    if (Math.abs(mouseAccumulatorX) >= 120) {
+                                        const direction = mouseAccumulatorX * reverse < 0 ? 1 : -1;
+                                        if (handleScrollAction(xBehavior, direction)) {
+                                            actionInProgress = true;
+                                            cooldownTimer.restart();
+                                        }
+                                        mouseAccumulatorX = 0;
                                     }
                                 }
                                 wheel.accepted = false;
@@ -745,26 +741,25 @@ PanelWindow {
                                 return;
                             }
 
-                            const isTraditionalMouse = !hasPixelY && Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
-                            const isHighDpiMouse = !hasPixelY && !isTraditionalMouse && deltaY !== 0;
-                            const reverse = SettingsData.reverseScrolling ? -1 : 1;
-                            const direction = deltaY * reverse < 0 ? 1 : -1;
-
-                            if (isTraditionalMouse || isHighDpiMouse) {
-                                if (handleScrollAction(yBehavior, direction)) {
-                                    actionInProgress = true;
-                                    cooldownTimer.restart();
-                                    scrollAccumulatorY = 0;
-                                }
-                            } else {
-                                scrollAccumulatorY += deltaY;
-                                if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
-                                    const touchDirection = scrollAccumulatorY < 0 ? 1 : -1;
-                                    if (handleScrollAction(yBehavior, touchDirection)) {
+                            if (isTouchpadY) {
+                                touchpadAccumulatorY += deltaY;
+                                if (Math.abs(touchpadAccumulatorY) >= 500) {
+                                    const direction = touchpadAccumulatorY * reverse < 0 ? 1 : -1;
+                                    if (handleScrollAction(yBehavior, direction)) {
                                         actionInProgress = true;
                                         cooldownTimer.restart();
                                     }
-                                    scrollAccumulatorY = 0;
+                                    touchpadAccumulatorY = 0;
+                                }
+                            } else {
+                                mouseAccumulatorY += deltaY;
+                                if (Math.abs(mouseAccumulatorY) >= 120) {
+                                    const direction = mouseAccumulatorY * reverse < 0 ? 1 : -1;
+                                    if (handleScrollAction(yBehavior, direction)) {
+                                        actionInProgress = true;
+                                        cooldownTimer.restart();
+                                    }
+                                    mouseAccumulatorY = 0;
                                 }
                             }
 
