@@ -13,4 +13,3 @@ if [ "$(printf '%s\n%s' "$MINIMUM_VERSION" "$CURRENT_VERSION" | sort -V | head -
 else
     exec Hyprland -c /etc/greetd/dms-hypr.conf
 fi
-
