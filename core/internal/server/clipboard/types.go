@@ -18,9 +18,7 @@ type Config struct {
 	MaxEntrySize   int64 `json:"maxEntrySize"`
 	AutoClearDays  int   `json:"autoClearDays"`
 	ClearAtStartup bool  `json:"clearAtStartup"`
-
-	Disabled       bool `json:"disabled"`
-	DisableHistory bool `json:"disableHistory"`
+	Disabled       bool  `json:"disabled"`
 }
 
 func DefaultConfig() Config {

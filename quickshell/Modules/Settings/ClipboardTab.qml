@@ -326,22 +326,12 @@ Item {
 
                 SettingsToggleRow {
                     tab: "clipboard"
-                    tags: ["clipboard", "disable", "manager"]
-                    settingKey: "disabled"
-                    text: I18n.tr("Disable Clipboard Manager")
-                    description: I18n.tr("Disable clipboard manager entirely (requires restart)")
-                    checked: root.config.disabled ?? false
-                    onToggled: checked => root.saveConfig("disabled", checked)
-                }
-
-                SettingsToggleRow {
-                    tab: "clipboard"
                     tags: ["clipboard", "disable", "history"]
-                    settingKey: "disableHistory"
+                    settingKey: "disabled"
                     text: I18n.tr("Disable History Persistence")
                     description: I18n.tr("Clipboard works but nothing saved to disk")
-                    checked: root.config.disableHistory ?? false
-                    onToggled: checked => root.saveConfig("disableHistory", checked)
+                    checked: root.config.disabled ?? false
+                    onToggled: checked => root.saveConfig("disabled", checked)
                 }
             }
         }

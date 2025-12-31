@@ -524,8 +524,11 @@ PanelWindow {
         }
 
         property bool reveal: {
-            const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
+            const inOverviewWithShow = CompositorService.isNiri && NiriService.inOverview && (barConfig?.openOnOverview ?? false);
+            if (inOverviewWithShow)
+                return true;
 
+            const showOnWindowsSetting = barConfig?.showOnWindowsOpen ?? false;
             if (showOnWindowsSetting && autoHide && (CompositorService.isNiri || CompositorService.isHyprland)) {
                 if (barWindow.shouldHideForWindows)
                     return topBarMouseArea.containsMouse || hasActivePopout || revealSticky;
@@ -533,7 +536,7 @@ PanelWindow {
             }
 
             if (CompositorService.isNiri && NiriService.inOverview)
-                return (barConfig?.openOnOverview ?? false) || topBarMouseArea.containsMouse || hasActivePopout || revealSticky;
+                return topBarMouseArea.containsMouse || hasActivePopout || revealSticky;
 
             return (barConfig?.visible ?? true) && (!autoHide || topBarMouseArea.containsMouse || hasActivePopout || revealSticky);
         }

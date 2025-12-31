@@ -1,7 +1,7 @@
-import QtQuick
-import Quickshell
 pragma Singleton
 pragma ComponentBehavior: Bound
+import QtQuick
+import Quickshell
 
 Singleton {
     id: root
@@ -11,6 +11,7 @@ Singleton {
     property string usernameInput: ""
     property bool showPasswordInput: false
     property string selectedSession: ""
+    property string selectedSessionPath: ""
     property string pamState: ""
     property bool unlocking: false
 
@@ -20,10 +21,10 @@ Singleton {
     property int currentSessionIndex: 0
 
     function reset() {
-        showPasswordInput = false
-        username = ""
-        usernameInput = ""
-        passwordBuffer = ""
-        pamState = ""
+        showPasswordInput = false;
+        username = "";
+        usernameInput = "";
+        passwordBuffer = "";
+        pamState = "";
     }
 }

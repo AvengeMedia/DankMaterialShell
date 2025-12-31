@@ -6678,6 +6678,18 @@
     "comment": ""
   },
   {
+    "term": "Smartcard Authentication",
+    "context": "Smartcard Authentication",
+    "reference": "Modals/WifiPasswordModal.qml:272",
+    "comment": ""
+  },
+  {
+    "term": "Smartcard PIN",
+    "context": "Smartcard PIN",
+    "reference": "Modals/WifiPasswordModal.qml:194",
+    "comment": ""
+  },
+  {
     "term": "Some plugins require a newer version of DMS:",
     "context": "Some plugins require a newer version of DMS:",
     "reference": "Modules/Settings/PluginsTab.qml:167",

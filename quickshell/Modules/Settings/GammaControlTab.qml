@@ -2,6 +2,7 @@ import QtQuick
 import qs.Common
 import qs.Services
 import qs.Widgets
+import qs.Modules.Settings.Widgets
 
 Item {
     id: root
@@ -96,47 +97,39 @@ Item {
                         rightPadding: Theme.spacingM
                         visible: DisplayService.gammaControlAvailable
 
-                        DankDropdown {
+                        SettingsSliderRow {
+                            id: nightTempSlider
+                            settingKey: "nightModeTemperature"
+                            tags: ["gamma", "night", "temperature", "kelvin", "warm", "color", "blue light"]
                             width: parent.width - parent.leftPadding - parent.rightPadding
                             text: SessionData.nightModeAutoEnabled ? I18n.tr("Night Temperature") : I18n.tr("Color Temperature")
                             description: SessionData.nightModeAutoEnabled ? I18n.tr("Color temperature for night mode") : I18n.tr("Warm color temperature to apply")
-                            currentValue: SessionData.nightModeTemperature + "K"
-                            options: {
-                                var temps = [];
-                                for (var i = 2500; i <= 6000; i += 500) {
-                                    temps.push(i + "K");
-                                }
-                                return temps;
-                            }
-                            onValueChanged: value => {
-                                var temp = parseInt(value.replace("K", ""));
-                                SessionData.setNightModeTemperature(temp);
-                                if (SessionData.nightModeHighTemperature < temp) {
-                                    SessionData.setNightModeHighTemperature(temp);
-                                }
+                            minimum: 2500
+                            maximum: 6000
+                            step: 100
+                            unit: "K"
+                            value: SessionData.nightModeTemperature
+                            onSliderValueChanged: newValue => {
+                                SessionData.setNightModeTemperature(newValue);
+                                if (SessionData.nightModeHighTemperature < newValue)
+                                    SessionData.setNightModeHighTemperature(newValue);
                             }
                         }
 
-                        DankDropdown {
+                        SettingsSliderRow {
+                            id: dayTempSlider
+                            settingKey: "nightModeHighTemperature"
+                            tags: ["gamma", "day", "temperature", "kelvin", "color"]
                             width: parent.width - parent.leftPadding - parent.rightPadding
                             text: I18n.tr("Day Temperature")
                             description: I18n.tr("Color temperature for day time")
-                            currentValue: SessionData.nightModeHighTemperature + "K"
+                            minimum: SessionData.nightModeTemperature
+                            maximum: 10000
+                            step: 100
+                            unit: "K"
+                            value: Math.max(SessionData.nightModeHighTemperature, SessionData.nightModeTemperature)
                             visible: SessionData.nightModeAutoEnabled
-                            options: {
-                                var temps = [];
-                                var minTemp = SessionData.nightModeTemperature;
-                                for (var i = Math.max(2500, minTemp); i <= 10000; i += 500) {
-                                    temps.push(i + "K");
-                                }
-                                return temps;
-                            }
-                            onValueChanged: value => {
-                                var temp = parseInt(value.replace("K", ""));
-                                if (temp >= SessionData.nightModeTemperature) {
-                                    SessionData.setNightModeHighTemperature(temp);
-                                }
-                            }
+                            onSliderValueChanged: newValue => SessionData.setNightModeHighTemperature(newValue)
                         }
                     }
 

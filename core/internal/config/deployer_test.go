@@ -462,7 +462,7 @@ func TestHyprlandConfigStructure(t *testing.T) {
 	assert.Contains(t, HyprlandConfig, "# KEYBINDINGS")
 	assert.Contains(t, HyprlandConfig, "bind = $mod, T, exec, {{TERMINAL_COMMAND}}")
 	assert.Contains(t, HyprlandConfig, "bind = $mod, space, exec, dms ipc call spotlight toggle")
-	assert.Contains(t, HyprlandConfig, "windowrulev2 = noborder, class:^(com\\.mitchellh\\.ghostty)$")
+	assert.Contains(t, HyprlandConfig, "windowrule = border_size 0, match:class ^(com\\.mitchellh\\.ghostty)$")
 }
 
 func TestGhosttyConfigStructure(t *testing.T) {

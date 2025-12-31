@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import qs.Common
 import qs.Widgets
 
@@ -9,6 +8,7 @@ Item {
     property int value: 50
     property int minimum: 0
     property int maximum: 100
+    property int step: 1
     property string leftIcon: ""
     property string rightIcon: ""
     property bool enabled: true
@@ -29,11 +29,13 @@ Item {
     height: 48
 
     function updateValueFromPosition(x) {
-        let ratio = Math.max(0, Math.min(1, (x - sliderHandle.width / 2) / (sliderTrack.width - sliderHandle.width)))
-        let newValue = Math.round(minimum + ratio * (maximum - minimum))
+        let ratio = Math.max(0, Math.min(1, (x - sliderHandle.width / 2) / (sliderTrack.width - sliderHandle.width)));
+        let rawValue = minimum + ratio * (maximum - minimum);
+        let newValue = step > 1 ? Math.round(rawValue / step) * step : Math.round(rawValue);
+        newValue = Math.max(minimum, Math.min(maximum, newValue));
         if (newValue !== value) {
-            value = newValue
-            sliderValueChanged(newValue)
+            value = newValue;
+            sliderValueChanged(newValue);
         }
     }
 
@@ -68,13 +70,12 @@ Item {
                 height: parent.height
                 radius: Theme.cornerRadius
                 width: {
-                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum)
-                    const travel = sliderTrack.width - sliderHandle.width
-                    const center = (travel * ratio) + sliderHandle.width / 2
-                    return Math.max(0, Math.min(sliderTrack.width, center))
+                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum);
+                    const travel = sliderTrack.width - sliderHandle.width;
+                    const center = (travel * ratio) + sliderHandle.width / 2;
+                    return Math.max(0, Math.min(sliderTrack.width, center));
                 }
                 color: slider.enabled ? Theme.primary : Theme.withAlpha(Theme.onSurface, 0.12)
-
             }
 
             StyledRect {
@@ -86,15 +87,14 @@ Item {
                 height: 24
                 radius: Theme.cornerRadius
                 x: {
-                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum)
-                    const travel = sliderTrack.width - width
-                    return Math.max(0, Math.min(travel, travel * ratio))
+                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum);
+                    const travel = sliderTrack.width - width;
+                    return Math.max(0, Math.min(travel, travel * ratio));
                 }
                 anchors.verticalCenter: parent.verticalCenter
                 color: slider.enabled ? Theme.primary : Theme.withAlpha(Theme.onSurface, 0.12)
                 border.width: 3
                 border.color: slider.thumbOutlineColor
-
 
                 StyledRect {
                     anchors.fill: parent
@@ -126,10 +126,10 @@ Item {
                     opacity: 0
 
                     function start() {
-                        opacity = 0.16
-                        width = 0
-                        height = 0
-                        rippleAnimation.start()
+                        opacity = 0.16;
+                        width = 0;
+                        height = 0;
+                        rippleAnimation.start();
                     }
 
                     SequentialAnimation {
@@ -153,11 +153,10 @@ Item {
                     acceptedButtons: Qt.LeftButton
                     onPressedChanged: {
                         if (pressed && slider.enabled) {
-                            ripple.start()
+                            ripple.start();
                         }
                     }
                 }
-
 
                 scale: active ? 1.05 : 1.0
 
@@ -188,43 +187,45 @@ Item {
                     preventStealing: true
                     acceptedButtons: Qt.LeftButton
                     onWheel: wheelEvent => {
-                                 if (!slider.wheelEnabled) {
-                                     wheelEvent.accepted = false
-                                     return
-                                 }
-                                 let step = Math.max(0.5, (maximum - minimum) / 100)
-                                 let newValue = wheelEvent.angleDelta.y > 0 ? Math.min(maximum, value + step) : Math.max(minimum, value - step)
-                                 newValue = Math.round(newValue)
-                                 if (newValue !== value) {
-                                     value = newValue
-                                     sliderValueChanged(newValue)
-                                 }
-                                 wheelEvent.accepted = true
-                             }
+                        if (!slider.wheelEnabled) {
+                            wheelEvent.accepted = false;
+                            return;
+                        }
+                        let wheelStep = slider.step > 1 ? slider.step : Math.max(1, (maximum - minimum) / 100);
+                        let newValue = wheelEvent.angleDelta.y > 0 ? Math.min(maximum, value + wheelStep) : Math.max(minimum, value - wheelStep);
+                        if (slider.step > 1)
+                            newValue = Math.round(newValue / slider.step) * slider.step;
+                        newValue = Math.round(newValue);
+                        if (newValue !== value) {
+                            value = newValue;
+                            sliderValueChanged(newValue);
+                        }
+                        wheelEvent.accepted = true;
+                    }
                     onPressed: mouse => {
-                                   if (slider.enabled) {
-                                       slider.isDragging = true
-                                       sliderMouseArea.isDragging = true
-                                       updateValueFromPosition(mouse.x)
-                                   }
-                               }
+                        if (slider.enabled) {
+                            slider.isDragging = true;
+                            sliderMouseArea.isDragging = true;
+                            updateValueFromPosition(mouse.x);
+                        }
+                    }
                     onReleased: {
                         if (slider.enabled) {
-                            slider.isDragging = false
-                            sliderMouseArea.isDragging = false
-                            slider.sliderDragFinished(slider.value)
+                            slider.isDragging = false;
+                            sliderMouseArea.isDragging = false;
+                            slider.sliderDragFinished(slider.value);
                         }
                     }
                     onPositionChanged: mouse => {
-                                           if (pressed && slider.isDragging && slider.enabled) {
-                                               updateValueFromPosition(mouse.x)
-                                           }
-                                       }
+                        if (pressed && slider.isDragging && slider.enabled) {
+                            updateValueFromPosition(mouse.x);
+                        }
+                    }
                     onClicked: mouse => {
-                                   if (slider.enabled && !slider.isDragging) {
-                                       updateValueFromPosition(mouse.x)
-                                   }
-                               }
+                        if (slider.enabled && !slider.isDragging) {
+                            updateValueFromPosition(mouse.x);
+                        }
+                    }
                 }
             }
 
@@ -239,7 +240,7 @@ Item {
                 border.width: 1
                 anchors.bottom: parent.top
                 anchors.bottomMargin: Theme.spacingM
-                x: Math.max(0, Math.min(parent.width - width, sliderHandle.x + sliderHandle.width/2 - width/2))
+                x: Math.max(0, Math.min(parent.width - width, sliderHandle.x + sliderHandle.width / 2 - width / 2))
                 visible: slider.alwaysShowValue ? slider.showValue : ((sliderMouseArea.containsMouse && slider.showValue) || (slider.isDragging && slider.showValue))
                 opacity: visible ? 1 : 0
 

@@ -2,6 +2,7 @@ import QtCore
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
@@ -54,10 +55,8 @@ Item {
         pickRandomFact();
         initWeatherService();
 
-        if (isPrimaryScreen) {
-            sessionListProc.running = true;
+        if (isPrimaryScreen)
             applyLastSuccessfulUser();
-        }
 
         if (CompositorService.isHyprland)
             updateHyprlandLayout();
@@ -1030,130 +1029,146 @@ Item {
                 alignPopupRight: true
                 onValueChanged: value => {
                     const idx = GreeterState.sessionList.indexOf(value);
-                    if (idx >= 0) {
-                        GreeterState.currentSessionIndex = idx;
-                        GreeterState.selectedSession = GreeterState.sessionExecs[idx];
-                        GreetdMemory.setLastSessionId(GreeterState.sessionPaths[idx]);
-                    }
+                    if (idx < 0)
+                        return;
+                    GreeterState.currentSessionIndex = idx;
+                    GreeterState.selectedSession = GreeterState.sessionExecs[idx];
+                    GreeterState.selectedSessionPath = GreeterState.sessionPaths[idx];
                 }
             }
         }
     }
 
     property string currentSessionName: GreeterState.sessionList[GreeterState.currentSessionIndex] || ""
-    property int pendingParsers: 0
 
     function finalizeSessionSelection() {
-        if (GreeterState.sessionList.length === 0) {
+        if (GreeterState.sessionList.length === 0)
             return;
-        }
 
         const savedSession = GreetdMemory.lastSessionId;
-        let foundSaved = false;
         if (savedSession) {
             for (var i = 0; i < GreeterState.sessionPaths.length; i++) {
                 if (GreeterState.sessionPaths[i] === savedSession) {
                     GreeterState.currentSessionIndex = i;
-                    foundSaved = true;
-                    break;
+                    GreeterState.selectedSession = GreeterState.sessionExecs[i] || "";
+                    GreeterState.selectedSessionPath = GreeterState.sessionPaths[i];
+                    return;
                 }
             }
         }
 
-        if (!foundSaved) {
-            GreeterState.currentSessionIndex = 0;
-        }
-
-        GreeterState.selectedSession = GreeterState.sessionExecs[GreeterState.currentSessionIndex] || GreeterState.sessionExecs[0] || "";
+        GreeterState.currentSessionIndex = 0;
+        GreeterState.selectedSession = GreeterState.sessionExecs[0] || "";
+        GreeterState.selectedSessionPath = GreeterState.sessionPaths[0] || "";
     }
 
-    Process {
-        id: sessionListProc
-        property string homeDir: Quickshell.env("HOME") || ""
-        property string xdgDirs: xdgDataDirs || ""
-        command: {
-            var paths = ["/usr/share/wayland-sessions", "/usr/share/xsessions", "/usr/local/share/wayland-sessions", "/usr/local/share/xsessions"];
-            if (homeDir) {
-                paths.push(homeDir + "/.local/share/wayland-sessions");
-                paths.push(homeDir + "/.local/share/xsessions");
-            }
-            // Add XDG_DATA_DIRS paths
-            if (xdgDirs) {
-                xdgDirs.split(":").forEach(function (dir) {
-                    if (dir) {
-                        paths.push(dir + "/wayland-sessions");
-                        paths.push(dir + "/xsessions");
-                    }
-                });
-            }
-            // 1. Explicit system/user paths
-            var explicitFind = "find " + paths.join(" ") + " -maxdepth 1 -name '*.desktop' -type f -follow 2>/dev/null";
-            // 2. Scan all /home user directories for local session files
-            var homeScan = "find /home -maxdepth 5 \\( -path '*/wayland-sessions/*.desktop' -o -path '*/xsessions/*.desktop' \\) -type f -follow 2>/dev/null";
-            var findCmd = "(" + explicitFind + "; " + homeScan + ") | sort -u";
-            return ["sh", "-c", findCmd];
-        }
-        running: false
+    property var sessionDirs: {
+        const homeDir = Quickshell.env("HOME") || "";
+        const dirs = ["/usr/share/wayland-sessions", "/usr/share/xsessions", "/usr/local/share/wayland-sessions", "/usr/local/share/xsessions"];
 
-        stdout: SplitParser {
-            onRead: data => {
-                if (data.trim()) {
-                    root.pendingParsers++;
-                    parseDesktopFile(data.trim());
+        if (homeDir) {
+            dirs.push(homeDir + "/.local/share/wayland-sessions");
+            dirs.push(homeDir + "/.local/share/xsessions");
+        }
+
+        if (xdgDataDirs) {
+            xdgDataDirs.split(":").forEach(dir => {
+                if (dir) {
+                    dirs.push(dir + "/wayland-sessions");
+                    dirs.push(dir + "/xsessions");
                 }
-            }
+            });
         }
+        return dirs;
     }
 
-    function parseDesktopFile(path) {
-        const parser = desktopParser.createObject(null, {
-            "desktopPath": path
+    property var _pendingFiles: ({})
+    property int _pendingCount: 0
+
+    function _addSession(path, name, exec) {
+        if (!name || !exec || GreeterState.sessionList.includes(name))
+            return;
+        GreeterState.sessionList = GreeterState.sessionList.concat([name]);
+        GreeterState.sessionExecs = GreeterState.sessionExecs.concat([exec]);
+        GreeterState.sessionPaths = GreeterState.sessionPaths.concat([path]);
+    }
+
+    function _parseDesktopFile(content, path) {
+        let name = "";
+        let exec = "";
+        const lines = content.split("\n");
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (!name && line.startsWith("Name="))
+                name = line.substring(5).trim();
+            else if (!exec && line.startsWith("Exec="))
+                exec = line.substring(5).trim();
+            if (name && exec)
+                break;
+        }
+        _addSession(path, name, exec);
+    }
+
+    function _loadDesktopFile(filePath) {
+        if (_pendingFiles[filePath])
+            return;
+        _pendingFiles[filePath] = true;
+        _pendingCount++;
+
+        const loader = desktopFileLoader.createObject(root, {
+            "filePath": filePath
         });
     }
 
+    function _onFileLoaded(filePath) {
+        _pendingCount--;
+        if (_pendingCount === 0)
+            Qt.callLater(finalizeSessionSelection);
+    }
+
     Component {
-        id: desktopParser
-        Process {
-            property string desktopPath: ""
-            command: ["bash", "-c", `grep -E '^(Name|Exec)=' "${desktopPath}"`]
-            running: true
+        id: desktopFileLoader
 
-            stdout: StdioCollector {
-                onStreamFinished: {
-                    const lines = text.split("\n");
-                    let name = "";
-                    let exec = "";
+        FileView {
+            id: fv
+            property string filePath: ""
+            path: filePath
 
-                    for (const line of lines) {
-                        if (line.startsWith("Name=")) {
-                            name = line.substring(5).trim();
-                        } else if (line.startsWith("Exec=")) {
-                            exec = line.substring(5).trim();
-                        }
-                    }
-
-                    if (name && exec) {
-                        if (!GreeterState.sessionList.includes(name)) {
-                            let newList = GreeterState.sessionList.slice();
-                            let newExecs = GreeterState.sessionExecs.slice();
-                            let newPaths = GreeterState.sessionPaths.slice();
-                            newList.push(name);
-                            newExecs.push(exec);
-                            newPaths.push(desktopPath);
-                            GreeterState.sessionList = newList;
-                            GreeterState.sessionExecs = newExecs;
-                            GreeterState.sessionPaths = newPaths;
-                        }
-                    }
-                }
+            onLoaded: {
+                root._parseDesktopFile(text(), filePath);
+                root._onFileLoaded(filePath);
+                fv.destroy();
             }
 
-            onExited: code => {
-                root.pendingParsers--;
-                if (root.pendingParsers === 0) {
-                    Qt.callLater(root.finalizeSessionSelection);
+            onLoadFailed: {
+                root._onFileLoaded(filePath);
+                fv.destroy();
+            }
+        }
+    }
+
+    Repeater {
+        model: isPrimaryScreen ? sessionDirs : []
+
+        Item {
+            required property string modelData
+
+            FolderListModel {
+                folder: "file://" + modelData
+                nameFilters: ["*.desktop"]
+                showDirs: false
+                showDotAndDotDot: false
+
+                onStatusChanged: {
+                    if (status !== FolderListModel.Ready)
+                        return;
+                    for (let i = 0; i < count; i++) {
+                        let fp = get(i, "filePath");
+                        if (fp.startsWith("file://"))
+                            fp = fp.substring(7);
+                        root._loadDesktopFile(fp);
+                    }
                 }
-                destroy();
             }
         }
     }
@@ -1167,22 +1182,31 @@ Item {
                 Greetd.respond(GreeterState.passwordBuffer);
                 GreeterState.passwordBuffer = "";
                 inputField.text = "";
-            } else if (!error) {
-                Greetd.respond("");
+                return;
             }
+            if (!error)
+                Greetd.respond("");
         }
 
         function onReadyToLaunch() {
-            GreeterState.unlocking = true;
             const sessionCmd = GreeterState.selectedSession || GreeterState.sessionExecs[GreeterState.currentSessionIndex];
-            if (sessionCmd) {
-                GreetdMemory.setLastSessionId(GreeterState.sessionPaths[GreeterState.currentSessionIndex]);
-                GreetdMemory.setLastSuccessfulUser(GreeterState.username);
-                Greetd.launch(sessionCmd.split(" "), ["XDG_SESSION_TYPE=wayland"]);
+            const sessionPath = GreeterState.selectedSessionPath || GreeterState.sessionPaths[GreeterState.currentSessionIndex];
+            if (!sessionCmd) {
+                GreeterState.pamState = "error";
+                placeholderDelay.restart();
+                return;
             }
+
+            GreeterState.unlocking = true;
+            launchTimeout.restart();
+            GreetdMemory.setLastSessionId(sessionPath);
+            GreetdMemory.setLastSuccessfulUser(GreeterState.username);
+            Greetd.launch(sessionCmd.split(" "), ["XDG_SESSION_TYPE=wayland"]);
         }
 
         function onAuthFailure(message) {
+            launchTimeout.stop();
+            GreeterState.unlocking = false;
             GreeterState.pamState = "fail";
             GreeterState.passwordBuffer = "";
             inputField.text = "";
@@ -1190,8 +1214,26 @@ Item {
         }
 
         function onError(error) {
+            launchTimeout.stop();
+            GreeterState.unlocking = false;
+            GreeterState.pamState = "error";
+            GreeterState.passwordBuffer = "";
+            inputField.text = "";
+            placeholderDelay.restart();
+            Greetd.cancelSession();
+        }
+    }
+
+    Timer {
+        id: launchTimeout
+        interval: 8000
+        onTriggered: {
+            if (!GreeterState.unlocking)
+                return;
+            GreeterState.unlocking = false;
             GreeterState.pamState = "error";
             placeholderDelay.restart();
+            Greetd.cancelSession();
         }
     }
 

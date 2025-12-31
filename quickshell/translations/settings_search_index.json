@@ -749,6 +749,32 @@
     "description": "Show only workspaces belonging to each specific monitor."
   },
   {
+    "section": "reverseScrolling",
+    "label": "Reverse Scrolling Direction",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "desktop",
+      "direction",
+      "over",
+      "panel",
+      "reverse",
+      "scroll",
+      "scrolling",
+      "spaces",
+      "statusbar",
+      "switch",
+      "taskbar",
+      "topbar",
+      "virtual",
+      "virtual desktops",
+      "workspace",
+      "workspaces"
+    ],
+    "description": "Reverse workspace switch direction when scrolling over the bar",
+    "conditionKey": "isNiri"
+  },
+  {
     "section": "dwlShowAllTags",
     "label": "Show All Tags",
     "tabIndex": 4,
@@ -792,26 +818,6 @@
     ],
     "description": "Display only workspaces that contain windows",
     "conditionKey": "isNiri"
-  },
-  {
-    "section": "reverseScrolling",
-    "label": "Reverse Scrolling Direction",
-    "tabIndex": 4,
-    "category": "Workspaces",
-    "keywords": [
-      "active",
-      "contain",
-      "desktop",
-      "desktops",
-      "scroll",
-      "scrolling",
-      "reverse",
-      "direction",
-      "windows",
-      "workspace",
-      "workspaces"
-    ],
-    "description": "Display only workspaces that contain windows"
   },
   {
     "section": "showWorkspaceApps",
@@ -1557,24 +1563,6 @@
       "appearance",
       "colors",
       "firefox",
-      "look",
-      "matugen",
-      "scheme",
-      "style",
-      "template",
-      "theme"
-    ]
-  },
-  {
-    "section": "matugenTemplateZenBrowser",
-    "label": "Zen Browser",
-    "tabIndex": 10,
-    "category": "Theme & Colors",
-    "keywords": [
-      "appearance",
-      "colors",
-      "zen",
-      "zenbrowser",
       "look",
       "matugen",
       "scheme",
@@ -2358,6 +2346,23 @@
       "template",
       "theme",
       "vesktop"
+    ]
+  },
+  {
+    "section": "matugenTemplateZenBrowser",
+    "label": "zenbrowser",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "zenbrowser"
     ]
   },
   {
@@ -3582,16 +3587,18 @@
       "cliphist",
       "copy",
       "disable",
-      "entirely",
+      "disk",
       "history",
       "linux",
-      "manager",
+      "nothing",
       "os",
       "paste",
-      "system"
+      "saved",
+      "system",
+      "works"
     ],
     "icon": "tune",
-    "description": "Disable clipboard manager entirely (requires restart)"
+    "description": "Clipboard works but nothing saved to disk"
   },
   {
     "section": "autoClearDays",
@@ -3632,29 +3639,6 @@
     ],
     "icon": "settings",
     "description": "Clear all history when server starts"
-  },
-  {
-    "section": "disableHistory",
-    "label": "Disable History Persistence",
-    "tabIndex": 23,
-    "category": "System",
-    "keywords": [
-      "clipboard",
-      "cliphist",
-      "copy",
-      "disable",
-      "disk",
-      "history",
-      "linux",
-      "nothing",
-      "os",
-      "paste",
-      "persistence",
-      "saved",
-      "system",
-      "works"
-    ],
-    "description": "Clipboard works but nothing saved to disk"
   },
   {
     "section": "maxHistory",
@@ -3700,5 +3684,57 @@
       "system"
     ],
     "description": "Maximum size per clipboard entry"
+  },
+  {
+    "section": "nightModeHighTemperature",
+    "label": "Day Temperature",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "celsius",
+      "color",
+      "colour",
+      "day",
+      "displays",
+      "fahrenheit",
+      "gamma",
+      "hue",
+      "kelvin",
+      "monitor",
+      "resolution",
+      "screen",
+      "temp",
+      "temperature",
+      "time",
+      "tint"
+    ],
+    "description": "Color temperature for day time"
+  },
+  {
+    "section": "nightModeTemperature",
+    "label": "Night Temperature",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "blue light",
+      "celsius",
+      "color",
+      "colour",
+      "displays",
+      "fahrenheit",
+      "gamma",
+      "hue",
+      "kelvin",
+      "mode",
+      "monitor",
+      "night",
+      "resolution",
+      "screen",
+      "temp",
+      "temperature",
+      "tint",
+      "warm"
+    ],
+    "description": "Color temperature for night mode"
   }
 ]

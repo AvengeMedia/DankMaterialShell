@@ -282,111 +282,33 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 		}
 	}
 
-	needsUsernamePrePrompt := false
 	var vpnServiceType string
+	var vpnData map[string]string
 	if vpnSettings, ok := targetSettings["vpn"]; ok {
 		if svc, ok := vpnSettings["service-type"].(string); ok {
 			vpnServiceType = svc
 		}
 		if data, ok := vpnSettings["data"].(map[string]string); ok {
-			connType := data["connection-type"]
-			username := data["username"]
-			// OpenVPN password auth needs username in vpn.data
-			if strings.Contains(vpnServiceType, "openvpn") &&
-				(connType == "password" || connType == "password-tls") &&
-				username == "" {
-				needsUsernamePrePrompt = true
-			}
+			vpnData = data
 		}
 	}
 
-	// If username is needed but missing, prompt for it before activating
-	if needsUsernamePrePrompt && b.promptBroker != nil {
-		log.Infof("[ConnectVPN] OpenVPN requires username in vpn.data - prompting before activation")
+	authAction := detectVPNAuthAction(vpnServiceType, vpnData)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		token, err := b.promptBroker.Ask(ctx, PromptRequest{
-			Name:           connName,
-			ConnType:       "vpn",
-			VpnService:     vpnServiceType,
-			SettingName:    "vpn",
-			Fields:         []string{"username", "password"},
-			FieldsInfo:     []FieldInfo{{Name: "username", Label: "Username", IsSecret: false}, {Name: "password", Label: "Password", IsSecret: true}},
-			Reason:         "required",
-			ConnectionId:   connName,
-			ConnectionUuid: targetUUID,
-			ConnectionPath: string(targetConn.GetPath()),
-		})
-		if err != nil {
-			return fmt.Errorf("failed to request credentials: %w", err)
+	switch authAction {
+	case "pkcs11_pin":
+		if b.promptBroker == nil {
+			return fmt.Errorf("PKCS11 authentication requires interactive prompt")
 		}
-
-		reply, err := b.promptBroker.Wait(ctx, token)
-		if err != nil {
-			return fmt.Errorf("credentials prompt failed: %w", err)
+		if err := b.handlePKCS11Auth(targetConn, connName, targetUUID, vpnServiceType); err != nil {
+			return err
 		}
-
-		username := reply.Secrets["username"]
-		password := reply.Secrets["password"]
-		if username != "" {
-			connObj := b.dbusConn.Object("org.freedesktop.NetworkManager", targetConn.GetPath())
-			var existingSettings map[string]map[string]dbus.Variant
-			if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&existingSettings); err != nil {
-				return fmt.Errorf("failed to get settings for username save: %w", err)
-			}
-
-			settings := make(map[string]map[string]dbus.Variant)
-			if connSection, ok := existingSettings["connection"]; ok {
-				settings["connection"] = connSection
-			}
-			vpn := existingSettings["vpn"]
-			var data map[string]string
-			if dataVariant, ok := vpn["data"]; ok {
-				if dm, ok := dataVariant.Value().(map[string]string); ok {
-					data = make(map[string]string)
-					for k, v := range dm {
-						data[k] = v
-					}
-				} else {
-					data = make(map[string]string)
-				}
-			} else {
-				data = make(map[string]string)
-			}
-			data["username"] = username
-
-			if reply.Save && password != "" {
-				data["password-flags"] = "0"
-				secs := make(map[string]string)
-				secs["password"] = password
-				vpn["secrets"] = dbus.MakeVariant(secs)
-				log.Infof("[ConnectVPN] Saving username and password to vpn.data")
-			} else {
-				log.Infof("[ConnectVPN] Saving username to vpn.data (password will be prompted)")
-			}
-
-			vpn["data"] = dbus.MakeVariant(data)
-			settings["vpn"] = vpn
-
-			var result map[string]dbus.Variant
-			if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.Update2", 0,
-				settings, uint32(0x1), map[string]dbus.Variant{}).Store(&result); err != nil {
-				return fmt.Errorf("failed to save username: %w", err)
-			}
-			log.Infof("[ConnectVPN] Username saved to connection, now activating")
-
-			if password != "" && !reply.Save {
-				b.cachedVPNCredsMu.Lock()
-				b.cachedVPNCreds = &cachedVPNCredentials{
-					ConnectionUUID: targetUUID,
-					Password:       password,
-					SavePassword:   reply.Save,
-				}
-				b.cachedVPNCredsMu.Unlock()
-				log.Infof("[ConnectVPN] Cached password for GetSecrets")
-			}
+	case "openvpn_username":
+		if b.promptBroker == nil {
+			return fmt.Errorf("OpenVPN password authentication requires interactive prompt")
+		}
+		if err := b.handleOpenVPNUsernameAuth(targetConn, connName, targetUUID, vpnServiceType); err != nil {
+			return err
 		}
 	}
 
@@ -412,6 +334,201 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 		}
 
 		return fmt.Errorf("failed to activate VPN: %w", err)
+	}
+
+	return nil
+}
+
+func detectVPNAuthAction(serviceType string, data map[string]string) string {
+	if data == nil {
+		return ""
+	}
+
+	switch {
+	case strings.Contains(serviceType, "openconnect"):
+		authType := data["authtype"]
+		userCert := data["usercert"]
+		if authType == "cert" && strings.HasPrefix(userCert, "pkcs11:") {
+			return "pkcs11_pin"
+		}
+	case strings.Contains(serviceType, "openvpn"):
+		connType := data["connection-type"]
+		username := data["username"]
+		if (connType == "password" || connType == "password-tls") && username == "" {
+			return "openvpn_username"
+		}
+	}
+	return ""
+}
+
+func (b *NetworkManagerBackend) handlePKCS11Auth(targetConn gonetworkmanager.Connection, connName, targetUUID, vpnServiceType string) error {
+	log.Infof("[ConnectVPN] PKCS11 authentication detected - prompting for PIN")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	token, err := b.promptBroker.Ask(ctx, PromptRequest{
+		Name:           connName,
+		ConnType:       "vpn",
+		VpnService:     vpnServiceType,
+		SettingName:    "vpn",
+		Fields:         []string{"key_pass"},
+		FieldsInfo:     []FieldInfo{{Name: "key_pass", Label: "PIN", IsSecret: true}},
+		Reason:         "pkcs11",
+		ConnectionId:   connName,
+		ConnectionUuid: targetUUID,
+		ConnectionPath: string(targetConn.GetPath()),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to request PIN: %w", err)
+	}
+
+	reply, err := b.promptBroker.Wait(ctx, token)
+	if err != nil {
+		return fmt.Errorf("PIN prompt failed: %w", err)
+	}
+
+	if reply.Cancel {
+		return fmt.Errorf("user cancelled PIN entry")
+	}
+
+	pin := reply.Secrets["key_pass"]
+	if pin == "" {
+		return fmt.Errorf("PIN required for PKCS11 authentication")
+	}
+
+	connObj := b.dbusConn.Object("org.freedesktop.NetworkManager", targetConn.GetPath())
+	var existingSettings map[string]map[string]dbus.Variant
+	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&existingSettings); err != nil {
+		return fmt.Errorf("failed to get settings: %w", err)
+	}
+
+	settings := make(map[string]map[string]dbus.Variant)
+	if connSection, ok := existingSettings["connection"]; ok {
+		settings["connection"] = connSection
+	}
+
+	vpn := existingSettings["vpn"]
+	var data map[string]string
+	if dataVariant, ok := vpn["data"]; ok {
+		if dm, ok := dataVariant.Value().(map[string]string); ok {
+			data = make(map[string]string)
+			for k, v := range dm {
+				data[k] = v
+			}
+		} else {
+			data = make(map[string]string)
+		}
+	} else {
+		data = make(map[string]string)
+	}
+	data["key_pass"] = pin
+
+	vpn["data"] = dbus.MakeVariant(data)
+	settings["vpn"] = vpn
+
+	var result map[string]dbus.Variant
+	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.Update2", 0,
+		settings, uint32(0x2), map[string]dbus.Variant{}).Store(&result); err != nil {
+		return fmt.Errorf("failed to set PIN: %w", err)
+	}
+
+	log.Infof("[ConnectVPN] PIN set (in-memory only)")
+	return nil
+}
+
+func (b *NetworkManagerBackend) handleOpenVPNUsernameAuth(targetConn gonetworkmanager.Connection, connName, targetUUID, vpnServiceType string) error {
+	log.Infof("[ConnectVPN] OpenVPN requires username in vpn.data - prompting before activation")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	token, err := b.promptBroker.Ask(ctx, PromptRequest{
+		Name:           connName,
+		ConnType:       "vpn",
+		VpnService:     vpnServiceType,
+		SettingName:    "vpn",
+		Fields:         []string{"username", "password"},
+		FieldsInfo:     []FieldInfo{{Name: "username", Label: "Username", IsSecret: false}, {Name: "password", Label: "Password", IsSecret: true}},
+		Reason:         "required",
+		ConnectionId:   connName,
+		ConnectionUuid: targetUUID,
+		ConnectionPath: string(targetConn.GetPath()),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to request credentials: %w", err)
+	}
+
+	reply, err := b.promptBroker.Wait(ctx, token)
+	if err != nil {
+		return fmt.Errorf("credentials prompt failed: %w", err)
+	}
+
+	if reply.Cancel {
+		return fmt.Errorf("user cancelled authentication")
+	}
+
+	username := reply.Secrets["username"]
+	password := reply.Secrets["password"]
+	if username == "" {
+		return nil
+	}
+
+	connObj := b.dbusConn.Object("org.freedesktop.NetworkManager", targetConn.GetPath())
+	var existingSettings map[string]map[string]dbus.Variant
+	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.GetSettings", 0).Store(&existingSettings); err != nil {
+		return fmt.Errorf("failed to get settings for username save: %w", err)
+	}
+
+	settings := make(map[string]map[string]dbus.Variant)
+	if connSection, ok := existingSettings["connection"]; ok {
+		settings["connection"] = connSection
+	}
+	vpn := existingSettings["vpn"]
+	var data map[string]string
+	if dataVariant, ok := vpn["data"]; ok {
+		if dm, ok := dataVariant.Value().(map[string]string); ok {
+			data = make(map[string]string)
+			for k, v := range dm {
+				data[k] = v
+			}
+		} else {
+			data = make(map[string]string)
+		}
+	} else {
+		data = make(map[string]string)
+	}
+	data["username"] = username
+
+	if reply.Save && password != "" {
+		data["password-flags"] = "0"
+		secs := make(map[string]string)
+		secs["password"] = password
+		vpn["secrets"] = dbus.MakeVariant(secs)
+		log.Infof("[ConnectVPN] Saving username and password to vpn.data")
+	} else {
+		log.Infof("[ConnectVPN] Saving username to vpn.data (password will be prompted)")
+	}
+
+	vpn["data"] = dbus.MakeVariant(data)
+	settings["vpn"] = vpn
+
+	var result map[string]dbus.Variant
+	if err := connObj.Call("org.freedesktop.NetworkManager.Settings.Connection.Update2", 0,
+		settings, uint32(0x1), map[string]dbus.Variant{}).Store(&result); err != nil {
+		return fmt.Errorf("failed to save username: %w", err)
+	}
+	log.Infof("[ConnectVPN] Username saved to connection")
+
+	if password != "" && !reply.Save {
+		b.cachedVPNCredsMu.Lock()
+		b.cachedVPNCreds = &cachedVPNCredentials{
+			ConnectionUUID: targetUUID,
+			Password:       password,
+			SavePassword:   reply.Save,
+		}
+		b.cachedVPNCredsMu.Unlock()
+		log.Infof("[ConnectVPN] Cached password for GetSecrets")
 	}
 
 	return nil

@@ -182,7 +182,7 @@ Item {
 
                             let version = SystemUpdateService.shellVersion;
 
-                            // Debian/Ubuntu/OpenSUSE git format: 0.6.2+git2264.c5c5ce84
+                            // Debian/Ubuntu/OpenSUSE git format: 1.0.3+git2264.c5c5ce84
                             let match = version.match(/^([\d.]+)\+git(\d+)\./);
                             if (match) {
                                 return `dms (git) v${match[1]}-${match[2]}`;
@@ -191,10 +191,10 @@ Item {
                             // Fedora COPR git format: 0.0.git.2267.d430cae9
                             match = version.match(/^[\d.]+\.git\.(\d+)\./);
                             if (match) {
-                                return `dms (git) v0.6.2-${match[1]}`;
+                                return `dms (git) v1.0.3-${match[1]}`;
                             }
 
-                            // Stable release format: 0.6.2
+                            // Stable release format: 1.0.3
                             match = version.match(/^([\d.]+)$/);
                             if (match) {
                                 return `dms v${match[1]}`;

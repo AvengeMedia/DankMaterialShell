@@ -26,7 +26,7 @@ DankModal {
     property Component clipboardContent
     property int activeImageLoads: 0
     readonly property int maxConcurrentLoads: 3
-    readonly property bool clipboardAvailable: DMSService.isConnected && DMSService.capabilities.includes("clipboard")
+    readonly property bool clipboardAvailable: DMSService.isConnected && (DMSService.capabilities.length === 0 || DMSService.capabilities.includes("clipboard"))
     property bool wtypeAvailable: false
 
     Process {

@@ -142,8 +142,6 @@ var (
 	clipConfigNoClearStartup bool
 	clipConfigDisabled       bool
 	clipConfigEnabled        bool
-	clipConfigDisableHistory bool
-	clipConfigEnableHistory  bool
 )
 
 func init() {
@@ -167,10 +165,8 @@ func init() {
 	clipConfigSetCmd.Flags().IntVar(&clipConfigAutoClearDays, "auto-clear-days", -1, "Auto-clear entries older than N days (0 to disable)")
 	clipConfigSetCmd.Flags().BoolVar(&clipConfigClearAtStartup, "clear-at-startup", false, "Clear history on startup")
 	clipConfigSetCmd.Flags().BoolVar(&clipConfigNoClearStartup, "no-clear-at-startup", false, "Don't clear history on startup")
-	clipConfigSetCmd.Flags().BoolVar(&clipConfigDisabled, "disable", false, "Disable clipboard manager entirely")
-	clipConfigSetCmd.Flags().BoolVar(&clipConfigEnabled, "enable", false, "Enable clipboard manager")
-	clipConfigSetCmd.Flags().BoolVar(&clipConfigDisableHistory, "disable-history", false, "Disable clipboard history persistence")
-	clipConfigSetCmd.Flags().BoolVar(&clipConfigEnableHistory, "enable-history", false, "Enable clipboard history persistence")
+	clipConfigSetCmd.Flags().BoolVar(&clipConfigDisabled, "disable", false, "Disable clipboard tracking")
+	clipConfigSetCmd.Flags().BoolVar(&clipConfigEnabled, "enable", false, "Enable clipboard tracking")
 
 	clipWatchCmd.Flags().BoolVarP(&clipWatchStore, "store", "s", false, "Store clipboard changes to history (no server required)")
 
@@ -586,12 +582,6 @@ func runClipConfigSet(cmd *cobra.Command, args []string) {
 	}
 	if clipConfigEnabled {
 		params["disabled"] = false
-	}
-	if clipConfigDisableHistory {
-		params["disableHistory"] = true
-	}
-	if clipConfigEnableHistory {
-		params["disableHistory"] = false
 	}
 
 	if len(params) == 0 {

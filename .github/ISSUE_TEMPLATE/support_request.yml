@@ -1,0 +1,69 @@
+name: Support Request
+description: Help with installation, usage, or general questions about DankMaterialShell
+labels:
+  - support
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## DankMaterialShell Support Request
+  - type: checkboxes
+    id: compositor
+    attributes:
+      label: Compositor
+      options:
+        - label: Niri
+        - label: Hyprland
+        - label: MangoWC (dwl)
+        - label: Sway
+        - label: Other (specify below)
+    validations:
+      required: false
+  - type: input
+    id: distribution
+    attributes:
+      label: Distribution
+      description: Which Linux distribution are you using? (e.g., Arch, Fedora, Debian, etc.)
+      placeholder: Your Linux distribution
+    validations:
+      required: false
+  - type: input
+    id: dms_version
+    attributes:
+      label: dms version
+      description: Output of dms version command
+      placeholder: e.g., 1.2.3
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief description of the support needed
+      placeholder: What do you need help with?
+    validations:
+      required: true
+  - type: textarea
+    id: solutions_tried
+    attributes:
+      label: Solutions Tried
+      description: Describe what you've tried so far (commands, documentation, etc.)
+      placeholder: List steps or resources you've already tried
+    validations:
+      required: false
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Configuration Details
+      description: Include any relevant configuration if relevant
+      placeholder: Add configuration or environment info
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots/Recordings
+      description: If applicable, add screenshots or screen recordings
+      placeholder: Attach images or videos here
+    validations:
+      required: false
