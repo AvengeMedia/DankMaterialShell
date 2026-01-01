@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -526,6 +527,14 @@ func runShellDaemon(session bool) {
 	}
 }
 
+var qsHasAnyDisplay = sync.OnceValue(func() bool {
+	out, err := exec.Command("qs", "ipc", "--help").Output()
+	if err != nil {
+		return false
+	}
+	return strings.Contains(string(out), "--any-display")
+})
+
 func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 	targets := make(ipcTargets)
 	var currentTarget string
@@ -556,7 +565,11 @@ func parseTargetsFromIPCShowOutput(output string) ipcTargets {
 }
 
 func getShellIPCCompletions(args []string, _ string) []string {
-	cmdArgs := []string{"-p", configPath, "ipc", "show"}
+	cmdArgs := []string{"ipc"}
+	if qsHasAnyDisplay() {
+		cmdArgs = append(cmdArgs, "--any-display")
+	}
+	cmdArgs = append(cmdArgs, "-p", configPath, "show")
 	cmd := exec.Command("qs", cmdArgs...)
 	var targets ipcTargets
 
@@ -610,7 +623,12 @@ func runShellIPCCommand(args []string) {
 		args = append([]string{"call"}, args...)
 	}
 
-	cmdArgs := append([]string{"-p", configPath, "ipc"}, args...)
+	cmdArgs := []string{"ipc"}
+	if qsHasAnyDisplay() {
+		cmdArgs = append(cmdArgs, "--any-display")
+	}
+	cmdArgs = append(cmdArgs, "-p", configPath)
+	cmdArgs = append(cmdArgs, args...)
 	cmd := exec.Command("qs", cmdArgs...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

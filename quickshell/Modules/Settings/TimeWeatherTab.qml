@@ -455,8 +455,8 @@ Item {
                                             onTextEdited: {
                                                 if (text && longitudeInput.text) {
                                                     const coords = text + "," + longitudeInput.text;
-                                                    SettingsData.weatherCoordinates = coords;
-                                                    SettingsData.saveSettings();
+                                                    SessionData.weatherCoordinates = coords;
+                                                    SessionData.saveSettings();
                                                 }
                                             }
                                         }
@@ -505,8 +505,8 @@ Item {
                                             onTextEdited: {
                                                 if (text && latitudeInput.text) {
                                                     const coords = latitudeInput.text + "," + text;
-                                                    SettingsData.weatherCoordinates = coords;
-                                                    SettingsData.saveSettings();
+                                                    SessionData.weatherCoordinates = coords;
+                                                    SessionData.saveSettings();
                                                 }
                                             }
                                         }

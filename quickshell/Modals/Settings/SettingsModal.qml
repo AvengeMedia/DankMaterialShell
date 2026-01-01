@@ -220,9 +220,91 @@ FloatingWindow {
                 }
             }
 
+            Rectangle {
+                id: readOnlyBanner
+
+                property bool showBanner: (SettingsData._isReadOnly && SettingsData._hasUnsavedChanges) || (SessionData._isReadOnly && SessionData._hasUnsavedChanges)
+
+                width: parent.width
+                height: showBanner ? bannerContent.implicitHeight + Theme.spacingM * 2 : 0
+                color: Theme.surfaceContainerHigh
+                visible: showBanner
+                clip: true
+
+                Behavior on height {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
+                Row {
+                    id: bannerContent
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: Theme.spacingL
+                    anchors.rightMargin: Theme.spacingM
+                    spacing: Theme.spacingM
+
+                    DankIcon {
+                        name: "info"
+                        size: Theme.iconSize
+                        color: Theme.warning
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    StyledText {
+                        id: bannerText
+
+                        text: I18n.tr("Settings are read-only. Changes will not persist.", "read-only settings warning for NixOS home-manager users")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceText
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Math.max(100, parent.width - (copySettingsButton.visible ? copySettingsButton.width + Theme.spacingM : 0) - (copySessionButton.visible ? copySessionButton.width + Theme.spacingM : 0) - Theme.spacingM * 2 - Theme.iconSize)
+                        wrapMode: Text.WordWrap
+                    }
+
+                    DankButton {
+                        id: copySettingsButton
+
+                        visible: SettingsData._isReadOnly && SettingsData._hasUnsavedChanges
+                        text: "settings.json"
+                        iconName: "content_copy"
+                        backgroundColor: Theme.primary
+                        textColor: Theme.primaryText
+                        buttonHeight: 32
+                        horizontalPadding: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            Quickshell.execDetached(["dms", "cl", "copy", SettingsData.getCurrentSettingsJson()]);
+                            ToastService.showInfo(I18n.tr("Copied to clipboard"));
+                        }
+                    }
+
+                    DankButton {
+                        id: copySessionButton
+
+                        visible: SessionData._isReadOnly && SessionData._hasUnsavedChanges
+                        text: "session.json"
+                        iconName: "content_copy"
+                        backgroundColor: Theme.primary
+                        textColor: Theme.primaryText
+                        buttonHeight: 32
+                        horizontalPadding: Theme.spacingM
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            Quickshell.execDetached(["dms", "cl", "copy", SessionData.getCurrentSessionJson()]);
+                            ToastService.showInfo(I18n.tr("Copied to clipboard"));
+                        }
+                    }
+                }
+            }
+
             Item {
                 width: parent.width
-                height: parent.height - 48
+                height: parent.height - 48 - readOnlyBanner.height
                 clip: true
 
                 SettingsSidebar {

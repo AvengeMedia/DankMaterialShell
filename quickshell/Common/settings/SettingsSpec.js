@@ -112,8 +112,6 @@ var SPEC = {
     spotlightCloseNiriOverview: { def: true },
     niriOverviewOverlayEnabled: { def: true },
 
-    weatherLocation: { def: "New York, NY" },
-    weatherCoordinates: { def: "40.7128,-74.0060" },
     useAutoLocation: { def: false },
     weatherEnabled: { def: true },
 

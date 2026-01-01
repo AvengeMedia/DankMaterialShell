@@ -22,10 +22,6 @@ Singleton {
         pluginSettingsCheckProcess.running = true;
     }
 
-    function checkDefaultSettings() {
-        defaultSettingsCheckProcess.running = true;
-    }
-
     property var qtToolsDetectionProcess: Process {
         command: ["sh", "-c", "echo -n 'qt5ct:'; command -v qt5ct >/dev/null && echo 'true' || echo 'false'; echo -n 'qt6ct:'; command -v qt6ct >/dev/null && echo 'true' || echo 'false'; echo -n 'gtk:'; (command -v gsettings >/dev/null || command -v dconf >/dev/null) && echo 'true' || echo 'false'"]
         running: false
@@ -46,25 +42,6 @@ Singleton {
                             settingsRoot.gtkAvailable = line.split(':')[1] === 'true';
                         }
                     }
-                }
-            }
-        }
-    }
-
-    property var defaultSettingsCheckProcess: Process {
-        command: ["sh", "-c", "CONFIG_DIR=\"" + (settingsRoot?._configDir || "") + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-settings.json\" ] && [ ! -f \"$CONFIG_DIR/settings.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-settings.json\" \"$CONFIG_DIR/settings.json\" && echo 'copied'; else echo 'not_found'; fi"]
-        running: false
-        onExited: function (exitCode) {
-            if (!settingsRoot)
-                return;
-            if (exitCode === 0) {
-                console.info("Copied default-settings.json to settings.json");
-                if (settingsRoot.settingsFile) {
-                    settingsRoot.settingsFile.reload();
-                }
-            } else {
-                if (typeof ThemeApplier !== "undefined") {
-                    ThemeApplier.applyStoredTheme(settingsRoot);
                 }
             }
         }

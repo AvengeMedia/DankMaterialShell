@@ -7,16 +7,20 @@ import Quickshell
 import Quickshell.Io
 import qs.Common
 import qs.Services
+import "settings/SessionSpec.js" as Spec
+import "settings/SessionStore.js" as Store
 
 Singleton {
     id: root
 
-    readonly property int sessionConfigVersion: 1
+    readonly property int sessionConfigVersion: 2
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
-    property bool hasTriedDefaultSession: false
     property bool _parseError: false
     property bool _hasLoaded: false
+    property bool _isReadOnly: false
+    property bool _hasUnsavedChanges: false
+    property var _loadedSessionSnapshot: null
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
@@ -95,18 +99,52 @@ Singleton {
     property string wifiDeviceOverride: ""
     property bool weatherHourlyDetailed: true
 
+    property string weatherLocation: "New York, NY"
+    property string weatherCoordinates: "40.7128,-74.0060"
+
     Component.onCompleted: {
         if (!isGreeterMode) {
             loadSettings();
         }
     }
 
+    property var _pendingMigration: null
+
     function loadSettings() {
+        _hasUnsavedChanges = false;
+        _pendingMigration = null;
+
         if (isGreeterMode) {
             parseSettings(greeterSessionFile.text());
-        } else {
-            parseSettings(settingsFile.text());
+            return;
         }
+        parseSettings(settingsFile.text());
+        _checkSessionWritable();
+    }
+
+    function _checkSessionWritable() {
+        sessionWritableCheckProcess.running = true;
+    }
+
+    function _onWritableCheckComplete(writable) {
+        _isReadOnly = !writable;
+        if (_isReadOnly) {
+            console.info("SessionData: session.json is read-only (NixOS home-manager mode)");
+        } else if (_pendingMigration) {
+            settingsFile.setText(JSON.stringify(_pendingMigration, null, 2));
+        }
+        _pendingMigration = null;
+    }
+
+    function _checkForUnsavedChanges() {
+        if (!_hasLoaded || !_loadedSessionSnapshot)
+            return false;
+        const current = getCurrentSessionJson();
+        return current !== _loadedSessionSnapshot;
+    }
+
+    function getCurrentSessionJson() {
+        return JSON.stringify(Store.toJson(root), null, 2);
     }
 
     function parseSettings(content) {
@@ -116,79 +154,48 @@ Singleton {
                 _parseError = true;
                 return;
             }
-            var settings = JSON.parse(content);
-            isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false;
 
-            if (settings.wallpaperPath && settings.wallpaperPath.startsWith("we:")) {
+            let obj = JSON.parse(content);
+
+            if (obj.brightnessLogarithmicDevices && !obj.brightnessExponentialDevices) {
+                obj.brightnessExponentialDevices = obj.brightnessLogarithmicDevices;
+            }
+
+            if (obj.nightModeStartTime !== undefined) {
+                const parts = obj.nightModeStartTime.split(":");
+                obj.nightModeStartHour = parseInt(parts[0]) || 18;
+                obj.nightModeStartMinute = parseInt(parts[1]) || 0;
+            }
+            if (obj.nightModeEndTime !== undefined) {
+                const parts = obj.nightModeEndTime.split(":");
+                obj.nightModeEndHour = parseInt(parts[0]) || 6;
+                obj.nightModeEndMinute = parseInt(parts[1]) || 0;
+            }
+
+            const oldVersion = obj.configVersion ?? 0;
+            if (oldVersion === 0) {
+                migrateFromUndefinedToV1(obj);
+            }
+
+            if (oldVersion < sessionConfigVersion) {
+                const settingsDataRef = (typeof SettingsData !== "undefined") ? SettingsData : null;
+                const migrated = Store.migrateToVersion(obj, sessionConfigVersion, settingsDataRef);
+                if (migrated) {
+                    _pendingMigration = migrated;
+                    obj = migrated;
+                }
+            }
+
+            Store.parse(root, obj);
+
+            if (wallpaperPath && wallpaperPath.startsWith("we:")) {
                 console.warn("WallpaperEngine wallpaper detected, resetting wallpaper");
                 wallpaperPath = "";
                 Quickshell.execDetached(["notify-send", "-u", "critical", "-a", "DMS", "-i", "dialog-warning", "WallpaperEngine Support Moved", "WallpaperEngine support has been moved to a plugin. Please enable the Linux Wallpaper Engine plugin in Settings → Plugins to continue using WallpaperEngine."]);
-            } else {
-                wallpaperPath = settings.wallpaperPath !== undefined ? settings.wallpaperPath : "";
             }
-            perMonitorWallpaper = settings.perMonitorWallpaper !== undefined ? settings.perMonitorWallpaper : false;
-            monitorWallpapers = settings.monitorWallpapers !== undefined ? settings.monitorWallpapers : {};
-            perModeWallpaper = settings.perModeWallpaper !== undefined ? settings.perModeWallpaper : false;
-            wallpaperPathLight = settings.wallpaperPathLight !== undefined ? settings.wallpaperPathLight : "";
-            wallpaperPathDark = settings.wallpaperPathDark !== undefined ? settings.wallpaperPathDark : "";
-            monitorWallpapersLight = settings.monitorWallpapersLight !== undefined ? settings.monitorWallpapersLight : {};
-            monitorWallpapersDark = settings.monitorWallpapersDark !== undefined ? settings.monitorWallpapersDark : {};
-            brightnessExponentialDevices = settings.brightnessExponentialDevices !== undefined ? settings.brightnessExponentialDevices : (settings.brightnessLogarithmicDevices || {});
-            brightnessUserSetValues = settings.brightnessUserSetValues !== undefined ? settings.brightnessUserSetValues : {};
-            brightnessExponentValues = settings.brightnessExponentValues !== undefined ? settings.brightnessExponentValues : {};
-            doNotDisturb = settings.doNotDisturb !== undefined ? settings.doNotDisturb : false;
-            nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
-            nightModeTemperature = settings.nightModeTemperature !== undefined ? settings.nightModeTemperature : 4500;
-            nightModeHighTemperature = settings.nightModeHighTemperature !== undefined ? settings.nightModeHighTemperature : 6500;
-            nightModeAutoEnabled = settings.nightModeAutoEnabled !== undefined ? settings.nightModeAutoEnabled : false;
-            nightModeAutoMode = settings.nightModeAutoMode !== undefined ? settings.nightModeAutoMode : "time";
-            if (settings.nightModeStartTime !== undefined) {
-                const parts = settings.nightModeStartTime.split(":");
-                nightModeStartHour = parseInt(parts[0]) || 18;
-                nightModeStartMinute = parseInt(parts[1]) || 0;
-            } else {
-                nightModeStartHour = settings.nightModeStartHour !== undefined ? settings.nightModeStartHour : 18;
-                nightModeStartMinute = settings.nightModeStartMinute !== undefined ? settings.nightModeStartMinute : 0;
-            }
-            if (settings.nightModeEndTime !== undefined) {
-                const parts = settings.nightModeEndTime.split(":");
-                nightModeEndHour = parseInt(parts[0]) || 6;
-                nightModeEndMinute = parseInt(parts[1]) || 0;
-            } else {
-                nightModeEndHour = settings.nightModeEndHour !== undefined ? settings.nightModeEndHour : 6;
-                nightModeEndMinute = settings.nightModeEndMinute !== undefined ? settings.nightModeEndMinute : 0;
-            }
-            latitude = settings.latitude !== undefined ? settings.latitude : 0.0;
-            longitude = settings.longitude !== undefined ? settings.longitude : 0.0;
-            nightModeUseIPLocation = settings.nightModeUseIPLocation !== undefined ? settings.nightModeUseIPLocation : false;
-            nightModeLocationProvider = settings.nightModeLocationProvider !== undefined ? settings.nightModeLocationProvider : "";
-            pinnedApps = settings.pinnedApps !== undefined ? settings.pinnedApps : [];
-            hiddenTrayIds = settings.hiddenTrayIds !== undefined ? settings.hiddenTrayIds : [];
-            selectedGpuIndex = settings.selectedGpuIndex !== undefined ? settings.selectedGpuIndex : 0;
-            nvidiaGpuTempEnabled = settings.nvidiaGpuTempEnabled !== undefined ? settings.nvidiaGpuTempEnabled : false;
-            nonNvidiaGpuTempEnabled = settings.nonNvidiaGpuTempEnabled !== undefined ? settings.nonNvidiaGpuTempEnabled : false;
-            enabledGpuPciIds = settings.enabledGpuPciIds !== undefined ? settings.enabledGpuPciIds : [];
-            wifiDeviceOverride = settings.wifiDeviceOverride !== undefined ? settings.wifiDeviceOverride : "";
-            weatherHourlyDetailed = settings.weatherHourlyDetailed !== undefined ? settings.weatherHourlyDetailed : true;
-            wallpaperCyclingEnabled = settings.wallpaperCyclingEnabled !== undefined ? settings.wallpaperCyclingEnabled : false;
-            wallpaperCyclingMode = settings.wallpaperCyclingMode !== undefined ? settings.wallpaperCyclingMode : "interval";
-            wallpaperCyclingInterval = settings.wallpaperCyclingInterval !== undefined ? settings.wallpaperCyclingInterval : 300;
-            wallpaperCyclingTime = settings.wallpaperCyclingTime !== undefined ? settings.wallpaperCyclingTime : "06:00";
-            monitorCyclingSettings = settings.monitorCyclingSettings !== undefined ? settings.monitorCyclingSettings : {};
-            lastBrightnessDevice = settings.lastBrightnessDevice !== undefined ? settings.lastBrightnessDevice : "";
-            launchPrefix = settings.launchPrefix !== undefined ? settings.launchPrefix : "";
-            wallpaperTransition = settings.wallpaperTransition !== undefined ? settings.wallpaperTransition : "fade";
-            includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none");
-            recentColors = settings.recentColors !== undefined ? settings.recentColors : [];
-            showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false;
-            _hasLoaded = true;
 
-            if (settings.configVersion === undefined) {
-                migrateFromUndefinedToV1(settings);
-                saveSettings();
-            } else if (settings.configVersion === sessionConfigVersion) {
-                cleanupUnusedKeys();
-            }
+            _hasLoaded = true;
+            _loadedSessionSnapshot = getCurrentSessionJson();
 
             if (!isGreeterMode && typeof Theme !== "undefined") {
                 Theme.generateSystemThemesFromCurrentTheme();
@@ -208,54 +215,11 @@ Singleton {
     function saveSettings() {
         if (isGreeterMode || _parseError || !_hasLoaded)
             return;
-        settingsFile.setText(JSON.stringify({
-            "isLightMode": isLightMode,
-            "wallpaperPath": wallpaperPath,
-            "perMonitorWallpaper": perMonitorWallpaper,
-            "monitorWallpapers": monitorWallpapers,
-            "perModeWallpaper": perModeWallpaper,
-            "wallpaperPathLight": wallpaperPathLight,
-            "wallpaperPathDark": wallpaperPathDark,
-            "monitorWallpapersLight": monitorWallpapersLight,
-            "monitorWallpapersDark": monitorWallpapersDark,
-            "brightnessExponentialDevices": brightnessExponentialDevices,
-            "brightnessUserSetValues": brightnessUserSetValues,
-            "brightnessExponentValues": brightnessExponentValues,
-            "doNotDisturb": doNotDisturb,
-            "nightModeEnabled": nightModeEnabled,
-            "nightModeTemperature": nightModeTemperature,
-            "nightModeHighTemperature": nightModeHighTemperature,
-            "nightModeAutoEnabled": nightModeAutoEnabled,
-            "nightModeAutoMode": nightModeAutoMode,
-            "nightModeStartHour": nightModeStartHour,
-            "nightModeStartMinute": nightModeStartMinute,
-            "nightModeEndHour": nightModeEndHour,
-            "nightModeEndMinute": nightModeEndMinute,
-            "latitude": latitude,
-            "longitude": longitude,
-            "nightModeUseIPLocation": nightModeUseIPLocation,
-            "nightModeLocationProvider": nightModeLocationProvider,
-            "pinnedApps": pinnedApps,
-            "hiddenTrayIds": hiddenTrayIds,
-            "selectedGpuIndex": selectedGpuIndex,
-            "nvidiaGpuTempEnabled": nvidiaGpuTempEnabled,
-            "nonNvidiaGpuTempEnabled": nonNvidiaGpuTempEnabled,
-            "enabledGpuPciIds": enabledGpuPciIds,
-            "wifiDeviceOverride": wifiDeviceOverride,
-            "weatherHourlyDetailed": weatherHourlyDetailed,
-            "wallpaperCyclingEnabled": wallpaperCyclingEnabled,
-            "wallpaperCyclingMode": wallpaperCyclingMode,
-            "wallpaperCyclingInterval": wallpaperCyclingInterval,
-            "wallpaperCyclingTime": wallpaperCyclingTime,
-            "monitorCyclingSettings": monitorCyclingSettings,
-            "lastBrightnessDevice": lastBrightnessDevice,
-            "launchPrefix": launchPrefix,
-            "wallpaperTransition": wallpaperTransition,
-            "includedTransitions": includedTransitions,
-            "recentColors": recentColors,
-            "showThirdPartyPlugins": showThirdPartyPlugins,
-            "configVersion": sessionConfigVersion
-        }, null, 2));
+        if (_isReadOnly) {
+            _hasUnsavedChanges = _checkForUnsavedChanges();
+            return;
+        }
+        settingsFile.setText(getCurrentSessionJson());
     }
 
     function migrateFromUndefinedToV1(settings) {
@@ -303,32 +267,6 @@ Singleton {
                 CacheData.profileLastPath = settings.profileLastPath;
             }
             CacheData.saveCache();
-        }
-    }
-
-    function cleanupUnusedKeys() {
-        const validKeys = ["isLightMode", "wallpaperPath", "perMonitorWallpaper", "monitorWallpapers", "perModeWallpaper", "wallpaperPathLight", "wallpaperPathDark", "monitorWallpapersLight", "monitorWallpapersDark", "doNotDisturb", "nightModeEnabled", "nightModeTemperature", "nightModeHighTemperature", "nightModeAutoEnabled", "nightModeAutoMode", "nightModeStartHour", "nightModeStartMinute", "nightModeEndHour", "nightModeEndMinute", "latitude", "longitude", "nightModeUseIPLocation", "nightModeLocationProvider", "pinnedApps", "hiddenTrayIds", "selectedGpuIndex", "nvidiaGpuTempEnabled", "nonNvidiaGpuTempEnabled", "enabledGpuPciIds", "wifiDeviceOverride", "weatherHourlyDetailed", "wallpaperCyclingEnabled", "wallpaperCyclingMode", "wallpaperCyclingInterval", "wallpaperCyclingTime", "monitorCyclingSettings", "lastBrightnessDevice", "brightnessExponentialDevices", "brightnessUserSetValues", "brightnessExponentValues", "launchPrefix", "wallpaperTransition", "includedTransitions", "recentColors", "showThirdPartyPlugins", "configVersion"];
-
-        try {
-            const content = settingsFile.text();
-            if (!content || !content.trim())
-                return;
-            const settings = JSON.parse(content);
-            let needsSave = false;
-
-            for (const key in settings) {
-                if (!validKeys.includes(key)) {
-                    console.log("SessionData: Removing unused key:", key);
-                    delete settings[key];
-                    needsSave = true;
-                }
-            }
-
-            if (needsSave) {
-                settingsFile.setText(JSON.stringify(settings, null, 2));
-            }
-        } catch (e) {
-            console.warn("SessionData: Failed to cleanup unused keys:", e.message);
         }
     }
 
@@ -923,6 +861,12 @@ Singleton {
         saveSettings();
     }
 
+    function setWeatherLocation(displayName, coordinates) {
+        weatherLocation = displayName;
+        weatherCoordinates = coordinates;
+        saveSettings();
+    }
+
     function syncWallpaperForCurrentMode() {
         if (!perModeWallpaper)
             return;
@@ -1005,14 +949,8 @@ Singleton {
         watchChanges: !isGreeterMode
         onLoaded: {
             if (!isGreeterMode) {
+                _hasUnsavedChanges = false;
                 parseSettings(settingsFile.text());
-                hasTriedDefaultSession = false;
-            }
-        }
-        onLoadFailed: error => {
-            if (!isGreeterMode && !hasTriedDefaultSession) {
-                hasTriedDefaultSession = true;
-                defaultSessionCheckProcess.running = true;
             }
         }
     }
@@ -1037,14 +975,17 @@ Singleton {
     }
 
     Process {
-        id: defaultSessionCheckProcess
+        id: sessionWritableCheckProcess
 
-        command: ["sh", "-c", "CONFIG_DIR=\"" + _stateDir + "/DankMaterialShell\"; if [ -f \"$CONFIG_DIR/default-session.json\" ] && [ ! -f \"$CONFIG_DIR/session.json\" ]; then cp --no-preserve=mode \"$CONFIG_DIR/default-session.json\" \"$CONFIG_DIR/session.json\" && echo 'copied'; else echo 'not_found'; fi"]
+        property string sessionPath: Paths.strip(settingsFile.path)
+
+        command: ["sh", "-c", "[ -w \"" + sessionPath + "\" ] && echo 'writable' || echo 'readonly'"]
         running: false
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                console.info("Copied default-session.json to session.json");
-                settingsFile.reload();
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const result = text.trim();
+                root._onWritableCheckComplete(result === "writable");
             }
         }
     }

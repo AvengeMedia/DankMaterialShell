@@ -72,6 +72,8 @@ type NetworkManagerBackend struct {
 	pendingVPNSaveMu sync.Mutex
 	cachedVPNCreds   *cachedVPNCredentials
 	cachedVPNCredsMu sync.Mutex
+	cachedPKCS11PIN  *cachedPKCS11PIN
+	cachedPKCS11Mu   sync.Mutex
 
 	onStateChange func()
 }
@@ -87,6 +89,11 @@ type cachedVPNCredentials struct {
 	ConnectionUUID string
 	Password       string
 	SavePassword   bool
+}
+
+type cachedPKCS11PIN struct {
+	ConnectionUUID string
+	PIN            string
 }
 
 func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*NetworkManagerBackend, error) {

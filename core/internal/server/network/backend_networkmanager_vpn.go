@@ -683,6 +683,11 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.LastError = ""
 				b.stateMutex.Unlock()
 
+				// Clear cached PKCS11 PIN on success
+				b.cachedPKCS11Mu.Lock()
+				b.cachedPKCS11PIN = nil
+				b.cachedPKCS11Mu.Unlock()
+
 				b.pendingVPNSaveMu.Lock()
 				pending := b.pendingVPNSave
 				b.pendingVPNSave = nil
@@ -699,6 +704,11 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.ConnectingVPNUUID = ""
 				b.state.LastError = "VPN connection failed"
 				b.stateMutex.Unlock()
+
+				// Clear cached PKCS11 PIN on failure
+				b.cachedPKCS11Mu.Lock()
+				b.cachedPKCS11PIN = nil
+				b.cachedPKCS11Mu.Unlock()
 				return
 			}
 		}
@@ -711,6 +721,11 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 		b.state.ConnectingVPNUUID = ""
 		b.state.LastError = "VPN connection failed"
 		b.stateMutex.Unlock()
+
+		// Clear cached PKCS11 PIN
+		b.cachedPKCS11Mu.Lock()
+		b.cachedPKCS11PIN = nil
+		b.cachedPKCS11Mu.Unlock()
 	}
 }
 

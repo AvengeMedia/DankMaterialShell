@@ -214,6 +214,16 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 4;
     }
 
+    if (currentVersion < 5) {
+        console.info("Migrating settings from version", currentVersion, "to version 5");
+        console.info("Moving sensitive data (weather location, coordinates) to session.json");
+
+        delete settings.weatherLocation;
+        delete settings.weatherCoordinates;
+
+        settings.configVersion = 5;
+    }
+
     return settings;
 }
 

@@ -50,15 +50,18 @@ func findConfig(cmd *cobra.Command, args []string) error {
 
 	configStateFile := filepath.Join(getRuntimeDir(), "danklinux.path")
 	if data, readErr := os.ReadFile(configStateFile); readErr == nil {
-		statePath := strings.TrimSpace(string(data))
-		shellPath := filepath.Join(statePath, "shell.qml")
-
-		if info, statErr := os.Stat(shellPath); statErr == nil && !info.IsDir() {
-			log.Debug("Using config from active session state file: %s", statePath)
-			configPath = statePath
-			log.Debug("Using config from: %s", configPath)
-			return nil // <-- Guard statement
+		if len(getAllDMSPIDs()) == 0 {
+			os.Remove(configStateFile)
 		} else {
+			statePath := strings.TrimSpace(string(data))
+			shellPath := filepath.Join(statePath, "shell.qml")
+
+			if info, statErr := os.Stat(shellPath); statErr == nil && !info.IsDir() {
+				log.Debug("Using config from active session state file: %s", statePath)
+				configPath = statePath
+				log.Debug("Using config from: %s", configPath)
+				return nil
+			}
 			os.Remove(configStateFile)
 		}
 	}

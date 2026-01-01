@@ -30,9 +30,9 @@ Rectangle {
         radius: parent.radius
         color: {
             if (pressed)
-                return Theme.primaryPressed;
+                return Theme.withAlpha(root.textColor, 0.20);
             if (hovered)
-                return Theme.primaryHover;
+                return Theme.withAlpha(root.textColor, 0.12);
             return "transparent";
         }
 

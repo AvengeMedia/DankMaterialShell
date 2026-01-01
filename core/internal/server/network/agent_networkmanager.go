@@ -252,6 +252,28 @@ func (a *SecretAgent) GetSecrets(
 	}
 
 	if settingName == "vpn" && a.backend != nil {
+		// Check for cached PKCS11 PIN first
+		isPKCS11Request := len(fields) == 1 && fields[0] == "key_pass"
+		if isPKCS11Request {
+			a.backend.cachedPKCS11Mu.Lock()
+			cached := a.backend.cachedPKCS11PIN
+			if cached != nil && cached.ConnectionUUID == connUuid {
+				a.backend.cachedPKCS11PIN = nil
+				a.backend.cachedPKCS11Mu.Unlock()
+
+				log.Infof("[SecretAgent] Using cached PKCS11 PIN")
+
+				out := nmSettingMap{}
+				vpnSec := nmVariantMap{}
+				vpnSec["secrets"] = dbus.MakeVariant(map[string]string{"key_pass": cached.PIN})
+				out[settingName] = vpnSec
+
+				return out, nil
+			}
+			a.backend.cachedPKCS11Mu.Unlock()
+		}
+
+		// Check for cached VPN password
 		a.backend.cachedVPNCredsMu.Lock()
 		cached := a.backend.cachedVPNCreds
 		if cached != nil && cached.ConnectionUUID == connUuid {
@@ -261,9 +283,9 @@ func (a *SecretAgent) GetSecrets(
 			log.Infof("[SecretAgent] Using cached password from pre-activation prompt")
 
 			out := nmSettingMap{}
-			sec := nmVariantMap{}
-			sec["password"] = dbus.MakeVariant(cached.Password)
-			out[settingName] = sec
+			vpnSec := nmVariantMap{}
+			vpnSec["secrets"] = dbus.MakeVariant(map[string]string{"password": cached.Password})
+			out[settingName] = vpnSec
 
 			if cached.SavePassword {
 				a.backend.pendingVPNSaveMu.Lock()
@@ -367,16 +389,41 @@ func (a *SecretAgent) GetSecrets(
 		}
 		sec[k] = dbus.MakeVariant(v)
 	}
-	out[settingName] = sec
+
+	// Check if this is PKCS11 auth (key_pass)
+	pin, isPKCS11 := reply.Secrets["key_pass"]
 
 	switch settingName {
-	case "802-1x":
-		log.Infof("[SecretAgent] Returning 802-1x enterprise secrets with %d fields", len(sec))
 	case "vpn":
-		log.Infof("[SecretAgent] Returning VPN secrets with %d fields for %s", len(sec), vpnSvc)
-	}
+		// VPN secrets must be wrapped in a "secrets" key per NM spec
+		secretsDict := make(map[string]string)
+		for k, v := range reply.Secrets {
+			if k != "username" {
+				secretsDict[k] = v
+			}
+		}
+		vpnSec := nmVariantMap{}
+		vpnSec["secrets"] = dbus.MakeVariant(secretsDict)
+		out[settingName] = vpnSec
+		log.Infof("[SecretAgent] Returning VPN secrets with %d fields for %s", len(secretsDict), vpnSvc)
 
-	if settingName == "vpn" && a.backend != nil && (vpnUsername != "" || reply.Save) {
+		// Cache PKCS11 PIN in case GetSecrets is called again during activation
+		if isPKCS11 && a.backend != nil {
+			a.backend.cachedPKCS11Mu.Lock()
+			a.backend.cachedPKCS11PIN = &cachedPKCS11PIN{
+				ConnectionUUID: connUuid,
+				PIN:            pin,
+			}
+			a.backend.cachedPKCS11Mu.Unlock()
+			log.Infof("[SecretAgent] Cached PKCS11 PIN for potential re-request")
+		}
+	case "802-1x":
+		out[settingName] = sec
+		log.Infof("[SecretAgent] Returning 802-1x enterprise secrets with %d fields", len(sec))
+	default:
+		out[settingName] = sec
+	}
+	if settingName == "vpn" && a.backend != nil && !isPKCS11 && (vpnUsername != "" || reply.Save) {
 		pw := reply.Secrets["password"]
 		a.backend.pendingVPNSaveMu.Lock()
 		a.backend.pendingVPNSave = &pendingVPNCredentials{
