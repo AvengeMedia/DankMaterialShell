@@ -151,6 +151,7 @@ DankPopout {
                     height: {
                         let usedHeight = 40 + Theme.spacingL;
                         usedHeight += 48 + Theme.spacingL;
+                        usedHeight += latestNews.visible ? latestNews.height : 0;
                         return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
@@ -257,6 +258,43 @@ DankPopout {
                     }
                 }
 
+                DankListView {
+                    id: latestNews
+                    width: parent.width - Theme.spacingL * 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    height: 20
+                    spacing: Theme.spacingM
+                    visible: SettingsData.updaterShowLatestNews
+                    model: SystemUpdateService.latestNews
+
+                    delegate: Row {
+                        // anchors.fill: parent
+                        spacing: Theme.spacingM
+                        width: parent.width
+                        // anchors.verticalCenter: parent.verticalCenter
+                        StyledText {
+                            opacity: 0.7
+                            width: latestNews.width - extendNewsIcon.width
+                            height: latestNews.height
+
+                            text: {
+                                if (SettingsData.updaterShowLatestNews)
+                                    return modelData.title
+                            }
+
+                            DankIcon {
+                                id: extendNewsIcon
+                                anchors.left: parent.right
+                                anchors.margins: Theme.spacingM
+                                name: "navigate_next"
+                                size: Theme.iconSize
+                                color: Theme.primary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
+                }
+
                 Row {
                     width: parent.width
                     height: 48
@@ -351,6 +389,8 @@ DankPopout {
                         }
                     }
                 }
+
+
             }
         }
     }

@@ -268,6 +268,8 @@ var SPEC = {
     updaterUseCustomCommand: { def: false },
     updaterCustomCommand: { def: "" },
     updaterTerminalAdditionalParams: { def: "" },
+    updaterShowLatestNews: { def: false },
+    updaterLatestNewsUrl: { def: "" },
 
     displayNameMode: { def: "system" },
     screenPreferences: { def: {} },

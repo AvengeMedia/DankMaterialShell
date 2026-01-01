@@ -138,6 +138,60 @@ Item {
                         }
                     }
                 }
+
+                SettingsToggleRow {
+                    text: I18n.tr("Show Latest News")
+                    description: I18n.tr("Show your distro's latest news")
+                    checked: SettingsData.updaterShowLatestNews
+                    onToggled: checked => {
+                        SettingsData.set("updaterShowLatestNews", checked);
+                    }
+                }
+
+                FocusScope {
+                    width: parent.width - Theme.spacingM * 2
+                    height: latestNewsColumn.implicitHeight
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+
+                    Column {
+                        id: latestNewsColumn
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Latest news RSS feed")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: updaterLatestNews
+                            width: parent.width
+                            height: 48
+                            placeholderText: "https://archlinux.org/feeds/news/"
+                            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+                            normalBorderColor: Theme.outlineMedium
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.updaterLatestNewsUrl) {
+                                    text = SettingsData.updaterLatestNewsUrl;
+                                }
+                            }
+
+                            onTextEdited: SettingsData.set("updaterLatestNewsUrl", text.trim())
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onPressed: mouse => {
+                                    updaterLatestNews.forceActiveFocus();
+                                    mouse.accepted = false;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

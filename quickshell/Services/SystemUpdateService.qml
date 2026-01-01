@@ -21,9 +21,28 @@ Singleton {
     property string shellVersion: ""
     property string shellCodename: ""
     property string semverVersion: ""
+    property var latestNews: []
+    property int lastNewsCheckTimestamp: 0
 
     function getParsedShellVersion() {
         return parseVersion(semverVersion);
+    }
+
+    readonly property var archBasedLatestNewsSettings: {
+        "listLatestNewsSettings": {
+            "params": [],
+            "correctExitCodes": [0, 2]   // Exit code 0 = updates available, 2 = no updates
+        },
+        "parserSettings": {
+            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>/,
+            "entryProducer": function (match) {
+                return {
+                    "title": match[1],
+                    "link": match[2],
+                    "description": match[3]
+                };
+            }
+        }
     }
 
     readonly property var archBasedUCSettings: {
@@ -96,6 +115,13 @@ Singleton {
         "paru": archBasedPMSettings,
         "dnf": fedoraBasedPMSettings
     }
+    readonly property var latestNewsCheckerParams: {
+        "arch": archBasedLatestNewsSettings,
+        "cachyos": archBasedLatestNewsSettings,
+        "manjaro": archBasedLatestNewsSettings,
+        "endeavouros": archBasedLatestNewsSettings
+    }
+
     readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros", "fedora"]
     readonly property int updateCount: availableUpdates.length
     readonly property bool helperAvailable: pkgManager !== "" && distributionSupported
@@ -223,6 +249,50 @@ Singleton {
         }
     }
 
+    Process {
+        id: latestNewsChecker
+        command: ["curl", SettingsData.updaterLatestNewsUrl]
+        onExited: exitCode => {
+            const correctExitCodes = [0];
+            if (correctExitCodes.includes(exitCode)) {
+                lastNewsCheckTimestamp = Date.now();
+                parseLatestNews(stdout.text);
+            } else {
+                console.warn("SystemUpdate: Failed downloading the latest news RSS feed.");
+            }
+        }
+
+        stdout: StdioCollector {}
+    }
+
+
+    function parseLatestNews(feed) {
+        if (!latestNewsCheckerParams[distribution]) {
+            console.warn(`SystemUpdate: ${distribution} is not supported.`);
+            return;
+        }
+
+        const regex = latestNewsCheckerParams[distribution].parserSettings.lineRegex
+        const items = feed.match(regex);
+
+        if (!items || items.length <= 0) {
+            console.log("SystemUpdate: Empty latest news RSS feed.");
+            return;
+        }
+
+        const news = [];
+        const entryProducer = latestNewsCheckerParams[distribution].parserSettings.entryProducer;
+
+        for (const item of items) {
+            const match = item.match(regex);
+            if (match) {
+                news.push(entryProducer(match));
+            }
+        }
+
+        latestNews = news;
+    }
+
     function checkForUpdates() {
         if (!distributionSupported || (!pkgManager && !updChecker) || isChecking)
             return;
@@ -234,6 +304,10 @@ Singleton {
             updateChecker.command = [pkgManager].concat(packageManagerParams[pkgManager].listUpdatesSettings.params);
         }
         updateChecker.running = true;
+
+        if (SettingsData.updaterShowLatestNews && SettingsData.updaterLatestNewsUrl.length > 0 && Date.now() > lastNewsCheckTimestamp + 60) {
+            latestNewsChecker.running = true;
+        }
     }
 
     function parseUpdates(output) {
