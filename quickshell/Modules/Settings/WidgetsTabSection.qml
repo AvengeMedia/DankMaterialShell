@@ -419,6 +419,24 @@ Column {
                             }
 
                             DankActionButton {
+                                id: largerSizeButton
+                                buttonSize: 28
+                                visible: modelData.id === "music"
+                                iconName: "fit_screen"
+                                iconSize: 16
+                                iconColor: (modelData.mediaSize !== undefined ? modelData.mediaSize : SettingsData.mediaSize) === 3 ? Theme.primary : Theme.outline
+                                onClicked: {
+                                    root.compactModeChanged("music", 3);
+                                }
+                                onEntered: {
+                                    sharedTooltip.show("Largest", largerSizeButton, 0, 0, "bottom");
+                                }
+                                onExited: {
+                                    sharedTooltip.hide();
+                                }
+                            }
+
+                            DankActionButton {
                                 id: compactModeButton
                                 buttonSize: 28
                                 visible: modelData.id === "clock" || modelData.id === "focusedWindow" || modelData.id === "runningApps" || modelData.id === "keyboard_layout_name"
