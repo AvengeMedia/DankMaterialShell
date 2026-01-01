@@ -28,6 +28,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install flatpak
+        run: sudo apt update && sudo apt install -y flatpak
+
+      - name: Add flathub
+        run: sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+      - name: Add a flatpak that mutagen could support
+        run: sudo flatpak install -y org.freedesktop.Platform/x86_64/24.08 app.zen_browser.zen
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
