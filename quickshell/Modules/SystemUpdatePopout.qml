@@ -23,7 +23,6 @@ DankPopout {
     shouldBeVisible: false
 
     onBackgroundClicked: close()
-
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
             if (SystemUpdateService.updateCount === 0 && !SystemUpdateService.isChecking) {
@@ -42,6 +41,7 @@ DankPopout {
 
             property bool newsExpanded: false
 
+            // Background layers
             Repeater {
                 model: [
                     {
@@ -78,6 +78,7 @@ DankPopout {
                 y: Theme.spacingL
                 spacing: Theme.spacingL
 
+                // Header
                 Item {
                     width: parent.width
                     height: 40
@@ -89,24 +90,6 @@ DankPopout {
                         font.weight: Font.Medium
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
-
-                        Behavior on text {
-                            SequentialAnimation {
-                                NumberAnimation {
-                                    target: parent
-                                    property: "opacity"
-                                    to: 0
-                                    duration: Theme.shortDuration / 2
-                                }
-                                PropertyAction {}
-                                NumberAnimation {
-                                    target: parent
-                                    property: "opacity"
-                                    to: 1
-                                    duration: Theme.shortDuration / 2
-                                }
-                            }
-                        }
                     }
 
                     Row {
@@ -159,7 +142,6 @@ DankPopout {
                         DankActionButton {
                             id: checkForUpdatesButton
                             visible: !updaterPanel.newsExpanded
-                            // opacity: visible ? 1.0 : 0.0
                             buttonSize: 28
                             iconName: "refresh"
                             iconSize: 18
@@ -193,12 +175,13 @@ DankPopout {
                     }
                 }
 
+                // Main content
                 Rectangle {
                     width: parent.width
                     height: {
                         let usedHeight = 40 + Theme.spacingL;
                         usedHeight += 48 + Theme.spacingL;
-                        usedHeight += latestNewsTicker.visible ? latestNewsTicker.height + Theme.spacingL : 0;
+                        usedHeight += latestNewsTicker.shouldShow ? latestNewsTicker.height + Theme.spacingL : 0;
                         return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
@@ -212,11 +195,12 @@ DankPopout {
                         anchors.margins: Theme.spacingM
                         anchors.rightMargin: 0
                         opacity: updaterPanel.newsExpanded ? 0 : 1
-                        visible: !updaterPanel.newsExpanded
+                        enabled: opacity === 1 // Only interactive when fully visible
+                        visible: true
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: Theme.shortDuration
+                                duration: Theme.longDuration
                                 easing.type: Easing.InOutQuad
                             }
                         }
@@ -320,11 +304,12 @@ DankPopout {
                         anchors.margins: Theme.spacingM
                         anchors.rightMargin: 0
                         opacity: updaterPanel.newsExpanded ? 1 : 0
-                        visible: updaterPanel.newsExpanded
+                        enabled: opacity === 1
+                        visible: true
 
                         Behavior on opacity {
                             NumberAnimation {
-                                duration: Theme.shortDuration
+                                duration: Theme.longDuration
                                 easing.type: Easing.InOutQuad
                             }
                         }
@@ -352,20 +337,8 @@ DankPopout {
 
                                 Behavior on height {
                                     NumberAnimation {
-                                        duration: Theme.mediumDuration
+                                        duration: Theme.longDuration
                                         easing.type: Easing.OutCubic
-                                    }
-                                }
-
-                                Behavior on color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
-                                    }
-                                }
-
-                                Behavior on border.color {
-                                    ColorAnimation {
-                                        duration: Theme.shortDuration
                                     }
                                 }
 
@@ -377,7 +350,7 @@ DankPopout {
                                     anchors.margins: Theme.spacingS
                                     spacing: Theme.spacingXS
 
-                                    // Header row with title and expand icon
+                                    // News titles
                                     Row {
                                         width: parent.width
                                         spacing: Theme.spacingS
@@ -406,7 +379,6 @@ DankPopout {
                                             }
                                         }
 
-                                        // Expand/collapse indicator
                                         Item {
                                             id: expandIndicator
                                             visible: modelData.description && modelData.description.length > 0
@@ -423,7 +395,7 @@ DankPopout {
                                         }
                                     }
 
-                                    // Separator between header and description
+                                    // Separator between titles and description
                                     Rectangle {
                                         width: parent.width
                                         height: 1
@@ -461,10 +433,8 @@ DankPopout {
                                     Item {
                                         width: parent.width
                                         visible: newsItem.expanded && modelData.link
-                                        // spacing: Theme.spacingS
                                         height: externalLinkButton.height
 
-                                        // External link button (shown when expanded and link exists)
                                         DankActionButton {
                                             id: externalLinkButton
                                             visible: modelData.link && newsItem.expanded
@@ -487,10 +457,8 @@ DankPopout {
                                                 }
                                             }
                                         }
-
                                     }
                                 }
-
                                 MouseArea {
                                     id: newsMouseArea
                                     anchors.fill: parent
@@ -511,9 +479,10 @@ DankPopout {
                 Item {
                     id: latestNewsTicker
                     width: parent.width
-                    height: 16
-                    visible: SettingsData.updaterShowLatestNews && !updaterPanel.newsExpanded && SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0
-                    opacity: 0.7
+                    // This smooths the transition of the main content rectangle resizing.
+                    property bool shouldShow: SettingsData.updaterShowLatestNews && !updaterPanel.newsExpanded && SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0
+                    height: shouldShow ? 16 : 0
+                    opacity: shouldShow ? 0.7 : 0
 
                     Behavior on opacity {
                         NumberAnimation { duration: Theme.shortDuration }
@@ -571,6 +540,7 @@ DankPopout {
                     }
                 }
 
+                // Buttons
                 Row {
                     width: parent.width
                     height: 48
