@@ -35,13 +35,12 @@ DankPopout {
     content: Component {
         Rectangle {
             id: updaterPanel
-
-            property bool newsExpanded: false
-
             color: "transparent"
             radius: Theme.cornerRadius
             antialiasing: true
             smooth: true
+
+            property bool newsExpanded: false
 
             Repeater {
                 model: [
@@ -213,10 +212,13 @@ DankPopout {
                         anchors.margins: Theme.spacingM
                         anchors.rightMargin: 0
                         opacity: updaterPanel.newsExpanded ? 0 : 1
-                        visible: opacity > 0
+                        visible: !updaterPanel.newsExpanded
 
                         Behavior on opacity {
-                            NumberAnimation { duration: Theme.shortDuration * 2 }
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Easing.InOutQuad
+                            }
                         }
 
                         StyledText {
@@ -315,13 +317,16 @@ DankPopout {
                     // Latest news view
                     Column {
                         anchors.fill: parent
-                        anchors.margins: Theme.spacingS
+                        anchors.margins: Theme.spacingM
                         anchors.rightMargin: 0
                         opacity: updaterPanel.newsExpanded ? 1 : 0
-                        visible: opacity > 0
+                        visible: updaterPanel.newsExpanded
 
                         Behavior on opacity {
-                            NumberAnimation { duration: Theme.shortDuration * 2 }
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Easing.InOutQuad
+                            }
                         }
 
                         DankListView {
