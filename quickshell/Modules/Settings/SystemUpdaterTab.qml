@@ -160,7 +160,7 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Latest news url to parse")
+                            text: I18n.tr("Custom feed to parse")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
@@ -195,7 +195,7 @@ Item {
 
                 FocusScope {
                     width: parent.width - Theme.spacingM * 2
-                    height: latestNewsRegexColumn.implicitHeight
+                    implicitHeight: latestNewsRegexColumn.implicitHeight
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingM
 
@@ -205,21 +205,17 @@ Item {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Latest news regex")
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceVariantText
-                        }
-                        StyledText {
-                            text: I18n.tr("It must produce 4 matches in this exact order: title, description, link, pubDate")
+                            width: parent.width
+                            text: I18n.tr("Custom feed regex")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
 
                         DankTextField {
-                            id: updaterLatestNews
+                            id: updaterLatestNewsRegex
                             width: parent.width
                             height: 48
-                            placeholderText: "/<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>/g"
+                            placeholderText: "<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>"
                             backgroundColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
                             normalBorderColor: Theme.outlineMedium
                             focusedBorderColor: Theme.primary
@@ -235,10 +231,19 @@ Item {
                             MouseArea {
                                 anchors.fill: parent
                                 onPressed: mouse => {
-                                    updaterLatestNews.forceActiveFocus();
+                                    updaterLatestNewsRegex.forceActiveFocus();
                                     mouse.accepted = false;
                                 }
                             }
+                        }
+
+                        StyledText {
+                            width: parent.width
+                            text: I18n.tr("Don't include the regex delimeters and flags. It will use a global flag by default. It must produce 4 matches in this exact order: title, description, link, pubDate")
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.italic: true
+                            color: Theme.surfaceVariantText
+                            opacity: 0.7
                         }
                     }
                 }

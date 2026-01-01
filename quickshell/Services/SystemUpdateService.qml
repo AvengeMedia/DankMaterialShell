@@ -127,7 +127,7 @@ Singleton {
     readonly property var customLatestNewsSettings: {
         "url": SettingsData.updaterLatestNewsUrl,
         "parserSettings": {
-            "lineRegex": SettingsData.updaterLatestNewsRegex,
+            "lineRegex": RegExp(SettingsData.updaterLatestNewsRegex, "g"),
             "entryProducer": latestNewsParserProducer
         }
     }
@@ -316,7 +316,8 @@ Singleton {
 
 
     function parseLatestNews(feed) {
-        const parserParams = latestNewsParserParams[distribution] ? latestNewsParserParams[distribution] : latestNewsParserParams["custom"];
+        const isCustom = !!SettingsData.updaterLatestNewsUrl && !!SettingsData.updaterLatestNewsRegex;
+        const parserParams = isCustom ? latestNewsParserParams["custom"] : latestNewsParserParams[distribution];
         const regex = parserParams.parserSettings.lineRegex;
         const entryProducer = parserParams.parserSettings.entryProducer;
 
@@ -349,7 +350,7 @@ Singleton {
         }
         updateChecker.running = true;
 
-        if (SettingsData.updaterShowLatestNews && Date.now() > lastNewsCheckTimestamp + 60) {
+        if (SettingsData.updaterShowLatestNews && Date.now() > lastNewsCheckTimestamp + 10) {
             if (!latestNewsParserParams[distribution] && (SettingsData.updaterLatestNewsUrl === "" || SettingsData.updaterLatestNewsRegex === "")) {
                 console.log(`SystemUpdate: ${distribution} latest news not supported by default. Add a custom regex and feed.`);
                 return;
