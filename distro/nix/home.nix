@@ -25,24 +25,41 @@ in
       "dank-material-shell"
       "enableNightMode"
     ] "Night mode is now always available.")
+    (lib.mkRemovedOptionModule [
+      "programs"
+      "dank-material-shell"
+      "default"
+      "settings"
+    ] "Declared settings are now respected.")
+    (lib.mkRemovedOptionModule [
+      "programs"
+      "dank-material-shell"
+      "default"
+      "session"
+    ] "Declared session settings are now respected.")
     (lib.mkRenamedOptionModule
       [ "programs" "dank-material-shell" "enableSystemd" ]
       [ "programs" "dank-material-shell" "systemd" "enable" ]
     )
   ];
 
-  options.programs.dank-material-shell = with lib.types; {
-    default = {
-      settings = lib.mkOption {
-        type = jsonFormat.type;
-        default = { };
-        description = "The default settings are only read if the settings.json file don't exist";
-      };
-      session = lib.mkOption {
-        type = jsonFormat.type;
-        default = { };
-        description = "The default session are only read if the session.json file don't exist";
-      };
+  options.programs.dank-material-shell = {
+    settings = lib.mkOption {
+      type = jsonFormat.type;
+      default = { };
+      description = "DankMaterialShell configuration settings as an attribute set, to be written to ~/.config/DankMaterialShell/settings.json.";
+    };
+
+    clsettings = lib.mkOption {
+      type = jsonFormat.type;
+      default = { };
+      description = "DankMaterialShell clipboard settings as an attribute set, to be written to ~/.config/DankMaterialShell/clsettings.json.";
+    };
+
+    session = lib.mkOption {
+      type = jsonFormat.type;
+      default = { };
+      description = "DankMaterialShell session settings as an attribute set, to be written to ~/.local/state/DankMaterialShell/session.json.";
     };
   };
 
@@ -67,22 +84,25 @@ in
       Install.WantedBy = [ config.wayland.systemd.target ];
     };
 
-    xdg.stateFile."DankMaterialShell/default-session.json" = lib.mkIf (cfg.default.session != { }) {
-      source = jsonFormat.generate "default-session.json" cfg.default.session;
+    xdg.stateFile."DankMaterialShell/session.json" = lib.mkIf (cfg.session != { }) {
+      source = jsonFormat.generate "session.json" cfg.session;
     };
 
-    xdg.configFile = lib.mkMerge [
-      (lib.mapAttrs' (name: value: {
-        name = "DankMaterialShell/plugins/${name}";
-        inherit value;
-      }) common.plugins)
-      {
-        "DankMaterialShell/default-settings.json" = lib.mkIf (cfg.default.settings != { }) {
-          source = jsonFormat.generate "default-settings.json" cfg.default.settings;
-        };
-      }
-    ];
+    xdg.configFile = {
+      "DankMaterialShell/settings.json" = lib.mkIf (cfg.settings != { }) {
+        source = jsonFormat.generate "settings.json" cfg.settings;
+      };
+      "DankMaterialShell/clsettings.json" = lib.mkIf (cfg.clsettings != { }) {
+        source = jsonFormat.generate "clsettings.json" cfg.clsettings;
+      };
+      "DankMaterialShell/plugin_settings.json" = (
+        lib.mapAttrs' (name: value: {
+          name = "DankMaterialShell/plugins/${name}";
+          inherit value;
+        }) common.plugins
+      );
 
+    };
     home.packages = common.packages;
   };
 }
