@@ -324,12 +324,12 @@ DankPopout {
                             NumberAnimation { duration: Theme.shortDuration * 2 }
                         }
 
-                        ListView {
+                        DankListView {
                             id: expandedNewsList
                             width: parent.width
                             height: parent.height
                             clip: true
-                            spacing: Theme.spacingS
+                            spacing: Theme.spacingM
                             model: SystemUpdateService.latestNews
                             boundsBehavior: Flickable.StopAtBounds
 
@@ -337,7 +337,7 @@ DankPopout {
                                 id: newsItem
                                 width: ListView.view.width - Theme.spacingS
                                 radius: Theme.cornerRadius
-                                color: newsMouseArea.containsMouse && !newsItem.expanded ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.15)
+                                color: newsMouseArea.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.15)
                                 border.color: newsItem.expanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
                                 border.width: 1
 
@@ -372,26 +372,50 @@ DankPopout {
                                     anchors.margins: Theme.spacingS
                                     spacing: Theme.spacingXS
 
-                                    // Title
-                                    StyledText {
-                                        id: titleText
+                                    // Header row with title and expand icon
+                                    Row {
                                         width: parent.width
-                                        text: modelData.title || ""
-                                        font.pixelSize: Theme.fontSizeMedium
-                                        color: Theme.surfaceText
-                                        font.weight: Font.Medium
-                                        wrapMode: Text.WordWrap
-                                    }
+                                        spacing: Theme.spacingS
 
-                                    // Pub date
-                                    StyledText {
-                                        id: metaText
-                                        width: parent.width
-                                        text: modelData.pubDate || ""
-                                        font.pixelSize: Theme.fontSizeSmall
-                                        color: Theme.surfaceVariantText
-                                        visible: modelData.pubDate && modelData.pubDate.length > 0
-                                        wrapMode: Text.WordWrap
+                                        Column {
+                                            width: parent.width - expandIndicator.width
+                                            spacing: 2
+
+                                            StyledText {
+                                                width: parent.width
+                                                text: modelData.title || ""
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                color: Theme.surfaceText
+                                                font.weight: Font.Medium
+                                                wrapMode: Text.WordWrap
+                                            }
+
+                                            StyledText {
+                                                width: parent.width
+                                                text: modelData.pubDate || ""
+                                                opacity: 0.7
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                visible: modelData.pubDate && modelData.pubDate.length > 0
+                                                wrapMode: Text.WordWrap
+                                            }
+                                        }
+
+                                        // Expand/collapse indicator
+                                        Item {
+                                            id: expandIndicator
+                                            visible: modelData.description && modelData.description.length > 0
+                                            width: visible ? expandIcon.width : 0
+                                            height: visible ? expandIcon.height : 0
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            DankIcon {
+                                                id: expandIcon
+                                                name: newsItem.expanded ? "expand_less" : "expand_more"
+                                                size: Theme.iconSizeSmall
+                                                opacity: 0.7
+                                            }
+                                        }
                                     }
 
                                     // Separator between header and description
@@ -412,7 +436,6 @@ DankPopout {
 
                                     // Description
                                     StyledText {
-                                        id: descText
                                         width: parent.width
                                         text: modelData.description || ""
                                         font.pixelSize: Theme.fontSizeSmall
@@ -429,12 +452,12 @@ DankPopout {
                                         }
                                     }
 
-                                    // Footer with external link and expand indicator
-                                    Row {
+                                    // Footer with external link
+                                    Item {
                                         width: parent.width
-                                        visible: (modelData.description && modelData.description.length > 0) || modelData.link
-                                        spacing: Theme.spacingS
-                                        height: Math.max(expandIndicator.height, externalLinkButton.height)
+                                        visible: newsItem.expanded && modelData.link
+                                        // spacing: Theme.spacingS
+                                        height: externalLinkButton.height
 
                                         // External link button (shown when expanded and link exists)
                                         DankActionButton {
@@ -442,6 +465,7 @@ DankPopout {
                                             visible: modelData.link && newsItem.expanded
                                             opacity: visible ? 1 : 0
                                             anchors.verticalCenter: parent.verticalCenter
+                                            anchors.right: parent.right
                                             buttonSize: 28
                                             iconName: "open_in_new"
                                             iconSize: 14
@@ -459,34 +483,13 @@ DankPopout {
                                             }
                                         }
 
-                                        // // Spacer
-                                        Item {
-                                            width: parent.width - expandIndicator.width - (externalLinkButton.visible ? externalLinkButton.width + Theme.spacingS : 0)
-                                            height: 1
-                                        }
-
-                                        // Expand/collapse indicator
-                                        Item {
-                                            id: expandIndicator
-                                            visible: modelData.description && modelData.description.length > 0
-                                            width: expandIcon.width
-                                            height: expandIcon.height
-                                            anchors.verticalCenter: parent.verticalCenter
-
-                                            DankIcon {
-                                                id: expandIcon
-                                                name: newsItem.expanded ? "expand_less" : "expand_more"
-                                                size: Theme.iconSizeSmall
-                                                color: Theme.primary
-                                            }
-                                        }
                                     }
                                 }
 
                                 MouseArea {
                                     id: newsMouseArea
                                     anchors.fill: parent
-                                    anchors.leftMargin: newsItem.expanded && externalLinkButton.visible ? externalLinkButton.width + Theme.spacingS : 0
+                                    anchors.rightMargin: newsItem.expanded && externalLinkButton.visible ? externalLinkButton.width + Theme.spacingS : 0
                                     hoverEnabled: true
                                     cursorShape: modelData.description && modelData.description.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
                                     enabled: modelData.description && modelData.description.length > 0
@@ -500,21 +503,19 @@ DankPopout {
                 }
 
                 // News ticker
-                Row {
+                Item {
                     id: latestNewsTicker
-                    width: parent.width - Theme.spacingL * 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    height: 20
-                    spacing: Theme.spacingS
+                    width: parent.width
+                    height: 16
                     visible: SettingsData.updaterShowLatestNews && !updaterPanel.newsExpanded && SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0
-                    opacity:  0.7
+                    opacity: 0.7
 
                     Behavior on opacity {
                         NumberAnimation { duration: Theme.shortDuration }
                     }
 
                     MouseArea {
-                        id: latestNewsMouseArea
+                        id: tickerMouseArea
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
@@ -523,34 +524,43 @@ DankPopout {
                         }
                     }
 
-                    Row {
-                        anchors.fill: parent
-                        spacing: Theme.spacingS
+                    Item {
+                        width: parent.width - Theme.spacingM * 2
+                        height: parent.height
+                        anchors.centerIn: parent
 
-                        StyledText {
-                            opacity: latestNewsMouseArea.containsMouse ? 1.0 : 0.7
+                        Row {
+                            width: parent.width
                             height: parent.height
-                            width: parent.width - extendNewsIcon.width - Theme.spacingS
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0 ? SystemUpdateService.latestNews[0].title : ""
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceText
+                            spacing: Theme.spacingS
 
-                            Behavior on opacity {
-                                NumberAnimation { duration: Theme.shortDuration }
+                            StyledText {
+                                width: parent.width - extendNewsIcon.width - Theme.spacingS
+                                height: parent.height
+                                text: SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0 ? SystemUpdateService.latestNews[0].title : ""
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                opacity: tickerMouseArea.containsMouse ? 1.0 : 0.7
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+
+                                Behavior on opacity {
+                                    NumberAnimation { duration: Theme.shortDuration }
+                                }
                             }
-                        }
 
-                        DankIcon {
-                            id: extendNewsIcon
-                            anchors.verticalCenter: parent.verticalCenter
-                            name: "arrow_forward"
-                            size: Theme.iconSizeSmall
-                            color: Theme.primary
-                            opacity: latestNewsMouseArea.containsMouse ? 1.0 : 0.7
+                            DankIcon {
+                                id: extendNewsIcon
+                                height: parent.height
+                                width: height
+                                name: "arrow_forward"
+                                size: Theme.iconSizeSmall
+                                color: Theme.primary
+                                opacity: tickerMouseArea.containsMouse ? 1.0 : 0.7
 
-                            Behavior on opacity {
-                                NumberAnimation { duration: Theme.shortDuration }
+                                Behavior on opacity {
+                                    NumberAnimation { duration: Theme.shortDuration }
+                                }
                             }
                         }
                     }

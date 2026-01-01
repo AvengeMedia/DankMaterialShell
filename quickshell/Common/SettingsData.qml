@@ -373,7 +373,8 @@ Singleton {
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""
     property bool updaterShowLatestNews: false
-    property string updaterLatestNewsUrl: "https://archlinux.org/feeds/news/"
+    property string updaterLatestNewsUrl: ""
+    property string updaterLatestNewsRegex: ""
 
     property string displayNameMode: "system"
     property var screenPreferences: ({})

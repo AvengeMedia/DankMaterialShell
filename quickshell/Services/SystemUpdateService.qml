@@ -28,38 +28,29 @@ Singleton {
         return parseVersion(semverVersion);
     }
 
-    readonly property var archBasedLatestNewsSettings: {
-        "listLatestNewsSettings": {
-            "params": [],
-            "correctExitCodes": [0, 2]
-        },
-        "parserSettings": {
-            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>/g,
-            "entryProducer": function (match) {
-                function parseCommonSymbols(text) {
-                    return text.replace(/&lt;/g, '<')
-                    .replace(/&gt;/g, '>')
-                    .replace(/&amp;/g, '&')
-                    .replace(/&quot;/g, '"')
-                    .replace(/&#39;/g, "'")
-                    .replace(/&nbsp;/g, ' ')
-                    .trim();
-                }
-
-                // Strip HTML tags from description
-                const cleanTitle = parseCommonSymbols(match[1]);
-
-                let cleanDescription = match[3].replace(/<[^>]*>/g, '');
-                cleanDescription = parseCommonSymbols(cleanDescription);
-
-                return {
-                    "title": cleanTitle,
-                    "link": match[2].trim(),
-                    "description": cleanDescription,
-                    "pubDate": match[4] ? match[4].trim() : ""
-                };
-            }
+    function latestNewsParserProducer(match) {
+        function parseCommonSymbols(text) {
+            return text.replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&nbsp;/g, ' ')
+            .trim();
         }
+
+        // Strip HTML tags from description
+        const cleanTitle = parseCommonSymbols(match[1]);
+
+        let cleanDescription = match[3].replace(/<[^>]*>/g, '');
+        cleanDescription = parseCommonSymbols(cleanDescription);
+
+        return {
+            "title": cleanTitle,
+            "link": match[2].trim(),
+            "description": cleanDescription,
+            "pubDate": match[4] ? match[4].trim() : ""
+        };
     }
 
     readonly property var archBasedUCSettings: {
@@ -102,6 +93,31 @@ Singleton {
         }
     }
 
+
+    readonly property var archBasedLatestNewsSettings: {
+        "url": "https://archlinux.org/feeds/news/",
+        "parserSettings": {
+            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>/g,
+            "entryProducer": latestNewsParserProducer
+        }
+    }
+
+    readonly property var fedoraBasedLatestNewsSettings: {
+        "url": "https://communityblog.fedoraproject.org/feed/",
+        "parserSettings": {
+            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>[\s\S]*?<pubDate>([^<]+)<\/pubDate>[\s\S]*?<description>([\s\S]*?)<\/description>[\s\S]*?/g,
+            "entryProducer": latestNewsParserProducer
+        }
+    }
+
+    readonly property var customLatestNewsSettings: {
+        "url": SettingsData.updaterLatestNewsUrl,
+        "parserSettings": {
+            "lineRegex": SettingsData.updaterLatestNewsRegex,
+            "entryProducer": latestNewsParserProducer
+        }
+    }
+
     readonly property var fedoraBasedPMSettings: {
         "listUpdatesSettings": {
             "params": ["list", "--upgrades", "--quiet", "--color=never"],
@@ -132,11 +148,13 @@ Singleton {
         "paru": archBasedPMSettings,
         "dnf": fedoraBasedPMSettings
     }
-    readonly property var latestNewsCheckerParams: {
+    readonly property var latestNewsParserParams: {
         "arch": archBasedLatestNewsSettings,
         "cachyos": archBasedLatestNewsSettings,
         "manjaro": archBasedLatestNewsSettings,
-        "endeavouros": archBasedLatestNewsSettings
+        "endeavouros": archBasedLatestNewsSettings,
+        "fedora": fedoraBasedLatestNewsSettings,
+        "custom": customLatestNewsSettings
     }
 
     readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros", "fedora"]
@@ -268,7 +286,7 @@ Singleton {
 
     Process {
         id: latestNewsChecker
-        command: ["curl", SettingsData.updaterLatestNewsUrl]
+        command: ["curl", SettingsData.updaterLatestNewsUrl || latestNewsParserParams[distribution].url]
         onExited: exitCode => {
             const correctExitCodes = [0];
             if (correctExitCodes.includes(exitCode)) {
@@ -284,13 +302,9 @@ Singleton {
 
 
     function parseLatestNews(feed) {
-        if (!latestNewsCheckerParams[distribution]) {
-            console.warn(`SystemUpdate: ${distribution} latest news are not supported.`);
-            return;
-        }
-
-        const regex = latestNewsCheckerParams[distribution].parserSettings.lineRegex;
-        const entryProducer = latestNewsCheckerParams[distribution].parserSettings.entryProducer;
+        const parserParams = latestNewsParserParams[distribution] ? latestNewsParserParams[distribution] : latestNewsParserParams["custom"];
+        const regex = parserParams.parserSettings.lineRegex;
+        const entryProducer = parserParams.parserSettings.entryProducer;
 
         const news = [];
         let match;
@@ -321,7 +335,12 @@ Singleton {
         }
         updateChecker.running = true;
 
-        if (SettingsData.updaterShowLatestNews && SettingsData.updaterLatestNewsUrl.length > 0 && Date.now() > lastNewsCheckTimestamp + 60) {
+        if (SettingsData.updaterShowLatestNews && Date.now() > lastNewsCheckTimestamp + 60) {
+            if (!latestNewsParserParams[distribution] && (SettingsData.updaterLatestNewsUrl === "" || SettingsData.updaterLatestNewsRegex === "")) {
+                console.log(`SystemUpdate: ${distribution} latest news not supported by default. Add a custom regex and feed.`);
+                return;
+            }
+
             latestNewsChecker.running = true;
         }
     }

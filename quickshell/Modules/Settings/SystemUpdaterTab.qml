@@ -150,23 +150,23 @@ Item {
 
                 FocusScope {
                     width: parent.width - Theme.spacingM * 2
-                    height: latestNewsColumn.implicitHeight
+                    height: latestNewsUrlColumn.implicitHeight
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.spacingM
 
                     Column {
-                        id: latestNewsColumn
+                        id: latestNewsUrlColumn
                         width: parent.width
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: I18n.tr("Latest news RSS feed")
+                            text: I18n.tr("Latest news url to parse")
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceVariantText
                         }
 
                         DankTextField {
-                            id: updaterLatestNews
+                            id: updaterLatestNewsFeed
                             width: parent.width
                             height: 48
                             placeholderText: "https://archlinux.org/feeds/news/"
@@ -181,6 +181,56 @@ Item {
                             }
 
                             onTextEdited: SettingsData.set("updaterLatestNewsUrl", text.trim())
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onPressed: mouse => {
+                                    updaterLatestNewsFeed.forceActiveFocus();
+                                    mouse.accepted = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                FocusScope {
+                    width: parent.width - Theme.spacingM * 2
+                    height: latestNewsRegexColumn.implicitHeight
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.spacingM
+
+                    Column {
+                        id: latestNewsRegexColumn
+                        width: parent.width
+                        spacing: Theme.spacingXS
+
+                        StyledText {
+                            text: I18n.tr("Latest news regex")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+                        StyledText {
+                            text: I18n.tr("It must produce 4 matches in this exact order: title, description, link, pubDate")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        DankTextField {
+                            id: updaterLatestNews
+                            width: parent.width
+                            height: 48
+                            placeholderText: "/<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>/g"
+                            backgroundColor: Theme.withAlpha(Theme.surfaceContainerHighest, Theme.popupTransparency)
+                            normalBorderColor: Theme.outlineMedium
+                            focusedBorderColor: Theme.primary
+
+                            Component.onCompleted: {
+                                if (SettingsData.updaterLatestNewsRegex) {
+                                    text = SettingsData.updaterLatestNewsRegex;
+                                }
+                            }
+
+                            onTextEdited: SettingsData.set("updaterLatestNewsRegex", text.trim())
 
                             MouseArea {
                                 anchors.fill: parent
