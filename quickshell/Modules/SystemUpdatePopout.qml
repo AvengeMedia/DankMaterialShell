@@ -199,7 +199,7 @@ DankPopout {
                     height: {
                         let usedHeight = 40 + Theme.spacingL;
                         usedHeight += 48 + Theme.spacingL;
-                        usedHeight += latestNewsTicker.visible ? latestNewsTicker.height + Theme.spacingS : 0;
+                        usedHeight += latestNewsTicker.visible ? latestNewsTicker.height + Theme.spacingL : 0;
                         return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius

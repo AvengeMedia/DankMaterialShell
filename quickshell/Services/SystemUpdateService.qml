@@ -28,17 +28,19 @@ Singleton {
         return parseVersion(semverVersion);
     }
 
-    function latestNewsParserProducer(match) {
-        function parseCommonSymbols(text) {
-            return text.replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&amp;/g, '&')
-            .replace(/&quot;/g, '"')
-            .replace(/&#39;/g, "'")
-            .replace(/&nbsp;/g, ' ')
-            .trim();
-        }
+    function parseCommonSymbols(text) {
+        return text.replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&#8211;/g, '–')
+        .replace(/&#8230;/g, '…')
+        .trim();
+    }
 
+    function latestNewsParserProducer(match) {
         // Strip HTML tags from description
         const cleanTitle = parseCommonSymbols(match[1]);
 
@@ -103,10 +105,22 @@ Singleton {
     }
 
     readonly property var fedoraBasedLatestNewsSettings: {
-        "url": "https://communityblog.fedoraproject.org/feed/",
+        "url": "https://fedoramagazine.org/feed/",
         "parserSettings": {
             "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>[\s\S]*?<pubDate>([^<]+)<\/pubDate>[\s\S]*?<description>([\s\S]*?)<\/description>[\s\S]*?/g,
-            "entryProducer": latestNewsParserProducer
+            "entryProducer": function(match) {
+                const cleanTitle = parseCommonSymbols(match[1]);
+
+                let cleanDescription = match[4].replace(/<[^>]*>/g, '').replace("]]>", '');
+                cleanDescription = parseCommonSymbols(cleanDescription);
+
+                return {
+                    "title": cleanTitle,
+                    "link": match[2].trim(),
+                    "description": cleanDescription,
+                    "pubDate": match[3] ? match[3].trim() : ""
+                };
+            }
         }
     }
 
