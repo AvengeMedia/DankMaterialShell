@@ -36,6 +36,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "showWorkspaceName"
+                    tags: ["workspace", "name", "labels"]
+                    text: I18n.tr("Workspace Names")
+                    description: I18n.tr("Show workspace name on horizontal bars, and first letter on vertical bars")
+                    checked: SettingsData.showWorkspaceName
+                    onToggled: checked => SettingsData.set("showWorkspaceName", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "showWorkspacePadding"
                     tags: ["workspace", "padding", "minimum"]
                     text: I18n.tr("Workspace Padding")

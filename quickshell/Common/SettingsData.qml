@@ -168,6 +168,7 @@ Singleton {
     ]
 
     property bool showWorkspaceIndex: false
+    property bool showWorkspaceName: false
     property bool showWorkspacePadding: false
     property bool workspaceScrolling: false
     property bool showWorkspaceApps: false

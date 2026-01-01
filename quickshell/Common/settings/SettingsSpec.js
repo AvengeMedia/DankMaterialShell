@@ -81,6 +81,7 @@ var SPEC = {
     ]},
 
     showWorkspaceIndex: { def: false },
+    showWorkspaceName: { def: false },
     showWorkspacePadding: { def: false },
     workspaceScrolling: { def: false },
     showWorkspaceApps: { def: false },

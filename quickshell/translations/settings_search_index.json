@@ -872,6 +872,28 @@
     "description": "Show workspace index numbers in the top bar workspace switcher"
   },
   {
+    "section": "showWorkspaceName",
+    "label": "Workspace Name",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "desktop",
+      "labels",
+      "panel",
+      "show",
+      "spaces",
+      "statusbar",
+      "switcher",
+      "taskbar",
+      "topbar",
+      "virtual",
+      "virtual desktops",
+      "workspace",
+      "workspaces"
+    ],
+    "description": "Show workspace name on horizontal bars, and first letter on vertical bars"
+  },
+  {
     "section": "showWorkspacePadding",
     "label": "Workspace Padding",
     "tabIndex": 4,

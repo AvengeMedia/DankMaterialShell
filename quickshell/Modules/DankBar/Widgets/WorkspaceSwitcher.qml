@@ -565,6 +565,17 @@ Item {
         if (isPlaceholder)
             return index + 1;
 
+        if (SettingsData.showWorkspaceName) {
+            let workspaceName = modelData?.name;
+
+            if (workspaceName && workspaceName !== "") {
+                if (root.isVertical) {
+                    return workspaceName.charAt(0);
+                }
+                return workspaceName;
+            }
+        }
+
         if (root.useExtWorkspace)
             return index + 1;
         if (CompositorService.isHyprland)
@@ -942,7 +953,7 @@ Item {
                                 id: rowLayout
                                 Row {
                                     spacing: 4
-                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -975,7 +986,7 @@ Item {
                                     }
 
                                     Item {
-                                        visible: SettingsData.showWorkspaceIndex && !loadedHasIcon
+                                        visible: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon
                                         width: wsIndexText.implicitWidth + (isActive && loadedIcons.length > 0 ? 4 : 0)
                                         height: root.appIconSize
 
@@ -1072,7 +1083,7 @@ Item {
                                 id: columnLayout
                                 Column {
                                     spacing: 4
-                                    visible: loadedIcons.length > 0 || loadedHasIcon
+                                    visible: loadedIcons.length > 0 || SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || loadedHasIcon
 
                                     DankIcon {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
@@ -1209,7 +1220,7 @@ Item {
                     Loader {
                         id: indexLoader
                         anchors.fill: parent
-                        active: SettingsData.showWorkspaceIndex && !loadedHasIcon && !SettingsData.showWorkspaceApps
+                        active: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon && !SettingsData.showWorkspaceApps
                         sourceComponent: Item {
                             StyledText {
                                 anchors.centerIn: parent
