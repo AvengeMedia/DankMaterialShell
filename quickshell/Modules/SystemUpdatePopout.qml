@@ -23,6 +23,7 @@ DankPopout {
     shouldBeVisible: false
 
     onBackgroundClicked: close()
+
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
             if (SystemUpdateService.updateCount === 0 && !SystemUpdateService.isChecking) {
@@ -34,6 +35,7 @@ DankPopout {
     content: Component {
         Rectangle {
             id: updaterPanel
+
             color: "transparent"
             radius: Theme.cornerRadius
             antialiasing: true
@@ -148,6 +150,7 @@ DankPopout {
                             z: 15
                             iconColor: Theme.surfaceText
                             enabled: !SystemUpdateService.isChecking
+                            opacity: enabled ? 1.0 : 0.5
                             onClicked: {
                                 SystemUpdateService.checkForUpdates();
                             }
