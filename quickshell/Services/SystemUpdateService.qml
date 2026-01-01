@@ -31,15 +31,32 @@ Singleton {
     readonly property var archBasedLatestNewsSettings: {
         "listLatestNewsSettings": {
             "params": [],
-            "correctExitCodes": [0, 2]   // Exit code 0 = updates available, 2 = no updates
+            "correctExitCodes": [0, 2]
         },
         "parserSettings": {
-            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>/,
+            "lineRegex": /<item>\s*<title>([^<]+)<\/title>\s*<link>([^<]+)<\/link>\s*<description>([\s\S]*?)<\/description>[\s\S]*?<pubDate>([^<]+)<\/pubDate>/g,
             "entryProducer": function (match) {
+                function parseCommonSymbols(text) {
+                    return text.replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'")
+                    .replace(/&nbsp;/g, ' ')
+                    .trim();
+                }
+
+                // Strip HTML tags from description
+                const cleanTitle = parseCommonSymbols(match[1]);
+
+                let cleanDescription = match[3].replace(/<[^>]*>/g, '');
+                cleanDescription = parseCommonSymbols(cleanDescription);
+
                 return {
-                    "title": match[1],
-                    "link": match[2],
-                    "description": match[3]
+                    "title": cleanTitle,
+                    "link": match[2].trim(),
+                    "description": cleanDescription,
+                    "pubDate": match[4] ? match[4].trim() : ""
                 };
             }
         }
@@ -258,7 +275,7 @@ Singleton {
                 lastNewsCheckTimestamp = Date.now();
                 parseLatestNews(stdout.text);
             } else {
-                console.warn("SystemUpdate: Failed downloading the latest news RSS feed.");
+                console.warn("SystemUpdate: Failed downloading the latest news feed.");
             }
         }
 
@@ -268,29 +285,28 @@ Singleton {
 
     function parseLatestNews(feed) {
         if (!latestNewsCheckerParams[distribution]) {
-            console.warn(`SystemUpdate: ${distribution} is not supported.`);
+            console.warn(`SystemUpdate: ${distribution} latest news are not supported.`);
             return;
         }
 
-        const regex = latestNewsCheckerParams[distribution].parserSettings.lineRegex
-        const items = feed.match(regex);
-
-        if (!items || items.length <= 0) {
-            console.log("SystemUpdate: Empty latest news RSS feed.");
-            return;
-        }
-
-        const news = [];
+        const regex = latestNewsCheckerParams[distribution].parserSettings.lineRegex;
         const entryProducer = latestNewsCheckerParams[distribution].parserSettings.entryProducer;
 
-        for (const item of items) {
-            const match = item.match(regex);
-            if (match) {
-                news.push(entryProducer(match));
-            }
+        const news = [];
+        let match;
+
+        // Use exec() in a loop to get all matches with global regex
+        while ((match = regex.exec(feed)) !== null) {
+            news.push(entryProducer(match));
+        }
+
+        if (news.length === 0) {
+            console.log("SystemUpdate: Empty latest news feed.");
+            return;
         }
 
         latestNews = news;
+        console.log(`SystemUpdate: Found ${news.length} news items`);
     }
 
     function checkForUpdates() {
