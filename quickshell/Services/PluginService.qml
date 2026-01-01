@@ -39,6 +39,7 @@ Singleton {
     signal pluginDataChanged(string pluginId)
     signal pluginListUpdated
     signal globalVarChanged(string pluginId, string varName)
+    signal requestLauncherUpdate(string pluginId)
 
     Timer {
         id: resyncDebounce
@@ -286,12 +287,14 @@ Singleton {
                 return false;
             }
 
-            if (isDaemon) {
+            // MODIFICATION: Treat Launchers as persistent instances like Daemons
+            if (isDaemon || isLauncher) {
                 const instance = comp.createObject(root, {
-                    "pluginId": pluginId
+                    "pluginId": pluginId,
+                    "pluginService": root // Inject PluginService
                 });
                 if (!instance) {
-                    console.error("PluginService: failed to instantiate daemon:", pluginId, comp.errorString());
+                    console.error("PluginService: failed to instantiate plugin:", pluginId, comp.errorString());
                     pluginLoadFailed(pluginId, comp.errorString());
                     return false;
                 }
@@ -299,13 +302,15 @@ Singleton {
                 newInstances[pluginId] = instance;
                 pluginInstances = newInstances;
 
-                const newDaemons = Object.assign({}, pluginDaemonComponents);
-                newDaemons[pluginId] = comp;
-                pluginDaemonComponents = newDaemons;
-            } else if (isLauncher) {
-                const newLaunchers = Object.assign({}, pluginLauncherComponents);
-                newLaunchers[pluginId] = comp;
-                pluginLauncherComponents = newLaunchers;
+                if (isDaemon) {
+                    const newDaemons = Object.assign({}, pluginDaemonComponents);
+                    newDaemons[pluginId] = comp;
+                    pluginDaemonComponents = newDaemons;
+                } else {
+                    const newLaunchers = Object.assign({}, pluginLauncherComponents);
+                    newLaunchers[pluginId] = comp;
+                    pluginLauncherComponents = newLaunchers;
+                }
             } else if (isDesktop) {
                 const newDesktop = Object.assign({}, pluginDesktopComponents);
                 newDesktop[pluginId] = comp;

@@ -51,6 +51,10 @@ Item {
         function onPluginLoaded() { updateCategories() }
         function onPluginUnloaded() { updateCategories() }
         function onPluginListUpdated() { updateCategories() }
+        function onRequestLauncherUpdate(pluginId) {
+            // Only update if we are actually looking at this plugin or in All category
+            updateFilteredModel()
+        }
     }
 
     Connections {

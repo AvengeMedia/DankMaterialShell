@@ -411,26 +411,43 @@ Singleton {
             return []
         }
 
-        const component = PluginService.pluginLauncherComponents[pluginId]
-        if (!component)
+        let instance = PluginService.pluginInstances[pluginId]
+        let isPersistent = true
+
+        if (!instance) {
+            const component = PluginService.pluginLauncherComponents[pluginId]
+            if (!component)
+                return []
+
+            try {
+                instance = component.createObject(root, {
+                    "pluginService": PluginService
+                })
+                isPersistent = false
+            } catch (e) {
+                console.warn("AppSearchService: Error creating temporary plugin instance", pluginId, ":", e)
+                return []
+            }
+        }
+
+        if (!instance)
             return []
 
         try {
-            const instance = component.createObject(root, {
-                                                        "pluginService": PluginService
-                                                    })
-
-            if (instance && typeof instance.getItems === "function") {
+            if (typeof instance.getItems === "function") {
                 const items = instance.getItems(query || "")
-                instance.destroy()
+                if (!isPersistent)
+                    instance.destroy()
                 return items || []
             }
 
-            if (instance) {
+            if (!isPersistent) {
                 instance.destroy()
             }
         } catch (e) {
             console.warn("AppSearchService: Error getting items from plugin", pluginId, ":", e)
+            if (!isPersistent)
+                instance.destroy()
         }
 
         return []
@@ -440,26 +457,43 @@ Singleton {
         if (typeof PluginService === "undefined")
             return false
 
-        const component = PluginService.pluginLauncherComponents[pluginId]
-        if (!component)
+        let instance = PluginService.pluginInstances[pluginId]
+        let isPersistent = true
+
+        if (!instance) {
+            const component = PluginService.pluginLauncherComponents[pluginId]
+            if (!component)
+                return false
+
+            try {
+                instance = component.createObject(root, {
+                                                      "pluginService": PluginService
+                                                  })
+                isPersistent = false
+            } catch (e) {
+                console.warn("AppSearchService: Error creating temporary plugin instance for execution", pluginId, ":", e)
+                return false
+            }
+        }
+
+        if (!instance)
             return false
 
         try {
-            const instance = component.createObject(root, {
-                                                        "pluginService": PluginService
-                                                    })
-
-            if (instance && typeof instance.executeItem === "function") {
+            if (typeof instance.executeItem === "function") {
                 instance.executeItem(item)
-                instance.destroy()
+                if (!isPersistent)
+                    instance.destroy()
                 return true
             }
 
-            if (instance) {
+            if (!isPersistent) {
                 instance.destroy()
             }
         } catch (e) {
             console.warn("AppSearchService: Error executing item from plugin", pluginId, ":", e)
+            if (!isPersistent)
+                instance.destroy()
         }
 
         return false
