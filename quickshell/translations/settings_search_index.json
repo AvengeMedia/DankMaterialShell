@@ -3185,7 +3185,10 @@
       "updater",
       "updates",
       "upgrade",
-      "widget"
+      "widget",
+      "news",
+      "feed",
+      "rss"
     ],
     "icon": "refresh",
     "description": "When updater widget is used, then hide it if no update found"
