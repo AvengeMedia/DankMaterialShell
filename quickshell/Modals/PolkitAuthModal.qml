@@ -10,6 +10,7 @@ FloatingWindow {
     property string passwordInput: ""
     property var currentFlow: PolkitService.agent?.flow
     property bool isLoading: false
+    readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
     property int calculatedHeight: Math.max(240, headerRow.implicitHeight + mainColumn.implicitHeight + Theme.spacingM * 3)
 
     function focusPasswordField() {
@@ -202,7 +203,7 @@ FloatingWindow {
 
             Rectangle {
                 width: parent.width
-                height: 50
+                height: inputFieldHeight
                 radius: Theme.cornerRadius
                 color: Theme.surfaceHover
                 border.color: passwordField.activeFocus ? Theme.primary : Theme.outlineStrong

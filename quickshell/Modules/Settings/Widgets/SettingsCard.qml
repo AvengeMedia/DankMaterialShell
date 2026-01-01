@@ -110,7 +110,7 @@ StyledRect {
         Item {
             id: headerRow
             width: parent.width
-            height: root.hasHeader ? Math.max(headerIcon.height, headerText.height) : 0
+            height: root.hasHeader ? Math.max(headerIcon.height, headerText.height, headerActionsRow.height) : 0
             visible: root.hasHeader
 
             Row {

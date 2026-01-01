@@ -331,7 +331,7 @@ func appendConfig(opts *Options, cfgFile *os.File, checkCmd []string, fileName s
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if !utils.AnyCommandExists(checkCmd...) {
+	if len(checkCmd) > 0 && !utils.AnyCommandExists(checkCmd...) {
 		return
 	}
 	data, err := os.ReadFile(configPath)
@@ -347,7 +347,7 @@ func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkC
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if !utils.AnyCommandExists(checkCmd...) {
+	if len(checkCmd) > 0 && !utils.AnyCommandExists(checkCmd...) {
 		return
 	}
 	data, err := os.ReadFile(configPath)

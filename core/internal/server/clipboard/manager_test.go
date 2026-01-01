@@ -457,7 +457,6 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, 0, cfg.AutoClearDays)
 	assert.False(t, cfg.ClearAtStartup)
 	assert.False(t, cfg.Disabled)
-	assert.False(t, cfg.DisableHistory)
 }
 
 func TestManager_PostDelegatesToWlContext(t *testing.T) {

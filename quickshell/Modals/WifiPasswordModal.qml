@@ -28,14 +28,29 @@ FloatingWindow {
     property var fieldsInfo: []
     property var secretValues: ({})
 
+    readonly property bool showUsernameField: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
+    readonly property bool showPasswordField: fieldsInfo.length === 0
+    readonly property bool showAnonField: requiresEnterprise && !isVpnPrompt
+    readonly property bool showDomainField: requiresEnterprise && !isVpnPrompt
+    readonly property bool showShowPasswordCheckbox: fieldsInfo.length === 0
+    readonly property bool showSavePasswordCheckbox: (isVpnPrompt || fieldsInfo.length > 0) && promptReason !== "pkcs11"
+
+    readonly property int inputFieldHeight: Theme.fontSizeMedium + Theme.spacingL * 2
+    readonly property int inputFieldWithSpacing: inputFieldHeight + Theme.spacingM
+    readonly property int checkboxRowHeight: Theme.fontSizeMedium + Theme.spacingS
+    readonly property int headerHeight: Theme.fontSizeLarge + Theme.fontSizeMedium + Theme.spacingM * 2
+    readonly property int buttonRowHeight: 36 + Theme.spacingM
+
     property int calculatedHeight: {
-        if (fieldsInfo.length > 0)
-            return 180 + (fieldsInfo.length * 60);
-        if (requiresEnterprise)
-            return 430;
-        if (isVpnPrompt)
-            return 260;
-        return 230;
+        let h = headerHeight + buttonRowHeight + Theme.spacingL * 2;
+        h += fieldsInfo.length * inputFieldWithSpacing;
+        if (showUsernameField) h += inputFieldWithSpacing;
+        if (showPasswordField) h += inputFieldWithSpacing;
+        if (showAnonField) h += inputFieldWithSpacing;
+        if (showDomainField) h += inputFieldWithSpacing;
+        if (showShowPasswordCheckbox) h += checkboxRowHeight;
+        if (showSavePasswordCheckbox) h += checkboxRowHeight;
+        return h;
     }
 
     function focusFirstField() {
@@ -127,6 +142,7 @@ FloatingWindow {
         case "private-key-password":
             return I18n.tr("Private Key Password");
         case "pin":
+        case "key_pass":
             return I18n.tr("PIN");
         case "psk":
             return I18n.tr("Password");
@@ -188,7 +204,13 @@ FloatingWindow {
     }
 
     objectName: "wifiPasswordModal"
-    title: isVpnPrompt ? I18n.tr("VPN Password") : I18n.tr("Wi-Fi Password")
+    title: {
+        if (promptReason === "pkcs11")
+            return I18n.tr("Smartcard PIN");
+        if (isVpnPrompt)
+            return I18n.tr("VPN Password");
+        return I18n.tr("Wi-Fi Password");
+    }
     minimumSize: Qt.size(420, calculatedHeight)
     maximumSize: Qt.size(420, calculatedHeight)
     color: Theme.surfaceContainer
@@ -242,7 +264,7 @@ FloatingWindow {
         Column {
             id: contentCol
             anchors.centerIn: parent
-            width: parent.width - Theme.spacingM * 2
+            width: parent.width - Theme.spacingL * 2
             spacing: Theme.spacingM
 
             Row {
@@ -260,7 +282,13 @@ FloatingWindow {
                         spacing: Theme.spacingXS
 
                         StyledText {
-                            text: isVpnPrompt ? I18n.tr("Connect to VPN") : I18n.tr("Connect to Wi-Fi")
+                            text: {
+                                if (promptReason === "pkcs11")
+                                    return I18n.tr("Smartcard Authentication");
+                                if (isVpnPrompt)
+                                    return I18n.tr("Connect to VPN");
+                                return I18n.tr("Connect to Wi-Fi");
+                            }
                             font.pixelSize: Theme.fontSizeLarge
                             color: Theme.surfaceText
                             font.weight: Font.Medium
@@ -272,6 +300,8 @@ FloatingWindow {
 
                             StyledText {
                                 text: {
+                                    if (promptReason === "pkcs11")
+                                        return I18n.tr("Enter PIN for ") + wifiPasswordSSID;
                                     if (fieldsInfo.length > 0)
                                         return I18n.tr("Enter credentials for ") + wifiPasswordSSID;
                                     if (isVpnPrompt)
@@ -325,7 +355,7 @@ FloatingWindow {
                     required property int index
 
                     width: contentCol.width
-                    height: 50
+                    height: inputFieldHeight
                     radius: Theme.cornerRadius
                     color: Theme.surfaceHover
                     border.color: fieldInput.activeFocus ? Theme.primary : Theme.outlineStrong
@@ -388,12 +418,12 @@ FloatingWindow {
 
             Rectangle {
                 width: parent.width
-                height: 50
+                height: inputFieldHeight
                 radius: Theme.cornerRadius
                 color: Theme.surfaceHover
                 border.color: usernameInput.activeFocus ? Theme.primary : Theme.outlineStrong
                 border.width: usernameInput.activeFocus ? 2 : 1
-                visible: requiresEnterprise && !isVpnPrompt && fieldsInfo.length === 0
+                visible: showUsernameField
 
                 MouseArea {
                     anchors.fill: parent
@@ -419,12 +449,12 @@ FloatingWindow {
 
             Rectangle {
                 width: parent.width
-                height: 50
+                height: inputFieldHeight
                 radius: Theme.cornerRadius
                 color: Theme.surfaceHover
                 border.color: passwordInput.activeFocus ? Theme.primary : Theme.outlineStrong
                 border.width: passwordInput.activeFocus ? 2 : 1
-                visible: fieldsInfo.length === 0
+                visible: showPasswordField
 
                 MouseArea {
                     anchors.fill: parent
@@ -456,9 +486,9 @@ FloatingWindow {
             }
 
             Rectangle {
-                visible: requiresEnterprise && !isVpnPrompt
+                visible: showAnonField
                 width: parent.width
-                height: 50
+                height: inputFieldHeight
                 radius: Theme.cornerRadius
                 color: Theme.surfaceHover
                 border.color: anonInput.activeFocus ? Theme.primary : Theme.outlineStrong
@@ -487,9 +517,9 @@ FloatingWindow {
             }
 
             Rectangle {
-                visible: requiresEnterprise && !isVpnPrompt
+                visible: showDomainField
                 width: parent.width
-                height: 50
+                height: inputFieldHeight
                 radius: Theme.cornerRadius
                 color: Theme.surfaceHover
                 border.color: domainMatchInput.activeFocus ? Theme.primary : Theme.outlineStrong
@@ -523,7 +553,7 @@ FloatingWindow {
 
                 Row {
                     spacing: Theme.spacingS
-                    visible: fieldsInfo.length === 0
+                    visible: showShowPasswordCheckbox
 
                     Rectangle {
                         id: showPasswordCheckbox
@@ -563,7 +593,7 @@ FloatingWindow {
 
                 Row {
                     spacing: Theme.spacingS
-                    visible: isVpnPrompt || fieldsInfo.length > 0
+                    visible: showSavePasswordCheckbox
 
                     Rectangle {
                         id: savePasswordCheckbox

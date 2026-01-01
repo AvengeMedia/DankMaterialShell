@@ -16,6 +16,7 @@ Singleton {
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
     property bool hasTriedDefaultSession: false
     property bool _parseError: false
+    property bool _hasLoaded: false
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
@@ -111,8 +112,10 @@ Singleton {
     function parseSettings(content) {
         _parseError = false;
         try {
-            if (!content || !content.trim())
+            if (!content || !content.trim()) {
+                _parseError = true;
                 return;
+            }
             var settings = JSON.parse(content);
             isLightMode = settings.isLightMode !== undefined ? settings.isLightMode : false;
 
@@ -178,6 +181,7 @@ Singleton {
             includedTransitions = settings.includedTransitions !== undefined ? settings.includedTransitions : availableWallpaperTransitions.filter(t => t !== "none");
             recentColors = settings.recentColors !== undefined ? settings.recentColors : [];
             showThirdPartyPlugins = settings.showThirdPartyPlugins !== undefined ? settings.showThirdPartyPlugins : false;
+            _hasLoaded = true;
 
             if (settings.configVersion === undefined) {
                 migrateFromUndefinedToV1(settings);
@@ -202,7 +206,7 @@ Singleton {
     }
 
     function saveSettings() {
-        if (isGreeterMode || _parseError)
+        if (isGreeterMode || _parseError || !_hasLoaded)
             return;
         settingsFile.setText(JSON.stringify({
             "isLightMode": isLightMode,

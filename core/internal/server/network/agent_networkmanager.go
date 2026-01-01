@@ -233,6 +233,9 @@ func (a *SecretAgent) GetSecrets(
 	if a.manager != nil && connType == "802-11-wireless" && a.manager.WasRecentlyFailed(ssid) {
 		reason = "wrong-password"
 	}
+	if settingName == "vpn" && isPKCS11Auth(conn, vpnSvc) {
+		reason = "pkcs11"
+	}
 
 	var connId, connUuid string
 	if c, ok := conn["connection"]; ok {
@@ -579,6 +582,15 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 	connType := dataMap["connection-type"]
 
 	switch {
+	case strings.Contains(vpnService, "openconnect"):
+		authType := dataMap["authtype"]
+		userCert := dataMap["usercert"]
+		if authType == "cert" && strings.HasPrefix(userCert, "pkcs11:") {
+			return []string{"key_pass"}
+		}
+		if dataMap["username"] == "" {
+			fields = []string{"username", "password"}
+		}
 	case strings.Contains(vpnService, "openvpn"):
 		if connType == "password" || connType == "password-tls" {
 			if dataMap["username"] == "" {
@@ -586,7 +598,7 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 			}
 		}
 	case strings.Contains(vpnService, "vpnc"), strings.Contains(vpnService, "l2tp"),
-		strings.Contains(vpnService, "pptp"), strings.Contains(vpnService, "openconnect"):
+		strings.Contains(vpnService, "pptp"):
 		if dataMap["username"] == "" {
 			fields = []string{"username", "password"}
 		}
@@ -597,6 +609,8 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 
 func vpnFieldMeta(field, vpnService string) (label string, isSecret bool) {
 	switch field {
+	case "key_pass":
+		return "PIN", true
 	case "password":
 		return "Password", true
 	case "Xauth password":
@@ -622,6 +636,25 @@ func vpnFieldMeta(field, vpnService string) (label string, isSecret bool) {
 		return titleCaser.String(strings.ReplaceAll(field, "-", " ")), true
 	}
 	return titleCaser.String(strings.ReplaceAll(field, "-", " ")), false
+}
+
+func isPKCS11Auth(conn map[string]nmVariantMap, vpnService string) bool {
+	if !strings.Contains(vpnService, "openconnect") {
+		return false
+	}
+	vpnSettings, ok := conn["vpn"]
+	if !ok {
+		return false
+	}
+	dataVariant, ok := vpnSettings["data"]
+	if !ok {
+		return false
+	}
+	dataMap, ok := dataVariant.Value().(map[string]string)
+	if !ok {
+		return false
+	}
+	return dataMap["authtype"] == "cert" && strings.HasPrefix(dataMap["usercert"], "pkcs11:")
 }
 
 func readVPNPasswordFlags(conn map[string]nmVariantMap, settingName string) uint32 {

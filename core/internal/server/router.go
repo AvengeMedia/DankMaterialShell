@@ -207,9 +207,6 @@ func handleClipboardSetConfig(conn net.Conn, req models.Request) {
 	if v, ok := req.Params["disabled"].(bool); ok {
 		cfg.Disabled = v
 	}
-	if v, ok := req.Params["disableHistory"].(bool); ok {
-		cfg.DisableHistory = v
-	}
 
 	if err := clipboard.SaveConfig(cfg); err != nil {
 		models.RespondError(conn, req.ID, err.Error())

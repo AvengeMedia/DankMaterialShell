@@ -1,11 +1,9 @@
 pragma Singleton
 pragma ComponentBehavior: Bound
 
-import QtCore
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import qs.Common
 
 Singleton {
     id: root
@@ -20,40 +18,40 @@ Singleton {
     property bool nightModeEnabled: false
 
     Component.onCompleted: {
-        Quickshell.execDetached(["mkdir", "-p", greetCfgDir])
-        loadMemory()
-        loadSessionConfig()
+        Quickshell.execDetached(["mkdir", "-p", greetCfgDir]);
+        loadMemory();
+        loadSessionConfig();
     }
 
     function loadMemory() {
-        parseMemory(memoryFileView.text())
+        parseMemory(memoryFileView.text());
     }
 
     function loadSessionConfig() {
-        parseSessionConfig(sessionConfigFileView.text())
+        parseSessionConfig(sessionConfigFileView.text());
     }
 
     function parseSessionConfig(content) {
         try {
             if (content && content.trim()) {
-                const config = JSON.parse(content)
-                isLightMode = config.isLightMode !== undefined ? config.isLightMode : false
-                nightModeEnabled = config.nightModeEnabled !== undefined ? config.nightModeEnabled : false
+                const config = JSON.parse(content);
+                isLightMode = config.isLightMode !== undefined ? config.isLightMode : false;
+                nightModeEnabled = config.nightModeEnabled !== undefined ? config.nightModeEnabled : false;
             }
         } catch (e) {
-            console.warn("Failed to parse greeter session config:", e)
+            console.warn("Failed to parse greeter session config:", e);
         }
     }
 
     function parseMemory(content) {
         try {
-            if (content && content.trim()) {
-                const memory = JSON.parse(content)
-                lastSessionId = memory.lastSessionId !== undefined ? memory.lastSessionId : ""
-                lastSuccessfulUser = memory.lastSuccessfulUser !== undefined ? memory.lastSuccessfulUser : ""
-            }
+            if (!content || !content.trim())
+                return;
+            const memory = JSON.parse(content);
+            lastSessionId = memory.lastSessionId || "";
+            lastSuccessfulUser = memory.lastSuccessfulUser || "";
         } catch (e) {
-            console.warn("Failed to parse greetd memory:", e)
+            console.warn("Failed to parse greetd memory:", e);
         }
     }
 
@@ -61,17 +59,17 @@ Singleton {
         memoryFileView.setText(JSON.stringify({
             "lastSessionId": lastSessionId,
             "lastSuccessfulUser": lastSuccessfulUser
-        }, null, 2))
+        }, null, 2));
     }
 
     function setLastSessionId(id) {
-        lastSessionId = id || ""
-        saveMemory()
+        lastSessionId = id || "";
+        saveMemory();
     }
 
     function setLastSuccessfulUser(username) {
-        lastSuccessfulUser = username || ""
-        saveMemory()
+        lastSuccessfulUser = username || "";
+        saveMemory();
     }
 
     FileView {
@@ -83,7 +81,7 @@ Singleton {
         watchChanges: false
         printErrors: false
         onLoaded: {
-            parseMemory(memoryFileView.text())
+            parseMemory(memoryFileView.text());
         }
     }
 
@@ -96,10 +94,10 @@ Singleton {
         watchChanges: false
         printErrors: true
         onLoaded: {
-            parseSessionConfig(sessionConfigFileView.text())
+            parseSessionConfig(sessionConfigFileView.text());
         }
         onLoadFailed: error => {
-            console.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error)
+            console.warn("Could not load greeter session config from", root.sessionConfigPath, "error:", error);
         }
     }
 }

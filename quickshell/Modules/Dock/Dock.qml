@@ -35,6 +35,17 @@ Variants {
 
         readonly property real widgetHeight: SettingsData.dockIconSize
         readonly property real effectiveBarHeight: widgetHeight + SettingsData.dockSpacing * 2 + 10 + borderThickness * 2
+        function getBarHeight(barConfig) {
+            if (!barConfig)
+                return 0;
+            const innerPadding = barConfig.innerPadding ?? 4;
+            const widgetThickness = Math.max(20, 26 + innerPadding * 0.6);
+            const barThickness = Math.max(widgetThickness + innerPadding + 4, Theme.barHeight - 4 - (8 - innerPadding));
+            const spacing = barConfig.spacing ?? 4;
+            const bottomGap = barConfig.bottomGap ?? 0;
+            return barThickness + spacing + bottomGap;
+        }
+
         readonly property real barSpacing: {
             const defaultBar = SettingsData.barConfigs[0] || SettingsData.getBarConfig("default");
             if (!defaultBar)
@@ -58,6 +69,36 @@ Variants {
                 return spacing + effectiveBarHeight + bottomGap;
             }
             return 0;
+        }
+
+        readonly property real adjacentTopBarHeight: {
+            if (!isVertical || autoHide)
+                return 0;
+            const screenName = dock.modelData?.name ?? "";
+            const topBar = SettingsData.barConfigs.find(bc => {
+                if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
+                    return false;
+                if (bc.position !== SettingsData.Position.Top && bc.position !== 0)
+                    return false;
+                const onThisScreen = bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all") || bc.screenPreferences.includes(screenName);
+                return onThisScreen;
+            });
+            return getBarHeight(topBar);
+        }
+
+        readonly property real adjacentLeftBarWidth: {
+            if (isVertical || autoHide)
+                return 0;
+            const screenName = dock.modelData?.name ?? "";
+            const leftBar = SettingsData.barConfigs.find(bc => {
+                if (!bc.enabled || bc.autoHide || !(bc.visible ?? true))
+                    return false;
+                if (bc.position !== SettingsData.Position.Left && bc.position !== 2)
+                    return false;
+                const onThisScreen = bc.screenPreferences.length === 0 || bc.screenPreferences.includes("all") || bc.screenPreferences.includes(screenName);
+                return onThisScreen;
+            });
+            return getBarHeight(leftBar);
         }
 
         readonly property real dockMargin: SettingsData.dockSpacing
@@ -186,27 +227,31 @@ Variants {
 
         function showTooltipForHoveredButton() {
             dockTooltip.hide();
-            if (dock.hoveredButton && dock.reveal && !slideXAnimation.running && !slideYAnimation.running) {
-                const buttonGlobalPos = dock.hoveredButton.mapToGlobal(0, 0);
-                const tooltipText = dock.hoveredButton.tooltipText || "";
-                if (tooltipText) {
-                    const screenX = dock.screen ? (dock.screen.x || 0) : 0;
-                    const screenY = dock.screen ? (dock.screen.y || 0) : 0;
-                    const screenHeight = dock.screen ? dock.screen.height : 0;
-                    if (!dock.isVertical) {
-                        const isBottom = SettingsData.dockPosition === SettingsData.Position.Bottom;
-                        const globalX = buttonGlobalPos.x + dock.hoveredButton.width / 2;
-                        const screenRelativeY = isBottom ? (screenHeight - dock.effectiveBarHeight - SettingsData.dockSpacing - SettingsData.dockBottomGap - SettingsData.dockMargin - 35) : (buttonGlobalPos.y - screenY + dock.hoveredButton.height + Theme.spacingS);
-                        dockTooltip.show(tooltipText, globalX, screenRelativeY, dock.screen, false, false);
-                    } else {
-                        const isLeft = SettingsData.dockPosition === SettingsData.Position.Left;
-                        const tooltipOffset = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + Theme.spacingXS;
-                        const tooltipX = isLeft ? tooltipOffset : (dock.screen.width - tooltipOffset);
-                        const screenRelativeY = buttonGlobalPos.y - screenY + dock.hoveredButton.height / 2;
-                        dockTooltip.show(tooltipText, screenX + tooltipX, screenRelativeY, dock.screen, isLeft, !isLeft);
-                    }
-                }
+            if (!dock.hoveredButton || !dock.reveal || slideXAnimation.running || slideYAnimation.running)
+                return;
+
+            const buttonGlobalPos = dock.hoveredButton.mapToGlobal(0, 0);
+            const tooltipText = dock.hoveredButton.tooltipText || "";
+            if (!tooltipText)
+                return;
+
+            const screenX = dock.screen ? (dock.screen.x || 0) : 0;
+            const screenY = dock.screen ? (dock.screen.y || 0) : 0;
+            const screenHeight = dock.screen ? dock.screen.height : 0;
+
+            if (!dock.isVertical) {
+                const isBottom = SettingsData.dockPosition === SettingsData.Position.Bottom;
+                const globalX = buttonGlobalPos.x + dock.hoveredButton.width / 2 + adjacentLeftBarWidth;
+                const screenRelativeY = isBottom ? (screenHeight - dock.effectiveBarHeight - SettingsData.dockSpacing - SettingsData.dockBottomGap - SettingsData.dockMargin - barSpacing - 35) : (buttonGlobalPos.y - screenY + dock.hoveredButton.height + Theme.spacingS);
+                dockTooltip.show(tooltipText, globalX, screenRelativeY, dock.screen, false, false);
+                return;
             }
+
+            const isLeft = SettingsData.dockPosition === SettingsData.Position.Left;
+            const tooltipOffset = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockMargin + barSpacing + Theme.spacingXS;
+            const tooltipX = isLeft ? tooltipOffset : (dock.screen.width - tooltipOffset);
+            const screenRelativeY = buttonGlobalPos.y - screenY + dock.hoveredButton.height / 2 + adjacentTopBarHeight;
+            dockTooltip.show(tooltipText, screenX + tooltipX, screenRelativeY, dock.screen, isLeft, !isLeft);
         }
 
         Connections {

@@ -401,7 +401,7 @@ Item {
                         currentIndex = clampedIndex;
                         positionViewAtIndex(clampedIndex, GridView.Contain);
                     }
-                    enableAnimation = true;
+                    Qt.callLater(() => { enableAnimation = true; });
                 }
 
                 Connections {
@@ -463,12 +463,6 @@ Item {
                                     }
                                 }
                             }
-                        }
-
-                        BusyIndicator {
-                            anchors.centerIn: parent
-                            running: thumbnailImage.status === Image.Loading
-                            visible: running
                         }
 
                         StateLayer {

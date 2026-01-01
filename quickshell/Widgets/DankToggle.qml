@@ -27,7 +27,7 @@ Item {
     readonly property int insetCircle: 24
 
     width: showText ? parent.width : trackWidth
-    height: showText ? (description.length > 0 ? 60 : 44) : trackHeight
+    height: showText ? Math.max(trackHeight, textColumn.implicitHeight + Theme.spacingM * 2) : trackHeight
 
     function handleClick() {
         if (!enabled)
@@ -62,6 +62,7 @@ Item {
         visible: showText
 
         Column {
+            id: textColumn
             width: parent.width
             anchors.verticalCenter: parent.verticalCenter
             spacing: Theme.spacingXS
