@@ -46,11 +46,27 @@ Item {
                     onToggled: checked => SettingsData.set("audioVisualizerEnabled", checked)
                 }
 
-                SettingsToggleRow {
+                SettingsDropdownRow {
                     text: I18n.tr("Scroll Wheel")
-                    description: I18n.tr("Scroll on widget changes media volume")
-                    checked: SettingsData.audioScrollEnabled
-                    onToggled: checked => SettingsData.set("audioScrollEnabled", checked)
+                    description: I18n.tr("Scroll wheel behavior on media widget")
+                    settingKey: "audioScrollMode"
+                    options: ["Change Volume", "Change Song", "Nothing"]
+                    currentValue: {
+                        if (SettingsData.audioScrollMode === "volume")
+                            return "Change Volume";
+                        if (SettingsData.audioScrollMode === "song")
+                            return "Change Song";
+                        return "Nothing";
+                    }
+                    onValueChanged: value => {
+                        if (value === "Change Volume") {
+                            SettingsData.set("audioScrollMode", "volume");
+                        } else if (value === "Change Song") {
+                            SettingsData.set("audioScrollMode", "song");
+                        } else {
+                            SettingsData.set("audioScrollMode", "nothing");
+                        }
+                    }
                 }
             }
         }

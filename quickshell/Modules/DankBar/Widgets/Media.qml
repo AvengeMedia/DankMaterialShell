@@ -54,38 +54,67 @@ BasePill {
     property real touchpadThreshold: 100
 
     onWheel: function (wheelEvent) {
-        if (!usePlayerVolume)
-            return;
-        if (!SettingsData.audioScrollEnabled)
+        if (SettingsData.audioScrollMode === "nothing")
             return;
 
-        wheelEvent.accepted = true;
+        if (SettingsData.audioScrollMode === "volume") {
+            if (!usePlayerVolume)
+                return;
 
-        const deltaY = wheelEvent.angleDelta.y;
-        const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+            wheelEvent.accepted = true;
 
-        const currentVolume = activePlayer.volume * 100;
+            const deltaY = wheelEvent.angleDelta.y;
+            const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
 
-        let newVolume = currentVolume;
-        if (isMouseWheelY) {
-            if (deltaY > 0) {
-                newVolume = Math.min(100, currentVolume + 5);
-            } else if (deltaY < 0) {
-                newVolume = Math.max(0, currentVolume - 5);
-            }
-        } else {
-            scrollAccumulatorY += deltaY;
-            if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
-                if (scrollAccumulatorY > 0) {
-                    newVolume = Math.min(100, currentVolume + 1);
-                } else {
-                    newVolume = Math.max(0, currentVolume - 1);
+            const currentVolume = activePlayer.volume * 100;
+
+            let newVolume = currentVolume;
+            if (isMouseWheelY) {
+                if (deltaY > 0) {
+                    newVolume = Math.min(100, currentVolume + 5);
+                } else if (deltaY < 0) {
+                    newVolume = Math.max(0, currentVolume - 5);
                 }
-                scrollAccumulatorY = 0;
+            } else {
+                scrollAccumulatorY += deltaY;
+                if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
+                    if (scrollAccumulatorY > 0) {
+                        newVolume = Math.min(100, currentVolume + 1);
+                    } else {
+                        newVolume = Math.max(0, currentVolume - 1);
+                    }
+                    scrollAccumulatorY = 0;
+                }
+            }
+
+            activePlayer.volume = newVolume / 100;
+        } else if (SettingsData.audioScrollMode === "song") {
+            if (!activePlayer)
+                return;
+
+            wheelEvent.accepted = true;
+
+            const deltaY = wheelEvent.angleDelta.y;
+            const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+
+            if (isMouseWheelY) {
+                if (deltaY > 0 && activePlayer.canGoPrevious) {
+                    activePlayer.previous();
+                } else if (deltaY < 0 && activePlayer.canGoNext) {
+                    activePlayer.next();
+                }
+            } else {
+                scrollAccumulatorY += deltaY;
+                if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
+                    if (scrollAccumulatorY > 0 && activePlayer.canGoPrevious) {
+                        activePlayer.previous();
+                    } else if (scrollAccumulatorY < 0 && activePlayer.canGoNext) {
+                        activePlayer.next();
+                    }
+                    scrollAccumulatorY = 0;
+                }
             }
         }
-
-        activePlayer.volume = newVolume / 100;
     }
 
     content: Component {
