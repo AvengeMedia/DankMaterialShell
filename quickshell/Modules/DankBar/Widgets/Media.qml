@@ -98,17 +98,17 @@ BasePill {
             const isMouseWheelY = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
 
             if (isMouseWheelY) {
-                if (deltaY > 0 && activePlayer.canGoPrevious) {
+                if (deltaY > 0) {
                     activePlayer.previous();
-                } else if (deltaY < 0 && activePlayer.canGoNext) {
+                } else {
                     activePlayer.next();
                 }
             } else {
                 scrollAccumulatorY += deltaY;
                 if (Math.abs(scrollAccumulatorY) >= touchpadThreshold) {
-                    if (scrollAccumulatorY > 0 && activePlayer.canGoPrevious) {
+                    if (scrollAccumulatorY > 0) {
                         activePlayer.previous();
-                    } else if (scrollAccumulatorY < 0 && activePlayer.canGoNext) {
+                    } else {
                         activePlayer.next();
                     }
                     scrollAccumulatorY = 0;
