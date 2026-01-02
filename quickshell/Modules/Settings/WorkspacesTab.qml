@@ -107,7 +107,7 @@ Item {
                     settingKey: "groupWorkspaceApps"
                     tags: ["workspace", "apps", "icons", "group", "grouped", "collapse"]
                     text: I18n.tr("Group Workspace Apps")
-                    description: I18n.tr("Group repeated application icons in the same workspace")
+                    description: I18n.tr("Group repeated application icons in unfocused workspaces")
                     checked: SettingsData.groupWorkspaceApps
                     visible: SettingsData.showWorkspaceApps
                     onToggled: checked => SettingsData.set("groupWorkspaceApps", checked)
