@@ -47,25 +47,21 @@ Item {
                 }
 
                 SettingsDropdownRow {
+                    property var scrollOpts: {
+                        "Change Volume": "volume",
+                        "Change Song": "song",
+                        "Nothing": "nothing"
+                    }
+
                     text: I18n.tr("Scroll Wheel")
                     description: I18n.tr("Scroll wheel behavior on media widget")
                     settingKey: "audioScrollMode"
-                    options: ["Change Volume", "Change Song", "Nothing"]
+                    options: Object.keys(scrollOpts).sort()
                     currentValue: {
-                        if (SettingsData.audioScrollMode === "volume")
-                            return "Change Volume";
-                        if (SettingsData.audioScrollMode === "song")
-                            return "Change Song";
-                        return "Nothing";
+                        Object.keys(scrollOpts).find(key => scrollOpts[key] === SettingsData.audioScrollMode) ?? "volume"
                     }
                     onValueChanged: value => {
-                        if (value === "Change Volume") {
-                            SettingsData.set("audioScrollMode", "volume");
-                        } else if (value === "Change Song") {
-                            SettingsData.set("audioScrollMode", "song");
-                        } else {
-                            SettingsData.set("audioScrollMode", "nothing");
-                        }
+                        SettingsData.set("audioScrollMode", scrollOpts[value])
                     }
                 }
             }
