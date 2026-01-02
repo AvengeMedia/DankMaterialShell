@@ -56,6 +56,7 @@ Item {
                     text: I18n.tr("Scroll Wheel")
                     description: I18n.tr("Scroll wheel behavior on media widget")
                     settingKey: "audioScrollMode"
+                    tags: ["media", "music", "scroll"]
                     options: Object.keys(scrollOpts).sort()
                     currentValue: {
                         Object.keys(scrollOpts).find(key => scrollOpts[key] === SettingsData.audioScrollMode) ?? "volume"

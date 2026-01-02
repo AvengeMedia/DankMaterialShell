@@ -2497,6 +2497,27 @@
     "description": "If the field is hidden, it will appear as soon as a key is pressed."
   },
   {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
     "section": "lockScreenShowPasswordField",
     "label": "Show Password Field",
     "tabIndex": 11,
@@ -2928,6 +2949,7 @@
       "playback",
       "player",
       "progress",
+      "scroll",
       "settings",
       "spotify",
       "statusbar",
@@ -2937,6 +2959,24 @@
     ],
     "icon": "music_note",
     "description": "Use animated wave progress bars for media playback"
+  },
+  {
+    "section": "audioScrollMode",
+    "label": "Scroll Wheel",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "behavior",
+      "media",
+      "mpris",
+      "music",
+      "player",
+      "scroll",
+      "spotify",
+      "wheel",
+      "widget"
+    ],
+    "description": "Scroll wheel behavior on media widget"
   },
   {
     "section": "notificationTimeoutCritical",
@@ -3412,27 +3452,6 @@
     ],
     "icon": "schedule",
     "description": "Gradually fade the screen before locking with a configurable grace period"
-  },
-  {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
   },
   {
     "section": "powerConfirmation",
