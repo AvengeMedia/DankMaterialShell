@@ -175,6 +175,7 @@ Singleton {
     property bool showWorkspacePadding: false
     property bool workspaceScrolling: false
     property bool showWorkspaceApps: false
+    property bool groupWorkspaceApps: true
     property int maxWorkspaceIcons: 3
     property bool workspacesPerMonitor: true
     property bool showOccupiedWorkspacesOnly: false

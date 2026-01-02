@@ -104,6 +104,16 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "groupWorkspaceApps"
+                    tags: ["workspace", "apps", "icons", "group", "grouped", "collapse"]
+                    text: I18n.tr("Group Workspace Apps")
+                    description: I18n.tr("Group repeated application icons in the same workspace")
+                    checked: SettingsData.groupWorkspaceApps
+                    visible: SettingsData.showWorkspaceApps
+                    onToggled: checked => SettingsData.set("groupWorkspaceApps", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "workspacesPerMonitor"
                     tags: ["workspace", "per-monitor", "multi-monitor"]
                     text: I18n.tr("Per-Monitor Workspaces")

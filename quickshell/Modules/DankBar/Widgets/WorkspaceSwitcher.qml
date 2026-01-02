@@ -241,7 +241,7 @@ Item {
             }
 
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
-            const key = isActiveWs ? `${keyBase}_${i}` : keyBase;
+            const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${keyBase}_${i}` : keyBase;
 
             if (!byApp[key]) {
                 const moddedId = Paths.moddedAppId(keyBase);
