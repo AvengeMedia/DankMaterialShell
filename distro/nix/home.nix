@@ -25,18 +25,21 @@ in
       "dank-material-shell"
       "enableNightMode"
     ] "Night mode is now always available.")
-    (lib.mkRemovedOptionModule [
-      "programs"
-      "dank-material-shell"
-      "default"
-      "settings"
-    ] "Declared settings are now respected.")
+    (lib.mkRemovedOptionModule
+      [
+        "programs"
+        "dank-material-shell"
+        "default"
+        "settings"
+      ]
+      "Default settings have been removed and been replaced with programs.dank-material-shell.settings."
+    )
     (lib.mkRemovedOptionModule [
       "programs"
       "dank-material-shell"
       "default"
       "session"
-    ] "Declared session settings are now respected.")
+    ] "Default session has been removed and been replaced with programs.dank-material-shell.session.")
     (lib.mkRenamedOptionModule
       [ "programs" "dank-material-shell" "enableSystemd" ]
       [ "programs" "dank-material-shell" "systemd" "enable" ]
@@ -50,7 +53,7 @@ in
       description = "DankMaterialShell configuration settings as an attribute set, to be written to ~/.config/DankMaterialShell/settings.json.";
     };
 
-    clsettings = lib.mkOption {
+    clipboardSettings = lib.mkOption {
       type = jsonFormat.type;
       default = { };
       description = "DankMaterialShell clipboard settings as an attribute set, to be written to ~/.config/DankMaterialShell/clsettings.json.";
