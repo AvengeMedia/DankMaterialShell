@@ -42,11 +42,12 @@ const (
 	catOptionalFeatures
 	catConfigFiles
 	catServices
+	catEnvironment
 )
 
 var categoryNames = []string{
 	"System", "Versions", "Installation", "Compositor",
-	"Quickshell Features", "Optional Features", "Config Files", "Services",
+	"Quickshell Features", "Optional Features", "Config Files", "Services", "Environment",
 }
 
 type checkResult struct {
@@ -71,6 +72,7 @@ func runDoctor(cmd *cobra.Command, args []string) {
 		checkOptionalDependencies(),
 		checkConfigurationFiles(),
 		checkSystemdServices(),
+		checkEnvironmentVars(),
 	)
 
 	printResults(results)
@@ -152,6 +154,23 @@ func checkSystemInfo() []checkResult {
 	}
 
 	return results
+}
+
+func checkEnvironmentVars() []checkResult {
+	results := []checkResult{}
+	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME")...)
+	results = append(results, checkEnvVar("QT_ICON_THEME")...)
+	return results
+}
+
+func checkEnvVar(name string) []checkResult {
+	value := os.Getenv(name)
+	if value != "" {
+		return []checkResult{{catEnvironment, name, "info", value, ""}}
+	} else if doctorVerbose {
+		return []checkResult{{catEnvironment, name, "info", "Not set", ""}}
+	}
+	return nil
 }
 
 func readOSRelease() map[string]string {
@@ -631,10 +650,12 @@ func printResultLine(r checkResult, styles tui.Styles) {
 	}
 
 	name := r.name
-	if len(name) > 18 {
+	nameLen := len(name)
+	if nameLen > 18 {
 		name = name[:17] + "…"
+		nameLen = 18
 	}
-	dots := strings.Repeat("·", 19-len(name))
+	dots := strings.Repeat("·", 19-nameLen)
 
 	fmt.Printf("    %s %s %s %s\n", style.Render(icon), name, styles.Subtle.Render(dots), r.message)
 
