@@ -10,7 +10,7 @@ let
     "programs"
     "dank-material-shell"
   ];
-
+  jsonFormat = pkgs.formats.json { };
   builtInRemovedMsg = "This is now built-in in DMS and doesn't need additional dependencies.";
 in
 {
@@ -37,7 +37,7 @@ in
     };
 
     dgop = {
-      package = lib.mkPackageOption pkgs "dgop" {};
+      package = lib.mkPackageOption pkgs "dgop" { };
     };
 
     enableSystemMonitoring = lib.mkOption {
@@ -88,6 +88,11 @@ in
             src = lib.mkOption {
               type = types.either types.package types.path;
               description = "Source of the plugin package or path";
+            };
+            settings = lib.mkOption {
+              type = jsonFormat.type;
+              default = { };
+              description = "Plugin settings as an attribute set";
             };
           };
         }
