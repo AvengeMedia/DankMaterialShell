@@ -577,12 +577,16 @@ func checkOptionalDependencies() []checkResult {
 }
 
 func checkConfigurationFiles() []checkResult {
+	configDir, _ := os.UserConfigDir()
+	cacheDir, _ := os.UserCacheDir()
+	dmsDir := "DankMaterialShell"
+
 	configFiles := []struct{ name, path string }{
-		{"settings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "settings.json")},
-		{"clsettings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "clsettings.json")},
-		{"plugin_settings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "plugin_settings.json")},
-		{"session.json", filepath.Join(utils.XDGStateHome(), "DankMaterialShell", "session.json")},
-		{"dms-colors.json", filepath.Join(utils.XDGCacheHome(), "DankMaterialShell", "dms-colors.json")},
+		{"settings.json", filepath.Join(configDir, dmsDir, "settings.json")},
+		{"clsettings.json", filepath.Join(configDir, dmsDir, "clsettings.json")},
+		{"plugin_settings.json", filepath.Join(configDir, dmsDir, "plugin_settings.json")},
+		{"session.json", filepath.Join(utils.XDGStateHome(), dmsDir, "session.json")},
+		{"dms-colors.json", filepath.Join(cacheDir, dmsDir, "dms-colors.json")},
 	}
 
 	var results []checkResult

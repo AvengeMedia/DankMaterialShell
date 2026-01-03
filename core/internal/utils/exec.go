@@ -29,5 +29,5 @@ func IsServiceActive(name string, userService bool) bool {
 		args = []string{"--user", "is-active", name}
 	}
 	output, _ := exec.Command("systemctl", args...).Output()
-	return strings.TrimSpace(string(output)) == "active"
+	return strings.EqualFold(strings.TrimSpace(string(output)), "active")
 }
