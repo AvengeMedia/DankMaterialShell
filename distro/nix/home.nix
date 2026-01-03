@@ -16,6 +16,12 @@ let
       dmsPkgs
       ;
   };
+  hasPluginSettings = lib.any (plugin: plugin.settings != { }) (
+    lib.attrValues (lib.filterAttrs (n: v: v.enable) cfg.plugins)
+  );
+  pluginSettings = lib.mapAttrs (name: plugin: { enabled = plugin.enable; } // plugin.settings) (
+    lib.filterAttrs (n: v: v.enable) cfg.plugins
+  );
 in
 {
   imports = [
@@ -24,22 +30,19 @@ in
       "programs"
       "dank-material-shell"
       "enableNightMode"
-    ] "Night mode is now always available.")
-    (lib.mkRemovedOptionModule
-      [
-        "programs"
-        "dank-material-shell"
-        "default"
-        "settings"
-      ]
-      "Default settings have been removed and been replaced with programs.dank-material-shell.settings."
-    )
+    ] "Night mode is now always available")
+    (lib.mkRemovedOptionModule [
+      "programs"
+      "dank-material-shell"
+      "default"
+      "settings"
+    ] "Default settings have been removed and been replaced with programs.dank-material-shell.settings")
     (lib.mkRemovedOptionModule [
       "programs"
       "dank-material-shell"
       "default"
       "session"
-    ] "Default session has been removed and been replaced with programs.dank-material-shell.session.")
+    ] "Default session has been removed and been replaced with programs.dank-material-shell.session")
     (lib.mkRenamedOptionModule
       [ "programs" "dank-material-shell" "enableSystemd" ]
       [ "programs" "dank-material-shell" "systemd" "enable" ]
@@ -63,6 +66,12 @@ in
       type = jsonFormat.type;
       default = { };
       description = "DankMaterialShell session settings as an attribute set, to be written to ~/.local/state/DankMaterialShell/session.json.";
+    };
+
+    managePluginSettings = lib.mkOption {
+      type = lib.types.bool;
+      default = hasPluginSettings;
+      description = ''Whether to manage plugin settings. Automatically enabled if any plugins have settings configured.'';
     };
   };
 
@@ -95,17 +104,20 @@ in
       "DankMaterialShell/settings.json" = lib.mkIf (cfg.settings != { }) {
         source = jsonFormat.generate "settings.json" cfg.settings;
       };
-      "DankMaterialShell/clsettings.json" = lib.mkIf (cfg.clsettings != { }) {
-        source = jsonFormat.generate "clsettings.json" cfg.clsettings;
+      "DankMaterialShell/clsettings.json" = lib.mkIf (cfg.clipboardSettings != { }) {
+        source = jsonFormat.generate "clsettings.json" cfg.clipboardSettings;
       };
-      "DankMaterialShell/plugin_settings.json" = (
-        lib.mapAttrs' (name: value: {
-          name = "DankMaterialShell/plugins/${name}";
-          inherit value;
-        }) common.plugins
-      );
-
-    };
+      "DankMaterialShell/plugin_settings.json" = lib.mkIf cfg.managePluginSettings {
+        source = jsonFormat.generate "plugin_settings.json" pluginSettings;
+      };
+    }
+    // (lib.mapAttrs' (name: value: {
+      name = "DankMaterialShell/plugins/${name}";
+      inherit value;
+    }) common.plugins);
+    warnings =
+      lib.optional (!cfg.managePluginSettings && hasPluginSettings)
+        "You have disabled managePluginSettings but provided plugin settings. These settings will be ignored.";
     home.packages = common.packages;
   };
 }
