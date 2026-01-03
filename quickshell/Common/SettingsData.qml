@@ -379,6 +379,9 @@ Singleton {
     property bool updaterUseCustomCommand: false
     property string updaterCustomCommand: ""
     property string updaterTerminalAdditionalParams: ""
+    property bool updaterShowLatestNews: false
+    property string updaterLatestNewsUrl: ""
+    property string updaterLatestNewsRegex: ""
 
     property string displayNameMode: "system"
     property var screenPreferences: ({})

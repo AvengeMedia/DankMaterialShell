@@ -41,6 +41,9 @@ DankPopout {
             antialiasing: true
             smooth: true
 
+            property bool newsExpanded: false
+
+            // Background layers
             Repeater {
                 model: [
                     {
@@ -77,12 +80,13 @@ DankPopout {
                 y: Theme.spacingL
                 spacing: Theme.spacingL
 
+                // Header
                 Item {
                     width: parent.width
                     height: 40
 
                     StyledText {
-                        text: I18n.tr("System Updates")
+                        text: updaterPanel.newsExpanded ? I18n.tr("Latest News") : I18n.tr("System Updates")
                         font.pixelSize: Theme.fontSizeLarge
                         color: Theme.surfaceText
                         font.weight: Font.Medium
@@ -95,8 +99,27 @@ DankPopout {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: Theme.spacingXS
 
+                        DankActionButton {
+                            id: backToUpdatesButton
+                            visible: updaterPanel.newsExpanded
+                            opacity: visible ? 1.0 : 0.0
+                            buttonSize: 28
+                            iconName: "arrow_back"
+                            iconSize: 18
+                            iconColor: Theme.primary
+                            onClicked: {
+                                updaterPanel.newsExpanded = false
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.shortDuration }
+                            }
+                        }
+
                         StyledText {
                             anchors.verticalCenter: parent.verticalCenter
+                            visible: !updaterPanel.newsExpanded
+                            opacity: visible ? 1.0 : 0.0
                             text: {
                                 if (SystemUpdateService.isChecking)
                                     return "Checking...";
@@ -112,10 +135,15 @@ DankPopout {
                                     return Theme.error;
                                 return Theme.surfaceText;
                             }
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.shortDuration }
+                            }
                         }
 
                         DankActionButton {
                             id: checkForUpdatesButton
+                            visible: !updaterPanel.newsExpanded
                             buttonSize: 28
                             iconName: "refresh"
                             iconSize: 18
@@ -125,6 +153,10 @@ DankPopout {
                             opacity: enabled ? 1.0 : 0.5
                             onClicked: {
                                 SystemUpdateService.checkForUpdates();
+                            }
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: Theme.shortDuration }
                             }
 
                             RotationAnimation {
@@ -146,11 +178,13 @@ DankPopout {
                     }
                 }
 
+                // Main content
                 Rectangle {
                     width: parent.width
                     height: {
                         let usedHeight = 40 + Theme.spacingL;
                         usedHeight += 48 + Theme.spacingL;
+                        usedHeight += latestNewsTicker.shouldShow ? latestNewsTicker.height + Theme.spacingL : 0;
                         return parent.height - usedHeight;
                     }
                     radius: Theme.cornerRadius
@@ -158,10 +192,21 @@ DankPopout {
                     border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.05)
                     border.width: 0
 
+                    // Updates view
                     Column {
                         anchors.fill: parent
                         anchors.margins: Theme.spacingM
                         anchors.rightMargin: 0
+                        opacity: updaterPanel.newsExpanded ? 0 : 1
+                        enabled: opacity === 1 // Only interactive when fully visible
+                        visible: true
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
 
                         StyledText {
                             id: statusText
@@ -255,8 +300,250 @@ DankPopout {
                             }
                         }
                     }
+
+                    // Latest news view
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: Theme.spacingM
+                        anchors.rightMargin: 0
+                        opacity: updaterPanel.newsExpanded ? 1 : 0
+                        enabled: opacity === 1
+                        visible: true
+
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Theme.longDuration
+                                easing.type: Easing.InOutQuad
+                            }
+                        }
+
+                        DankListView {
+                            id: expandedNewsList
+                            width: parent.width
+                            height: parent.height
+                            clip: true
+                            spacing: Theme.spacingM
+                            model: SystemUpdateService.latestNews
+                            boundsBehavior: Flickable.StopAtBounds
+
+                            delegate: Rectangle {
+                                id: newsItem
+                                width: ListView.view.width - Theme.spacingS
+                                radius: Theme.cornerRadius
+                                color: newsMouseArea.containsMouse ? Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.3) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.15)
+                                border.color: newsItem.expanded ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.2) : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+                                border.width: 1
+
+                                property bool expanded: false
+
+                                height: newsContentColumn.height + Theme.spacingS * 2
+
+                                Behavior on height {
+                                    NumberAnimation {
+                                        duration: Theme.longDuration
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+
+                                Column {
+                                    id: newsContentColumn
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.margins: Theme.spacingS
+                                    spacing: Theme.spacingXS
+
+                                    // News titles
+                                    Row {
+                                        width: parent.width
+                                        spacing: Theme.spacingS
+
+                                        Column {
+                                            width: parent.width - expandIndicator.width
+                                            spacing: 2
+
+                                            StyledText {
+                                                width: parent.width
+                                                text: modelData.title || ""
+                                                font.pixelSize: Theme.fontSizeMedium
+                                                color: Theme.surfaceText
+                                                font.weight: Font.Medium
+                                                wrapMode: Text.WordWrap
+                                            }
+
+                                            StyledText {
+                                                width: parent.width
+                                                text: modelData.pubDate || ""
+                                                opacity: 0.7
+                                                font.pixelSize: Theme.fontSizeSmall
+                                                color: Theme.surfaceVariantText
+                                                visible: modelData.pubDate && modelData.pubDate.length > 0
+                                                wrapMode: Text.WordWrap
+                                            }
+                                        }
+
+                                        Item {
+                                            id: expandIndicator
+                                            visible: modelData.description && modelData.description.length > 0
+                                            width: visible ? expandIcon.width : 0
+                                            height: visible ? expandIcon.height : 0
+                                            anchors.verticalCenter: parent.verticalCenter
+
+                                            DankIcon {
+                                                id: expandIcon
+                                                name: newsItem.expanded ? "expand_less" : "expand_more"
+                                                size: Theme.iconSizeSmall
+                                                opacity: 0.7
+                                            }
+                                        }
+                                    }
+
+                                    // Separator between titles and description
+                                    Rectangle {
+                                        width: parent.width
+                                        height: 1
+                                        color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.15)
+                                        visible: newsItem.expanded && modelData.description && modelData.description.length > 0
+                                        opacity: newsItem.expanded ? 1 : 0
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.mediumDuration
+                                                easing.type: Easing.InOutQuad
+                                            }
+                                        }
+                                    }
+
+                                    // Description
+                                    StyledText {
+                                        width: parent.width
+                                        text: modelData.description || ""
+                                        font.pixelSize: Theme.fontSizeSmall
+                                        color: Theme.surfaceVariantText
+                                        wrapMode: Text.WordWrap
+                                        visible: modelData.description && modelData.description.length > 0 && newsItem.expanded
+                                        opacity: newsItem.expanded ? 1 : 0
+
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.mediumDuration
+                                                easing.type: Easing.InOutQuad
+                                            }
+                                        }
+                                    }
+
+                                    // Footer with external link
+                                    Item {
+                                        width: parent.width
+                                        visible: newsItem.expanded && modelData.link
+                                        height: externalLinkButton.height
+
+                                        DankActionButton {
+                                            id: externalLinkButton
+                                            visible: modelData.link && newsItem.expanded
+                                            opacity: visible ? 1 : 0
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            anchors.right: parent.right
+                                            buttonSize: 28
+                                            iconName: "open_in_new"
+                                            iconSize: 14
+                                            iconColor: Theme.primary
+                                            z: 100
+                                            onClicked: {
+                                                Qt.openUrlExternally(modelData.link)
+                                            }
+
+                                            Behavior on opacity {
+                                                NumberAnimation {
+                                                    duration: Theme.mediumDuration
+                                                    easing.type: Easing.InOutQuad
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                MouseArea {
+                                    id: newsMouseArea
+                                    anchors.fill: parent
+                                    anchors.rightMargin: newsItem.expanded && externalLinkButton.visible ? externalLinkButton.width + Theme.spacingS : 0
+                                    hoverEnabled: true
+                                    cursorShape: modelData.description && modelData.description.length > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    enabled: modelData.description && modelData.description.length > 0
+                                    onClicked: {
+                                        newsItem.expanded = !newsItem.expanded
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
+                // News ticker
+                Item {
+                    id: latestNewsTicker
+                    width: parent.width
+                    // This smooths the transition of the main content rectangle resizing.
+                    property bool shouldShow: SettingsData.updaterShowLatestNews && !updaterPanel.newsExpanded && SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0
+                    height: shouldShow ? 16 : 0
+                    opacity: shouldShow ? 0.7 : 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: Theme.shortDuration }
+                    }
+
+                    MouseArea {
+                        id: tickerMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            updaterPanel.newsExpanded = true
+                        }
+                    }
+
+                    Item {
+                        width: parent.width - Theme.spacingM * 2
+                        height: parent.height
+                        anchors.centerIn: parent
+
+                        Row {
+                            width: parent.width
+                            height: parent.height
+                            spacing: Theme.spacingS
+
+                            StyledText {
+                                width: parent.width - extendNewsIcon.width - Theme.spacingS
+                                height: parent.height
+                                text: SystemUpdateService.latestNews && SystemUpdateService.latestNews.length > 0 ? SystemUpdateService.latestNews[0].title : ""
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceText
+                                opacity: tickerMouseArea.containsMouse ? 1.0 : 0.7
+                                verticalAlignment: Text.AlignVCenter
+                                elide: Text.ElideRight
+
+                                Behavior on opacity {
+                                    NumberAnimation { duration: Theme.shortDuration }
+                                }
+                            }
+
+                            DankIcon {
+                                id: extendNewsIcon
+                                height: parent.height
+                                width: height
+                                name: "arrow_forward"
+                                size: Theme.iconSizeSmall
+                                color: Theme.primary
+                                opacity: tickerMouseArea.containsMouse ? 1.0 : 0.7
+
+                                Behavior on opacity {
+                                    NumberAnimation { duration: Theme.shortDuration }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Buttons
                 Row {
                     width: parent.width
                     height: 48
