@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -54,6 +55,10 @@ func FlatpakSearchBySubstring(substring string) bool {
 		}
 	}
 	return false
+}
+
+func AnyFlatpakExists(flatpaks ...string) bool {
+	return slices.ContainsFunc(flatpaks, FlatpakExists)
 }
 
 func FlatpakInstallationDir(name string) (string, error) {

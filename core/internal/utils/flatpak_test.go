@@ -208,3 +208,42 @@ func TestFlatpakInstallationDirCommandFailure(t *testing.T) {
 		t.Errorf("expected 'not installed' error, got: %v", err)
 	}
 }
+
+func TestAnyFlatpakExistsSomeExist(t *testing.T) {
+	if !FlatpakInPath() {
+		t.Skip("flatpak not in PATH")
+	}
+
+	result := AnyFlatpakExists("com.nonexistent.flatpak", "app.zen_browser.zen", "com.another.nonexistent")
+	if !result {
+		t.Errorf("expected true when at least one flatpak exists")
+	}
+}
+
+func TestAnyFlatpakExistsNoneExist(t *testing.T) {
+	if !FlatpakInPath() {
+		t.Skip("flatpak not in PATH")
+	}
+
+	result := AnyFlatpakExists("com.nonexistent.flatpak1", "com.nonexistent.flatpak2")
+	if result {
+		t.Errorf("expected false when no flatpaks exist")
+	}
+}
+
+func TestAnyFlatpakExistsNoFlatpak(t *testing.T) {
+	tempDir := t.TempDir()
+	t.Setenv("PATH", tempDir)
+
+	result := AnyFlatpakExists("any.package.name", "another.package")
+	if result {
+		t.Errorf("expected false when flatpak not in PATH, got true")
+	}
+}
+
+func TestAnyFlatpakExistsEmpty(t *testing.T) {
+	result := AnyFlatpakExists()
+	if result {
+		t.Errorf("expected false when no flatpaks specified")
+	}
+}

@@ -250,35 +250,35 @@ output_path = '%s'
 	if !opts.ShouldSkipTemplate("gtk") {
 		switch opts.Mode {
 		case "light":
-			appendConfig(opts, cfgFile, nil, "gtk3-light.toml")
+			appendConfig(opts, cfgFile, nil, nil, "gtk3-light.toml")
 		default:
-			appendConfig(opts, cfgFile, nil, "gtk3-dark.toml")
+			appendConfig(opts, cfgFile, nil, nil, "gtk3-dark.toml")
 		}
 	}
 
 	if !opts.ShouldSkipTemplate("niri") {
-		appendConfig(opts, cfgFile, []string{"niri"}, "niri.toml")
+		appendConfig(opts, cfgFile, []string{"niri"}, nil, "niri.toml")
 	}
 	if !opts.ShouldSkipTemplate("qt5ct") {
-		appendConfig(opts, cfgFile, []string{"qt5ct"}, "qt5ct.toml")
+		appendConfig(opts, cfgFile, []string{"qt5ct"}, nil, "qt5ct.toml")
 	}
 	if !opts.ShouldSkipTemplate("qt6ct") {
-		appendConfig(opts, cfgFile, []string{"qt6ct"}, "qt6ct.toml")
+		appendConfig(opts, cfgFile, []string{"qt6ct"}, nil, "qt6ct.toml")
 	}
 	if !opts.ShouldSkipTemplate("firefox") {
-		appendConfig(opts, cfgFile, []string{"firefox"}, "firefox.toml")
+		appendConfig(opts, cfgFile, []string{"firefox"}, nil, "firefox.toml")
 	}
 	if !opts.ShouldSkipTemplate("pywalfox") {
-		appendConfig(opts, cfgFile, []string{"pywalfox"}, "pywalfox.toml")
+		appendConfig(opts, cfgFile, []string{"pywalfox"}, nil, "pywalfox.toml")
 	}
 	if !opts.ShouldSkipTemplate("zenbrowser") {
-		appendConfig(opts, cfgFile, []string{"zen", "zen-browser"}, "zenbrowser.toml")
+		appendConfig(opts, cfgFile, []string{"zen", "zen-browser"}, []string{"app.zen_browser.zen"}, "zenbrowser.toml")
 	}
 	if !opts.ShouldSkipTemplate("vesktop") {
-		appendConfig(opts, cfgFile, []string{"vesktop"}, "vesktop.toml")
+		appendConfig(opts, cfgFile, []string{"vesktop"}, []string{"dev.vencord.Vesktop"}, "vesktop.toml")
 	}
 	if !opts.ShouldSkipTemplate("equibop") {
-		appendConfig(opts, cfgFile, []string{"equibop"}, "equibop.toml")
+		appendConfig(opts, cfgFile, []string{"equibop"}, nil, "equibop.toml")
 	}
 	if !opts.ShouldSkipTemplate("ghostty") {
 		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"ghostty"}, "ghostty.toml")
@@ -300,11 +300,11 @@ output_path = '%s'
 	}
 
 	if !opts.ShouldSkipTemplate("dgop") {
-		appendConfig(opts, cfgFile, []string{"dgop"}, "dgop.toml")
+		appendConfig(opts, cfgFile, []string{"dgop"}, nil, "dgop.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("kcolorscheme") {
-		appendConfig(opts, cfgFile, nil, "kcolorscheme.toml")
+		appendConfig(opts, cfgFile, nil, nil, "kcolorscheme.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("vscode") {
@@ -342,12 +342,21 @@ output_path = '%s'
 	return nil
 }
 
-func appendConfig(opts *Options, cfgFile *os.File, checkCmd []string, fileName string) {
+func appendConfig(
+	opts *Options,
+	cfgFile *os.File,
+	checkCmd []string,
+	checkFlatpaks []string,
+	fileName string,
+) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
 	if len(checkCmd) > 0 && !utils.AnyCommandExists(checkCmd...) {
+		return
+	}
+	if len(checkFlatpaks) > 0 && !utils.AnyFlatpakExists(checkFlatpaks...) {
 		return
 	}
 	data, err := os.ReadFile(configPath)
