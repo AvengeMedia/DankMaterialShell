@@ -12,6 +12,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
@@ -473,6 +474,21 @@ ShellRoot {
 	return results, missingFeatures
 }
 
+func checkI2CAvailability() checkResult {
+	ddc, err := brightness.NewDDCBackend()
+	if err != nil {
+		return checkResult{catOptionalFeatures, "I2C/DDC", "info", "Not available", "External monitor brightness control"}
+	}
+	defer ddc.Close()
+
+	devices, err := ddc.GetDevices()
+	if err != nil || len(devices) == 0 {
+		return checkResult{catOptionalFeatures, "I2C/DDC", "info", "No monitors detected", "External monitor brightness control"}
+	}
+
+	return checkResult{catOptionalFeatures, "I2C/DDC", "ok", fmt.Sprintf("%d monitor(s) detected", len(devices)), "External monitor brightness control"}
+}
+
 func checkOptionalDependencies() []checkResult {
 	results := []checkResult{}
 
@@ -481,6 +497,15 @@ func checkOptionalDependencies() []checkResult {
 	} else {
 		results = append(results, checkResult{catOptionalFeatures, "accountsservice", "warn", "Not running", "User accounts"})
 	}
+
+	if utils.IsServiceActive("power-profiles-daemon", false) {
+		results = append(results, checkResult{catOptionalFeatures, "power-profiles-daemon", "ok", "Running", "Power profile management"})
+	} else {
+		results = append(results, checkResult{catOptionalFeatures, "power-profiles-daemon", "info", "Not running", "Power profile management"})
+	}
+
+	i2cStatus := checkI2CAvailability()
+	results = append(results, i2cStatus)
 
 	terminals := []string{"ghostty", "kitty", "alacritty", "foot", "wezterm"}
 	terminalFound := ""
