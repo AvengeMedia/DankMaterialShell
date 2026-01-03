@@ -13,6 +13,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/config"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/brightness"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
@@ -582,6 +583,29 @@ func checkI2CAvailability() checkResult {
 	return checkResult{catOptionalFeatures, "I2C/DDC", statusOK, fmt.Sprintf("%d monitor(s) detected", len(devices)), "External monitor brightness control"}
 }
 
+func detectNetworkBackend() string {
+	result, err := network.DetectNetworkStack()
+	if err != nil {
+		return ""
+	}
+
+	switch result.Backend {
+	case network.BackendNetworkManager:
+		return "NetworkManager"
+	case network.BackendIwd:
+		return "iwd"
+	case network.BackendNetworkd:
+		if result.HasIwd {
+			return "iwd + systemd-networkd"
+		}
+		return "systemd-networkd"
+	case network.BackendConnMan:
+		return "ConnMan"
+	default:
+		return ""
+	}
+}
+
 func checkOptionalDependencies() []checkResult {
 	var results []checkResult
 
@@ -631,13 +655,24 @@ func checkOptionalDependencies() []checkResult {
 
 		if found {
 			message := "Installed"
-			switch foundCmd {
-			case "nmcli":
-				message = "NetworkManager"
-			case "iwctl":
-				message = "iwd"
+			details := d.desc
+			if d.name == "Network" {
+				result, err := network.DetectNetworkStack()
+				if err == nil && result.Backend != network.BackendNone {
+					message = detectNetworkBackend() + " (active)"
+					if doctorVerbose {
+						details = result.ChosenReason
+					}
+				} else {
+					switch foundCmd {
+					case "nmcli":
+						message = "NetworkManager (installed)"
+					case "iwctl":
+						message = "iwd (installed)"
+					}
+				}
 			}
-			results = append(results, checkResult{catOptionalFeatures, d.name, statusOK, message, d.desc})
+			results = append(results, checkResult{catOptionalFeatures, d.name, statusOK, message, details})
 		} else if d.important {
 			results = append(results, checkResult{catOptionalFeatures, d.name, statusWarn, "Missing", d.desc})
 		} else {
