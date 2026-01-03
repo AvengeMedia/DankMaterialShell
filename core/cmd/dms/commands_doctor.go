@@ -180,7 +180,7 @@ func checkSystemInfo() []checkResult {
 func checkEnvironmentVars() []checkResult {
 	var results []checkResult
 	results = append(results, checkEnvVar("QT_QPA_PLATFORMTHEME")...)
-	results = append(results, checkEnvVar("QT_ICON_THEME")...)
+	results = append(results, checkEnvVar("QS_ICON_THEME")...)
 	return results
 }
 
