@@ -281,22 +281,22 @@ output_path = '%s'
 		appendConfig(opts, cfgFile, []string{"equibop"}, nil, "equibop.toml")
 	}
 	if !opts.ShouldSkipTemplate("ghostty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"ghostty"}, "ghostty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"ghostty"}, nil, "ghostty.toml")
 	}
 	if !opts.ShouldSkipTemplate("kitty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"kitty"}, "kitty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"kitty"}, nil, "kitty.toml")
 	}
 	if !opts.ShouldSkipTemplate("foot") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"foot"}, "foot.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"foot"}, nil, "foot.toml")
 	}
 	if !opts.ShouldSkipTemplate("alacritty") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"alacritty"}, "alacritty.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"alacritty"}, nil, "alacritty.toml")
 	}
 	if !opts.ShouldSkipTemplate("wezterm") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"wezterm"}, "wezterm.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"wezterm"}, nil, "wezterm.toml")
 	}
 	if !opts.ShouldSkipTemplate("nvim") {
-		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"nvim"}, "neovim.toml")
+		appendTerminalConfig(opts, cfgFile, tmpDir, []string{"nvim"}, nil, "neovim.toml")
 	}
 
 	if !opts.ShouldSkipTemplate("dgop") {
@@ -353,10 +353,10 @@ func appendConfig(
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if len(checkCmd) > 0 && !utils.AnyCommandExists(checkCmd...) {
-		return
-	}
-	if len(checkFlatpaks) > 0 && !utils.AnyFlatpakExists(checkFlatpaks...) {
+	cmdExists := checkCmd == nil || utils.AnyCommandExists(checkCmd...)
+	flatpakExists := checkFlatpaks == nil || utils.AnyFlatpakExists(checkFlatpaks...)
+
+	if !cmdExists && !flatpakExists {
 		return
 	}
 	data, err := os.ReadFile(configPath)
@@ -367,12 +367,15 @@ func appendConfig(
 	cfgFile.WriteString("\n")
 }
 
-func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkCmd []string, fileName string) {
+func appendTerminalConfig(opts *Options, cfgFile *os.File, tmpDir string, checkCmd []string, checkFlatpaks []string, fileName string) {
 	configPath := filepath.Join(opts.ShellDir, "matugen", "configs", fileName)
 	if _, err := os.Stat(configPath); err != nil {
 		return
 	}
-	if len(checkCmd) > 0 && !utils.AnyCommandExists(checkCmd...) {
+	cmdExists := checkCmd == nil || utils.AnyCommandExists(checkCmd...)
+	flatpakExists := checkFlatpaks == nil || utils.AnyFlatpakExists(checkFlatpaks...)
+
+	if !cmdExists && !flatpakExists {
 		return
 	}
 	data, err := os.ReadFile(configPath)

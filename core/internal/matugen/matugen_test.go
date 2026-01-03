@@ -70,7 +70,7 @@ func TestAppendConfigBinaryDoesNotExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir}
 
-	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, nil, "test.toml")
+	appendConfig(opts, cfgFile, []string{"nonexistent-binary-12345"}, []string{}, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
@@ -144,7 +144,7 @@ func TestAppendConfigFlatpakDoesNotExist(t *testing.T) {
 
 	opts := &Options{ShellDir: shellDir}
 
-	appendConfig(opts, cfgFile, nil, []string{"com.nonexistent.flatpak"}, "test.toml")
+	appendConfig(opts, cfgFile, []string{}, []string{"com.nonexistent.flatpak"}, "test.toml")
 
 	cfgFile.Close()
 	output, err := os.ReadFile(outFile)
