@@ -539,15 +539,26 @@ func checkOptionalDependencies() []checkResult {
 
 func checkConfigurationFiles() []checkResult {
 	configFiles := []struct{ name, path string }{
-		{"Settings", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "settings.json")},
-		{"Session", filepath.Join(utils.XDGStateHome(), "DankMaterialShell", "session.json")},
-		{"Colors", filepath.Join(utils.XDGCacheHome(), "DankMaterialShell", "dms-colors.json")},
+		{"settings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "settings.json")},
+		{"clsettings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "clsettings.json")},
+		{"plugin_settings.json", filepath.Join(utils.XDGConfigHome(), "DankMaterialShell", "plugin_settings.json")},
+		{"session.json", filepath.Join(utils.XDGStateHome(), "DankMaterialShell", "session.json")},
+		{"dms-colors.json", filepath.Join(utils.XDGCacheHome(), "DankMaterialShell", "dms-colors.json")},
 	}
 
 	results := []checkResult{}
 	for _, cf := range configFiles {
-		if _, err := os.Stat(cf.path); err == nil {
-			results = append(results, checkResult{catConfigFiles, cf.name, "ok", "Present", cf.path})
+		info, err := os.Stat(cf.path)
+		if err == nil {
+			status := "ok"
+			message := "Present"
+
+			if info.Mode().Perm()&0200 == 0 {
+				status = "warn"
+				message += " (read-only)"
+			}
+
+			results = append(results, checkResult{catConfigFiles, cf.name, status, message, cf.path})
 		} else {
 			results = append(results, checkResult{catConfigFiles, cf.name, "info", "Not yet created", cf.path})
 		}
@@ -651,11 +662,14 @@ func printResultLine(r checkResult, styles tui.Styles) {
 
 	name := r.name
 	nameLen := len(name)
-	if nameLen > 18 {
-		name = name[:17] + "…"
-		nameLen = 18
+
+	maxLength := 21
+
+	if nameLen > maxLength {
+		name = name[:maxLength-1] + "…"
+		nameLen = maxLength
 	}
-	dots := strings.Repeat("·", 19-nameLen)
+	dots := strings.Repeat("·", maxLength-nameLen)
 
 	fmt.Printf("    %s %s %s %s\n", style.Render(icon), name, styles.Subtle.Render(dots), r.message)
 
