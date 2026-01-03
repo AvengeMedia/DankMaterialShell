@@ -16,15 +16,67 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/tui"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/version"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 
+type status string
+
 const (
-	statusOK    = "ok"
-	statusWarn  = "warn"
-	statusError = "error"
-	statusInfo  = "info"
+	statusOK    status = "ok"
+	statusWarn  status = "warn"
+	statusError status = "error"
+	statusInfo  status = "info"
 )
+
+func (s status) IconStyle(styles tui.Styles) (string, lipgloss.Style) {
+	switch s {
+	case statusOK:
+		return "●", styles.Success
+	case statusWarn:
+		return "●", styles.Warning
+	case statusError:
+		return "●", styles.Error
+	default:
+		return "○", styles.Subtle
+	}
+}
+
+type DoctorStatus struct {
+	Errors   []checkResult
+	Warnings []checkResult
+	OK       []checkResult
+	Info     []checkResult
+}
+
+func (ds *DoctorStatus) Add(r checkResult) {
+	switch r.status {
+	case statusError:
+		ds.Errors = append(ds.Errors, r)
+	case statusWarn:
+		ds.Warnings = append(ds.Warnings, r)
+	case statusOK:
+		ds.OK = append(ds.OK, r)
+	case statusInfo:
+		ds.Info = append(ds.Info, r)
+	}
+}
+
+func (ds *DoctorStatus) HasIssues() bool {
+	return len(ds.Errors) > 0 || len(ds.Warnings) > 0
+}
+
+func (ds *DoctorStatus) ErrorCount() int {
+	return len(ds.Errors)
+}
+
+func (ds *DoctorStatus) WarningCount() int {
+	return len(ds.Warnings)
+}
+
+func (ds *DoctorStatus) OKCount() int {
+	return len(ds.OK)
+}
 
 var (
 	quickshellVersionRegex = regexp.MustCompile(`quickshell (\d+\.\d+\.\d+)`)
@@ -62,9 +114,29 @@ const (
 	catEnvironment
 )
 
-var categoryNames = []string{
-	"System", "Versions", "Installation", "Compositor",
-	"Quickshell Features", "Optional Features", "Config Files", "Services", "Environment",
+func (c category) String() string {
+	switch c {
+	case catSystem:
+		return "System"
+	case catVersions:
+		return "Versions"
+	case catInstallation:
+		return "Installation"
+	case catCompositor:
+		return "Compositor"
+	case catQuickshellFeatures:
+		return "Quickshell Features"
+	case catOptionalFeatures:
+		return "Optional Features"
+	case catConfigFiles:
+		return "Config Files"
+	case catServices:
+		return "Services"
+	case catEnvironment:
+		return "Environment"
+	default:
+		return "Unknown"
+	}
 }
 
 const (
@@ -74,7 +146,7 @@ const (
 type checkResult struct {
 	category category
 	name     string
-	status   string
+	status   status
 	message  string
 	details  string
 }
@@ -256,7 +328,7 @@ func getDMSShellVersion() (version, path string) {
 	return "", ""
 }
 
-func getQuickshellVersionInfo(missingFeatures bool) (string, string, string) {
+func getQuickshellVersionInfo(missingFeatures bool) (string, status, string) {
 	if !utils.CommandExists("qs") {
 		return "Not installed", statusError, ""
 	}
@@ -685,7 +757,7 @@ func printResults(results []checkResult) {
 			if currentCategory != -1 {
 				fmt.Println()
 			}
-			fmt.Printf("  %s\n", styles.Bold.Render(categoryNames[r.category]))
+			fmt.Printf("  %s\n", styles.Bold.Render(r.category.String()))
 			currentCategory = r.category
 		}
 		printResultLine(r, styles)
@@ -693,15 +765,7 @@ func printResults(results []checkResult) {
 }
 
 func printResultLine(r checkResult, styles tui.Styles) {
-	icon, style := "○", styles.Subtle
-	switch r.status {
-	case statusOK:
-		icon, style = "●", styles.Success
-	case statusWarn:
-		icon, style = "●", styles.Warning
-	case statusError:
-		icon, style = "●", styles.Error
-	}
+	icon, style := r.status.IconStyle(styles)
 
 	name := r.name
 	nameLen := len(name)
@@ -723,32 +787,26 @@ func printSummary(results []checkResult, qsMissingFeatures bool) {
 	theme := tui.TerminalTheme()
 	styles := tui.NewStyles(theme)
 
-	errors, warnings, ok := 0, 0, 0
+	var ds DoctorStatus
 	for _, r := range results {
-		switch r.status {
-		case statusError:
-			errors++
-		case statusWarn:
-			warnings++
-		case statusOK:
-			ok++
-		}
+		ds.Add(r)
 	}
 
 	fmt.Println()
 	fmt.Printf("  %s\n", styles.Subtle.Render("──────────────────────────────────────"))
 
-	if errors == 0 && warnings == 0 {
+	if !ds.HasIssues() {
 		fmt.Printf("  %s\n", styles.Success.Render("✓ All checks passed!"))
 	} else {
 		var parts []string
-		if errors > 0 {
-			parts = append(parts, styles.Error.Render(fmt.Sprintf("%d error(s)", errors)))
+
+		if ds.ErrorCount() > 0 {
+			parts = append(parts, styles.Error.Render(fmt.Sprintf("%d error(s)", ds.ErrorCount())))
 		}
-		if warnings > 0 {
-			parts = append(parts, styles.Warning.Render(fmt.Sprintf("%d warning(s)", warnings)))
+		if ds.WarningCount() > 0 {
+			parts = append(parts, styles.Warning.Render(fmt.Sprintf("%d warning(s)", ds.WarningCount())))
 		}
-		parts = append(parts, styles.Success.Render(fmt.Sprintf("%d ok", ok)))
+		parts = append(parts, styles.Success.Render(fmt.Sprintf("%d ok", ds.OKCount())))
 		fmt.Printf("  %s\n", strings.Join(parts, ", "))
 
 		if qsMissingFeatures {
