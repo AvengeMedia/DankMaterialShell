@@ -38,7 +38,7 @@ Singleton {
     ]
 
     function refreshApplications() {
-        applications = DesktopEntries.applications.values;
+        applications = DesktopEntries.applications.values.filter(app => !app.noDisplay && !app.hidden);
         _cachedCategories = null;
     }
 
