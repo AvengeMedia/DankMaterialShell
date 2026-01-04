@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -95,10 +96,14 @@ var doctorCmd = &cobra.Command{
 	Run:   runDoctor,
 }
 
-var doctorVerbose bool
+var (
+	doctorVerbose bool
+	doctorJSON    bool
+)
 
 func init() {
 	doctorCmd.Flags().BoolVarP(&doctorVerbose, "verbose", "v", false, "Show detailed output including paths and versions")
+	doctorCmd.Flags().BoolVarP(&doctorJSON, "json", "j", false, "Output results in JSON format")
 }
 
 type category int
@@ -152,8 +157,38 @@ type checkResult struct {
 	details  string
 }
 
+type checkResultJSON struct {
+	Category string `json:"category"`
+	Name     string `json:"name"`
+	Status   string `json:"status"`
+	Message  string `json:"message"`
+	Details  string `json:"details,omitempty"`
+}
+
+type doctorOutputJSON struct {
+	Summary struct {
+		Errors   int `json:"errors"`
+		Warnings int `json:"warnings"`
+		OK       int `json:"ok"`
+		Info     int `json:"info"`
+	} `json:"summary"`
+	Results []checkResultJSON `json:"results"`
+}
+
+func (r checkResult) toJSON() checkResultJSON {
+	return checkResultJSON{
+		Category: r.category.String(),
+		Name:     r.name,
+		Status:   string(r.status),
+		Message:  r.message,
+		Details:  r.details,
+	}
+}
+
 func runDoctor(cmd *cobra.Command, args []string) {
-	printDoctorHeader()
+	if !doctorJSON {
+		printDoctorHeader()
+	}
 
 	qsFeatures, qsMissingFeatures := checkQuickshellFeatures()
 
@@ -169,8 +204,12 @@ func runDoctor(cmd *cobra.Command, args []string) {
 		checkEnvironmentVars(),
 	)
 
-	printResults(results)
-	printSummary(results, qsMissingFeatures)
+	if doctorJSON {
+		printResultsJSON(results)
+	} else {
+		printResults(results)
+		printSummary(results, qsMissingFeatures)
+	}
 }
 
 func printDoctorHeader() {
@@ -796,6 +835,31 @@ func printResults(results []checkResult) {
 			currentCategory = r.category
 		}
 		printResultLine(r, styles)
+	}
+}
+
+func printResultsJSON(results []checkResult) {
+	var ds DoctorStatus
+	for _, r := range results {
+		ds.Add(r)
+	}
+
+	output := doctorOutputJSON{}
+	output.Summary.Errors = ds.ErrorCount()
+	output.Summary.Warnings = ds.WarningCount()
+	output.Summary.OK = ds.OKCount()
+	output.Summary.Info = len(ds.Info)
+
+	output.Results = make([]checkResultJSON, 0, len(results))
+	for _, r := range results {
+		output.Results = append(output.Results, r.toJSON())
+	}
+
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(output); err != nil {
+		fmt.Fprintf(os.Stderr, "Error encoding JSON: %v\n", err)
+		os.Exit(1)
 	}
 }
 
