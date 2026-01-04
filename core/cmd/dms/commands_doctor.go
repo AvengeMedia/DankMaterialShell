@@ -772,6 +772,8 @@ func checkSystemdServices() []checkResult {
 		}
 		if dmsState.enabled == "disabled" {
 			status, message = statusWarn, "Disabled"
+		} else if dmsState.active == "failed" || dmsState.active == "inactive" {
+			status = statusError
 		}
 		results = append(results, checkResult{catServices, "dms.service", status, message, ""})
 	}
