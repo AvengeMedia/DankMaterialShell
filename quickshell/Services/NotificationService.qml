@@ -491,13 +491,13 @@ Singleton {
 
             if (wrapper) {
                 root.allWrappers.push(wrapper);
-                const shouldSave = !isTransient && _shouldSaveToHistory(notif.urgency);
-                if (shouldSave) {
+                if (!isTransient) {
                     root.notifications.push(wrapper);
                     _trimStored();
-                    root.addToHistory(wrapper);
+                    if (_shouldSaveToHistory(notif.urgency)) {
+                        root.addToHistory(wrapper);
+                    }
                 }
-
                 Qt.callLater(() => {
                     _initWrapperPersistence(wrapper);
                 });
