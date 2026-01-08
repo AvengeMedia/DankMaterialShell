@@ -341,11 +341,11 @@ Singleton {
         };
     }
 
-    function formatTemp(celcius, includeUnits = true, unitsShort = true) {
-        if (celcius == null) {
+    function formatTemp(celsius, includeUnits = true, unitsShort = true) {
+        if (celsius == null) {
             return null;
         }
-        const value = SettingsData.useFahrenheit ? Math.round(celcius * (9 / 5) + 32) : celcius;
+        const value = SettingsData.useFahrenheit ? Math.round(celsius * (9 / 5) + 32) : celsius;
         const unit = unitsShort ? "°" : (SettingsData.useFahrenheit ? "°F" : "°C");
         return includeUnits ? value + unit : value;
     }

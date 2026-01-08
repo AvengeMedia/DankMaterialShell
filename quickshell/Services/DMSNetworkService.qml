@@ -677,12 +677,12 @@ Singleton {
         if (!info) {
             details = "Network information not found or network not available.";
         } else {
-            details += "Inteface: " + info.iface + "\\n";
+            details += "Interface: " + info.iface + "\\n";
             details += "Driver: " + info.driver + "\\n";
             details += "MAC Addr: " + info.hwAddr + "\\n";
             details += "Speed: " + info.speed + " Mb/s\\n\\n";
 
-            details += "IPv4 informations:\\n";
+            details += "IPv4 information:\\n";
 
             for (const ip4 of info.IPv4s.ips) {
                 details += "    IPv4 address: " + ip4 + "\\n";
@@ -691,7 +691,7 @@ Singleton {
             details += "    DNS: " + info.IPv4s.dns + "\\n";
 
             if (info.IPv6s.ips) {
-                details += "\\nIPv6 informations:\\n";
+                details += "\\nIPv6 information:\\n";
 
                 for (const ip6 of info.IPv6s.ips) {
                     details += "    IPv6 address: " + ip6 + "\\n";

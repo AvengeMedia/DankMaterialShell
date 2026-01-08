@@ -31,7 +31,7 @@ import (
 	wlclient "github.com/AvengeMedia/DankMaterialShell/core/pkg/go-wayland/wayland/client"
 )
 
-// These mime types wont be stored in history
+// These mime types won't be stored in history
 var sensitiveMimeTypes = []string{
 	"x-kde-passwordManagerHint",
 }

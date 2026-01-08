@@ -96,7 +96,7 @@ func (c *CUPSClient) RejectJobs(printer string) error {
 	return err
 }
 
-// AddPrinterToClass adds a printer to a class, if the class does not exists it will be crated
+// AddPrinterToClass adds a printer to a class, if the class does not exists it will be created
 func (c *CUPSClient) AddPrinterToClass(class, printer string) error {
 	attributes, err := c.GetPrinterAttributes(class, []string{AttributeMemberURIs})
 	if err != nil && !IsNotExistsError(err) {

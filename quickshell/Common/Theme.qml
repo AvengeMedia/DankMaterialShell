@@ -546,7 +546,7 @@ Singleton {
         if (savePrefs && typeof SessionData !== "undefined" && !isGreeterMode)
             SessionData.setLightMode(light);
         if (!isGreeterMode) {
-            // Skip with matugen becuase, our script runner will do it.
+            // Skip with matugen because, our script runner will do it.
             if (!matugenAvailable) {
                 PortalService.setLightMode(light);
             }
