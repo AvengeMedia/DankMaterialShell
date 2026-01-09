@@ -148,29 +148,9 @@ BasePill {
                 }
             }
 
-            DankIcon {
-                anchors.centerIn: parent
-                size: 18
-                name: "sports_esports"
-                color: Theme.widgetTextColor
-                visible: {
-                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId)
-                        return false;
-                    const moddedId = Paths.moddedAppId(activeWindow.appId);
-                    return moddedId.toLowerCase().includes("steam_app");
-                }
-            }
-
             Text {
                 anchors.centerIn: parent
-                visible: {
-                    if (!root.isVerticalOrientation || !activeWindow || !activeWindow.appId)
-                        return false;
-                    if (appIcon.status === Image.Ready)
-                        return false;
-                    const moddedId = Paths.moddedAppId(activeWindow.appId);
-                    return !moddedId.toLowerCase().includes("steam_app");
-                }
+                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready
                 text: {
                     if (!activeWindow || !activeWindow.appId)
                         return "?";

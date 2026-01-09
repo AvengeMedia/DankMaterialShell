@@ -59,6 +59,9 @@ Singleton {
                 return "transmission";
             return "transmission-gtk";
         }
+        const steamMatch = appId.match(/^steam_app_(\d+)$/);
+        if (steamMatch)
+            return `steam_icon_${steamMatch[1]}`;
         return appId;
     }
 
@@ -68,8 +71,8 @@ Singleton {
         }
 
         const moddedId = moddedAppId(appId);
-        if (moddedId.toLowerCase().includes("steam_app")) {
-            return "";
+        if (moddedId.startsWith("steam_icon_")) {
+            return Quickshell.iconPath(moddedId, true);
         }
 
         return desktopEntry && desktopEntry.icon ? Quickshell.iconPath(desktopEntry.icon, true) : "";

@@ -392,20 +392,6 @@ Item {
             }
         }
 
-        DankIcon {
-            anchors.centerIn: parent
-            size: actualIconSize
-            name: "sports_esports"
-            color: Theme.surfaceText
-            visible: {
-                if (!appData || !appData.appId || appData.appId === "__SEPARATOR__") {
-                    return false;
-                }
-                const moddedId = Paths.moddedAppId(appData.appId);
-                return moddedId.toLowerCase().includes("steam_app");
-            }
-        }
-
         Rectangle {
             width: actualIconSize
             height: actualIconSize

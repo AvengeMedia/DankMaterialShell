@@ -384,27 +384,9 @@ Item {
                             }
                         }
 
-                        DankIcon {
-                            anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness)) / 2) : Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-                            size: Theme.barIconSize(root.barThickness)
-                            name: "sports_esports"
-                            color: Theme.widgetTextColor
-                            visible: {
-                                const moddedId = Paths.moddedAppId(appId);
-                                return moddedId.toLowerCase().includes("steam_app");
-                            }
-                        }
-
-                        // Fallback text if no icon found
                         Text {
                             anchors.centerIn: parent
-                            visible: {
-                                const moddedId = Paths.moddedAppId(appId);
-                                const isSteamApp = moddedId.toLowerCase().includes("steam_app");
-                                return !iconImg.visible && !isSteamApp;
-                            }
+                            visible: !iconImg.visible
                             text: {
                                 root._desktopEntriesUpdateTrigger;
                                 if (!appId)
@@ -634,26 +616,9 @@ Item {
                             }
                         }
 
-                        DankIcon {
-                            anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness)) / 2) : Theme.spacingXS
-                            anchors.verticalCenter: parent.verticalCenter
-                            size: Theme.barIconSize(root.barThickness)
-                            name: "sports_esports"
-                            color: Theme.widgetTextColor
-                            visible: {
-                                const moddedId = Paths.moddedAppId(appId);
-                                return moddedId.toLowerCase().includes("steam_app");
-                            }
-                        }
-
                         Text {
                             anchors.centerIn: parent
-                            visible: {
-                                const moddedId = Paths.moddedAppId(appId);
-                                const isSteamApp = moddedId.toLowerCase().includes("steam_app");
-                                return !iconImg.visible && !isSteamApp;
-                            }
+                            visible: !iconImg.visible
                             text: {
                                 root._desktopEntriesUpdateTrigger;
                                 if (!appId)

@@ -264,15 +264,12 @@ Item {
             const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${keyBase}_${i}` : keyBase;
 
             if (!byApp[key]) {
-                const moddedId = Paths.moddedAppId(keyBase);
-                const isSteamApp = moddedId.toLowerCase().includes("steam_app");
                 const isQuickshell = keyBase === "org.quickshell";
                 const desktopEntry = DesktopEntries.heuristicLookup(keyBase);
-                const icon = isSteamApp ? "" : Paths.getAppIcon(keyBase, desktopEntry);
+                const icon = Paths.getAppIcon(keyBase, desktopEntry);
                 byApp[key] = {
                     "type": "icon",
                     "icon": icon,
-                    "isSteamApp": isSteamApp,
                     "isQuickshell": isQuickshell,
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
@@ -1137,7 +1134,7 @@ Item {
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isSteamApp && !modelData.isQuickshell
+                                                visible: !modelData.isQuickshell
                                             }
 
                                             IconImage {
@@ -1151,15 +1148,6 @@ Item {
                                                     colorization: 1
                                                     colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
                                                 }
-                                            }
-
-                                            DankIcon {
-                                                anchors.centerIn: parent
-                                                size: root.appIconSize
-                                                name: "sports_esports"
-                                                color: Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp
                                             }
 
                                             MouseArea {
@@ -1240,7 +1228,7 @@ Item {
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isSteamApp && !modelData.isQuickshell
+                                                visible: !modelData.isQuickshell
                                             }
 
                                             IconImage {
@@ -1254,15 +1242,6 @@ Item {
                                                     colorization: 1
                                                     colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
                                                 }
-                                            }
-
-                                            DankIcon {
-                                                anchors.centerIn: parent
-                                                size: root.appIconSize
-                                                name: "sports_esports"
-                                                color: Theme.widgetTextColor
-                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: modelData.isSteamApp
                                             }
 
                                             MouseArea {
