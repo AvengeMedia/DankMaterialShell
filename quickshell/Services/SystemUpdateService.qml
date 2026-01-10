@@ -96,7 +96,7 @@ Singleton {
         "paru": archBasedPMSettings,
         "dnf": fedoraBasedPMSettings
     }
-    readonly property list<string> supportedDistributions: ["arch", "cachyos", "manjaro", "endeavouros", "fedora"]
+    readonly property list<string> supportedDistributions: ["arch", "artix", "cachyos", "manjaro", "endeavouros", "fedora"]
     readonly property int updateCount: availableUpdates.length
     readonly property bool helperAvailable: pkgManager !== "" && distributionSupported
 
