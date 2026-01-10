@@ -3154,33 +3154,6 @@
     "description": "If the field is hidden, it will appear as soon as a key is pressed."
   },
   {
-    "section": "lockScreenNotificationMode",
-    "label": "Notification Display",
-    "tabIndex": 11,
-    "category": "Lock Screen",
-    "keywords": [
-      "alert",
-      "control",
-      "display",
-      "information",
-      "lock",
-      "lockscreen",
-      "login",
-      "monitor",
-      "notif",
-      "notification",
-      "notifications",
-      "output",
-      "password",
-      "privacy",
-      "screen",
-      "security",
-      "shown",
-      "what"
-    ],
-    "description": "Control what notification information is shown on the lock screen"
-  },
-  {
     "section": "lockScreenShowPasswordField",
     "label": "Show Password Field",
     "tabIndex": 11,
@@ -3916,6 +3889,35 @@
     "description": "Timeout for normal priority notifications"
   },
   {
+    "section": "lockScreenNotificationMode",
+    "label": "Notification Display",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "control",
+      "display",
+      "information",
+      "lock",
+      "lockscreen",
+      "login",
+      "messages",
+      "monitor",
+      "notif",
+      "notification",
+      "notifications",
+      "output",
+      "privacy",
+      "screen",
+      "security",
+      "shown",
+      "toast",
+      "what"
+    ],
+    "description": "Control what notification information is shown on the lock screen"
+  },
+  {
     "section": "notificationOverlayEnabled",
     "label": "Notification Overlay",
     "tabIndex": 17,
@@ -4035,6 +4037,29 @@
     ],
     "icon": "tune",
     "description": "Choose where on-screen displays appear on screen"
+  },
+  {
+    "section": "appIdSubstitutions",
+    "label": "App ID Substitutions",
+    "tabIndex": 19,
+    "category": "Running Apps",
+    "keywords": [
+      "active",
+      "app",
+      "apps",
+      "class",
+      "icon",
+      "pattern",
+      "regex",
+      "replacement",
+      "running",
+      "substitution",
+      "substitutions",
+      "tasks",
+      "window",
+      "windows"
+    ],
+    "icon": "find_replace"
   },
   {
     "section": "runningApps",

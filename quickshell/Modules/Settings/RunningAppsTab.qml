@@ -38,6 +38,7 @@ Item {
                 iconName: "find_replace"
                 title: I18n.tr("App ID Substitutions")
                 settingKey: "appIdSubstitutions"
+                tags: ["app", "icon", "substitution", "replacement", "pattern", "window", "class", "regex"]
 
                 headerActions: [
                     DankActionButton {
@@ -105,7 +106,6 @@ Item {
                                         DankTextField {
                                             id: patternField
                                             width: parent.width
-                                            height: 40
                                             text: modelData.pattern
                                             font.pixelSize: Theme.fontSizeSmall
                                             onEditingFinished: SettingsData.updateAppIdSubstitution(index, text, replacementField.text, modelData.type)
@@ -125,7 +125,6 @@ Item {
                                         DankTextField {
                                             id: replacementField
                                             width: parent.width
-                                            height: 40
                                             text: modelData.replacement
                                             font.pixelSize: Theme.fontSizeSmall
                                             onEditingFinished: SettingsData.updateAppIdSubstitution(index, patternField.text, text, modelData.type)
