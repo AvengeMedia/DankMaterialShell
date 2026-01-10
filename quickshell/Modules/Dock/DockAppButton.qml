@@ -49,6 +49,13 @@ Item {
             updateDesktopEntry();
         }
     }
+
+    Connections {
+        target: SettingsData
+        function onAppIdSubstitutionsChanged() {
+            updateDesktopEntry();
+        }
+    }
     property bool isWindowFocused: {
         if (!appData) {
             return false;

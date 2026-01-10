@@ -56,6 +56,13 @@ BasePill {
         }
     }
 
+    Connections {
+        target: SettingsData
+        function onAppIdSubstitutionsChanged() {
+            root.updateDesktopEntry();
+        }
+    }
+
     function updateDesktopEntry() {
         if (activeWindow && activeWindow.appId) {
             const moddedId = Paths.moddedAppId(activeWindow.appId);

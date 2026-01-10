@@ -69,6 +69,7 @@ Item {
 
     property int _desktopEntriesUpdateTrigger: 0
     property int _toplevelsUpdateTrigger: 0
+    property int _appIdSubstitutionsTrigger: 0
 
     readonly property var sortedToplevels: {
         _toplevelsUpdateTrigger;
@@ -93,6 +94,13 @@ Item {
         target: DesktopEntries
         function onApplicationsChanged() {
             _desktopEntriesUpdateTrigger++;
+        }
+    }
+
+    Connections {
+        target: SettingsData
+        function onAppIdSubstitutionsChanged() {
+            _appIdSubstitutionsTrigger++;
         }
     }
     readonly property var groupedWindows: {
@@ -364,6 +372,7 @@ Item {
                             height: Theme.barIconSize(root.barThickness)
                             source: {
                                 root._desktopEntriesUpdateTrigger;
+                                root._appIdSubstitutionsTrigger;
                                 if (!appId)
                                     return "";
                                 const moddedId = Paths.moddedAppId(appId);
@@ -596,6 +605,7 @@ Item {
                             height: Theme.barIconSize(root.barThickness)
                             source: {
                                 root._desktopEntriesUpdateTrigger;
+                                root._appIdSubstitutionsTrigger;
                                 if (!appId)
                                     return "";
                                 const moddedId = Paths.moddedAppId(appId);

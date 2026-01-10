@@ -265,7 +265,8 @@ Item {
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell";
-                const desktopEntry = DesktopEntries.heuristicLookup(keyBase);
+                const moddedId = Paths.moddedAppId(keyBase);
+                const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
                 const icon = Paths.getAppIcon(keyBase, desktopEntry);
                 byApp[key] = {
                     "type": "icon",
@@ -1365,6 +1366,9 @@ Item {
                         delegateRoot.updateAllData();
                     }
                     function onWorkspaceNameIconsChanged() {
+                        delegateRoot.updateAllData();
+                    }
+                    function onAppIdSubstitutionsChanged() {
                         delegateRoot.updateAllData();
                     }
                 }

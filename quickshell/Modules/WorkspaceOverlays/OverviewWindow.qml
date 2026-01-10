@@ -33,8 +33,8 @@ Item {
 
     property var iconToWindowRatio: 0.25
     property var iconToWindowRatioCompact: 0.45
-    property var entry: DesktopEntries.heuristicLookup(windowData?.class)
-    property var iconPath: Quickshell.iconPath(entry?.icon ?? windowData?.class ?? "application-x-executable", "image-missing")
+    property var entry: DesktopEntries.heuristicLookup(Paths.moddedAppId(windowData?.class ?? ""))
+    property var iconPath: Paths.getAppIcon(windowData?.class ?? "", entry) || Quickshell.iconPath("application-x-executable", "image-missing")
     property bool compactMode: Theme.fontSizeSmall * 4 > targetWindowHeight || Theme.fontSizeSmall * 4 > targetWindowWidth
 
     x: initX
