@@ -142,7 +142,7 @@ StyledRect {
 
             Row {
                 id: headerActionsRow
-                anchors.right: caretIcon.left
+                anchors.right: root.collapsible ? caretIcon.left : parent.right
                 anchors.rightMargin: root.collapsible ? Theme.spacingS : 0
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXS
@@ -172,6 +172,7 @@ StyledRect {
             }
 
             MouseArea {
+                visible: root.collapsible
                 anchors.left: caretIcon.left
                 anchors.right: parent.right
                 anchors.top: parent.top
