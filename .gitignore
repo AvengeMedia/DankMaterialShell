@@ -109,3 +109,4 @@ bin/
 .envrc
 .direnv/
 quickshell/dms-plugins
+__pycache__

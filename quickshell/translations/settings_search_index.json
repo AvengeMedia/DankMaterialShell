@@ -296,6 +296,20 @@
     "description": "Set different wallpapers for each connected monitor"
   },
   {
+    "section": "_tab_0",
+    "label": "Personalization",
+    "tabIndex": 0,
+    "category": "Personalization",
+    "keywords": [
+      "appearance",
+      "custom",
+      "customize",
+      "personal",
+      "personalization"
+    ],
+    "icon": "palette"
+  },
+  {
     "section": "wallpaperTransition",
     "label": "Transition Effect",
     "tabIndex": 0,
@@ -495,6 +509,22 @@
     "description": "Display seconds in the clock"
   },
   {
+    "section": "_tab_1",
+    "label": "Time & Weather",
+    "tabIndex": 1,
+    "category": "Time & Weather",
+    "keywords": [
+      "climate",
+      "clock",
+      "date",
+      "forecast",
+      "temperature",
+      "time",
+      "weather"
+    ],
+    "icon": "schedule"
+  },
+  {
     "section": "timeFormat",
     "label": "Time Format",
     "tabIndex": 1,
@@ -577,6 +607,23 @@
     "description": "Show weather information in top bar and control center"
   },
   {
+    "section": "_tab_2",
+    "label": "Keyboard Shortcuts",
+    "tabIndex": 2,
+    "category": "Keyboard Shortcuts",
+    "keywords": [
+      "bindings",
+      "hotkey",
+      "hotkeys",
+      "keybinds",
+      "keyboard",
+      "keys",
+      "shortcuts"
+    ],
+    "icon": "keyboard",
+    "conditionKey": "keybindsAvailable"
+  },
+  {
     "section": "barConfigurations",
     "label": "Bar Configurations",
     "tabIndex": 3,
@@ -613,6 +660,21 @@
       "topbar"
     ],
     "icon": "rounded_corner"
+  },
+  {
+    "section": "_tab_3",
+    "label": "Dank Bar",
+    "tabIndex": 3,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "dank",
+      "panel",
+      "statusbar",
+      "taskbar",
+      "topbar"
+    ],
+    "icon": "toolbar"
   },
   {
     "section": "barDisplay",
@@ -1023,6 +1085,25 @@
     "conditionKey": "isNiri"
   },
   {
+    "section": "_tab_4",
+    "label": "Workspaces & Widgets",
+    "tabIndex": 4,
+    "category": "Workspaces",
+    "keywords": [
+      "components",
+      "desktop",
+      "desktops",
+      "modules",
+      "spaces",
+      "virtual",
+      "virtual desktops",
+      "widgets",
+      "workspace",
+      "workspaces"
+    ],
+    "icon": "dashboard"
+  },
+  {
     "section": "dockAutoHide",
     "label": "Auto-hide Dock",
     "tabIndex": 5,
@@ -1079,6 +1160,24 @@
     ],
     "icon": "border_style",
     "description": "Add a border around the dock"
+  },
+  {
+    "section": "_tab_5",
+    "label": "Dock & Launcher",
+    "tabIndex": 5,
+    "category": "Dock",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "dock",
+      "launcher",
+      "launcher bar",
+      "panel",
+      "start menu",
+      "taskbar"
+    ],
+    "icon": "apps"
   },
   {
     "section": "dockPosition",
@@ -1298,6 +1397,38 @@
     "icon": "opacity"
   },
   {
+    "section": "_tab_7",
+    "label": "Network",
+    "tabIndex": 7,
+    "category": "Network",
+    "keywords": [
+      "connection",
+      "connectivity",
+      "ethernet",
+      "internet",
+      "network",
+      "online",
+      "wi-fi",
+      "wifi",
+      "wireless"
+    ],
+    "icon": "wifi",
+    "conditionKey": "dmsConnected"
+  },
+  {
+    "section": "_tab_8",
+    "label": "System",
+    "tabIndex": 8,
+    "category": "System",
+    "keywords": [
+      "linux",
+      "os",
+      "system"
+    ],
+    "icon": "computer",
+    "conditionKey": "cupsAvailable"
+  },
+  {
     "section": "launcherLogoBrightness",
     "label": "Brightness",
     "tabIndex": 9,
@@ -1420,6 +1551,23 @@
       "start"
     ],
     "icon": "terminal"
+  },
+  {
+    "section": "_tab_9",
+    "label": "Launcher",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "drawer",
+      "launcher",
+      "menu",
+      "start",
+      "start menu"
+    ],
+    "icon": "grid_view"
   },
   {
     "section": "launcherLogo",
@@ -2532,6 +2680,26 @@
     "description": "Force terminal applications to always use dark color schemes"
   },
   {
+    "section": "_tab_10",
+    "label": "Theme & Colors",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "colour",
+      "colours",
+      "hue",
+      "look",
+      "palette",
+      "scheme",
+      "style",
+      "theme",
+      "tint"
+    ],
+    "icon": "format_paint"
+  },
+  {
     "section": "themeColor",
     "label": "Theme Color",
     "tabIndex": 10,
@@ -3154,6 +3322,54 @@
     "description": "If the field is hidden, it will appear as soon as a key is pressed."
   },
   {
+    "section": "lockScreenNotificationMode",
+    "label": "Notification Display",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "alert",
+      "control",
+      "display",
+      "information",
+      "lock",
+      "lockscreen",
+      "login",
+      "monitor",
+      "notif",
+      "notification",
+      "notifications",
+      "output",
+      "password",
+      "privacy",
+      "screen",
+      "security",
+      "shown",
+      "what"
+    ],
+    "description": "Control what notification information is shown on the lock screen"
+  },
+  {
+    "section": "_tab_11",
+    "label": "Power & Security",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "hibernate",
+      "lock",
+      "login",
+      "password",
+      "power",
+      "reboot",
+      "restart",
+      "screen",
+      "security",
+      "shutdown",
+      "sleep",
+      "suspend"
+    ],
+    "icon": "security"
+  },
+  {
     "section": "lockScreenShowPasswordField",
     "label": "Show Password Field",
     "tabIndex": 11,
@@ -3267,6 +3483,35 @@
       "system",
       "time"
     ]
+  },
+  {
+    "section": "_tab_12",
+    "label": "Plugins",
+    "tabIndex": 12,
+    "category": "Plugins",
+    "keywords": [
+      "addon",
+      "addons",
+      "extend",
+      "extensions",
+      "plugins",
+      "widgets"
+    ],
+    "icon": "extension"
+  },
+  {
+    "section": "_tab_13",
+    "label": "About",
+    "tabIndex": 13,
+    "category": "About",
+    "keywords": [
+      "about",
+      "credits",
+      "help",
+      "info",
+      "version"
+    ],
+    "icon": "info"
   },
   {
     "section": "animationSpeed",
@@ -3423,6 +3668,22 @@
     "description": "Select the font family for UI text"
   },
   {
+    "section": "_tab_14",
+    "label": "Typography & Motion",
+    "tabIndex": 14,
+    "category": "Typography & Motion",
+    "keywords": [
+      "animation",
+      "font",
+      "fonts",
+      "motion",
+      "text",
+      "typeface",
+      "typography"
+    ],
+    "icon": "text_fields"
+  },
+  {
     "section": "soundsEnabled",
     "label": "Enable System Sounds",
     "tabIndex": 15,
@@ -3508,6 +3769,20 @@
     "description": "Select system sound theme"
   },
   {
+    "section": "_tab_15",
+    "label": "Sounds",
+    "tabIndex": 15,
+    "category": "Sounds",
+    "keywords": [
+      "audio",
+      "effects",
+      "sfx",
+      "sounds"
+    ],
+    "icon": "volume_up",
+    "conditionKey": "soundsAvailable"
+  },
+  {
     "section": "systemSounds",
     "label": "System Sounds",
     "tabIndex": 15,
@@ -3570,6 +3845,22 @@
     "description": "Play sound when volume is adjusted"
   },
   {
+    "section": "_tab_16",
+    "label": "Media Player",
+    "tabIndex": 16,
+    "category": "Media Player",
+    "keywords": [
+      "audio",
+      "media",
+      "mpris",
+      "music",
+      "playback",
+      "player",
+      "spotify"
+    ],
+    "icon": "music_note"
+  },
+  {
     "section": "mediaPlayer",
     "label": "Media Player Settings",
     "tabIndex": 16,
@@ -3613,6 +3904,28 @@
       "widget"
     ],
     "description": "Scroll wheel behavior on media widget"
+  },
+  {
+    "section": "notificationCompactMode",
+    "label": "Compact",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "cards",
+      "compact",
+      "display",
+      "messages",
+      "mode",
+      "notif",
+      "notification",
+      "notifications",
+      "size",
+      "smaller",
+      "toast"
+    ],
+    "description": "Use smaller notification cards"
   },
   {
     "section": "notificationHistorySaveCritical",
@@ -3889,35 +4202,6 @@
     "description": "Timeout for normal priority notifications"
   },
   {
-    "section": "lockScreenNotificationMode",
-    "label": "Notification Display",
-    "tabIndex": 17,
-    "category": "Notifications",
-    "keywords": [
-      "alert",
-      "alerts",
-      "control",
-      "display",
-      "information",
-      "lock",
-      "lockscreen",
-      "login",
-      "messages",
-      "monitor",
-      "notif",
-      "notification",
-      "notifications",
-      "output",
-      "privacy",
-      "screen",
-      "security",
-      "shown",
-      "toast",
-      "what"
-    ],
-    "description": "Control what notification information is shown on the lock screen"
-  },
-  {
     "section": "notificationOverlayEnabled",
     "label": "Notification Overlay",
     "tabIndex": 17,
@@ -3992,6 +4276,22 @@
     "description": "Timeout for low priority notifications"
   },
   {
+    "section": "_tab_17",
+    "label": "Notifications",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "alerts",
+      "messages",
+      "notif",
+      "notifications",
+      "notifs",
+      "toast"
+    ],
+    "icon": "notifications"
+  },
+  {
     "section": "notificationPopupPosition",
     "label": "Popup Position",
     "tabIndex": 17,
@@ -4014,6 +4314,25 @@
       "where"
     ],
     "description": "Choose where notification popups appear on screen"
+  },
+  {
+    "section": "_tab_18",
+    "label": "On-screen Displays",
+    "tabIndex": 18,
+    "category": "On-screen Displays",
+    "keywords": [
+      "displays",
+      "indicator",
+      "monitor",
+      "monitors",
+      "osd",
+      "output",
+      "outputs",
+      "popup",
+      "screen",
+      "screens"
+    ],
+    "icon": "tune"
   },
   {
     "section": "osd",
@@ -4062,6 +4381,23 @@
     "icon": "find_replace"
   },
   {
+    "section": "_tab_19",
+    "label": "Running Apps",
+    "tabIndex": 19,
+    "category": "Running Apps",
+    "keywords": [
+      "active",
+      "apps",
+      "open",
+      "running",
+      "taskbar",
+      "tasks",
+      "windows"
+    ],
+    "icon": "apps",
+    "conditionKey": "isHyprlandOrNiri"
+  },
+  {
     "section": "runningApps",
     "label": "Running Apps Settings",
     "tabIndex": 19,
@@ -4083,6 +4419,20 @@
     ],
     "icon": "apps",
     "description": "Show only apps running in current workspace"
+  },
+  {
+    "section": "_tab_20",
+    "label": "System Updater",
+    "tabIndex": 20,
+    "category": "System Updater",
+    "keywords": [
+      "packages",
+      "system",
+      "updater",
+      "updates",
+      "upgrade"
+    ],
+    "icon": "refresh"
   },
   {
     "section": "systemUpdater",
@@ -4395,6 +4745,23 @@
     ]
   },
   {
+    "section": "_tab_21",
+    "label": "Power & Sleep",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "energy",
+      "hibernate",
+      "power",
+      "reboot",
+      "restart",
+      "shutdown",
+      "sleep",
+      "suspend"
+    ],
+    "icon": "power_settings_new"
+  },
+  {
     "section": "powerConfirmation",
     "label": "Power Action Confirmation",
     "tabIndex": 21,
@@ -4537,6 +4904,23 @@
     "description": "Display power menu actions in a grid instead of a list"
   },
   {
+    "section": "_tab_22",
+    "label": "Widgets",
+    "tabIndex": 22,
+    "category": "Dank Bar",
+    "keywords": [
+      "bar",
+      "components",
+      "dank",
+      "modules",
+      "panel",
+      "statusbar",
+      "topbar",
+      "widgets"
+    ],
+    "icon": "widgets"
+  },
+  {
     "section": "disabled",
     "label": "Advanced",
     "tabIndex": 23,
@@ -4601,6 +4985,24 @@
     "description": "Clear all history when server starts"
   },
   {
+    "section": "_tab_23",
+    "label": "Clipboard",
+    "tabIndex": 23,
+    "category": "System",
+    "keywords": [
+      "clipboard",
+      "cliphist",
+      "copy",
+      "history",
+      "linux",
+      "os",
+      "paste",
+      "system"
+    ],
+    "icon": "content_paste",
+    "conditionKey": "dmsConnected"
+  },
+  {
     "section": "maxHistory",
     "label": "History Settings",
     "tabIndex": 23,
@@ -4646,6 +5048,23 @@
     "description": "Maximum size per clipboard entry"
   },
   {
+    "section": "_tab_24",
+    "label": "Displays",
+    "tabIndex": 24,
+    "category": "Displays",
+    "keywords": [
+      "displays",
+      "monitor",
+      "monitors",
+      "output",
+      "outputs",
+      "resolution",
+      "screen",
+      "screens"
+    ],
+    "icon": "monitor"
+  },
+  {
     "section": "nightModeHighTemperature",
     "label": "Day Temperature",
     "tabIndex": 25,
@@ -4669,6 +5088,25 @@
       "tint"
     ],
     "description": "Color temperature for day time"
+  },
+  {
+    "section": "_tab_25",
+    "label": "Gamma Control",
+    "tabIndex": 25,
+    "category": "Displays",
+    "keywords": [
+      "blue light",
+      "color temperature",
+      "control",
+      "displays",
+      "gamma",
+      "monitor",
+      "night light",
+      "redshift",
+      "resolution",
+      "screen"
+    ],
+    "icon": "brightness_6"
   },
   {
     "section": "nightModeTemperature",
@@ -4696,5 +5134,36 @@
       "warm"
     ],
     "description": "Color temperature for night mode"
+  },
+  {
+    "section": "_tab_26",
+    "label": "Widgets",
+    "tabIndex": 26,
+    "category": "Displays",
+    "keywords": [
+      "components",
+      "displays",
+      "modules",
+      "monitor",
+      "resolution",
+      "screen",
+      "widgets"
+    ],
+    "icon": "widgets"
+  },
+  {
+    "section": "_tab_27",
+    "label": "Desktop Widgets",
+    "tabIndex": 27,
+    "category": "Desktop Widgets",
+    "keywords": [
+      "components",
+      "conky",
+      "desktop",
+      "desktop clock",
+      "modules",
+      "widgets"
+    ],
+    "icon": "widgets"
   }
 ]

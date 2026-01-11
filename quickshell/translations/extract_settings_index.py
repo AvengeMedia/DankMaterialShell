@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import os
 import re
 import json
+from collections import Counter
 from pathlib import Path
 
 ABBREVIATIONS = {
@@ -153,11 +153,49 @@ SEARCHABLE_COMPONENTS = [
     "SettingsToggleCard",
 ]
 
+STOPWORDS = {
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "this",
+    "that",
+    "are",
+    "was",
+    "will",
+    "can",
+    "has",
+    "have",
+    "been",
+    "when",
+    "your",
+    "use",
+    "used",
+    "using",
+    "instead",
+    "like",
+    "such",
+    "also",
+    "only",
+    "which",
+    "each",
+    "other",
+    "some",
+    "into",
+    "than",
+    "then",
+    "them",
+    "these",
+    "those",
+}
+
+
 def enrich_keywords(label, description, category, existing_tags):
     keywords = set(existing_tags)
 
     label_lower = label.lower()
-    label_words = re.split(r'[\s\-_&/]+', label_lower)
+    label_words = re.split(r"[\s\-_&/]+", label_lower)
     keywords.update(w for w in label_words if len(w) > 2)
 
     for term, aliases in ABBREVIATIONS.items():
@@ -166,7 +204,7 @@ def enrich_keywords(label, description, category, existing_tags):
 
     if description:
         desc_lower = description.lower()
-        desc_words = re.split(r'[\s\-_&/,.]+', desc_lower)
+        desc_words = re.split(r"[\s\-_&/,.]+", desc_lower)
         keywords.update(w for w in desc_words if len(w) > 3 and w.isalpha())
         for term, aliases in ABBREVIATIONS.items():
             if term in desc_lower:
@@ -176,16 +214,12 @@ def enrich_keywords(label, description, category, existing_tags):
         keywords.update(CATEGORY_KEYWORDS[category])
 
     cat_lower = category.lower()
-    cat_words = re.split(r'[\s\-_&/]+', cat_lower)
+    cat_words = re.split(r"[\s\-_&/]+", cat_lower)
     keywords.update(w for w in cat_words if len(w) > 2)
 
-    stopwords = {'the', 'and', 'for', 'with', 'from', 'this', 'that', 'are', 'was',
-                 'will', 'can', 'has', 'have', 'been', 'when', 'your', 'use', 'used',
-                 'using', 'instead', 'like', 'such', 'also', 'only', 'which', 'each',
-                 'other', 'some', 'into', 'than', 'then', 'them', 'these', 'those'}
-    keywords = {k for k in keywords if k not in stopwords and len(k) > 1}
-
+    keywords = {k for k in keywords if k not in STOPWORDS and len(k) > 1}
     return sorted(keywords)
+
 
 def extract_i18n_string(value):
     match = re.search(r'I18n\.tr\(["\']([^"\']+)["\']', value)
@@ -196,13 +230,15 @@ def extract_i18n_string(value):
         return match.group(1)
     return None
 
+
 def extract_tags(value):
-    match = re.search(r'\[([^\]]+)\]', value)
+    match = re.search(r"\[([^\]]+)\]", value)
     if not match:
         return []
     content = match.group(1)
     tags = re.findall(r'["\']([^"\']+)["\']', content)
     return tags
+
 
 def parse_component_block(content, start_pos, component_name):
     brace_count = 0
@@ -210,23 +246,25 @@ def parse_component_block(content, start_pos, component_name):
     block_start = start_pos
 
     for i in range(start_pos, len(content)):
-        if content[i] == '{':
+        if content[i] == "{":
             if not started:
                 block_start = i
                 started = True
             brace_count += 1
-        elif content[i] == '}':
+        elif content[i] == "}":
             brace_count -= 1
             if started and brace_count == 0:
-                return content[block_start:i+1]
+                return content[block_start : i + 1]
     return ""
 
+
 def extract_property(block, prop_name):
-    pattern = rf'{prop_name}\s*:\s*([^\n]+)'
+    pattern = rf"{prop_name}\s*:\s*([^\n]+)"
     match = re.search(pattern, block)
     if match:
         return match.group(1).strip()
     return None
+
 
 def find_settings_components(content, filename):
     results = []
@@ -236,7 +274,7 @@ def find_settings_components(content, filename):
         return results
 
     for component in SEARCHABLE_COMPONENTS:
-        pattern = rf'\b{component}\s*\{{'
+        pattern = rf"\b{component}\s*\{{"
         for match in re.finditer(pattern, content):
             block = parse_component_block(content, match.start(), component)
             if not block:
@@ -244,7 +282,7 @@ def find_settings_components(content, filename):
 
             setting_key = extract_property(block, "settingKey")
             if setting_key:
-                setting_key = setting_key.strip('"\'')
+                setting_key = setting_key.strip("\"'")
 
             if not setting_key:
                 continue
@@ -263,7 +301,7 @@ def find_settings_components(content, filename):
             icon_raw = extract_property(block, "iconName")
             icon = None
             if icon_raw:
-                icon = icon_raw.strip('"\'')
+                icon = icon_raw.strip("\"'")
                 if icon.startswith("{") or "?" in icon:
                     icon = None
 
@@ -321,6 +359,95 @@ def find_settings_components(content, filename):
 
     return results
 
+
+def parse_tabs_from_sidebar(sidebar_file):
+    with open(sidebar_file, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    pattern = r'"text"\s*:\s*I18n\.tr\("([^"]+)"(?:,\s*"[^"]+")?\).*?"icon"\s*:\s*"([^"]+)".*?"tabIndex"\s*:\s*(\d+)'
+    tabs = []
+
+    for match in re.finditer(pattern, content, re.DOTALL):
+        label, icon, tab_idx = match.group(1), match.group(2), int(match.group(3))
+
+        before_text = content[: match.start()]
+        parent_match = re.search(
+            r'"text"\s*:\s*I18n\.tr\("([^"]+)"\)[^{]*"children"[^[]*\[[^{]*$',
+            before_text,
+        )
+        parent = parent_match.group(1) if parent_match else None
+
+        cond = None
+        after_pos = match.end()
+        snippet = content[match.start() : min(after_pos + 200, len(content))]
+        for qml_cond, key in [
+            ("shortcutsOnly", "keybindsAvailable"),
+            ("soundsOnly", "soundsAvailable"),
+            ("cupsOnly", "cupsAvailable"),
+            ("dmsOnly", "dmsConnected"),
+            ("hyprlandNiriOnly", "isHyprlandOrNiri"),
+            ("clipboardOnly", "dmsConnected"),
+        ]:
+            if f'"{qml_cond}": true' in snippet:
+                cond = key
+                break
+
+        tabs.append(
+            {
+                "tabIndex": tab_idx,
+                "label": label,
+                "icon": icon,
+                "parent": parent,
+                "conditionKey": cond,
+            }
+        )
+
+    return tabs
+
+
+def generate_tab_entries(sidebar_file):
+    tabs = parse_tabs_from_sidebar(sidebar_file)
+
+    label_counts = Counter([t["label"] for t in tabs])
+
+    entries = []
+    for tab in tabs:
+        label = (
+            f"{tab['parent']}: {tab['label']}"
+            if label_counts[tab["label"]] > 1 and tab["parent"]
+            else tab["label"]
+        )
+        category = TAB_CATEGORY_MAP.get(tab["tabIndex"], "Settings")
+
+        keywords = enrich_keywords(tab["label"], None, category, [])
+
+        if tab["parent"]:
+            parent_keywords = [
+                w for w in re.split(r"[\s\-_&/]+", tab["parent"].lower()) if len(w) > 2
+            ]
+            keywords = sorted(
+                set(
+                    keywords
+                    + parent_keywords
+                    + [k for p in parent_keywords for k in ABBREVIATIONS.get(p, [])]
+                )
+            )
+
+        entry = {
+            "section": f"_tab_{tab['tabIndex']}",
+            "label": label,
+            "tabIndex": tab["tabIndex"],
+            "category": category,
+            "keywords": keywords,
+            "icon": tab["icon"],
+        }
+        if tab["conditionKey"]:
+            entry["conditionKey"] = tab["conditionKey"]
+        entries.append(entry)
+
+    return entries
+
+
 def extract_settings_index(root_dir):
     settings_dir = Path(root_dir) / "Modules" / "Settings"
     all_entries = []
@@ -330,7 +457,7 @@ def extract_settings_index(root_dir):
         if not qml_file.name.endswith("Tab.qml"):
             continue
 
-        with open(qml_file, 'r', encoding='utf-8') as f:
+        with open(qml_file, "r", encoding="utf-8") as f:
             content = f.read()
 
         entries = find_settings_components(content, qml_file.name)
@@ -342,29 +469,37 @@ def extract_settings_index(root_dir):
 
     return all_entries
 
+
 def main():
     script_dir = Path(__file__).parent
     root_dir = script_dir.parent
+    sidebar_file = root_dir / "Modals" / "Settings" / "SettingsSidebar.qml"
 
     print("Extracting settings search index...")
-    entries = extract_settings_index(root_dir)
+    settings_entries = extract_settings_index(root_dir)
+    tab_entries = generate_tab_entries(sidebar_file)
 
-    entries.sort(key=lambda x: (x["tabIndex"], x["label"]))
+    all_entries = tab_entries + settings_entries
+
+    all_entries.sort(key=lambda x: (x["tabIndex"], x["label"]))
 
     output_path = script_dir / "settings_search_index.json"
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(entries, f, indent=2, ensure_ascii=False)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(all_entries, f, indent=2, ensure_ascii=False)
 
-    print(f"Found {len(entries)} searchable settings")
+    print(f"Found {len(settings_entries)} searchable settings")
+    print(f"Found {len(tab_entries)} tab entries")
+    print(f"Total: {len(all_entries)} entries")
     print(f"Output: {output_path}")
 
     conditions = set()
-    for entry in entries:
+    for entry in all_entries:
         if "conditionKey" in entry:
             conditions.add(entry["conditionKey"])
 
     if conditions:
         print(f"Condition keys found: {', '.join(sorted(conditions))}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
