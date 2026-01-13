@@ -19,7 +19,8 @@ in
   ]
   ++ lib.optional cfg.enableDynamicTheming pkgs.matugen
   ++ lib.optional cfg.enableAudioWavelength pkgs.cava
-  ++ lib.optional cfg.enableCalendarEvents pkgs.khal;
+  ++ lib.optional cfg.enableCalendarEvents pkgs.khal
+  ++ lib.optional cfg.enableClipboardPaste pkgs.wtype;
 
   plugins = lib.mapAttrs (name: plugin: {
     source = plugin.src;

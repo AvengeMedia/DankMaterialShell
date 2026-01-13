@@ -70,6 +70,12 @@ in
       description = "Add calendar events support via khal";
     };
 
+    enableClipboardPaste = lib.mkOption {
+      type = types.bool;
+      default = true;
+      description = "Adds needed dependencies for directly pasting items from the clipboard history.";
+    };
+
     quickshell = {
       package = lib.mkPackageOption dmsPkgs "quickshell" {
         extraDescription = "The quickshell package to use (defaults to be built from source, due to unreleased features used by DMS).";
