@@ -203,6 +203,8 @@ Item {
 
     Component.onCompleted: {
         dockRecreateDebounce.start();
+        // Force PolkitService singleton to initialize
+        PolkitService.polkitAvailable;
     }
 
     Connections {
@@ -315,19 +317,44 @@ Item {
         }
     }
 
-    WifiPasswordModal {
-        id: wifiPasswordModal
+    LazyLoader {
+        id: wifiPasswordModalLoader
+        active: false
 
         Component.onCompleted: {
-            PopoutService.wifiPasswordModal = wifiPasswordModal;
+            PopoutService.wifiPasswordModalLoader = wifiPasswordModalLoader;
+        }
+
+        WifiPasswordModal {
+            id: wifiPasswordModalItem
+
+            Component.onCompleted: {
+                PopoutService.wifiPasswordModal = wifiPasswordModalItem;
+            }
         }
     }
 
-    PolkitAuthModal {
-        id: polkitAuthModal
+    LazyLoader {
+        id: polkitAuthModalLoader
+        active: false
 
-        Component.onCompleted: {
-            PopoutService.polkitAuthModal = polkitAuthModal;
+        PolkitAuthModal {
+            id: polkitAuthModal
+
+            Component.onCompleted: {
+                PopoutService.polkitAuthModal = polkitAuthModal;
+            }
+        }
+    }
+
+    Connections {
+        target: PolkitService.agent
+        enabled: PolkitService.polkitAvailable
+
+        function onAuthenticationRequestStarted() {
+            polkitAuthModalLoader.active = true;
+            if (polkitAuthModalLoader.item)
+                polkitAuthModalLoader.item.show();
         }
     }
 
@@ -349,17 +376,21 @@ Item {
             const now = Date.now();
             const timeSinceLastPrompt = now - lastCredentialsTime;
 
-            if (wifiPasswordModal.visible && timeSinceLastPrompt < 1000) {
+            wifiPasswordModalLoader.active = true;
+            if (!wifiPasswordModalLoader.item)
+                return;
+
+            if (wifiPasswordModalLoader.item.visible && timeSinceLastPrompt < 1000) {
                 NetworkService.cancelCredentials(lastCredentialsToken);
                 lastCredentialsToken = token;
                 lastCredentialsTime = now;
-                wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
+                wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
                 return;
             }
 
             lastCredentialsToken = token;
             lastCredentialsTime = now;
-            wifiPasswordModal.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
+            wifiPasswordModalLoader.item.showFromPrompt(token, ssid, setting, fields, hints, reason, connType, connName, vpnService, fieldsInfo);
         }
     }
 

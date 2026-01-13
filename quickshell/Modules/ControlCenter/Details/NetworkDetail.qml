@@ -687,8 +687,8 @@ Rectangle {
                                 if (modelData.secured && !modelData.saved) {
                                     if (DMSService.apiVersion >= 7) {
                                         NetworkService.connectToWifi(modelData.ssid);
-                                    } else if (PopoutService.wifiPasswordModal) {
-                                        PopoutService.wifiPasswordModal.show(modelData.ssid);
+                                    } else {
+                                        PopoutService.showWifiPasswordModal(modelData.ssid);
                                     }
                                 } else {
                                     NetworkService.connectToWifi(modelData.ssid);
@@ -749,8 +749,8 @@ Rectangle {
                     if (networkContextMenu.currentSecured && !networkContextMenu.currentSaved) {
                         if (DMSService.apiVersion >= 7) {
                             NetworkService.connectToWifi(networkContextMenu.currentSSID);
-                        } else if (PopoutService.wifiPasswordModal) {
-                            PopoutService.wifiPasswordModal.show(networkContextMenu.currentSSID);
+                        } else {
+                            PopoutService.showWifiPasswordModal(networkContextMenu.currentSSID);
                         }
                     } else {
                         NetworkService.connectToWifi(networkContextMenu.currentSSID);

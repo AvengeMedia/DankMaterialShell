@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.Common
 import qs.Modals.Common
 import qs.Modals.FileBrowser
@@ -23,15 +24,25 @@ Item {
         NetworkService.removeRef();
     }
 
-    FileBrowserModal {
-        id: vpnFileBrowser
-        browserTitle: I18n.tr("Import VPN")
-        browserIcon: "vpn_key"
-        browserType: "vpn"
-        fileExtensions: VPNService.getFileFilter()
+    function openVpnFileBrowser() {
+        vpnFileBrowserLoader.active = true;
+        if (vpnFileBrowserLoader.item)
+            vpnFileBrowserLoader.item.open();
+    }
 
-        onFileSelected: path => {
-            VPNService.importVpn(path.replace("file://", ""));
+    LazyLoader {
+        id: vpnFileBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            browserTitle: I18n.tr("Import VPN")
+            browserIcon: "vpn_key"
+            browserType: "vpn"
+            fileExtensions: VPNService.getFileFilter()
+
+            onFileSelected: path => {
+                VPNService.importVpn(path.replace("file://", ""));
+            }
         }
     }
 
@@ -1520,7 +1531,7 @@ Item {
                                     hoverEnabled: true
                                     cursorShape: VPNService.importing ? Qt.BusyCursor : Qt.PointingHandCursor
                                     enabled: !VPNService.importing
-                                    onClicked: vpnFileBrowser.open()
+                                    onClicked: networkTab.openVpnFileBrowser()
                                 }
                             }
 
