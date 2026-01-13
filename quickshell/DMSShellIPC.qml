@@ -797,11 +797,9 @@ Item {
             const modal = PopoutService.settingsModal;
             if (modal) {
                 if (type === "wallpaper") {
-                    modal.wallpaperBrowser.allowStacking = false;
-                    modal.wallpaperBrowser.open();
+                    modal.openWallpaperBrowser(false);
                 } else if (type === "profile") {
-                    modal.profileBrowser.allowStacking = false;
-                    modal.profileBrowser.open();
+                    modal.openProfileBrowser(false);
                 }
             } else {
                 PopoutService.openSettings();

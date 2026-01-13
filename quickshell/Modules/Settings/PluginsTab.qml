@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -209,7 +210,7 @@ FocusScope {
                             iconName: "store"
                             enabled: DMSService.dmsAvailable
                             onClicked: {
-                                pluginBrowser.show();
+                                showPluginBrowser();
                             }
                         }
 
@@ -382,9 +383,11 @@ FocusScope {
     Connections {
         target: DMSService
         function onPluginsListReceived(plugins) {
-            pluginBrowser.isLoading = false;
-            pluginBrowser.allPlugins = plugins;
-            pluginBrowser.updateFilteredPlugins();
+            if (!pluginBrowserLoader.item)
+                return;
+            pluginBrowserLoader.item.isLoading = false;
+            pluginBrowserLoader.item.allPlugins = plugins;
+            pluginBrowserLoader.item.updateFilteredPlugins();
         }
         function onInstalledPluginsReceived(plugins) {
             var pluginMap = {};
@@ -410,22 +413,36 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        pluginBrowser.parentModal = pluginsTab.parentModal;
         if (DMSService.dmsAvailable && DMSService.apiVersion >= 8)
             DMSService.listInstalled();
         if (PopoutService.pendingPluginInstall)
-            Qt.callLater(() => pluginBrowser.show());
+            Qt.callLater(showPluginBrowser);
     }
 
     Connections {
         target: PopoutService
         function onPendingPluginInstallChanged() {
             if (PopoutService.pendingPluginInstall)
-                pluginBrowser.show();
+                showPluginBrowser();
         }
     }
 
-    PluginBrowser {
-        id: pluginBrowser
+    LazyLoader {
+        id: pluginBrowserLoader
+        active: false
+
+        PluginBrowser {
+            id: pluginBrowserItem
+
+            Component.onCompleted: {
+                pluginBrowserItem.parentModal = pluginsTab.parentModal;
+            }
+        }
+    }
+
+    function showPluginBrowser() {
+        pluginBrowserLoader.active = true;
+        if (pluginBrowserLoader.item)
+            pluginBrowserLoader.item.show();
     }
 }

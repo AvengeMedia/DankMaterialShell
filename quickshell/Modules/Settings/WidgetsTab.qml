@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -916,12 +917,26 @@ Item {
         });
     }
 
-    WidgetSelectionPopup {
-        id: widgetSelectionPopup
-        parentModal: widgetsTab.parentModal
-        onWidgetSelected: (widgetId, targetSection) => {
-            widgetsTab.addWidgetToSection(widgetId, targetSection);
+    LazyLoader {
+        id: widgetSelectionPopupLoader
+        active: false
+
+        WidgetSelectionPopup {
+            id: widgetSelectionPopupItem
+            parentModal: widgetsTab.parentModal
+            onWidgetSelected: (widgetId, targetSection) => {
+                widgetsTab.addWidgetToSection(widgetId, targetSection);
+            }
         }
+    }
+
+    function showWidgetSelectionPopup(sectionId) {
+        widgetSelectionPopupLoader.active = true;
+        if (!widgetSelectionPopupLoader.item)
+            return;
+        widgetSelectionPopupLoader.item.targetSection = sectionId;
+        widgetSelectionPopupLoader.item.allWidgets = widgetsTab.getWidgetsForPopup();
+        widgetSelectionPopupLoader.item.show();
     }
 
     DankFlickable {
@@ -1113,9 +1128,7 @@ Item {
                             widgetsTab.handleItemOrderChanged(sectionId, newOrder);
                         }
                         onAddWidget: sectionId => {
-                            widgetSelectionPopup.targetSection = sectionId;
-                            widgetSelectionPopup.allWidgets = widgetsTab.getWidgetsForPopup();
-                            widgetSelectionPopup.show();
+                            showWidgetSelectionPopup(sectionId);
                         }
                         onRemoveWidget: (sectionId, index) => {
                             widgetsTab.removeWidgetFromSection(sectionId, index);
@@ -1170,9 +1183,7 @@ Item {
                             widgetsTab.handleItemOrderChanged(sectionId, newOrder);
                         }
                         onAddWidget: sectionId => {
-                            widgetSelectionPopup.targetSection = sectionId;
-                            widgetSelectionPopup.allWidgets = widgetsTab.getWidgetsForPopup();
-                            widgetSelectionPopup.show();
+                            showWidgetSelectionPopup(sectionId);
                         }
                         onRemoveWidget: (sectionId, index) => {
                             widgetsTab.removeWidgetFromSection(sectionId, index);
@@ -1227,9 +1238,7 @@ Item {
                             widgetsTab.handleItemOrderChanged(sectionId, newOrder);
                         }
                         onAddWidget: sectionId => {
-                            widgetSelectionPopup.targetSection = sectionId;
-                            widgetSelectionPopup.allWidgets = widgetsTab.getWidgetsForPopup();
-                            widgetSelectionPopup.show();
+                            showWidgetSelectionPopup(sectionId);
                         }
                         onRemoveWidget: (sectionId, index) => {
                             widgetsTab.removeWidgetFromSection(sectionId, index);

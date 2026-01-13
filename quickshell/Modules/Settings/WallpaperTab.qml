@@ -139,7 +139,7 @@ Item {
                                     MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
-                                        onClicked: mainWallpaperBrowser.open()
+                                        onClicked: root.openMainWallpaperBrowser()
                                     }
                                 }
 
@@ -476,7 +476,7 @@ Item {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 cursorShape: Qt.PointingHandCursor
-                                                onClicked: lightWallpaperBrowser.open()
+                                                onClicked: root.openLightWallpaperBrowser()
                                             }
                                         }
 
@@ -660,7 +660,7 @@ Item {
                                             MouseArea {
                                                 anchors.fill: parent
                                                 cursorShape: Qt.PointingHandCursor
-                                                onClicked: darkWallpaperBrowser.open()
+                                                onClicked: root.openDarkWallpaperBrowser()
                                             }
                                         }
 
@@ -1242,53 +1242,83 @@ Item {
         }
     }
 
-    FileBrowserModal {
-        id: mainWallpaperBrowser
-        parentModal: root.parentModal
-        browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
-        browserIcon: "wallpaper"
-        browserType: "wallpaper"
-        showHiddenFiles: true
-        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-        onFileSelected: path => {
-            if (SessionData.perMonitorWallpaper) {
-                SessionData.setMonitorWallpaper(selectedMonitorName, path);
-            } else {
-                SessionData.setWallpaper(path);
+    function openMainWallpaperBrowser() {
+        mainWallpaperBrowserLoader.active = true;
+        if (mainWallpaperBrowserLoader.item)
+            mainWallpaperBrowserLoader.item.open();
+    }
+
+    function openLightWallpaperBrowser() {
+        lightWallpaperBrowserLoader.active = true;
+        if (lightWallpaperBrowserLoader.item)
+            lightWallpaperBrowserLoader.item.open();
+    }
+
+    function openDarkWallpaperBrowser() {
+        darkWallpaperBrowserLoader.active = true;
+        if (darkWallpaperBrowserLoader.item)
+            darkWallpaperBrowserLoader.item.open();
+    }
+
+    LazyLoader {
+        id: mainWallpaperBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Select Wallpaper", "wallpaper file browser title")
+            browserIcon: "wallpaper"
+            browserType: "wallpaper"
+            showHiddenFiles: true
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
+            onFileSelected: path => {
+                if (SessionData.perMonitorWallpaper) {
+                    SessionData.setMonitorWallpaper(selectedMonitorName, path);
+                } else {
+                    SessionData.setWallpaper(path);
+                }
+                close();
             }
-            close();
         }
     }
 
-    FileBrowserModal {
-        id: lightWallpaperBrowser
-        parentModal: root.parentModal
-        browserTitle: I18n.tr("Select Wallpaper", "light mode wallpaper file browser title")
-        browserIcon: "light_mode"
-        browserType: "wallpaper"
-        showHiddenFiles: true
-        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-        onFileSelected: path => {
-            SessionData.wallpaperPathLight = path;
-            SessionData.syncWallpaperForCurrentMode();
-            SessionData.saveSettings();
-            close();
+    LazyLoader {
+        id: lightWallpaperBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Select Wallpaper", "light mode wallpaper file browser title")
+            browserIcon: "light_mode"
+            browserType: "wallpaper"
+            showHiddenFiles: true
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
+            onFileSelected: path => {
+                SessionData.wallpaperPathLight = path;
+                SessionData.syncWallpaperForCurrentMode();
+                SessionData.saveSettings();
+                close();
+            }
         }
     }
 
-    FileBrowserModal {
-        id: darkWallpaperBrowser
-        parentModal: root.parentModal
-        browserTitle: I18n.tr("Select Wallpaper", "dark mode wallpaper file browser title")
-        browserIcon: "dark_mode"
-        browserType: "wallpaper"
-        showHiddenFiles: true
-        fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
-        onFileSelected: path => {
-            SessionData.wallpaperPathDark = path;
-            SessionData.syncWallpaperForCurrentMode();
-            SessionData.saveSettings();
-            close();
+    LazyLoader {
+        id: darkWallpaperBrowserLoader
+        active: false
+
+        FileBrowserModal {
+            parentModal: root.parentModal
+            browserTitle: I18n.tr("Select Wallpaper", "dark mode wallpaper file browser title")
+            browserIcon: "dark_mode"
+            browserType: "wallpaper"
+            showHiddenFiles: true
+            fileExtensions: ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif", "*.webp"]
+            onFileSelected: path => {
+                SessionData.wallpaperPathDark = path;
+                SessionData.syncWallpaperForCurrentMode();
+                SessionData.saveSettings();
+                close();
+            }
         }
     }
 }

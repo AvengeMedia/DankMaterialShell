@@ -22,18 +22,38 @@ Item {
     readonly property var allInstances: SettingsData.desktopWidgetInstances || []
     readonly property var allGroups: SettingsData.desktopWidgetGroups || []
 
-    DesktopWidgetBrowser {
-        id: widgetBrowser
-        parentModal: root.parentModal
-        onWidgetAdded: widgetType => {
-            ToastService.showInfo(I18n.tr("Widget added"));
+    function showWidgetBrowser() {
+        widgetBrowserLoader.active = true;
+        if (widgetBrowserLoader.item)
+            widgetBrowserLoader.item.show();
+    }
+
+    function showDesktopPluginBrowser() {
+        desktopPluginBrowserLoader.active = true;
+        if (desktopPluginBrowserLoader.item)
+            desktopPluginBrowserLoader.item.show();
+    }
+
+    LazyLoader {
+        id: widgetBrowserLoader
+        active: false
+
+        DesktopWidgetBrowser {
+            parentModal: root.parentModal
+            onWidgetAdded: widgetType => {
+                ToastService.showInfo(I18n.tr("Widget added"));
+            }
         }
     }
 
-    PluginBrowser {
-        id: desktopPluginBrowser
-        parentModal: root.parentModal
-        typeFilter: "desktop-widget"
+    LazyLoader {
+        id: desktopPluginBrowserLoader
+        active: false
+
+        PluginBrowser {
+            parentModal: root.parentModal
+            typeFilter: "desktop-widget"
+        }
     }
 
     DankFlickable {
@@ -74,13 +94,13 @@ Item {
                         DankButton {
                             text: I18n.tr("Add Widget")
                             iconName: "add"
-                            onClicked: widgetBrowser.show()
+                            onClicked: root.showWidgetBrowser()
                         }
 
                         DankButton {
                             text: I18n.tr("Browse Plugins")
                             iconName: "store"
-                            onClicked: desktopPluginBrowser.show()
+                            onClicked: root.showDesktopPluginBrowser()
                         }
                     }
                 }
