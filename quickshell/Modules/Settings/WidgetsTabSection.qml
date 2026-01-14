@@ -875,6 +875,11 @@ Column {
                             icon: "print",
                             label: I18n.tr("Printer"),
                             setting: "showPrinterIcon"
+                        },
+                        {
+                            icon: "screen_record",
+                            label: I18n.tr("Screen Sharing"),
+                            setting: "showScreenSharingIcon"
                         }
                     ]
 
@@ -907,6 +912,8 @@ Column {
                                 return wd?.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
                             case "showPrinterIcon":
                                 return wd?.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
+                            case "showScreenSharingIcon":
+                                return wd?.showScreenSharingIcon ?? SettingsData.controlCenterShowScreenSharingIcon;
                             default:
                                 return false;
                             }
