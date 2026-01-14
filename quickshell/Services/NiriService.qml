@@ -27,6 +27,10 @@ Singleton {
 
     property bool inOverview: false
 
+    property var casts: []
+    property bool hasCasts: casts.length > 0
+    property bool hasActiveCast: casts.some(c => c.is_active)
+
     property int currentKeyboardLayoutIndex: 0
     property var keyboardLayoutNames: []
 
@@ -356,6 +360,15 @@ Singleton {
         case 'ScreenshotCaptured':
             handleScreenshotCaptured(event.ScreenshotCaptured);
             break;
+        case 'CastsChanged':
+            handleCastsChanged(event.CastsChanged);
+            break;
+        case 'CastStartedOrChanged':
+            handleCastStartedOrChanged(event.CastStartedOrChanged);
+            break;
+        case 'CastStopped':
+            handleCastStopped(event.CastStopped);
+            break;
         }
     }
 
@@ -647,6 +660,28 @@ Singleton {
             });
             pendingScreenshotPath = "";
         }
+    }
+
+    function handleCastsChanged(data) {
+        casts = data.casts || [];
+    }
+
+    function handleCastStartedOrChanged(data) {
+        if (!data.cast)
+            return;
+        const cast = data.cast;
+        const existingIndex = casts.findIndex(c => c.stream_id === cast.stream_id);
+        if (existingIndex >= 0) {
+            const updatedCasts = [...casts];
+            updatedCasts[existingIndex] = cast;
+            casts = updatedCasts;
+        } else {
+            casts = [...casts, cast];
+        }
+    }
+
+    function handleCastStopped(data) {
+        casts = casts.filter(c => c.stream_id !== data.stream_id);
     }
 
     function updateCurrentOutputWorkspaces() {
