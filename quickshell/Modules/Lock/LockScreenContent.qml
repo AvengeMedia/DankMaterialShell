@@ -1407,6 +1407,14 @@ Item {
                 visible: NetworkService.networkAvailable || (BluetoothService.available && BluetoothService.enabled) || (AudioService.sink && AudioService.sink.audio)
 
                 DankIcon {
+                    name: "screen_record"
+                    size: Theme.iconSize - 2
+                    color: NiriService.hasActiveCast ? "white" : Qt.rgba(255, 255, 255, 0.5)
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: NiriService.hasCasts
+                }
+
+                DankIcon {
                     name: {
                         if (NetworkService.wifiToggling)
                             return "sync";
