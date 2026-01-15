@@ -477,7 +477,7 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{
 			catCompositor, c.name, statusOK,
 			getVersionFromCommand(c.versionCmd, c.versionArg, c.versionRegex), details,
-			doctorDocsURL + "#compositor",
+			doctorDocsURL + "#compositor-checks",
 		})
 	}
 
@@ -486,7 +486,7 @@ func checkWindowManagers() []checkResult {
 			catCompositor, "Compositor", statusError,
 			"No supported Wayland compositor found",
 			"Install Hyprland, niri, Sway, River, or Wayfire",
-			doctorDocsURL + "#compositor",
+			doctorDocsURL + "#compositor-checks",
 		})
 	}
 
@@ -885,6 +885,10 @@ func printResultLine(r checkResult, styles tui.Styles) {
 
 	if doctorVerbose && r.details != "" {
 		fmt.Printf("      %s\n", styles.Subtle.Render("└─ "+r.details))
+	}
+
+	if (r.status == statusError || r.status == statusWarn) && r.url != "" {
+		fmt.Printf("      %s\n", styles.Subtle.Render("→ "+r.url))
 	}
 }
 
