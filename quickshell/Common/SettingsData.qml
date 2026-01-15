@@ -145,6 +145,7 @@ Singleton {
     property bool controlCenterShowMicPercent: true
     property bool controlCenterShowBatteryIcon: false
     property bool controlCenterShowPrinterIcon: false
+    property bool controlCenterShowScreenSharingIcon: true
     property bool showPrivacyButton: true
     property bool privacyShowMicIcon: false
     property bool privacyShowCameraIcon: false

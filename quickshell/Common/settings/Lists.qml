@@ -28,7 +28,8 @@ Singleton {
             showMicIcon: false,
             showMicPercent: true,
             showBatteryIcon: false,
-            showPrinterIcon: false
+            showPrinterIcon: false,
+            showScreenSharingIcon: true
         };
         leftModel.append(dummy);
         centerModel.append(dummy);
@@ -84,6 +85,8 @@ Singleton {
                 item.showBatteryIcon = order[i].showBatteryIcon;
             if (isObj && order[i].showPrinterIcon !== undefined)
                 item.showPrinterIcon = order[i].showPrinterIcon;
+            if (isObj && order[i].showScreenSharingIcon !== undefined)
+                item.showScreenSharingIcon = order[i].showScreenSharingIcon;
 
             model.append(item);
         }
