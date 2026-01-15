@@ -132,8 +132,11 @@ Item {
                 case "media":
                     root.dankDashPopoutLoader.item.currentTabIndex = 1;
                     break;
+                case "wallpaper":
+                    root.dankDashPopoutLoader.item.currentTabIndex = 2;
+                    break;
                 case "weather":
-                    root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 2 : 0;
+                    root.dankDashPopoutLoader.item.currentTabIndex = SettingsData.weatherEnabled ? 3 : 0;
                     break;
                 default:
                     root.dankDashPopoutLoader.item.currentTabIndex = 0;
