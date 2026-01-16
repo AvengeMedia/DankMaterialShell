@@ -98,6 +98,9 @@ in
       Service = {
         ExecStart = lib.getExe dmsPkgs.dms-shell + " run --session";
         Restart = "on-failure";
+        Environment = [
+          "PATH=${lib.makeBinPath [ dmsPkgs.dms-shell cfg.quickshell.package ]}:$PATH"
+        ];
       };
 
       Install.WantedBy = [ cfg.systemd.target ];
