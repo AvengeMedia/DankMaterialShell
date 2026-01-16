@@ -287,11 +287,14 @@ Singleton {
                 return false;
             }
 
-            // MODIFICATION: Treat Launchers as persistent instances like Daemons
-            if (isDaemon || isLauncher) {
+            if (isDaemon) {
+                const newDaemons = Object.assign({}, pluginDaemonComponents);
+                newDaemons[pluginId] = comp;
+                pluginDaemonComponents = newDaemons;
+            } else if (isLauncher) {
                 const instance = comp.createObject(root, {
                     "pluginId": pluginId,
-                    "pluginService": root // Inject PluginService
+                    "pluginService": root
                 });
                 if (!instance) {
                     console.error("PluginService: failed to instantiate plugin:", pluginId, comp.errorString());
@@ -302,15 +305,9 @@ Singleton {
                 newInstances[pluginId] = instance;
                 pluginInstances = newInstances;
 
-                if (isDaemon) {
-                    const newDaemons = Object.assign({}, pluginDaemonComponents);
-                    newDaemons[pluginId] = comp;
-                    pluginDaemonComponents = newDaemons;
-                } else {
-                    const newLaunchers = Object.assign({}, pluginLauncherComponents);
-                    newLaunchers[pluginId] = comp;
-                    pluginLauncherComponents = newLaunchers;
-                }
+                const newLaunchers = Object.assign({}, pluginLauncherComponents);
+                newLaunchers[pluginId] = comp;
+                pluginLauncherComponents = newLaunchers;
             } else if (isDesktop) {
                 const newDesktop = Object.assign({}, pluginDesktopComponents);
                 newDesktop[pluginId] = comp;
