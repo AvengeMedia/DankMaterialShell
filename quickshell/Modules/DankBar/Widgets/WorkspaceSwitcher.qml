@@ -265,6 +265,7 @@ Item {
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell";
+                const isSteamApp = Paths.isSteamApp(keyBase);
                 const moddedId = Paths.moddedAppId(keyBase);
                 const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
                 const icon = Paths.getAppIcon(keyBase, desktopEntry);
@@ -272,6 +273,7 @@ Item {
                     "type": "icon",
                     "icon": icon,
                     "isQuickshell": isQuickshell,
+                    "isSteamApp": isSteamApp,
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
@@ -1135,7 +1137,7 @@ Item {
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp
                                             }
 
                                             IconImage {
@@ -1149,6 +1151,22 @@ Item {
                                                     colorization: 1
                                                     colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
                                                 }
+                                            }
+
+                                            IconImage {
+                                                anchors.fill: parent
+                                                source: modelData.icon
+                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                visible: modelData.isSteamApp && modelData.icon
+                                            }
+
+                                            DankIcon {
+                                                anchors.centerIn: parent
+                                                size: root.appIconSize
+                                                name: "sports_esports"
+                                                color: Theme.widgetTextColor
+                                                opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                visible: modelData.isSteamApp && !modelData.icon
                                             }
 
                                             MouseArea {
@@ -1229,7 +1247,7 @@ Item {
                                                 anchors.fill: parent
                                                 source: modelData.icon
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp
                                             }
 
                                             IconImage {
@@ -1243,6 +1261,22 @@ Item {
                                                     colorization: 1
                                                     colorizationColor: isActive ? quickshellIconActiveColor : quickshellIconInactiveColor
                                                 }
+                                            }
+
+                                            IconImage {
+                                                anchors.fill: parent
+                                                source: modelData.icon
+                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                visible: modelData.isSteamApp && modelData.icon
+                                            }
+
+                                            DankIcon {
+                                                anchors.centerIn: parent
+                                                size: root.appIconSize
+                                                name: "sports_esports"
+                                                color: Theme.widgetTextColor
+                                                opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+                                                visible: modelData.isSteamApp && !modelData.icon
                                             }
 
                                             MouseArea {

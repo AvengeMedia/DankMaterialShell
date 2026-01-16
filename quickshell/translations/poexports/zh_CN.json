@@ -240,7 +240,7 @@
     "All displays": "所有显示器"
   },
   "Allow clicks to pass through the widget": {
-    "Allow clicks to pass through the widget": ""
+    "Allow clicks to pass through the widget": "允许鼠标穿透部件"
   },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/退格: 返回 • F1/I: 文件信息 • F10: 帮助 • Esc: 关闭"
@@ -279,7 +279,7 @@
     "Anonymous Identity (optional)": "匿名身份（可选）"
   },
   "App ID Substitutions": {
-    "App ID Substitutions": ""
+    "App ID Substitutions": "应用ID替换"
   },
   "App Launcher": {
     "App Launcher": "启动器"
@@ -729,7 +729,7 @@
     "Click Import to add a .ovpn or .conf": "点击导入添加 .ovpn 或 .conf 文件"
   },
   "Click Through": {
-    "Click Through": ""
+    "Click Through": "鼠标穿透"
   },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "点击任意快捷方式以编辑。更改将保存至%1。"
@@ -1797,7 +1797,7 @@
     "Grid Columns": "网格列"
   },
   "Group": {
-    "Group": ""
+    "Group": "分组"
   },
   "Group Workspace Apps": {
     "Group Workspace Apps": "分组工作区应用"
@@ -1809,13 +1809,13 @@
     "Group multiple windows of the same app together with a window count indicator": "将同一应用的多个窗口合并显示，并标注窗口数量"
   },
   "Group removed": {
-    "Group removed": ""
+    "Group removed": "分组已移除"
   },
   "Group repeated application icons in unfocused workspaces": {
     "Group repeated application icons in unfocused workspaces": "在不聚焦的工作区中将重复应用图标分组"
   },
   "Groups": {
-    "Groups": ""
+    "Groups": "分组"
   },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR（EDID）"
@@ -2214,7 +2214,7 @@
     "Manual Show/Hide": "手动显示/隐藏"
   },
   "Map window class names to icon names for proper icon display": {
-    "Map window class names to icon names for proper icon display": ""
+    "Map window class names to icon names for proper icon display": "将窗口类名称映射到图标名称以实现正确的图标显示"
   },
   "Margin": {
     "Margin": "边距"
@@ -2439,7 +2439,7 @@
     "New York, NY": "纽约，美国纽约州"
   },
   "New group name...": {
-    "New group name...": ""
+    "New group name...": "新分组名..."
   },
   "Next Transition": {
     "Next Transition": "下一过渡"
@@ -2673,7 +2673,7 @@
     "Options": "选项"
   },
   "Organize widgets into collapsible groups": {
-    "Organize widgets into collapsible groups": ""
+    "Organize widgets into collapsible groups": "将部件组织成可折叠分组"
   },
   "Other": {
     "Other": "其他"
@@ -2748,7 +2748,7 @@
     "Password": "密码"
   },
   "Pattern": {
-    "Pattern": ""
+    "Pattern": "模式"
   },
   "Pause": {
     "Pause": "暂停"
@@ -3012,7 +3012,7 @@
     "Repeat": "重复"
   },
   "Replacement": {
-    "Replacement": ""
+    "Replacement": "替换"
   },
   "Report": {
     "Report": "报告"
@@ -3648,7 +3648,7 @@
     "Sync Mode with Portal": "同步系统深色模式"
   },
   "Sync Position Across Screens": {
-    "Sync Position Across Screens": ""
+    "Sync Position Across Screens": "在显示器间同步位置"
   },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "随系统设置开启深色模式，以适配全局主题"
@@ -3876,7 +3876,7 @@
     "Unfocused Color": "未聚焦颜色"
   },
   "Ungrouped": {
-    "Ungrouped": ""
+    "Ungrouped": "已解除分组"
   },
   "Uninstall Plugin": {
     "Uninstall Plugin": "卸载插件"
@@ -3978,13 +3978,13 @@
     "Use light theme instead of dark theme": "使用浅色主题替代深色主题"
   },
   "Use smaller notification cards": {
-    "Use smaller notification cards": ""
+    "Use smaller notification cards": "使用更小的通知卡"
   },
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "使用系统设置中的声音主题"
   },
   "Use the same position and size on all displays": {
-    "Use the same position and size on all displays": ""
+    "Use the same position and size on all displays": "在所有显示器上使用同样的位置与大小"
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": "使用触发前缀以激活"

@@ -383,6 +383,7 @@ Item {
             widgetObj.showMicPercent = SettingsData.controlCenterShowMicPercent;
             widgetObj.showBatteryIcon = SettingsData.controlCenterShowBatteryIcon;
             widgetObj.showPrinterIcon = SettingsData.controlCenterShowPrinterIcon;
+            widgetObj.showScreenSharingIcon = SettingsData.controlCenterShowScreenSharingIcon;
         }
         if (widgetId === "diskUsage")
             widgetObj.mountPath = "/";
@@ -401,6 +402,24 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
+    function cloneWidgetData(widget) {
+        if (typeof widget === "string")
+            return {
+                "id": widget,
+                "enabled": true
+            };
+        var result = {
+            "id": widget.id,
+            "enabled": widget.enabled
+        };
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon"];
+        for (var i = 0; i < keys.length; i++) {
+            if (widget[keys[i]] !== undefined)
+                result[keys[i]] = widget[keys[i]];
+        }
+        return result;
+    }
+
     function handleItemEnabledChanged(sectionId, itemId, enabled) {
         var widgets = getWidgetsForSection(sectionId).slice();
         for (var i = 0; i < widgets.length; i++) {
@@ -408,42 +427,8 @@ Item {
             var widgetId = typeof widget === "string" ? widget : widget.id;
             if (widgetId !== itemId)
                 continue;
-
-            if (typeof widget === "string") {
-                widgets[i] = {
-                    "id": widget,
-                    "enabled": enabled
-                };
-                break;
-            }
-
-            var newWidget = {
-                "id": widget.id,
-                "enabled": enabled
-            };
-            if (widget.size !== undefined)
-                newWidget.size = widget.size;
-            if (widget.selectedGpuIndex !== undefined)
-                newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-            else if (widget.id === "gpuTemp")
-                newWidget.selectedGpuIndex = 0;
-            if (widget.pciId !== undefined)
-                newWidget.pciId = widget.pciId;
-            else if (widget.id === "gpuTemp")
-                newWidget.pciId = "";
-            if (widget.id === "controlCenterButton") {
-                newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-                newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-                newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-                newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-                newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-                newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-                newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-                newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-                newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-                newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-                newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-            }
+            var newWidget = cloneWidgetData(widget);
+            newWidget.enabled = enabled;
             widgets[i] = newWidget;
             break;
         }
@@ -456,128 +441,36 @@ Item {
 
     function handleSpacerSizeChanged(sectionId, widgetIndex, newSize) {
         var widgets = getWidgetsForSection(sectionId).slice();
-        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
-            setWidgetsForSection(sectionId, widgets);
+        if (widgetIndex < 0 || widgetIndex >= widgets.length)
             return;
-        }
-
         var widget = widgets[widgetIndex];
         var widgetId = typeof widget === "string" ? widget : widget.id;
-        if (widgetId !== "spacer") {
-            setWidgetsForSection(sectionId, widgets);
+        if (widgetId !== "spacer")
             return;
-        }
-
-        if (typeof widget === "string") {
-            widgets[widgetIndex] = {
-                "id": widget,
-                "enabled": true,
-                "size": newSize
-            };
-            setWidgetsForSection(sectionId, widgets);
-            return;
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled,
-            "size": newSize
-        };
-        if (widget.selectedGpuIndex !== undefined)
-            newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-        if (widget.pciId !== undefined)
-            newWidget.pciId = widget.pciId;
-        if (widget.id === "controlCenterButton") {
-            newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-            newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-            newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-            newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-            newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-            newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-            newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-            newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-            newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-            newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-            newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-        }
+        var newWidget = cloneWidgetData(widget);
+        newWidget.size = newSize;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
 
     function handleGpuSelectionChanged(sectionId, widgetIndex, selectedGpuIndex) {
         var widgets = getWidgetsForSection(sectionId).slice();
-        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
-            setWidgetsForSection(sectionId, widgets);
+        if (widgetIndex < 0 || widgetIndex >= widgets.length)
             return;
-        }
-
         var pciId = DgopService.availableGpus && DgopService.availableGpus.length > selectedGpuIndex ? DgopService.availableGpus[selectedGpuIndex].pciId : "";
-        var widget = widgets[widgetIndex];
-        if (typeof widget === "string") {
-            widgets[widgetIndex] = {
-                "id": widget,
-                "enabled": true,
-                "selectedGpuIndex": selectedGpuIndex,
-                "pciId": pciId
-            };
-            setWidgetsForSection(sectionId, widgets);
-            return;
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled,
-            "selectedGpuIndex": selectedGpuIndex,
-            "pciId": pciId
-        };
-        if (widget.size !== undefined)
-            newWidget.size = widget.size;
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.selectedGpuIndex = selectedGpuIndex;
+        newWidget.pciId = pciId;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
 
     function handleDiskMountSelectionChanged(sectionId, widgetIndex, mountPath) {
         var widgets = getWidgetsForSection(sectionId).slice();
-        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
-            setWidgetsForSection(sectionId, widgets);
+        if (widgetIndex < 0 || widgetIndex >= widgets.length)
             return;
-        }
-
-        var widget = widgets[widgetIndex];
-        if (typeof widget === "string") {
-            widgets[widgetIndex] = {
-                "id": widget,
-                "enabled": true,
-                "mountPath": mountPath
-            };
-            setWidgetsForSection(sectionId, widgets);
-            return;
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled,
-            "mountPath": mountPath
-        };
-        if (widget.size !== undefined)
-            newWidget.size = widget.size;
-        if (widget.selectedGpuIndex !== undefined)
-            newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-        if (widget.pciId !== undefined)
-            newWidget.pciId = widget.pciId;
-        if (widget.id === "controlCenterButton") {
-            newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-            newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-            newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-            newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-            newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-            newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-            newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-            newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-            newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-            newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-            newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.mountPath = mountPath;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
@@ -586,32 +479,8 @@ Item {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length)
             return;
-
-        var widget = widgets[widgetIndex];
-        if (typeof widget === "string") {
-            widget = {
-                "id": widget,
-                "enabled": true
-            };
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled !== undefined ? widget.enabled : true,
-            "showNetworkIcon": widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon,
-            "showBluetoothIcon": widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon,
-            "showAudioIcon": widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon,
-            "showAudioPercent": widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent,
-            "showVpnIcon": widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon,
-            "showBrightnessIcon": widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon,
-            "showBrightnessPercent": widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent,
-            "showMicIcon": widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon,
-            "showMicPercent": widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent,
-            "showBatteryIcon": widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon,
-            "showPrinterIcon": widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon
-        };
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
         newWidget[settingName] = value;
-
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
@@ -636,46 +505,8 @@ Item {
             setWidgetsForSection(sectionId, widgets);
             return;
         }
-
-        var widget = widgets[widgetIndex];
-        if (typeof widget === "string") {
-            widgets[widgetIndex] = {
-                "id": widget,
-                "enabled": true,
-                "minimumWidth": enabled
-            };
-            setWidgetsForSection(sectionId, widgets);
-            return;
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled,
-            "minimumWidth": enabled
-        };
-        if (widget.size !== undefined)
-            newWidget.size = widget.size;
-        if (widget.selectedGpuIndex !== undefined)
-            newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-        if (widget.pciId !== undefined)
-            newWidget.pciId = widget.pciId;
-        if (widget.mountPath !== undefined)
-            newWidget.mountPath = widget.mountPath;
-        if (widget.showSwap !== undefined)
-            newWidget.showSwap = widget.showSwap;
-        if (widget.id === "controlCenterButton") {
-            newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-            newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-            newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-            newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-            newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-            newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-            newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-            newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-            newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-            newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-            newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.minimumWidth = enabled;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
@@ -686,141 +517,41 @@ Item {
             setWidgetsForSection(sectionId, widgets);
             return;
         }
-
-        var widget = widgets[widgetIndex];
-        if (typeof widget === "string") {
-            widgets[widgetIndex] = {
-                "id": widget,
-                "enabled": true,
-                "showSwap": enabled
-            };
-            setWidgetsForSection(sectionId, widgets);
-            return;
-        }
-
-        var newWidget = {
-            "id": widget.id,
-            "enabled": widget.enabled,
-            "showSwap": enabled
-        };
-        if (widget.size !== undefined)
-            newWidget.size = widget.size;
-        if (widget.selectedGpuIndex !== undefined)
-            newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-        if (widget.pciId !== undefined)
-            newWidget.pciId = widget.pciId;
-        if (widget.mountPath !== undefined)
-            newWidget.mountPath = widget.mountPath;
-        if (widget.minimumWidth !== undefined)
-            newWidget.minimumWidth = widget.minimumWidth;
-        if (widget.mediaSize !== undefined)
-            newWidget.mediaSize = widget.mediaSize;
-        if (widget.clockCompactMode !== undefined)
-            newWidget.clockCompactMode = widget.clockCompactMode;
-        if (widget.focusedWindowCompactMode !== undefined)
-            newWidget.focusedWindowCompactMode = widget.focusedWindowCompactMode;
-        if (widget.runningAppsCompactMode !== undefined)
-            newWidget.runningAppsCompactMode = widget.runningAppsCompactMode;
-        if (widget.keyboardLayoutNameCompactMode !== undefined)
-            newWidget.keyboardLayoutNameCompactMode = widget.keyboardLayoutNameCompactMode;
-        if (widget.id === "controlCenterButton") {
-            newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-            newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-            newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-            newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-            newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-            newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-            newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-            newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-            newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-            newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-            newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.showSwap = enabled;
         widgets[widgetIndex] = newWidget;
         setWidgetsForSection(sectionId, widgets);
     }
 
     function handleCompactModeChanged(sectionId, widgetId, value) {
         var widgets = getWidgetsForSection(sectionId).slice();
-
         for (var i = 0; i < widgets.length; i++) {
             var widget = widgets[i];
             var currentId = typeof widget === "string" ? widget : widget.id;
-
             if (currentId !== widgetId)
                 continue;
 
-            if (typeof widget === "string") {
-                widgets[i] = {
-                    "id": widget,
-                    "enabled": true
-                };
-                widget = widgets[i];
-            } else {
-                var newWidget = {
-                    "id": widget.id,
-                    "enabled": widget.enabled
-                };
-                if (widget.size !== undefined)
-                    newWidget.size = widget.size;
-                if (widget.selectedGpuIndex !== undefined)
-                    newWidget.selectedGpuIndex = widget.selectedGpuIndex;
-                if (widget.pciId !== undefined)
-                    newWidget.pciId = widget.pciId;
-                if (widget.mountPath !== undefined)
-                    newWidget.mountPath = widget.mountPath;
-                if (widget.minimumWidth !== undefined)
-                    newWidget.minimumWidth = widget.minimumWidth;
-                if (widget.showSwap !== undefined)
-                    newWidget.showSwap = widget.showSwap;
-                if (widget.mediaSize !== undefined)
-                    newWidget.mediaSize = widget.mediaSize;
-                if (widget.clockCompactMode !== undefined)
-                    newWidget.clockCompactMode = widget.clockCompactMode;
-                if (widget.focusedWindowCompactMode !== undefined)
-                    newWidget.focusedWindowCompactMode = widget.focusedWindowCompactMode;
-                if (widget.runningAppsCompactMode !== undefined)
-                    newWidget.runningAppsCompactMode = widget.runningAppsCompactMode;
-                if (widget.keyboardLayoutNameCompactMode !== undefined)
-                    newWidget.keyboardLayoutNameCompactMode = widget.keyboardLayoutNameCompactMode;
-                if (widget.id === "controlCenterButton") {
-                    newWidget.showNetworkIcon = widget.showNetworkIcon ?? SettingsData.controlCenterShowNetworkIcon;
-                    newWidget.showBluetoothIcon = widget.showBluetoothIcon ?? SettingsData.controlCenterShowBluetoothIcon;
-                    newWidget.showAudioIcon = widget.showAudioIcon ?? SettingsData.controlCenterShowAudioIcon;
-                    newWidget.showAudioPercent = widget.showAudioPercent ?? SettingsData.controlCenterShowAudioPercent;
-                    newWidget.showVpnIcon = widget.showVpnIcon ?? SettingsData.controlCenterShowVpnIcon;
-                    newWidget.showBrightnessIcon = widget.showBrightnessIcon ?? SettingsData.controlCenterShowBrightnessIcon;
-                    newWidget.showBrightnessPercent = widget.showBrightnessPercent ?? SettingsData.controlCenterShowBrightnessPercent;
-                    newWidget.showMicIcon = widget.showMicIcon ?? SettingsData.controlCenterShowMicIcon;
-                    newWidget.showMicPercent = widget.showMicPercent ?? SettingsData.controlCenterShowMicPercent;
-                    newWidget.showBatteryIcon = widget.showBatteryIcon ?? SettingsData.controlCenterShowBatteryIcon;
-                    newWidget.showPrinterIcon = widget.showPrinterIcon ?? SettingsData.controlCenterShowPrinterIcon;
-                }
-                widgets[i] = newWidget;
-                widget = newWidget;
-            }
-
+            var newWidget = cloneWidgetData(widget);
             switch (widgetId) {
             case "music":
-                widget.mediaSize = value;
+                newWidget.mediaSize = value;
                 break;
             case "clock":
-                widget.clockCompactMode = value;
+                newWidget.clockCompactMode = value;
                 break;
             case "focusedWindow":
-                widget.focusedWindowCompactMode = value;
+                newWidget.focusedWindowCompactMode = value;
                 break;
             case "runningApps":
-                widget.runningAppsCompactMode = value;
+                newWidget.runningAppsCompactMode = value;
                 break;
             case "keyboard_layout_name":
-                widget.keyboardLayoutNameCompactMode = value;
+                newWidget.keyboardLayoutNameCompactMode = value;
                 break;
             }
-
+            widgets[i] = newWidget;
             break;
         }
-
         setWidgetsForSection(sectionId, widgets);
     }
 
@@ -867,6 +598,8 @@ Item {
                     item.showBatteryIcon = widget.showBatteryIcon;
                 if (widget.showPrinterIcon !== undefined)
                     item.showPrinterIcon = widget.showPrinterIcon;
+                if (widget.showScreenSharingIcon !== undefined)
+                    item.showScreenSharingIcon = widget.showScreenSharingIcon;
                 if (widget.minimumWidth !== undefined)
                     item.minimumWidth = widget.minimumWidth;
                 if (widget.showSwap !== undefined)

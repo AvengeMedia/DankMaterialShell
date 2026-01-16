@@ -122,6 +122,21 @@ Rectangle {
         contentHeight: audioColumn.height
         clip: true
 
+        property int maxPinnedInputs: 3
+
+        function normalizePinList(value) {
+            if (Array.isArray(value))
+                return value.filter(v => v)
+            if (typeof value === "string" && value.length > 0)
+                return [value]
+            return []
+        }
+
+        function getPinnedInputs() {
+            const pins = SettingsData.audioInputDevicePins || {}
+            return normalizePinList(pins["preferredInput"])
+        }
+
         Column {
             id: audioColumn
             width: parent.width
@@ -133,16 +148,20 @@ Rectangle {
                         const nodes = Pipewire.nodes.values.filter(node => {
                             return node.audio && !node.isSink && !node.isStream;
                         });
-                        const pins = SettingsData.audioInputDevicePins || {};
-                        const pinnedName = pins["preferredInput"];
+                        const pinnedList = audioContent.getPinnedInputs();
 
                         let sorted = [...nodes];
                         sorted.sort((a, b) => {
                             // Pinned device first
-                            if (a.name === pinnedName && b.name !== pinnedName)
-                                return -1;
-                            if (b.name === pinnedName && a.name !== pinnedName)
-                                return 1;
+                            const aPinnedIndex = pinnedList.indexOf(a.name)
+                            const bPinnedIndex = pinnedList.indexOf(b.name)
+                            if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
+                                if (aPinnedIndex === -1)
+                                    return 1
+                                if (bPinnedIndex === -1)
+                                    return -1
+                                return aPinnedIndex - bPinnedIndex
+                            }
                             // Then active device
                             if (a === AudioService.source && b !== AudioService.source)
                                 return -1;
@@ -224,7 +243,7 @@ Rectangle {
                         height: 28
                         radius: height / 2
                         color: {
-                            const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                            const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
                             return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05);
                         }
 
@@ -237,7 +256,7 @@ Rectangle {
                                 name: "push_pin"
                                 size: 16
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
                                     return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
@@ -245,12 +264,12 @@ Rectangle {
 
                             StyledText {
                                 text: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
                                     return isThisDevicePinned ? I18n.tr("Pinned") : I18n.tr("Pin");
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.audioInputDevicePins || {})["preferredInput"] === modelData.name;
+                                    const isThisDevicePinned = audioContent.getPinnedInputs().includes(modelData.name);
                                     return isThisDevicePinned ? Theme.primary : Theme.surfaceText;
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
@@ -261,16 +280,24 @@ Rectangle {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}));
-                                const isCurrentlyPinned = pins["preferredInput"] === modelData.name;
+                                const pins = JSON.parse(JSON.stringify(SettingsData.audioInputDevicePins || {}))
+                                let pinnedList = audioContent.normalizePinList(pins["preferredInput"])
+                                const pinIndex = pinnedList.indexOf(modelData.name)
 
-                                if (isCurrentlyPinned) {
-                                    delete pins["preferredInput"];
+                                if (pinIndex !== -1) {
+                                    pinnedList.splice(pinIndex, 1)
                                 } else {
-                                    pins["preferredInput"] = modelData.name;
+                                    pinnedList.unshift(modelData.name)
+                                    if (pinnedList.length > audioContent.maxPinnedInputs)
+                                        pinnedList = pinnedList.slice(0, audioContent.maxPinnedInputs)
                                 }
 
-                                SettingsData.set("audioInputDevicePins", pins);
+                                if (pinnedList.length > 0)
+                                    pins["preferredInput"] = pinnedList
+                                else
+                                    delete pins["preferredInput"]
+
+                                SettingsData.set("audioInputDevicePins", pins)
                             }
                         }
                     }

@@ -262,9 +262,7 @@ DankOSD {
                     target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
 
                     function onVolumeChanged() {
-                        if (!vertSlider.dragging) {
-                            vertSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
-                        }
+                        vertSlider.value = Math.min(100, Math.round(AudioService.sink.audio.volume * 100));
                     }
                 }
             }

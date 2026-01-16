@@ -150,6 +150,21 @@ Rectangle {
         contentHeight: bluetoothColumn.height
         clip: true
 
+        property int maxPinnedDevices: 3
+
+        function normalizePinList(value) {
+            if (Array.isArray(value))
+                return value.filter(v => v)
+            if (typeof value === "string" && value.length > 0)
+                return [value]
+            return []
+        }
+
+        function getPinnedDevices() {
+            const pins = SettingsData.bluetoothDevicePins || {}
+            return normalizePinList(pins["preferredDevice"])
+        }
+
         Column {
             id: bluetoothColumn
             width: parent.width
@@ -162,14 +177,18 @@ Rectangle {
                     if (!BluetoothService.adapter || !BluetoothService.adapter.devices)
                         return []
 
-                    const pins = SettingsData.bluetoothDevicePins || {}
-                    const pinnedAddr = pins["preferredDevice"]
+                    const pinnedList = bluetoothContent.getPinnedDevices()
 
                     let devices = [...BluetoothService.adapter.devices.values.filter(dev => dev && (dev.paired || dev.trusted))]
                     devices.sort((a, b) => {
                         // Pinned device first
-                        if (a.address === pinnedAddr && b.address !== pinnedAddr) return -1
-                        if (b.address === pinnedAddr && a.address !== pinnedAddr) return 1
+                        const aPinnedIndex = pinnedList.indexOf(a.address)
+                        const bPinnedIndex = pinnedList.indexOf(b.address)
+                        if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
+                            if (aPinnedIndex === -1) return 1
+                            if (bPinnedIndex === -1) return -1
+                            return aPinnedIndex - bPinnedIndex
+                        }
                         // Then connected devices
                         if (a.connected && !b.connected) return -1
                         if (!a.connected && b.connected) return 1
@@ -302,7 +321,7 @@ Rectangle {
                         height: 28
                         radius: height / 2
                         color: {
-                            const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                            const isThisDevicePinned = bluetoothContent.getPinnedDevices().includes(modelData.address)
                             return isThisDevicePinned ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceText, 0.05)
                         }
 
@@ -315,7 +334,7 @@ Rectangle {
                                 name: "push_pin"
                                 size: 16
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    const isThisDevicePinned = bluetoothContent.getPinnedDevices().includes(modelData.address)
                                     return isThisDevicePinned ? Theme.primary : Theme.surfaceText
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
@@ -323,12 +342,12 @@ Rectangle {
 
                             StyledText {
                                 text: {
-                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    const isThisDevicePinned = bluetoothContent.getPinnedDevices().includes(modelData.address)
                                     return isThisDevicePinned ? I18n.tr("Pinned") : I18n.tr("Pin")
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: {
-                                    const isThisDevicePinned = (SettingsData.bluetoothDevicePins || {})["preferredDevice"] === modelData.address
+                                    const isThisDevicePinned = bluetoothContent.getPinnedDevices().includes(modelData.address)
                                     return isThisDevicePinned ? Theme.primary : Theme.surfaceText
                                 }
                                 anchors.verticalCenter: parent.verticalCenter
@@ -340,13 +359,21 @@ Rectangle {
                             cursorShape: Qt.PointingHandCursor
                             onClicked: {
                                 const pins = JSON.parse(JSON.stringify(SettingsData.bluetoothDevicePins || {}))
-                                const isCurrentlyPinned = pins["preferredDevice"] === modelData.address
+                                let pinnedList = bluetoothContent.normalizePinList(pins["preferredDevice"])
+                                const pinIndex = pinnedList.indexOf(modelData.address)
 
-                                if (isCurrentlyPinned) {
-                                    delete pins["preferredDevice"]
+                                if (pinIndex !== -1) {
+                                    pinnedList.splice(pinIndex, 1)
                                 } else {
-                                    pins["preferredDevice"] = modelData.address
+                                    pinnedList.unshift(modelData.address)
+                                    if (pinnedList.length > bluetoothContent.maxPinnedDevices)
+                                        pinnedList = pinnedList.slice(0, bluetoothContent.maxPinnedDevices)
                                 }
+
+                                if (pinnedList.length > 0)
+                                    pins["preferredDevice"] = pinnedList
+                                else
+                                    delete pins["preferredDevice"]
 
                                 SettingsData.set("bluetoothDevicePins", pins)
                             }

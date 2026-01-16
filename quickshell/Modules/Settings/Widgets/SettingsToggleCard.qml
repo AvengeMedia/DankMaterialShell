@@ -51,6 +51,7 @@ StyledRect {
 
                 Row {
                     spacing: Theme.spacingM
+                    width: parent.width
 
                     DankIcon {
                         id: headerIcon
@@ -69,6 +70,8 @@ StyledRect {
                         color: Theme.surfaceText
                         anchors.verticalCenter: parent.verticalCenter
                         visible: root.title !== ""
+                        width: parent.width - (headerIcon.visible ? headerIcon.width + parent.spacing : 0)
+                        horizontalAlignment: Text.AlignLeft
                     }
                 }
 

@@ -87,6 +87,8 @@ var (
 	swayVersionRegex       = regexp.MustCompile(`sway version (\d+\.\d+)`)
 	riverVersionRegex      = regexp.MustCompile(`river (\d+\.\d+)`)
 	wayfireVersionRegex    = regexp.MustCompile(`wayfire (\d+\.\d+)`)
+	labwcVersionRegex      = regexp.MustCompile(`labwc (\d+\.\d+\.\d+)`)
+	mangowcVersionRegex    = regexp.MustCompile(`mango (\d+\.\d+\.\d+)`)
 )
 
 var doctorCmd = &cobra.Command{
@@ -448,11 +450,13 @@ func checkWindowManagers() []checkResult {
 		versionRegex                 *regexp.Regexp
 		commands                     []string
 	}{
-		{"Hyprland", "hyprctl", "version", hyprlandVersionRegex, []string{"hyprland", "Hyprland"}},
+		{"Hyprland", "Hyprland", "--version", hyprlandVersionRegex, []string{"hyprland", "Hyprland"}},
 		{"niri", "niri", "--version", niriVersionRegex, []string{"niri"}},
 		{"Sway", "sway", "--version", swayVersionRegex, []string{"sway"}},
 		{"River", "river", "-version", riverVersionRegex, []string{"river"}},
 		{"Wayfire", "wayfire", "--version", wayfireVersionRegex, []string{"wayfire"}},
+		{"labwc", "labwc", "--version", labwcVersionRegex, []string{"labwc"}},
+		{"mangowc", "mango", "-v", mangowcVersionRegex, []string{"mango"}},
 	}
 
 	var results []checkResult
@@ -477,7 +481,7 @@ func checkWindowManagers() []checkResult {
 		results = append(results, checkResult{
 			catCompositor, c.name, statusOK,
 			getVersionFromCommand(c.versionCmd, c.versionArg, c.versionRegex), details,
-			doctorDocsURL + "#compositor",
+			doctorDocsURL + "#compositor-checks",
 		})
 	}
 
@@ -486,7 +490,7 @@ func checkWindowManagers() []checkResult {
 			catCompositor, "Compositor", statusError,
 			"No supported Wayland compositor found",
 			"Install Hyprland, niri, Sway, River, or Wayfire",
-			doctorDocsURL + "#compositor",
+			doctorDocsURL + "#compositor-checks",
 		})
 	}
 
@@ -498,8 +502,8 @@ func checkWindowManagers() []checkResult {
 }
 
 func getVersionFromCommand(cmd, arg string, regex *regexp.Regexp) string {
-	output, err := exec.Command(cmd, arg).Output()
-	if err != nil {
+	output, err := exec.Command(cmd, arg).CombinedOutput()
+	if err != nil && len(output) == 0 {
 		return "installed"
 	}
 
@@ -634,19 +638,14 @@ func checkI2CAvailability() checkResult {
 	return checkResult{catOptionalFeatures, "I2C/DDC", statusOK, fmt.Sprintf("%d monitor(s) detected", len(devices)), "External monitor brightness control", doctorDocsURL + "#optional-features"}
 }
 
-func detectNetworkBackend() string {
-	result, err := network.DetectNetworkStack()
-	if err != nil {
-		return ""
-	}
-
-	switch result.Backend {
+func detectNetworkBackend(stackResult *network.DetectResult) string {
+	switch stackResult.Backend {
 	case network.BackendNetworkManager:
 		return "NetworkManager"
 	case network.BackendIwd:
 		return "iwd"
 	case network.BackendNetworkd:
-		if result.HasIwd {
+		if stackResult.HasIwd {
 			return "iwd + systemd-networkd"
 		}
 		return "systemd-networkd"
@@ -657,75 +656,73 @@ func detectNetworkBackend() string {
 	}
 }
 
+func getOptionalDBusStatus(busName string) (status, string) {
+	if utils.IsDBusServiceAvailable(busName) {
+		return statusOK, "Available"
+	} else {
+		return statusWarn, "Not available"
+	}
+}
+
 func checkOptionalDependencies() []checkResult {
 	var results []checkResult
 
-	if utils.IsServiceActive("accounts-daemon", false) {
-		results = append(results, checkResult{catOptionalFeatures, "accountsservice", statusOK, "Running", "User accounts", doctorDocsURL + "#optional-features"})
-	} else {
-		results = append(results, checkResult{catOptionalFeatures, "accountsservice", statusWarn, "Not running", "User accounts", doctorDocsURL + "#optional-features"})
-	}
+	optionalFeaturesURL := doctorDocsURL + "#optional-features"
 
-	if utils.IsServiceActive("power-profiles-daemon", false) {
-		results = append(results, checkResult{catOptionalFeatures, "power-profiles-daemon", statusOK, "Running", "Power profile management", doctorDocsURL + "#optional-features"})
-	} else {
-		results = append(results, checkResult{catOptionalFeatures, "power-profiles-daemon", statusInfo, "Not running", "Power profile management", doctorDocsURL + "#optional-features"})
-	}
+	accountsStatus, accountsMsg := getOptionalDBusStatus("org.freedesktop.Accounts")
+	results = append(results, checkResult{catOptionalFeatures, "accountsservice", accountsStatus, accountsMsg, "User accounts", optionalFeaturesURL})
+
+	ppdStatus, ppdMsg := getOptionalDBusStatus("org.freedesktop.UPower.PowerProfiles")
+	results = append(results, checkResult{catOptionalFeatures, "power-profiles-daemon", ppdStatus, ppdMsg, "Power profile management", optionalFeaturesURL})
+
+	logindStatus, logindMsg := getOptionalDBusStatus("org.freedesktop.login1")
+	results = append(results, checkResult{catOptionalFeatures, "logind", logindStatus, logindMsg, "Session management", optionalFeaturesURL})
 
 	results = append(results, checkI2CAvailability())
 
 	terminals := []string{"ghostty", "kitty", "alacritty", "foot", "wezterm"}
 	if idx := slices.IndexFunc(terminals, utils.CommandExists); idx >= 0 {
-		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusOK, terminals[idx], "", doctorDocsURL + "#optional-features"})
+		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusOK, terminals[idx], "", optionalFeaturesURL})
 	} else {
-		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusWarn, "None found", "Install ghostty, kitty, or alacritty", doctorDocsURL + "#optional-features"})
+		results = append(results, checkResult{catOptionalFeatures, "Terminal", statusWarn, "None found", "Install ghostty, kitty, or alacritty", optionalFeaturesURL})
 	}
 
+	networkResult, err := network.DetectNetworkStack()
+	networkStatus, networkMessage, networkDetails := statusOK, "Not available", "Network management"
+
+	if err == nil && networkResult.Backend != network.BackendNone {
+		networkMessage = detectNetworkBackend(networkResult)
+		if doctorVerbose {
+			networkDetails = networkResult.ChosenReason
+		}
+	} else {
+		networkStatus = statusInfo
+	}
+
+	results = append(results, checkResult{catOptionalFeatures, "Network", networkStatus, networkMessage, networkDetails, optionalFeaturesURL})
+
 	deps := []struct {
-		name, cmd, altCmd, desc string
-		important               bool
+		name, cmd, desc string
+		important       bool
 	}{
-		{"matugen", "matugen", "", "Dynamic theming", true},
-		{"dgop", "dgop", "", "System monitoring", true},
-		{"cava", "cava", "", "Audio visualizer", true},
-		{"khal", "khal", "", "Calendar events", false},
-		{"Network", "nmcli", "iwctl", "Network management", false},
-		{"danksearch", "dsearch", "", "File search", false},
-		{"loginctl", "loginctl", "", "Session management", false},
-		{"fprintd", "fprintd-list", "", "Fingerprint auth", false},
+		{"matugen", "matugen", "Dynamic theming", true},
+		{"dgop", "dgop", "System monitoring", true},
+		{"cava", "cava", "Audio visualizer", true},
+		{"khal", "khal", "Calendar events", false},
+		{"danksearch", "dsearch", "File search", false},
+		{"fprintd", "fprintd-list", "Fingerprint auth", false},
 	}
 
 	for _, d := range deps {
-		found, foundCmd := utils.CommandExists(d.cmd), d.cmd
-		if !found && d.altCmd != "" && utils.CommandExists(d.altCmd) {
-			found, foundCmd = true, d.altCmd
-		}
+		found := utils.CommandExists(d.cmd)
 
 		switch {
 		case found:
-			message := "Installed"
-			details := d.desc
-			if d.name == "Network" {
-				result, err := network.DetectNetworkStack()
-				if err == nil && result.Backend != network.BackendNone {
-					message = detectNetworkBackend() + " (active)"
-					if doctorVerbose {
-						details = result.ChosenReason
-					}
-				} else {
-					switch foundCmd {
-					case "nmcli":
-						message = "NetworkManager (installed)"
-					case "iwctl":
-						message = "iwd (installed)"
-					}
-				}
-			}
-			results = append(results, checkResult{catOptionalFeatures, d.name, statusOK, message, details, doctorDocsURL + "#optional-features"})
+			results = append(results, checkResult{catOptionalFeatures, d.name, statusOK, "Installed", d.desc, optionalFeaturesURL})
 		case d.important:
-			results = append(results, checkResult{catOptionalFeatures, d.name, statusWarn, "Missing", d.desc, doctorDocsURL + "#optional-features"})
+			results = append(results, checkResult{catOptionalFeatures, d.name, statusWarn, "Missing", d.desc, optionalFeaturesURL})
 		default:
-			results = append(results, checkResult{catOptionalFeatures, d.name, statusInfo, "Not installed", d.desc, doctorDocsURL + "#optional-features"})
+			results = append(results, checkResult{catOptionalFeatures, d.name, statusInfo, "Not installed", d.desc, optionalFeaturesURL})
 		}
 	}
 
@@ -892,6 +889,10 @@ func printResultLine(r checkResult, styles tui.Styles) {
 
 	if doctorVerbose && r.details != "" {
 		fmt.Printf("      %s\n", styles.Subtle.Render("└─ "+r.details))
+	}
+
+	if (r.status == statusError || r.status == statusWarn) && r.url != "" {
+		fmt.Printf("      %s\n", styles.Subtle.Render("→ "+r.url))
 	}
 }
 

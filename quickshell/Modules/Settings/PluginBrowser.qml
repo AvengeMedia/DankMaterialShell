@@ -270,7 +270,9 @@ FloatingWindow {
                                 root.updateFilteredPlugins();
                                 return;
                             }
-                            thirdPartyConfirmModal.visible = true;
+                            thirdPartyConfirmLoader.active = true;
+                            if (thirdPartyConfirmLoader.item)
+                                thirdPartyConfirmLoader.item.show();
                         }
                     }
 
@@ -668,119 +670,132 @@ FloatingWindow {
         }
     }
 
-    FloatingWindow {
-        id: thirdPartyConfirmModal
+    LazyLoader {
+        id: thirdPartyConfirmLoader
+        active: false
 
-        objectName: "thirdPartyConfirm"
-        title: I18n.tr("Third-Party Plugin Warning")
-        implicitWidth: 500
-        implicitHeight: 350
-        color: Theme.surfaceContainer
-        visible: false
+        FloatingWindow {
+            id: thirdPartyConfirmModal
 
-        FocusScope {
-            anchors.fill: parent
-            focus: true
-
-            Keys.onPressed: event => {
-                if (event.key === Qt.Key_Escape) {
-                    thirdPartyConfirmModal.visible = false;
-                    event.accepted = true;
-                }
+            function show() {
+                visible = true;
             }
 
-            Column {
+            function hide() {
+                visible = false;
+            }
+
+            objectName: "thirdPartyConfirm"
+            title: I18n.tr("Third-Party Plugin Warning")
+            implicitWidth: 500
+            implicitHeight: 350
+            color: Theme.surfaceContainer
+            visible: false
+
+            FocusScope {
                 anchors.fill: parent
-                anchors.margins: Theme.spacingL
-                spacing: Theme.spacingL
+                focus: true
 
-                Row {
-                    width: parent.width
-                    spacing: Theme.spacingM
-
-                    DankIcon {
-                        name: "warning"
-                        size: Theme.iconSize
-                        color: Theme.warning
-                        anchors.verticalCenter: parent.verticalCenter
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) {
+                        thirdPartyConfirmModal.hide();
+                        event.accepted = true;
                     }
-
-                    StyledText {
-                        text: I18n.tr("Third-Party Plugin Warning")
-                        font.pixelSize: Theme.fontSizeLarge
-                        font.weight: Font.Medium
-                        color: Theme.surfaceText
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Item {
-                        width: parent.width - parent.spacing * 2 - Theme.iconSize - parent.children[1].implicitWidth - closeConfirmBtn.width
-                        height: 1
-                    }
-
-                    DankActionButton {
-                        id: closeConfirmBtn
-                        iconName: "close"
-                        iconSize: Theme.iconSize - 2
-                        iconColor: Theme.outline
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: thirdPartyConfirmModal.visible = false
-                    }
-                }
-
-                StyledText {
-                    width: parent.width
-                    text: I18n.tr("Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.")
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    wrapMode: Text.WordWrap
                 }
 
                 Column {
-                    width: parent.width
-                    spacing: Theme.spacingS
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingL
+                    spacing: Theme.spacingL
 
-                    StyledText {
-                        text: I18n.tr("• Plugins may contain bugs or security issues")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
+                    Row {
+                        width: parent.width
+                        spacing: Theme.spacingM
+
+                        DankIcon {
+                            name: "warning"
+                            size: Theme.iconSize
+                            color: Theme.warning
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Third-Party Plugin Warning")
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Item {
+                            width: parent.width - parent.spacing * 2 - Theme.iconSize - parent.children[1].implicitWidth - closeConfirmBtn.width
+                            height: 1
+                        }
+
+                        DankActionButton {
+                            id: closeConfirmBtn
+                            iconName: "close"
+                            iconSize: Theme.iconSize - 2
+                            iconColor: Theme.outline
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: thirdPartyConfirmModal.hide()
+                        }
                     }
 
                     StyledText {
-                        text: I18n.tr("• Review code before installation when possible")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
+                        width: parent.width
+                        text: I18n.tr("Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.")
+                        font.pixelSize: Theme.fontSizeMedium
+                        color: Theme.surfaceText
+                        wrapMode: Text.WordWrap
                     }
 
-                    StyledText {
-                        text: I18n.tr("• Install only from trusted sources")
-                        font.pixelSize: Theme.fontSizeSmall
-                        color: Theme.surfaceVariantText
+                    Column {
+                        width: parent.width
+                        spacing: Theme.spacingS
+
+                        StyledText {
+                            text: I18n.tr("• Plugins may contain bugs or security issues")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: I18n.tr("• Review code before installation when possible")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
+
+                        StyledText {
+                            text: I18n.tr("• Install only from trusted sources")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                        }
                     }
-                }
 
-                Item {
-                    width: parent.width
-                    height: parent.height - parent.spacing * 3 - y
-                }
-
-                Row {
-                    anchors.right: parent.right
-                    spacing: Theme.spacingM
-
-                    DankButton {
-                        text: I18n.tr("Cancel")
-                        iconName: "close"
-                        onClicked: thirdPartyConfirmModal.visible = false
+                    Item {
+                        width: parent.width
+                        height: parent.height - parent.spacing * 3 - y
                     }
 
-                    DankButton {
-                        text: I18n.tr("I Understand")
-                        iconName: "check"
-                        onClicked: {
-                            SessionData.setShowThirdPartyPlugins(true);
-                            root.updateFilteredPlugins();
-                            thirdPartyConfirmModal.visible = false;
+                    Row {
+                        anchors.right: parent.right
+                        spacing: Theme.spacingM
+
+                        DankButton {
+                            text: I18n.tr("Cancel")
+                            iconName: "close"
+                            onClicked: thirdPartyConfirmModal.hide()
+                        }
+
+                        DankButton {
+                            text: I18n.tr("I Understand")
+                            iconName: "check"
+                            onClicked: {
+                                SessionData.setShowThirdPartyPlugins(true);
+                                root.updateFilteredPlugins();
+                                thirdPartyConfirmModal.hide();
+                            }
                         }
                     }
                 }

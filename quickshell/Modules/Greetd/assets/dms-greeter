@@ -2,8 +2,6 @@
 
 set -e
 
-export WLR_DRM_DEVICES=/dev/dri/card1
-
 COMPOSITOR=""
 COMPOSITOR_CONFIG=""
 DMS_PATH="dms-greeter"
@@ -16,7 +14,7 @@ dms-greeter - DankMaterialShell greeter launcher
 Usage: dms-greeter --command COMPOSITOR [OPTIONS]
 
 Required:
-    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, scroll or mangowc)
+    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, scroll, mangowc, or labwc)
 
 Options:
     -C, --config PATH       Custom compositor config file
@@ -33,6 +31,7 @@ Examples:
     dms-greeter --command scroll -p /home/user/.config/quickshell/custom-dms
     dms-greeter --command niri --cache-dir /tmp/dmsgreeter
     dms-greeter --command mangowc
+    dms-greeter --command labwc
 EOF
 }
 
@@ -231,6 +230,15 @@ SCROLL_EOF
         exec scroll -c "$COMPOSITOR_CONFIG"
         ;;
 
+
+    labwc)
+        if [[ -n "$COMPOSITOR_CONFIG" ]]; then
+            exec labwc --config "$COMPOSITOR_CONFIG" --session "$QS_CMD"
+        else
+            exec labwc --session "$QS_CMD"
+        fi
+        ;;
+
     mangowc)
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
             exec mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
@@ -241,7 +249,7 @@ SCROLL_EOF
 
     *)
         echo "Error: Unsupported compositor: $COMPOSITOR" >&2
-        echo "Supported compositors: niri, hyprland, sway, mangowc" >&2
+        echo "Supported compositors: niri, hyprland, sway, scroll, mangowc, labwc" >&2
         exit 1
         ;;
 esac

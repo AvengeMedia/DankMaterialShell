@@ -327,11 +327,12 @@ Item {
         clip: false
         visible: !_noneAvailable && (!showNoPlayerNow)
         ColumnLayout {
-            x: 72
-            y: 20
             width: 484
             height: 370
             spacing: Theme.spacingXS
+            anchors.top: parent.top
+            anchors.topMargin: 20
+            anchors.horizontalCenter: parent.horizontalCenter
 
             Item {
                 width: parent.width

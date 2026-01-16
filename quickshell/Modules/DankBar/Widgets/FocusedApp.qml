@@ -155,9 +155,17 @@ BasePill {
                 }
             }
 
+            DankIcon {
+                anchors.centerIn: parent
+                size: 18
+                name: "sports_esports"
+                color: Theme.widgetTextColor
+                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && Paths.isSteamApp(activeWindow.appId)
+            }
+
             Text {
                 anchors.centerIn: parent
-                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready
+                visible: root.isVerticalOrientation && activeWindow && activeWindow.appId && appIcon.status !== Image.Ready && !Paths.isSteamApp(activeWindow.appId)
                 text: {
                     if (!activeWindow || !activeWindow.appId)
                         return "?";

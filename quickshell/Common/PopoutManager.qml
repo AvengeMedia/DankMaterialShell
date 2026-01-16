@@ -82,15 +82,19 @@ Singleton {
             popoutOpening();
         }
 
-        let justClosedSamePopout = false;
+        let movedFromOtherScreen = false;
         for (const otherScreenName in currentPopoutsByScreen) {
             if (otherScreenName === screenName)
                 continue;
             const otherPopout = currentPopoutsByScreen[otherScreenName];
             if (!otherPopout)
                 continue;
+
             if (otherPopout === popout) {
-                justClosedSamePopout = true;
+                movedFromOtherScreen = true;
+                currentPopoutsByScreen[otherScreenName] = null;
+                currentPopoutTriggers[otherScreenName] = null;
+                continue;
             }
 
             if (otherPopout.dashVisible !== undefined) {
@@ -112,7 +116,7 @@ Singleton {
             }
         }
 
-        if (currentPopout === popout && popout.shouldBeVisible) {
+        if (currentPopout === popout && popout.shouldBeVisible && !movedFromOtherScreen) {
             if (triggerId !== undefined && currentPopoutTriggers[screenName] === triggerId) {
                 if (popout.dashVisible !== undefined) {
                     popout.dashVisible = false;
@@ -139,6 +143,7 @@ Singleton {
                 popout.currentTabIndex = tabIndex;
             }
             currentPopoutTriggers[screenName] = triggerId;
+            return;
         }
 
         currentPopoutTriggers[screenName] = triggerId;
@@ -153,16 +158,8 @@ Singleton {
             ModalManager.closeAllModalsExcept(null);
         }
 
-        if (justClosedSamePopout) {
-            Qt.callLater(() => {
-                if (popout.dashVisible !== undefined) {
-                    popout.dashVisible = true;
-                } else if (popout.notificationHistoryVisible !== undefined) {
-                    popout.notificationHistoryVisible = true;
-                } else {
-                    popout.open();
-                }
-            });
+        if (movedFromOtherScreen) {
+            popout.open();
         } else {
             if (popout.dashVisible !== undefined) {
                 popout.dashVisible = true;

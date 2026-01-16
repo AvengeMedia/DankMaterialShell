@@ -73,6 +73,13 @@ in
       default = hasPluginSettings;
       description = ''Whether to manage plugin settings. Automatically enabled if any plugins have settings configured.'';
     };
+
+    systemd.target = lib.mkOption {
+      type = lib.types.str;
+      default = config.wayland.systemd.target;
+      defaultText = lib.literalExpression "config.wayland.systemd.target";
+      description = "Systemd target to bind to.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -84,8 +91,8 @@ in
     systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
       Unit = {
         Description = "DankMaterialShell";
-        PartOf = [ config.wayland.systemd.target ];
-        After = [ config.wayland.systemd.target ];
+        PartOf = [ cfg.systemd.target ];
+        After = [ cfg.systemd.target ];
       };
 
       Service = {
@@ -93,7 +100,7 @@ in
         Restart = "on-failure";
       };
 
-      Install.WantedBy = [ config.wayland.systemd.target ];
+      Install.WantedBy = [ cfg.systemd.target ];
     };
 
     xdg.stateFile."DankMaterialShell/session.json" = lib.mkIf (cfg.session != { }) {

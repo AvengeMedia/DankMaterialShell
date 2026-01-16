@@ -403,7 +403,7 @@ Item {
             width: actualIconSize
             height: actualIconSize
             anchors.centerIn: parent
-            visible: iconImg.status !== Image.Ready
+            visible: iconImg.status !== Image.Ready && appData && appData.appId && !Paths.isSteamApp(appData.appId)
             color: Theme.surfaceLight
             radius: Theme.cornerRadius
             border.width: 1
@@ -423,6 +423,14 @@ Item {
                 color: Theme.primary
                 font.weight: Font.Bold
             }
+        }
+
+        DankIcon {
+            anchors.centerIn: parent
+            size: actualIconSize
+            name: "sports_esports"
+            color: Theme.surfaceText
+            visible: iconImg.status !== Image.Ready && appData && appData.appId && Paths.isSteamApp(appData.appId)
         }
 
         Loader {

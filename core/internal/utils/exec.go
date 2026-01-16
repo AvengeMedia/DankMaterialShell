@@ -2,7 +2,6 @@ package utils
 
 import (
 	"os/exec"
-	"strings"
 )
 
 type AppChecker interface {
@@ -42,17 +41,4 @@ func AnyCommandExists(cmds ...string) bool {
 		}
 	}
 	return false
-}
-
-func IsServiceActive(name string, userService bool) bool {
-	if !CommandExists("systemctl") {
-		return false
-	}
-
-	args := []string{"is-active", name}
-	if userService {
-		args = []string{"--user", "is-active", name}
-	}
-	output, _ := exec.Command("systemctl", args...).Output()
-	return strings.EqualFold(strings.TrimSpace(string(output)), "active")
 }
