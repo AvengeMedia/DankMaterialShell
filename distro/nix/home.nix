@@ -79,6 +79,7 @@ in
       default = config.wayland.systemd.target;
       defaultText = lib.literalExpression "config.wayland.systemd.target";
       description = "Systemd target to bind to.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
