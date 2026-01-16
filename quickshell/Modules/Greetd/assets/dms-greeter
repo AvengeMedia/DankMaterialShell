@@ -2,8 +2,6 @@
 
 set -e
 
-export WLR_DRM_DEVICES=/dev/dri/card1
-
 COMPOSITOR=""
 COMPOSITOR_CONFIG=""
 DMS_PATH="dms-greeter"
