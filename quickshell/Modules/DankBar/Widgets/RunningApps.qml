@@ -393,9 +393,19 @@ Item {
                             }
                         }
 
+                        DankIcon {
+                            anchors.left: parent.left
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness)) / 2) : Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+                            size: Theme.barIconSize(root.barThickness)
+                            name: "sports_esports"
+                            color: Theme.widgetTextColor
+                            visible: !iconImg.visible && Paths.isSteamApp(appId)
+                        }
+
                         Text {
                             anchors.centerIn: parent
-                            visible: !iconImg.visible
+                            visible: !iconImg.visible && !Paths.isSteamApp(appId)
                             text: {
                                 root._desktopEntriesUpdateTrigger;
                                 if (!appId)
@@ -628,9 +638,19 @@ Item {
                             }
                         }
 
+                        DankIcon {
+                            anchors.left: parent.left
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness)) / 2) : Theme.spacingXS
+                            anchors.verticalCenter: parent.verticalCenter
+                            size: Theme.barIconSize(root.barThickness)
+                            name: "sports_esports"
+                            color: Theme.widgetTextColor
+                            visible: !iconImg.visible && Paths.isSteamApp(appId)
+                        }
+
                         Text {
                             anchors.centerIn: parent
-                            visible: !iconImg.visible
+                            visible: !iconImg.visible && !Paths.isSteamApp(appId)
                             text: {
                                 root._desktopEntriesUpdateTrigger;
                                 if (!appId)

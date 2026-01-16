@@ -45,6 +45,10 @@ Singleton {
         Quickshell.execDetached(["cp", strip(from), strip(to)]);
     }
 
+    function isSteamApp(appId: string): bool {
+        return appId && /^steam_app_\d+$/.test(appId);
+    }
+
     function moddedAppId(appId: string): string {
         const subs = SettingsData.appIdSubstitutions || [];
         for (let i = 0; i < subs.length; i++) {
@@ -60,6 +64,9 @@ Singleton {
                 }
             }
         }
+        const steamMatch = appId.match(/^steam_app_(\d+)$/);
+        if (steamMatch)
+            return `steam_icon_${steamMatch[1]}`;
         return appId;
     }
 
