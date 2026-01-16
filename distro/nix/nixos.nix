@@ -20,15 +20,19 @@ in
   imports = [
     (import ./options.nix args)
   ];
-
+  options.programs.dank-material-shell.systemd.target = lib.mkOption {
+    type = lib.types.str;
+    description = "Systemd target to bind to.";
+    default = "graphical-session.target";
+  };
   config = lib.mkIf cfg.enable {
     systemd.user.services.dms = lib.mkIf cfg.systemd.enable {
       description = "DankMaterialShell";
       path = lib.mkForce [ ];
 
-      partOf = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      wantedBy = [ "graphical-session.target" ];
+      partOf = [ cfg.systemd.target ];
+      after = [ cfg.systemd.target ];
+      wantedBy = [ cfg.systemd.target ];
       restartIfChanged = cfg.systemd.restartIfChanged;
 
       serviceConfig = {
