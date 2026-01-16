@@ -177,10 +177,11 @@ Item {
 
                     StyledText {
                         text: {
-                            if (!SystemUpdateService.shellVersion)
+                            if (!SystemUpdateService.shellVersion && !DMSService.cliVersion)
                                 return "dms";
 
-                            let version = SystemUpdateService.shellVersion;
+                            let version = SystemUpdateService.shellVersion || "";
+                            let cliVersion = DMSService.cliVersion || "";
 
                             // Debian/Ubuntu/OpenSUSE git format: 1.0.3+git2264.c5c5ce84
                             let match = version.match(/^([\d.]+)\+git(\d+)\./);
@@ -191,13 +192,36 @@ Item {
                             // Fedora COPR git format: 0.0.git.2267.d430cae9
                             match = version.match(/^[\d.]+\.git\.(\d+)\./);
                             if (match) {
-                                return `dms (git) v1.0.3-${match[1]}`;
+                                let baseVersion = "";
+                                if (cliVersion) {
+                                    const cliMatch = cliVersion.match(/^([\d.]+)/);
+                                    if (cliMatch)
+                                        baseVersion = cliMatch[1];
+                                }
+                                if (!baseVersion)
+                                    baseVersion = SystemUpdateService.semverVersion || "";
+                                if (baseVersion) {
+                                    return `dms (git) v${baseVersion}-${match[1]}`;
+                                }
+                                return `dms (git) v${match[1]}`;
                             }
 
                             // Stable release format: 1.0.3
                             match = version.match(/^([\d.]+)$/);
                             if (match) {
                                 return `dms v${match[1]}`;
+                            }
+
+                            if (!version && cliVersion) {
+                                match = cliVersion.match(/^([\d.]+)\+git(\d+)\./);
+                                if (match) {
+                                    return `dms (git) v${match[1]}-${match[2]}`;
+                                }
+                                match = cliVersion.match(/^([\d.]+)$/);
+                                if (match) {
+                                    return `dms v${match[1]}`;
+                                }
+                                return `dms ${cliVersion}`;
                             }
 
                             return `dms ${version}`;
