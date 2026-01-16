@@ -240,7 +240,7 @@
     "All displays": "Tutti gli schermi"
   },
   "Allow clicks to pass through the widget": {
-    "Allow clicks to pass through the widget": ""
+    "Allow clicks to pass through the widget": "Consenti il passaggio dei clic attraverso il widget"
   },
   "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": {
     "Alt+←/Backspace: Back • F1/I: File Info • F10: Help • Esc: Close": "Alt+←/Backspace: Indietro • F1/I: File Info • F10: Aiuto • Esc: Chiudi"
@@ -279,7 +279,7 @@
     "Anonymous Identity (optional)": "Identità anonima (facoltativa)"
   },
   "App ID Substitutions": {
-    "App ID Substitutions": ""
+    "App ID Substitutions": "Sostituzioni App ID"
   },
   "App Launcher": {
     "App Launcher": "App Launcher"
@@ -729,7 +729,7 @@
     "Click Import to add a .ovpn or .conf": "Clicca su Importa per aggiungere un file .ovpn o .conf"
   },
   "Click Through": {
-    "Click Through": ""
+    "Click Through": "Clic passanti"
   },
   "Click any shortcut to edit. Changes save to %1": {
     "Click any shortcut to edit. Changes save to %1": "Clicca su qualsiasi scorciatoia per modificare. Le modifiche vengono salvate in %1"
@@ -1797,7 +1797,7 @@
     "Grid Columns": "Colonne Griglia"
   },
   "Group": {
-    "Group": ""
+    "Group": "Gruppo"
   },
   "Group Workspace Apps": {
     "Group Workspace Apps": "Raggruppa App per Spazio di Lavoro"
@@ -1809,13 +1809,13 @@
     "Group multiple windows of the same app together with a window count indicator": "Raggruppa molteplici finestre della stessa app con un indicatore del numero di finestre"
   },
   "Group removed": {
-    "Group removed": ""
+    "Group removed": "Gruppo rimosso"
   },
   "Group repeated application icons in unfocused workspaces": {
     "Group repeated application icons in unfocused workspaces": "Raggruppa le icone delle applicazioni duplicate negli spazi di lavoro non attivi"
   },
   "Groups": {
-    "Groups": ""
+    "Groups": "Gruppi"
   },
   "HDR (EDID)": {
     "HDR (EDID)": "HDR (EDID)"
@@ -2214,7 +2214,7 @@
     "Manual Show/Hide": "Mostra/Nascondi Manuale"
   },
   "Map window class names to icon names for proper icon display": {
-    "Map window class names to icon names for proper icon display": ""
+    "Map window class names to icon names for proper icon display": "Associa i nomi delle classi delle finestre ai nomi delle icone per una corretta visualizzazione"
   },
   "Margin": {
     "Margin": "Margini"
@@ -2439,7 +2439,7 @@
     "New York, NY": "New York, NY"
   },
   "New group name...": {
-    "New group name...": ""
+    "New group name...": "Nome del nuovo gruppo..."
   },
   "Next Transition": {
     "Next Transition": "Prossima Transizione"
@@ -2673,7 +2673,7 @@
     "Options": "Opzioni"
   },
   "Organize widgets into collapsible groups": {
-    "Organize widgets into collapsible groups": ""
+    "Organize widgets into collapsible groups": "Organizza i widget in gruppi comprimibili"
   },
   "Other": {
     "Other": "Altro"
@@ -2748,7 +2748,7 @@
     "Password": "Password"
   },
   "Pattern": {
-    "Pattern": ""
+    "Pattern": "Pattern"
   },
   "Pause": {
     "Pause": "Pausa"
@@ -3012,7 +3012,7 @@
     "Repeat": "Ripetizione"
   },
   "Replacement": {
-    "Replacement": ""
+    "Replacement": "Sostituzione"
   },
   "Report": {
     "Report": "Riepilogo"
@@ -3648,7 +3648,7 @@
     "Sync Mode with Portal": "Modalità Sync con Portale"
   },
   "Sync Position Across Screens": {
-    "Sync Position Across Screens": ""
+    "Sync Position Across Screens": "Sincronizza la posizione tra gli schermi"
   },
   "Sync dark mode with settings portals for system-wide theme hints": {
     "Sync dark mode with settings portals for system-wide theme hints": "Sincronizza tema scuro con impostazioni di sistema"
@@ -3876,7 +3876,7 @@
     "Unfocused Color": "Colore Inattivo"
   },
   "Ungrouped": {
-    "Ungrouped": ""
+    "Ungrouped": "Non Raggruppato"
   },
   "Uninstall Plugin": {
     "Uninstall Plugin": "Disinstalla Plugin"
@@ -3978,13 +3978,13 @@
     "Use light theme instead of dark theme": "Usa tema chiaro invece del tema scuro"
   },
   "Use smaller notification cards": {
-    "Use smaller notification cards": ""
+    "Use smaller notification cards": "Usa schede di notifica più piccole"
   },
   "Use sound theme from system settings": {
     "Use sound theme from system settings": "Usa tema di suoni dalle impostazioni di sistema"
   },
   "Use the same position and size on all displays": {
-    "Use the same position and size on all displays": ""
+    "Use the same position and size on all displays": "Usa la stessa posizione e dimensione su tutti gli schermi"
   },
   "Use trigger prefix to activate": {
     "Use trigger prefix to activate": "Usa il prefisso attivatore per attivare"
@@ -4553,7 +4553,7 @@
     "No wallpaper selected": "Nessuno sfondo selezionato"
   },
   "notification center tab": {
-    "Current": "Attuale",
+    "Current": "Attuali",
     "History": "Cronologia"
   },
   "notification history filter": {
