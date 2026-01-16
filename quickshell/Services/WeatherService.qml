@@ -754,7 +754,7 @@ Singleton {
                                 "humidity": Math.round(hourly.relative_humidity_2m?.[i] || 0),
                                 "wind": Math.round(hourly.wind_speed_10m?.[i] || 0),
                                 "pressure": Math.round(hourly.surface_pressure?.[i] || 0),
-                                "precipitationProbability": Math.round(hourly.precipitation_probability_max?.[0] || 0),
+                                "precipitationProbability": Math.round(hourly.precipitation_probability?.[i] || 0),
                                 "visibility": Math.round(hourly.visibility?.[i] || 0),
                                 "isDay": isDay
                             });
