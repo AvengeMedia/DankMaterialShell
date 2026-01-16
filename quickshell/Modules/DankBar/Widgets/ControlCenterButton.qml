@@ -24,6 +24,7 @@ BasePill {
     property bool showMicPercent: widgetData?.showMicPercent !== undefined ? widgetData.showMicPercent : SettingsData.controlCenterShowMicPercent
     property bool showBatteryIcon: widgetData?.showBatteryIcon !== undefined ? widgetData.showBatteryIcon : SettingsData.controlCenterShowBatteryIcon
     property bool showPrinterIcon: widgetData?.showPrinterIcon !== undefined ? widgetData.showPrinterIcon : SettingsData.controlCenterShowPrinterIcon
+    property bool showScreenSharingIcon: widgetData?.showScreenSharingIcon !== undefined ? widgetData.showScreenSharingIcon : SettingsData.controlCenterShowScreenSharingIcon
     property real touchpadThreshold: 100
     property real micAccumulator: 0
     property real volumeAccumulator: 0
@@ -213,7 +214,25 @@ BasePill {
     }
 
     function hasNoVisibleIcons() {
-        return !root.showNetworkIcon && !root.showBluetoothIcon && !root.showAudioIcon && !root.showVpnIcon && !root.showBrightnessIcon && !root.showMicIcon && !root.showBatteryIcon && !root.showPrinterIcon;
+        if (root.showScreenSharingIcon && NiriService.hasCasts)
+            return false;
+        if (root.showNetworkIcon && NetworkService.networkAvailable)
+            return false;
+        if (root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected)
+            return false;
+        if (root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled)
+            return false;
+        if (root.showAudioIcon)
+            return false;
+        if (root.showMicIcon)
+            return false;
+        if (root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice())
+            return false;
+        if (root.showBatteryIcon && BatteryService.batteryAvailable)
+            return false;
+        if (root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs())
+            return false;
+        return true;
     }
 
     content: Component {
@@ -226,6 +245,14 @@ BasePill {
                 visible: root.isVerticalOrientation
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
+
+                DankIcon {
+                    name: "screen_record"
+                    size: Theme.barIconSize(root.barThickness, -4)
+                    color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    visible: root.showScreenSharingIcon && NiriService.hasCasts
+                }
 
                 DankIcon {
                     name: root.getNetworkIconName()
@@ -401,6 +428,14 @@ BasePill {
                 visible: !root.isVerticalOrientation
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
+
+                DankIcon {
+                    name: "screen_record"
+                    size: Theme.barIconSize(root.barThickness, -4)
+                    color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.showScreenSharingIcon && NiriService.hasCasts
+                }
 
                 DankIcon {
                     id: networkIcon
