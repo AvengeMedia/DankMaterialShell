@@ -132,6 +132,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "lockScreenPowerOffMonitorsOnLock"
+                    tags: ["lock", "screen", "monitor", "display", "dpms", "power"]
+                    text: I18n.tr("Power off monitors on lock")
+                    description: I18n.tr("Turn off all displays immediately when the lock screen activates")
+                    checked: SettingsData.lockScreenPowerOffMonitorsOnLock
+                    onToggled: checked => SettingsData.set("lockScreenPowerOffMonitorsOnLock", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "enableFprint"
                     tags: ["lock", "screen", "fingerprint", "authentication", "biometric", "fprint"]
                     text: I18n.tr("Enable fingerprint authentication")

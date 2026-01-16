@@ -774,19 +774,31 @@ Singleton {
     }
 
     function powerOffMonitors() {
-        return send({
-            "Action": {
-                "PowerOffMonitors": {}
-            }
+        Proc.runCommand("niri-power-off-monitors", ["niri", "msg", "action", "power-off-monitors"], (output, exitCode) => {
+            if (exitCode === 0)
+                return;
+            console.warn("NiriService: Failed to power off monitors via niri msg, falling back to socket");
+            send({
+                "Action": {
+                    "PowerOffMonitors": {}
+                }
+            });
         });
+        return true;
     }
 
     function powerOnMonitors() {
-        return send({
-            "Action": {
-                "PowerOnMonitors": {}
-            }
+        Proc.runCommand("niri-power-on-monitors", ["niri", "msg", "action", "power-on-monitors"], (output, exitCode) => {
+            if (exitCode === 0)
+                return;
+            console.warn("NiriService: Failed to power on monitors via niri msg, falling back to socket");
+            send({
+                "Action": {
+                    "PowerOnMonitors": {}
+                }
+            });
         });
+        return true;
     }
 
     function cycleKeyboardLayout() {

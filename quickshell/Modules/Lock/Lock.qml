@@ -12,8 +12,34 @@ Scope {
 
     property string sharedPasswordBuffer: ""
     property bool shouldLock: false
+
+    onShouldLockChanged: {
+        if (shouldLock && lockPowerOffArmed) {
+            lockStateCheck.restart();
+        }
+    }
+
+    Timer {
+        id: lockStateCheck
+        interval: 100
+        repeat: false
+        onTriggered: {
+            if (sessionLock.locked && lockPowerOffArmed) {
+                pendingLock = false;
+                IdleService.monitorsOff = true;
+                CompositorService.powerOffMonitors();
+                lockWakeAllowed = false;
+                lockWakeDebounce.restart();
+                lockPowerOffArmed = false;
+                dpmsReapplyTimer.start();
+            }
+        }
+    }
+
     property bool lockInitiatedLocally: false
     property bool pendingLock: false
+    property bool lockPowerOffArmed: false
+    property bool lockWakeAllowed: false
 
     Component.onCompleted: {
         IdleService.lockComponent = this;
@@ -37,6 +63,7 @@ Scope {
             return;
 
         lockInitiatedLocally = true;
+        lockPowerOffArmed = SettingsData.lockScreenPowerOffMonitorsOnLock;
 
         if (!SessionService.active && SessionService.loginctlAvailable) {
             pendingLock = true;
@@ -78,6 +105,7 @@ Scope {
                 return;
             }
             lockInitiatedLocally = false;
+            lockPowerOffArmed = SettingsData.lockScreenPowerOffMonitorsOnLock;
             shouldLock = true;
         }
 
@@ -96,11 +124,13 @@ Scope {
             if (SessionService.active && pendingLock) {
                 pendingLock = false;
                 lockInitiatedLocally = true;
+                lockPowerOffArmed = SettingsData.lockScreenPowerOffMonitorsOnLock;
                 shouldLock = true;
                 return;
             }
             if (SessionService.locked && !shouldLock && !pendingLock) {
                 lockInitiatedLocally = false;
+                lockPowerOffArmed = SettingsData.lockScreenPowerOffMonitorsOnLock;
                 shouldLock = true;
             }
         }
@@ -118,13 +148,6 @@ Scope {
         id: sessionLock
 
         locked: shouldLock
-
-        onLockedChanged: {
-            if (locked) {
-                pendingLock = false;
-                dpmsReapplyTimer.start();
-            }
-        }
 
         WlSessionLockSurface {
             id: lockSurface
@@ -155,7 +178,33 @@ Scope {
         }
     }
 
+    Connections {
+        target: sessionLock
+
+        function onLockedChanged() {
+            if (sessionLock.locked) {
+                pendingLock = false;
+                if (lockPowerOffArmed && SettingsData.lockScreenPowerOffMonitorsOnLock) {
+                    IdleService.monitorsOff = true;
+                    CompositorService.powerOffMonitors();
+                    lockWakeAllowed = false;
+                    lockWakeDebounce.restart();
+                }
+                lockPowerOffArmed = false;
+                dpmsReapplyTimer.start();
+                return;
+            }
+
+            lockWakeAllowed = false;
+            if (IdleService.monitorsOff && SettingsData.lockScreenPowerOffMonitorsOnLock) {
+                IdleService.monitorsOff = false;
+                CompositorService.powerOnMonitors();
+            }
+        }
+    }
+
     LockScreenDemo {
+
         id: demoWindow
     }
 
@@ -199,5 +248,47 @@ Scope {
         interval: 100
         repeat: false
         onTriggered: IdleService.reapplyDpmsIfNeeded()
+    }
+
+    Timer {
+        id: lockWakeDebounce
+        interval: 200
+        repeat: false
+        onTriggered: {
+            if (!sessionLock.locked)
+                return;
+            if (!SettingsData.lockScreenPowerOffMonitorsOnLock)
+                return;
+            if (!IdleService.monitorsOff) {
+                lockWakeAllowed = true;
+                return;
+            }
+            if (lockWakeAllowed) {
+                IdleService.monitorsOff = false;
+                CompositorService.powerOnMonitors();
+            } else {
+                lockWakeAllowed = true;
+            }
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        enabled: sessionLock.locked
+        hoverEnabled: enabled
+        onPressed: lockWakeDebounce.restart()
+        onPositionChanged: lockWakeDebounce.restart()
+        onWheel: lockWakeDebounce.restart()
+    }
+
+    FocusScope {
+        anchors.fill: parent
+        focus: sessionLock.locked
+
+        Keys.onPressed: event => {
+            if (!sessionLock.locked)
+                return;
+            lockWakeDebounce.restart();
+        }
     }
 }
