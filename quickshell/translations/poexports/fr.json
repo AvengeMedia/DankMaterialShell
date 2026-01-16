@@ -303,7 +303,7 @@
     "Apply warm color temperature to reduce eye strain. Use automation settings below to control when it activates.": "Appliquer une température de couleur chaude pour réduire la fatigue visuelle. Utilisez les paramètres d’automatisation ci-dessous pour définir son activation."
   },
   "Apps Icon": {
-    "Apps Icon": "Icône des applications"
+    "Apps Icon": "Icône des applis"
   },
   "Apps are ordered by usage frequency, then last used, then alphabetically.": {
     "Apps are ordered by usage frequency, then last used, then alphabetically.": "Les applications sont classées par fréquence d’utilisation, puis par dernière utilisation, puis par ordre alphabétique."
@@ -2619,7 +2619,7 @@
     "Numbers": "Nombres"
   },
   "OS Logo": {
-    "OS Logo": "Logo du système"
+    "OS Logo": "Logo de l'OS"
   },
   "OSD Position": {
     "OSD Position": "Position de l’OSD"
@@ -3867,7 +3867,7 @@
     "Typography": "Typographie"
   },
   "Typography & Motion": {
-    "Typography & Motion": "Typographie et mouvement"
+    "Typography & Motion": "Typographie et animation"
   },
   "Unavailable": {
     "Unavailable": "Indisponible"
