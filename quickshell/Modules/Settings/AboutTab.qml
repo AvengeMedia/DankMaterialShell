@@ -192,14 +192,21 @@ Item {
                             // Fedora COPR git format: 0.0.git.2267.d430cae9
                             match = version.match(/^[\d.]+\.git\.(\d+)\./);
                             if (match) {
-                                let baseVersion = "";
-                                if (cliVersion) {
-                                    const cliMatch = cliVersion.match(/^([\d.]+)/);
-                                    if (cliMatch)
-                                        baseVersion = cliMatch[1];
+                                function extractBaseVersion(value) {
+                                    if (!value)
+                                        return "";
+                                    let baseMatch = value.match(/(\d+\.\d+\.\d+)/);
+                                    if (baseMatch)
+                                        return baseMatch[1];
+                                    baseMatch = value.match(/(\d+\.\d+)/);
+                                    if (baseMatch)
+                                        return baseMatch[1];
+                                    return "";
                                 }
+
+                                let baseVersion = extractBaseVersion(cliVersion);
                                 if (!baseVersion)
-                                    baseVersion = SystemUpdateService.semverVersion || "";
+                                    baseVersion = extractBaseVersion(SystemUpdateService.semverVersion);
                                 if (baseVersion) {
                                     return `dms (git) v${baseVersion}-${match[1]}`;
                                 }
