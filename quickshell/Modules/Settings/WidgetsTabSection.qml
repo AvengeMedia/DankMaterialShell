@@ -31,6 +31,19 @@ Column {
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
 
+    function cloneWidgetData(widget) {
+        var result = {
+            "id": widget.id,
+            "enabled": widget.enabled
+        };
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon"];
+        for (var i = 0; i < keys.length; i++) {
+            if (widget[keys[i]] !== undefined)
+                result[keys[i]] = widget[keys[i]];
+        }
+        return result;
+    }
+
     width: parent.width
     height: implicitHeight
     spacing: Theme.spacingM
@@ -727,13 +740,7 @@ Column {
                                     var newItems = root.items.slice();
                                     var draggedItem = newItems.splice(index, 1)[0];
                                     newItems.splice(newIndex, 0, draggedItem);
-                                    root.itemOrderChanged(newItems.map(item => {
-                                        return ({
-                                                "id": item.id,
-                                                "enabled": item.enabled,
-                                                "size": item.size
-                                            });
-                                    }));
+                                    root.itemOrderChanged(newItems.map(item => root.cloneWidgetData(item)));
                                 }
                             }
                             delegateItem.x = 0;
