@@ -29,6 +29,7 @@ BasePill {
     property real micAccumulator: 0
     property real volumeAccumulator: 0
     property real brightnessAccumulator: 0
+    readonly property real vIconSize: Theme.barIconSize(root.barThickness, -4)
 
     Loader {
         active: root.showPrinterIcon
@@ -246,53 +247,75 @@ BasePill {
                 anchors.centerIn: parent
                 spacing: Theme.spacingXS
 
-                DankIcon {
-                    name: "screen_record"
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showScreenSharingIcon && NiriService.hasCasts
+
+                    DankIcon {
+                        name: "screen_record"
+                        size: root.vIconSize
+                        color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
+                        anchors.centerIn: parent
+                    }
                 }
 
-                DankIcon {
-                    name: root.getNetworkIconName()
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: root.getNetworkIconColor()
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showNetworkIcon && NetworkService.networkAvailable
+
+                    DankIcon {
+                        name: root.getNetworkIconName()
+                        size: root.vIconSize
+                        color: root.getNetworkIconColor()
+                        anchors.centerIn: parent
+                    }
                 }
 
-                DankIcon {
-                    name: "vpn_lock"
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected
+
+                    DankIcon {
+                        name: "vpn_lock"
+                        size: root.vIconSize
+                        color: NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText
+                        anchors.centerIn: parent
+                    }
                 }
 
-                DankIcon {
-                    name: "bluetooth"
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: BluetoothService.connected ? Theme.primary : Theme.surfaceText
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
+
+                    DankIcon {
+                        name: "bluetooth"
+                        size: root.vIconSize
+                        color: BluetoothService.connected ? Theme.primary : Theme.surfaceText
+                        anchors.centerIn: parent
+                    }
                 }
 
-                Rectangle {
-                    width: audioIconV.implicitWidth + 4
-                    height: audioIconV.implicitHeight + (root.showAudioPercent ? audioPercentV.implicitHeight : 0) + 4
-                    color: "transparent"
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize + (root.showAudioPercent ? audioPercentV.implicitHeight + 2 : 0)
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showAudioIcon
 
                     DankIcon {
                         id: audioIconV
                         name: root.getVolumeIconName()
-                        size: Theme.barIconSize(root.barThickness, -4)
+                        size: root.vIconSize
                         color: Theme.widgetIconColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        anchors.topMargin: 2
                     }
 
                     StyledText {
@@ -319,21 +342,19 @@ BasePill {
                     }
                 }
 
-                Rectangle {
-                    width: micIconV.implicitWidth + 4
-                    height: micIconV.implicitHeight + (root.showAudioPercent ? micPercentV.implicitHeight : 0) + 4
-                    color: "transparent"
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize + (root.showMicPercent ? micPercentV.implicitHeight + 2 : 0)
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showMicIcon
 
                     DankIcon {
                         id: micIconV
                         name: root.getMicIconName()
-                        size: Theme.barIconSize(root.barThickness, -4)
+                        size: root.vIconSize
                         color: root.getMicIconColor()
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        anchors.topMargin: 2
                     }
 
                     StyledText {
@@ -360,21 +381,19 @@ BasePill {
                     }
                 }
 
-                Rectangle {
-                    width: brightnessIconV.implicitWidth + 4
-                    height: brightnessIconV.implicitHeight + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight : 0) + 4
-                    color: "transparent"
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight + 2 : 0)
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice()
 
                     DankIcon {
                         id: brightnessIconV
                         name: root.getBrightnessIconName()
-                        size: Theme.barIconSize(root.barThickness, -4)
+                        size: root.vIconSize
                         color: Theme.widgetIconColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        anchors.topMargin: 2
                     }
 
                     StyledText {
@@ -398,28 +417,46 @@ BasePill {
                     }
                 }
 
-                DankIcon {
-                    name: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: root.getBatteryIconColor()
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBatteryIcon && BatteryService.batteryAvailable
+
+                    DankIcon {
+                        name: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
+                        size: root.vIconSize
+                        color: root.getBatteryIconColor()
+                        anchors.centerIn: parent
+                    }
                 }
 
-                DankIcon {
-                    name: "print"
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: Theme.primary
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs()
+
+                    DankIcon {
+                        name: "print"
+                        size: root.vIconSize
+                        color: Theme.primary
+                        anchors.centerIn: parent
+                    }
                 }
 
-                DankIcon {
-                    name: "settings"
-                    size: Theme.barIconSize(root.barThickness, -4)
-                    color: root.isActive ? Theme.primary : Theme.widgetIconColor
+                Item {
+                    width: root.vIconSize
+                    height: root.vIconSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.hasNoVisibleIcons()
+
+                    DankIcon {
+                        name: "settings"
+                        size: root.vIconSize
+                        color: root.isActive ? Theme.primary : Theme.widgetIconColor
+                        anchors.centerIn: parent
+                    }
                 }
             }
 
