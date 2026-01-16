@@ -63,15 +63,15 @@ Item {
                     onToggled: checked => SettingsData.set("showWorkspaceApps", checked)
                 }
 
-                Row {
-                    width: parent.width - Theme.spacingL
-                    spacing: Theme.spacingL
+                Item {
+                    width: parent.width
+                    height: maxAppsColumn.height
                     visible: SettingsData.showWorkspaceApps
                     opacity: visible ? 1 : 0
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.spacingL
 
                     Column {
+                        id: maxAppsColumn
+                        x: Theme.spacingL
                         width: 120
                         spacing: Theme.spacingS
 
@@ -80,14 +80,15 @@ Item {
                             font.pixelSize: Theme.fontSizeSmall
                             color: Theme.surfaceText
                             font.weight: Font.Medium
+                            horizontalAlignment: Text.AlignLeft
                         }
 
                         DankTextField {
                             width: 100
                             height: 28
-                            placeholderText: "#ffffff"
+                            placeholderText: "3"
                             text: SettingsData.maxWorkspaceIcons
-                            maximumLength: 7
+                            maximumLength: 2
                             font.pixelSize: Theme.fontSizeSmall
                             topPadding: Theme.spacingXS
                             bottomPadding: Theme.spacingXS

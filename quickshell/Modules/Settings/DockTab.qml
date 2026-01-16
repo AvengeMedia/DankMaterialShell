@@ -29,6 +29,9 @@ Item {
                 SettingsButtonGroupRow {
                     text: I18n.tr("Position")
                     model: ["Top", "Bottom", "Left", "Right"]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (SettingsData.dockPosition) {
                         case SettingsData.Position.Top:
@@ -129,6 +132,9 @@ Item {
                     tags: ["dock", "indicator", "style", "circle", "line"]
                     text: I18n.tr("Indicator Style")
                     model: ["Circle", "Line"]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: SettingsData.dockIndicatorStyle === "circle" ? 0 : 1
                     onSelectionChanged: (index, selected) => {
                         if (selected) {
@@ -225,6 +231,9 @@ Item {
                     description: I18n.tr("Choose the border accent color")
                     visible: SettingsData.dockBorderEnabled
                     model: ["Surface", "Secondary", "Primary"]
+                    buttonPadding: Theme.spacingS
+                    minButtonWidth: 44
+                    textSize: Theme.fontSizeSmall
                     currentIndex: {
                         switch (SettingsData.dockBorderColor) {
                         case "surfaceText":
