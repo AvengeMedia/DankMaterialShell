@@ -11,12 +11,18 @@ let
 
   inherit (config.services.greetd.settings.default_session) user;
 
+  compositorPackage =
+    let
+      configured = lib.attrByPath [ "programs" cfg.compositor.name "package" ] null config;
+    in
+    if configured != null then configured else builtins.getAttr cfg.compositor.name pkgs;
+
   cacheDir = "/var/lib/dms-greeter";
   greeterScript = pkgs.writeShellScriptBin "dms-greeter" ''
     export PATH=$PATH:${
       lib.makeBinPath [
         cfg.quickshell.package
-        config.programs.${cfg.compositor.name}.package
+        compositorPackage
       ]
     }
     ${
@@ -64,6 +70,7 @@ in
         "niri"
         "hyprland"
         "sway"
+        "labwc"
       ];
       description = "Compositor to run greeter in";
     };
