@@ -394,6 +394,7 @@ Singleton {
     property bool lockScreenShowDate: true
     property bool lockScreenShowProfileImage: true
     property bool lockScreenShowPasswordField: true
+    property bool lockScreenPowerOffMonitorsOnLock: false
 
     property bool enableFprint: false
     property int maxFprintTries: 15

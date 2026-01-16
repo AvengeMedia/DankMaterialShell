@@ -259,6 +259,7 @@ var SPEC = {
     lockScreenShowDate: { def: true },
     lockScreenShowProfileImage: { def: true },
     lockScreenShowPasswordField: { def: true },
+    lockScreenPowerOffMonitorsOnLock: { def: false },
     enableFprint: { def: false },
     maxFprintTries: { def: 15 },
     fprintdAvailable: { def: false, persist: false },
