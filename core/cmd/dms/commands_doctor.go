@@ -87,6 +87,8 @@ var (
 	swayVersionRegex       = regexp.MustCompile(`sway version (\d+\.\d+)`)
 	riverVersionRegex      = regexp.MustCompile(`river (\d+\.\d+)`)
 	wayfireVersionRegex    = regexp.MustCompile(`wayfire (\d+\.\d+)`)
+	labwcVersionRegex      = regexp.MustCompile(`labwc (\d+\.\d+\.\d+)`)
+	mangowcVersionRegex    = regexp.MustCompile(`mango (\d+\.\d+\.\d+)`)
 )
 
 var doctorCmd = &cobra.Command{
@@ -448,11 +450,13 @@ func checkWindowManagers() []checkResult {
 		versionRegex                 *regexp.Regexp
 		commands                     []string
 	}{
-		{"Hyprland", "hyprctl", "version", hyprlandVersionRegex, []string{"hyprland", "Hyprland"}},
+		{"Hyprland", "Hyprland", "--version", hyprlandVersionRegex, []string{"hyprland", "Hyprland"}},
 		{"niri", "niri", "--version", niriVersionRegex, []string{"niri"}},
 		{"Sway", "sway", "--version", swayVersionRegex, []string{"sway"}},
 		{"River", "river", "-version", riverVersionRegex, []string{"river"}},
 		{"Wayfire", "wayfire", "--version", wayfireVersionRegex, []string{"wayfire"}},
+		{"labwc", "labwc", "--version", labwcVersionRegex, []string{"labwc"}},
+		{"mangowc", "mango", "-v", mangowcVersionRegex, []string{"mango"}},
 	}
 
 	var results []checkResult
@@ -498,8 +502,8 @@ func checkWindowManagers() []checkResult {
 }
 
 func getVersionFromCommand(cmd, arg string, regex *regexp.Regexp) string {
-	output, err := exec.Command(cmd, arg).Output()
-	if err != nil {
+	output, err := exec.Command(cmd, arg).CombinedOutput()
+	if err != nil && len(output) == 0 {
 		return "installed"
 	}
 
