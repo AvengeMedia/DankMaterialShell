@@ -244,13 +244,13 @@ BasePill {
             Column {
                 id: controlColumn
                 visible: root.isVerticalOrientation
-                anchors.centerIn: parent
+                width: root.vIconSize
+                anchors.horizontalCenter: parent.horizontalCenter
                 spacing: Theme.spacingXS
 
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showScreenSharingIcon && NiriService.hasCasts
 
                     DankIcon {
@@ -264,7 +264,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showNetworkIcon && NetworkService.networkAvailable
 
                     DankIcon {
@@ -278,7 +277,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected
 
                     DankIcon {
@@ -292,7 +290,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
 
                     DankIcon {
@@ -306,7 +303,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize + (root.showAudioPercent ? audioPercentV.implicitHeight + 2 : 0)
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showAudioIcon
 
                     DankIcon {
@@ -345,7 +341,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize + (root.showMicPercent ? micPercentV.implicitHeight + 2 : 0)
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showMicIcon
 
                     DankIcon {
@@ -384,7 +379,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize + (root.showBrightnessPercent ? brightnessPercentV.implicitHeight + 2 : 0)
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBrightnessIcon && DisplayService.brightnessAvailable && root.hasPinnedBrightnessDevice()
 
                     DankIcon {
@@ -420,7 +414,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showBatteryIcon && BatteryService.batteryAvailable
 
                     DankIcon {
@@ -434,7 +427,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs()
 
                     DankIcon {
@@ -448,7 +440,6 @@ BasePill {
                 Item {
                     width: root.vIconSize
                     height: root.vIconSize
-                    anchors.horizontalCenter: parent.horizontalCenter
                     visible: root.hasNoVisibleIcons()
 
                     DankIcon {
