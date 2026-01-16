@@ -609,6 +609,20 @@ Item {
         }
     }
 
+    function getWorkspaceIndexFallback(modelData, index) {
+        if (root.useExtWorkspace)
+            return index + 1;
+        if (CompositorService.isNiri)
+            return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
+        if (CompositorService.isHyprland)
+            return modelData?.id || "";
+        if (CompositorService.isDwl)
+            return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
+        if (CompositorService.isSway || CompositorService.isScroll)
+            return modelData?.num || "";
+        return modelData - 1;
+    }
+
     function getWorkspaceIndex(modelData, index) {
         let isPlaceholder;
         if (root.useExtWorkspace) {
@@ -628,28 +642,28 @@ Item {
         if (isPlaceholder)
             return index + 1;
 
+        let workspaceName = "";
         if (SettingsData.showWorkspaceName) {
-            let workspaceName = modelData?.name;
+            workspaceName = modelData?.name ?? "";
 
             if (workspaceName && workspaceName !== "") {
                 if (root.isVertical) {
-                    return workspaceName.charAt(0);
+                    workspaceName = workspaceName.charAt(0);
                 }
-                return workspaceName;
+            } else {
+                workspaceName = "";
             }
         }
 
-        if (root.useExtWorkspace)
-            return index + 1;
-        if (CompositorService.isNiri)
-            return (modelData?.idx !== undefined && modelData?.idx !== -1) ? modelData.idx : "";
-        if (CompositorService.isHyprland)
-            return modelData?.id || "";
-        if (CompositorService.isDwl)
-            return (modelData?.tag !== undefined) ? (modelData.tag + 1) : "";
-        if (CompositorService.isSway || CompositorService.isScroll)
-            return modelData?.num || "";
-        return modelData - 1;
+        if (workspaceName) {
+            if (SettingsData.showWorkspaceIndex) {
+                const indexLabel = getWorkspaceIndexFallback(modelData, index);
+                return indexLabel ? `${indexLabel}: ${workspaceName}` : workspaceName;
+            }
+            return workspaceName;
+        }
+
+        return getWorkspaceIndexFallback(modelData, index);
     }
 
     readonly property bool hasNativeWorkspaceSupport: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll
