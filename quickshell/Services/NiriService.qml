@@ -49,7 +49,7 @@ Singleton {
 
     function setWorkspaces(newMap) {
         root.workspaces = newMap;
-        allWorkspaces = Object.values(newMap).sort((a, b) => a.idx - b.idx);
+        root.allWorkspaces = Object.values(newMap).sort((a, b) => a.idx - b.idx);
     }
 
     Component.onCompleted: fetchOutputs()
@@ -863,9 +863,13 @@ Singleton {
         return currentOutputWorkspaces.map(w => w.idx + 1);
     }
 
+    function getCurrentOutputWorkspaces() {
+        return currentOutputWorkspaces.slice();
+    }
+
     function getCurrentWorkspaceNumber() {
         if (focusedWorkspaceIndex >= 0 && focusedWorkspaceIndex < allWorkspaces.length) {
-            return allWorkspaces[focusedWorkspaceIndex].idx + 1;
+            return allWorkspaces[focusedWorkspaceIndex].idx;
         }
         return 1;
     }
