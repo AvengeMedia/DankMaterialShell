@@ -98,6 +98,9 @@ in
       Service = {
         ExecStart = lib.getExe dmsPkgs.dms-shell + " run --session";
         Restart = "on-failure";
+        Environment = [
+          "PATH=${lib.makeBinPath common.packages}"
+        ];
       };
 
       Install.WantedBy = [ cfg.systemd.target ];
