@@ -200,6 +200,46 @@ Item {
                 }
 
                 SettingsButtonGroupRow {
+                    text: I18n.tr("Occupied Color")
+                    model: ["sec", "s", "sc", "sch", "none"]
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+                    buttonHeight: 22
+                    minButtonWidth: 36
+                    buttonPadding: Theme.spacingS
+                    checkIconSize: Theme.iconSizeSmall - 2
+                    textSize: Theme.fontSizeSmall - 1
+                    spacing: 1
+                    currentIndex: {
+                        switch (SettingsData.wokspaceColorMode) {
+                        case "s":
+                            return 1;
+                        case "sc":
+                            return 2;
+                        case "sch":
+                            return 3;
+                        case "none":
+                            return 4;
+                        default:
+                            return 0;
+                        }
+                    }
+                    onSelectionChanged: (index, selected) => {
+                        if (!selected)
+                            return;
+                        const modes = ["default", "s", "sc", "sch", "none"];
+                        SettingsData.set("workspaceOccupiedColorMode", modes[index]);
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: Theme.outline
+                    opacity: 0.15
+                    visible: CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl
+                }
+
+                SettingsButtonGroupRow {
                     text: I18n.tr("Unfocused Color")
                     model: ["def", "s", "sc", "sch"]
                     buttonHeight: 22

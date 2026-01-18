@@ -206,6 +206,7 @@ Singleton {
     property bool reverseScrolling: false
     property bool dwlShowAllTags: false
     property string workspaceColorMode: "default"
+    property string workspaceOccupiedColorMode: "default"
     property string workspaceUnfocusedColorMode: "default"
     property string workspaceUrgentColorMode: "default"
     property bool workspaceFocusedBorderEnabled: false
