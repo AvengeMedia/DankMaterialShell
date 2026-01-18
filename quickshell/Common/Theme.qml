@@ -754,7 +754,9 @@ Singleton {
 
     function barIconSize(barThickness, offset) {
         const defaultOffset = offset !== undefined ? offset : -6;
-        return Math.round((barThickness / 48) * (iconSize + defaultOffset));
+        const size = (SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")).noBackground ? iconSizeLarge : iconSize;
+
+        return Math.round((barThickness / 48) * (size + defaultOffset));
     }
 
     function barTextSize(barThickness, fontScale) {
