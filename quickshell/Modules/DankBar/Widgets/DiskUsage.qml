@@ -112,7 +112,7 @@ BasePill {
 
                 DankIcon {
                     name: "storage"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (root.diskUsagePercent > 90) {
                             return Theme.tempDanger;
@@ -146,7 +146,7 @@ BasePill {
 
                 DankIcon {
                     name: "storage"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (root.diskUsagePercent > 90) {
                             return Theme.tempDanger;

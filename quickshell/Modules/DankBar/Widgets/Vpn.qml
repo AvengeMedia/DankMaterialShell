@@ -41,7 +41,7 @@ BasePill {
                 id: icon
 
                 name: DMSNetworkService.connected ? "vpn_lock" : "vpn_key_off"
-                size: Theme.barIconSize(root.barThickness, -4)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                 color: DMSNetworkService.connected ? Theme.primary : Theme.widgetIconColor
                 opacity: DMSNetworkService.isBusy ? 0.5 : 1.0
                 anchors.centerIn: parent

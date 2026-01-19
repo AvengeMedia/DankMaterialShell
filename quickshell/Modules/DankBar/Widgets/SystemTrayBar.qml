@@ -198,8 +198,8 @@ Item {
                         IconImage {
                             id: iconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness)
-                            height: Theme.barIconSize(root.barThickness)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                             source: delegateRoot.iconSource
                             asynchronous: true
                             smooth: true
@@ -262,7 +262,7 @@ Item {
                     DankIcon {
                         anchors.centerIn: parent
                         name: root.menuOpen ? "expand_less" : "expand_more"
-                        size: Theme.barIconSize(root.barThickness)
+                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                         color: Theme.widgetTextColor
                     }
 
@@ -331,8 +331,8 @@ Item {
                         IconImage {
                             id: iconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness)
-                            height: Theme.barIconSize(root.barThickness)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                             source: delegateRoot.iconSource
                             asynchronous: true
                             smooth: true
@@ -402,7 +402,7 @@ Item {
                                 return root.menuOpen ? "chevron_right" : "chevron_left";
                             }
                         }
-                        size: Theme.barIconSize(root.barThickness)
+                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                         color: Theme.widgetTextColor
                     }
 
@@ -754,8 +754,8 @@ Item {
                         IconImage {
                             id: menuIconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness)
-                            height: Theme.barIconSize(root.barThickness)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                             source: parent.iconSource
                             asynchronous: true
                             smooth: true

@@ -467,7 +467,7 @@ Item {
     readonly property real padding: Math.max(Theme.spacingXS, Theme.spacingS * (widgetHeight / 30))
     readonly property real visualWidth: isVertical ? widgetHeight : (workspaceRow.implicitWidth + padding * 2)
     readonly property real visualHeight: isVertical ? (workspaceRow.implicitHeight + padding * 2) : widgetHeight
-    readonly property real appIconSize: Theme.barIconSize(barThickness, -6)
+    readonly property real appIconSize: Theme.barIconSize(barThickness, -6, root.barConfig?.noBackground)
 
     function getRealWorkspaces() {
         return root.workspaceList.filter(ws => {

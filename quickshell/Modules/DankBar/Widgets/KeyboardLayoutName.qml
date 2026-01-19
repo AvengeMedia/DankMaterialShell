@@ -61,7 +61,7 @@ BasePill {
 
                 DankIcon {
                     name: "keyboard"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }

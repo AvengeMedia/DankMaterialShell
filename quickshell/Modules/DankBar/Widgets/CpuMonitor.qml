@@ -36,7 +36,7 @@ BasePill {
 
                 DankIcon {
                     name: "memory"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (DgopService.cpuUsage > 80) {
                             return Theme.tempDanger;
@@ -74,7 +74,7 @@ BasePill {
                 DankIcon {
                     id: cpuIcon
                     name: "memory"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (DgopService.cpuUsage > 80) {
                             return Theme.tempDanger;

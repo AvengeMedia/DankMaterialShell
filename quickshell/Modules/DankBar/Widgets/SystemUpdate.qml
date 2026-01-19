@@ -36,7 +36,7 @@ BasePill {
                         return "system_update_alt";
                     return "check_circle";
                 }
-                size: Theme.barIconSize(root.barThickness, -4)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                 color: {
                     if (SystemUpdateService.hasError)
                         return Theme.error;
@@ -93,7 +93,7 @@ BasePill {
                             return "system_update_alt";
                         return "check_circle";
                     }
-                    size: Theme.barIconSize(root.barThickness, -4)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                     color: {
                         if (SystemUpdateService.hasError)
                             return Theme.error;

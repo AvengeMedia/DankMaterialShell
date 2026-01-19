@@ -36,7 +36,7 @@ BasePill {
 
                 DankIcon {
                     name: "device_thermostat"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (DgopService.cpuTemperature > 85) {
                             return Theme.tempDanger;
@@ -74,7 +74,7 @@ BasePill {
                 DankIcon {
                     id: cpuTempIcon
                     name: "device_thermostat"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (DgopService.cpuTemperature > 85) {
                             return Theme.tempDanger;

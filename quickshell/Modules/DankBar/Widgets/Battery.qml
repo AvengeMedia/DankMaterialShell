@@ -42,7 +42,7 @@ BasePill {
 
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
-                    size: Theme.barIconSize(battery.barThickness)
+                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.noBackground)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -78,7 +78,7 @@ BasePill {
 
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
-                    size: Theme.barIconSize(battery.barThickness, -4)
+                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.noBackground)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;

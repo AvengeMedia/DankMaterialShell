@@ -752,9 +752,9 @@ Singleton {
         return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) < 0.5;
     }
 
-    function barIconSize(barThickness, offset) {
+    function barIconSize(barThickness, offset, noBackground) {
         const defaultOffset = offset !== undefined ? offset : -6;
-        const size = (SettingsData.barConfigs[0] || SettingsData.getBarConfig("default")).noBackground ? iconSizeLarge : iconSize;
+        const size = (noBackground ?? false) ? iconSizeLarge : iconSize;
 
         return Math.round((barThickness / 48) * (size + defaultOffset));
     }

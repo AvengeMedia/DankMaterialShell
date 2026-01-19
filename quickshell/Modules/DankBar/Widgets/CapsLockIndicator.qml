@@ -45,7 +45,7 @@ BasePill {
             DankIcon {
                 anchors.centerIn: parent
                 name: "shift_lock"
-                size: Theme.barIconSize(root.barThickness)
+                size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                 color: Theme.primary
             }
         }

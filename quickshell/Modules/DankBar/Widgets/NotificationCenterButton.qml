@@ -18,7 +18,7 @@ BasePill {
                 id: notifIcon
                 anchors.centerIn: parent
                 name: SessionData.doNotDisturb ? "notifications_off" : "notifications"
-                size: Theme.barIconSize(root.barThickness, -4)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                 color: SessionData.doNotDisturb ? Theme.primary : (root.isActive ? Theme.primary : Theme.widgetIconColor)
             }
 

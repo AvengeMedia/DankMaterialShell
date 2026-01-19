@@ -59,8 +59,8 @@ Item {
     readonly property bool hasVerticalPill: verticalBarPill !== null
     readonly property bool hasPopout: popoutContent !== null
 
-    readonly property int iconSize: Theme.barIconSize(barThickness, -4)
-    readonly property int iconSizeLarge: Theme.barIconSize(barThickness)
+    readonly property int iconSize: Theme.barIconSize(barThickness, -4, root.barConfig?.noBackground)
+    readonly property int iconSizeLarge: Theme.barIconSize(barThickness, undefined, root.barConfig?.noBackground)
 
     Component.onCompleted: {
         loadPluginData();

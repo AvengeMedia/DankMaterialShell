@@ -16,7 +16,7 @@ BasePill {
             DankIcon {
                 anchors.centerIn: parent
                 name: "power_settings_new"
-                size: Theme.barIconSize(root.barThickness)
+                size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                 color: Theme.widgetIconColor
             }
         }

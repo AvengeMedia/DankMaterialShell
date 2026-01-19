@@ -30,7 +30,7 @@ BasePill {
 
                 DankIcon {
                     name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                    size: Theme.barIconSize(root.barThickness, -6)
+                    size: Theme.barIconSize(root.barThickness, -6, root.barConfig?.noBackground)
                     color: Theme.widgetIconColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -57,7 +57,7 @@ BasePill {
 
                 DankIcon {
                     name: WeatherService.getWeatherIcon(WeatherService.weather.wCode)
-                    size: Theme.barIconSize(root.barThickness, -6)
+                    size: Theme.barIconSize(root.barThickness, -6, root.barConfig?.noBackground)
                     color: Theme.widgetIconColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

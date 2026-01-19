@@ -104,7 +104,7 @@ BasePill {
 
                 DankIcon {
                     name: "auto_awesome_mosaic"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (root.displayTemp > 80) {
                             return Theme.tempDanger;
@@ -142,7 +142,7 @@ BasePill {
                 DankIcon {
                     id: gpuTempIcon
                     name: "auto_awesome_mosaic"
-                    size: Theme.barIconSize(root.barThickness)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
                     color: {
                         if (root.displayTemp > 80) {
                             return Theme.tempDanger;

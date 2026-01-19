@@ -57,7 +57,7 @@ BasePill {
 
                 DankIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness)
+                    size: Theme.barIconSize(layout.barThickness, undefined, layout.barConfig?.noBackground)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -78,7 +78,7 @@ BasePill {
 
                 DankIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness, -4)
+                    size: Theme.barIconSize(layout.barThickness, -4, layout.barConfig?.noBackground)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

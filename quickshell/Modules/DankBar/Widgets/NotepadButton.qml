@@ -44,7 +44,7 @@ BasePill {
 
                 anchors.centerIn: parent
                 name: "assignment"
-                size: Theme.barIconSize(root.barThickness, -4)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                 color: root.isActive ? Theme.primary : Theme.surfaceText
             }
         }

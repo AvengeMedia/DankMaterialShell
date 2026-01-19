@@ -18,7 +18,7 @@ BasePill {
             DankIcon {
                 anchors.centerIn: parent
                 name: "palette"
-                size: Theme.barIconSize(root.barThickness, -4)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
                 color: root.isActive ? Theme.primary : Theme.surfaceText
             }
         }
