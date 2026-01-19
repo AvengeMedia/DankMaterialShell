@@ -133,6 +133,11 @@ binds {
     Mod+Ctrl+U         { move-column-to-workspace-down; }
     Mod+Ctrl+I         { move-column-to-workspace-up; }
 
+    // === Workspace Management ===
+    Ctrl+Shift+R hotkey-overlay-title="Rename Workspace" {
+        spawn "dms" "ipc" "call" "workspace-rename" "open";
+    }
+
     // === Move Workspaces ===
     Mod+Shift+Page_Down { move-workspace-down; }
     Mod+Shift+Page_Up   { move-workspace-up; }

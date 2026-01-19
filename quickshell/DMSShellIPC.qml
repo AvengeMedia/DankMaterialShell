@@ -1204,4 +1204,39 @@ Item {
 
         target: "desktopWidget"
     }
+
+    IpcHandler {
+        function open(): string {
+            if (!workspaceRenameModal) {
+                return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
+            }
+            const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
+            workspaceRenameModal.show(ws?.name || "");
+            return "WORKSPACE_RENAME_MODAL_OPENED";
+        }
+
+        function close(): string {
+            if (!workspaceRenameModal) {
+                return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
+            }
+            workspaceRenameModal.hide();
+            return "WORKSPACE_RENAME_MODAL_CLOSED";
+        }
+
+        function toggle(): string {
+            if (!workspaceRenameModal) {
+                return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
+            }
+            if (workspaceRenameModal.shouldBeVisible) {
+                workspaceRenameModal.hide();
+                return "WORKSPACE_RENAME_MODAL_CLOSED";
+            } else {
+                const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
+                workspaceRenameModal.show(ws?.name || "");
+                return "WORKSPACE_RENAME_MODAL_OPENED";
+            }
+        }
+
+        target: "workspace-rename"
+    }
 }

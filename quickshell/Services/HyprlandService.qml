@@ -308,4 +308,18 @@ decoration {
             reloadConfig();
         });
     }
+
+    function renameWorkspace(newName) {
+        if (!Hyprland.focusedWorkspace)
+            return;
+        const wsId = Hyprland.focusedWorkspace.id;
+        if (!wsId)
+            return;
+        const fullName = wsId + " " + newName;
+        Proc.runCommand("hyprland-rename-ws", ["hyprctl", "dispatch", "renameworkspace", String(wsId), fullName], (output, exitCode) => {
+            if (exitCode !== 0) {
+                console.warn("HyprlandService: Failed to rename workspace:", output);
+            }
+        });
+    }
 }

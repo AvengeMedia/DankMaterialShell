@@ -737,4 +737,10 @@ Singleton {
             if (callback) callback(response);
         });
     }
+
+    function renameWorkspace(name, callback) {
+        sendRequest("extworkspace.renameWorkspace", {
+            "name": name
+        }, callback);
+    }
 }

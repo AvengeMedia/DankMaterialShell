@@ -100,7 +100,8 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call hypr openOverview", label: "Hyprland: Open Overview", compositor: "hyprland" },
     { id: "spawn dms ipc call hypr closeOverview", label: "Hyprland: Close Overview", compositor: "hyprland" },
     { id: "spawn dms ipc call wallpaper next", label: "Wallpaper: Next" },
-    { id: "spawn dms ipc call wallpaper prev", label: "Wallpaper: Previous" }
+    { id: "spawn dms ipc call wallpaper prev", label: "Wallpaper: Previous" },
+    { id: "spawn dms ipc call workspace-rename open", label: "Workspace: Rename" }
 ];
 
 const NIRI_ACTIONS = {

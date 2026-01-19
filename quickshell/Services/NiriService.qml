@@ -1418,6 +1418,16 @@ Singleton {
         return block;
     }
 
+    function renameWorkspace(name) {
+        return send({
+            "Action": {
+                "SetWorkspaceName": {
+                    "name": name
+                }
+            }
+        });
+    }
+
     IpcHandler {
         function screenshot(): string {
             if (!CompositorService.isNiri) {

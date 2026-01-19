@@ -631,6 +631,10 @@ Item {
         }
     }
 
+    WorkspaceRenameModal {
+        id: workspaceRenameModal
+    }
+
     LazyLoader {
         id: processListModalLoader
 
