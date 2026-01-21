@@ -866,8 +866,10 @@ Item {
 
                 readonly property real baseWidth: root.isVertical ? (SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5) : (isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7)
                 readonly property real baseHeight: root.isVertical ? (isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7) : (SettingsData.showWorkspaceApps ? widgetHeight * 0.7 : widgetHeight * 0.5)
-                readonly property real contentImplicitWidth: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || SettingsData.showWorkspaceApps || loadedHasIcon) ? (appIconsLoader.item?.contentWidth ?? 0) : 0
-                readonly property real contentImplicitHeight: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName || SettingsData.showWorkspaceApps || loadedHasIcon) ? (appIconsLoader.item?.contentHeight ?? 0) : 0
+                readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
+                readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && CompositorService.isNiri
+                readonly property real contentImplicitWidth: (hasWorkspaceName || loadedHasIcon) ? (appIconsLoader.item?.contentWidth ?? 0) : 0
+                readonly property real contentImplicitHeight: (workspaceNamesEnabled || loadedHasIcon) ? (appIconsLoader.item?.contentHeight ?? 0) : 0
 
                 readonly property real iconsExtraWidth: {
                     if (!root.isVertical && SettingsData.showWorkspaceApps && loadedIcons.length > 0) {
@@ -884,8 +886,16 @@ Item {
                     return 0;
                 }
 
-                readonly property real visualWidth: Math.max(baseWidth + iconsExtraWidth, contentImplicitWidth > 0 ? contentImplicitWidth + Theme.spacingS : 0)
-                readonly property real visualHeight: Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight > 0 ? contentImplicitHeight + Theme.spacingS : 0)
+                readonly property real visualWidth: {
+                    if (contentImplicitWidth <= 0) return baseWidth + iconsExtraWidth;
+                    const padding = root.isVertical ? Theme.spacingXS : Theme.spacingS;
+                    return Math.max(baseWidth + iconsExtraWidth, contentImplicitWidth + padding);
+                }
+                readonly property real visualHeight: {
+                    if (contentImplicitHeight <= 0) return baseHeight + iconsExtraHeight;
+                    const padding = root.isVertical ? Theme.spacingS : Theme.spacingXS;
+                    return Math.max(baseHeight + iconsExtraHeight, contentImplicitHeight + padding);
+                }
 
                 readonly property color unfocusedColor: {
                     switch (SettingsData.workspaceUnfocusedColorMode) {
