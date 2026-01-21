@@ -1207,32 +1207,34 @@ Item {
 
     IpcHandler {
         function open(): string {
-            if (!workspaceRenameModal) {
+            if (!workspaceRenameModalLoader || !workspaceRenameModalLoader.item) {
                 return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
             }
+            workspaceRenameModalLoader.active = true;
             const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-            workspaceRenameModal.show(ws?.name || "");
+            workspaceRenameModalLoader.item.show(ws?.name || "");
             return "WORKSPACE_RENAME_MODAL_OPENED";
         }
 
         function close(): string {
-            if (!workspaceRenameModal) {
+            if (!workspaceRenameModalLoader || !workspaceRenameModalLoader.item) {
                 return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
             }
-            workspaceRenameModal.hide();
+            workspaceRenameModalLoader.item.hide();
             return "WORKSPACE_RENAME_MODAL_CLOSED";
         }
 
         function toggle(): string {
-            if (!workspaceRenameModal) {
+            if (!workspaceRenameModalLoader || !workspaceRenameModalLoader.item) {
                 return "WORKSPACE_RENAME_MODAL_NOT_FOUND";
             }
-            if (workspaceRenameModal.shouldBeVisible) {
-                workspaceRenameModal.hide();
+            if (workspaceRenameModalLoader.item.shouldBeVisible) {
+                workspaceRenameModalLoader.item.hide();
                 return "WORKSPACE_RENAME_MODAL_CLOSED";
             } else {
+                workspaceRenameModalLoader.active = true;
                 const ws = NiriService.workspaces[NiriService.focusedWorkspaceId];
-                workspaceRenameModal.show(ws?.name || "");
+                workspaceRenameModalLoader.item.show(ws?.name || "");
                 return "WORKSPACE_RENAME_MODAL_OPENED";
             }
         }
