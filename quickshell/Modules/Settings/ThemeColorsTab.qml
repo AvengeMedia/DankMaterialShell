@@ -1862,6 +1862,18 @@ Item {
                     checked: SettingsData.matugenTemplateVscode
                     onToggled: checked => SettingsData.set("matugenTemplateVscode", checked)
                 }
+
+		SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["matugen", "emacs, "template"]
+                    settingKey: "matugenTemplateEmacs"
+                    text: "Emacs"
+                    description: getTemplateDescription("emacs", "")
+                    descriptionColor: getTemplateDescriptionColor("emacs")
+                    visible: SettingsData.runDmsMatugenTemplates
+                    checked: SettingsData.matugenTemplateEmacs
+                    onToggled: checked => SettingsData.set("matugenTemplateEmacs", checked)
+                }
             }
 
             Rectangle {

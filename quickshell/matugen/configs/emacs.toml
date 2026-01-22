@@ -1,0 +1,3 @@
+[templates.dmsemacs]
+input_path = "SHELL_DIR/matugen/templates/dank-emacs.el"
+output_path = "~/.emacs.d/themes/dank-emacs-theme.el"

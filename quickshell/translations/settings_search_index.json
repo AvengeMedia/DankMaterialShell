@@ -2934,6 +2934,23 @@
     ]
   },
   {
+    "section": "matugenTemplateEmacs",
+    "label": "Emacs",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "colors",
+      "look",
+      "matugen",
+      "scheme",
+      "style",
+      "template",
+      "theme",
+      "emacs"
+    ]
+  },
+  {
     "section": "widgetBackgroundColor",
     "label": "Widget Background Color",
     "tabIndex": 10,

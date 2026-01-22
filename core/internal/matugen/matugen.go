@@ -62,6 +62,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "dgop", Commands: []string{"dgop"}, ConfigFile: "dgop.toml"},
 	{ID: "kcolorscheme", ConfigFile: "kcolorscheme.toml", RunUnconditionally: true},
 	{ID: "vscode", Kind: TemplateKindVSCode},
+	{ID: "emacs", Commands: []string{"emacs"}, ConfigFile: "emacs.toml"},
 }
 
 func (c *ColorMode) GTKTheme() string {

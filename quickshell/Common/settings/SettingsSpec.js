@@ -236,6 +236,7 @@ var SPEC = {
     matugenTemplateDgop: { def: true },
     matugenTemplateKcolorscheme: { def: true },
     matugenTemplateVscode: { def: true },
+    matugenTemplateEmacs: { def: true },
 
     showDock: { def: false },
     dockAutoHide: { def: false },
