@@ -1,6 +1,6 @@
 ;;; dank-emacs-theme.el --- Enhanced theme using Matugen SCSS variables with dank16 colors
 
-;; Copyright (C) 2025 
+;; Copyright (C) 2025
 
 ;; Author: Generated (Enhanced)
 ;; Version: 1.3
@@ -51,7 +51,7 @@
       (surface-variant "{{colors.surface_variant.dark.hex}}")
       (tertiary "{{colors.tertiary.dark.hex}}")
       (tertiary-container "{{colors.tertiary_container.dark.hex}}")
-      
+
       ;; Enhanced dank16 colors for better syntax highlighting
       (dank-red "{{dank16.color1.dark.hex}}")          ; Bright red
       (dank-red-alt "{{dank16.color9.dark.hex}}")      ; Alternative red
@@ -68,13 +68,13 @@
       (dank-fg "{{dank16.color7.dark.hex}}")           ; Light foreground
       (dank-gray "{{dank16.color8.dark.hex}}")         ; Gray
       (dank-white "{{dank16.color15.dark.hex}}")       ; White
-      
+
       ;; Map success colors to green
       (success "{{dank16.color2.dark.hex}}")
       (on-success "{{colors.on_tertiary.dark.hex}}")
       (success-container "{{colors.tertiary_container.dark.hex}}")
       (on-success-container "{{colors.on_tertiary_container.dark.hex}}")
-      
+
       ;; Map fixed colors
       (primary-fixed "{{colors.primary_fixed.dark.hex}}")
       (primary-fixed-dim "{{colors.primary_fixed_dim.dark.hex}}")
@@ -88,12 +88,12 @@
       (on-secondary-fixed-variant "{{colors.on_secondary_fixed_variant.dark.hex}}")
       (on-tertiary-fixed "{{colors.on_tertiary_fixed.dark.hex}}")
       (on-tertiary-fixed-variant "{{colors.on_tertiary_fixed_variant.dark.hex}}")
-      
+
       ;; Map inverse colors
       (inverse-on-surface "{{colors.inverse_on_surface.dark.hex}}")
       (inverse-primary "{{colors.inverse_primary.dark.hex}}")
       (inverse-surface "{{colors.inverse_surface.dark.hex}}")
-      
+
       ;; Terminal colors from dank16
       (term0 "{{dank16.color0.dark.hex}}")
       (term1 "{{dank16.color1.dark.hex}}")
@@ -132,7 +132,7 @@
    `(warning ((t (:foreground ,dank-yellow))))
    `(error ((t (:foreground ,err))))
    `(match ((t (:background ,dank-yellow :foreground ,bg :weight bold))))
-   
+
    ;; Font-lock - enhanced with dank16 colors for vibrant syntax highlighting
    `(font-lock-builtin-face ((t (:foreground ,dank-cyan-bright))))
    `(font-lock-comment-face ((t (:foreground ,dank-gray :slant italic))))
@@ -151,14 +151,14 @@
    ;; Show paren
    `(show-paren-match ((t (:background ,primary-container :foreground ,dank-cyan-bright :weight bold))))
    `(show-paren-mismatch ((t (:background ,err-container :foreground ,on-err-container :weight bold))))
-   
+
    ;; Mode line - improved status bar styling
    `(mode-line ((t (:background ,surface-container :foreground ,on-surface :box nil))))
    `(mode-line-inactive ((t (:background ,surface :foreground ,dank-gray :box nil))))
    `(mode-line-buffer-id ((t (:foreground ,dank-cyan :weight bold))))
    `(mode-line-emphasis ((t (:foreground ,dank-cyan :weight bold))))
    `(mode-line-highlight ((t (:foreground ,dank-cyan-bright :box nil))))
-   
+
    ;; Improved Source blocks - seamless integration
    `(org-block ((t (:background ,surface-container-low :extend t :inherit fixed-pitch))))
    `(org-block-begin-line ((t (:background ,surface-container-low :foreground ,dank-teal :extend t :slant italic :inherit fixed-pitch))))
@@ -166,7 +166,7 @@
    `(org-code ((t (:background ,surface-container-low :foreground ,dank-yellow-bright :inherit fixed-pitch))))
    `(org-verbatim ((t (:background ,surface-container-low :foreground ,dank-cyan :inherit fixed-pitch))))
    `(org-meta-line ((t (:foreground ,dank-gray :slant italic))))
-   
+
    ;; Org mode with enhanced colors and hidden asterisks
    `(org-level-1 ((t (:foreground ,dank-cyan :weight bold :height 1.2))))
    `(org-level-2 ((t (:foreground ,dank-blue :weight bold :height 1.1))))
@@ -189,7 +189,7 @@
    `(org-date ((t (:foreground ,dank-teal :underline t))))
    `(org-special-keyword ((t (:foreground ,dank-gray :slant italic))))
    `(org-tag ((t (:foreground ,dank-gray :weight normal))))
-   
+
    ;; Magit with enhanced diff colors
    `(magit-section-highlight ((t (:background ,surface-container-low))))
    `(magit-diff-hunk-heading ((t (:background ,surface-container :foreground ,dank-gray))))
@@ -203,7 +203,7 @@
    `(magit-hash ((t (:foreground ,dank-gray))))
    `(magit-branch-local ((t (:foreground ,dank-blue :weight bold))))
    `(magit-branch-remote ((t (:foreground ,dank-cyan :weight bold))))
-   
+
    ;; Company
    `(company-tooltip ((t (:background ,surface-container :foreground ,on-surface))))
    `(company-tooltip-selection ((t (:background ,primary-container :foreground ,dank-cyan-bright))))
@@ -214,14 +214,14 @@
    `(company-scrollbar-bg ((t (:background ,surface-variant))))
    `(company-preview ((t (:foreground ,dank-gray :slant italic))))
    `(company-preview-common ((t (:foreground ,dank-cyan :slant italic))))
-   
+
    ;; Ido
    `(ido-first-match ((t (:foreground ,dank-cyan :weight bold))))
    `(ido-only-match ((t (:foreground ,dank-green :weight bold))))
    `(ido-subdir ((t (:foreground ,dank-blue))))
    `(ido-indicator ((t (:foreground ,dank-red))))
    `(ido-virtual ((t (:foreground ,dank-gray))))
-   
+
    ;; Helm
    `(helm-selection ((t (:background ,primary-container :foreground ,dank-cyan-bright))))
    `(helm-match ((t (:foreground ,dank-cyan :weight bold))))
@@ -234,22 +234,22 @@
    ;; corfu
    `(corfu-default ((t (:background ,surface-container :foreground ,on-surface))))
    `(corfu-current ((t (:background ,primary-container :foreground ,dank-cyan-bright))))
-   
+
    ;; Which-key
    `(which-key-key-face ((t (:foreground ,dank-cyan :weight bold))))
    `(which-key-separator-face ((t (:foreground ,outline-variant))))
    `(which-key-command-description-face ((t (:foreground ,on-surface))))
    `(which-key-group-description-face ((t (:foreground ,dank-blue))))
    `(which-key-special-key-face ((t (:foreground ,dank-yellow :weight bold))))
-   
+
    ;; Line numbers
    `(line-number ((t (:foreground ,dank-gray :inherit fixed-pitch))))
    `(line-number-current-line ((t (:foreground ,dank-cyan :weight bold :inherit fixed-pitch))))
-   
+
    ;; Parenthesis matching
    `(sp-show-pair-match-face ((t (:background ,primary-container :foreground ,dank-cyan-bright))))
    `(sp-show-pair-mismatch-face ((t (:background ,err-container :foreground ,on-err-container))))
-   
+
    ;; Rainbow delimiters - vibrant colors
    `(rainbow-delimiters-depth-1-face ((t (:foreground ,dank-cyan))))
    `(rainbow-delimiters-depth-2-face ((t (:foreground ,dank-yellow))))
@@ -262,7 +262,7 @@
    `(rainbow-delimiters-depth-9-face ((t (:foreground ,dank-red-alt))))
    `(rainbow-delimiters-mismatched-face ((t (:foreground ,err :weight bold))))
    `(rainbow-delimiters-unmatched-face ((t (:foreground ,err :weight bold))))
-   
+
    ;; Dired
    `(dired-directory ((t (:foreground ,dank-cyan :weight bold))))
    `(dired-ignored ((t (:foreground ,dank-gray))))
@@ -270,7 +270,7 @@
    `(dired-marked ((t (:foreground ,dank-yellow :weight bold))))
    `(dired-symlink ((t (:foreground ,dank-magenta :slant italic))))
    `(dired-header ((t (:foreground ,dank-cyan :weight bold :height 1.1))))
-   
+
    ;; Terminal colors
    `(term-color-black ((t (:foreground ,term0 :background ,term0))))
    `(term-color-red ((t (:foreground ,term1 :background ,term1))))
@@ -280,7 +280,7 @@
    `(term-color-magenta ((t (:foreground ,term5 :background ,term5))))
    `(term-color-cyan ((t (:foreground ,term6 :background ,term6))))
    `(term-color-white ((t (:foreground ,term7 :background ,term7))))
-   
+
    ;; EShell
    `(eshell-prompt ((t (:foreground ,dank-cyan :weight bold))))
    `(eshell-ls-directory ((t (:foreground ,dank-cyan :weight bold))))
@@ -294,7 +294,7 @@
    `(eshell-ls-readonly ((t (:foreground ,dank-gray))))
    `(eshell-ls-special ((t (:foreground ,dank-blue))))
    `(eshell-ls-unreadable ((t (:foreground ,dank-gray))))
-   
+
    ;; Improved markdown mode
    `(markdown-header-face ((t (:foreground ,dank-cyan :weight bold))))
    `(markdown-header-face-1 ((t (:foreground ,dank-cyan :weight bold :height 1.2))))
@@ -305,7 +305,7 @@
    `(markdown-code-face ((t (:background ,surface-container-low :extend t :inherit fixed-pitch))))
    `(markdown-pre-face ((t (:background ,surface-container-low :inherit fixed-pitch))))
    `(markdown-table-face ((t (:foreground ,dank-magenta :inherit fixed-pitch))))
-   
+
    ;; Web mode
    `(web-mode-html-tag-face ((t (:foreground ,dank-cyan))))
    `(web-mode-html-tag-bracket-face ((t (:foreground ,dank-gray))))
@@ -314,7 +314,7 @@
    `(web-mode-css-selector-face ((t (:foreground ,dank-cyan))))
    `(web-mode-css-property-name-face ((t (:foreground ,dank-blue))))
    `(web-mode-css-string-face ((t (:foreground ,dank-green))))
-   
+
    ;; Flycheck
    `(flycheck-error ((t (:underline (:style wave :color ,err)))))
    `(flycheck-warning ((t (:underline (:style wave :color ,dank-yellow)))))
@@ -322,15 +322,15 @@
    `(flycheck-fringe-error ((t (:foreground ,err))))
    `(flycheck-fringe-warning ((t (:foreground ,dank-yellow))))
    `(flycheck-fringe-info ((t (:foreground ,dank-blue))))
-   
+
    ;; Mini-buffer customization
    `(minibuffer-prompt ((t (:foreground ,dank-cyan :weight bold))))
-   
+
    ;; Improved search highlighting
    `(lsp-face-highlight-textual ((t (:background ,primary-container :foreground ,dank-cyan-bright :weight bold))))
    `(lsp-face-highlight-read ((t (:background ,secondary-container :foreground ,dank-yellow-bright :weight bold))))
    `(lsp-face-highlight-write ((t (:background ,tertiary-container :foreground ,dank-green-bright :weight bold))))
-   
+
    ;; Info and help modes
    `(info-title-1 ((t (:foreground ,dank-cyan :weight bold :height 1.3))))
    `(info-title-2 ((t (:foreground ,dank-blue :weight bold :height 1.2))))
@@ -358,11 +358,11 @@
    `(centaur-tabs-selected-modified ((t (:background ,surface-container-high :foreground ,dank-yellow :weight bold))))
    `(centaur-tabs-unselected-modified ((t (:background ,surface :foreground ,dank-yellow))))
    `(centaur-tabs-active-bar-face ((t (:background ,dank-cyan))))
-   
+
    ;; Fixed-pitch faces
    `(fixed-pitch ((t (:family "monospace"))))
    `(fixed-pitch-serif ((t (:family "monospace serif"))))
-   
+
    ;; Variable-pitch face
    `(variable-pitch ((t (:family "sans serif"))))
    ))
