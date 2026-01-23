@@ -186,6 +186,14 @@ Item {
         }
     }
 
+    function toggleWithQuery(query) {
+        if (spotlightOpen) {
+            hide();
+        } else {
+            showWithQuery(query);
+        }
+    }
+
     Timer {
         id: closeCleanupTimer
         interval: Theme.expressiveDurations.expressiveFastSpatial + 50

@@ -1063,7 +1063,7 @@ Item {
         }
 
         function toggleQuery(query: string): string {
-            PopoutService.toggleDankLauncherV2();
+            PopoutService.toggleDankLauncherV2WithQuery(query);
             return "LAUNCHER_TOGGLE_QUERY_SUCCESS";
         }
 
@@ -1107,7 +1107,7 @@ Item {
         }
 
         function toggleQuery(query: string): string {
-            PopoutService.toggleDankLauncherV2();
+            PopoutService.toggleDankLauncherV2WithQuery(query);
             return "SPOTLIGHT_TOGGLE_QUERY_SUCCESS";
         }
 

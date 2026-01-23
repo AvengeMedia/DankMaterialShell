@@ -416,6 +416,17 @@ Singleton {
         }
     }
 
+    function toggleDankLauncherV2WithQuery(query: string) {
+        if (dankLauncherV2Modal) {
+            dankLauncherV2Modal.toggleWithQuery(query);
+        } else if (dankLauncherV2ModalLoader) {
+            _dankLauncherV2PendingQuery = query;
+            _dankLauncherV2WantsOpen = true;
+            _dankLauncherV2WantsToggle = false;
+            dankLauncherV2ModalLoader.active = true;
+        }
+    }
+
     function _onDankLauncherV2ModalLoaded() {
         if (_dankLauncherV2WantsOpen) {
             _dankLauncherV2WantsOpen = false;
