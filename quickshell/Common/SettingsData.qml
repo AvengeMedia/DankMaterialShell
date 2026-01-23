@@ -146,6 +146,7 @@ Singleton {
 
     property bool use24HourClock: true
     property bool showSeconds: false
+    property bool padHours12Hour: false
     property bool useFahrenheit: false
     property string windSpeedUnit: "kmh"
     property bool nightModeEnabled: false
@@ -1252,11 +1253,11 @@ Singleton {
     }
 
     function getEffectiveTimeFormat() {
-        if (use24HourClock) {
+        if (use24HourClock)
             return showSeconds ? "hh:mm:ss" : "hh:mm";
-        } else {
+        if (padHours12Hour)
             return showSeconds ? "hh:mm:ss AP" : "hh:mm AP";
-        }
+        return showSeconds ? "h:mm:ss AP" : "h:mm AP";
     }
 
     function getEffectiveClockDateFormat() {

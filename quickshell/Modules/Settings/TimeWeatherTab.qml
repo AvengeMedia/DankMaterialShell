@@ -49,6 +49,17 @@ Item {
                     checked: SettingsData.showSeconds
                     onToggled: checked => SettingsData.set("showSeconds", checked)
                 }
+
+                SettingsToggleRow {
+                    tab: "time"
+                    tags: ["time", "12hour", "format", "padding", "leading", "zero"]
+                    settingKey: "padHours12Hour"
+                    text: I18n.tr("Pad Hours")
+                    description: "02:31 PM vs 2:31 PM"
+                    checked: SettingsData.padHours12Hour
+                    onToggled: checked => SettingsData.set("padHours12Hour", checked)
+                    visible: !SettingsData.use24HourClock
+                }
             }
 
             SettingsCard {

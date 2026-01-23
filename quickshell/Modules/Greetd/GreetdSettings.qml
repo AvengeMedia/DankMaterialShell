@@ -20,6 +20,7 @@ Singleton {
     property string matugenScheme: "scheme-tonal-spot"
     property bool use24HourClock: true
     property bool showSeconds: false
+    property bool padHours12Hour: false
     property bool useFahrenheit: false
     property bool nightModeEnabled: false
     property string weatherLocation: "New York, NY"
@@ -53,6 +54,7 @@ Singleton {
                 matugenScheme = settings.matugenScheme !== undefined ? settings.matugenScheme : "scheme-tonal-spot";
                 use24HourClock = settings.use24HourClock !== undefined ? settings.use24HourClock : true;
                 showSeconds = settings.showSeconds !== undefined ? settings.showSeconds : false;
+                padHours12Hour = settings.padHours12Hour !== undefined ? settings.padHours12Hour : false;
                 useFahrenheit = settings.useFahrenheit !== undefined ? settings.useFahrenheit : false;
                 nightModeEnabled = settings.nightModeEnabled !== undefined ? settings.nightModeEnabled : false;
                 weatherLocation = settings.weatherLocation !== undefined ? settings.weatherLocation : "New York, NY";
@@ -91,11 +93,11 @@ Singleton {
     }
 
     function getEffectiveTimeFormat() {
-        if (use24HourClock) {
+        if (use24HourClock)
             return showSeconds ? "hh:mm:ss" : "hh:mm";
-        } else {
+        if (padHours12Hour)
             return showSeconds ? "hh:mm:ss AP" : "hh:mm AP";
-        }
+        return showSeconds ? "h:mm:ss AP" : "h:mm AP";
     }
 
     function getEffectiveLockDateFormat() {
