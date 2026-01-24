@@ -47,6 +47,7 @@
           kirigami.unwrapped
           sonnet
           qtmultimedia
+          qtimageformats
         ];
     in
     {
