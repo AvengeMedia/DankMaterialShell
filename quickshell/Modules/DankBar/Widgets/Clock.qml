@@ -211,6 +211,20 @@ BasePill {
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
                     color: Theme.widgetTextColor
                     anchors.baseline: dateText.baseline
+                    width: timeTextMetrics.width
+                    horizontalAlignment: Text.AlignHCenter
+                    TextMetrics {
+                        id: timeTextMetrics
+                        font: timeText.font
+                        text: {
+                            const format = SettingsData.getEffectiveTimeFormat();
+                            if (SettingsData.use24HourClock) {
+                                return SettingsData.showSeconds ? "88:88:88" : "88:88";
+                            } else {
+                                return SettingsData.showSeconds ? "88:88:88 PM" : "88:88 PM";
+                            }
+                        }
+                    }
                 }
 
                 StyledText {
