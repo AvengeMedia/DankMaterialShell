@@ -164,7 +164,7 @@ BasePill {
                         const variant = mainKeyboard.variant;
                         const index = mainKeyboard.active_layout_index;
 
-                        if (root.compactMode && layout && variant && index !== undefined) {
+                        if (root.compactMode && layout && index !== undefined) {
                             const layouts = mainKeyboard.layout.split(",");
                             const variants = mainKeyboard.variant.split(",");
                             const index = mainKeyboard.active_layout_index;
@@ -176,7 +176,7 @@ BasePill {
                                     root.currentLayout = layouts[index] + "-" + variants[index];
                                 }
                             } else {
-                                root.currentLayout = "Unknown";
+                                root.currentLayout = layouts[index];
                             }
                         } else if (mainKeyboard && mainKeyboard.active_keymap) {
                             root.currentLayout = mainKeyboard.active_keymap;
