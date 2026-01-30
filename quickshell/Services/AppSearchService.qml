@@ -322,7 +322,7 @@ Singleton {
             PopoutService.toggleNotepad();
             return true;
         case "processlist":
-            PopoutService.toggleProcessList();
+            PopoutService.toggleProcessListModal();
             return true;
         }
         return false;
