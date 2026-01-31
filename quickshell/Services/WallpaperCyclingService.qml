@@ -21,7 +21,7 @@ Singleton {
         }
         return false;
     }
-    readonly property bool shouldPauseCycling: anyFullscreen || SessionService.locked
+    readonly property bool shouldPauseCycling: SessionService.locked
     property string cachedCyclingTime: SessionData.wallpaperCyclingTime
     property int cachedCyclingInterval: SessionData.wallpaperCyclingInterval
     property string lastTimeCheck: ""
