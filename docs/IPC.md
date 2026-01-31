@@ -533,6 +533,16 @@ File browser controls for selecting wallpapers and profile images.
   - `profile` - Opens profile image file browser in Pictures directory
   - Both browsers support common image formats (jpg, jpeg, png, bmp, gif, webp)
 
+### Target: `color-picker`
+Color picker modal control.
+
+**Functions:**
+- `open` - Show color picker modal
+- `close` - Hide color picker modal
+- `closeInstant` - Hide color picker modal without animation
+- `toggle` - Toggle color picker modal visibility
+- `toggleInstant` - Toggle color picker modal visibility without animation on hide
+
 ### Target: `hypr`
 Hyprland-specific controls including keybinds cheatsheet and workspace overview (Hyprland only).
 
@@ -609,6 +619,9 @@ dms ipc call dankdash wallpaper
 # Open file browsers
 dms ipc call file browse wallpaper
 dms ipc call file browse profile
+
+# Open color picker
+dms ipc call color-picker toggle
 
 # Show Hyprland keybinds cheatsheet (Hyprland only)
 dms ipc call hypr toggleBinds
