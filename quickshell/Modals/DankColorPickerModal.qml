@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import qs.Common
 import qs.Modals.Common
 import qs.Services
@@ -45,6 +46,22 @@ DankModal {
 
     function hideInstant() {
         instantClose();
+    }
+
+    function toggle() {
+        if (shouldBeVisible) {
+          hide();
+        } else {
+          show();
+        }
+    }
+
+    function toggleInstant() {
+        if (shouldBeVisible) {
+          hideInstant();
+        } else {
+          show();
+        }
     }
 
     onColorSelected: color => {
@@ -123,6 +140,35 @@ DankModal {
     allowStacking: true
 
     onBackgroundClicked: hide()
+
+    IpcHandler {
+      function open(): string {
+        root.show();
+        return "COLOR_PICKER_MODAL_OPEN_SUCCESS";
+      }
+
+      function close(): string {
+        root.hide();
+        return "COLOR_PICKER_MODAL_CLOSE_SUCCESS";
+      }
+
+      function closeInstant(): string {
+        root.hideInstant();
+        return "COLOR_PICKER_MODAL_CLOSE_INSTANT_SUCCESS";
+      }
+
+      function toggle(): string {
+        root.toggle();
+        return "COLOR_PICKER_MODAL_TOGGLE_SUCCESS";
+      }
+
+      function toggleInstant(): string {
+        root.toggleInstant();
+        return "COLOR_PICKER_MODAL_TOGGLE_INSTANT_SUCCESS";
+      }
+
+      target: "color-picker"
+    }
 
     content: Component {
         FocusScope {
