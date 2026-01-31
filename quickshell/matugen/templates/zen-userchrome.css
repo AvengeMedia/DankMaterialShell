@@ -8,7 +8,7 @@
   --arrowpanel-color: {{colors.on_surface.default.hex}} !important;
   --arrowpanel-background: {{colors.surface_container.default.hex}} !important;
   --sidebar-text-color: {{colors.on_background.default.hex}} !important;
-/*  --zen-main-browser-background: {{colors.background.default.hex}} !important; */
+  --zen-main-browser-background: {{colors.background.default.hex}} !important;
 }
 
 .sidebar-placesTree {
