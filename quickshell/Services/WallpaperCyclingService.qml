@@ -12,16 +12,16 @@ Singleton {
     id: root
 
     property bool cyclingActive: false
-    readonly property bool anyFullscreen: {
+    readonly property bool fullscreenShowing: {
         if (!ToplevelManager.toplevels?.values)
             return false;
         for (const toplevel of ToplevelManager.toplevels.values) {
-            if (toplevel.fullscreen)
+            if (toplevel.fullscreen && toplevel.activated)
                 return true;
         }
         return false;
     }
-    readonly property bool shouldPauseCycling: anyFullscreen || SessionService.locked
+    readonly property bool shouldPauseCycling: fullscreenShowing || SessionService.locked
     property string cachedCyclingTime: SessionData.wallpaperCyclingTime
     property int cachedCyclingInterval: SessionData.wallpaperCyclingInterval
     property string lastTimeCheck: ""
@@ -35,7 +35,7 @@ Singleton {
             property string targetScreen: ""
             running: false
             repeat: true
-            onTriggered: {
+	        onTriggered: {
                 if (typeof WallpaperCyclingService !== "undefined" && targetScreen !== "" && !WallpaperCyclingService.shouldPauseCycling) {
                     WallpaperCyclingService.cycleNextForMonitor(targetScreen);
                 }
