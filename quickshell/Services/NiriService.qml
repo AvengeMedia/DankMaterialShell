@@ -1452,6 +1452,19 @@ Singleton {
         });
     }
 
+    function moveWorkspaceToIndex(workspaceIdx, targetIndex) {
+        return send({
+            "Action": {
+                "MoveWorkspaceToIndex": {
+                    "index": targetIndex,
+                    "reference": {
+                        "Index": workspaceIdx
+                    }
+                }
+            }
+        });
+    }
+
     IpcHandler {
         function screenshot(): string {
             if (!CompositorService.isNiri) {
