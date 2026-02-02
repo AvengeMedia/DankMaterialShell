@@ -98,6 +98,7 @@ var SPEC = {
     showWorkspacePadding: { def: false },
     workspaceScrolling: { def: false },
     showWorkspaceApps: { def: false },
+    workspaceDragReorder: { def: true },
     maxWorkspaceIcons: { def: 3 },
     workspaceAppIconSizeOffset: { def: 0 },
     groupWorkspaceApps: { def: true },

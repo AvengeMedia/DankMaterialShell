@@ -1112,14 +1112,14 @@ Item {
                     property bool mousePressed: false
 
                     onPressed: mouse => {
-                        if (mouse.button === Qt.LeftButton && CompositorService.isNiri && !isPlaceholder) {
+                        if (mouse.button === Qt.LeftButton && CompositorService.isNiri && SettingsData.workspaceDragReorder && !isPlaceholder) {
                             mousePressed = true;
                             dragHandler.dragStartPos = Qt.point(mouse.x, mouse.y);
                         }
                     }
 
                     onPositionChanged: mouse => {
-                        if (!mousePressed || !CompositorService.isNiri || isPlaceholder)
+                        if (!mousePressed || !CompositorService.isNiri || !SettingsData.workspaceDragReorder || isPlaceholder)
                             return;
 
                         if (!dragHandler.dragging) {
