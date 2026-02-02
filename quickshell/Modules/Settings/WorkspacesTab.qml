@@ -156,6 +156,16 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "workspaceDragReorder"
+                    tags: ["workspace", "drag", "reorder", "sort", "move"]
+                    text: I18n.tr("Drag to Reorder")
+                    description: I18n.tr("Drag workspace indicators to reorder them")
+                    checked: SettingsData.workspaceDragReorder
+                    visible: CompositorService.isNiri
+                    onToggled: checked => SettingsData.set("workspaceDragReorder", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "dwlShowAllTags"
                     tags: ["dwl", "tags", "workspace"]
                     text: I18n.tr("Show All Tags")
