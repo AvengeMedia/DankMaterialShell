@@ -26,6 +26,9 @@ Item {
     property string activePluginId: ""
     property var collapsedSections: ({})
     property bool keyboardNavigationActive: false
+    property bool mouseHasMoved: false
+    property real lastGlobalMouseX: -1
+    property real lastGlobalMouseY: -1
     property var sectionViewModes: ({})
     property var pluginViewPreferences: ({})
     property int gridColumns: SettingsData.appLauncherGridColumns
@@ -324,6 +327,22 @@ Item {
         activePluginCategory = "";
         pluginFilter = "";
         collapsedSections = {};
+        mouseHasMoved = false;
+        lastGlobalMouseX = -1;
+        lastGlobalMouseY = -1;
+    }
+
+    function handleMousePositionChanged(globalPos) {
+        if (lastGlobalMouseX >= 0 && lastGlobalMouseY >= 0) {
+            const dx = Math.abs(globalPos.x - lastGlobalMouseX);
+            const dy = Math.abs(globalPos.y - lastGlobalMouseY);
+            if (dx > 0.5 || dy > 0.5) {
+                keyboardNavigationActive = false;
+                mouseHasMoved = true;
+            }
+        }
+        lastGlobalMouseX = globalPos.x;
+        lastGlobalMouseY = globalPos.y;
     }
 
     function loadPluginCategories(pluginId) {

@@ -9,7 +9,7 @@ Rectangle {
 
     property var item: null
     property bool isSelected: false
-    property bool isHovered: itemArea.containsMouse
+    property bool isHovered: controller?.mouseHasMoved && itemArea.containsMouse
     property var controller: null
     property int flatIndex: -1
 
@@ -84,9 +84,9 @@ Rectangle {
             }
         }
 
-        onPositionChanged: {
+        onPositionChanged: mouse => {
             if (root.controller) {
-                root.controller.keyboardNavigationActive = false;
+                root.controller.handleMousePositionChanged(mapToItem(null, mouse.x, mouse.y));
             }
         }
     }

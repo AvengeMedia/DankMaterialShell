@@ -77,6 +77,12 @@ Item {
     signal dialogClosed
 
     function _initializeAndShow(query, mode) {
+        if (spotlightContent.controller) {
+            spotlightContent.controller.mouseHasMoved = false;
+            spotlightContent.controller.lastGlobalMouseX = -1;
+            spotlightContent.controller.lastGlobalMouseY = -1;
+        }
+
         contentVisible = true;
         spotlightContent.searchField.forceActiveFocus();
 
@@ -90,6 +96,8 @@ Item {
             spotlightContent.controller.activePluginName = "";
             spotlightContent.controller.pluginFilter = "";
             spotlightContent.controller.collapsedSections = {};
+            spotlightContent.controller.selectedFlatIndex = 0;
+            spotlightContent.controller.selectedItem = null;
             if (query) {
                 spotlightContent.controller.setSearchQuery(query);
             } else {
