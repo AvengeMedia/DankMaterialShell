@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import Quickshell.Services.SystemTray
 import qs.Common
 import qs.Services
 import qs.Modules.Settings.DisplayConfig
@@ -1529,5 +1530,57 @@ Item {
         }
 
         target: "outputs"
+    }
+
+    IpcHandler {
+        function findTrayItem(itemId: string): var {
+            if (!itemId)
+                return null;
+
+            return SystemTray.items.values.find(item => {
+                const id = item?.id || "";
+                const title = item?.tooltipTitle || "";
+                const fullKey = title ? `${id}::${title}` : id;
+                return fullKey === itemId || id === itemId;
+            });
+        }
+
+        function list(): string {
+            const items = SystemTray.items.values;
+            if (items.length === 0)
+                return "No tray items available";
+
+            return items.map(item => {
+                const id = item?.id || "";
+                const title = item?.tooltipTitle || "";
+                const fullKey = title ? `${id}::${title}` : id;
+                const hasMenu = item?.hasMenu ? " [menu]" : "";
+                return fullKey + hasMenu;
+            }).join("\n");
+        }
+
+        function activate(itemId: string): string {
+            const item = findTrayItem(itemId);
+            if (!item)
+                return `ERROR: Tray item not found: ${itemId}`;
+
+            item.activate();
+            return `SUCCESS: Activated ${itemId}`;
+        }
+
+        function status(itemId: string): string {
+            const item = findTrayItem(itemId);
+            if (!item)
+                return `ERROR: Tray item not found: ${itemId}`;
+
+            const id = item?.id || "";
+            const title = item?.tooltipTitle || "";
+            const hasMenu = item?.hasMenu || false;
+            const onlyMenu = item?.onlyMenu || false;
+
+            return `id: ${id}\ntitle: ${title}\nhasMenu: ${hasMenu}\nonlyMenu: ${onlyMenu}`;
+        }
+
+        target: "tray"
     }
 }
