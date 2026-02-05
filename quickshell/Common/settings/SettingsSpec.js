@@ -330,6 +330,7 @@ var SPEC = {
     osdPosition: { def: 5 },
     osdVolumeEnabled: { def: true },
     osdMediaVolumeEnabled: { def: true },
+    osdMediaPlaybackEnabled: { def: true },
     osdBrightnessEnabled: { def: true },
     osdIdleInhibitorEnabled: { def: true },
     osdMicMuteEnabled: { def: true },

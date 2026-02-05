@@ -502,6 +502,7 @@ Singleton {
     property int osdPosition: SettingsData.Position.BottomCenter
     property bool osdVolumeEnabled: true
     property bool osdMediaVolumeEnabled: true
+    property bool osdMediaPlaybackEnabled: true
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true

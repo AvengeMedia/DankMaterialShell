@@ -101,6 +101,13 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    text: I18n.tr("Media Playback")
+                    description: I18n.tr("Show on-screen display when media playback status changes")
+                    checked: SettingsData.osdMediaPlaybackEnabled
+                    onToggled: checked => SettingsData.set("osdMediaPlaybackEnabled", checked)
+                }
+
+                SettingsToggleRow {
                     text: I18n.tr("Brightness")
                     description: I18n.tr("Show on-screen display when brightness changes")
                     checked: SettingsData.osdBrightnessEnabled
