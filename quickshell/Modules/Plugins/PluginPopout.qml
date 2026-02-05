@@ -5,7 +5,7 @@ import qs.Widgets
 DankPopout {
     id: root
 
-    layerNamespace: "dms-plugin:" + layerNamespacePlugin
+    layerNamespace: "dms:plugins:" + layerNamespacePlugin
 
     property var triggerScreen: null
     property Component pluginContent: null

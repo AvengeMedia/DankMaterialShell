@@ -287,7 +287,7 @@ Item {
 
         mask: root.clickThrough ? emptyMask : null
 
-        WlrLayershell.namespace: "quickshell:desktop-widget:" + root.pluginId + (root.instanceId ? ":" + root.instanceId : "")
+        WlrLayershell.namespace: "dms:desktop-widget:" + root.pluginId + (root.instanceId ? ":" + root.instanceId : "")
         WlrLayershell.layer: {
             if (root.isInteracting && !CompositorService.useHyprlandFocusGrab)
                 return WlrLayer.Overlay;
@@ -549,7 +549,7 @@ Item {
 
             mask: Region {}
 
-            WlrLayershell.namespace: "quickshell:desktop-widget-preview"
+            WlrLayershell.namespace: "dms:desktop-widget-preview"
             WlrLayershell.layer: WlrLayer.Bottom
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -629,7 +629,7 @@ Item {
 
             mask: Region {}
 
-            WlrLayershell.namespace: "quickshell:desktop-widget-grid"
+            WlrLayershell.namespace: "dms:desktop-widget-grid"
             WlrLayershell.layer: root.overviewActive && (root.showOnOverview || root.showOnOverviewOnly) ? WlrLayer.Overlay : WlrLayer.Background
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -675,7 +675,7 @@ Item {
             screen: root.screen
             color: "transparent"
 
-            WlrLayershell.namespace: "quickshell:desktop-widget-helper"
+            WlrLayershell.namespace: "dms:desktop-widget-helper"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
