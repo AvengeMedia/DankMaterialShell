@@ -10,24 +10,17 @@ DankOSD {
     readonly property bool useVertical: isVerticalLayout
     readonly property var player: MprisController.activePlayer
 
-    TextMetrics {
-        id: textMetrics
-        font.pixelSize: Theme.fontSizeMedium
-        font.weight: Font.Medium
-        font.family: Theme.fontFamily
-    }
-
     osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, Screen.width - Theme.spacingM * 2)
     osdHeight: useVertical ? (Theme.iconSize * 2) : (40 + Theme.spacingS * 2)
     autoHideInterval: 3000
     enableMouseInteraction: true
 
-    function getPlaybackIcon(volume) {
+    function getPlaybackIcon() {
         if (player.playbackState === MprisPlaybackState.Playing)
             return "play_arrow"
         if (player.playbackState === MprisPlaybackState.Paused || player.playbackState === MprisPlaybackState.Stopped)
-            return "pause";
-        return "music_note";
+            return "pause"
+        return "music_note"
     }
 
     function togglePlaying() {
@@ -41,14 +34,13 @@ DankOSD {
 
         function handleUpdate() {
             if (SettingsData.osdMediaPlaybackEnabled) {
-                root.show();
-                resetHideTimer();
+                root.show()
             }
         }
 
         function onIsPlayingChanged() { handleUpdate() }
         // Not enough room to show track name vertically - skip it
-        function onTrackChanged() { if(!useVertical) handleUpdate() }
+        function onTrackChanged() { if (!useVertical) handleUpdate() }
     }
 
     content: Loader {
@@ -96,7 +88,7 @@ DankOSD {
                 x: parent.gap * 2 + Theme.iconSize
                 width: parent.width - Theme.iconSize - parent.gap * 3
                 anchors.verticalCenter: parent.verticalCenter
-                text: (`${player.trackTitle || "Unknown Title"} • ${player.trackArtist || "Unknown Artist"}`)
+                text: (`${player.trackTitle || I18n.tr("Unknown Title")} • ${player.trackArtist || I18n.tr("Unknown Artist")}`)
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 color: Theme.surfaceText
