@@ -270,7 +270,7 @@ FloatingWindow {
 
                     DankButton {
                         id: thirdPartyButton
-                        text: SessionData.showThirdPartyPlugins ? "Hide 3rd Party" : "Show 3rd Party"
+                        text: SessionData.showThirdPartyPlugins ? I18n.tr("Hide 3rd Party") : I18n.tr("Show 3rd Party")
                         iconName: SessionData.showThirdPartyPlugins ? "visibility_off" : "visibility"
                         height: 28
                         onClicked: {

@@ -166,7 +166,7 @@ StyledRect {
                 }
 
                 StyledText {
-                    text: "v" + root.pluginVersion + " by " + root.pluginAuthor
+                    text: I18n.tr("v%1 by %2").arg(root.pluginVersion).arg(root.pluginAuthor)
                     font.pixelSize: Theme.fontSizeSmall
                     color: Theme.surfaceVariantText
                     width: parent.width

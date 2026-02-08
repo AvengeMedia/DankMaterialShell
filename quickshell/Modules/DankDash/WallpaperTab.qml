@@ -495,7 +495,7 @@ Item {
             StyledText {
                 anchors.centerIn: parent
                 visible: wallpaperFolderModel.count === 0
-                text: "No wallpapers found\n\nClick the folder icon below to browse"
+                text: I18n.tr("No wallpapers found\n\nClick the folder icon below to browse")
                 font.pixelSize: 14
                 color: Theme.outline
                 horizontalAlignment: Text.AlignHCenter

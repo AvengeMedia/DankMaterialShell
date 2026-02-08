@@ -1209,7 +1209,7 @@ Item {
 
                     StyledText {
                         width: parent.width
-                        text: "No apps have been launched yet."
+                        text: I18n.tr("No apps have been launched yet.")
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceVariantText
                         horizontalAlignment: Text.AlignHCenter
