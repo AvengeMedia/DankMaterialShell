@@ -464,7 +464,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, dmsPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", dmsPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0640", dmsTemp.Name(), dmsPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", dmsTemp.Name(), dmsPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri dms config: %w", err)
 	}
 
@@ -487,7 +487,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, mainPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", mainPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0640", mainTemp.Name(), mainPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", mainTemp.Name(), mainPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri main config: %w", err)
 	}
 
