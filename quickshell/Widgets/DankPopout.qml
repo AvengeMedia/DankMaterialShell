@@ -145,6 +145,25 @@ Item {
         shouldBeVisible ? close() : open();
     }
 
+    Connections {
+        target: Quickshell
+        function onScreensChanged() {
+            if (!shouldBeVisible || !screen)
+                return;
+            const currentScreenName = screen.name;
+            let screenStillExists = false;
+            for (let i = 0; i < Quickshell.screens.length; i++) {
+                if (Quickshell.screens[i].name === currentScreenName) {
+                    screenStillExists = true;
+                    break;
+                }
+            }
+            if (!screenStillExists) {
+                close();
+            }
+        }
+    }
+
     Timer {
         id: closeTimer
         interval: animationDuration
