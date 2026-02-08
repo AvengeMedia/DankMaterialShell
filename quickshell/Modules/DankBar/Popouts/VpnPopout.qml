@@ -17,7 +17,7 @@ DankPopout {
     property var triggerScreen: null
 
     popupWidth: 380
-    popupHeight: Math.min(Screen.height - 100, contentLoader.item ? contentLoader.item.implicitHeight : 320)
+    popupHeight: Math.min((screen ? screen.height : Screen.height) - 100, contentLoader.item ? contentLoader.item.implicitHeight : 320)
     triggerWidth: 70
     screen: triggerScreen
     shouldBeVisible: false
