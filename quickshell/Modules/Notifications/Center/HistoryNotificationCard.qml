@@ -14,7 +14,9 @@ Rectangle {
     property bool __initialized: false
 
     Component.onCompleted: {
-        Qt.callLater(() => { __initialized = true; });
+        Qt.callLater(() => {
+            __initialized = true;
+        });
     }
 
     readonly property bool compactMode: SettingsData.notificationCompactMode

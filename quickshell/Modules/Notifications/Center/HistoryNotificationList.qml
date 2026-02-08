@@ -256,7 +256,9 @@ Item {
                 property bool __delegateInitialized: false
 
                 Component.onCompleted: {
-                    Qt.callLater(() => { __delegateInitialized = true; });
+                    Qt.callLater(() => {
+                        __delegateInitialized = true;
+                    });
                 }
 
                 width: ListView.view.width

@@ -198,10 +198,10 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		return fmt.Errorf("failed to set cache directory owner: %w", err)
 	}
 
-	if err := runSudoCmd(sudoPassword, "chmod", "750", cacheDir); err != nil {
+	if err := runSudoCmd(sudoPassword, "chmod", "755", cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
-	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: greeter:greeter, permissions: 750)", cacheDir))
+	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: greeter:greeter, permissions: 755)", cacheDir))
 
 	return nil
 }
@@ -442,7 +442,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := runSudoCmd(sudoPassword, "chown", "root:greeter", greeterDir); err != nil {
 		return fmt.Errorf("failed to set greetd niri directory ownership: %w", err)
 	}
-	if err := runSudoCmd(sudoPassword, "chmod", "750", greeterDir); err != nil {
+	if err := runSudoCmd(sudoPassword, "chmod", "755", greeterDir); err != nil {
 		return fmt.Errorf("failed to set greetd niri directory permissions: %w", err)
 	}
 
@@ -464,7 +464,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, dmsPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", dmsPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0640", dmsTemp.Name(), dmsPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", dmsTemp.Name(), dmsPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri dms config: %w", err)
 	}
 
@@ -487,7 +487,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, mainPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", mainPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0640", mainTemp.Name(), mainPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", mainTemp.Name(), mainPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri main config: %w", err)
 	}
 

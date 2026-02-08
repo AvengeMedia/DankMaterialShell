@@ -10,13 +10,14 @@ DankListView {
     property bool keyboardActive: false
     property bool autoScrollDisabled: false
     property bool isAnimatingExpansion: false
-    property alias count: listView.count
     property alias listContentHeight: listView.contentHeight
     property bool cardAnimateExpansion: true
     property bool listInitialized: false
 
     Component.onCompleted: {
-        Qt.callLater(() => { listInitialized = true; });
+        Qt.callLater(() => {
+            listInitialized = true;
+        });
     }
 
     clip: true
@@ -86,7 +87,9 @@ DankListView {
         property bool __delegateInitialized: false
 
         Component.onCompleted: {
-            Qt.callLater(() => { __delegateInitialized = true; });
+            Qt.callLater(() => {
+                __delegateInitialized = true;
+            });
         }
 
         width: ListView.view.width

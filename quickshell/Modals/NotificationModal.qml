@@ -23,6 +23,7 @@ DankModal {
 
     function show() {
         notificationModalOpen = true;
+        currentTab = 0;
         NotificationService.onOverlayOpen();
         open();
         modalKeyboardController.reset();

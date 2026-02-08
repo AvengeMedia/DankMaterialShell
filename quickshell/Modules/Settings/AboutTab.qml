@@ -56,7 +56,7 @@ Item {
             return "https://github.com/DreamMaoMao/mangowc";
         if (isLabwc)
             return "https://labwc.github.io/";
-        return "https://github.com/YaLTeR/niri";
+        return "https://github.com/niri-wm/niri";
     }
 
     property string compositorTooltip: {
