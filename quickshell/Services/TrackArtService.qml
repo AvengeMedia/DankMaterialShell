@@ -5,6 +5,7 @@ import Quickshell
 import QtQuick
 
 import Quickshell.Io
+import Quickshell.Services.Mpris
 
 Singleton {
     id: root
@@ -37,6 +38,12 @@ Singleton {
         }
         // otherwise
         _bgArtSource = url;
+    }
+
+    property MprisPlayer activePlayer: MprisController.activePlayer
+
+    onActivePlayerChanged: {
+        loadArtwork(activePlayer.trackArtUrl);
     }
 
     Process {
