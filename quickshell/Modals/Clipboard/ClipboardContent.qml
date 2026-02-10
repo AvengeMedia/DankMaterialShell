@@ -164,6 +164,7 @@ Item {
             }
             visible: modal.activeTab === "saved"
 
+            currentIndex: clipboardContent.modal ? clipboardContent.modal.selectedIndex : 0
             spacing: Theme.spacingXS
             interactive: true
             flickDeceleration: 1500
@@ -172,6 +173,26 @@ Item {
             boundsMovement: Flickable.FollowBoundsBehavior
             pressDelay: 0
             flickableDirection: Flickable.VerticalFlick
+
+            function ensureVisible(index) {
+                if (index < 0 || index >= count) {
+                    return;
+                }
+                const itemHeight = ClipboardConstants.itemHeight + spacing;
+                const itemY = index * itemHeight;
+                const itemBottom = itemY + itemHeight;
+                if (itemY < contentY) {
+                    contentY = itemY;
+                } else if (itemBottom > contentY + height) {
+                    contentY = itemBottom - height;
+                }
+            }
+
+            onCurrentIndexChanged: {
+                if (clipboardContent.modal?.keyboardNavigationActive && currentIndex >= 0) {
+                    ensureVisible(currentIndex);
+                }
+            }
 
             StyledText {
                 text: I18n.tr("No saved clipboard entries")
@@ -190,7 +211,7 @@ Item {
                 entry: modelData
                 entryIndex: index + 1
                 itemIndex: index
-                isSelected: false
+                isSelected: clipboardContent.modal?.keyboardNavigationActive && index === clipboardContent.modal.selectedIndex
                 modal: clipboardContent.modal
                 listView: savedListView
                 onCopyRequested: clipboardContent.modal.copyEntry(modelData)

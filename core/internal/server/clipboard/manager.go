@@ -388,6 +388,10 @@ func (m *Manager) deduplicateInTx(b *bolt.Bucket, hash uint64) error {
 		if extractHash(v) != hash {
 			continue
 		}
+		entry, err := decodeEntry(v)
+		if err == nil && entry.Pinned {
+			continue
+		}
 		if err := b.Delete(k); err != nil {
 			return err
 		}
@@ -840,6 +844,62 @@ func (m *Manager) TouchEntry(id uint64) error {
 	m.notifySubscribers()
 
 	return nil
+}
+
+func (m *Manager) CreateHistoryEntryFromPinned(pinnedEntry *Entry) error {
+	if m.db == nil {
+		return fmt.Errorf("database not available")
+	}
+
+	// Create a new unpinned entry with the same data
+	newEntry := Entry{
+		Data:      pinnedEntry.Data,
+		MimeType:  pinnedEntry.MimeType,
+		Size:      pinnedEntry.Size,
+		Timestamp: time.Now(),
+		IsImage:   pinnedEntry.IsImage,
+		Preview:   pinnedEntry.Preview,
+		Pinned:    false,
+	}
+
+	if err := m.storeEntryWithoutDedup(newEntry); err != nil {
+		return err
+	}
+
+	m.updateState()
+	m.notifySubscribers()
+
+	return nil
+}
+
+func (m *Manager) storeEntryWithoutDedup(entry Entry) error {
+	if m.db == nil {
+		return fmt.Errorf("database not available")
+	}
+
+	entry.Hash = computeHash(entry.Data)
+
+	return m.db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+
+		id, err := b.NextSequence()
+		if err != nil {
+			return err
+		}
+
+		entry.ID = id
+
+		encoded, err := encodeEntry(entry)
+		if err != nil {
+			return err
+		}
+
+		if err := b.Put(itob(id), encoded); err != nil {
+			return err
+		}
+
+		return m.trimLengthInTx(b)
+	})
 }
 
 func (m *Manager) ClearHistory() {
@@ -1419,6 +1479,37 @@ func (m *Manager) PinEntry(id uint64) error {
 		return fmt.Errorf("database not available")
 	}
 
+	entryToPin, err := m.GetEntry(id)
+	if err != nil {
+		return err
+	}
+
+	var hashExists bool
+	if err := m.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("clipboard"))
+		if b == nil {
+			return nil
+		}
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			entry, err := decodeEntry(v)
+			if err != nil || !entry.Pinned {
+				continue
+			}
+			if entry.Hash == entryToPin.Hash {
+				hashExists = true
+				return nil
+			}
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	if hashExists {
+		return nil
+	}
+
 	// Check pinned count
 	cfg := m.getConfig()
 	pinnedCount := 0
@@ -1443,7 +1534,7 @@ func (m *Manager) PinEntry(id uint64) error {
 		return fmt.Errorf("maximum pinned entries reached (%d)", cfg.MaxPinned)
 	}
 
-	err := m.db.Update(func(tx *bolt.Tx) error {
+	err = m.db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("clipboard"))
 		v := b.Get(itob(id))
 		if v == nil {

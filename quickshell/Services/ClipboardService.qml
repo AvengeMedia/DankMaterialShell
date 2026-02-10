@@ -248,6 +248,13 @@ Singleton {
         return "text";
     }
 
+    function hashedPinnedEntry(entryHash) {
+        if (!entryHash) {
+            return false;
+        }
+        return pinnedEntries.some(pinnedEntry => pinnedEntry.hash === entryHash);
+    }
+
     Connections {
         target: DMSService
         enabled: root.refCount > 0

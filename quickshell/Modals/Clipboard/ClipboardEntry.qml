@@ -19,6 +19,7 @@ Rectangle {
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
+    readonly property bool hasPinnedDuplicate: !entry.pinned && modal ? modal.hashedPinnedEntry(entry.hash) : false
 
     radius: Theme.cornerRadius
     color: {
@@ -111,8 +112,8 @@ Rectangle {
         DankActionButton {
             iconName: "push_pin"
             iconSize: Theme.iconSize - 6
-            iconColor: entry.pinned ? Theme.primary : Theme.surfaceText
-            backgroundColor: entry.pinned ? Theme.primarySelected : "transparent"
+            iconColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primary : Theme.surfaceText
+            backgroundColor: (entry.pinned || hasPinnedDuplicate) ? Theme.primarySelected : "transparent"
             onClicked: entry.pinned ? unpinRequested() : pinRequested()
         }
 

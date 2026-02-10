@@ -13,15 +13,17 @@ QtObject {
     }
 
     function selectNext() {
-        if (!ClipboardService.clipboardEntries || ClipboardService.clipboardEntries.length === 0) {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0) {
             return;
         }
         ClipboardService.keyboardNavigationActive = true;
-        ClipboardService.selectedIndex = Math.min(ClipboardService.selectedIndex + 1, ClipboardService.clipboardEntries.length - 1);
+        ClipboardService.selectedIndex = Math.min(ClipboardService.selectedIndex + 1, entries.length - 1);
     }
 
     function selectPrevious() {
-        if (!ClipboardService.clipboardEntries || ClipboardService.clipboardEntries.length === 0) {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0) {
             return;
         }
         ClipboardService.keyboardNavigationActive = true;
@@ -29,19 +31,25 @@ QtObject {
     }
 
     function copySelected() {
-        if (!ClipboardService.clipboardEntries || ClipboardService.clipboardEntries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= ClipboardService.clipboardEntries.length) {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= entries.length) {
             return;
         }
-        const selectedEntry = ClipboardService.clipboardEntries[ClipboardService.selectedIndex];
+        const selectedEntry = entries[ClipboardService.selectedIndex];
         modal.copyEntry(selectedEntry);
     }
 
     function deleteSelected() {
-        if (!ClipboardService.clipboardEntries || ClipboardService.clipboardEntries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= ClipboardService.clipboardEntries.length) {
+        const entries = modal.activeTab === "saved" ? ClipboardService.pinnedEntries : ClipboardService.unpinnedEntries;
+        if (!entries || entries.length === 0 || ClipboardService.selectedIndex < 0 || ClipboardService.selectedIndex >= entries.length) {
             return;
         }
-        const selectedEntry = ClipboardService.clipboardEntries[ClipboardService.selectedIndex];
-        modal.deleteEntry(selectedEntry);
+        const selectedEntry = entries[ClipboardService.selectedIndex];
+        if (modal.activeTab === "saved") {
+            modal.deletePinnedEntry(selectedEntry);
+        } else {
+            modal.deleteEntry(selectedEntry);
+        }
     }
 
     function handleKey(event) {
