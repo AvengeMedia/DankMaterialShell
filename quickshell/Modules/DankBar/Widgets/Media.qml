@@ -71,9 +71,9 @@ BasePill {
             let newVolume = currentVolume;
             if (isMouseWheelY) {
                 if (deltaY > 0) {
-                    newVolume = Math.min(100, currentVolume + 5);
+                    newVolume = Math.min(100, currentVolume + SettingsData.audioWheelScrollAmount);
                 } else if (deltaY < 0) {
-                    newVolume = Math.max(0, currentVolume - 5);
+                    newVolume = Math.max(0, currentVolume - SettingsData.audioWheelScrollAmount);
                 }
             } else {
                 scrollAccumulatorY += deltaY;
