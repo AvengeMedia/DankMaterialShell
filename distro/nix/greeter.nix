@@ -71,6 +71,7 @@ in
         "hyprland"
         "sway"
         "labwc"
+        "mangowc"
       ];
       description = "Compositor to run greeter in";
     };
