@@ -107,8 +107,6 @@ DankPopout {
 
             property var externalKeyboardController: null
             property real cachedHeaderHeight: 32
-            property bool notificationListAnimating: notificationList.isAnimatingExpansion
-
             implicitHeight: {
                 let baseHeight = Theme.spacingL * 2;
                 baseHeight += cachedHeaderHeight;

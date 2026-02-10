@@ -125,10 +125,6 @@ DankModal {
         return ClipboardService.getEntryType(entry);
     }
 
-    function hashedPinnedEntry(entryHash) {
-        return ClipboardService.hashedPinnedEntry(entryHash);
-    }
-
     visible: false
     modalWidth: ClipboardConstants.modalWidth
     modalHeight: ClipboardConstants.modalHeight

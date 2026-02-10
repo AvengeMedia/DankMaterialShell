@@ -1,5 +1,6 @@
 import QtQuick
 import qs.Common
+import qs.Services
 import qs.Widgets
 
 Rectangle {
@@ -19,7 +20,7 @@ Rectangle {
 
     readonly property string entryType: modal ? modal.getEntryType(entry) : "text"
     readonly property string entryPreview: modal ? modal.getEntryPreview(entry) : ""
-    readonly property bool hasPinnedDuplicate: !entry.pinned && modal ? modal.hashedPinnedEntry(entry.hash) : false
+    readonly property bool hasPinnedDuplicate: !entry.pinned && ClipboardService.hashedPinnedEntry(entry.hash)
 
     radius: Theme.cornerRadius
     color: {
@@ -29,83 +30,29 @@ Rectangle {
         return mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
     }
 
-    Row {
-        anchors.fill: parent
-        anchors.margins: Theme.spacingM
-        anchors.rightMargin: Theme.spacingS
-        spacing: Theme.spacingL
+    Rectangle {
+        id: indexBadge
+        anchors.left: parent.left
+        anchors.leftMargin: Theme.spacingM
+        anchors.verticalCenter: parent.verticalCenter
+        width: 24
+        height: 24
+        radius: 12
+        color: Theme.primarySelected
 
-        Rectangle {
-            width: 24
-            height: 24
-            radius: 12
-            color: Theme.primarySelected
-            anchors.verticalCenter: parent.verticalCenter
-
-            StyledText {
-                anchors.centerIn: parent
-                text: entryIndex.toString()
-                font.pixelSize: Theme.fontSizeSmall
-                font.weight: Font.Bold
-                color: Theme.primary
-            }
-        }
-
-        Row {
-            anchors.verticalCenter: parent.verticalCenter
-            width: parent.width - 110
-            spacing: Theme.spacingM
-
-            ClipboardThumbnail {
-                width: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
-                height: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
-                anchors.verticalCenter: parent.verticalCenter
-                entry: root.entry
-                entryType: root.entryType
-                modal: root.modal
-                listView: root.listView
-                itemIndex: root.itemIndex
-            }
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - (entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize) - Theme.spacingM
-                spacing: Theme.spacingXS
-
-                StyledText {
-                    text: {
-                        switch (entryType) {
-                        case "image":
-                            return I18n.tr("Image") + " • " + entryPreview;
-                        case "long_text":
-                            return I18n.tr("Long Text");
-                        default:
-                            return I18n.tr("Text");
-                        }
-                    }
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: Theme.primary
-                    font.weight: Font.Medium
-                    width: parent.width
-                    elide: Text.ElideRight
-                }
-
-                StyledText {
-                    text: entryPreview
-                    font.pixelSize: Theme.fontSizeMedium
-                    color: Theme.surfaceText
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    maximumLineCount: entryType === "long_text" ? 3 : 1
-                    elide: Text.ElideRight
-                }
-            }
+        StyledText {
+            anchors.centerIn: parent
+            text: entryIndex.toString()
+            font.pixelSize: Theme.fontSizeSmall
+            font.weight: Font.Bold
+            color: Theme.primary
         }
     }
 
     Row {
+        id: actionButtons
         anchors.right: parent.right
-        anchors.rightMargin: Theme.spacingM
+        anchors.rightMargin: Theme.spacingS
         anchors.verticalCenter: parent.verticalCenter
         spacing: Theme.spacingXS
 
@@ -122,6 +69,66 @@ Rectangle {
             iconSize: Theme.iconSize - 6
             iconColor: Theme.surfaceText
             onClicked: deleteRequested()
+        }
+    }
+
+    Item {
+        anchors.left: indexBadge.right
+        anchors.leftMargin: Theme.spacingM
+        anchors.right: actionButtons.left
+        anchors.rightMargin: Theme.spacingM
+        anchors.verticalCenter: parent.verticalCenter
+        height: contentColumn.implicitHeight
+        clip: true
+
+        ClipboardThumbnail {
+            id: thumbnail
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            width: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
+            height: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
+            entry: root.entry
+            entryType: root.entryType
+            modal: root.modal
+            listView: root.listView
+            itemIndex: root.itemIndex
+        }
+
+        Column {
+            id: contentColumn
+            anchors.left: thumbnail.right
+            anchors.leftMargin: Theme.spacingM
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: Theme.spacingXS
+
+            StyledText {
+                text: {
+                    switch (entryType) {
+                    case "image":
+                        return I18n.tr("Image") + " • " + entryPreview;
+                    case "long_text":
+                        return I18n.tr("Long Text");
+                    default:
+                        return I18n.tr("Text");
+                    }
+                }
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.primary
+                font.weight: Font.Medium
+                width: parent.width
+                elide: Text.ElideRight
+            }
+
+            StyledText {
+                text: entryPreview
+                font.pixelSize: Theme.fontSizeMedium
+                color: Theme.surfaceText
+                width: parent.width
+                wrapMode: Text.WordWrap
+                maximumLineCount: entryType === "long_text" ? 3 : 1
+                elide: Text.ElideRight
+            }
         }
     }
 

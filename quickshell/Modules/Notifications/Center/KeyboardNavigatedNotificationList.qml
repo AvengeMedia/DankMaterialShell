@@ -93,8 +93,8 @@ DankListView {
         }
 
         width: ListView.view.width
-        height: isDismissing ? 0 : notificationCard.height
-        clip: isDismissing
+        height: isDismissing ? 0 : notificationCard.targetHeight
+        clip: isDismissing || notificationCard.isAnimating
 
         NotificationCard {
             id: notificationCard

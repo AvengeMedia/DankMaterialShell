@@ -30,6 +30,7 @@ Rectangle {
 
     width: parent ? parent.width : 400
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
+    readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
     property bool __initialized: false
 
@@ -734,8 +735,9 @@ Rectangle {
     Behavior on height {
         enabled: root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
-            duration: Theme.mediumDuration
-            easing.type: root.expanded ? Theme.emphasizedEasing : Theme.standardEasing
+            duration: Theme.expressiveDurations.normal
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.standard
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;

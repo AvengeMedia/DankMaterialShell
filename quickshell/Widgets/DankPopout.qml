@@ -180,7 +180,7 @@ Item {
 
     readonly property real screenWidth: screen ? screen.width : 0
     readonly property real screenHeight: screen ? screen.height : 0
-    readonly property real dpr: screen ? CompositorService.getScreenScale(screen) : 1
+    readonly property real dpr: screen ? screen.devicePixelRatio : 1
 
     readonly property real shadowBuffer: 5
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
@@ -442,6 +442,8 @@ Item {
                 readonly property int blurMax: 64
 
                 layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                layer.smooth: false
+                layer.textureSize: Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr))
 
                 layer.effect: MultiEffect {
                     id: shadowFx
