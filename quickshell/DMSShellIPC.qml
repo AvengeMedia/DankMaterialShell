@@ -339,6 +339,36 @@ Item {
             }
         }
 
+        function increment(step: string): string {
+            if (MprisController.activePlayer && MprisController.activePlayer.volumeSupported) {
+                const currentVolume = Math.round(MprisController.activePlayer.volume * 100);
+                const stepValue = parseInt(step || "5");
+                const newVolume = Math.max(0, Math.min(100, currentVolume + stepValue));
+
+                MprisController.activePlayer.volume = newVolume / 100;
+                return `Player volume increased to ${newVolume}%`;
+            }
+        }
+
+        function decrement(step: string): string {
+            if (MprisController.activePlayer && MprisController.activePlayer.volumeSupported) {
+                const currentVolume = Math.round(MprisController.activePlayer.volume * 100);
+                const stepValue = parseInt(step || "5");
+                const newVolume = Math.max(0, Math.min(100, currentVolume - stepValue));
+
+                MprisController.activePlayer.volume = newVolume / 100;
+                return `Player volume decreased to ${newVolume}%`;
+            }
+        }
+
+        function setvolume(percentage: string): string {
+            if (MprisController.activePlayer && MprisController.activePlayer.volumeSupported) {
+                const clampedVolume = Math.max(0, Math.min(100, percentage));
+                MprisController.activePlayer.volume = clampedVolume / 100;
+                return `Player volume set to ${clampedVolume}%`;
+            }
+        }
+
         target: "mpris"
     }
 
