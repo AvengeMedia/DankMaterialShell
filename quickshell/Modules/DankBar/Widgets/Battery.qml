@@ -115,7 +115,8 @@ BasePill {
         height: battery.height + battery.topMargin + battery.bottomMargin
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
-        onPressed: {
+        onPressed: mouse => {
+            battery.triggerRipple(this, mouse.x, mouse.y);
             toggleBatteryPopup();
         }
     }

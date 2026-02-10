@@ -206,7 +206,8 @@ BasePill {
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton
-        onPressed: {
+        onPressed: mouse => {
+            root.triggerRipple(this, mouse.x, mouse.y);
             DgopService.setSortBy("cpu");
             gpuTempClicked();
         }

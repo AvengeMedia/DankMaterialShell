@@ -293,6 +293,11 @@ Item {
                             visible: modelData.name === currentCodec
                         }
 
+                        DankRipple {
+                            id: codecRipple
+                            cornerRadius: parent.radius
+                        }
+
                         MouseArea {
                             id: codecMouseArea
 
@@ -300,6 +305,7 @@ Item {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
                             enabled: modelData.name !== currentCodec && !isLoading
+                            onPressed: mouse => codecRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
                                 selectCodec(modelData.profile);
                             }

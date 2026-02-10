@@ -72,6 +72,11 @@ Rectangle {
         }
     }
 
+    DankRipple {
+        id: bodyRipple
+        cornerRadius: root.radius
+    }
+
     Row {
         id: row
         anchors.fill: parent
@@ -112,11 +117,17 @@ Rectangle {
                 color: isActive ? _tileIconActive : _tileIconInactive
             }
 
+            DankRipple {
+                id: tileRipple
+                cornerRadius: _tileRadius
+            }
+
             MouseArea {
                 id: tileMouse
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                onPressed: mouse => tileRipple.trigger(mouse.x, mouse.y)
                 onClicked: root.toggled()
             }
         }
@@ -167,7 +178,11 @@ Rectangle {
                     rightHoverOverlay.opacity = 0.0;
                     rightHoverOverlay.visible = false;
                 }
-                onPressed: rightHoverOverlay.opacity = 0.16
+                onPressed: mouse => {
+                    const pos = mapToItem(root, mouse.x, mouse.y);
+                    bodyRipple.trigger(pos.x, pos.y);
+                    rightHoverOverlay.opacity = 0.16;
+                }
                 onReleased: rightHoverOverlay.opacity = containsMouse ? 0.08 : 0.0
                 onClicked: root.expandClicked()
                 onWheel: function (ev) {

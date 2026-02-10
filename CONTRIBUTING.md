@@ -37,10 +37,43 @@ This is a monorepo, the easiest thing to do is to open an editor in either `quic
 1. Install the [QML Extension](https://doc.qt.io/vscodeext/)
 2. Configure `ctrl+shift+p` -> user preferences (json) with qmlls path
 
+**Note:** Paths may vary by distribution. Below are examples for Arch Linux and Fedora.
+
+**Arch Linux:**
+
 ```json
 {
+  "[qml]": {
+    "editor.defaultFormatter": "qt-project.qmlls",
+    "editor.formatOnSave": true
+  },
   "qt-qml.doNotAskForQmllsDownload": true,
-  "qt-qml.qmlls.customExePath": "/usr/lib/qt6/bin/qmlls"
+  "qt-qml.qmlls.customExePath": "/usr/lib/qt6/bin/qmlls",
+  "qt-core.additionalQtPaths": [
+    {
+      "name": "Qt-6.x-linux-g++",
+      "path": "/usr/bin/qmake"
+    }
+  ]
+}
+```
+
+**Fedora:**
+
+```json
+{
+  "[qml]": {
+    "editor.defaultFormatter": "qt-project.qmlls",
+    "editor.formatOnSave": true
+  },
+  "qt-qml.doNotAskForQmllsDownload": true,
+  "qt-qml.qmlls.customExePath": "/usr/bin/qmlls",
+  "qt-core.additionalQtPaths": [
+    {
+      "name": "Qt-6.x-Fedora-linux-g++",
+      "path": "/usr/bin/qmake6"
+    }
+  ]
 }
 ```
 

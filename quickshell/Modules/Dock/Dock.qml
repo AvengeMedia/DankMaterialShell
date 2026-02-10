@@ -180,6 +180,7 @@ Variants {
             }
 
             // Hyprland implementation
+            Hyprland.focusedWorkspace;
             const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
 
             if (filtered.length === 0)
@@ -381,9 +382,7 @@ Variants {
                 const globalX = buttonGlobalPos.x + dock.hoveredButton.width / 2 + adjacentLeftBarWidth;
                 const tooltipHeight = 32;
                 const tooltipOffset = dock.effectiveBarHeight + SettingsData.dockSpacing + SettingsData.dockBottomGap + SettingsData.dockMargin + barSpacing + Theme.spacingM;
-                const screenRelativeY = isBottom
-                    ? (screenHeight - tooltipOffset - tooltipHeight)
-                    : tooltipOffset;
+                const screenRelativeY = isBottom ? (screenHeight - tooltipOffset - tooltipHeight) : tooltipOffset;
                 dockTooltip.show(tooltipText, globalX, screenRelativeY, dock.screen, false, false);
                 return;
             }

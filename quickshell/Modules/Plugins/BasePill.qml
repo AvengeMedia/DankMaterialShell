@@ -1,6 +1,7 @@
 import QtQuick
 import qs.Common
 import qs.Services
+import qs.Widgets
 
 Item {
     id: root
@@ -18,6 +19,9 @@ Item {
     property bool isFirst: false
     property bool isLast: false
     property real sectionSpacing: 0
+    property bool enableBackgroundHover: true
+    property bool enableCursor: true
+    readonly property bool isMouseHovered: mouseArea.containsMouse
     property bool isLeftBarEdge: false
     property bool isRightBarEdge: false
     property bool isTopBarEdge: false
@@ -37,6 +41,11 @@ Item {
     signal clicked
     signal rightClicked(real rootX, real rootY)
     signal wheel(var wheelEvent)
+
+    function triggerRipple(sourceItem, mouseX, mouseY) {
+        const pos = sourceItem.mapToItem(visualContent, mouseX, mouseY);
+        rippleLayer.trigger(pos.x, pos.y);
+    }
 
     width: isVerticalOrientation ? barThickness : visualWidth
     height: isVerticalOrientation ? visualHeight : barThickness
@@ -95,7 +104,7 @@ Item {
                 }
 
                 const rawTransparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
-                const isHovered = mouseArea.containsMouse || (root.isHovered || false);
+                const isHovered = root.enableBackgroundHover && (mouseArea.containsMouse || (root.isHovered || false));
                 const transparency = isHovered ? Math.max(0.3, rawTransparency) : rawTransparency;
                 const baseColor = isHovered ? Theme.widgetBaseHoverColor : Theme.widgetBaseBackgroundColor;
 
@@ -104,6 +113,12 @@ Item {
                 }
                 return Theme.withAlpha(baseColor, transparency);
             }
+        }
+
+        DankRipple {
+            id: rippleLayer
+            rippleColor: Theme.surfaceText
+            cornerRadius: background.radius
         }
 
         Loader {
@@ -121,7 +136,7 @@ Item {
         width: root.width + root.leftMargin + root.rightMargin
         height: root.height + root.topMargin + root.bottomMargin
         hoverEnabled: true
-        cursorShape: Qt.PointingHandCursor
+        cursorShape: root.enableCursor ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         onPressed: function (mouse) {
             if (mouse.button === Qt.RightButton) {
@@ -129,6 +144,8 @@ Item {
                 root.rightClicked(rPos.x, rPos.y);
                 return;
             }
+            const ripplePos = mouseArea.mapToItem(visualContent, mouse.x, mouse.y);
+            rippleLayer.trigger(ripplePos.x, ripplePos.y);
             if (popoutTarget) {
                 // Ensure bar context is set first if supported
                 if (popoutTarget.setBarContext) {

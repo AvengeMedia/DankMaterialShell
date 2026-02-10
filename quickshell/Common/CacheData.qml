@@ -178,6 +178,33 @@ Singleton {
         }
     }
 
+    function loadLauncherCache() {
+        try {
+            var content = launcherCacheFile.text();
+            if (content && content.trim())
+                return JSON.parse(content);
+        } catch (e) {
+            console.warn("CacheData: Failed to parse launcher cache:", e.message);
+        }
+        return null;
+    }
+
+    function saveLauncherCache(sections) {
+        if (_loading)
+            return;
+        launcherCacheFile.setText(JSON.stringify(sections));
+    }
+
+    FileView {
+        id: launcherCacheFile
+
+        path: isGreeterMode ? "" : _stateDir + "/DankMaterialShell/launcher_cache.json"
+        blockLoading: true
+        blockWrites: true
+        atomicWrites: true
+        watchChanges: false
+    }
+
     FileView {
         id: cacheFile
 

@@ -25,6 +25,9 @@ function findPrevNonHeaderIndex(flatModel, startIndex) {
 }
 
 function getSectionBounds(flatModel, sectionId) {
+    if (flatModel._sectionBounds && flatModel._sectionBounds[sectionId])
+        return flatModel._sectionBounds[sectionId];
+
     var start = -1, end = -1;
     for (var i = 0; i < flatModel.length; i++) {
         if (flatModel[i].isHeader && flatModel[i].section?.id === sectionId) {

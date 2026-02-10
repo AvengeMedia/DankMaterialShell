@@ -130,6 +130,9 @@ BasePill {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onPressed: mouse => {
+            root.triggerRipple(this, mouse.x, mouse.y);
+        }
         onClicked: function (mouse) {
             if (mouse.button === Qt.RightButton) {
                 openContextMenu();

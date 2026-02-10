@@ -270,6 +270,7 @@ Singleton {
     property bool scrollTitleEnabled: true
     property bool audioVisualizerEnabled: true
     property string audioScrollMode: "volume"
+    property int audioWheelScrollAmount: 5
     property bool clockCompactMode: false
     property bool focusedWindowCompactMode: false
     property bool runningAppsCompactMode: true

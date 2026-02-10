@@ -16,7 +16,7 @@ Rectangle {
     property int buttonHeight: 40
     property int horizontalPadding: Theme.spacingL
     property bool enableScaleAnimation: false
-    property bool enableRipple: false
+    property bool enableRipple: typeof SettingsData !== "undefined" ? (SettingsData.enableRippleEffects ?? true) : true
 
     signal clicked
 
@@ -55,6 +55,13 @@ Rectangle {
         }
     }
 
+    DankRipple {
+        id: rippleLayer
+        rippleColor: root.textColor
+        cornerRadius: root.radius
+        enableRipple: root.enableRipple
+    }
+
     Row {
         id: contentRow
         anchors.centerIn: parent
@@ -83,6 +90,10 @@ Rectangle {
         hoverEnabled: true
         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         enabled: root.enabled
+        onPressed: mouse => {
+            if (root.enableRipple)
+                rippleLayer.trigger(mouse.x, mouse.y);
+        }
         onClicked: root.clicked()
     }
 }

@@ -313,6 +313,12 @@ Popup {
                             }
                         }
 
+                        DankRipple {
+                            id: menuItemRipple
+                            rippleColor: modelData.dangerous ? Theme.error : Theme.surfaceText
+                            cornerRadius: menuItem.radius
+                        }
+
                         MouseArea {
                             id: menuItemArea
                             anchors.fill: parent
@@ -323,6 +329,7 @@ Popup {
                                 keyboardNavigation = false;
                                 selectedIndex = index;
                             }
+                            onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
                             onClicked: modelData.action()
                         }
                     }

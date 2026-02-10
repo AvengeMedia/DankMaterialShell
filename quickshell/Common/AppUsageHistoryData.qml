@@ -10,6 +10,7 @@ Singleton {
     id: root
 
     property var appUsageRanking: {}
+    property bool _saving: false
 
     Component.onCompleted: {
         loadSettings();
@@ -59,7 +60,9 @@ Singleton {
         }
 
         appUsageRanking = currentRanking;
+        _saving = true;
         saveSettings();
+        _saving = false;
     }
 
     function getRankedApps() {
@@ -97,7 +100,9 @@ Singleton {
 
         if (hasChanges) {
             appUsageRanking = currentRanking;
+            _saving = true;
             saveSettings();
+            _saving = false;
         }
     }
 
@@ -109,6 +114,8 @@ Singleton {
         blockWrites: true
         watchChanges: true
         onLoaded: {
+            if (root._saving)
+                return;
             parseSettings(settingsFile.text());
         }
         onLoadFailed: error => {}

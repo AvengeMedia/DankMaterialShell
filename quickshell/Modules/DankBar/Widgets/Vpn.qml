@@ -71,6 +71,7 @@ BasePill {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         enabled: !DMSNetworkService.isBusy
         onPressed: event => {
+            root.triggerRipple(this, event.x, event.y);
             switch (event.button) {
             case Qt.RightButton:
                 DMSNetworkService.toggleVpn();

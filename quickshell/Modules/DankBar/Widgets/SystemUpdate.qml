@@ -133,7 +133,8 @@ BasePill {
         z: 1
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onPressed: {
+        onPressed: mouse => {
+            root.triggerRipple(this, mouse.x, mouse.y);
             if (popoutTarget && popoutTarget.setTriggerPosition) {
                 const globalPos = root.visualContent.mapToItem(null, 0, 0);
                 const currentScreen = parentScreen || Screen;

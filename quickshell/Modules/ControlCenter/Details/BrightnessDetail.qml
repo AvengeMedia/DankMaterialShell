@@ -211,9 +211,15 @@ Rectangle {
                             }
                         }
 
+                        DankRipple {
+                            id: pinRipple
+                            cornerRadius: parent.radius
+                        }
+
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                             onClicked: root.togglePinToScreen()
                         }
                     }
@@ -443,9 +449,15 @@ Rectangle {
                                 }
                             }
 
+                            DankRipple {
+                                id: expToggleRipple
+                                cornerRadius: parent.radius
+                            }
+
                             MouseArea {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
+                                onPressed: mouse => expToggleRipple.trigger(mouse.x, mouse.y)
                                 onClicked: {
                                     const currentState = SessionData.getBrightnessExponential(modelData.name);
                                     SessionData.setBrightnessExponential(modelData.name, !currentState);
@@ -454,12 +466,18 @@ Rectangle {
                         }
                     }
 
+                    DankRipple {
+                        id: deviceRipple
+                        cornerRadius: parent.radius
+                    }
+
                     MouseArea {
                         anchors.fill: parent
                         anchors.bottomMargin: 28
                         anchors.rightMargin: SessionData.getBrightnessExponential(modelData.name) ? 145 : 0
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => deviceRipple.trigger(mouse.x, mouse.y)
                         onClicked: {
                             const pinKey = root.getScreenPinKey();
                             if (pinKey.length > 0 && modelData.name !== currentDeviceName) {

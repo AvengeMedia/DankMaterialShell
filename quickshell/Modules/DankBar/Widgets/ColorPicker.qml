@@ -29,7 +29,8 @@ BasePill {
         z: 1
         anchors.fill: parent
         cursorShape: Qt.PointingHandCursor
-        onPressed: {
+        onPressed: mouse => {
+            root.triggerRipple(this, mouse.x, mouse.y);
             root.colorPickerRequested();
         }
     }

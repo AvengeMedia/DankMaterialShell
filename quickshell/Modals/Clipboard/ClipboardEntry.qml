@@ -30,6 +30,12 @@ Rectangle {
         return mouseArea.containsMouse ? Theme.primaryHoverLight : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency);
     }
 
+    DankRipple {
+        id: rippleLayer
+        rippleColor: Theme.surfaceText
+        cornerRadius: root.radius
+    }
+
     Rectangle {
         id: indexBadge
         anchors.left: parent.left
@@ -138,6 +144,10 @@ Rectangle {
         anchors.rightMargin: 80
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        onPressed: mouse => {
+            const pos = mouseArea.mapToItem(root, mouse.x, mouse.y);
+            rippleLayer.trigger(pos.x, pos.y);
+        }
         onClicked: copyRequested()
     }
 }

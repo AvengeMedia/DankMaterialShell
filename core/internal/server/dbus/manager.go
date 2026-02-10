@@ -276,9 +276,7 @@ func (m *Manager) UnsubscribeClient(clientID string) {
 	})
 
 	for _, subID := range toDelete {
-		if err := m.Unsubscribe(subID); err != nil {
-			log.Warnf("dbus: failed to unsubscribe %s: %v", subID, err)
-		}
+		_ = m.Unsubscribe(subID)
 	}
 }
 

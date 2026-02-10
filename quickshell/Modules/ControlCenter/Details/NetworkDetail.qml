@@ -344,12 +344,18 @@ Rectangle {
                         }
                     }
 
+                    DankRipple {
+                        id: wiredRipple
+                        cornerRadius: parent.radius
+                    }
+
                     MouseArea {
                         id: wiredNetworkMouseArea
                         anchors.fill: parent
                         anchors.rightMargin: wiredOptionsButton.width + Theme.spacingS
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => wiredRipple.trigger(mouse.x, mouse.y)
                         onClicked: function (event) {
                             if (modelData.uuid !== NetworkService.ethernetConnectionUuid) {
                                 NetworkService.connectToSpecificWiredConfig(modelData.uuid);
@@ -467,15 +473,15 @@ Rectangle {
 
         function normalizePinList(value) {
             if (Array.isArray(value))
-                return value.filter(v => v)
+                return value.filter(v => v);
             if (typeof value === "string" && value.length > 0)
-                return [value]
-            return []
+                return [value];
+            return [];
         }
 
         function getPinnedNetworks() {
-            const pins = SettingsData.wifiNetworkPins || {}
-            return normalizePinList(pins["preferredWifi"])
+            const pins = SettingsData.wifiNetworkPins || {};
+            return normalizePinList(pins["preferredWifi"]);
         }
 
         property var frozenNetworks: []
@@ -483,18 +489,18 @@ Rectangle {
         property var sortedNetworks: {
             const ssid = NetworkService.currentWifiSSID;
             const networks = NetworkService.wifiNetworks;
-            const pinnedList = getPinnedNetworks()
+            const pinnedList = getPinnedNetworks();
 
             let sorted = [...networks];
             sorted.sort((a, b) => {
-                const aPinnedIndex = pinnedList.indexOf(a.ssid)
-                const bPinnedIndex = pinnedList.indexOf(b.ssid)
+                const aPinnedIndex = pinnedList.indexOf(a.ssid);
+                const bPinnedIndex = pinnedList.indexOf(b.ssid);
                 if (aPinnedIndex !== -1 || bPinnedIndex !== -1) {
                     if (aPinnedIndex === -1)
-                        return 1
+                        return 1;
                     if (bPinnedIndex === -1)
-                        return -1
-                    return aPinnedIndex - bPinnedIndex
+                        return -1;
+                    return aPinnedIndex - bPinnedIndex;
                 }
                 if (a.ssid === ssid)
                     return -1;
@@ -677,30 +683,41 @@ Rectangle {
                             }
                         }
 
+                        DankRipple {
+                            id: pinRipple
+                            cornerRadius: parent.radius
+                        }
+
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => pinRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
-                                const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}))
-                                let pinnedList = wifiContent.normalizePinList(pins["preferredWifi"])
-                                const pinIndex = pinnedList.indexOf(modelData.ssid)
+                                const pins = JSON.parse(JSON.stringify(SettingsData.wifiNetworkPins || {}));
+                                let pinnedList = wifiContent.normalizePinList(pins["preferredWifi"]);
+                                const pinIndex = pinnedList.indexOf(modelData.ssid);
 
                                 if (pinIndex !== -1) {
-                                    pinnedList.splice(pinIndex, 1)
+                                    pinnedList.splice(pinIndex, 1);
                                 } else {
-                                    pinnedList.unshift(modelData.ssid)
+                                    pinnedList.unshift(modelData.ssid);
                                     if (pinnedList.length > wifiContent.maxPinnedNetworks)
-                                        pinnedList = pinnedList.slice(0, wifiContent.maxPinnedNetworks)
+                                        pinnedList = pinnedList.slice(0, wifiContent.maxPinnedNetworks);
                                 }
 
                                 if (pinnedList.length > 0)
-                                    pins["preferredWifi"] = pinnedList
+                                    pins["preferredWifi"] = pinnedList;
                                 else
-                                    delete pins["preferredWifi"]
+                                    delete pins["preferredWifi"];
 
-                                SettingsData.set("wifiNetworkPins", pins)
+                                SettingsData.set("wifiNetworkPins", pins);
                             }
                         }
+                    }
+
+                    DankRipple {
+                        id: wifiRipple
+                        cornerRadius: parent.radius
                     }
 
                     MouseArea {
@@ -709,6 +726,7 @@ Rectangle {
                         anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS + pinWifiRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => wifiRipple.trigger(mouse.x, mouse.y)
                         onClicked: function (event) {
                             if (modelData.ssid !== NetworkService.currentWifiSSID) {
                                 if (modelData.secured && !modelData.saved) {

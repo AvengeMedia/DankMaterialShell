@@ -1,6 +1,6 @@
 .pragma library
 
-.import "ControllerUtils.js" as Utils
+    .import "ControllerUtils.js" as Utils
 
 function transformApp(app, override, defaultActions, primaryActionLabel) {
     var appId = app.id || app.execString || app.exec || "";
@@ -31,7 +31,11 @@ function transformApp(app, override, defaultActions, primaryActionLabel) {
             name: primaryActionLabel,
             icon: "open_in_new",
             action: "launch"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -66,7 +70,11 @@ function transformCoreApp(app, openLabel) {
             name: openLabel,
             icon: "open_in_new",
             action: "launch"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -100,7 +108,11 @@ function transformBuiltInLauncherItem(item, pluginId, openLabel) {
             name: openLabel,
             icon: "open_in_new",
             action: "execute"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -133,7 +145,11 @@ function transformFileResult(file, openLabel, openFolderLabel, copyPathLabel) {
             name: openLabel,
             icon: "open_in_new",
             action: "open"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -166,7 +182,11 @@ function transformPluginItem(item, pluginId, selectLabel) {
             name: selectLabel,
             icon: "check",
             action: "execute"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -188,7 +208,11 @@ function createCalculatorItem(calc, query, copyLabel) {
             name: copyLabel,
             icon: "content_copy",
             action: "copy"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }
 
@@ -218,6 +242,10 @@ function createPluginBrowseItem(pluginId, plugin, trigger, isBuiltIn, isAllowed,
             name: browseLabel,
             icon: "arrow_forward",
             action: "browse_plugin"
-        }
+        },
+        _hName: "",
+        _hSub: "",
+        _hRich: false,
+        _preScored: undefined
     };
 }

@@ -125,6 +125,7 @@ var SPEC = {
     scrollTitleEnabled: { def: true },
     audioVisualizerEnabled: { def: true },
     audioScrollMode: { def: "volume" },
+    audioWheelScrollAmount: { def: 5 },
     clockCompactMode: { def: false },
     focusedWindowCompactMode: { def: false },
     runningAppsCompactMode: { def: true },

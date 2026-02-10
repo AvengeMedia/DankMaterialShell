@@ -239,7 +239,6 @@ Rectangle {
             "icon": "computer",
             "collapsedByDefault": true,
             "children": [
-
                 {
                     "id": "audio",
                     "text": I18n.tr("Audio"),
@@ -702,6 +701,12 @@ Rectangle {
                             return "transparent";
                         }
 
+                        DankRipple {
+                            id: resultRipple
+                            rippleColor: root.searchSelectedIndex === resultDelegate.index ? Theme.buttonText : Theme.surfaceText
+                            cornerRadius: resultDelegate.radius
+                        }
+
                         Row {
                             id: resultContent
                             anchors.left: parent.left
@@ -749,6 +754,7 @@ Rectangle {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => resultRipple.trigger(mouse.x, mouse.y)
                             onClicked: root.selectSearchResult(resultDelegate.modelData)
                         }
 
@@ -825,6 +831,12 @@ Rectangle {
                             return "transparent";
                         }
 
+                        DankRipple {
+                            id: categoryRipple
+                            rippleColor: categoryRow.isActive ? Theme.buttonText : Theme.surfaceText
+                            cornerRadius: categoryRow.radius
+                        }
+
                         Row {
                             id: categoryRowContent
                             anchors.left: parent.left
@@ -864,6 +876,7 @@ Rectangle {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
+                            onPressed: mouse => categoryRipple.trigger(mouse.x, mouse.y)
                             onClicked: {
                                 root.keyboardHighlightIndex = -1;
                                 if (categoryDelegate.modelData.children) {
@@ -915,6 +928,12 @@ Rectangle {
                                     return "transparent";
                                 }
 
+                                DankRipple {
+                                    id: childRipple
+                                    rippleColor: childDelegate.isActive ? Theme.buttonText : Theme.surfaceText
+                                    cornerRadius: childDelegate.radius
+                                }
+
                                 Row {
                                     id: childRowContent
                                     anchors.left: parent.left
@@ -943,6 +962,7 @@ Rectangle {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
+                                    onPressed: mouse => childRipple.trigger(mouse.x, mouse.y)
                                     onClicked: {
                                         root.keyboardHighlightIndex = -1;
                                         root.tabChangeRequested(childDelegate.modelData.tabIndex);

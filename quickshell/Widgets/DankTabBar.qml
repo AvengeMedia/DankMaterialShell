@@ -27,81 +27,80 @@ FocusScope {
     KeyNavigation.backtab: previousFocusTarget
     KeyNavigation.up: previousFocusTarget
 
-    Keys.onPressed: (event) => {
+    Keys.onPressed: event => {
         if (!tabBar.activeFocus || tabRepeater.count === 0)
-            return
-
+            return;
         function findSelectableIndex(startIndex, step) {
-            let idx = startIndex
+            let idx = startIndex;
             for (let i = 0; i < tabRepeater.count; i++) {
-                idx = (idx + step + tabRepeater.count) % tabRepeater.count
-                const item = tabRepeater.itemAt(idx)
+                idx = (idx + step + tabRepeater.count) % tabRepeater.count;
+                const item = tabRepeater.itemAt(idx);
                 if (item && !item.isAction)
-                    return idx
+                    return idx;
             }
-            return -1
+            return -1;
         }
 
-        const goToIndex = (nextIndex) => {
+        const goToIndex = nextIndex => {
             if (nextIndex >= 0 && nextIndex !== tabBar.currentIndex) {
-                tabBar.currentIndex = nextIndex
-                tabBar.tabClicked(nextIndex)
+                tabBar.currentIndex = nextIndex;
+                tabBar.tabClicked(nextIndex);
             }
-        }
+        };
 
-        const resolveTarget = (item) => {
+        const resolveTarget = item => {
             if (!item)
-                return null
+                return null;
 
             if (item.focusTarget)
-                return resolveTarget(item.focusTarget)
+                return resolveTarget(item.focusTarget);
 
-            return item
-        }
+            return item;
+        };
 
-        const focusItem = (item) => {
-            const target = resolveTarget(item)
+        const focusItem = item => {
+            const target = resolveTarget(item);
             if (!target)
-                return false
+                return false;
 
             if (target.requestFocus) {
-                Qt.callLater(() => target.requestFocus())
-                return true
+                Qt.callLater(() => target.requestFocus());
+                return true;
             }
 
             if (target.forceActiveFocus) {
-                Qt.callLater(() => target.forceActiveFocus())
-                return true
+                Qt.callLater(() => target.forceActiveFocus());
+                return true;
             }
 
-            return false
-        }
+            return false;
+        };
 
         if (event.key === Qt.Key_Right && tabBar.enableArrowNavigation) {
-            const baseIndex = (tabBar.currentIndex >= 0 && tabBar.currentIndex < tabRepeater.count) ? tabBar.currentIndex : -1
-            const nextIndex = findSelectableIndex(baseIndex, 1)
+            const baseIndex = (tabBar.currentIndex >= 0 && tabBar.currentIndex < tabRepeater.count) ? tabBar.currentIndex : -1;
+            const nextIndex = findSelectableIndex(baseIndex, 1);
             if (nextIndex >= 0) {
-                goToIndex(nextIndex)
-                event.accepted = true
+                goToIndex(nextIndex);
+                event.accepted = true;
             }
         } else if (event.key === Qt.Key_Left && tabBar.enableArrowNavigation) {
-            const baseIndex = (tabBar.currentIndex >= 0 && tabBar.currentIndex < tabRepeater.count) ? tabBar.currentIndex : 0
-            const nextIndex = findSelectableIndex(baseIndex, -1)
+            const baseIndex = (tabBar.currentIndex >= 0 && tabBar.currentIndex < tabRepeater.count) ? tabBar.currentIndex : 0;
+            const nextIndex = findSelectableIndex(baseIndex, -1);
             if (nextIndex >= 0) {
-                goToIndex(nextIndex)
-                event.accepted = true
+                goToIndex(nextIndex);
+                event.accepted = true;
             }
         } else if (event.key === Qt.Key_Tab && (event.modifiers & Qt.ShiftModifier)) {
             if (focusItem(tabBar.previousFocusTarget)) {
-                event.accepted = true
+                event.accepted = true;
             }
         } else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Down) {
             if (focusItem(tabBar.nextFocusTarget)) {
-                event.accepted = true
+                event.accepted = true;
             }
         } else if (event.key === Qt.Key_Up) {
             if (focusItem(tabBar.previousFocusTarget)) {
-                event.accepted = true
+                event.accepted = true;
             }
         }
     }
@@ -142,7 +141,7 @@ FocusScope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pixelSize: Theme.fontSizeMedium
                         color: tabItem.isActive ? Theme.primary : Theme.surfaceText
-                        font.weight: tabItem.isActive ? Font.Medium : Font.Normal
+                        font.weight: Font.Medium
                         visible: hasText
                     }
                 }
@@ -154,7 +153,17 @@ FocusScope {
                     opacity: tabArea.pressed ? 0.12 : (tabArea.containsMouse ? 0.08 : 0)
                     visible: opacity > 0
                     radius: Theme.cornerRadius
-                    Behavior on opacity { NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing } }
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: Theme.shortDuration
+                            easing.type: Theme.standardEasing
+                        }
+                    }
+                }
+
+                DankRipple {
+                    id: tabRipple
+                    cornerRadius: Theme.cornerRadius
                 }
 
                 MouseArea {
@@ -162,15 +171,15 @@ FocusScope {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
+                    onPressed: mouse => tabRipple.trigger(mouse.x, mouse.y)
                     onClicked: {
                         if (tabItem.isAction) {
-                            tabBar.actionTriggered(index)
+                            tabBar.actionTriggered(index);
                         } else {
-                            tabBar.tabClicked(index)
+                            tabBar.tabClicked(index);
                         }
                     }
                 }
-
             }
         }
     }
@@ -216,39 +225,39 @@ FocusScope {
 
     function updateIndicator() {
         if (tabRepeater.count === 0 || currentIndex < 0 || currentIndex >= tabRepeater.count) {
-            return
+            return;
         }
 
-        const item = tabRepeater.itemAt(currentIndex)
+        const item = tabRepeater.itemAt(currentIndex);
         if (!item || item.isAction) {
-            return
+            return;
         }
 
-        const tabPos = item.mapToItem(tabBar, 0, 0)
-        const tabCenterX = tabPos.x + item.width / 2
-        const indicatorWidth = 60
+        const tabPos = item.mapToItem(tabBar, 0, 0);
+        const tabCenterX = tabPos.x + item.width / 2;
+        const indicatorWidth = 60;
 
         if (tabPos.x < 10 && currentIndex > 0) {
-            Qt.callLater(updateIndicator)
-            return
+            Qt.callLater(updateIndicator);
+            return;
         }
 
         if (!indicator.initialSetupComplete) {
-            indicator.animationEnabled = false
-            indicator.width = indicatorWidth
-            indicator.x = tabCenterX - indicatorWidth / 2
-            indicator.visible = true
-            indicator.initialSetupComplete = true
-            indicator.animationEnabled = true
+            indicator.animationEnabled = false;
+            indicator.width = indicatorWidth;
+            indicator.x = tabCenterX - indicatorWidth / 2;
+            indicator.visible = true;
+            indicator.initialSetupComplete = true;
+            indicator.animationEnabled = true;
         } else {
-            indicator.width = indicatorWidth
-            indicator.x = tabCenterX - indicatorWidth / 2
-            indicator.visible = true
+            indicator.width = indicatorWidth;
+            indicator.x = tabCenterX - indicatorWidth / 2;
+            indicator.visible = true;
         }
     }
 
     onCurrentIndexChanged: {
-        Qt.callLater(updateIndicator)
+        Qt.callLater(updateIndicator);
     }
     onWidthChanged: Qt.callLater(updateIndicator)
 }

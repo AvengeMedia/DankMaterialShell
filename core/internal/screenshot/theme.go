@@ -3,11 +3,11 @@ package screenshot
 import (
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 )
 
 type ThemeColors struct {
@@ -83,12 +83,11 @@ func getColorsFilePath() string {
 }
 
 func isLightMode() bool {
-	out, err := exec.Command("gsettings", "get", "org.gnome.desktop.interface", "color-scheme").Output()
+	scheme, err := utils.GsettingsGet("org.gnome.desktop.interface", "color-scheme")
 	if err != nil {
 		return false
 	}
 
-	scheme := strings.TrimSpace(string(out))
 	switch scheme {
 	case "'prefer-light'", "'default'":
 		return true

@@ -34,7 +34,7 @@ Popup {
         return false;
     }
 
-    readonly property bool isCoreApp: item?.type === "app" && item?.isCore
+    readonly property bool isCoreApp: item?.type === "app" && !!item?.isCore
     readonly property var coreAppData: isCoreApp ? item?.data ?? null : null
     readonly property var desktopEntry: !isCoreApp ? (item?.data ?? null) : null
     readonly property string appId: {
@@ -475,6 +475,12 @@ Popup {
                                 }
                             }
 
+                            DankRipple {
+                                id: menuItemRipple
+                                rippleColor: Theme.surfaceText
+                                cornerRadius: Theme.cornerRadius
+                            }
+
                             MouseArea {
                                 id: itemMouseArea
                                 anchors.fill: parent
@@ -484,6 +490,7 @@ Popup {
                                     root.keyboardNavigation = false;
                                     root.selectedMenuIndex = menuItemDelegate.itemIndex;
                                 }
+                                onPressed: mouse => menuItemRipple.trigger(mouse.x, mouse.y)
                                 onClicked: {
                                     var menuItem = menuItemDelegate.modelData;
                                     if (menuItem.action)

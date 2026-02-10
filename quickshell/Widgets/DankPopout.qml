@@ -443,7 +443,7 @@ Item {
 
                 layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                 layer.smooth: false
-                layer.textureSize: Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr))
+                layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 
                 layer.effect: MultiEffect {
                     id: shadowFx

@@ -33,25 +33,16 @@ Rectangle {
         }
     }
 
-    function highlightText(text, query, baseColor) {
-        if (!text || !query || query.length === 0)
-            return text;
-        var lowerText = text.toLowerCase();
-        var lowerQuery = query.toLowerCase();
-        var idx = lowerText.indexOf(lowerQuery);
-        if (idx === -1)
-            return text;
-        var before = text.substring(0, idx);
-        var match = text.substring(idx, idx + query.length);
-        var after = text.substring(idx + query.length);
-        var highlightColor = Theme.primary;
-        return '<span style="color:' + baseColor + '">' + before + '</span>' + '<span style="color:' + highlightColor + '; font-weight:600">' + match + '</span>' + '<span style="color:' + baseColor + '">' + after + '</span>';
-    }
-
     width: parent?.width ?? 200
     height: 52
     color: isSelected ? Theme.primaryPressed : isHovered ? Theme.primaryHoverLight : "transparent"
     radius: Theme.cornerRadius
+
+    DankRipple {
+        id: rippleLayer
+        rippleColor: Theme.surfaceText
+        cornerRadius: root.radius
+    }
 
     MouseArea {
         id: itemArea
@@ -62,6 +53,10 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
+        onPressed: mouse => {
+            if (mouse.button === Qt.LeftButton)
+                rippleLayer.trigger(mouse.x, mouse.y);
+        }
         onClicked: mouse => {
             if (mouse.button === Qt.RightButton) {
                 var scenePos = mapToItem(null, mouse.x, mouse.y);
@@ -100,14 +95,8 @@ Rectangle {
 
             Text {
                 width: parent.width
-                text: {
-                    var query = root.controller?.searchQuery ?? "";
-                    var name = root.item?.name ?? "";
-                    if (!query)
-                        return name;
-                    return root.highlightText(name, query, Theme.surfaceText);
-                }
-                textFormat: root.controller?.searchQuery ? Text.RichText : Text.PlainText
+                text: root.item?._hName ?? root.item?.name ?? ""
+                textFormat: root.item?._hRich ? Text.RichText : Text.PlainText
                 font.pixelSize: Theme.fontSizeMedium
                 font.weight: Font.Medium
                 font.family: Theme.fontFamily
@@ -118,16 +107,8 @@ Rectangle {
 
             Text {
                 width: parent.width
-                text: {
-                    var query = root.controller?.searchQuery ?? "";
-                    var subtitle = root.item?.subtitle ?? "";
-                    if (!subtitle)
-                        return "";
-                    if (!query)
-                        return subtitle;
-                    return root.highlightText(subtitle, query, Theme.surfaceVariantText);
-                }
-                textFormat: root.controller?.searchQuery ? Text.RichText : Text.PlainText
+                text: root.item?._hSub ?? root.item?.subtitle ?? ""
+                textFormat: root.item?._hRich ? Text.RichText : Text.PlainText
                 font.pixelSize: Theme.fontSizeSmall
                 font.family: Theme.fontFamily
                 color: Theme.surfaceVariantText
@@ -183,7 +164,7 @@ Rectangle {
             }
 
             Rectangle {
-                visible: root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse"
+                visible: !!root.item?.type && root.item.type !== "app" && root.item.type !== "plugin_browse"
                 width: typeBadge.implicitWidth + Theme.spacingS * 2
                 height: 20
                 radius: 10

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Effects
 import qs.Common
 import qs.Services
@@ -37,9 +36,23 @@ DankOSD {
         }
     }
 
+    property bool _pendingShow: false
+
     onPlayerChanged: {
-        if (!player)
+        if (!player) {
+            _pendingShow = false;
             hide();
+        }
+    }
+
+    Connections {
+        target: TrackArtService
+        function onLoadingChanged() {
+            if (!TrackArtService.loading && root._pendingShow) {
+                root._pendingShow = false;
+                root.show();
+            }
+        }
     }
 
     Connections {
@@ -48,10 +61,20 @@ DankOSD {
         function handleUpdate() {
             if (!root.player?.trackTitle)
                 return;
-            if (SettingsData.osdMediaPlaybackEnabled) {
-                TrackArtService.loadArtwork(player.trackArtUrl);
+            if (!SettingsData.osdMediaPlaybackEnabled)
+                return;
+
+            TrackArtService.loadArtwork(player.trackArtUrl);
+
+            if (!player.trackArtUrl || player.trackArtUrl === "") {
                 root.show();
+                return;
             }
+            if (!TrackArtService.loading) {
+                root.show();
+                return;
+            }
+            root._pendingShow = true;
         }
 
         function onTrackArtUrlChanged() {

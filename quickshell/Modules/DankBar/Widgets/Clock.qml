@@ -11,6 +11,8 @@ BasePill {
     property bool compactMode: false
     signal clockClicked
 
+    onClicked: clockClicked()
+
     content: Component {
         Item {
             implicitWidth: root.isVerticalOrientation ? (root.widgetThickness - root.horizontalPadding * 2) : clockRow.implicitWidth
@@ -324,17 +326,6 @@ BasePill {
                 id: systemClock
                 precision: SettingsData.showSeconds ? SystemClock.Seconds : SystemClock.Minutes
             }
-        }
-    }
-
-    MouseArea {
-        x: -root.leftMargin
-        y: -root.topMargin
-        width: root.width + root.leftMargin + root.rightMargin
-        height: root.height + root.topMargin + root.bottomMargin
-        cursorShape: Qt.PointingHandCursor
-        onPressed: {
-            root.clockClicked();
         }
     }
 }

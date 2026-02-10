@@ -67,7 +67,7 @@ DankPopout {
 
             Component.onCompleted: {
                 if (processListPopout.shouldBeVisible)
-                    forceActiveFocus();
+                    searchField.forceActiveFocus();
                 processContextMenu.parent = processListContent;
                 processContextMenu.parentFocusItem = processListContent;
             }
@@ -107,7 +107,7 @@ DankPopout {
                 target: processListPopout
                 function onShouldBeVisibleChanged() {
                     if (processListPopout.shouldBeVisible) {
-                        Qt.callLater(() => processListContent.forceActiveFocus());
+                        Qt.callLater(() => searchField.forceActiveFocus());
                     } else {
                         processesView.reset();
                     }

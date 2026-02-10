@@ -111,7 +111,17 @@ Singleton {
 
     function getVisibleApplications() {
         if (_cachedVisibleApps === null) {
-            _cachedVisibleApps = applications.filter(app => !isAppHidden(app));
+            const seen = new Set();
+            _cachedVisibleApps = applications.filter(app => {
+                if (isAppHidden(app))
+                    return false;
+                const id = app.id;
+                if (id && seen.has(id))
+                    return false;
+                if (id)
+                    seen.add(id);
+                return true;
+            });
         }
         return _cachedVisibleApps.map(app => applyAppOverride(app));
     }

@@ -6,6 +6,7 @@ import qs.Widgets
 ListView {
     id: listView
 
+    property real scrollBarTopMargin: 0
     property real mouseWheelSpeed: 60
     property real savedY: 0
     property bool justChanged: false
@@ -208,5 +209,6 @@ ListView {
 
     ScrollBar.vertical: DankScrollbar {
         id: vbar
+        topPadding: listView.scrollBarTopMargin
     }
 }

@@ -5,25 +5,21 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.Common
+import qs.Modules.Plugins
 import qs.Services
 import qs.Widgets
 
-Item {
+BasePill {
     id: root
 
+    enableBackgroundHover: false
+    enableCursor: false
+    section: "left"
+
     property var widgetData: null
-    property var barConfig: null
-    property bool isVertical: axis?.isVertical ?? false
-    property var axis: null
-    property string section: "left"
-    property var parentScreen
     property var hoveredItem: null
     property var topBar: null
-    property real widgetThickness: 30
-    property real barThickness: 48
-    property real barSpacing: 4
     property bool isAutoHideBar: false
-    readonly property real horizontalPadding: (barConfig?.noBackground ?? false) ? 2 : Theme.spacingS
     property Item windowRoot: (Window.window ? Window.window.contentItem : null)
 
     readonly property real effectiveBarThickness: {
@@ -52,7 +48,7 @@ Item {
     readonly property real barY: barBounds.y
 
     readonly property real minTooltipY: {
-        if (!parentScreen || !isVertical) {
+        if (!parentScreen || !isVerticalOrientation) {
             return 0;
         }
 
@@ -139,108 +135,42 @@ Item {
         }
     }
     readonly property int windowCount: _groupByApp ? (groupedWindows?.length || 0) : (sortedToplevels?.length || 0)
-    readonly property int calculatedSize: {
-        if (windowCount === 0) {
-            return 0;
-        }
-        if (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) {
-            return windowCount * 24 + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2;
-        } else {
-            return windowCount * (24 + Theme.spacingXS + 120) + (windowCount - 1) * Theme.spacingXS + horizontalPadding * 2;
-        }
-    }
-
-    width: windowCount > 0 ? (isVertical ? barThickness : calculatedSize) : 0
-    height: windowCount > 0 ? (isVertical ? calculatedSize : barThickness) : 0
     visible: windowCount > 0
 
-    Item {
-        id: visualBackground
-        width: root.isVertical ? root.widgetThickness : root.calculatedSize
-        height: root.isVertical ? root.calculatedSize : root.widgetThickness
-        anchors.centerIn: parent
-        clip: false
+    property real scrollAccumulator: 0
+    property real touchpadThreshold: 500
 
-        Rectangle {
-            id: outline
-            anchors.centerIn: parent
-            width: {
-                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
-                return parent.width + borderWidth * 2;
-            }
-            height: {
-                const borderWidth = (barConfig?.widgetOutlineEnabled ?? false) ? (barConfig?.widgetOutlineThickness ?? 1) : 0;
-                return parent.height + borderWidth * 2;
-            }
-            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
-            color: "transparent"
-            border.width: {
-                if (barConfig?.widgetOutlineEnabled ?? false) {
-                    return barConfig?.widgetOutlineThickness ?? 1;
-                }
-                return 0;
-            }
-            border.color: {
-                if (!(barConfig?.widgetOutlineEnabled ?? false)) {
-                    return "transparent";
-                }
-                const colorOption = barConfig?.widgetOutlineColor || "primary";
-                const opacity = barConfig?.widgetOutlineOpacity ?? 1.0;
-                switch (colorOption) {
-                case "surfaceText":
-                    return Theme.withAlpha(Theme.surfaceText, opacity);
-                case "secondary":
-                    return Theme.withAlpha(Theme.secondary, opacity);
-                case "primary":
-                    return Theme.withAlpha(Theme.primary, opacity);
-                default:
-                    return Theme.withAlpha(Theme.primary, opacity);
+    onWheel: function (wheelEvent) {
+        const deltaY = wheelEvent.angleDelta.y;
+        const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
+
+        const windows = root.sortedToplevels;
+        if (windows.length < 2)
+            return;
+
+        if (isMouseWheel) {
+            let currentIndex = -1;
+            for (var i = 0; i < windows.length; i++) {
+                if (windows[i].activated) {
+                    currentIndex = i;
+                    break;
                 }
             }
-        }
 
-        Rectangle {
-            id: background
-            anchors.fill: parent
-            radius: (barConfig?.noBackground ?? false) ? 0 : Theme.cornerRadius
-            color: {
-                if (windowCount === 0) {
-                    return "transparent";
-                }
-
-                if ((barConfig?.noBackground ?? false)) {
-                    return "transparent";
-                }
-
-                const baseColor = Theme.widgetBaseBackgroundColor;
-                const transparency = (root.barConfig && root.barConfig.widgetTransparency !== undefined) ? root.barConfig.widgetTransparency : 1.0;
-                if (Theme.widgetBackgroundHasAlpha) {
-                    return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, baseColor.a * transparency);
-                }
-                return Theme.withAlpha(baseColor, transparency);
-            }
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-        acceptedButtons: Qt.NoButton
-
-        property real scrollAccumulator: 0
-        property real touchpadThreshold: 500
-
-        onWheel: wheel => {
-            const deltaY = wheel.angleDelta.y;
-            const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
-
-            const windows = root.sortedToplevels;
-            if (windows.length < 2) {
-                return;
+            let nextIndex;
+            if (deltaY < 0) {
+                nextIndex = currentIndex === -1 ? 0 : Math.min(currentIndex + 1, windows.length - 1);
+            } else {
+                nextIndex = currentIndex === -1 ? windows.length - 1 : Math.max(currentIndex - 1, 0);
             }
 
-            if (isMouseWheel) {
-                // Direct mouse wheel action
+            const nextWindow = windows[nextIndex];
+            if (nextWindow)
+                nextWindow.activate();
+        } else {
+            scrollAccumulator += deltaY;
+
+            if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
                 let currentIndex = -1;
                 for (var i = 0; i < windows.length; i++) {
                     if (windows[i].activated) {
@@ -250,69 +180,32 @@ Item {
                 }
 
                 let nextIndex;
-                if (deltaY < 0) {
-                    if (currentIndex === -1) {
-                        nextIndex = 0;
-                    } else {
-                        nextIndex = Math.min(currentIndex + 1, windows.length - 1);
-                    }
+                if (scrollAccumulator < 0) {
+                    nextIndex = currentIndex === -1 ? 0 : Math.min(currentIndex + 1, windows.length - 1);
                 } else {
-                    if (currentIndex === -1) {
-                        nextIndex = windows.length - 1;
-                    } else {
-                        nextIndex = Math.max(currentIndex - 1, 0);
-                    }
+                    nextIndex = currentIndex === -1 ? windows.length - 1 : Math.max(currentIndex - 1, 0);
                 }
 
                 const nextWindow = windows[nextIndex];
-                if (nextWindow) {
+                if (nextWindow)
                     nextWindow.activate();
-                }
-            } else {
-                // Touchpad - accumulate small deltas
-                scrollAccumulator += deltaY;
 
-                if (Math.abs(scrollAccumulator) >= touchpadThreshold) {
-                    let currentIndex = -1;
-                    for (var i = 0; i < windows.length; i++) {
-                        if (windows[i].activated) {
-                            currentIndex = i;
-                            break;
-                        }
-                    }
-
-                    let nextIndex;
-                    if (scrollAccumulator < 0) {
-                        if (currentIndex === -1) {
-                            nextIndex = 0;
-                        } else {
-                            nextIndex = Math.min(currentIndex + 1, windows.length - 1);
-                        }
-                    } else {
-                        if (currentIndex === -1) {
-                            nextIndex = windows.length - 1;
-                        } else {
-                            nextIndex = Math.max(currentIndex - 1, 0);
-                        }
-                    }
-
-                    const nextWindow = windows[nextIndex];
-                    if (nextWindow) {
-                        nextWindow.activate();
-                    }
-
-                    scrollAccumulator = 0;
-                }
+                scrollAccumulator = 0;
             }
-
-            wheel.accepted = true;
         }
     }
 
-    Loader {
-        id: layoutLoader
-        anchors.centerIn: parent
-        sourceComponent: root.isVertical ? columnLayout : rowLayout
+    content: Component {
+        Item {
+            implicitWidth: layoutLoader.item ? layoutLoader.item.implicitWidth : 0
+            implicitHeight: layoutLoader.item ? layoutLoader.item.implicitHeight : 0
+
+            Loader {
+                id: layoutLoader
+                anchors.centerIn: parent
+                sourceComponent: root.isVerticalOrientation ? columnLayout : rowLayout
+            }
+        }
     }
 
     Component {
@@ -458,6 +351,11 @@ Item {
                             elide: Text.ElideRight
                             maximumLineCount: 1
                         }
+
+                        DankRipple {
+                            id: itemRipple
+                            cornerRadius: Theme.cornerRadius
+                        }
                     }
 
                     MouseArea {
@@ -466,6 +364,10 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+                        onPressed: mouse => {
+                            const pos = mapToItem(visualContent, mouse.x, mouse.y);
+                            itemRipple.trigger(pos.x, pos.y);
+                        }
                         onClicked: mouse => {
                             if (mouse.button === Qt.LeftButton) {
                                 if (isGrouped && windowCount > 1) {
@@ -495,7 +397,7 @@ Item {
                                     windowContextMenuLoader.item.triggerBarPosition = root.axis.edge === "left" ? 2 : (root.axis.edge === "right" ? 3 : (root.axis.edge === "top" ? 0 : 1));
                                     windowContextMenuLoader.item.triggerBarThickness = root.barThickness;
                                     windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing;
-                                    if (root.isVertical) {
+                                    if (root.isVerticalOrientation) {
                                         const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
                                         const screenX = root.parentScreen ? root.parentScreen.x : 0;
                                         const screenY = root.parentScreen ? root.parentScreen.y : 0;
@@ -526,7 +428,7 @@ Item {
                             root.hoveredItem = delegateItem;
                             tooltipLoader.active = true;
                             if (tooltipLoader.item) {
-                                if (root.isVertical) {
+                                if (root.isVerticalOrientation) {
                                     const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
                                     const screenX = root.parentScreen ? root.parentScreen.x : 0;
                                     const screenY = root.parentScreen ? root.parentScreen.y : 0;
@@ -703,6 +605,11 @@ Item {
                             elide: Text.ElideRight
                             maximumLineCount: 1
                         }
+
+                        DankRipple {
+                            id: itemRipple
+                            cornerRadius: Theme.cornerRadius
+                        }
                     }
 
                     MouseArea {
@@ -711,6 +618,10 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        onPressed: mouse => {
+                            const pos = mapToItem(visualContent, mouse.x, mouse.y);
+                            itemRipple.trigger(pos.x, pos.y);
+                        }
                         onClicked: mouse => {
                             if (mouse.button === Qt.LeftButton) {
                                 if (isGrouped && windowCount > 1) {
@@ -740,7 +651,7 @@ Item {
                                     windowContextMenuLoader.item.triggerBarPosition = root.axis.edge === "left" ? 2 : (root.axis.edge === "right" ? 3 : (root.axis.edge === "top" ? 0 : 1));
                                     windowContextMenuLoader.item.triggerBarThickness = root.barThickness;
                                     windowContextMenuLoader.item.triggerBarSpacing = root.barSpacing;
-                                    if (root.isVertical) {
+                                    if (root.isVerticalOrientation) {
                                         const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
                                         const screenX = root.parentScreen ? root.parentScreen.x : 0;
                                         const screenY = root.parentScreen ? root.parentScreen.y : 0;
@@ -765,7 +676,7 @@ Item {
                             root.hoveredItem = delegateItem;
                             tooltipLoader.active = true;
                             if (tooltipLoader.item) {
-                                if (root.isVertical) {
+                                if (root.isVerticalOrientation) {
                                     const globalPos = delegateItem.mapToGlobal(delegateItem.width / 2, delegateItem.height / 2);
                                     const screenX = root.parentScreen ? root.parentScreen.x : 0;
                                     const screenY = root.parentScreen ? root.parentScreen.y : 0;

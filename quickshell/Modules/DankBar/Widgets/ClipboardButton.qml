@@ -65,6 +65,7 @@ BasePill {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         cursorShape: Qt.PointingHandCursor
+        onPressed: mouse => root.triggerRipple(this, mouse.x, mouse.y)
         onClicked: function (mouse) {
             switch (mouse.button) {
             case Qt.RightButton:

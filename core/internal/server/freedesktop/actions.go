@@ -1,11 +1,9 @@
 package freedesktop
 
 import (
-	"context"
 	"fmt"
-	"os/exec"
-	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -107,22 +105,8 @@ func (m *Manager) GetUserIconFile(username string) (string, error) {
 }
 
 func (m *Manager) SetIconTheme(iconTheme string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	check := exec.CommandContext(ctx, "gsettings", "writable", "org.gnome.desktop.interface", "icon-theme")
-	if err := check.Run(); err == nil {
-		cmd := exec.CommandContext(ctx, "gsettings", "set", "org.gnome.desktop.interface", "icon-theme", iconTheme)
-		if err := cmd.Run(); err != nil {
-			return fmt.Errorf("gsettings set failed: %w", err)
-		}
-		return nil
+	if err := utils.GsettingsSet("org.gnome.desktop.interface", "icon-theme", iconTheme); err != nil {
+		return fmt.Errorf("failed to set icon theme: %w", err)
 	}
-
-	checkDconf := exec.CommandContext(ctx, "dconf", "write", "/org/gnome/desktop/interface/icon-theme", fmt.Sprintf("'%s'", iconTheme))
-	if err := checkDconf.Run(); err != nil {
-		return fmt.Errorf("both gsettings and dconf unavailable or failed: %w", err)
-	}
-
 	return nil
 }

@@ -155,10 +155,16 @@ Rectangle {
                         }
                     }
 
+                    DankRipple {
+                        id: mountRipple
+                        cornerRadius: parent.radius
+                    }
+
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => mountRipple.trigger(mouse.x, mouse.y)
                         onClicked: {
                             currentMountPath = modelData.mount;
                             mountPathChanged(modelData.mount);

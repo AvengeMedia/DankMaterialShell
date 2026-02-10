@@ -91,12 +91,18 @@ Row {
         radius: (Theme.iconSize + Theme.spacingS * 2) / 2
         color: iconArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.primary, 0)
 
+        DankRipple {
+            id: iconRipple
+            cornerRadius: parent.radius
+        }
+
         MouseArea {
             id: iconArea
             anchors.fill: parent
             hoverEnabled: true
             cursorShape: DisplayService.devices && DisplayService.devices.length > 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
 
+            onPressed: mouse => iconRipple.trigger(mouse.x, mouse.y)
             onClicked: {
                 if (DisplayService.devices && DisplayService.devices.length > 1) {
                     root.iconClicked();

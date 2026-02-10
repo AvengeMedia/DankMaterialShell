@@ -86,6 +86,7 @@ FocusScope {
 
     Controller {
         id: controller
+        active: root.parentModal?.spotlightOpen ?? true
         viewModeContext: root.viewModeContext
 
         onItemExecuted: {

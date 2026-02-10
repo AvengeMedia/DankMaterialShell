@@ -139,12 +139,18 @@ Rectangle {
                 }
             }
 
+            DankRipple {
+                id: scanRipple
+                cornerRadius: scanButton.radius
+            }
+
             MouseArea {
                 id: scanMouseArea
                 anchors.fill: parent
                 hoverEnabled: true
                 enabled: scanButton.adapterEnabled
                 cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onPressed: mouse => scanRipple.trigger(mouse.x, mouse.y)
                 onClicked: {
                     if (!BluetoothService.adapter)
                         return;
@@ -399,12 +405,21 @@ Rectangle {
                         }
                     }
 
+                    DankRipple {
+                        id: deviceRipple
+                        cornerRadius: pairedDelegate.radius
+                    }
+
                     MouseArea {
                         id: deviceMouseArea
                         anchors.fill: parent
                         anchors.rightMargin: pairedOptionsButton.width + Theme.spacingM + pinBluetoothRow.width + Theme.spacingS * 4
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
+                        onPressed: mouse => {
+                            const pos = mapToItem(pairedDelegate, mouse.x, mouse.y);
+                            deviceRipple.trigger(pos.x, pos.y);
+                        }
                         onClicked: {
                             if (pairedDelegate.isConnected) {
                                 pairedDelegate.modelData.disconnect();
@@ -547,12 +562,18 @@ Rectangle {
                         font.weight: Font.Medium
                     }
 
+                    DankRipple {
+                        id: availableRipple
+                        cornerRadius: availableDelegate.radius
+                    }
+
                     MouseArea {
                         id: availableMouseArea
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: availableDelegate.isInteractive ? Qt.PointingHandCursor : Qt.ArrowCursor
                         enabled: availableDelegate.isInteractive
+                        onPressed: mouse => availableRipple.trigger(mouse.x, mouse.y)
                         onClicked: root.handlePairDevice(availableDelegate.modelData)
                     }
                 }

@@ -110,12 +110,18 @@ Rectangle {
         }
     }
 
+    DankRipple {
+        id: ripple
+        cornerRadius: root.radius
+    }
+
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
         enabled: root.enabled
+        onPressed: mouse => ripple.trigger(mouse.x, mouse.y)
         onClicked: root.clicked()
     }
 

@@ -169,6 +169,12 @@ Flow {
                 }
             }
 
+            DankRipple {
+                id: segmentRipple
+                cornerRadius: Theme.cornerRadius
+                rippleColor: segment.selected ? Theme.buttonText : Theme.surfaceVariantText
+            }
+
             Item {
                 id: contentItem
                 anchors.centerIn: parent
@@ -222,6 +228,7 @@ Flow {
                 anchors.fill: parent
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
+                onPressed: mouse => segmentRipple.trigger(mouse.x, mouse.y)
                 onClicked: root.selectItem(index)
             }
         }

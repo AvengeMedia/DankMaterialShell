@@ -11,19 +11,11 @@ Rectangle {
     property string iconName: ""
     property string text: ""
 
-    signal pressed()
+    signal pressed
 
     height: 34
     radius: Theme.cornerRadius
-    color: mouseArea.containsMouse ? Qt.rgba(
-                                        Theme.primary.r,
-                                        Theme.primary.g,
-                                        Theme.primary.b,
-                                        0.12) : Qt.rgba(
-                                        Theme.surfaceVariant.r,
-                                        Theme.surfaceVariant.g,
-                                        Theme.surfaceVariant.b,
-                                        0.5)
+    color: mouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Qt.rgba(Theme.surfaceVariant.r, Theme.surfaceVariant.g, Theme.surfaceVariant.b, 0.5)
 
     Row {
         anchors.centerIn: parent
@@ -44,12 +36,20 @@ Rectangle {
         }
     }
 
+    DankRipple {
+        id: ripple
+        cornerRadius: root.radius
+    }
+
     MouseArea {
         id: mouseArea
 
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        onPressed: root.pressed()
+        onPressed: mouse => {
+            ripple.trigger(mouse.x, mouse.y);
+            root.pressed();
+        }
     }
 }
