@@ -60,6 +60,12 @@ binds {
 		XF86AudioNext allow-when-locked=true {
 		    spawn "dms" "ipc" "call" "mpris" "next";
 		}
+        Ctrl+XF86AudioRaiseVolume allow-when-locked=true {
+            spawn "dms" "ipc" "call" "mpris" "increment" "3";
+        }
+        Ctrl+XF86AudioLowerVolume allow-when-locked=true {
+            spawn "dms" "ipc" "call" "mpris" "decrement" "3";
+        }
 
     // === Brightness Controls ===
     XF86MonBrightnessUp allow-when-locked=true {

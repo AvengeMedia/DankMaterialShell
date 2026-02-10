@@ -57,6 +57,8 @@ const DMS_ACTIONS = [
     { id: "spawn dms ipc call audio decrement 1", label: "Volume Down (1%)" },
     { id: "spawn dms ipc call audio decrement 5", label: "Volume Down (5%)" },
     { id: "spawn dms ipc call audio decrement 10", label: "Volume Down (10%)" },
+    { id: "spawn dms ipc call mpris increment 5", label: "Player Volume Up (5%)" },
+    { id: "spawn dms ipc call mpris decrement 5", label: "Player Volume Down (5%)" },
     { id: "spawn dms ipc call audio mute", label: "Volume Mute Toggle" },
     { id: "spawn dms ipc call audio micmute", label: "Microphone Mute Toggle" },
     { id: "spawn dms ipc call audio cycleoutput", label: "Audio Output: Cycle" },
@@ -717,6 +719,14 @@ const DMS_ACTION_ARGS = {
     },
     "audio decrement": {
         base: "spawn dms ipc call audio decrement",
+        args: [{ name: "amount", type: "number", label: "Amount %", placeholder: "5", default: "5" }]
+    },
+    "player increment": {
+        base: "spawn dms ipc call mpris increment",
+        args: [{ name: "amount", type: "number", label: "Amount %", placeholder: "5", default: "5" }]
+    },
+    "player decrement": {
+        base: "spawn dms ipc call mpris decrement",
         args: [{ name: "amount", type: "number", label: "Amount %", placeholder: "5", default: "5" }]
     },
     "brightness increment": {
