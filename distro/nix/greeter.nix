@@ -13,8 +13,8 @@ let
 
   compositorPackage =
     let
-      programs.mangowc.package = programs.mango.package;
-      configured = lib.attrByPath [ "programs" cfg.compositor.name "package" ] null config;
+      compositor = if config.programs.mango.enable != null then mango else cfg.compositor.name;
+      configured = lib.attrByPath [ "programs" compositor "package" ] null config;
     in
     if configured != null then configured else builtins.getAttr cfg.compositor.name pkgs;
 
@@ -73,6 +73,7 @@ in
         "sway"
         "labwc"
         "mangowc"
+        "scroll"
       ];
       description = "Compositor to run greeter in";
     };
