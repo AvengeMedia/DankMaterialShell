@@ -13,6 +13,7 @@ let
 
   compositorPackage =
     let
+      programs.mangowc.package = programs.mango.package;
       configured = lib.attrByPath [ "programs" cfg.compositor.name "package" ] null config;
     in
     if configured != null then configured else builtins.getAttr cfg.compositor.name pkgs;
