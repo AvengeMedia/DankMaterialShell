@@ -483,6 +483,7 @@ Singleton {
     property bool lockScreenShowPasswordField: true
     property bool lockScreenShowMediaPlayer: true
     property bool lockScreenPowerOffMonitorsOnLock: false
+    property bool lockAtStartup: false
 
     property bool enableFprint: false
     property int maxFprintTries: 15

@@ -15,7 +15,8 @@ Rectangle {
 
     Component.onCompleted: {
         Qt.callLater(() => {
-            __initialized = true;
+            if (root)
+                root.__initialized = true;
         });
     }
 

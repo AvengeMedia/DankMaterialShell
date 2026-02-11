@@ -149,6 +149,22 @@ DankPopout {
                     event.accepted = true;
                     return;
                 }
+
+                if (event.key === Qt.Key_Left) {
+                    if (notificationHeader.currentTab > 0) {
+                        notificationHeader.currentTab = 0;
+                        event.accepted = true;
+                    }
+                    return;
+                }
+
+                if (event.key === Qt.Key_Right) {
+                    if (notificationHeader.currentTab === 0 && SettingsData.notificationHistoryEnabled) {
+                        notificationHeader.currentTab = 1;
+                        event.accepted = true;
+                    }
+                    return;
+                }
                 if (notificationHeader.currentTab === 1) {
                     historyList.handleKey(event);
                     return;

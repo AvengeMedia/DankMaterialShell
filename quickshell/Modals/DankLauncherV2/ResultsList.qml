@@ -112,6 +112,11 @@ Item {
         function onViewModeVersionChanged() {
             Qt.callLater(root._rebuildVisualModel);
         }
+        function onSearchModeChanged() {
+            root._visualRows = [];
+            root._cumulativeHeights = [];
+            root._flatIndexToRowMap = {};
+        }
     }
 
     function resetScroll() {
@@ -355,9 +360,6 @@ Item {
         readonly property int versionTrigger: root.controller?.viewModeVersion ?? 0
 
         readonly property var stickyHeaderSection: {
-            if (!root.controller?.sections || root.controller.sections.length === 0)
-                return null;
-
             var scrollY = mainListView.contentY - mainListView.originY;
             if (scrollY <= 0)
                 return null;

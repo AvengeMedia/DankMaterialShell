@@ -43,6 +43,8 @@ Scope {
 
     Component.onCompleted: {
         IdleService.lockComponent = this;
+        if (SettingsData.lockAtStartup)
+            lock();
     }
 
     function notifyLoginctl(lockAction: bool) {
@@ -204,7 +206,6 @@ Scope {
     }
 
     LockScreenDemo {
-
         id: demoWindow
     }
 

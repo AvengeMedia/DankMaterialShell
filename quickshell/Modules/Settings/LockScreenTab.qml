@@ -149,6 +149,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "lockAtStartup"
+                    tags: ["lock", "screen", "startup", "start", "boot", "login", "automatic"]
+                    text: I18n.tr("Lock at startup")
+                    description: I18n.tr("Automatically lock the screen when DMS starts")
+                    checked: SettingsData.lockAtStartup
+                    onToggled: checked => SettingsData.set("lockAtStartup", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "enableFprint"
                     tags: ["lock", "screen", "fingerprint", "authentication", "biometric", "fprint"]
                     text: I18n.tr("Enable fingerprint authentication")

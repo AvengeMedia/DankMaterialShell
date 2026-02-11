@@ -310,6 +310,7 @@ var SPEC = {
     lockScreenShowPasswordField: { def: true },
     lockScreenShowMediaPlayer: { def: true },
     lockScreenPowerOffMonitorsOnLock: { def: false },
+    lockAtStartup: { def: false },
     enableFprint: { def: false },
     maxFprintTries: { def: 15 },
     fprintdAvailable: { def: false, persist: false },

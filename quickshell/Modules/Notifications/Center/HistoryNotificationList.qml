@@ -257,7 +257,8 @@ Item {
 
                 Component.onCompleted: {
                     Qt.callLater(() => {
-                        __delegateInitialized = true;
+                        if (delegateRoot)
+                            delegateRoot.__delegateInitialized = true;
                     });
                 }
 

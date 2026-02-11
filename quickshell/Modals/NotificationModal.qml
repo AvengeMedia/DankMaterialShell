@@ -21,6 +21,8 @@ DankModal {
     property var historyListRef: null
     property int currentTab: 0
 
+    property var notificationHeaderRef: null
+
     function show() {
         notificationModalOpen = true;
         currentTab = 0;
@@ -89,6 +91,22 @@ DankModal {
             event.accepted = true;
             return;
         }
+
+        if (event.key === Qt.Key_Left) {
+            if (notificationHeaderRef && notificationHeaderRef.currentTab > 0) {
+                notificationHeaderRef.currentTab = 0;
+                event.accepted = true;
+            }
+            return;
+        }
+        if (event.key === Qt.Key_Right) {
+            if (notificationHeaderRef && notificationHeaderRef.currentTab === 0 && SettingsData.notificationHistoryEnabled) {
+                notificationHeaderRef.currentTab = 1;
+                event.accepted = true;
+            }
+            return;
+        }
+
         if (currentTab === 1 && historyListRef) {
             historyListRef.handleKey(event);
             return;
@@ -161,6 +179,7 @@ DankModal {
                     id: notificationHeader
                     keyboardController: modalKeyboardController
                     onCurrentTabChanged: notificationModal.currentTab = currentTab
+                    Component.onCompleted: notificationModal.notificationHeaderRef = notificationHeader
                 }
 
                 NotificationSettings {
