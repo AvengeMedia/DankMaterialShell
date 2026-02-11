@@ -13,9 +13,7 @@ let
 
   compositorPackage =
     let
-      mango = lib.hasAttrByPath [ "programs" "mango" "package" ] true;
-      compositor = if mango != null then "mango" else cfg.compositor.name;
-      configured = lib.attrByPath [ "programs" compositor "package" ] null config;
+      configured = lib.attrByPath [ "programs" cfg.compositor.name "package" ] null config;
     in
     if configured != null then configured else builtins.getAttr cfg.compositor.name pkgs;
 
@@ -73,7 +71,7 @@ in
         "hyprland"
         "sway"
         "labwc"
-        "mangowc"
+        "mango"
         "scroll"
       ];
       description = "Compositor to run greeter in";
