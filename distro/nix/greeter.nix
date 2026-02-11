@@ -13,7 +13,8 @@ let
 
   compositorPackage =
     let
-      compositor = lib.attrByPath [ "programs" "mango" "enable" ] null "mango";
+      mango = lib.hasAttrByPath [ "programs" "mango" "package" ] true;
+      compositor = if mango != null then "mango" else cfg.compositor.name;
       configured = lib.attrByPath [ "programs" compositor "package" ] null config;
     in
     if configured != null then configured else builtins.getAttr cfg.compositor.name pkgs;
