@@ -5,6 +5,7 @@ import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Window
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import qs.Common
@@ -44,19 +45,14 @@ Item {
         WeatherService.addRef();
         UserInfoService.getUserInfo();
 
-        if (CompositorService.isHyprland) {
+        if (CompositorService.isHyprland)
             updateHyprlandLayout();
-            hyprlandLayoutUpdateTimer.start();
-        }
 
         lockerReadyArmed = true;
     }
 
     Component.onDestruction: {
         WeatherService.removeRef();
-        if (CompositorService.isHyprland) {
-            hyprlandLayoutUpdateTimer.stop();
-        }
     }
 
     function sendLockerReadyOnce() {
@@ -118,22 +114,19 @@ Item {
                 try {
                     const data = JSON.parse(text);
                     const mainKeyboard = data.keyboards.find(kb => kb.main === true);
+                    if (!mainKeyboard) {
+                        hyprlandCurrentLayout = "";
+                        hyprlandLayoutCount = 0;
+                        return;
+                    }
                     hyprlandKeyboard = mainKeyboard.name;
-                    if (mainKeyboard && mainKeyboard.active_keymap) {
+                    if (mainKeyboard.active_keymap) {
                         const parts = mainKeyboard.active_keymap.split(" ");
-                        if (parts.length > 0) {
-                            hyprlandCurrentLayout = parts[0].substring(0, 2).toUpperCase();
-                        } else {
-                            hyprlandCurrentLayout = mainKeyboard.active_keymap.substring(0, 2).toUpperCase();
-                        }
+                        hyprlandCurrentLayout = parts[0].substring(0, 2).toUpperCase();
                     } else {
                         hyprlandCurrentLayout = "";
                     }
-                    if (mainKeyboard && mainKeyboard.layout_names) {
-                        hyprlandLayoutCount = mainKeyboard.layout_names.length;
-                    } else {
-                        hyprlandLayoutCount = 0;
-                    }
+                    hyprlandLayoutCount = mainKeyboard.layout ? mainKeyboard.layout.split(",").length : 0;
                 } catch (e) {
                     hyprlandCurrentLayout = "";
                     hyprlandLayoutCount = 0;
@@ -142,12 +135,14 @@ Item {
         }
     }
 
-    Timer {
-        id: hyprlandLayoutUpdateTimer
-        interval: 1000
-        running: false
-        repeat: true
-        onTriggered: updateHyprlandLayout()
+    Connections {
+        target: CompositorService.isHyprland ? Hyprland : null
+        enabled: CompositorService.isHyprland
+
+        function onRawEvent(event) {
+            if (event.name === "activelayout")
+                updateHyprlandLayout();
+        }
     }
 
     Loader {
