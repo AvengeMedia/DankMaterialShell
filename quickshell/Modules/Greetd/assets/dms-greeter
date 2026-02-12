@@ -253,7 +253,7 @@ SCROLL_EOF
         fi
         ;;
 
-    mango)
+    mango|mangowc)
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
             exec mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
         else
