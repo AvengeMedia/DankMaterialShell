@@ -504,6 +504,7 @@ Singleton {
     property bool notificationHistorySaveLow: true
     property bool notificationHistorySaveNormal: true
     property bool notificationHistorySaveCritical: true
+    property var notificationRules: []
 
     property bool osdAlwaysShowValue: false
     property int osdPosition: SettingsData.Position.BottomCenter
@@ -2131,6 +2132,56 @@ Singleton {
             return;
         subs.splice(index, 1);
         appIdSubstitutions = subs;
+        saveSettings();
+    }
+
+    function addNotificationRule() {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        rules.push({
+            enabled: true,
+            field: "appName",
+            pattern: "",
+            matchType: "contains",
+            action: "mute",
+            urgency: "default"
+        });
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function updateNotificationRule(index, ruleData) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        if (index < 0 || index >= rules.length)
+            return;
+        var existing = rules[index] || {};
+        rules[index] = Object.assign({}, existing, ruleData || {});
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function updateNotificationRuleField(index, key, value) {
+        if (key === undefined || key === null || key === "")
+            return;
+        var patch = {};
+        patch[key] = value;
+        updateNotificationRule(index, patch);
+    }
+
+    function removeNotificationRule(index) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        if (index < 0 || index >= rules.length)
+            return;
+        rules.splice(index, 1);
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function getDefaultNotificationRules() {
+        return Spec.SPEC.notificationRules.def;
+    }
+
+    function resetNotificationRules() {
+        notificationRules = JSON.parse(JSON.stringify(Spec.SPEC.notificationRules.def));
         saveSettings();
     }
 

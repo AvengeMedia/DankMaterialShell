@@ -153,12 +153,12 @@ QtObject {
         if (!wrapper || !wrapper.notification) {
             return false;
         }
-        const incomingUrgency = wrapper.notification.urgency || 0;
+        const incomingUrgency = wrapper.urgency || 0;
         for (const p of activeWindows) {
             if (!p.notificationData || !p.notificationData.notification) {
                 continue;
             }
-            const existingUrgency = p.notificationData.notification.urgency || 0;
+            const existingUrgency = p.notificationData.urgency || 0;
             if (existingUrgency < incomingUrgency) {
                 return true;
             }
@@ -188,10 +188,9 @@ QtObject {
     }
 
     function _selectPopupToRemove(activeWindows, incomingWrapper) {
-        const incomingUrgency = (incomingWrapper && incomingWrapper.notification) ? incomingWrapper.notification.urgency || 0 : 0;
         const sortedWindows = activeWindows.slice().sort((a, b) => {
-            const aUrgency = (a.notificationData && a.notificationData.notification) ? a.notificationData.notification.urgency || 0 : 0;
-            const bUrgency = (b.notificationData && b.notificationData.notification) ? b.notificationData.notification.urgency || 0 : 0;
+            const aUrgency = (a.notificationData) ? a.notificationData.urgency || 0 : 0;
+            const bUrgency = (b.notificationData) ? b.notificationData.urgency || 0 : 0;
             if (aUrgency !== bUrgency) {
                 return aUrgency - bUrgency;
             }

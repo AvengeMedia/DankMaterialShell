@@ -260,14 +260,14 @@ Singleton {
         return Date.now() / 1000.0;
     }
 
-    function _ingressAllowed(notif) {
+    function _ingressAllowed(urgency) {
         const t = _nowSec();
         if (t - _lastIngressSec >= 1.0) {
             _lastIngressSec = t;
             _ingressCountThisSec = 0;
         }
         _ingressCountThisSec += 1;
-        if (notif.urgency === NotificationUrgency.Critical) {
+        if (urgency === NotificationUrgency.Critical) {
             return true;
         }
         return _ingressCountThisSec <= maxIngressPerSecond;
@@ -294,11 +294,13 @@ Singleton {
 
     function _initWrapperPersistence(wrapper) {
         const timeoutMs = wrapper.timer ? wrapper.timer.interval : 5000;
-        const isCritical = wrapper.notification && wrapper.notification.urgency === NotificationUrgency.Critical;
+        const isCritical = wrapper && wrapper.urgency === NotificationUrgency.Critical;
         wrapper.isPersistent = isCritical || (timeoutMs === 0);
     }
 
-    function _shouldSaveToHistory(urgency) {
+    function _shouldSaveToHistory(urgency, forceDisable) {
+        if (forceDisable === true)
+            return false;
         if (!SettingsData.notificationHistoryEnabled)
             return false;
         switch (urgency) {
@@ -309,6 +311,126 @@ Singleton {
         default:
             return SettingsData.notificationHistorySaveNormal;
         }
+    }
+
+    function _resolveAppNameForRule(notif) {
+        if (!notif)
+            return "";
+        if (notif.appName && notif.appName !== "")
+            return notif.appName;
+        const entry = DesktopEntries.heuristicLookup(notif.desktopEntry);
+        if (entry && entry.name)
+            return entry.name;
+        return "";
+    }
+
+    function _ruleFieldValue(field, info) {
+        switch ((field || "").toString()) {
+        case "desktopEntry":
+            return info.desktopEntry;
+        case "summary":
+            return info.summary;
+        case "body":
+            return info.body;
+        case "appName":
+        default:
+            return info.appName;
+        }
+    }
+
+    function _coerceRuleUrgency(value, fallbackUrgency) {
+        if (typeof value === "number" && value >= NotificationUrgency.Low && value <= NotificationUrgency.Critical)
+            return value;
+
+        const mapped = (value || "default").toString().toLowerCase();
+        switch (mapped) {
+        case "low":
+            return NotificationUrgency.Low;
+        case "normal":
+            return NotificationUrgency.Normal;
+        case "critical":
+            return NotificationUrgency.Critical;
+        default:
+            return fallbackUrgency;
+        }
+    }
+
+    function _matchesNotificationRule(rule, info) {
+        if (!rule)
+            return false;
+        if (rule.enabled === false)
+            return false;
+
+        const pattern = (rule.pattern || "").toString();
+        if (!pattern.trim())
+            return false;
+
+        const value = (_ruleFieldValue(rule.field, info) || "").toString();
+        const matchType = (rule.matchType || "contains").toString().toLowerCase();
+
+        if (matchType === "exact")
+            return value.toLowerCase() === pattern.toLowerCase();
+        if (matchType === "regex") {
+            try {
+                return new RegExp(pattern, "i").test(value);
+            } catch (e) {
+                console.warn("NotificationService: invalid notification rule regex:", pattern);
+                return false;
+            }
+        }
+
+        return value.toLowerCase().includes(pattern.toLowerCase());
+    }
+
+    function _evaluateNotificationPolicy(notif) {
+        const baseUrgency = typeof notif.urgency === "number" ? notif.urgency : NotificationUrgency.Normal;
+        const policy = {
+            "drop": false,
+            "disablePopup": false,
+            "hideFromCenter": false,
+            "disableHistory": false,
+            "urgency": baseUrgency
+        };
+
+        const rules = SettingsData.notificationRules || [];
+        if (!rules.length)
+            return policy;
+
+        const info = {
+            "appName": _resolveAppNameForRule(notif),
+            "desktopEntry": notif.desktopEntry || "",
+            "summary": notif.summary || "",
+            "body": notif.body || ""
+        };
+
+        for (const rule of rules) {
+            if (!_matchesNotificationRule(rule, info))
+                continue;
+
+            const action = (rule.action || "default").toString().toLowerCase();
+            switch (action) {
+            case "ignore":
+                policy.drop = true;
+                break;
+            case "mute":
+                policy.disablePopup = true;
+                break;
+            case "popup_only":
+                policy.hideFromCenter = true;
+                policy.disableHistory = true;
+                break;
+            case "no_history":
+                policy.disableHistory = true;
+                break;
+            default:
+                break;
+            }
+
+            policy.urgency = _coerceRuleUrgency(rule.urgency, policy.urgency);
+            return policy;
+        }
+
+        return policy;
     }
 
     function pruneHistory() {
@@ -440,8 +562,16 @@ Singleton {
         onNotification: notif => {
             notif.tracked = true;
 
-            if (!_ingressAllowed(notif)) {
-                if (notif.urgency !== NotificationUrgency.Critical) {
+            const policy = _evaluateNotificationPolicy(notif);
+            if (policy.drop) {
+                try {
+                    notif.dismiss();
+                } catch (e) {}
+                return;
+            }
+
+            if (!_ingressAllowed(policy.urgency)) {
+                if (policy.urgency !== NotificationUrgency.Critical) {
                     try {
                         notif.dismiss();
                     } catch (e) {}
@@ -450,25 +580,35 @@ Singleton {
             }
 
             if (SettingsData.soundsEnabled && SettingsData.soundNewNotification) {
-                if (notif.urgency === NotificationUrgency.Critical) {
+                if (policy.urgency === NotificationUrgency.Critical) {
                     AudioService.playCriticalNotificationSound();
                 } else {
                     AudioService.playNormalNotificationSound();
                 }
             }
 
-            const shouldShowPopup = !root.popupsDisabled && !SessionData.doNotDisturb;
+            const shouldShowPopup = !root.popupsDisabled && !SessionData.doNotDisturb && !policy.disablePopup;
             const isTransient = notif.transient;
+            const shouldKeepInCenter = !isTransient && !policy.hideFromCenter;
+
+            if (!shouldShowPopup && !shouldKeepInCenter) {
+                try {
+                    notif.dismiss();
+                } catch (e) {}
+                return;
+            }
+
             const wrapper = notifComponent.createObject(root, {
                 "popup": shouldShowPopup,
-                "notification": notif
+                "notification": notif,
+                "urgencyOverride": policy.urgency
             });
 
             if (wrapper) {
                 root.allWrappers.push(wrapper);
-                if (!isTransient) {
+                if (shouldKeepInCenter) {
                     root.notifications.push(wrapper);
-                    if (_shouldSaveToHistory(notif.urgency)) {
+                    if (_shouldSaveToHistory(wrapper.urgency, policy.disableHistory)) {
                         root.addToHistory(wrapper);
                     }
                 }
@@ -505,7 +645,7 @@ Singleton {
             interval: {
                 if (!wrapper.notification)
                     return 5000;
-                switch (wrapper.notification.urgency) {
+                switch (wrapper.urgency) {
                 case NotificationUrgency.Low:
                     return SettingsData.notificationTimeoutLow;
                 case NotificationUrgency.Critical:
@@ -600,7 +740,8 @@ Singleton {
                 return "";
             return Paths.strip(image);
         }
-        readonly property int urgency: notification?.urgency ?? 1
+        property int urgencyOverride: notification?.urgency ?? NotificationUrgency.Normal
+        readonly property int urgency: urgencyOverride
         readonly property list<NotificationAction> actions: notification?.actions ?? []
 
         readonly property Connections conn: Connections {
