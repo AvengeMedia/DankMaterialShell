@@ -6774,6 +6774,12 @@
     "comment": ""
   },
   {
+    "term": "No widgets added. Click \"Add Widget\" to get started.",
+    "context": "No widgets added. Click \"Add Widget\" to get started.",
+    "reference": "Modules/Settings/DesktopWidgetsTab.qml:603",
+    "comment": ""
+  },
+  {
     "term": "No widgets match your search",
     "context": "No widgets match your search",
     "reference": "Modules/Settings/DesktopWidgetBrowser.qml:459",

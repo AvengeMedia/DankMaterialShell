@@ -3231,6 +3231,9 @@
   "No variants created. Click Add to create a new monitor widget.": {
     "No variants created. Click Add to create a new monitor widget.": "Nenhuma variante criada. Clique Adicionar para criar um novo widget de monitor."
   },
+  "No widgets added. Click \"Add Widget\" to get started.": {
+    "No widgets added. Click \"Add Widget\" to get started.": "Nenhum widget adicionado. Clique em \"Adicionar widget\" para começar."
+  },
   "No widgets available": {
     "No widgets available": ""
   },
@@ -3521,7 +3524,7 @@
     "Make sure KDE Connect or Valent is running on your other devices": ""
   },
   "Phone Connect no devices status | bluetooth status": {
-    "No devices": ""
+    "No devices": "Nenhum dispositivo"
   },
   "Phone Connect pairing action": {
     "Device paired": "",
@@ -5297,7 +5300,7 @@
     "Charging": "",
     "Discharging": "",
     "Empty": "",
-    "Fully Charged": "",
+    "Fully Charged": "Totalmente carregada",
     "No Battery": "",
     "Pending Charge": "",
     "Pending Discharge": "",
@@ -5306,13 +5309,15 @@
   "bluetooth status": {
     "Bluetooth": "",
     "Connected Device": "",
-    "Enabled": "",
+    "Disabled": "Desativado",
+    "Enabled": "Ativado",
     "No adapter": "",
     "No adapters": "",
+    "No devices": "Nenhum dispositivo",
     "Off": ""
   },
   "bluetooth status | lock screen notification mode option": {
-    "Disabled": ""
+    "Disabled": "Desativado"
   },
   "border color": {
     "Color": ""
@@ -5364,16 +5369,16 @@
     "Select Wallpaper": "Selecionar Papel de Parede"
   },
   "date format option": {
-    "Custom...": "",
-    "Day Date": "",
-    "Day Month Date": "",
-    "Full Day & Month": "",
-    "Full with Year": "",
-    "ISO Date": "",
-    "Month Date": "",
-    "Numeric (D/M)": "",
-    "Numeric (M/D)": "",
-    "System Default": ""
+    "Custom...": "Personalizado...",
+    "Day Date": "Dia e data",
+    "Day Month Date": "Dia, mês e data",
+    "Full Day & Month": "Dia completo e mês",
+    "Full with Year": "Completo com ano",
+    "ISO Date": "Data ISO",
+    "Month Date": "Mês e data",
+    "Numeric (D/M)": "Numérico (D/M)",
+    "Numeric (M/D)": "Numérico (M/D)",
+    "System Default": "Padrão do sistema"
   },
   "days": {
     "days": "dias"
@@ -5406,8 +5411,8 @@
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": ""
   },
   "dock indicator style option": {
-    "Circle": "",
-    "Line": ""
+    "Circle": "Círculo",
+    "Line": "Linha"
   },
   "dock position option": {
     "Bottom": "",
@@ -5662,15 +5667,15 @@
     "loginctl not available - lock integration requires DMS socket connection": "loginctl não disponível - integração com bloqueio requer conexão de socket DMS"
   },
   "matugen color scheme option": {
-    "Content": "",
-    "Expressive": "",
-    "Fidelity": "",
-    "Fruit Salad": "",
-    "Monochrome": "",
-    "Neutral": "",
-    "Rainbow": "",
-    "Tonal Spot": "",
-    "Vibrant": ""
+    "Content": "Conteúdo",
+    "Expressive": "Expressivo",
+    "Fidelity": "Fidelidade",
+    "Fruit Salad": "Salada de frutas",
+    "Monochrome": "Monocromático",
+    "Neutral": "Neutro",
+    "Rainbow": "Arco-íris",
+    "Tonal Spot": "Ponto tonal",
+    "Vibrant": "Vibrante"
   },
   "matugen error": {
     "matugen not found - install matugen package for dynamic theming": ""
@@ -5682,9 +5687,9 @@
     "Matugen Missing": ""
   },
   "media scroll wheel option": {
-    "Change Song": "",
-    "Change Volume": "",
-    "Nothing": ""
+    "Change Song": "Trocar música",
+    "Change Volume": "Alterar volume",
+    "Nothing": "Nada"
   },
   "minutes": {
     "minutes": "minutos"
@@ -5792,9 +5797,9 @@
     "Prioritize performance": ""
   },
   "power profile option": {
-    "Balanced": "",
-    "Performance": "",
-    "Power Saver": ""
+    "Balanced": "Equilibrado",
+    "Performance": "Desempenho",
+    "Power Saver": "Economia de energia"
   },
   "primary color": {
     "Primary": ""
@@ -5818,14 +5823,14 @@
     "Color theme from DMS registry": ""
   },
   "screen position option": {
-    "Bottom Center": "",
-    "Bottom Left": "",
-    "Bottom Right": "",
-    "Left Center": "",
-    "Right Center": "",
-    "Top Center": "",
-    "Top Left": "",
-    "Top Right": ""
+    "Bottom Center": "Inferior central",
+    "Bottom Left": "Inferior esquerdo",
+    "Bottom Right": "Inferior direito",
+    "Left Center": "Centro esquerdo",
+    "Right Center": "Centro direito",
+    "Top Center": "Superior central",
+    "Top Left": "Superior esquerdo",
+    "Top Right": "Superior direito"
   },
   "secondary color": {
     "Secondary": ""
@@ -5872,10 +5877,10 @@
     "Install color themes from the DMS theme registry": ""
   },
   "theme category option": {
-    "Auto": "",
-    "Browse": "",
-    "Custom": "",
-    "Generic": ""
+    "Auto": "Automático",
+    "Browse": "Navegar",
+    "Custom": "Personalizado",
+    "Generic": "Genérico"
   },
   "theme installation confirmation": {
     "Install theme '%1' from the DMS registry?": ""
@@ -5924,13 +5929,13 @@
     "Wallpaper Error": ""
   },
   "wallpaper fill mode": {
-    "Fill": "",
-    "Fit": "",
-    "Pad": "",
-    "Stretch": "",
-    "Tile": "",
-    "Tile H": "",
-    "Tile V": ""
+    "Fill": "Preencher",
+    "Fit": "Ajustar",
+    "Pad": "Centralizar",
+    "Stretch": "Esticar",
+    "Tile": "Lado a lado",
+    "Tile H": "Lado a lado (H)",
+    "Tile V": "Lado a lado (V)"
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": ""
@@ -5945,15 +5950,15 @@
     "External Wallpaper Management": "Gerenciamento Externo de Papéis de Parede"
   },
   "wallpaper transition option": {
-    "Disc": "",
-    "Fade": "",
-    "Iris Bloom": "",
-    "None": "",
-    "Pixelate": "",
-    "Portal": "",
-    "Random": "",
-    "Stripes": "",
-    "Wipe": ""
+    "Disc": "Disco",
+    "Fade": "Desvanecer",
+    "Iris Bloom": "Íris em expansão",
+    "None": "Nenhum",
+    "Pixelate": "Pixelizar",
+    "Portal": "Portal",
+    "Random": "Aleatório",
+    "Stripes": "Listras",
+    "Wipe": "Deslizar"
   },
   "weather feels like temperature": {
     "Feels Like %1°": ""

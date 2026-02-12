@@ -1,44 +1,74 @@
 #!/usr/bin/env python3
-import os
+import ast
 import re
 import json
 from pathlib import Path
 from collections import defaultdict
 
+
+def decode_string_literal(content, quote):
+    try:
+        return ast.literal_eval(f"{quote}{content}{quote}")
+    except (ValueError, SyntaxError):
+        return content
+
+
+def spans_overlap(a, b):
+    return a[0] < b[1] and b[0] < a[1]
+
+
 def extract_qstr_strings(root_dir):
     translations = defaultdict(lambda: {'contexts': set(), 'occurrences': []})
-    qstr_pattern_double = re.compile(r'qsTr\("([^"]+)"\)')
-    qstr_pattern_single = re.compile(r"qsTr\('([^']+)'\)")
-    i18n_pattern_with_context_double = re.compile(r'I18n\.tr\("([^"]+)"\s*,\s*"([^"]+)"\)')
-    i18n_pattern_with_context_single = re.compile(r"I18n\.tr\('([^']+)'\s*,\s*'([^']+)'\)")
-    i18n_pattern_simple_double = re.compile(r'I18n\.tr\("([^"]+)"\)')
-    i18n_pattern_simple_single = re.compile(r"I18n\.tr\('([^']+)'\)")
+    qstr_patterns = [
+        (re.compile(r'qsTr\(\s*"((?:\\.|[^"\\])*)"\s*\)'), '"'),
+        (re.compile(r"qsTr\(\s*'((?:\\.|[^'\\])*)'\s*\)"), "'")
+    ]
+    i18n_context_patterns = [
+        (
+            re.compile(r'I18n\.tr\(\s*"((?:\\.|[^"\\])*)"\s*,\s*"((?:\\.|[^"\\])*)"\s*\)'),
+            '"'
+        ),
+        (
+            re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*,\s*'((?:\\.|[^'\\])*)'\s*\)"),
+            "'"
+        )
+    ]
+    i18n_simple_patterns = [
+        (re.compile(r'I18n\.tr\(\s*"((?:\\.|[^"\\])*)"\s*\)'), '"'),
+        (re.compile(r"I18n\.tr\(\s*'((?:\\.|[^'\\])*)'\s*\)"), "'")
+    ]
 
     for qml_file in Path(root_dir).rglob('*.qml'):
         relative_path = qml_file.relative_to(root_dir)
 
         with open(qml_file, 'r', encoding='utf-8') as f:
             for line_num, line in enumerate(f, 1):
-                qstr_matches = qstr_pattern_double.findall(line) + qstr_pattern_single.findall(line)
-                for match in qstr_matches:
-                    translations[match]['occurrences'].append({
-                        'file': str(relative_path),
-                        'line': line_num
-                    })
+                for pattern, quote in qstr_patterns:
+                    for match in pattern.finditer(line):
+                        term = decode_string_literal(match.group(1), quote)
+                        translations[term]['occurrences'].append({
+                            'file': str(relative_path),
+                            'line': line_num
+                        })
 
-                i18n_with_context = i18n_pattern_with_context_double.findall(line) + i18n_pattern_with_context_single.findall(line)
-                for term, context in i18n_with_context:
-                    translations[term]['contexts'].add(context)
-                    translations[term]['occurrences'].append({
-                        'file': str(relative_path),
-                        'line': line_num
-                    })
+                context_spans = []
+                for pattern, quote in i18n_context_patterns:
+                    for match in pattern.finditer(line):
+                        term = decode_string_literal(match.group(1), quote)
+                        context = decode_string_literal(match.group(2), quote)
+                        translations[term]['contexts'].add(context)
+                        translations[term]['occurrences'].append({
+                            'file': str(relative_path),
+                            'line': line_num
+                        })
+                        context_spans.append(match.span())
 
-                has_context = i18n_pattern_with_context_double.search(line) or i18n_pattern_with_context_single.search(line)
-                if not has_context:
-                    i18n_simple = i18n_pattern_simple_double.findall(line) + i18n_pattern_simple_single.findall(line)
-                    for match in i18n_simple:
-                        translations[match]['occurrences'].append({
+                for pattern, quote in i18n_simple_patterns:
+                    for match in pattern.finditer(line):
+                        if any(spans_overlap(match.span(), span) for span in context_spans):
+                            continue
+                        term = decode_string_literal(match.group(1), quote)
+                        translations[term]['occurrences'].append({
                             'file': str(relative_path),
                             'line': line_num
                         })
