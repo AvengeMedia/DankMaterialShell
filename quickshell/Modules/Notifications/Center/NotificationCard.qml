@@ -221,7 +221,7 @@ Rectangle {
                     color: Theme.surfaceText
                     font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
-                    width: parent.width
+                    width: parent.width - ((notificationGroup?.count || 0) > 1 ? 10 : 0)
                     elide: Text.ElideRight
                     maximumLineCount: 1
                     visible: text.length > 0
