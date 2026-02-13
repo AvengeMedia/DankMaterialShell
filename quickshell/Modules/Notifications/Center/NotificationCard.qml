@@ -37,7 +37,8 @@ Rectangle {
 
     Component.onCompleted: {
         Qt.callLater(() => {
-            __initialized = true;
+            if (root)
+                root.__initialized = true;
         });
     }
 
@@ -341,6 +342,7 @@ Rectangle {
                 model: notificationGroup?.notifications?.slice(0, 10) || []
 
                 delegate: Rectangle {
+                    id: expandedDelegate
                     required property var modelData
                     required property int index
                     readonly property bool messageExpanded: NotificationService.expandedMessages[modelData?.notification?.id] || false
@@ -352,7 +354,8 @@ Rectangle {
 
                     Component.onCompleted: {
                         Qt.callLater(() => {
-                            __delegateInitialized = true;
+                            if (expandedDelegate)
+                                expandedDelegate.__delegateInitialized = true;
                         });
                     }
 

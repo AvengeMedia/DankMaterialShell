@@ -16,7 +16,8 @@ DankListView {
 
     Component.onCompleted: {
         Qt.callLater(() => {
-            listInitialized = true;
+            if (listView)
+                listView.listInitialized = true;
         });
     }
 
@@ -88,7 +89,8 @@ DankListView {
 
         Component.onCompleted: {
             Qt.callLater(() => {
-                __delegateInitialized = true;
+                if (delegateRoot)
+                    delegateRoot.__delegateInitialized = true;
             });
         }
 
@@ -109,6 +111,8 @@ DankListView {
                     listView.isAnimatingExpansion = true;
                 } else {
                     Qt.callLater(() => {
+                        if (!notificationCard || !listView)
+                            return;
                         let anyAnimating = false;
                         for (let i = 0; i < listView.count; i++) {
                             const item = listView.itemAtIndex(i);
