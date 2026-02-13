@@ -28,7 +28,7 @@ PanelWindow {
     readonly property real popupIconSize: compactMode ? 48 : 63
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real collapsedContentHeight: popupIconSize
+    readonly property real collapsedContentHeight: popupIconSize + (compactMode ? 0 : Theme.fontSizeSmall * 1.2)
     readonly property real basePopupHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + Theme.spacingS
 
     signal entered
@@ -104,9 +104,9 @@ PanelWindow {
         if (!descriptionExpanded)
             return basePopupHeight;
         const bodyTextHeight = bodyText.contentHeight || 0;
-        const twoLineHeight = Theme.fontSizeSmall * 1.2 * 2;
-        if (bodyTextHeight > twoLineHeight + 2)
-            return basePopupHeight + bodyTextHeight - twoLineHeight;
+        const collapsedBodyHeight = Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3);
+        if (bodyTextHeight > collapsedBodyHeight + 2)
+            return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
     }
     onHasValidDataChanged: {
@@ -317,8 +317,8 @@ PanelWindow {
                 id: notificationContent
 
                 readonly property real expandedTextHeight: bodyText.contentHeight || 0
-                readonly property real twoLineHeight: Theme.fontSizeSmall * 1.2 * 2
-                readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > twoLineHeight + 2) ? (expandedTextHeight - twoLineHeight) : 0
+                readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)
+                readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedBodyHeight + 2) ? (expandedTextHeight - collapsedBodyHeight) : 0
 
                 anchors.top: parent.top
                 anchors.left: parent.left
@@ -437,7 +437,7 @@ PanelWindow {
                         width: parent.width
                         elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
-                        maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
+                        maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 3)
                         wrapMode: Text.WordWrap
                         visible: text.length > 0
                         linkColor: Theme.primary
@@ -816,7 +816,7 @@ PanelWindow {
 
     Menu {
         id: popupContextMenu
-        width: 220
+        width: 300
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
@@ -827,7 +827,9 @@ PanelWindow {
         }
 
         MenuItem {
-            text: I18n.tr("Mute popups for %1").arg(notificationData?.appName || I18n.tr("this app"))
+            id: muteUnmuteItem
+            readonly property bool isMuted: SettingsData.isAppMuted(notificationData?.appName || "", notificationData?.desktopEntry || "")
+            text: isMuted ? I18n.tr("Unmute popups for %1").arg(notificationData?.appName || I18n.tr("this app")) : I18n.tr("Mute popups for %1").arg(notificationData?.appName || I18n.tr("this app"))
 
             contentItem: StyledText {
                 text: parent.text
@@ -845,9 +847,13 @@ PanelWindow {
             onTriggered: {
                 const appName = notificationData?.appName || "";
                 const desktopEntry = notificationData?.desktopEntry || "";
-                SettingsData.addMuteRuleForApp(appName, desktopEntry);
-                if (notificationData && !exiting)
-                    NotificationService.dismissNotification(notificationData);
+                if (isMuted) {
+                    SettingsData.removeMuteRuleForApp(appName, desktopEntry);
+                } else {
+                    SettingsData.addMuteRuleForApp(appName, desktopEntry);
+                    if (notificationData && !exiting)
+                        NotificationService.dismissNotification(notificationData);
+                }
             }
         }
 

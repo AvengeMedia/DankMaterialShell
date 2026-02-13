@@ -6,6 +6,16 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property var mutedRules: {
+        var rules = SettingsData.notificationRules || [];
+        var out = [];
+        for (var i = 0; i < rules.length; i++) {
+            if ((rules[i].action || "").toString().toLowerCase() === "mute")
+                out.push({ rule: rules[i], index: i });
+        }
+        return out;
+    }
+
     readonly property var timeoutOptions: [
         {
             text: I18n.tr("Never"),
@@ -478,6 +488,7 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 165
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleFieldOptions, modelData.field, root.notificationRuleFieldOptions[0].label)
                                             options: root.notificationRuleFieldOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "field", root.getRuleOptionValue(root.notificationRuleFieldOptions, value, "appName"))
@@ -518,6 +529,7 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 170
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleActionOptions, modelData.action, root.notificationRuleActionOptions[0].label)
                                             options: root.notificationRuleActionOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "action", root.getRuleOptionValue(root.notificationRuleActionOptions, value, "default"))
@@ -538,10 +550,100 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 165
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleUrgencyOptions, modelData.urgency, root.notificationRuleUrgencyOptions[0].label)
                                             options: root.notificationRuleUrgencyOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "urgency", root.getRuleOptionValue(root.notificationRuleUrgencyOptions, value, "default"))
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "volume_off"
+                title: I18n.tr("Muted Apps")
+                settingKey: "mutedApps"
+                tags: ["notification", "mute", "unmute", "popup"]
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        text: mutedRules.length > 0 ? I18n.tr("Apps with notification popups muted. Unmute or delete to remove.") : I18n.tr("No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                        bottomPadding: Theme.spacingS
+                    }
+
+                    Repeater {
+                        model: mutedRules
+
+                        delegate: Rectangle {
+                            width: parent.width
+                            height: mutedRow.implicitHeight + Theme.spacingS * 2
+                            radius: Theme.cornerRadius
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+
+                            Row {
+                                id: mutedRow
+                                anchors.fill: parent
+                                anchors.margins: Theme.spacingS
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    id: mutedAppLabel
+                                    text: (modelData.rule && modelData.rule.pattern) ? modelData.rule.pattern : I18n.tr("Unknown")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Item {
+                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - deleteBtn.width - Theme.spacingS * 5)
+                                    height: 1
+                                }
+
+                                DankButton {
+                                    id: unmuteBtn
+                                    text: I18n.tr("Unmute")
+                                    backgroundColor: Theme.surfaceContainer
+                                    textColor: Theme.primary
+                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
+                                }
+
+                                Item {
+                                    id: deleteBtn
+                                    width: 28
+                                    height: 28
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: Theme.cornerRadius
+                                        color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                    }
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "delete"
+                                        size: 18
+                                        color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                    }
+
+                                    MouseArea {
+                                        id: deleteArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: SettingsData.removeNotificationRule(modelData.index)
                                     }
                                 }
                             }

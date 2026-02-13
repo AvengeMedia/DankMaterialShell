@@ -2147,7 +2147,7 @@ Singleton {
             field: "appName",
             pattern: "",
             matchType: "contains",
-            action: "mute",
+            action: "default",
             urgency: "default"
         });
         notificationRules = rules;
@@ -2170,6 +2170,51 @@ Singleton {
         });
         notificationRules = rules;
         saveSettings();
+    }
+
+    function isAppMuted(appName, desktopEntry) {
+        const rules = notificationRules || [];
+        const pat = (desktopEntry && desktopEntry !== "" ? desktopEntry : appName || "").toString().toLowerCase();
+        if (!pat)
+            return false;
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            if ((r.action || "").toString().toLowerCase() !== "mute" || r.enabled === false)
+                continue;
+            const field = (r.field || "appName").toString().toLowerCase();
+            const rulePat = (r.pattern || "").toString().toLowerCase();
+            if (!rulePat)
+                continue;
+            const useDesktop = field === "desktopentry";
+            const matches = (useDesktop && desktopEntry) ? (desktopEntry.toString().toLowerCase() === rulePat) : (appName && appName.toString().toLowerCase() === rulePat);
+            if (matches)
+                return true;
+            if (rulePat === pat)
+                return true;
+        }
+        return false;
+    }
+
+    function removeMuteRuleForApp(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        const app = (appName || "").toString().toLowerCase();
+        const desktop = (desktopEntry || "").toString().toLowerCase();
+        if (!app && !desktop)
+            return;
+        for (let i = rules.length - 1; i >= 0; i--) {
+            const r = rules[i];
+            if ((r.action || "").toString().toLowerCase() !== "mute")
+                continue;
+            const rulePat = (r.pattern || "").toString().toLowerCase();
+            if (!rulePat)
+                continue;
+            if (rulePat === app || rulePat === desktop) {
+                rules.splice(i, 1);
+                notificationRules = rules;
+                saveSettings();
+                return;
+            }
+        }
     }
 
     function updateNotificationRule(index, ruleData) {

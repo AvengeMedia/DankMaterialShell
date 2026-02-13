@@ -749,7 +749,7 @@ Rectangle {
 
     Menu {
         id: notificationCardContextMenu
-        width: 220
+        width: 300
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
@@ -760,7 +760,9 @@ Rectangle {
         }
 
         MenuItem {
-            text: I18n.tr("Mute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app"))
+            id: muteUnmuteItem
+            readonly property bool isMuted: SettingsData.isAppMuted(notificationGroup?.appName || "", notificationGroup?.latestNotification?.desktopEntry || "")
+            text: isMuted ? I18n.tr("Unmute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app")) : I18n.tr("Mute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app"))
 
             contentItem: StyledText {
                 text: parent.text
@@ -778,8 +780,12 @@ Rectangle {
             onTriggered: {
                 const appName = notificationGroup?.appName || "";
                 const desktopEntry = notificationGroup?.latestNotification?.desktopEntry || "";
-                SettingsData.addMuteRuleForApp(appName, desktopEntry);
-                NotificationService.dismissGroup(notificationGroup?.key || "");
+                if (isMuted) {
+                    SettingsData.removeMuteRuleForApp(appName, desktopEntry);
+                } else {
+                    SettingsData.addMuteRuleForApp(appName, desktopEntry);
+                    NotificationService.dismissGroup(notificationGroup?.key || "");
+                }
             }
         }
 

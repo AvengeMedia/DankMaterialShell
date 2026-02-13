@@ -11,7 +11,7 @@ QtObject {
     readonly property real cardPadding: compactMode ? Theme.spacingS : Theme.spacingM
     readonly property real popupIconSize: compactMode ? 48 : 63
     readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real popupSpacing: 4
+    readonly property real popupSpacing: 8
     readonly property int baseNotificationHeight: cardPadding * 2 + popupIconSize + actionButtonHeight + Theme.spacingS + popupSpacing
     property int maxTargetNotifications: 4
     property var popupWindows: [] // strong refs to windows (live until exitFinished)
