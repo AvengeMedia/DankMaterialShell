@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
@@ -215,26 +216,22 @@ Rectangle {
                 spacing: compactMode ? 1 : 2
 
                 StyledText {
-                    width: parent.width
-                    text: {
-                        const timeStr = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.timeStr) || "";
-                        const appName = (notificationGroup && notificationGroup.appName) || "";
-                        return timeStr.length > 0 ? `${appName} • ${timeStr}` : appName;
-                    }
-                    color: Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
+                    text: (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.summary) || ""
+                    color: Theme.surfaceText
+                    font.pixelSize: Theme.fontSizeMedium
                     font.weight: Font.Medium
+                    width: parent.width
                     elide: Text.ElideRight
                     maximumLineCount: 1
                     visible: text.length > 0
                 }
 
                 StyledText {
-                    text: (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.summary) || ""
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
                     width: parent.width
+                    text: (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.timeStr) || ""
+                    color: Theme.surfaceVariantText
+                    font.pixelSize: Theme.fontSizeSmall
+                    font.weight: Font.Medium
                     elide: Text.ElideRight
                     maximumLineCount: 1
                     visible: text.length > 0
@@ -541,7 +538,7 @@ Rectangle {
                                             StyledText {
                                                 id: expandedActionText
                                                 text: {
-                                                    const baseText = modelData.text || "View";
+                                                    const baseText = modelData.text || "Open";
                                                     if (keyboardNavigationActive && (isGroupSelected || selectedNotificationIndex >= 0))
                                                         return `${baseText} (${index + 1})`;
                                                     return baseText;
@@ -624,7 +621,7 @@ Rectangle {
                 StyledText {
                     id: collapsedActionText
                     text: {
-                        const baseText = modelData.text || "View";
+                        const baseText = modelData.text || "Open";
                         if (keyboardNavigationActive && isGroupSelected) {
                             return `${baseText} (${index + 1})`;
                         }
@@ -733,9 +730,9 @@ Rectangle {
     Behavior on height {
         enabled: root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
-            duration: Theme.expressiveDurations.normal
+            duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: Theme.expressiveCurves.standard
+            easing.bezierCurve: root.expanded ? Theme.expressiveCurves.emphasizedDecel : Theme.expressiveCurves.emphasizedAccel
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;
@@ -743,6 +740,73 @@ Rectangle {
                     root.isAnimating = false;
                     root.userInitiatedExpansion = false;
                 }
+            }
+        }
+    }
+
+    Menu {
+        id: notificationCardContextMenu
+        width: 220
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        background: Rectangle {
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            radius: Theme.cornerRadius
+            border.width: 0
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        }
+
+        MenuItem {
+            text: I18n.tr("Mute popups for %1").arg(notificationGroup?.appName || I18n.tr("this app"))
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                const appName = notificationGroup?.appName || "";
+                const desktopEntry = notificationGroup?.latestNotification?.desktopEntry || "";
+                SettingsData.addMuteRuleForApp(appName, desktopEntry);
+                NotificationService.dismissGroup(notificationGroup?.key || "");
+            }
+        }
+
+        MenuItem {
+            text: I18n.tr("Dismiss")
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: NotificationService.dismissGroup(notificationGroup?.key || "")
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        z: 10
+        onClicked: mouse => {
+            if (mouse.button === Qt.RightButton && notificationGroup) {
+                notificationCardContextMenu.popup();
             }
         }
     }

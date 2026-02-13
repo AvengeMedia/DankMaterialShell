@@ -251,9 +251,13 @@ Singleton {
         const timeStr = SettingsData.use24HourClock ? date.toLocaleTimeString(Qt.locale(), "HH:mm") : date.toLocaleTimeString(Qt.locale(), "h:mm AP");
         if (daysDiff === 0)
             return timeStr;
-        if (daysDiff === 1)
-            return I18n.tr("yesterday") + ", " + timeStr;
-        return I18n.tr("%1 days ago").arg(daysDiff);
+        try {
+            const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
+            const weekday = date.toLocaleDateString(localeName, { weekday: "long" });
+            return weekday + ", " + timeStr;
+        } catch (e) {
+            return timeStr;
+        }
     }
 
     function _nowSec() {
@@ -688,11 +692,13 @@ Singleton {
                 return formatTime(time);
             }
 
-            if (daysDiff === 1) {
-                return `yesterday, ${formatTime(time)}`;
+            try {
+                const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
+                const weekday = time.toLocaleDateString(localeName, { weekday: "long" });
+                return `${weekday}, ${formatTime(time)}`;
+            } catch (e) {
+                return formatTime(time);
             }
-
-            return `${daysDiff} days ago`;
         }
 
         function formatTime(date) {
@@ -852,7 +858,7 @@ Singleton {
         }
 
         const activePopupCount = visibleNotifications.filter(n => n && n.popup).length;
-        if (activePopupCount >= 4) {
+        if (activePopupCount >= maxVisibleNotifications) {
             return;
         }
 

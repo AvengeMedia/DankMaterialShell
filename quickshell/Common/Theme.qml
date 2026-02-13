@@ -776,6 +776,37 @@ Singleton {
         };
     }
 
+    readonly property int notificationAnimationBaseDuration: {
+        if (typeof SettingsData === "undefined")
+            return 200;
+        if (SettingsData.notificationAnimationSpeed === SettingsData.AnimationSpeed.None)
+            return 0;
+        if (SettingsData.notificationAnimationSpeed === SettingsData.AnimationSpeed.Custom)
+            return SettingsData.notificationCustomAnimationDuration;
+        const presetMap = [0, 200, 400, 600];
+        return presetMap[SettingsData.notificationAnimationSpeed] ?? 200;
+    }
+
+    readonly property int notificationEnterDuration: {
+        const base = notificationAnimationBaseDuration;
+        return base === 0 ? 0 : Math.round(base * 0.875);
+    }
+
+    readonly property int notificationExitDuration: {
+        const base = notificationAnimationBaseDuration;
+        return base === 0 ? 0 : Math.round(base * 0.75);
+    }
+
+    readonly property int notificationExpandDuration: {
+        const base = notificationAnimationBaseDuration;
+        return base === 0 ? 0 : Math.round(base * 1.4);
+    }
+
+    readonly property int notificationCollapseDuration: {
+        const base = notificationAnimationBaseDuration;
+        return base === 0 ? 0 : Math.round(base * 1.1);
+    }
+
     readonly property int popoutAnimationDuration: {
         if (typeof SettingsData === "undefined")
             return 150;

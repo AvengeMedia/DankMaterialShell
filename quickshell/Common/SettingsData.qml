@@ -501,6 +501,8 @@ Singleton {
     property int notificationTimeoutCritical: 0
     property bool notificationCompactMode: false
     property int notificationPopupPosition: SettingsData.Position.Top
+    property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
+    property int notificationCustomAnimationDuration: 400
     property bool notificationHistoryEnabled: true
     property int notificationHistoryMaxCount: 50
     property int notificationHistoryMaxAgeDays: 7
@@ -2145,6 +2147,24 @@ Singleton {
             field: "appName",
             pattern: "",
             matchType: "contains",
+            action: "mute",
+            urgency: "default"
+        });
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function addMuteRuleForApp(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
+        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
+        if (pattern === "")
+            return;
+        rules.push({
+            enabled: true,
+            field: field,
+            pattern: pattern,
+            matchType: "exact",
             action: "mute",
             urgency: "default"
         });

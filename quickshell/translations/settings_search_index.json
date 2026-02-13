@@ -4678,6 +4678,50 @@
     "description": "Use smaller notification cards"
   },
   {
+    "section": "notificationAnimationSpeed",
+    "label": "Animation Speed",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "animate",
+      "animation",
+      "duration",
+      "fast",
+      "messages",
+      "motion",
+      "notif",
+      "notification",
+      "notifications",
+      "popup",
+      "speed",
+      "toast"
+    ],
+    "description": "Control animation duration for notification popups and history"
+  },
+  {
+    "section": "notificationCustomAnimationDuration",
+    "label": "Animation Duration",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "animate",
+      "animation",
+      "custom",
+      "duration",
+      "messages",
+      "ms",
+      "notif",
+      "notification",
+      "notifications",
+      "popup",
+      "speed",
+      "toast"
+    ],
+    "description": "Base duration for notification animations"
+  },
+  {
     "section": "notificationHistorySaveCritical",
     "label": "Critical Priority",
     "tabIndex": 17,

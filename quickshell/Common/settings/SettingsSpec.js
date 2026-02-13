@@ -325,6 +325,8 @@ var SPEC = {
     notificationTimeoutCritical: { def: 0 },
     notificationCompactMode: { def: false },
     notificationPopupPosition: { def: 0 },
+    notificationAnimationSpeed: { def: 1 },
+    notificationCustomAnimationDuration: { def: 400 },
     notificationHistoryEnabled: { def: true },
     notificationHistoryMaxCount: { def: 50 },
     notificationHistoryMaxAgeDays: { def: 7 },

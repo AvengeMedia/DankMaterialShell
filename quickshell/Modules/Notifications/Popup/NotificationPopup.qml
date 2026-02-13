@@ -99,7 +99,7 @@ PanelWindow {
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     color: "transparent"
-    implicitWidth: 400
+    implicitWidth: screen ? Math.min(420, Math.max(320, screen.width * 0.25)) : 400
     implicitHeight: {
         if (!descriptionExpanded)
             return basePopupHeight;
@@ -404,17 +404,11 @@ PanelWindow {
                     spacing: compactMode ? 1 : 2
 
                     StyledText {
-                        width: parent.width
-                        text: {
-                            if (!notificationData)
-                                return "";
-                            const appName = notificationData.appName || "";
-                            const timeStr = notificationData.timeStr || "";
-                            return timeStr.length > 0 ? appName + " • " + timeStr : appName;
-                        }
-                        color: Theme.surfaceVariantText
-                        font.pixelSize: Theme.fontSizeSmall
+                        text: notificationData ? (notificationData.summary || "") : ""
+                        color: Theme.surfaceText
+                        font.pixelSize: Theme.fontSizeMedium
                         font.weight: Font.Medium
+                        width: parent.width
                         elide: Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
                         maximumLineCount: 1
@@ -422,11 +416,11 @@ PanelWindow {
                     }
 
                     StyledText {
-                        text: notificationData ? (notificationData.summary || "") : ""
-                        color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
                         width: parent.width
+                        text: notificationData ? (notificationData.timeStr || "") : ""
+                        color: Theme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
                         elide: Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
                         maximumLineCount: 1
@@ -511,7 +505,7 @@ PanelWindow {
                         StyledText {
                             id: actionText
 
-                            text: modelData.text || "View"
+                            text: modelData.text || "Open"
                             color: parent.isHovered ? Theme.primary : Theme.surfaceVariantText
                             font.pixelSize: Theme.fontSizeSmall
                             font.weight: Font.Medium
@@ -598,7 +592,7 @@ PanelWindow {
                     if (!notificationData || win.exiting)
                         return;
                     if (mouse.button === Qt.RightButton) {
-                        NotificationService.dismissNotification(notificationData);
+                        popupContextMenu.popup();
                     } else if (mouse.button === Qt.LeftButton) {
                         if (notificationData.actions && notificationData.actions.length > 0) {
                             notificationData.actions[0].invoke();
@@ -704,7 +698,7 @@ PanelWindow {
             return isLeft ? -Anims.slidePx : Anims.slidePx;
         }
         to: 0
-        duration: Theme.mediumDuration
+        duration: Theme.notificationEnterDuration
         easing.type: Easing.BezierSpline
         easing.bezierCurve: isTopCenter ? Theme.expressiveCurves.standardDecel : Theme.expressiveCurves.emphasizedDecel
         onStopped: {
@@ -735,7 +729,7 @@ PanelWindow {
                 const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
                 return isLeft ? -Anims.slidePx : Anims.slidePx;
             }
-            duration: Theme.shortDuration
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
         }
@@ -745,7 +739,7 @@ PanelWindow {
             property: "opacity"
             from: 1
             to: 0
-            duration: Theme.shortDuration
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.standardAccel
         }
@@ -755,7 +749,7 @@ PanelWindow {
             property: "scale"
             from: 1
             to: 0.98
-            duration: Theme.shortDuration
+            duration: Theme.notificationExitDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.emphasizedAccel
         }
@@ -817,6 +811,66 @@ PanelWindow {
             duration: Theme.shortDuration
             easing.type: Easing.BezierSpline
             easing.bezierCurve: Theme.expressiveCurves.standardDecel
+        }
+    }
+
+    Menu {
+        id: popupContextMenu
+        width: 220
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+        background: Rectangle {
+            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            radius: Theme.cornerRadius
+            border.width: 0
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        }
+
+        MenuItem {
+            text: I18n.tr("Mute popups for %1").arg(notificationData?.appName || I18n.tr("this app"))
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                const appName = notificationData?.appName || "";
+                const desktopEntry = notificationData?.desktopEntry || "";
+                SettingsData.addMuteRuleForApp(appName, desktopEntry);
+                if (notificationData && !exiting)
+                    NotificationService.dismissNotification(notificationData);
+            }
+        }
+
+        MenuItem {
+            text: I18n.tr("Dismiss")
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                if (notificationData && !exiting)
+                    NotificationService.dismissNotification(notificationData);
+            }
         }
     }
 }

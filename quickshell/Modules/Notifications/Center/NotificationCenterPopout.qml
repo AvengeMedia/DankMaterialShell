@@ -20,7 +20,7 @@ DankPopout {
         }
     }
 
-    popupWidth: 400
+    popupWidth: triggerScreen ? Math.min(500, Math.max(380, triggerScreen.width - 48)) : 400
     popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 400
     positioning: ""
     animationScaleCollapsed: 1.0

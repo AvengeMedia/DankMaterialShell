@@ -15,6 +15,9 @@ const (
 	notifyDest      = "org.freedesktop.Notifications"
 	notifyPath      = "/org/freedesktop/Notifications"
 	notifyInterface = "org.freedesktop.Notifications"
+
+	maxSummaryLen = 29
+	maxBodyLen    = 80
 )
 
 type Notification struct {
@@ -37,6 +40,13 @@ func Send(n Notification) error {
 	}
 	if n.Timeout == 0 {
 		n.Timeout = 5000
+	}
+
+	if len(n.Summary) > maxSummaryLen {
+		n.Summary = n.Summary[:maxSummaryLen-3] + "..."
+	}
+	if len(n.Body) > maxBodyLen {
+		n.Body = n.Body[:maxBodyLen-3] + "..."
 	}
 
 	var actions []string

@@ -239,6 +239,77 @@ Item {
                     checked: SettingsData.notificationCompactMode
                     onToggled: checked => SettingsData.set("notificationCompactMode", checked)
                 }
+
+                Item {
+                    width: parent.width
+                    height: notificationAnimationColumn.implicitHeight + Theme.spacingM * 2
+
+                    Column {
+                        id: notificationAnimationColumn
+                        width: parent.width - Theme.spacingM * 2
+                        x: Theme.spacingM
+                        anchors.top: parent.top
+                        anchors.topMargin: Theme.spacingM
+                        spacing: Theme.spacingS
+
+                        StyledText {
+                            text: I18n.tr("Animation Speed")
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            width: parent.width
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Control animation duration for notification popups and history")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
+
+                        DankButtonGroup {
+                            id: notificationSpeedGroup
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingM
+                            minButtonWidth: parent.width < 480 ? 44 : 56
+                            textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                            model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
+                            selectionMode: "single"
+                            currentIndex: SettingsData.notificationAnimationSpeed
+                            onSelectionChanged: (index, selected) => {
+                                if (!selected)
+                                    return;
+                                SettingsData.set("notificationAnimationSpeed", index);
+                            }
+
+                            Connections {
+                                target: SettingsData
+                                function onNotificationAnimationSpeedChanged() {
+                                    notificationSpeedGroup.currentIndex = SettingsData.notificationAnimationSpeed;
+                                }
+                            }
+                        }
+
+                        SettingsSliderRow {
+                            settingKey: "notificationCustomAnimationDuration"
+                            tags: ["notification", "animation", "duration", "custom", "speed"]
+                            text: I18n.tr("Duration")
+                            description: I18n.tr("Base duration for animations (drag to use Custom)")
+                            minimum: 100
+                            maximum: 800
+                            value: Theme.notificationAnimationBaseDuration
+                            unit: "ms"
+                            defaultValue: 400
+                            onSliderValueChanged: newValue => {
+                                if (SettingsData.notificationAnimationSpeed !== SettingsData.AnimationSpeed.Custom) {
+                                    SettingsData.set("notificationAnimationSpeed", SettingsData.AnimationSpeed.Custom);
+                                }
+                                SettingsData.set("notificationCustomAnimationDuration", newValue);
+                            }
+                        }
+                    }
+                }
             }
 
             SettingsCard {
