@@ -339,6 +339,7 @@ Item {
             }
 
             SettingsCard {
+                id: notificationRulesCard
                 width: parent.width
                 iconName: "rule_settings"
                 title: I18n.tr("Notification Rules")
@@ -363,7 +364,11 @@ Item {
                         iconSize: 20
                         backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.primary
-                        onClicked: SettingsData.addNotificationRule()
+                        onClicked: {
+                            SettingsData.addNotificationRule();
+                            notificationRulesCard.userToggledCollapse = true;
+                            notificationRulesCard.expanded = true;
+                        }
                     }
                 ]
 
@@ -372,7 +377,7 @@ Item {
                     spacing: Theme.spacingS
 
                     StyledText {
-                        text: I18n.tr("Create rules to mute, ignore, hide from history, or override notification priority.")
+                        text: I18n.tr("Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
