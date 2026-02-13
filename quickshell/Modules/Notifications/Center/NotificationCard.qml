@@ -735,7 +735,7 @@ Rectangle {
         NumberAnimation {
             duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
             easing.type: Easing.BezierSpline
-            easing.bezierCurve: root.expanded ? Theme.expressiveCurves.emphasizedDecel : Theme.expressiveCurves.emphasizedAccel
+            easing.bezierCurve: Theme.expressiveCurves.emphasized
             onRunningChanged: {
                 if (running) {
                     root.isAnimating = true;

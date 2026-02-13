@@ -799,12 +799,12 @@ Singleton {
 
     readonly property int notificationExpandDuration: {
         const base = notificationAnimationBaseDuration;
-        return base === 0 ? 0 : Math.round(base * 1.4);
+        return base === 0 ? 0 : Math.round(base * 1.0);
     }
 
     readonly property int notificationCollapseDuration: {
         const base = notificationAnimationBaseDuration;
-        return base === 0 ? 0 : Math.round(base * 1.1);
+        return base === 0 ? 0 : Math.round(base * 0.85);
     }
 
     readonly property int popoutAnimationDuration: {

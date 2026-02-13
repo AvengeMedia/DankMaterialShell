@@ -11,14 +11,36 @@ DankListView {
     property bool autoScrollDisabled: false
     property bool isAnimatingExpansion: false
     property alias listContentHeight: listView.contentHeight
+    property real stableContentHeight: 0
     property bool cardAnimateExpansion: true
     property bool listInitialized: false
 
     Component.onCompleted: {
         Qt.callLater(() => {
-            if (listView)
+            if (listView) {
                 listView.listInitialized = true;
+                listView.stableContentHeight = listView.contentHeight;
+            }
         });
+    }
+
+    onContentHeightChanged: {
+        if (!isAnimatingExpansion)
+            stableContentHeight = contentHeight;
+    }
+
+    onIsAnimatingExpansionChanged: {
+        if (isAnimatingExpansion) {
+            let delta = 0;
+            for (let i = 0; i < count; i++) {
+                const item = itemAtIndex(i);
+                if (item && item.children[0] && item.children[0].isAnimating)
+                    delta += item.children[0].targetHeight - item.height;
+            }
+            stableContentHeight = contentHeight + delta;
+        } else {
+            stableContentHeight = contentHeight;
+        }
     }
 
     clip: true
