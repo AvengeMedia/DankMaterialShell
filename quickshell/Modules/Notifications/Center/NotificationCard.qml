@@ -747,7 +747,7 @@ Rectangle {
     Menu {
         id: notificationCardContextMenu
         width: 220
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
             color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
