@@ -80,7 +80,10 @@ Singleton {
             return Quickshell.iconPath(moddedId, true);
         }
 
-        return desktopEntry && desktopEntry.icon ? Quickshell.iconPath(desktopEntry.icon, true) : "";
+        if (desktopEntry && desktopEntry.icon) {
+            return Quickshell.iconPath(desktopEntry.icon, true);
+        }
+        return Quickshell.iconPath(appId, true);
     }
 
     function getAppName(appId: string, desktopEntry: var): string {
