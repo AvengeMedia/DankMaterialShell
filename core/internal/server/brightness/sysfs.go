@@ -101,6 +101,10 @@ func shouldSuppressDevice(name string) bool {
 	return false
 }
 
+func (b *SysfsBackend) Rescan() error {
+	return b.scanDevices()
+}
+
 func (b *SysfsBackend) GetDevices() ([]Device, error) {
 	devices := make([]Device, 0)
 
