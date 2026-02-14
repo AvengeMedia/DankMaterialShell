@@ -21,8 +21,8 @@ Rectangle {
     }
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property real cardPadding: compactMode ? Theme.spacingS : Theme.spacingM
-    readonly property real iconSize: compactMode ? 48 : 63
+    readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
+    readonly property real iconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real collapsedContentHeight: iconSize + cardPadding
     readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight
@@ -93,7 +93,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.topMargin: cardPadding
         anchors.leftMargin: Theme.spacingL
-        anchors.rightMargin: Theme.spacingL + (compactMode ? 32 : 40)
+        anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
         height: collapsedContentHeight + extraHeight
 
         DankCircularImage {
@@ -165,32 +165,47 @@ Rectangle {
             Column {
                 width: parent.width
                 anchors.top: parent.top
-                spacing: compactMode ? 1 : 2
+                spacing: Theme.notificationContentSpacing
 
-                StyledText {
+                Row {
                     width: parent.width
-                    text: {
-                        const timeStr = NotificationService.formatHistoryTime(historyItem.timestamp);
-                        const appName = historyItem.appName || "";
-                        return timeStr.length > 0 ? `${appName} • ${timeStr}` : appName;
+                    spacing: Theme.spacingXS
+                    readonly property real reservedTrailingWidth: historySeparator.implicitWidth + Math.max(historyTimeText.implicitWidth, 72) + spacing
+
+                    StyledText {
+                        id: historyTitleText
+                        width: Math.min(implicitWidth, Math.max(0, parent.width - parent.reservedTrailingWidth))
+                        text: {
+                            let title = historyItem.summary || "";
+                            const appName = historyItem.appName || "";
+                            const prefix = appName + " • ";
+                            if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
+                                title = title.substring(prefix.length);
+                            }
+                            return title;
+                        }
+                        color: Theme.surfaceText
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                        visible: text.length > 0
                     }
-                    color: Theme.surfaceVariantText
-                    font.pixelSize: Theme.fontSizeSmall
-                    font.weight: Font.Medium
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    visible: text.length > 0
-                }
-
-                StyledText {
-                    text: historyItem.summary || ""
-                    color: Theme.surfaceText
-                    font.pixelSize: Theme.fontSizeMedium
-                    font.weight: Font.Medium
-                    width: parent.width
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    visible: text.length > 0
+                    StyledText {
+                        id: historySeparator
+                        text: (historyTitleText.text.length > 0 && historyTimeText.text.length > 0) ? " • " : ""
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Normal
+                    }
+                    StyledText {
+                        id: historyTimeText
+                        text: NotificationService.formatHistoryTime(historyItem.timestamp)
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Normal
+                        visible: text.length > 0
+                    }
                 }
 
                 StyledText {

@@ -807,6 +807,22 @@ Singleton {
         return base === 0 ? 0 : Math.round(base * 0.85);
     }
 
+    readonly property real notificationIconSizeNormal: 56
+    readonly property real notificationIconSizeCompact: 48
+    readonly property real notificationExpandedIconSizeNormal: 48
+    readonly property real notificationExpandedIconSizeCompact: 40
+    readonly property real notificationActionMinWidth: 48
+    readonly property real notificationButtonCornerRadius: cornerRadius / 2
+    readonly property real notificationHoverRevealMargin: spacingXL
+    readonly property real notificationContentSpacing: spacingXS
+    readonly property real notificationCardPadding: spacingM
+    readonly property real notificationCardPaddingCompact: spacingS
+
+    readonly property real stateLayerHover: 0.08
+    readonly property real stateLayerFocus: 0.12
+    readonly property real stateLayerPressed: 0.12
+    readonly property real stateLayerDrag: 0.16
+
     readonly property int popoutAnimationDuration: {
         if (typeof SettingsData === "undefined")
             return 150;

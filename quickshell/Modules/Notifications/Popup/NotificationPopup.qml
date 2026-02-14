@@ -24,12 +24,12 @@ PanelWindow {
     property bool descriptionExpanded: false
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
-    readonly property real cardPadding: compactMode ? Theme.spacingS : Theme.spacingM
-    readonly property real popupIconSize: compactMode ? 48 : 63
+    readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
+    readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real collapsedContentHeight: popupIconSize + (compactMode ? 0 : Theme.fontSizeSmall * 1.2)
-    readonly property real basePopupHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + Theme.spacingS
+    readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3))
+    readonly property real basePopupHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
 
     signal entered
     signal exitStarted
@@ -310,6 +310,10 @@ PanelWindow {
             anchors.margins: Theme.snap(4, win.dpr)
             clip: true
 
+            HoverHandler {
+                id: cardHoverHandler
+            }
+
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
@@ -325,7 +329,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.topMargin: cardPadding
                 anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL + (compactMode ? 32 : 40)
+                anchors.rightMargin: Theme.spacingL + (cardHoverHandler.hovered ? Theme.notificationHoverRevealMargin : 0)
                 height: collapsedContentHeight + extraHeight
 
                 DankCircularImage {
@@ -348,6 +352,9 @@ PanelWindow {
                     height: popupIconSize
                     anchors.left: parent.left
                     anchors.top: parent.top
+                    anchors.topMargin: descriptionExpanded
+                        ? Math.max(0, (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)) / 2 - popupIconSize / 2)
+                        : Math.max(0, textContainer.height / 2 - popupIconSize / 2)
 
                     imageSource: {
                         if (!notificationData)
@@ -401,7 +408,7 @@ PanelWindow {
                     anchors.leftMargin: Theme.spacingM
                     anchors.right: parent.right
                     anchors.top: parent.top
-                    spacing: compactMode ? 1 : 2
+                    spacing: Theme.notificationContentSpacing
 
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
@@ -409,18 +416,6 @@ PanelWindow {
                         font.pixelSize: Theme.fontSizeMedium
                         font.weight: Font.Medium
                         width: parent.width
-                        elide: Text.ElideRight
-                        horizontalAlignment: Text.AlignLeft
-                        maximumLineCount: 1
-                        visible: text.length > 0
-                    }
-
-                    StyledText {
-                        width: parent.width
-                        text: notificationData ? (notificationData.timeStr || "") : ""
-                        color: Theme.surfaceVariantText
-                        font.pixelSize: Theme.fontSizeSmall
-                        font.weight: Font.Medium
                         elide: Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
                         maximumLineCount: 1
@@ -477,6 +472,17 @@ PanelWindow {
                 iconSize: compactMode ? 16 : 18
                 buttonSize: compactMode ? 24 : 28
                 z: 15
+                opacity: cardHoverHandler.hovered ? 1 : 0
+                visible: opacity > 0
+                enabled: cardHoverHandler.hovered
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
+                }
+
                 onClicked: {
                     if (notificationData && !win.exiting)
                         notificationData.popup = false;
@@ -484,6 +490,8 @@ PanelWindow {
             }
 
             Row {
+                visible: cardHoverHandler.hovered
+                opacity: visible ? 1 : 0
                 anchors.right: clearButton.visible ? clearButton.left : parent.right
                 anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
                 anchors.top: notificationContent.bottom
@@ -491,16 +499,20 @@ PanelWindow {
                 spacing: contentSpacing
                 z: 20
 
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+                }
+
                 Repeater {
                     model: notificationData ? (notificationData.actions || []) : []
 
                     Rectangle {
                         property bool isHovered: false
 
-                        width: Math.max(actionText.implicitWidth + Theme.spacingM, compactMode ? 40 : 50)
+                        width: Math.max(actionText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                         height: actionButtonHeight
-                        radius: Theme.spacingXS
-                        color: isHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : "transparent"
+                        radius: Theme.notificationButtonCornerRadius
+                        color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
 
                         StyledText {
                             id: actionText
@@ -537,15 +549,19 @@ PanelWindow {
                 property bool isHovered: false
                 readonly property int actionCount: notificationData ? (notificationData.actions || []).length : 0
 
-                visible: actionCount < 3
+                visible: actionCount < 3 && cardHoverHandler.hovered
+                opacity: visible ? 1 : 0
+                Behavior on opacity {
+                    NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+                }
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
                 anchors.top: notificationContent.bottom
                 anchors.topMargin: contentSpacing
-                width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, compactMode ? 40 : 50)
+                width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
-                radius: Theme.spacingXS
-                color: isHovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.1) : "transparent"
+                radius: Theme.notificationButtonCornerRadius
+                color: isHovered ? Theme.withAlpha(Theme.primary, Theme.stateLayerHover) : "transparent"
                 z: 20
 
                 StyledText {

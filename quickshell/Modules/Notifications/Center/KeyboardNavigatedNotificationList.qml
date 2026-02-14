@@ -14,6 +14,8 @@ DankListView {
     property real stableContentHeight: 0
     property bool cardAnimateExpansion: true
     property bool listInitialized: false
+    property real __pendingStableHeight: 0
+    property real __heightUpdateThreshold: 20
 
     Component.onCompleted: {
         Qt.callLater(() => {
@@ -24,22 +26,43 @@ DankListView {
         });
     }
 
+    Timer {
+        id: heightUpdateDebounce
+        interval: Theme.mediumDuration + 20
+        repeat: false
+        onTriggered: {
+            if (!listView.isAnimatingExpansion && Math.abs(listView.__pendingStableHeight - listView.stableContentHeight) > listView.__heightUpdateThreshold) {
+                listView.stableContentHeight = listView.__pendingStableHeight;
+            }
+        }
+    }
+
     onContentHeightChanged: {
-        if (!isAnimatingExpansion)
-            stableContentHeight = contentHeight;
+        if (!isAnimatingExpansion) {
+            __pendingStableHeight = contentHeight;
+            if (Math.abs(contentHeight - stableContentHeight) > __heightUpdateThreshold) {
+                heightUpdateDebounce.restart();
+            } else {
+                stableContentHeight = contentHeight;
+            }
+        }
     }
 
     onIsAnimatingExpansionChanged: {
         if (isAnimatingExpansion) {
+            heightUpdateDebounce.stop();
             let delta = 0;
             for (let i = 0; i < count; i++) {
                 const item = itemAtIndex(i);
                 if (item && item.children[0] && item.children[0].isAnimating)
                     delta += item.children[0].targetHeight - item.height;
             }
-            stableContentHeight = contentHeight + delta;
+            const targetHeight = contentHeight + delta;
+            // During expansion, always update immediately without threshold check
+            stableContentHeight = targetHeight;
         } else {
-            stableContentHeight = contentHeight;
+            __pendingStableHeight = contentHeight;
+            heightUpdateDebounce.restart();
         }
     }
 
