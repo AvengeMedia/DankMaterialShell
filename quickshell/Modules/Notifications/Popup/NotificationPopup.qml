@@ -99,7 +99,7 @@ PanelWindow {
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     color: "transparent"
-    implicitWidth: screen ? Math.min(420, Math.max(320, screen.width * 0.25)) : 400
+    implicitWidth: screen ? Math.min(400, Math.max(320, screen.width * 0.23)) : 380
     implicitHeight: {
         if (!descriptionExpanded)
             return basePopupHeight;
