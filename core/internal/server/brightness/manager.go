@@ -97,10 +97,10 @@ func (m *Manager) Rescan() {
 	}
 
 	if m.sysfsReady && m.sysfsBackend != nil {
-        if err := m.sysfsBackend.Rescan(); err != nil {
-            log.Debugf("Sysfs rescan failed: %v", err)
-        }
-    }
+		if err := m.sysfsBackend.Rescan(); err != nil {
+			log.Debugf("Sysfs rescan failed: %v", err)
+		}
+	}
 
 	m.updateState()
 }
