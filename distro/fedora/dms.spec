@@ -28,6 +28,7 @@ Recommends:     danksearch
 Recommends:     matugen
 Recommends:     NetworkManager
 Recommends:     qt6-qtmultimedia
+Suggests:       cups-pk-helper
 Suggests:       qt6ct
 
 %description
