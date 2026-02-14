@@ -141,9 +141,11 @@ PanelWindow {
     }
 
     property bool isTopCenter: SettingsData.notificationPopupPosition === -1
+    property bool isBottomCenter: SettingsData.notificationPopupPosition === SettingsData.Position.BottomCenter
+    property bool isCenterPosition: isTopCenter || isBottomCenter
 
     anchors.top: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
-    anchors.bottom: SettingsData.notificationPopupPosition === SettingsData.Position.Bottom || SettingsData.notificationPopupPosition === SettingsData.Position.Right
+    anchors.bottom: isBottomCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom || SettingsData.notificationPopupPosition === SettingsData.Position.Right
     anchors.left: SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom
     anchors.right: SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Right
 
@@ -182,7 +184,7 @@ PanelWindow {
 
     function getBottomMargin() {
         const popupPos = SettingsData.notificationPopupPosition;
-        const isBottom = popupPos === SettingsData.Position.Bottom || popupPos === SettingsData.Position.Right;
+        const isBottom = isBottomCenter || popupPos === SettingsData.Position.Bottom || popupPos === SettingsData.Position.Right;
         if (!isBottom)
             return 0;
 
@@ -192,7 +194,7 @@ PanelWindow {
     }
 
     function getLeftMargin() {
-        if (isTopCenter)
+        if (isCenterPosition)
             return screen ? (screen.width - implicitWidth) / 2 : 0;
 
         const popupPos = SettingsData.notificationPopupPosition;
@@ -205,7 +207,7 @@ PanelWindow {
     }
 
     function getRightMargin() {
-        if (isTopCenter)
+        if (isCenterPosition)
             return 0;
 
         const popupPos = SettingsData.notificationPopupPosition;
@@ -232,7 +234,7 @@ PanelWindow {
         visible: !win._finalized
 
         property real swipeOffset: 0
-        readonly property real dismissThreshold: isTopCenter ? height * 0.4 : width * 0.35
+        readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
@@ -329,7 +331,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.topMargin: cardPadding
                 anchors.leftMargin: Theme.spacingL
-                anchors.rightMargin: Theme.spacingL + (cardHoverHandler.hovered ? Theme.notificationHoverRevealMargin : 0)
+                anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
                 height: collapsedContentHeight + extraHeight
 
                 DankCircularImage {
@@ -352,9 +354,7 @@ PanelWindow {
                     height: popupIconSize
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    anchors.topMargin: descriptionExpanded
-                        ? Math.max(0, (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)) / 2 - popupIconSize / 2)
-                        : Math.max(0, textContainer.height / 2 - popupIconSize / 2)
+                    anchors.topMargin: descriptionExpanded ? Math.max(0, (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)) / 2 - popupIconSize / 2) : Math.max(0, textContainer.height / 2 - popupIconSize / 2)
 
                     imageSource: {
                         if (!notificationData)
@@ -469,19 +469,9 @@ PanelWindow {
                 anchors.topMargin: cardPadding
                 anchors.rightMargin: Theme.spacingL
                 iconName: "close"
-                iconSize: compactMode ? 16 : 18
-                buttonSize: compactMode ? 24 : 28
+                iconSize: compactMode ? 14 : 16
+                buttonSize: compactMode ? 20 : 24
                 z: 15
-                opacity: cardHoverHandler.hovered ? 1 : 0
-                visible: opacity > 0
-                enabled: cardHoverHandler.hovered
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.shortDuration
-                        easing.type: Theme.standardEasing
-                    }
-                }
 
                 onClicked: {
                     if (notificationData && !win.exiting)
@@ -500,7 +490,10 @@ PanelWindow {
                 z: 20
 
                 Behavior on opacity {
-                    NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
                 }
 
                 Repeater {
@@ -552,7 +545,10 @@ PanelWindow {
                 visible: actionCount < 3 && cardHoverHandler.hovered
                 opacity: visible ? 1 : 0
                 Behavior on opacity {
-                    NumberAnimation { duration: Theme.shortDuration; easing.type: Theme.standardEasing }
+                    NumberAnimation {
+                        duration: Theme.shortDuration
+                        easing.type: Theme.standardEasing
+                    }
                 }
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
@@ -594,6 +590,7 @@ PanelWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
+                cursorShape: Qt.PointingHandCursor
                 propagateComposedEvents: true
                 z: -1
                 onEntered: {
@@ -624,8 +621,8 @@ PanelWindow {
         DragHandler {
             id: swipeDragHandler
             target: null
-            xAxis.enabled: !isTopCenter
-            yAxis.enabled: isTopCenter
+            xAxis.enabled: !isCenterPosition
+            yAxis.enabled: isCenterPosition
 
             onActiveChanged: {
                 if (active || win.exiting || content.swipeDismissing)
@@ -643,9 +640,11 @@ PanelWindow {
                 if (win.exiting)
                     return;
 
-                const raw = isTopCenter ? translation.y : translation.x;
+                const raw = isCenterPosition ? translation.y : translation.x;
                 if (isTopCenter) {
                     content.swipeOffset = Math.min(0, raw);
+                } else if (isBottomCenter) {
+                    content.swipeOffset = Math.max(0, raw);
                 } else {
                     const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
                     content.swipeOffset = isLeft ? Math.min(0, raw) : Math.max(0, raw);
@@ -653,7 +652,7 @@ PanelWindow {
             }
         }
 
-        opacity: 1 - Math.abs(content.swipeOffset) / (isTopCenter ? content.height : content.width * 0.6)
+        opacity: 1 - Math.abs(content.swipeOffset) / (isCenterPosition ? content.height : content.width * 0.6)
 
         Behavior on opacity {
             enabled: !content.swipeActive
@@ -674,7 +673,7 @@ PanelWindow {
             id: swipeDismissAnim
             target: content
             property: "swipeOffset"
-            to: isTopCenter ? -content.height : (SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom ? -content.width : content.width)
+            to: isTopCenter ? -content.height : isBottomCenter ? content.height : (SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom ? -content.width : content.width)
             duration: Theme.shortDuration
             easing.type: Easing.OutCubic
             onStopped: {
@@ -686,18 +685,18 @@ PanelWindow {
         transform: [
             Translate {
                 id: swipeTx
-                x: isTopCenter ? 0 : content.swipeOffset
-                y: isTopCenter ? content.swipeOffset : 0
+                x: isCenterPosition ? 0 : content.swipeOffset
+                y: isCenterPosition ? content.swipeOffset : 0
             },
             Translate {
                 id: tx
                 x: {
-                    if (isTopCenter)
+                    if (isCenterPosition)
                         return 0;
                     const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
                     return isLeft ? -Anims.slidePx : Anims.slidePx;
                 }
-                y: isTopCenter ? -Anims.slidePx : 0
+                y: isTopCenter ? -Anims.slidePx : isBottomCenter ? Anims.slidePx : 0
             }
         ]
     }
@@ -706,20 +705,22 @@ PanelWindow {
         id: enterX
 
         target: tx
-        property: isTopCenter ? "y" : "x"
+        property: isCenterPosition ? "y" : "x"
         from: {
             if (isTopCenter)
                 return -Anims.slidePx;
+            if (isBottomCenter)
+                return Anims.slidePx;
             const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
             return isLeft ? -Anims.slidePx : Anims.slidePx;
         }
         to: 0
         duration: Theme.notificationEnterDuration
         easing.type: Easing.BezierSpline
-        easing.bezierCurve: isTopCenter ? Theme.expressiveCurves.standardDecel : Theme.expressiveCurves.emphasizedDecel
+        easing.bezierCurve: isCenterPosition ? Theme.expressiveCurves.standardDecel : Theme.expressiveCurves.emphasizedDecel
         onStopped: {
             if (!win.exiting && !win._isDestroying) {
-                if (isTopCenter) {
+                if (isCenterPosition) {
                     if (Math.abs(tx.y) < 0.5)
                         win.entered();
                 } else {
@@ -737,11 +738,13 @@ PanelWindow {
 
         PropertyAnimation {
             target: tx
-            property: isTopCenter ? "y" : "x"
+            property: isCenterPosition ? "y" : "x"
             from: 0
             to: {
                 if (isTopCenter)
                     return -Anims.slidePx;
+                if (isBottomCenter)
+                    return Anims.slidePx;
                 const isLeft = SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom;
                 return isLeft ? -Anims.slidePx : Anims.slidePx;
             }

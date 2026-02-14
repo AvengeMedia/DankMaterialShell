@@ -211,22 +211,33 @@ Item {
                             return I18n.tr("Top Left", "screen position option");
                         case SettingsData.Position.Right:
                             return I18n.tr("Bottom Right", "screen position option");
+                        case SettingsData.Position.BottomCenter:
+                            return I18n.tr("Bottom Center", "screen position option");
                         default:
                             return I18n.tr("Top Right", "screen position option");
                         }
                     }
-                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
+                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
                     onValueChanged: value => {
-                        if (value === I18n.tr("Top Right", "screen position option")) {
+                        switch (value) {
+                        case I18n.tr("Top Right", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Top);
-                        } else if (value === I18n.tr("Top Left", "screen position option")) {
+                            break;
+                        case I18n.tr("Top Left", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Left);
-                        } else if (value === I18n.tr("Top Center", "screen position option")) {
+                            break;
+                        case I18n.tr("Top Center", "screen position option"):
                             SettingsData.set("notificationPopupPosition", -1);
-                        } else if (value === I18n.tr("Bottom Right", "screen position option")) {
+                            break;
+                        case I18n.tr("Bottom Center", "screen position option"):
+                            SettingsData.set("notificationPopupPosition", SettingsData.Position.BottomCenter);
+                            break;
+                        case I18n.tr("Bottom Right", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Right);
-                        } else if (value === I18n.tr("Bottom Left", "screen position option")) {
+                            break;
+                        case I18n.tr("Bottom Left", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
+                            break;
                         }
                         SettingsData.sendTestNotifications();
                     }
