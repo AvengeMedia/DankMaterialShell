@@ -980,6 +980,13 @@ Singleton {
             return "";
         if (/<\/?[a-z][\s\S]*>/i.test(body))
             return body;
+
+        // Decode percent-encoded URLs (e.g. https%3A%2F%2F → https://)
+        body = body.replace(/\bhttps?%3A%2F%2F[^\s]+/gi, match => {
+            try { return decodeURIComponent(match); }
+            catch (e) { return match; }
+        });
+
         if (/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(body)) {
             const decoded = _decodeEntities(body);
             if (/<\/?[a-z][\s\S]*>/i.test(decoded))

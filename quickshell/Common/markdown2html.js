@@ -32,8 +32,15 @@ function markdownToHtml(text) {
         return `\x00INLINECODE${inlineIndex++}\x00`;
     });
 
-    // Now process everything else
-    // Escape HTML entities (but not in code blocks)
+    // Extract plain URLs before escaping so & in query strings is preserved
+    const urls = [];
+    let urlIndex = 0;
+    html = html.replace(/(^|[\s])((?:https?|file):\/\/[^\s]+)/gm, (match, prefix, url) => {
+        urls.push(url);
+        return prefix + `\x00URL${urlIndex++}\x00`;
+    });
+
+    // Escape HTML entities (but not in code blocks or URLs)
     html = html.replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
@@ -64,8 +71,12 @@ function markdownToHtml(text) {
         return '<ul>' + match + '</ul>';
     });
 
-    // Detect plain URLs and wrap them in anchor tags (but not inside existing <a> or markdown links)
-    html = html.replace(/(^|[^"'>])((https?|file):\/\/[^\s<]+)/g, '$1<a href="$2">$2</a>');
+    // Restore extracted URLs as anchor tags (preserves raw & in href)
+    html = html.replace(/\x00URL(\d+)\x00/g, (_, index) => {
+        const url = urls[parseInt(index)];
+        const display = url.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<a href="${url}">${display}</a>`;
+    });
 
     // Restore code blocks and inline code BEFORE line break processing
     html = html.replace(/\x00CODEBLOCK(\d+)\x00/g, (match, index) => {
