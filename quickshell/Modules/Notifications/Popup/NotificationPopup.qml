@@ -279,6 +279,10 @@ PanelWindow {
 
         property real swipeOffset: 0
         readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
+        readonly property real swipeFadeStartRatio: 0.75
+        readonly property real swipeTravelDistance: isCenterPosition ? height : width
+        readonly property real swipeFadeStartOffset: swipeTravelDistance * swipeFadeStartRatio
+        readonly property real swipeFadeDistance: Math.max(1, swipeTravelDistance - swipeFadeStartOffset)
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
@@ -792,7 +796,13 @@ PanelWindow {
             }
         }
 
-        opacity: 1 - Math.abs(content.swipeOffset) / (isCenterPosition ? content.height : content.width * 0.6)
+        opacity: {
+            const swipeAmount = Math.abs(content.swipeOffset);
+            if (swipeAmount <= content.swipeFadeStartOffset)
+                return 1;
+            const fadeProgress = (swipeAmount - content.swipeFadeStartOffset) / content.swipeFadeDistance;
+            return Math.max(0, 1 - fadeProgress);
+        }
 
         Behavior on opacity {
             enabled: !content.swipeActive
