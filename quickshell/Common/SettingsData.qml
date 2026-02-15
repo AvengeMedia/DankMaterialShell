@@ -2140,6 +2140,9 @@ Singleton {
         saveSettings();
     }
 
+    property bool _pendingExpandNotificationRules: false
+    property int _pendingNotificationRuleIndex: -1
+
     function addNotificationRule() {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
         rules.push({
@@ -2152,6 +2155,27 @@ Singleton {
         });
         notificationRules = rules;
         saveSettings();
+    }
+
+    function addNotificationRuleForNotification(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
+        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
+        var rule = {
+            enabled: true,
+            field: pattern ? field : "appName",
+            pattern: pattern || "",
+            matchType: pattern ? "exact" : "contains",
+            action: "default",
+            urgency: "default"
+        };
+        rules.push(rule);
+        notificationRules = rules;
+        saveSettings();
+        var index = rules.length - 1;
+        _pendingExpandNotificationRules = true;
+        _pendingNotificationRuleIndex = index;
+        return index;
     }
 
     function addMuteRuleForApp(appName, desktopEntry) {

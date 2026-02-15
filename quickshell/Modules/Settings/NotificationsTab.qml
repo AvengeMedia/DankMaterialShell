@@ -6,6 +6,15 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    Component.onCompleted: {
+        if (SettingsData._pendingExpandNotificationRules) {
+            SettingsData._pendingExpandNotificationRules = false;
+            notificationRulesCard.userToggledCollapse = true;
+            notificationRulesCard.expanded = true;
+            SettingsData._pendingNotificationRuleIndex = -1;
+        }
+    }
+
     readonly property var mutedRules: {
         var rules = SettingsData.notificationRules || [];
         var out = [];

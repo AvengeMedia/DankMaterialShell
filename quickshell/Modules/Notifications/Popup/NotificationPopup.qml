@@ -835,7 +835,10 @@ PanelWindow {
 
     Menu {
         id: popupContextMenu
-        width: 300
+        width: 220
+        contentHeight: 130
+        margins: -1
+        popupType: Popup.Window
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
@@ -843,6 +846,31 @@ PanelWindow {
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        }
+
+        MenuItem {
+            id: setNotificationRulesItem
+            text: I18n.tr("Set notification rules")
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                const appName = notificationData?.appName || "";
+                const desktopEntry = notificationData?.desktopEntry || "";
+                SettingsData.addNotificationRuleForNotification(appName, desktopEntry);
+                PopoutService.openSettingsWithTab("notifications");
+            }
         }
 
         MenuItem {

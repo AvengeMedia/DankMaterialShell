@@ -873,7 +873,7 @@ Rectangle {
 
     Menu {
         id: notificationCardContextMenu
-        width: 300
+        width: 220
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
         background: Rectangle {
@@ -881,6 +881,31 @@ Rectangle {
             radius: Theme.cornerRadius
             border.width: 0
             border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.12)
+        }
+
+        MenuItem {
+            id: setNotificationRulesItem
+            text: I18n.tr("Set notification rules")
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                const appName = notificationGroup?.appName || "";
+                const desktopEntry = notificationGroup?.latestNotification?.desktopEntry || "";
+                SettingsData.addNotificationRuleForNotification(appName, desktopEntry);
+                PopoutService.openSettingsWithTab("notifications");
+            }
         }
 
         MenuItem {
