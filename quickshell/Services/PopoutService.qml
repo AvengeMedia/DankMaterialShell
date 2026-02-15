@@ -454,6 +454,13 @@ Singleton {
         dankLauncherV2Modal?.hide();
     }
 
+    function unloadDankLauncherV2() {
+        if (dankLauncherV2ModalLoader) {
+            dankLauncherV2Modal = null;
+            dankLauncherV2ModalLoader.active = false;
+        }
+    }
+
     function toggleDankLauncherV2() {
         if (dankLauncherV2Modal) {
             dankLauncherV2Modal.toggle();
