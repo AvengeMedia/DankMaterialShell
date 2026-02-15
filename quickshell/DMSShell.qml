@@ -46,7 +46,7 @@ Item {
                     }
                     item.pluginId = pluginId;
                     console.info("Daemon plugin loaded:", pluginId);
-                }t
+                }
             }
         }
     }
