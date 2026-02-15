@@ -30,10 +30,7 @@ Singleton {
     })
 
     function getTerminalFlag(terminal) {
-        var name = terminal.split("/").pop()
-        if (terminalFlags[name] !== undefined)
-            return terminalFlags[name]
-        return ["-e"]
+        return terminalFlags[terminal] ?? ["-e"]
     }
 
     function _terminalPrefix() {
