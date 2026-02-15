@@ -270,6 +270,24 @@ Item {
                     onToggled: checked => SettingsData.set("notificationCompactMode", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "notificationPopupShadowEnabled"
+                    tags: ["notification", "popup", "shadow", "radius", "rounded"]
+                    text: I18n.tr("Popup Shadow")
+                    description: I18n.tr("Show drop shadow on notification popups")
+                    checked: SettingsData.notificationPopupShadowEnabled
+                    onToggled: checked => SettingsData.set("notificationPopupShadowEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "notificationPopupPrivacyMode"
+                    tags: ["notification", "popup", "privacy", "body", "content", "hide"]
+                    text: I18n.tr("Privacy Mode")
+                    description: I18n.tr("Hide notification content until expanded; popups show collapsed by default")
+                    checked: SettingsData.notificationPopupPrivacyMode
+                    onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
+                }
+
                 Item {
                     width: parent.width
                     height: notificationAnimationColumn.implicitHeight + Theme.spacingM * 2

@@ -25,10 +25,12 @@ Item {
     property real animationOffset: Theme.spacingL
     property list<real> animationEnterCurve: Theme.expressiveCurves.expressiveDefaultSpatial
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
+    property bool suspendShadowWhileResizing: false
     property bool shouldBeVisible: false
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
+    property bool _resizeActive: false
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -184,6 +186,26 @@ Item {
     readonly property real shadowBuffer: 5
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
+
+    onAlignedHeightChanged: {
+        if (!suspendShadowWhileResizing || !shouldBeVisible)
+            return;
+        _resizeActive = true;
+        resizeSettleTimer.restart();
+    }
+    onShouldBeVisibleChanged: {
+        if (!shouldBeVisible) {
+            _resizeActive = false;
+            resizeSettleTimer.stop();
+        }
+    }
+
+    Timer {
+        id: resizeSettleTimer
+        interval: 80
+        repeat: false
+        onTriggered: root._resizeActive = false
+    }
 
     readonly property real alignedX: Theme.snap((() => {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
@@ -440,7 +462,7 @@ Item {
                 readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
                 readonly property int blurMax: 64
 
-                layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
                 layer.smooth: false
                 layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
 

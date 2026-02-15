@@ -289,7 +289,8 @@ QtObject {
         let currentY = topMargin;
         for (const win of activeWindows) {
             win.screenY = currentY;
-            currentY += win.implicitHeight + popupSpacing;
+            const popupHeight = win.alignedHeight || win.implicitHeight;
+            currentY += popupHeight + popupSpacing;
         }
     }
 

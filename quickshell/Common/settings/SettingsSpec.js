@@ -297,6 +297,8 @@ var SPEC = {
     dockShowOverflowBadge: { def: true },
 
     notificationOverlayEnabled: { def: false },
+    notificationPopupShadowEnabled: { def: true },
+    notificationPopupPrivacyMode: { def: false },
     overviewRows: { def: 2, persist: false },
     overviewColumns: { def: 5, persist: false },
     overviewScale: { def: 0.16, persist: false },

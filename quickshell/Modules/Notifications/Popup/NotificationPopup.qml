@@ -20,12 +20,18 @@ PanelWindow {
     property bool exiting: false
     property bool _isDestroying: false
     property bool _finalized: false
+    property real _lastReportedAlignedHeight: -1
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
+    readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
     onDescriptionExpandedChanged: {
         popupHeightChanged();
     }
     onImplicitHeightChanged: {
+        const aligned = Theme.px(implicitHeight, dpr);
+        if (Math.abs(aligned - _lastReportedAlignedHeight) < 0.5)
+            return;
+        _lastReportedAlignedHeight = aligned;
         popupHeightChanged();
     }
 
@@ -35,7 +41,9 @@ PanelWindow {
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
+    readonly property real privacyCollapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2)
     readonly property real basePopupHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
+    readonly property real basePopupHeightPrivacy: cardPadding * 2 + privacyCollapsedContentHeight + actionButtonHeight + contentSpacing
 
     signal entered
     signal exitStarted
@@ -108,6 +116,8 @@ PanelWindow {
     color: "transparent"
     implicitWidth: screen ? Math.min(400, Math.max(320, screen.width * 0.23)) : 380
     implicitHeight: {
+        if (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded)
+            return basePopupHeightPrivacy;
         if (!descriptionExpanded)
             return basePopupHeight;
         const bodyTextHeight = bodyText.contentHeight || 0;
@@ -116,12 +126,26 @@ PanelWindow {
             return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
     }
+
+    Behavior on implicitHeight {
+        enabled: !exiting && !_isDestroying
+        NumberAnimation {
+            id: implicitHeightAnim
+            duration: descriptionExpanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
+            easing.type: Easing.BezierSpline
+            easing.bezierCurve: Theme.expressiveCurves.emphasized
+        }
+    }
+
     onHasValidDataChanged: {
         if (!hasValidData && !exiting && !_isDestroying) {
             forceExit();
         }
     }
     Component.onCompleted: {
+        _lastReportedAlignedHeight = Theme.px(implicitHeight, dpr);
+        if (SettingsData.notificationPopupPrivacyMode)
+            descriptionExpanded = false;
         if (hasValidData) {
             Qt.callLater(() => enterX.restart());
         } else {
@@ -130,6 +154,8 @@ PanelWindow {
     }
     onNotificationDataChanged: {
         if (!_isDestroying) {
+            if (SettingsData.notificationPopupPrivacyMode)
+                descriptionExpanded = false;
             wrapperConn.target = win.notificationData || null;
             notificationConn.target = (win.notificationData && win.notificationData.notification && win.notificationData.notification.Retainable) || null;
         }
@@ -242,14 +268,22 @@ PanelWindow {
         scale: cardHoverHandler.hovered ? 1.01 : 1.0
         transformOrigin: Item.Center
 
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
         property real swipeOffset: 0
         readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        property real shadowBlurPx: cardHoverHandler.hovered ? 16 : 10
-        property real shadowSpreadPx: cardHoverHandler.hovered ? 2 : 0
-        property real shadowBaseAlpha: 0.60
+        readonly property real radiusForShadow: Theme.cornerRadius
+        property real shadowBlurPx: SettingsData.notificationPopupShadowEnabled ? ((2 + radiusForShadow * 0.2) * (cardHoverHandler.hovered ? 1.2 : 1)) : 0
+        property real shadowSpreadPx: SettingsData.notificationPopupShadowEnabled ? (radiusForShadow * (cardHoverHandler.hovered ? 0.06 : 0)) : 0
+        property real shadowBaseAlpha: 0.35
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
         readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
 
@@ -267,18 +301,11 @@ PanelWindow {
             }
         }
 
-        Behavior on scale {
-            NumberAnimation {
-                duration: Theme.shortDuration
-                easing.type: Theme.standardEasing
-            }
-        }
-
         Item {
             id: bgShadowLayer
             anchors.fill: parent
             anchors.margins: Theme.snap(4, win.dpr)
-            layer.enabled: !win._isDestroying && win.screenValid
+            layer.enabled: !win._isDestroying && win.screenValid && !implicitHeightAnim.running
             layer.smooth: false
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -288,7 +315,7 @@ PanelWindow {
             layer.effect: MultiEffect {
                 id: shadowFx
                 autoPaddingEnabled: true
-                shadowEnabled: true
+                shadowEnabled: SettingsData.notificationPopupShadowEnabled
                 blurEnabled: false
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
@@ -300,7 +327,7 @@ PanelWindow {
             }
 
             Rectangle {
-                id: backgroundShape
+                id: shadowShapeSource
                 anchors.fill: parent
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
@@ -310,7 +337,7 @@ PanelWindow {
 
             Rectangle {
                 anchors.fill: parent
-                radius: backgroundShape.radius
+                radius: shadowShapeSource.radius
                 visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
                 opacity: 1
                 clip: true
@@ -346,6 +373,20 @@ PanelWindow {
                 id: cardHoverHandler
             }
 
+            Connections {
+                target: cardHoverHandler
+                function onHoveredChanged() {
+                    if (!notificationData || win.exiting || win._isDestroying)
+                        return;
+                    if (cardHoverHandler.hovered) {
+                        if (notificationData.timer)
+                            notificationData.timer.stop();
+                    } else if (notificationData.popup && notificationData.timer) {
+                        notificationData.timer.restart();
+                    }
+                }
+            }
+
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
 
@@ -354,6 +395,7 @@ PanelWindow {
 
                 readonly property real expandedTextHeight: bodyText.contentHeight || 0
                 readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)
+                readonly property real effectiveCollapsedHeight: (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) ? win.privacyCollapsedContentHeight : win.collapsedContentHeight
                 readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedBodyHeight + 2) ? (expandedTextHeight - collapsedBodyHeight) : 0
 
                 anchors.top: parent.top
@@ -362,7 +404,8 @@ PanelWindow {
                 anchors.topMargin: cardPadding
                 anchors.leftMargin: Theme.spacingL
                 anchors.rightMargin: Theme.spacingL + Theme.notificationHoverRevealMargin
-                height: collapsedContentHeight + extraHeight
+                height: effectiveCollapsedHeight + extraHeight
+                clip: SettingsData.notificationPopupPrivacyMode && !descriptionExpanded
 
                 DankCircularImage {
                     id: iconContainer
@@ -384,7 +427,15 @@ PanelWindow {
                     height: popupIconSize
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - popupIconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2)
+                    anchors.topMargin: {
+                    if (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) {
+                        const headerSummary = Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2;
+                        return Math.max(0, headerSummary / 2 - popupIconSize / 2);
+                    }
+                    if (descriptionExpanded)
+                        return Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - popupIconSize / 2);
+                    return Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2);
+                }
 
                     imageSource: {
                         if (!notificationData)
@@ -499,6 +550,7 @@ PanelWindow {
                         maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
                         wrapMode: Text.WordWrap
                         visible: text.length > 0
+                        opacity: (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) ? 0 : 1
                         linkColor: Theme.primary
                         onLinkActivated: link => Qt.openUrlExternally(link)
 
@@ -522,6 +574,14 @@ PanelWindow {
                             }
                         }
                     }
+
+                    StyledText {
+                        text: I18n.tr("Message Content", "notification privacy mode placeholder")
+                        color: Theme.surfaceVariantText
+                        font.pixelSize: Theme.fontSizeSmall
+                        width: parent.width
+                        visible: SettingsData.notificationPopupPrivacyMode && !descriptionExpanded && win.hasExpandableBody
+                    }
                 }
             }
 
@@ -540,6 +600,25 @@ PanelWindow {
                 onClicked: {
                     if (notificationData && !win.exiting)
                         notificationData.popup = false;
+                }
+            }
+
+            DankActionButton {
+                id: expandButton
+
+                anchors.right: closeButton.left
+                anchors.rightMargin: Theme.spacingXS
+                anchors.top: parent.top
+                anchors.topMargin: cardPadding
+                iconName: descriptionExpanded ? "expand_less" : "expand_more"
+                iconSize: compactMode ? 14 : 16
+                buttonSize: compactMode ? 20 : 24
+                z: 15
+                visible: SettingsData.notificationPopupPrivacyMode && win.hasExpandableBody
+
+                onClicked: {
+                    if (win.hasExpandableBody)
+                        win.descriptionExpanded = !win.descriptionExpanded;
                 }
             }
 
@@ -657,21 +736,14 @@ PanelWindow {
                 cursorShape: Qt.PointingHandCursor
                 propagateComposedEvents: true
                 z: -1
-                onEntered: {
-                    if (notificationData && notificationData.timer)
-                        notificationData.timer.stop();
-                }
-                onExited: {
-                    if (notificationData && notificationData.popup && notificationData.timer)
-                        notificationData.timer.restart();
-                }
                 onClicked: mouse => {
                     if (!notificationData || win.exiting)
                         return;
                     if (mouse.button === Qt.RightButton) {
                         popupContextMenu.popup();
                     } else if (mouse.button === Qt.LeftButton) {
-                        if (bodyText.hasMoreText || win.descriptionExpanded) {
+                        const canExpand = bodyText.hasMoreText || win.descriptionExpanded || (SettingsData.notificationPopupPrivacyMode && win.hasExpandableBody);
+                        if (canExpand) {
                             win.descriptionExpanded = !win.descriptionExpanded;
                         } else if (notificationData.actions && notificationData.actions.length > 0) {
                             notificationData.actions[0].invoke();
