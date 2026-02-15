@@ -22,18 +22,25 @@ PanelWindow {
     property bool _finalized: false
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
+    onDescriptionExpandedChanged: {
+        popupHeightChanged();
+    }
+    onImplicitHeightChanged: {
+        popupHeightChanged();
+    }
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
     readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3))
+    readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property real basePopupHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
 
     signal entered
     signal exitStarted
     signal exitFinished
+    signal popupHeightChanged()
 
     function startExit() {
         if (exiting || _isDestroying) {
@@ -104,7 +111,7 @@ PanelWindow {
         if (!descriptionExpanded)
             return basePopupHeight;
         const bodyTextHeight = bodyText.contentHeight || 0;
-        const collapsedBodyHeight = Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3);
+        const collapsedBodyHeight = Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2);
         if (bodyTextHeight > collapsedBodyHeight + 2)
             return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
@@ -232,17 +239,40 @@ PanelWindow {
         width: alignedWidth
         height: alignedHeight
         visible: !win._finalized
+        scale: cardHoverHandler.hovered ? 1.01 : 1.0
+        transformOrigin: Item.Center
 
         property real swipeOffset: 0
         readonly property real dismissThreshold: isCenterPosition ? height * 0.4 : width * 0.35
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        property real shadowBlurPx: 10
-        property real shadowSpreadPx: 0
+        property real shadowBlurPx: cardHoverHandler.hovered ? 16 : 10
+        property real shadowSpreadPx: cardHoverHandler.hovered ? 2 : 0
         property real shadowBaseAlpha: 0.60
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
         readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
+
+        Behavior on shadowBlurPx {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        Behavior on shadowSpreadPx {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        Behavior on scale {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
 
         Item {
             id: bgShadowLayer
@@ -323,7 +353,7 @@ PanelWindow {
                 id: notificationContent
 
                 readonly property real expandedTextHeight: bodyText.contentHeight || 0
-                readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)
+                readonly property real collapsedBodyHeight: Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)
                 readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedBodyHeight + 2) ? (expandedTextHeight - collapsedBodyHeight) : 0
 
                 anchors.top: parent.top
@@ -354,7 +384,7 @@ PanelWindow {
                     height: popupIconSize
                     anchors.left: parent.left
                     anchors.top: parent.top
-                    anchors.topMargin: descriptionExpanded ? Math.max(0, (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)) / 2 - popupIconSize / 2) : Math.max(0, textContainer.height / 2 - popupIconSize / 2)
+                    anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - popupIconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2)
 
                     imageSource: {
                         if (!notificationData)
@@ -410,6 +440,40 @@ PanelWindow {
                     anchors.top: parent.top
                     spacing: Theme.notificationContentSpacing
 
+                    Row {
+                        id: headerRow
+                        width: parent.width
+                        spacing: Theme.spacingXS
+                        visible: headerAppNameText.text.length > 0 || headerTimeText.text.length > 0
+
+                        StyledText {
+                            id: headerAppNameText
+                            text: notificationData ? (notificationData.appName || "") : ""
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Normal
+                            elide: Text.ElideRight
+                            maximumLineCount: 1
+                            width: Math.min(implicitWidth, parent.width - headerSeparator.implicitWidth - headerTimeText.implicitWidth - parent.spacing * 2)
+                        }
+
+                        StyledText {
+                            id: headerSeparator
+                            text: (headerAppNameText.text.length > 0 && headerTimeText.text.length > 0) ? " • " : ""
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Normal
+                        }
+
+                        StyledText {
+                            id: headerTimeText
+                            text: notificationData ? (notificationData.timeStr || "") : ""
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                            font.pixelSize: Theme.fontSizeSmall
+                            font.weight: Font.Normal
+                        }
+                    }
+
                     StyledText {
                         text: notificationData ? (notificationData.summary || "") : ""
                         color: Theme.surfaceText
@@ -432,7 +496,7 @@ PanelWindow {
                         width: parent.width
                         elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
-                        maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 3)
+                        maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
                         wrapMode: Text.WordWrap
                         visible: text.length > 0
                         linkColor: Theme.primary
@@ -607,7 +671,9 @@ PanelWindow {
                     if (mouse.button === Qt.RightButton) {
                         popupContextMenu.popup();
                     } else if (mouse.button === Qt.LeftButton) {
-                        if (notificationData.actions && notificationData.actions.length > 0) {
+                        if (bodyText.hasMoreText || win.descriptionExpanded) {
+                            win.descriptionExpanded = !win.descriptionExpanded;
+                        } else if (notificationData.actions && notificationData.actions.length > 0) {
                             notificationData.actions[0].invoke();
                             NotificationService.dismissNotification(notificationData);
                         } else {

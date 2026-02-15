@@ -14,6 +14,8 @@ DankListView {
     property real stableContentHeight: 0
     property bool cardAnimateExpansion: true
     property bool listInitialized: false
+    property int swipingCardIndex: -1
+    property real swipingCardOffset: 0
     property real __pendingStableHeight: 0
     property real __heightUpdateThreshold: 20
 
@@ -132,6 +134,11 @@ DankListView {
         readonly property real dismissThreshold: width * 0.35
         property bool __delegateInitialized: false
 
+        readonly property bool isAdjacentToSwipe: listView.count >= 2 && listView.swipingCardIndex !== -1 &&
+            (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
+        readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? listView.swipingCardOffset * 0.10 : 0
+        readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(listView.swipingCardOffset) / width * 0.02 : 1.0
+
         Component.onCompleted: {
             Qt.callLater(() => {
                 if (delegateRoot)
@@ -140,13 +147,15 @@ DankListView {
         }
 
         width: ListView.view.width
-        height: isDismissing ? 0 : notificationCard.height
-        clip: isDismissing || notificationCard.isAnimating
+        height: notificationCard.height
+        clip: notificationCard.isAnimating
 
         NotificationCard {
             id: notificationCard
             width: parent.width
-            x: delegateRoot.swipeOffset
+            x: delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
+            listLevelAdjacentScaleInfluence: delegateRoot.adjacentScaleInfluence
+            listLevelScaleAnimationsEnabled: listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe
             notificationGroup: modelData
             keyboardNavigationActive: listView.keyboardActive
             animateExpansion: listView.cardAnimateExpansion && listView.listInitialized
@@ -188,7 +197,7 @@ DankListView {
             }
 
             Behavior on x {
-                enabled: !swipeDragHandler.active && listView.listInitialized
+                enabled: !swipeDragHandler.active && !delegateRoot.isDismissing && (listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe) && listView.listInitialized
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
@@ -210,12 +219,18 @@ DankListView {
             xAxis.enabled: true
 
             onActiveChanged: {
-                if (active || delegateRoot.isDismissing)
+                if (active) {
+                    listView.swipingCardIndex = index;
+                    return;
+                }
+                listView.swipingCardIndex = -1;
+                listView.swipingCardOffset = 0;
+                if (delegateRoot.isDismissing)
                     return;
                 if (Math.abs(delegateRoot.swipeOffset) > delegateRoot.dismissThreshold) {
                     delegateRoot.isDismissing = true;
-                    delegateRoot.swipeOffset = delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width;
-                    dismissTimer.start();
+                    swipeDismissAnim.to = delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width;
+                    swipeDismissAnim.start();
                 } else {
                     delegateRoot.swipeOffset = 0;
                 }
@@ -225,13 +240,18 @@ DankListView {
                 if (delegateRoot.isDismissing)
                     return;
                 delegateRoot.swipeOffset = translation.x;
+                listView.swipingCardOffset = translation.x;
             }
         }
 
-        Timer {
-            id: dismissTimer
-            interval: Theme.shortDuration
-            onTriggered: NotificationService.dismissGroup(delegateRoot.modelData?.key || "")
+        NumberAnimation {
+            id: swipeDismissAnim
+            target: delegateRoot
+            property: "swipeOffset"
+            to: 0
+            duration: Theme.shortDuration
+            easing.type: Easing.OutCubic
+            onStopped: NotificationService.dismissGroup(delegateRoot.modelData?.key || "")
         }
     }
 

@@ -13,7 +13,8 @@ QtObject {
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real popupSpacing: compactMode ? 0 : Theme.spacingXS
-    readonly property int baseNotificationHeight: cardPadding * 2 + popupIconSize + actionButtonHeight + contentSpacing + popupSpacing
+    readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
+    readonly property int baseNotificationHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing + popupSpacing
     property int maxTargetNotifications: 4
     property var popupWindows: [] // strong refs to windows (live until exitFinished)
     property var destroyingWindows: new Set()
@@ -29,6 +30,7 @@ QtObject {
             onEntered: manager._onPopupEntered(this)
             onExitStarted: manager._onPopupExitStarted(this)
             onExitFinished: manager._onPopupExitFinished(this)
+            onPopupHeightChanged: manager._onPopupHeightChanged(this)
         }
     }
 
@@ -127,10 +129,7 @@ QtObject {
             }
             if (toRemove.length) {
                 popupWindows = popupWindows.filter(p => toRemove.indexOf(p) === -1);
-                const survivors = _active().sort((a, b) => a.screenY - b.screenY);
-                for (let k = 0; k < survivors.length; ++k) {
-                    survivors[k].screenY = topMargin + k * baseNotificationHeight;
-                }
+                _repositionAllActivePopups();
             }
             if (popupWindows.length === 0) {
                 sweeper.stop();
@@ -237,13 +236,6 @@ QtObject {
     function _doInsertNewestAtTop(wrapper) {
         if (!wrapper)
             return;
-        for (const p of popupWindows) {
-            if (!_isValidWindow(p))
-                continue;
-            if (p.exiting)
-                continue;
-            p.screenY = p.screenY + baseNotificationHeight;
-        }
         const notificationId = wrapper && wrapper.notification ? wrapper.notification.id : "";
         const win = popupComponent.createObject(null, {
             "notificationData": wrapper,
@@ -257,7 +249,10 @@ QtObject {
             win.destroy();
             return;
         }
-        popupWindows.push(win);
+        popupWindows.unshift(win);
+
+        _repositionAllActivePopups();
+
         createBusy = true;
         createTimer.restart();
         if (!sweeper.running)
@@ -283,12 +278,25 @@ QtObject {
     function _onPopupEntered(p) {
     }
 
+    function _onPopupHeightChanged(p) {
+        if (!p || p.exiting || p._isDestroying)
+            return;
+        _repositionAllActivePopups();
+    }
+
+    function _repositionAllActivePopups() {
+        const activeWindows = _active().sort((a, b) => a.screenY - b.screenY);
+        let currentY = topMargin;
+        for (const win of activeWindows) {
+            win.screenY = currentY;
+            currentY += win.implicitHeight + popupSpacing;
+        }
+    }
+
     function _onPopupExitStarted(p) {
         if (!p)
             return;
-        const survivors = _active().sort((a, b) => a.screenY - b.screenY);
-        for (let k = 0; k < survivors.length; ++k)
-            survivors[k].screenY = topMargin + k * baseNotificationHeight;
+        _repositionAllActivePopups();
     }
 
     function _onPopupExitFinished(p) {
@@ -310,10 +318,7 @@ QtObject {
         }
         _scheduleDestroy(p);
         Qt.callLater(() => destroyingWindows.delete(windowId));
-        const survivors = _active().sort((a, b) => a.screenY - b.screenY);
-        for (let k = 0; k < survivors.length; ++k) {
-            survivors[k].screenY = topMargin + k * baseNotificationHeight;
-        }
+        _repositionAllActivePopups();
     }
 
     function cleanupAllWindows() {

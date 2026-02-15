@@ -19,6 +19,10 @@ Rectangle {
     property bool isGroupSelected: false
     property int selectedNotificationIndex: -1
     property bool keyboardNavigationActive: false
+    property int swipingNotificationIndex: -1
+    property real swipingNotificationOffset: 0
+    property real listLevelAdjacentScaleInfluence: 1.0
+    property bool listLevelScaleAnimationsEnabled: true
 
     readonly property bool compactMode: SettingsData.notificationCompactMode
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
@@ -26,13 +30,14 @@ Rectangle {
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real badgeSize: compactMode ? 16 : 18
     readonly property real actionButtonHeight: compactMode ? 20 : 24
-    readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3))
+    readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property real baseCardHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing
 
     width: parent ? parent.width : 400
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
+    scale: (cardHoverHandler.hovered ? 1.01 : 1.0) * listLevelAdjacentScaleInfluence
     property bool __initialized: false
 
     Component.onCompleted: {
@@ -40,6 +45,14 @@ Rectangle {
             if (root)
                 root.__initialized = true;
         });
+    }
+
+    Behavior on scale {
+        enabled: listLevelScaleAnimationsEnabled
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
     }
 
     Behavior on border.color {
@@ -115,8 +128,8 @@ Rectangle {
         id: collapsedContent
 
         readonly property real expandedTextHeight: descriptionText.contentHeight
-        readonly property real collapsedLineCount: compactMode ? 1 : 3
-        readonly property real collapsedLineHeight: descriptionText.font.pixelSize * 1.2 * collapsedLineCount
+        readonly property real collapsedLineCount: compactMode ? 1 : 2
+        readonly property real collapsedLineHeight: Theme.fontSizeSmall * 1.2 * collapsedLineCount
         readonly property real extraHeight: (descriptionExpanded && expandedTextHeight > collapsedLineHeight + 2) ? (expandedTextHeight - collapsedLineHeight) : 0
 
         anchors.top: parent.top
@@ -146,7 +159,7 @@ Rectangle {
             height: iconSize
             anchors.left: parent.left
             anchors.top: parent.top
-            anchors.topMargin: descriptionExpanded ? Math.max(0, (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 3)) / 2 - iconSize / 2) : Math.max(0, textContainer.height / 2 - iconSize / 2)
+            anchors.topMargin: descriptionExpanded ? Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - iconSize / 2) : Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - iconSize / 2)
 
             imageSource: {
                 if (hasNotificationImage)
@@ -223,45 +236,49 @@ Rectangle {
                 spacing: Theme.notificationContentSpacing
 
                 Row {
-                    width: parent.width - ((notificationGroup?.count || 0) > 1 ? 10 : 0)
+                    id: collapsedHeaderRow
+                    width: parent.width
                     spacing: Theme.spacingXS
-                    visible: (collapsedTitleText.text.length > 0 || collapsedTimeText.text.length > 0)
-                    readonly property real reservedTrailingWidth: collapsedSeparator.implicitWidth + Math.max(collapsedTimeText.implicitWidth, 72) + spacing
+                    visible: (collapsedHeaderAppNameText.text.length > 0 || collapsedHeaderTimeText.text.length > 0)
 
                     StyledText {
-                        id: collapsedTitleText
-                        width: Math.min(implicitWidth, Math.max(0, parent.width - parent.reservedTrailingWidth))
-                        text: {
-                            let title = notificationGroup?.latestNotification?.summary || "";
-                            const appName = notificationGroup?.appName || "";
-                            const prefix = appName + " • ";
-                            if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
-                                title = title.substring(prefix.length);
-                            }
-                            return title;
-                        }
-                        color: Theme.surfaceText
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.weight: Font.Medium
+                        id: collapsedHeaderAppNameText
+                        text: notificationGroup?.appName || ""
+                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Normal
                         elide: Text.ElideRight
                         maximumLineCount: 1
-                        visible: text.length > 0
+                        width: Math.min(implicitWidth, parent.width - collapsedHeaderSeparator.implicitWidth - collapsedHeaderTimeText.implicitWidth - parent.spacing * 2)
                     }
+
                     StyledText {
-                        id: collapsedSeparator
-                        text: (collapsedTitleText.text.length > 0 && collapsedTimeText.text.length > 0) ? " • " : ""
+                        id: collapsedHeaderSeparator
+                        text: (collapsedHeaderAppNameText.text.length > 0 && collapsedHeaderTimeText.text.length > 0) ? " • " : ""
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
                     }
+
                     StyledText {
-                        id: collapsedTimeText
+                        id: collapsedHeaderTimeText
                         text: notificationGroup?.latestNotification?.timeStr || ""
                         color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                         font.pixelSize: Theme.fontSizeSmall
                         font.weight: Font.Normal
-                        visible: text.length > 0
                     }
+                }
+
+                StyledText {
+                    id: collapsedTitleText
+                    width: parent.width
+                    text: notificationGroup?.latestNotification?.summary || ""
+                    color: Theme.surfaceText
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.weight: Font.Medium
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    visible: text.length > 0
                 }
 
                 StyledText {
@@ -274,7 +291,7 @@ Rectangle {
                     font.pixelSize: Theme.fontSizeSmall
                     width: parent.width
                     elide: Text.ElideRight
-                    maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 3)
+                    maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
                     wrapMode: Text.WordWrap
                     visible: text.length > 0
                     linkColor: Theme.primary
@@ -380,7 +397,7 @@ Rectangle {
                         id: expandedDelegateHoverHandler
                     }
                     readonly property real expandedItemPadding: compactMode ? Theme.spacingS : Theme.spacingM
-                    readonly property real expandedBaseHeight: expandedItemPadding * 2 + expandedIconSize + actionButtonHeight + contentSpacing * 2
+                    readonly property real expandedBaseHeight: expandedItemPadding * 2 + Math.max(expandedIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * 2) + actionButtonHeight + contentSpacing * 2
                     property bool __delegateInitialized: false
                     property real swipeOffset: 0
                     property bool isDismissing: false
@@ -399,16 +416,34 @@ Rectangle {
 
                     Rectangle {
                         id: delegateRect
-                        x: parent.swipeOffset
                         width: parent.width
 
+                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 &&
+                            (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 ||
+                             expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
+                        readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? root.swipingNotificationOffset * 0.10 : 0
+                        readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(root.swipingNotificationOffset) / width * 0.02 : 1.0
+
+                        x: expandedDelegateWrapper.swipeOffset + adjacentSwipeInfluence
+                        scale: adjacentScaleInfluence
+                        transformOrigin: Item.Center
+
                         Behavior on x {
-                            enabled: !expandedSwipeHandler.active && !parent.parent.isDismissing
+                            enabled: !expandedSwipeHandler.active && !expandedDelegateWrapper.isDismissing
                             NumberAnimation {
                                 duration: Theme.shortDuration
                                 easing.type: Theme.standardEasing
                             }
                         }
+
+                        Behavior on scale {
+                            enabled: !expandedSwipeHandler.active
+                            NumberAnimation {
+                                duration: Theme.shortDuration
+                                easing.type: Theme.standardEasing
+                            }
+                        }
+
                         height: {
                             if (!messageExpanded)
                                 return expandedBaseHeight;
@@ -458,7 +493,7 @@ Rectangle {
                                 height: expandedIconSize
                                 anchors.left: parent.left
                                 anchors.top: parent.top
-                                anchors.topMargin: compactMode ? Theme.spacingM : Theme.spacingXL
+                                anchors.topMargin: Theme.fontSizeSmall * 1.2 + (compactMode ? Theme.spacingXS : Theme.spacingS)
 
                                 imageSource: {
                                     if (hasNotificationImage)
@@ -504,44 +539,49 @@ Rectangle {
                                     spacing: Theme.notificationContentSpacing
 
                                     Row {
+                                        id: expandedDelegateHeaderRow
                                         width: parent.width
                                         spacing: Theme.spacingXS
-                                        readonly property real reservedTrailingWidth: expandedDelegateSeparator.implicitWidth + Math.max(expandedDelegateTimeText.implicitWidth, 72) + spacing
+                                        visible: (expandedDelegateHeaderAppNameText.text.length > 0 || expandedDelegateHeaderTimeText.text.length > 0)
 
                                         StyledText {
-                                            id: expandedDelegateTitleText
-                                            width: Math.min(implicitWidth, Math.max(0, parent.width - parent.reservedTrailingWidth))
-                                            text: {
-                                                let title = modelData?.summary || "";
-                                                const appName = modelData?.appName || "";
-                                                const prefix = appName + " • ";
-                                                if (appName && title.toLowerCase().startsWith(prefix.toLowerCase())) {
-                                                    title = title.substring(prefix.length);
-                                                }
-                                                return title;
-                                            }
-                                            color: Theme.surfaceText
-                                            font.pixelSize: Theme.fontSizeMedium
-                                            font.weight: Font.Medium
+                                            id: expandedDelegateHeaderAppNameText
+                                            text: modelData?.appName || ""
+                                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
+                                            font.pixelSize: Theme.fontSizeSmall
+                                            font.weight: Font.Normal
                                             elide: Text.ElideRight
                                             maximumLineCount: 1
-                                            visible: text.length > 0
+                                            width: Math.min(implicitWidth, parent.width - expandedDelegateHeaderSeparator.implicitWidth - expandedDelegateHeaderTimeText.implicitWidth - parent.spacing * 2)
                                         }
+
                                         StyledText {
-                                            id: expandedDelegateSeparator
-                                            text: (expandedDelegateTitleText.text.length > 0 && expandedDelegateTimeText.text.length > 0) ? " • " : ""
+                                            id: expandedDelegateHeaderSeparator
+                                            text: (expandedDelegateHeaderAppNameText.text.length > 0 && expandedDelegateHeaderTimeText.text.length > 0) ? " • " : ""
                                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Normal
                                         }
+
                                         StyledText {
-                                            id: expandedDelegateTimeText
+                                            id: expandedDelegateHeaderTimeText
                                             text: modelData?.timeStr || ""
                                             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
                                             font.pixelSize: Theme.fontSizeSmall
                                             font.weight: Font.Normal
-                                            visible: text.length > 0
                                         }
+                                    }
+
+                                    StyledText {
+                                        id: expandedDelegateTitleText
+                                        width: parent.width
+                                        text: modelData?.summary || ""
+                                        color: Theme.surfaceText
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        font.weight: Font.Medium
+                                        elide: Text.ElideRight
+                                        maximumLineCount: 1
+                                        visible: text.length > 0
                                     }
 
                                     StyledText {
@@ -685,42 +725,49 @@ Rectangle {
                             }
                         }
                     }
-                }
-            }
 
-            DragHandler {
-                id: expandedSwipeHandler
-                target: null
-                xAxis.enabled: true
-                yAxis.enabled: false
-                grabPermissions: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType
+                    DragHandler {
+                        id: expandedSwipeHandler
+                        target: null
+                        xAxis.enabled: true
+                        yAxis.enabled: false
+                        grabPermissions: PointerHandler.CanTakeOverFromItems | PointerHandler.CanTakeOverFromHandlersOfDifferentType
 
-                onActiveChanged: {
-                    if (active || parent.isDismissing)
-                        return;
-                    if (Math.abs(parent.swipeOffset) > parent.dismissThreshold) {
-                        parent.isDismissing = true;
-                        expandedSwipeDismissAnim.start();
-                    } else {
-                        parent.swipeOffset = 0;
+                        onActiveChanged: {
+                            if (active) {
+                                root.swipingNotificationIndex = expandedDelegateWrapper.index;
+                            } else {
+                                root.swipingNotificationIndex = -1;
+                                root.swipingNotificationOffset = 0;
+                            }
+                            if (active || expandedDelegateWrapper.isDismissing)
+                                return;
+                            if (Math.abs(expandedDelegateWrapper.swipeOffset) > expandedDelegateWrapper.dismissThreshold) {
+                                expandedDelegateWrapper.isDismissing = true;
+                                expandedSwipeDismissAnim.start();
+                            } else {
+                                expandedDelegateWrapper.swipeOffset = 0;
+                            }
+                        }
+
+                        onTranslationChanged: {
+                            if (expandedDelegateWrapper.isDismissing)
+                                return;
+                            expandedDelegateWrapper.swipeOffset = translation.x;
+                            root.swipingNotificationOffset = translation.x;
+                        }
+                    }
+
+                    NumberAnimation {
+                        id: expandedSwipeDismissAnim
+                        target: expandedDelegateWrapper
+                        property: "swipeOffset"
+                        to: expandedDelegateWrapper.swipeOffset > 0 ? expandedDelegateWrapper.width : -expandedDelegateWrapper.width
+                        duration: Theme.shortDuration
+                        easing.type: Easing.OutCubic
+                        onStopped: NotificationService.dismissNotification(modelData)
                     }
                 }
-
-                onTranslationChanged: {
-                    if (parent.isDismissing)
-                        return;
-                    parent.swipeOffset = translation.x;
-                }
-            }
-
-            NumberAnimation {
-                id: expandedSwipeDismissAnim
-                target: parent
-                property: "swipeOffset"
-                to: parent.swipeOffset > 0 ? parent.width : -parent.width
-                duration: Theme.shortDuration
-                easing.type: Easing.OutCubic
-                onStopped: NotificationService.dismissNotification(modelData)
             }
         }
     }
@@ -855,7 +902,7 @@ Rectangle {
     }
 
     Behavior on height {
-        enabled: root.userInitiatedExpansion && root.animateExpansion
+        enabled: root.__initialized && root.userInitiatedExpansion && root.animateExpansion
         NumberAnimation {
             duration: root.expanded ? Theme.notificationExpandDuration : Theme.notificationCollapseDuration
             easing.type: Easing.BezierSpline

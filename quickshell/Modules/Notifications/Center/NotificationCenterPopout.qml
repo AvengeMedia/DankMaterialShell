@@ -81,6 +81,8 @@ DankPopout {
         } else {
             NotificationService.onOverlayClose();
             keyboardController.keyboardNavigationActive = false;
+            NotificationService.expandedGroups = {};
+            NotificationService.expandedMessages = {};
         }
     }
 
