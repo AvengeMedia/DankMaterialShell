@@ -67,13 +67,17 @@ Scope {
             hideSpotlight();
     }
 
-    Variants {
-        id: overlayVariants
-        model: Quickshell.screens
+    Loader {
+        id: niriOverlayLoader
+        active: overlayActive || isClosing
+        asynchronous: false
+        sourceComponent: Variants {
+            id: overlayVariants
+            model: Quickshell.screens
 
-        PanelWindow {
-            id: overlayWindow
-            required property var modelData
+            PanelWindow {
+                id: overlayWindow
+                required property var modelData
 
             readonly property real dpr: CompositorService.getScreenScale(screen)
             readonly property bool isActiveScreen: screen.name === NiriService.currentOutput
@@ -97,9 +101,9 @@ Scope {
                 }
             }
 
-            screen: modelData
-            visible: true
-            color: "transparent"
+                screen: modelData
+                visible: overlayVisible
+                color: "transparent"
 
             WlrLayershell.namespace: "dms:niri-overview-spotlight"
             WlrLayershell.layer: WlrLayer.Overlay
@@ -196,10 +200,10 @@ Scope {
                 }
             }
 
-            Item {
-                id: spotlightContainer
-                x: Theme.snap((parent.width - width) / 2, overlayWindow.dpr)
-                y: Theme.snap((parent.height - height) / 2, overlayWindow.dpr)
+                Item {
+                    id: spotlightContainer
+                    x: Theme.snap((parent.width - width) / 2, overlayWindow.dpr)
+                    y: Theme.snap((parent.height - height) / 2, overlayWindow.dpr)
 
                 readonly property int baseWidth: {
                     switch (SettingsData.dankLauncherV2Size) {
@@ -235,9 +239,9 @@ Scope {
                 visible: overlayWindow.shouldShowSpotlight || animatingOut
                 enabled: overlayWindow.shouldShowSpotlight
 
-                layer.enabled: true
-                layer.smooth: false
-                layer.textureSize: Qt.size(Math.round(width * overlayWindow.dpr), Math.round(height * overlayWindow.dpr))
+                    layer.enabled: visible
+                    layer.smooth: false
+                    layer.textureSize: layer.enabled ? Qt.size(Math.round(width * overlayWindow.dpr), Math.round(height * overlayWindow.dpr)) : Qt.size(0, 0)
 
                 Behavior on scale {
                     id: scaleAnimation
@@ -269,40 +273,41 @@ Scope {
                     border.width: 1
                 }
 
-                LauncherContent {
-                    id: launcherContent
-                    anchors.fill: parent
-                    anchors.margins: 0
+                    LauncherContent {
+                        id: launcherContent
+                        anchors.fill: parent
+                        anchors.margins: 0
 
-                    property var fakeParentModal: QtObject {
-                        property bool spotlightOpen: spotlightContainer.visible
-                        property bool isClosing: niriOverviewScope.isClosing
-                        function hide() {
-                            if (niriOverviewScope.searchActive) {
-                                niriOverviewScope.hideSpotlight();
-                                return;
+                        property var fakeParentModal: QtObject {
+                            property bool spotlightOpen: spotlightContainer.visible
+                            property bool isClosing: niriOverviewScope.isClosing
+                            function hide() {
+                                if (niriOverviewScope.searchActive) {
+                                    niriOverviewScope.hideSpotlight();
+                                    return;
+                                }
+                                NiriService.toggleOverview();
                             }
-                            NiriService.toggleOverview();
                         }
-                    }
 
-                    Connections {
-                        target: launcherContent.searchField
-                        function onTextChanged() {
-                            if (launcherContent.searchField.text.length > 0 || !niriOverviewScope.searchActive)
-                                return;
-                            niriOverviewScope.hideSpotlight();
+                        Connections {
+                            target: launcherContent.searchField
+                            function onTextChanged() {
+                                if (launcherContent.searchField.text.length > 0 || !niriOverviewScope.searchActive)
+                                    return;
+                                niriOverviewScope.hideSpotlight();
+                            }
                         }
-                    }
 
-                    Component.onCompleted: {
-                        parentModal = fakeParentModal;
-                    }
+                        Component.onCompleted: {
+                            parentModal = fakeParentModal;
+                        }
 
-                    Connections {
-                        target: launcherContent.controller
-                        function onItemExecuted() {
-                            niriOverviewScope.releaseKeyboard = true;
+                        Connections {
+                            target: launcherContent.controller
+                            function onItemExecuted() {
+                                niriOverviewScope.releaseKeyboard = true;
+                            }
                         }
                     }
                 }
