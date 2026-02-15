@@ -22,6 +22,16 @@ func DetectDMSPath() (string, error) {
 	return config.LocateDMSConfig()
 }
 
+// Tries to figure out the name of the
+// user and group used by greetd
+func DetectGreeterGroup() string {
+	osInfo, err := distros.GetOSInfo()
+	if err == nil && osInfo.Distribution.ID == "debian" {
+		return "_greetd"
+	}
+	return "greeter"
+}
+
 // DetectCompositors checks which compositors are installed
 func DetectCompositors() []string {
 	var compositors []string
@@ -194,14 +204,17 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		return fmt.Errorf("failed to create cache directory: %w", err)
 	}
 
-	if err := runSudoCmd(sudoPassword, "chown", "greeter:greeter", cacheDir); err != nil {
+	group := DetectGreeterGroup()
+	owner := fmt.Sprintf("%s:%s", group, group)
+
+	if err := runSudoCmd(sudoPassword, "chown", owner, cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory owner: %w", err)
 	}
 
 	if err := runSudoCmd(sudoPassword, "chmod", "755", cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
-	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: greeter:greeter, permissions: 755)", cacheDir))
+	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, permissions: 755)", owner, cacheDir))
 
 	return nil
 }
@@ -234,6 +247,8 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 		{filepath.Join(homeDir, ".local", "share"), ".local/share directory"},
 	}
 
+	owner := DetectGreeterGroup()
+
 	logFunc("\nSetting up parent directory ACLs for greeter user access...")
 
 	for _, dir := range parentDirs {
@@ -245,9 +260,9 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 		}
 
 		// Set ACL to allow greeter user read+execute permission (for session discovery)
-		if err := runSudoCmd(sudoPassword, "setfacl", "-m", "u:greeter:rx", dir.path); err != nil {
+		if err := runSudoCmd(sudoPassword, "setfacl", "-m", fmt.Sprintf("u:%s:rx", owner), dir.path); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to set ACL on %s: %v", dir.desc, err))
-			logFunc(fmt.Sprintf("  You may need to run manually: setfacl -m u:greeter:x %s", dir.path))
+			logFunc(fmt.Sprintf("  You may need to run manually: setfacl -m u:%s:x %s", owner, dir.path))
 			continue
 		}
 
@@ -271,17 +286,19 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 		return fmt.Errorf("failed to determine current user")
 	}
 
+	group := DetectGreeterGroup()
+
 	// Check if user is already in greeter group
 	groupsCmd := exec.Command("groups", currentUser)
 	groupsOutput, err := groupsCmd.Output()
-	if err == nil && strings.Contains(string(groupsOutput), "greeter") {
-		logFunc(fmt.Sprintf("✓ %s is already in greeter group", currentUser))
+	if err == nil && strings.Contains(string(groupsOutput), group) {
+		logFunc(fmt.Sprintf("✓ %s is already in %s group", currentUser, group))
 	} else {
 		// Add current user to greeter group for file access permissions
-		if err := runSudoCmd(sudoPassword, "usermod", "-aG", "greeter", currentUser); err != nil {
-			return fmt.Errorf("failed to add %s to greeter group: %w", currentUser, err)
+		if err := runSudoCmd(sudoPassword, "usermod", "-aG", group, currentUser); err != nil {
+			return fmt.Errorf("failed to add %s to %s group: %w", currentUser, group, err)
 		}
-		logFunc(fmt.Sprintf("✓ Added %s to greeter group (logout/login required for changes to take effect)", currentUser))
+		logFunc(fmt.Sprintf("✓ Added %s to %s group (logout/login required for changes to take effect)", currentUser, group))
 	}
 
 	configDirs := []struct {
@@ -304,7 +321,7 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 			}
 		}
 
-		if err := runSudoCmd(sudoPassword, "chgrp", "-R", "greeter", dir.path); err != nil {
+		if err := runSudoCmd(sudoPassword, "chgrp", "-R", group, dir.path); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to set group for %s: %v", dir.desc, err))
 			continue
 		}
@@ -436,10 +453,11 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	}
 
 	greeterDir := "/etc/greetd/niri"
+	greeterGroup := DetectGreeterGroup()
 	if err := runSudoCmd(sudoPassword, "mkdir", "-p", greeterDir); err != nil {
 		return fmt.Errorf("failed to create greetd niri directory: %w", err)
 	}
-	if err := runSudoCmd(sudoPassword, "chown", "root:greeter", greeterDir); err != nil {
+	if err := runSudoCmd(sudoPassword, "chown", fmt.Sprintf("root:%s", greeterGroup), greeterDir); err != nil {
 		return fmt.Errorf("failed to set greetd niri directory ownership: %w", err)
 	}
 	if err := runSudoCmd(sudoPassword, "chmod", "755", greeterDir); err != nil {
@@ -464,7 +482,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, dmsPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", dmsPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", dmsTemp.Name(), dmsPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", greeterGroup, "-m", "0644", dmsTemp.Name(), dmsPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri dms config: %w", err)
 	}
 
@@ -487,7 +505,7 @@ func syncNiriGreeterConfig(logFunc func(string), sudoPassword string) error {
 	if err := backupFileIfExists(sudoPassword, mainPath, ".backup"); err != nil {
 		return fmt.Errorf("failed to backup %s: %w", mainPath, err)
 	}
-	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", "greeter", "-m", "0644", mainTemp.Name(), mainPath); err != nil {
+	if err := runSudoCmd(sudoPassword, "install", "-o", "root", "-g", greeterGroup, "-m", "0644", mainTemp.Name(), mainPath); err != nil {
 		return fmt.Errorf("failed to install greetd niri main config: %w", err)
 	}
 
@@ -736,17 +754,19 @@ func ConfigureGreetd(dmsPath, compositor string, logFunc func(string), sudoPassw
 		logFunc(fmt.Sprintf("✓ Backed up existing config to %s", backupPath))
 	}
 
+	greeterUser := DetectGreeterGroup()
+
 	var configContent string
 	if data, err := os.ReadFile(configPath); err == nil {
 		configContent = string(data)
 	} else {
-		configContent = `[terminal]
+		configContent = fmt.Sprintf(`[terminal]
 vt = 1
 
 [default_session]
 
-user = "greeter"
-`
+user = "%s"
+`, greeterUser)
 	}
 
 	lines := strings.Split(configContent, "\n")
@@ -755,7 +775,7 @@ user = "greeter"
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
 			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
-				newLines = append(newLines, `user = "greeter"`)
+				newLines = append(newLines, fmt.Sprintf(`user = "%s"`, greeterUser))
 			} else {
 				newLines = append(newLines, line)
 			}
@@ -807,7 +827,7 @@ user = "greeter"
 		return fmt.Errorf("failed to move config to /etc/greetd: %w", err)
 	}
 
-	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: greeter, command: %s --command %s -p %s)", wrapperCmd, compositorLower, dmsPath))
+	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s --command %s -p %s)", greeterUser, wrapperCmd, compositorLower, dmsPath))
 	return nil
 }
 
