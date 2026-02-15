@@ -284,7 +284,7 @@ Item {
 
     PanelWindow {
         id: launcherWindow
-        visible: root._windowEnabled
+        visible: root._windowEnabled && (!root.unloadContentOnClose || spotlightOpen || isClosing)
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 
