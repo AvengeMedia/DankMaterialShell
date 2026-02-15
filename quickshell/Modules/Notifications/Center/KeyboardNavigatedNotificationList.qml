@@ -138,6 +138,8 @@ DankListView {
             (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
         readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? listView.swipingCardOffset * 0.10 : 0
         readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(listView.swipingCardOffset) / width * 0.02 : 1.0
+        readonly property real swipeFadeStartOffset: width * 0.75
+        readonly property real swipeFadeDistance: Math.max(1, width - swipeFadeStartOffset)
 
         Component.onCompleted: {
             Qt.callLater(() => {
@@ -159,7 +161,13 @@ DankListView {
             notificationGroup: modelData
             keyboardNavigationActive: listView.keyboardActive
             animateExpansion: listView.cardAnimateExpansion && listView.listInitialized
-            opacity: 1 - Math.abs(delegateRoot.swipeOffset) / (delegateRoot.width * 0.5)
+            opacity: {
+                const swipeAmount = Math.abs(delegateRoot.swipeOffset);
+                if (swipeAmount <= delegateRoot.swipeFadeStartOffset)
+                    return 1;
+                const fadeProgress = (swipeAmount - delegateRoot.swipeFadeStartOffset) / delegateRoot.swipeFadeDistance;
+                return Math.max(0, 1 - fadeProgress);
+            }
             onIsAnimatingChanged: {
                 if (isAnimating) {
                     listView.isAnimatingExpansion = true;

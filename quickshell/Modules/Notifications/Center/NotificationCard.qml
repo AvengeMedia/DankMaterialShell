@@ -28,6 +28,7 @@ Rectangle {
     readonly property real cardPadding: compactMode ? Theme.notificationCardPaddingCompact : Theme.notificationCardPadding
     readonly property real iconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
+    readonly property real collapsedDismissOffset: 5
     readonly property real badgeSize: compactMode ? 16 : 18
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(iconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
@@ -833,7 +834,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: Theme.spacingL
         anchors.top: collapsedContent.bottom
-        anchors.topMargin: contentSpacing
+        anchors.topMargin: contentSpacing + collapsedDismissOffset
         width: Math.max(collapsedClearText.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
         height: actionButtonHeight
         radius: Theme.notificationButtonCornerRadius
