@@ -1,8 +1,26 @@
 [
   {
+    "term": "%1 Animation Speed",
+    "context": "%1 Animation Speed",
+    "reference": "Modules/Settings/TypographyMotionTab.qml:300, Modules/Settings/TypographyMotionTab.qml:384",
+    "comment": ""
+  },
+  {
+    "term": "%1 DMS bind(s) may be overridden by config binds that come after the include.",
+    "context": "%1 DMS bind(s) may be overridden by config binds that come after the include.",
+    "reference": "Modules/Settings/KeybindsTab.qml:327",
+    "comment": ""
+  },
+  {
+    "term": "%1 Sessions",
+    "context": "%1 Sessions",
+    "reference": "Modals/MuxModal.qml:321",
+    "comment": ""
+  },
+  {
     "term": "%1 active, %2 filtered",
     "context": "%1 active, %2 filtered",
-    "reference": "Modals/MuxModal.qml:332",
+    "reference": "Modals/MuxModal.qml:331",
     "comment": ""
   },
   {
@@ -170,7 +188,7 @@
   {
     "term": "%1 windows",
     "context": "%1 windows",
-    "reference": "Modals/MuxModal.qml:494",
+    "reference": "Modals/MuxModal.qml:493",
     "comment": ""
   },
   {
@@ -1070,7 +1088,7 @@
   {
     "term": "Attach",
     "context": "Attach",
-    "reference": "Modals/MuxModal.qml:602",
+    "reference": "Modals/MuxModal.qml:601",
     "comment": ""
   },
   {
@@ -2216,7 +2234,7 @@
   {
     "term": "Close",
     "context": "Close",
-    "reference": "Modules/SystemUpdatePopout.qml:303, Modals/NetworkInfoModal.qml:129, Modals/NetworkWiredInfoModal.qml:129, Modules/DankBar/Widgets/RunningApps.qml:872",
+    "reference": "Modals/NetworkInfoModal.qml:129, Modals/NetworkWiredInfoModal.qml:129, Modals/MuxModal.qml:604, Modules/SystemUpdatePopout.qml:303, Modules/DankBar/Widgets/RunningApps.qml:873",
     "comment": ""
   },
   {
@@ -2870,7 +2888,19 @@
   {
     "term": "Create Printer",
     "context": "Create Printer",
-    "reference": "Modules/Settings/PrinterTab.qml:820",
+    "reference": "Modules/Settings/PrinterTab.qml:489",
+    "comment": ""
+  },
+  {
+    "term": "Create Window Rule",
+    "context": "Create Window Rule",
+    "reference": "Modals/WindowRuleModal.qml:24",
+    "comment": ""
+  },
+  {
+    "term": "Create a new %1 session (n)",
+    "context": "Create a new %1 session (n)",
+    "reference": "Modals/MuxModal.qml:402",
     "comment": ""
   },
   {
@@ -6434,7 +6464,7 @@
   {
     "term": "Kill",
     "context": "Kill",
-    "reference": "Modals/MuxModal.qml:127, Modals/MuxModal.qml:604",
+    "reference": "Modals/MuxModal.qml:127, Modals/MuxModal.qml:603",
     "comment": ""
   },
   {
@@ -7586,7 +7616,7 @@
   {
     "term": "Navigate",
     "context": "Navigate",
-    "reference": "Modals/MuxModal.qml:601",
+    "reference": "Modals/MuxModal.qml:600",
     "comment": ""
   },
   {
@@ -7664,13 +7694,7 @@
   {
     "term": "New",
     "context": "New",
-    "reference": "Modules/Notepad/NotepadTextEditor.qml:795",
-    "comment": ""
-  },
-  {
-    "term": "New group name...",
-    "context": "New group name...",
-    "reference": "Modules/Settings/DesktopWidgetsTab.qml:137",
+    "reference": "Modals/MuxModal.qml:602, Modules/Notepad/NotepadTextEditor.qml:795",
     "comment": ""
   },
   {
@@ -7694,7 +7718,7 @@
   {
     "term": "New Session",
     "context": "New Session",
-    "reference": "Modals/MuxModal.qml:137, Modals/MuxModal.qml:396",
+    "reference": "Modals/MuxModal.qml:137, Modals/MuxModal.qml:395",
     "comment": ""
   },
   {
@@ -7875,6 +7899,126 @@
     "term": "No Border",
     "context": "No Border",
     "reference": "Modals/WindowRuleModal.qml:947, Modules/Settings/WindowRulesTab.qml:557",
+    "comment": ""
+  },
+  {
+    "term": "No DMS shortcuts configured",
+    "context": "greeter no keybinds message",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:265",
+    "comment": ""
+  },
+  {
+    "term": "No Dim",
+    "context": "No Dim",
+    "reference": "Modals/WindowRuleModal.qml:955, Modules/Settings/WindowRulesTab.qml:559",
+    "comment": ""
+  },
+  {
+    "term": "No Focus",
+    "context": "No Focus",
+    "reference": "Modals/WindowRuleModal.qml:943, Modules/Settings/WindowRulesTab.qml:556",
+    "comment": ""
+  },
+  {
+    "term": "No GPU detected",
+    "context": "No GPU detected",
+    "reference": "Modules/Settings/WidgetsTabSection.qml:192",
+    "comment": ""
+  },
+  {
+    "term": "No GPUs detected",
+    "context": "empty state in gpu list",
+    "reference": "Modules/ProcessList/SystemView.qml:350",
+    "comment": ""
+  },
+  {
+    "term": "No History",
+    "context": "notification rule action option",
+    "reference": "Modules/Settings/NotificationsTab.qml:113",
+    "comment": ""
+  },
+  {
+    "term": "No Media",
+    "context": "No Media",
+    "reference": "Modules/DankDash/Overview/MediaOverviewCard.qml:56",
+    "comment": ""
+  },
+  {
+    "term": "No Round",
+    "context": "No Round",
+    "reference": "Modules/Settings/WindowRulesTab.qml:562",
+    "comment": ""
+  },
+  {
+    "term": "No Rounding",
+    "context": "No Rounding",
+    "reference": "Modals/WindowRuleModal.qml:967",
+    "comment": ""
+  },
+  {
+    "term": "No Shadow",
+    "context": "No Shadow",
+    "reference": "Modals/WindowRuleModal.qml:951, Modules/Settings/WindowRulesTab.qml:558",
+    "comment": ""
+  },
+  {
+    "term": "No VPN profiles",
+    "context": "No VPN profiles",
+    "reference": "Modules/Settings/NetworkTab.qml:1660, Widgets/VpnDetailContent.qml:177",
+    "comment": ""
+  },
+  {
+    "term": "No Weather Data Available",
+    "context": "No Weather Data Available",
+    "reference": "Modules/DankDash/WeatherTab.qml:135, Modules/Settings/TimeWeatherTab.qml:598",
+    "comment": ""
+  },
+  {
+    "term": "No action",
+    "context": "No action",
+    "reference": "Widgets/KeybindItem.qml:372",
+    "comment": ""
+  },
+  {
+    "term": "No active %1 sessions",
+    "context": "No active %1 sessions",
+    "reference": "Modals/MuxModal.qml:572",
+    "comment": ""
+  },
+  {
+    "term": "No adapter",
+    "context": "bluetooth status",
+    "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:299",
+    "comment": ""
+  },
+  {
+    "term": "No adapters",
+    "context": "bluetooth status",
+    "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:337, Modules/Settings/NetworkTab.qml:341",
+    "comment": ""
+  },
+  {
+    "term": "No app customizations.",
+    "context": "No app customizations.",
+    "reference": "Modules/Settings/LauncherTab.qml:1044",
+    "comment": ""
+  },
+  {
+    "term": "No apps found",
+    "context": "No apps found",
+    "reference": "Modals/DankLauncherV2/ResultsList.qml:479",
+    "comment": ""
+  },
+  {
+    "term": "No apps have been launched yet.",
+    "context": "No apps have been launched yet.",
+    "reference": "Modules/Settings/LauncherTab.qml:1214",
+    "comment": ""
+  },
+  {
+    "term": "No battery",
+    "context": "No battery",
+    "reference": "Modules/ControlCenter/Widgets/BatteryPill.qml:15",
     "comment": ""
   },
   {
@@ -8168,7 +8312,7 @@
   {
     "term": "No sessions found",
     "context": "No sessions found",
-    "reference": "Modals/MuxModal.qml:573",
+    "reference": "Modals/MuxModal.qml:572",
     "comment": ""
   },
   {
@@ -9500,7 +9644,7 @@
   {
     "term": "Press 'n' or click 'New Session' to create one",
     "context": "Press 'n' or click 'New Session' to create one",
-    "reference": "Modals/MuxModal.qml:580",
+    "reference": "Modals/MuxModal.qml:579",
     "comment": ""
   },
   {
@@ -9932,7 +10076,7 @@
   {
     "term": "Rename",
     "context": "Rename",
-    "reference": "Modals/WorkspaceRenameModal.qml:185",
+    "reference": "Modals/WorkspaceRenameModal.qml:185, Modals/MuxModal.qml:607",
     "comment": ""
   },
   {
@@ -10526,7 +10670,7 @@
   {
     "term": "Search sessions...",
     "context": "Search sessions...",
-    "reference": "Modals/MuxModal.qml:354",
+    "reference": "Modals/MuxModal.qml:353",
     "comment": ""
   },
   {
@@ -12614,7 +12758,7 @@
   {
     "term": "Try a different search",
     "context": "Try a different search",
-    "reference": "dms-plugins/DankGifSearch/DankGifSearch.qml:98, dms-plugins/DankStickerSearch/DankStickerSearch.qml:155",
+    "reference": "Modals/MuxModal.qml:579",
     "comment": ""
   },
   {
@@ -13827,6 +13971,234 @@
     "term": "You're All Set!",
     "context": "greeter completion page title",
     "reference": "Modals/Greeter/GreeterCompletePage.qml:105",
+    "comment": ""
+  },
+  {
+    "term": "actions",
+    "context": "actions",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:391",
+    "comment": ""
+  },
+  {
+    "term": "attached",
+    "context": "attached",
+    "reference": "Modals/MuxModal.qml:494",
+    "comment": ""
+  },
+  {
+    "term": "by %1",
+    "context": "author attribution",
+    "reference": "Modules/Settings/PluginBrowser.qml:537, Modules/Settings/ThemeBrowser.qml:527",
+    "comment": ""
+  },
+  {
+    "term": "days",
+    "context": "days",
+    "reference": "Modules/Settings/ClipboardTab.qml:179, Modules/Settings/NotificationsTab.qml:613",
+    "comment": ""
+  },
+  {
+    "term": "detached",
+    "context": "detached",
+    "reference": "Modals/MuxModal.qml:494",
+    "comment": ""
+  },
+  {
+    "term": "dgop not available",
+    "context": "dgop not available",
+    "reference": "Modules/ControlCenter/Details/DiskUsageDetail.qml:65, Modules/ControlCenter/Widgets/DiskUsagePill.qml:45",
+    "comment": ""
+  },
+  {
+    "term": "dms/cursor config exists but is not included. Cursor settings won't apply.",
+    "context": "dms/cursor config exists but is not included. Cursor settings won't apply.",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:2005",
+    "comment": ""
+  },
+  {
+    "term": "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.",
+    "context": "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.",
+    "reference": "Modules/Settings/DisplayConfig/IncludeWarningBox.qml:65",
+    "comment": ""
+  },
+  {
+    "term": "e.g., firefox, kitty --title foo",
+    "context": "e.g., firefox, kitty --title foo",
+    "reference": "Widgets/KeybindItem.qml:1477",
+    "comment": ""
+  },
+  {
+    "term": "e.g., focus-workspace 3, resize-column -10",
+    "context": "e.g., focus-workspace 3, resize-column -10",
+    "reference": "Widgets/KeybindItem.qml:1414",
+    "comment": ""
+  },
+  {
+    "term": "e.g., notify-send 'Hello' && sleep 1",
+    "context": "e.g., notify-send 'Hello' && sleep 1",
+    "reference": "Widgets/KeybindItem.qml:1509",
+    "comment": ""
+  },
+  {
+    "term": "e.g., scratch, /^tmp_.*/, build",
+    "context": "e.g., scratch, /^tmp_.*/, build",
+    "reference": "Modules/Settings/MuxTab.qml:131",
+    "comment": ""
+  },
+  {
+    "term": "events",
+    "context": "events",
+    "reference": "Modules/DankDash/Overview/CalendarOverviewCard.qml:135",
+    "comment": ""
+  },
+  {
+    "term": "featured",
+    "context": "featured",
+    "reference": "Modules/Settings/DesktopWidgetBrowser.qml:389, Modules/Settings/PluginBrowser.qml:485",
+    "comment": ""
+  },
+  {
+    "term": "leave empty for default",
+    "context": "leave empty for default",
+    "reference": "Widgets/KeybindItem.qml:1045",
+    "comment": ""
+  },
+  {
+    "term": "loginctl not available - lock integration requires DMS socket connection",
+    "context": "loginctl not available - lock integration requires DMS socket connection",
+    "reference": "Modules/Settings/LockScreenTab.qml:110",
+    "comment": ""
+  },
+  {
+    "term": "matugen not found - install matugen package for dynamic theming",
+    "context": "matugen error",
+    "reference": "Modules/Settings/ThemeColorsTab.qml:303",
+    "comment": ""
+  },
+  {
+    "term": "minutes",
+    "context": "minutes",
+    "reference": "Modules/Settings/NotificationsTab.qml:149",
+    "comment": ""
+  },
+  {
+    "term": "ms",
+    "context": "ms",
+    "reference": "Widgets/KeybindItem.qml:1695",
+    "comment": ""
+  },
+  {
+    "term": "nav",
+    "context": "nav",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:377",
+    "comment": ""
+  },
+  {
+    "term": "niri shortcuts config",
+    "context": "greeter keybinds niri description",
+    "reference": "Modals/Greeter/GreeterCompletePage.qml:414",
+    "comment": ""
+  },
+  {
+    "term": "now",
+    "context": "now",
+    "reference": "Services/NotificationService.qml:245",
+    "comment": ""
+  },
+  {
+    "term": "official",
+    "context": "official",
+    "reference": "Modules/Settings/PluginBrowser.qml:507, Modules/Settings/ThemeBrowser.qml:494",
+    "comment": ""
+  },
+  {
+    "term": "open",
+    "context": "open",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:384",
+    "comment": ""
+  },
+  {
+    "term": "procs",
+    "context": "short for processes",
+    "reference": "Modules/ProcessList/ProcessListPopout.qml:256",
+    "comment": ""
+  },
+  {
+    "term": "seconds",
+    "context": "seconds",
+    "reference": "Modules/Settings/NotificationsTab.qml:148",
+    "comment": ""
+  },
+  {
+    "term": "source",
+    "context": "source code link",
+    "reference": "Modules/Settings/PluginBrowser.qml:538",
+    "comment": ""
+  },
+  {
+    "term": "update dms for NM integration.",
+    "context": "update dms for NM integration.",
+    "reference": "Modules/ControlCenter/Components/DragDropGrid.qml:207",
+    "comment": ""
+  },
+  {
+    "term": "v%1 by %2",
+    "context": "v%1 by %2",
+    "reference": "Modules/Settings/PluginListItem.qml:169",
+    "comment": ""
+  },
+  {
+    "term": "wtype not available - install wtype for paste support",
+    "context": "wtype not available - install wtype for paste support",
+    "reference": "Services/ClipboardService.qml:118",
+    "comment": ""
+  },
+  {
+    "term": "yesterday",
+    "context": "yesterday",
+    "reference": "Services/NotificationService.qml:255",
+    "comment": ""
+  },
+  {
+    "term": "• Install only from trusted sources",
+    "context": "• Install only from trusted sources",
+    "reference": "Modules/Settings/PluginBrowser.qml:814",
+    "comment": ""
+  },
+  {
+    "term": "• M - Month (1-12)",
+    "context": "• M - Month (1-12)",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:295",
+    "comment": ""
+  },
+  {
+    "term": "• MM - Month (01-12)",
+    "context": "• MM - Month (01-12)",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:306",
+    "comment": ""
+  },
+  {
+    "term": "• MMM - Month (Jan)",
+    "context": "• MMM - Month (Jan)",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:311",
+    "comment": ""
+  },
+  {
+    "term": "• MMMM - Month (January)",
+    "context": "• MMMM - Month (January)",
+    "reference": "Modules/Settings/TimeWeatherTab.qml:316",
+    "comment": ""
+  },
+  {
+    "term": "• Plugins may contain bugs or security issues",
+    "context": "• Plugins may contain bugs or security issues",
+    "reference": "Modules/Settings/PluginBrowser.qml:802",
+    "comment": ""
+  },
+  {
+    "term": "• Review code before installation when possible",
+    "context": "• Review code before installation when possible",
+    "reference": "Modules/Settings/PluginBrowser.qml:808",
     "comment": ""
   },
   {
