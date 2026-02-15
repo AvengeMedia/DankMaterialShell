@@ -162,6 +162,13 @@ StyledRect {
                     if (root.keyForwardTargets[i])
                         root.keyForwardTargets[i].Keys.pressed(event);
                 }
+                return;
+            }
+            if ((event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier)) && root.keyForwardTargets.length > 0) {
+                for (var i = 0; i < root.keyForwardTargets.length; i++) {
+                    if (root.keyForwardTargets[i])
+                        root.keyForwardTargets[i].Keys.pressed(event);
+                }
             }
         }
 

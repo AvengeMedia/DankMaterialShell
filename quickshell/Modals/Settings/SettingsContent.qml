@@ -473,5 +473,20 @@ FocusScope {
                     Qt.callLater(() => item.forceActiveFocus());
             }
         }
+
+        Loader {
+            id: muxLoader
+            anchors.fill: parent
+            active: root.currentIndex === 30
+            visible: active
+            focus: active
+
+            sourceComponent: MuxTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                    Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
     }
 }

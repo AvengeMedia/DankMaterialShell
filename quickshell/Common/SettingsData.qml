@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 5
+    readonly property int settingsConfigVersion: 6
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -420,6 +420,12 @@ Singleton {
     property bool qtThemingEnabled: false
     property bool syncModeWithPortal: true
     property bool terminalsAlwaysDark: false
+
+    property string muxType: "tmux"
+    property string muxTerminal: "ghostty"
+    property bool muxUseCustomCommand: false
+    property string muxCustomCommand: ""
+    property string muxSessionFilter: ""
 
     property bool runDmsMatugenTemplates: true
     property bool matugenTemplateGtk: true
