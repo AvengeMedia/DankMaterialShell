@@ -33,8 +33,10 @@ Singleton {
         return terminalFlags[terminal] ?? ["-e"]
     }
 
+    readonly property string terminal: Quickshell.env("TERMINAL") || "ghostty"
+
     function _terminalPrefix() {
-        return [SettingsData.muxTerminal].concat(getTerminalFlag(SettingsData.muxTerminal))
+        return [terminal].concat(getTerminalFlag(terminal))
     }
 
     Process {

@@ -12,21 +12,7 @@ Item {
         "zellij"
     ]
 
-    readonly property var terminalOptions: [
-        "ghostty",
-        "kitty",
-        "alacritty",
-        "foot",
-        "wezterm",
-        "gnome-terminal",
-        "xterm",
-        "konsole",
-        "st",
-        "terminator",
-        "xfce4-terminal"
-    ]
-
-    DankFlickable {
+DankFlickable {
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
@@ -94,17 +80,6 @@ Item {
                     }
                 }
 
-                SettingsDropdownRow {
-                    tab: "mux"
-                    tags: ["mux", "terminal", "emulator"]
-                    settingKey: "muxTerminal"
-                    text: I18n.tr("Terminal Emulator")
-                    description: I18n.tr("Terminal used to open multiplexer sessions")
-                    options: root.terminalOptions
-                    currentValue: SettingsData.muxTerminal
-                    visible: !SettingsData.muxUseCustomCommand
-                    onValueChanged: value => SettingsData.set("muxTerminal", value)
-                }
             }
 
             SettingsCard {
