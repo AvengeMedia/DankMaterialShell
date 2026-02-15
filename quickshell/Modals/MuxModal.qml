@@ -110,14 +110,14 @@ DankModal {
     }
 
     function renameSession(name) {
-        inputModal.show(
-            I18n.tr("Rename Session"),
-            I18n.tr("Enter a new name for session \"%1\"").arg(name),
-            function (newName) {
+        inputModal.showWithOptions({
+            title: I18n.tr("Rename Session"),
+            message: I18n.tr("Enter a new name for session \"%1\"").arg(name),
+            initialText: name,
+            onConfirm: function (newName) {
                 MuxService.renameSession(name, newName)
-            },
-            function () {}
-        )
+            }
+        })
     }
 
     function killSession(name) {
@@ -133,14 +133,13 @@ DankModal {
     }
 
     function createNewSession() {
-        inputModal.show(
-            I18n.tr("New Session"),
-            I18n.tr("Please write a name for your new %1 session").arg(MuxService.displayName),
-            function (name) {
+        inputModal.showWithOptions({
+            title: I18n.tr("New Session"),
+            message: I18n.tr("Please write a name for your new %1 session").arg(MuxService.displayName),
+            onConfirm: function (name) {
                 MuxService.createSession(name)
-            },
-            function () {}
-        )
+            }
+        })
     }
 
     function selectNext() {
