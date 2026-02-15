@@ -422,7 +422,6 @@ Singleton {
     property bool terminalsAlwaysDark: false
 
     property string muxType: "tmux"
-    property string muxTerminal: "ghostty"
     property bool muxUseCustomCommand: false
     property string muxCustomCommand: ""
     property string muxSessionFilter: ""

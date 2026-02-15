@@ -247,7 +247,6 @@ var SPEC = {
     terminalsAlwaysDark: { def: false, onChange: "regenSystemThemes" },
 
     muxType: { def: "tmux" },
-    muxTerminal: { def: "ghostty" },
     muxUseCustomCommand: { def: false },
     muxCustomCommand: { def: "" },
     muxSessionFilter: { def: "" },
