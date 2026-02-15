@@ -21,96 +21,96 @@
 (deftheme dank-emacs "Enhanced theme using Matugen variables with dank16 color integration.")
 
 ;; Define all the color variables (replaced by template processor)
-(let* ((bg "{{colors.background.dark.hex}}")
-      (err "{{dank16.color1.dark.hex}}")  ; Red from dank16
-      (err-container "{{colors.error_container.dark.hex}}")
-      (on-background "{{colors.on_background.dark.hex}}")
-      (on-err "{{colors.on_error.dark.hex}}")
-      (on-err-container "{{colors.on_error_container.dark.hex}}")
-      (on-primary "{{colors.on_primary.dark.hex}}")
-      (on-primary-container "{{colors.on_primary_container.dark.hex}}")
-      (on-secondary "{{colors.on_secondary.dark.hex}}")
-      (on-secondary-container "{{colors.on_secondary_container.dark.hex}}")
-      (on-surface "{{colors.on_surface.dark.hex}}")
-      (on-surface-variant "{{colors.on_surface_variant.dark.hex}}")
-      (on-tertiary "{{colors.on_tertiary.dark.hex}}")
-      (on-tertiary-container "{{colors.on_tertiary_container.dark.hex}}")
-      (outline-color "{{colors.outline.dark.hex}}")
-      (outline-variant "{{colors.outline_variant.dark.hex}}")
-      (primary "{{colors.primary.dark.hex}}")
-      (primary-container "{{colors.primary_container.dark.hex}}")
-      (secondary "{{colors.secondary.dark.hex}}")
-      (secondary-container "{{colors.secondary_container.dark.hex}}")
-      (shadow "{{colors.shadow.dark.hex}}")
-      (surface "{{colors.surface.dark.hex}}")
-      (surface-container "{{colors.surface_container_high.dark.hex}}")
-      (surface-container-high "{{colors.surface_container_highest.dark.hex}}")
-      (surface-container-highest "{{colors.surface_container_high.dark.hex}}")
-      (surface-container-low "{{colors.surface_container_low.dark.hex}}")
-      (surface-container-lowest "{{colors.surface_container_lowest.dark.hex}}")
-      (surface-variant "{{colors.surface_variant.dark.hex}}")
-      (tertiary "{{colors.tertiary.dark.hex}}")
-      (tertiary-container "{{colors.tertiary_container.dark.hex}}")
+(let* ((bg "{{colors.background.default.hex}}")
+      (err "{{dank16.color1.default.hex}}")  ; Red from dank16
+      (err-container "{{colors.error_container.default.hex}}")
+      (on-background "{{colors.on_background.default.hex}}")
+      (on-err "{{colors.on_error.default.hex}}")
+      (on-err-container "{{colors.on_error_container.default.hex}}")
+      (on-primary "{{colors.on_primary.default.hex}}")
+      (on-primary-container "{{colors.on_primary_container.default.hex}}")
+      (on-secondary "{{colors.on_secondary.default.hex}}")
+      (on-secondary-container "{{colors.on_secondary_container.default.hex}}")
+      (on-surface "{{colors.on_surface.default.hex}}")
+      (on-surface-variant "{{colors.on_surface_variant.default.hex}}")
+      (on-tertiary "{{colors.on_tertiary.default.hex}}")
+      (on-tertiary-container "{{colors.on_tertiary_container.default.hex}}")
+      (outline-color "{{colors.outline.default.hex}}")
+      (outline-variant "{{colors.outline_variant.default.hex}}")
+      (primary "{{colors.primary.default.hex}}")
+      (primary-container "{{colors.primary_container.default.hex}}")
+      (secondary "{{colors.secondary.default.hex}}")
+      (secondary-container "{{colors.secondary_container.default.hex}}")
+      (shadow "{{colors.shadow.default.hex}}")
+      (surface "{{colors.surface.default.hex}}")
+      (surface-container "{{colors.surface_container_high.default.hex}}")
+      (surface-container-high "{{colors.surface_container_highest.default.hex}}")
+      (surface-container-highest "{{colors.surface_container_high.default.hex}}")
+      (surface-container-low "{{colors.surface_container_low.default.hex}}")
+      (surface-container-lowest "{{colors.surface_container_lowest.default.hex}}")
+      (surface-variant "{{colors.surface_variant.default.hex}}")
+      (tertiary "{{colors.tertiary.default.hex}}")
+      (tertiary-container "{{colors.tertiary_container.default.hex}}")
 
       ;; Enhanced dank16 colors for better syntax highlighting
-      (dank-red "{{dank16.color1.dark.hex}}")          ; Bright red
-      (dank-red-alt "{{dank16.color9.dark.hex}}")      ; Alternative red
-      (dank-green "{{dank16.color2.dark.hex}}")        ; Vibrant green
-      (dank-green-bright "{{dank16.color10.dark.hex}}") ; Bright green
-      (dank-yellow "{{dank16.color3.dark.hex}}")       ; Warm yellow
-      (dank-yellow-bright "{{dank16.color11.dark.hex}}") ; Bright yellow
-      (dank-blue "{{dank16.color4.dark.hex}}")         ; Blue-green
-      (dank-magenta "{{dank16.color5.dark.hex}}")      ; Teal-magenta
-      (dank-cyan "{{dank16.color6.dark.hex}}")         ; Bright cyan
-      (dank-cyan-bright "{{dank16.color12.dark.hex}}") ; Brightest cyan
-      (dank-cyan-dark "{{dank16.color13.dark.hex}}")   ; Dark cyan
-      (dank-teal "{{dank16.color14.dark.hex}}")        ; Dark teal
-      (dank-fg "{{dank16.color7.dark.hex}}")           ; Light foreground
-      (dank-gray "{{dank16.color8.dark.hex}}")         ; Gray
-      (dank-white "{{dank16.color15.dark.hex}}")       ; White
+      (dank-red "{{dank16.color1.default.hex}}")          ; Bright red
+      (dank-red-alt "{{dank16.color9.default.hex}}")      ; Alternative red
+      (dank-green "{{dank16.color2.default.hex}}")        ; Vibrant green
+      (dank-green-bright "{{dank16.color10.default.hex}}") ; Bright green
+      (dank-yellow "{{dank16.color3.default.hex}}")       ; Warm yellow
+      (dank-yellow-bright "{{dank16.color11.default.hex}}") ; Bright yellow
+      (dank-blue "{{dank16.color4.default.hex}}")         ; Blue-green
+      (dank-magenta "{{dank16.color5.default.hex}}")      ; Teal-magenta
+      (dank-cyan "{{dank16.color6.default.hex}}")         ; Bright cyan
+      (dank-cyan-bright "{{dank16.color12.default.hex}}") ; Brightest cyan
+      (dank-cyan-dark "{{dank16.color13.default.hex}}")   ; Dark cyan
+      (dank-teal "{{dank16.color14.default.hex}}")        ; Dark teal
+      (dank-fg "{{dank16.color7.default.hex}}")           ; Light foreground
+      (dank-gray "{{dank16.color8.default.hex}}")         ; Gray
+      (dank-white "{{dank16.color15.default.hex}}")       ; White
 
       ;; Map success colors to green
-      (success "{{dank16.color2.dark.hex}}")
-      (on-success "{{colors.on_tertiary.dark.hex}}")
-      (success-container "{{colors.tertiary_container.dark.hex}}")
-      (on-success-container "{{colors.on_tertiary_container.dark.hex}}")
+      (success "{{dank16.color2.default.hex}}")
+      (on-success "{{colors.on_tertiary.default.hex}}")
+      (success-container "{{colors.tertiary_container.default.hex}}")
+      (on-success-container "{{colors.on_tertiary_container.default.hex}}")
 
       ;; Map fixed colors
-      (primary-fixed "{{colors.primary_fixed.dark.hex}}")
-      (primary-fixed-dim "{{colors.primary_fixed_dim.dark.hex}}")
-      (secondary-fixed "{{colors.secondary_fixed.dark.hex}}")
-      (secondary-fixed-dim "{{colors.secondary_fixed_dim.dark.hex}}")
-      (tertiary-fixed "{{colors.tertiary_fixed.dark.hex}}")
-      (tertiary-fixed-dim "{{colors.tertiary_fixed_dim.dark.hex}}")
-      (on-primary-fixed "{{colors.on_primary_fixed.dark.hex}}")
-      (on-primary-fixed-variant "{{colors.on_primary_fixed_variant.dark.hex}}")
-      (on-secondary-fixed "{{colors.on_secondary_fixed.dark.hex}}")
-      (on-secondary-fixed-variant "{{colors.on_secondary_fixed_variant.dark.hex}}")
-      (on-tertiary-fixed "{{colors.on_tertiary_fixed.dark.hex}}")
-      (on-tertiary-fixed-variant "{{colors.on_tertiary_fixed_variant.dark.hex}}")
+      (primary-fixed "{{colors.primary_fixed.default.hex}}")
+      (primary-fixed-dim "{{colors.primary_fixed_dim.default.hex}}")
+      (secondary-fixed "{{colors.secondary_fixed.default.hex}}")
+      (secondary-fixed-dim "{{colors.secondary_fixed_dim.default.hex}}")
+      (tertiary-fixed "{{colors.tertiary_fixed.default.hex}}")
+      (tertiary-fixed-dim "{{colors.tertiary_fixed_dim.default.hex}}")
+      (on-primary-fixed "{{colors.on_primary_fixed.default.hex}}")
+      (on-primary-fixed-variant "{{colors.on_primary_fixed_variant.default.hex}}")
+      (on-secondary-fixed "{{colors.on_secondary_fixed.default.hex}}")
+      (on-secondary-fixed-variant "{{colors.on_secondary_fixed_variant.default.hex}}")
+      (on-tertiary-fixed "{{colors.on_tertiary_fixed.default.hex}}")
+      (on-tertiary-fixed-variant "{{colors.on_tertiary_fixed_variant.default.hex}}")
 
       ;; Map inverse colors
-      (inverse-on-surface "{{colors.inverse_on_surface.dark.hex}}")
-      (inverse-primary "{{colors.inverse_primary.dark.hex}}")
-      (inverse-surface "{{colors.inverse_surface.dark.hex}}")
+      (inverse-on-surface "{{colors.inverse_on_surface.default.hex}}")
+      (inverse-primary "{{colors.inverse_primary.default.hex}}")
+      (inverse-surface "{{colors.inverse_surface.default.hex}}")
 
       ;; Terminal colors from dank16
-      (term0 "{{dank16.color0.dark.hex}}")
-      (term1 "{{dank16.color1.dark.hex}}")
-      (term2 "{{dank16.color2.dark.hex}}")
-      (term3 "{{dank16.color3.dark.hex}}")
-      (term4 "{{dank16.color4.dark.hex}}")
-      (term5 "{{dank16.color5.dark.hex}}")
-      (term6 "{{dank16.color6.dark.hex}}")
-      (term7 "{{dank16.color7.dark.hex}}")
-      (term8 "{{dank16.color8.dark.hex}}")
-      (term9 "{{dank16.color9.dark.hex}}")
-      (term10 "{{dank16.color10.dark.hex}}")
-      (term11 "{{dank16.color11.dark.hex}}")
-      (term12 "{{dank16.color12.dark.hex}}")
-      (term13 "{{dank16.color13.dark.hex}}")
-      (term14 "{{dank16.color14.dark.hex}}")
-      (term15 "{{dank16.color15.dark.hex}}"))
+      (term0 "{{dank16.color0.default.hex}}")
+      (term1 "{{dank16.color1.default.hex}}")
+      (term2 "{{dank16.color2.default.hex}}")
+      (term3 "{{dank16.color3.default.hex}}")
+      (term4 "{{dank16.color4.default.hex}}")
+      (term5 "{{dank16.color5.default.hex}}")
+      (term6 "{{dank16.color6.default.hex}}")
+      (term7 "{{dank16.color7.default.hex}}")
+      (term8 "{{dank16.color8.default.hex}}")
+      (term9 "{{dank16.color9.default.hex}}")
+      (term10 "{{dank16.color10.default.hex}}")
+      (term11 "{{dank16.color11.default.hex}}")
+      (term12 "{{dank16.color12.default.hex}}")
+      (term13 "{{dank16.color13.default.hex}}")
+      (term14 "{{dank16.color14.default.hex}}")
+      (term15 "{{dank16.color15.default.hex}}"))
 
   (custom-theme-set-faces
    'dank-emacs
