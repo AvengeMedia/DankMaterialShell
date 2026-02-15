@@ -14,13 +14,13 @@
   {
     "term": "%1 Sessions",
     "context": "%1 Sessions",
-    "reference": "Modals/MuxModal.qml:322",
+    "reference": "Modals/MuxModal.qml:321",
     "comment": ""
   },
   {
     "term": "%1 active, %2 filtered",
     "context": "%1 active, %2 filtered",
-    "reference": "Modals/MuxModal.qml:332",
+    "reference": "Modals/MuxModal.qml:331",
     "comment": ""
   },
   {
@@ -134,7 +134,7 @@
   {
     "term": "%1 windows",
     "context": "%1 windows",
-    "reference": "Modals/MuxModal.qml:494",
+    "reference": "Modals/MuxModal.qml:493",
     "comment": ""
   },
   {
@@ -788,7 +788,7 @@
   {
     "term": "Attach",
     "context": "Attach",
-    "reference": "Modals/MuxModal.qml:602",
+    "reference": "Modals/MuxModal.qml:601",
     "comment": ""
   },
   {
@@ -1844,7 +1844,7 @@
   {
     "term": "Close",
     "context": "Close",
-    "reference": "Modals/NetworkInfoModal.qml:129, Modals/NetworkWiredInfoModal.qml:129, Modals/MuxModal.qml:605, Modules/SystemUpdatePopout.qml:303, Modules/DankBar/Widgets/RunningApps.qml:873",
+    "reference": "Modals/NetworkInfoModal.qml:129, Modals/NetworkWiredInfoModal.qml:129, Modals/MuxModal.qml:604, Modules/SystemUpdatePopout.qml:303, Modules/DankBar/Widgets/RunningApps.qml:873",
     "comment": ""
   },
   {
@@ -2384,7 +2384,7 @@
   {
     "term": "Create a new %1 session (n)",
     "context": "Create a new %1 session (n)",
-    "reference": "Modals/MuxModal.qml:403",
+    "reference": "Modals/MuxModal.qml:402",
     "comment": ""
   },
   {
@@ -5240,7 +5240,7 @@
   {
     "term": "Kill",
     "context": "Kill",
-    "reference": "Modals/MuxModal.qml:127, Modals/MuxModal.qml:604",
+    "reference": "Modals/MuxModal.qml:127, Modals/MuxModal.qml:603",
     "comment": ""
   },
   {
@@ -6182,7 +6182,7 @@
   {
     "term": "Navigate",
     "context": "Navigate",
-    "reference": "Modals/MuxModal.qml:601",
+    "reference": "Modals/MuxModal.qml:600",
     "comment": ""
   },
   {
@@ -6254,7 +6254,7 @@
   {
     "term": "New",
     "context": "New",
-    "reference": "Modals/MuxModal.qml:603, Modules/Notepad/NotepadTextEditor.qml:795",
+    "reference": "Modals/MuxModal.qml:602, Modules/Notepad/NotepadTextEditor.qml:795",
     "comment": ""
   },
   {
@@ -6278,7 +6278,7 @@
   {
     "term": "New Session",
     "context": "New Session",
-    "reference": "Modals/MuxModal.qml:137, Modals/MuxModal.qml:396",
+    "reference": "Modals/MuxModal.qml:137, Modals/MuxModal.qml:395",
     "comment": ""
   },
   {
@@ -6482,7 +6482,7 @@
   {
     "term": "No active %1 sessions",
     "context": "No active %1 sessions",
-    "reference": "Modals/MuxModal.qml:573",
+    "reference": "Modals/MuxModal.qml:572",
     "comment": ""
   },
   {
@@ -6734,7 +6734,7 @@
   {
     "term": "No sessions found",
     "context": "No sessions found",
-    "reference": "Modals/MuxModal.qml:573",
+    "reference": "Modals/MuxModal.qml:572",
     "comment": ""
   },
   {
@@ -7682,7 +7682,7 @@
   {
     "term": "Press 'n' or click 'New Session' to create one",
     "context": "Press 'n' or click 'New Session' to create one",
-    "reference": "Modals/MuxModal.qml:580",
+    "reference": "Modals/MuxModal.qml:579",
     "comment": ""
   },
   {
@@ -8042,7 +8042,7 @@
   {
     "term": "Rename",
     "context": "Rename",
-    "reference": "Modals/WorkspaceRenameModal.qml:185, Modals/MuxModal.qml:608",
+    "reference": "Modals/WorkspaceRenameModal.qml:185, Modals/MuxModal.qml:607",
     "comment": ""
   },
   {
@@ -8552,7 +8552,7 @@
   {
     "term": "Search sessions...",
     "context": "Search sessions...",
-    "reference": "Modals/MuxModal.qml:354",
+    "reference": "Modals/MuxModal.qml:353",
     "comment": ""
   },
   {
@@ -10172,7 +10172,7 @@
   {
     "term": "Try a different search",
     "context": "Try a different search",
-    "reference": "Modals/MuxModal.qml:580",
+    "reference": "Modals/MuxModal.qml:579",
     "comment": ""
   },
   {
@@ -11192,7 +11192,7 @@
   {
     "term": "attached",
     "context": "attached",
-    "reference": "Modals/MuxModal.qml:495",
+    "reference": "Modals/MuxModal.qml:494",
     "comment": ""
   },
   {
@@ -11210,7 +11210,7 @@
   {
     "term": "detached",
     "context": "detached",
-    "reference": "Modals/MuxModal.qml:495",
+    "reference": "Modals/MuxModal.qml:494",
     "comment": ""
   },
   {
