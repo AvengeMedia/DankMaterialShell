@@ -1,11 +1,13 @@
 import QtQuick
-import QtQuick.Controls
-import Quickshell
 import qs.Common
+import qs.Modals.Common
 import qs.Widgets
 
-FloatingWindow {
+DankModal {
     id: root
+
+    layerNamespace: "dms:input-modal"
+    keepPopoutsOpen: true
 
     property string inputTitle: ""
     property string inputMessage: ""
@@ -31,8 +33,7 @@ FloatingWindow {
         onCancel = onCancelCallback || (() => {});
         selectedButton = -1;
         keyboardNavigation = false;
-        visible = true;
-        Qt.callLater(() => textInput.forceActiveFocus());
+        open();
     }
 
     function showWithOptions(options) {
@@ -47,20 +48,19 @@ FloatingWindow {
         onCancel = options.onCancel || (() => {});
         selectedButton = -1;
         keyboardNavigation = false;
-        visible = true;
-        Qt.callLater(() => textInput.forceActiveFocus());
+        open();
     }
 
     function confirmAndClose() {
         const text = inputText;
-        visible = false;
+        close();
         if (onConfirm) {
             onConfirm(text);
         }
     }
 
     function cancelAndClose() {
-        visible = false;
+        close();
         if (onCancel) {
             onCancel();
         }
@@ -74,240 +74,239 @@ FloatingWindow {
         }
     }
 
-    title: inputTitle
-    visible: false
-    color: Theme.surfaceContainer
-    minimumSize: Qt.size(350, mainColumn.implicitHeight + Theme.spacingL * 2)
-    maximumSize: Qt.size(350, mainColumn.implicitHeight + Theme.spacingL * 2)
-
-    onVisibleChanged: {
-        if (visible) {
-            Qt.callLater(() => textInput.forceActiveFocus());
-        }
+    shouldBeVisible: false
+    allowStacking: true
+    modalWidth: 350
+    modalHeight: contentLoader.item ? contentLoader.item.implicitHeight + Theme.spacingM * 2 : 200
+    enableShadow: true
+    shouldHaveFocus: true
+    onBackgroundClicked: cancelAndClose()
+    onOpened: {
+        Qt.callLater(function () {
+            if (contentLoader.item && contentLoader.item.textInputRef) {
+                contentLoader.item.textInputRef.forceActiveFocus();
+            }
+        });
     }
 
-    FocusScope {
-        anchors.fill: parent
-        focus: true
+    content: Component {
+        FocusScope {
+            anchors.fill: parent
+            implicitHeight: mainColumn.implicitHeight
+            focus: true
 
-        Keys.onPressed: function (event) {
-            const textFieldFocused = textInput.activeFocus;
+            property alias textInputRef: textInput
 
-            switch (event.key) {
-            case Qt.Key_Escape:
-                cancelAndClose();
-                event.accepted = true;
-                break;
-            case Qt.Key_Tab:
-                if (textFieldFocused) {
-                    keyboardNavigation = true;
-                    selectedButton = 0;
-                    textInput.focus = false;
-                } else {
-                    keyboardNavigation = true;
-                    if (selectedButton === -1) {
-                        selectedButton = 0;
-                    } else if (selectedButton === 0) {
-                        selectedButton = 1;
+            Keys.onPressed: function (event) {
+                const textFieldFocused = textInput.activeFocus;
+
+                switch (event.key) {
+                case Qt.Key_Escape:
+                    root.cancelAndClose();
+                    event.accepted = true;
+                    break;
+                case Qt.Key_Tab:
+                    if (textFieldFocused) {
+                        root.keyboardNavigation = true;
+                        root.selectedButton = 0;
+                        textInput.focus = false;
                     } else {
-                        selectedButton = -1;
-                        textInput.forceActiveFocus();
+                        root.keyboardNavigation = true;
+                        if (root.selectedButton === -1) {
+                            root.selectedButton = 0;
+                        } else if (root.selectedButton === 0) {
+                            root.selectedButton = 1;
+                        } else {
+                            root.selectedButton = -1;
+                            textInput.forceActiveFocus();
+                        }
                     }
-                }
-                event.accepted = true;
-                break;
-            case Qt.Key_Left:
-                if (!textFieldFocused) {
-                    keyboardNavigation = true;
-                    selectedButton = 0;
                     event.accepted = true;
-                }
-                break;
-            case Qt.Key_Right:
-                if (!textFieldFocused) {
-                    keyboardNavigation = true;
-                    selectedButton = 1;
+                    break;
+                case Qt.Key_Left:
+                    if (!textFieldFocused) {
+                        root.keyboardNavigation = true;
+                        root.selectedButton = 0;
+                        event.accepted = true;
+                    }
+                    break;
+                case Qt.Key_Right:
+                    if (!textFieldFocused) {
+                        root.keyboardNavigation = true;
+                        root.selectedButton = 1;
+                        event.accepted = true;
+                    }
+                    break;
+                case Qt.Key_Return:
+                case Qt.Key_Enter:
+                    if (root.selectedButton !== -1) {
+                        root.selectButton();
+                    } else {
+                        root.confirmAndClose();
+                    }
                     event.accepted = true;
+                    break;
                 }
-                break;
-            case Qt.Key_Return:
-            case Qt.Key_Enter:
-                if (selectedButton !== -1) {
-                    selectButton();
-                } else {
-                    confirmAndClose();
+            }
+
+            Column {
+                id: mainColumn
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.leftMargin: Theme.spacingL
+                anchors.rightMargin: Theme.spacingL
+                anchors.topMargin: Theme.spacingL
+                spacing: 0
+
+                StyledText {
+                    text: root.inputTitle
+                    font.pixelSize: Theme.fontSizeLarge
+                    color: Theme.surfaceText
+                    font.weight: Font.Medium
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
                 }
-                event.accepted = true;
-                break;
-            }
-        }
 
-        Column {
-            id: mainColumn
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.leftMargin: Theme.spacingL
-            anchors.rightMargin: Theme.spacingL
-            anchors.topMargin: Theme.spacingL
-            spacing: 0
+                Item {
+                    width: 1
+                    height: Theme.spacingL
+                }
 
-            StyledText {
-                text: inputTitle
-                font.pixelSize: Theme.fontSizeLarge
-                color: Theme.surfaceText
-                font.weight: Font.Medium
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-            }
-
-            Item {
-                width: 1
-                height: Theme.spacingL
-            }
-
-            StyledText {
-                text: inputMessage
-                font.pixelSize: Theme.fontSizeMedium
-                color: Theme.surfaceText
-                width: parent.width
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                visible: inputMessage !== ""
-            }
-
-            Item {
-                width: 1
-                height: inputMessage !== "" ? Theme.spacingL : 0
-                visible: inputMessage !== ""
-            }
-
-            Rectangle {
-                width: parent.width
-                height: 40
-                radius: Theme.cornerRadius
-                color: Theme.surfaceVariantAlpha
-                border.color: textInput.activeFocus ? Theme.primary : "transparent"
-                border.width: textInput.activeFocus ? 1 : 0
-
-                TextInput {
-                    id: textInput
-
-                    anchors.fill: parent
-                    anchors.leftMargin: Theme.spacingM
-                    anchors.rightMargin: Theme.spacingM
-                    verticalAlignment: TextInput.AlignVCenter
+                StyledText {
+                    text: root.inputMessage
                     font.pixelSize: Theme.fontSizeMedium
                     color: Theme.surfaceText
-                    selectionColor: Theme.primary
-                    selectedTextColor: Theme.primaryText
-                    clip: true
-                    text: inputText
-                    onTextChanged: inputText = text
-
-                    StyledText {
-                        anchors.fill: parent
-                        verticalAlignment: Text.AlignVCenter
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
-                        text: inputPlaceholder
-                        visible: textInput.text === "" && !textInput.activeFocus
-                    }
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.WordWrap
+                    visible: root.inputMessage !== ""
                 }
-            }
 
-            Item {
-                width: 1
-                height: Theme.spacingL * 1.5
-            }
-
-            Row {
-                anchors.horizontalCenter: parent.horizontalCenter
-                spacing: Theme.spacingM
+                Item {
+                    width: 1
+                    height: root.inputMessage !== "" ? Theme.spacingL : 0
+                    visible: root.inputMessage !== ""
+                }
 
                 Rectangle {
-                    width: 120
+                    width: parent.width
                     height: 40
                     radius: Theme.cornerRadius
-                    color: {
-                        if (keyboardNavigation && selectedButton === 0) {
-                            return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
-                        } else if (cancelButton.containsMouse) {
-                            return Theme.surfacePressed;
-                        } else {
-                            return Theme.surfaceVariantAlpha;
-                        }
-                    }
-                    border.color: (keyboardNavigation && selectedButton === 0) ? Theme.primary : "transparent"
-                    border.width: (keyboardNavigation && selectedButton === 0) ? 1 : 0
+                    color: Theme.surfaceVariantAlpha
+                    border.color: textInput.activeFocus ? Theme.primary : "transparent"
+                    border.width: textInput.activeFocus ? 1 : 0
 
-                    StyledText {
-                        text: cancelButtonText
+                    TextInput {
+                        id: textInput
+
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.spacingM
+                        anchors.rightMargin: Theme.spacingM
+                        verticalAlignment: TextInput.AlignVCenter
                         font.pixelSize: Theme.fontSizeMedium
                         color: Theme.surfaceText
-                        font.weight: Font.Medium
-                        anchors.centerIn: parent
-                    }
+                        selectionColor: Theme.primary
+                        selectedTextColor: Theme.primaryText
+                        clip: true
+                        text: root.inputText
+                        onTextChanged: root.inputText = text
 
-                    MouseArea {
-                        id: cancelButton
-
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            cancelAndClose();
+                        StyledText {
+                            anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.4)
+                            text: root.inputPlaceholder
+                            visible: textInput.text === "" && !textInput.activeFocus
                         }
                     }
                 }
 
-                Rectangle {
-                    width: 120
-                    height: 40
-                    radius: Theme.cornerRadius
-                    color: {
-                        const baseColor = confirmButtonColor;
-                        if (keyboardNavigation && selectedButton === 1) {
-                            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1);
-                        } else if (confirmButton.containsMouse) {
-                            return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9);
-                        } else {
-                            return baseColor;
+                Item {
+                    width: 1
+                    height: Theme.spacingL * 1.5
+                }
+
+                Row {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: Theme.spacingM
+
+                    Rectangle {
+                        width: 120
+                        height: 40
+                        radius: Theme.cornerRadius
+                        color: {
+                            if (root.keyboardNavigation && root.selectedButton === 0) {
+                                return Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12);
+                            } else if (cancelButton.containsMouse) {
+                                return Theme.surfacePressed;
+                            } else {
+                                return Theme.surfaceVariantAlpha;
+                            }
+                        }
+                        border.color: (root.keyboardNavigation && root.selectedButton === 0) ? Theme.primary : "transparent"
+                        border.width: (root.keyboardNavigation && root.selectedButton === 0) ? 1 : 0
+
+                        StyledText {
+                            text: root.cancelButtonText
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.surfaceText
+                            font.weight: Font.Medium
+                            anchors.centerIn: parent
+                        }
+
+                        MouseArea {
+                            id: cancelButton
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.cancelAndClose()
                         }
                     }
-                    border.color: (keyboardNavigation && selectedButton === 1) ? "white" : "transparent"
-                    border.width: (keyboardNavigation && selectedButton === 1) ? 1 : 0
 
-                    StyledText {
-                        text: confirmButtonText
-                        font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.primaryText
-                        font.weight: Font.Medium
-                        anchors.centerIn: parent
-                    }
+                    Rectangle {
+                        width: 120
+                        height: 40
+                        radius: Theme.cornerRadius
+                        color: {
+                            const baseColor = root.confirmButtonColor;
+                            if (root.keyboardNavigation && root.selectedButton === 1) {
+                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 1);
+                            } else if (confirmButton.containsMouse) {
+                                return Qt.rgba(baseColor.r, baseColor.g, baseColor.b, 0.9);
+                            } else {
+                                return baseColor;
+                            }
+                        }
+                        border.color: (root.keyboardNavigation && root.selectedButton === 1) ? "white" : "transparent"
+                        border.width: (root.keyboardNavigation && root.selectedButton === 1) ? 1 : 0
 
-                    MouseArea {
-                        id: confirmButton
+                        StyledText {
+                            text: root.confirmButtonText
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: Theme.primaryText
+                            font.weight: Font.Medium
+                            anchors.centerIn: parent
+                        }
 
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            confirmAndClose();
+                        MouseArea {
+                            id: confirmButton
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.confirmAndClose()
                         }
                     }
                 }
-            }
 
-            Item {
-                width: 1
-                height: Theme.spacingL
+                Item {
+                    width: 1
+                    height: Theme.spacingL
+                }
             }
         }
-    }
-
-    FloatingWindowControls {
-        id: windowControls
-        targetWindow: root
     }
 }

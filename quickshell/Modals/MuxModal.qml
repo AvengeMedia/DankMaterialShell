@@ -219,8 +219,8 @@ DankModal {
 
     InputModal {
         id: inputModal
-        onVisibleChanged: {
-            if (visible) {
+        onShouldBeVisibleChanged: {
+            if (shouldBeVisible) {
                 muxModal.shouldHaveFocus = false;
                 muxModal.contentWindow.visible = false;
                 return;
