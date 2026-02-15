@@ -314,6 +314,7 @@ Singleton {
     property int dankLauncherV2BorderThickness: 2
     property string dankLauncherV2BorderColor: "primary"
     property bool dankLauncherV2ShowFooter: true
+    property bool dankLauncherV2UnloadOnClose: false
 
     property string _legacyWeatherLocation: "New York, NY"
     property string _legacyWeatherCoordinates: "40.7128,-74.0060"

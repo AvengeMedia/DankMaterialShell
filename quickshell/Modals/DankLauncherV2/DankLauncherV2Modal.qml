@@ -4,7 +4,6 @@ import Quickshell.Wayland
 import Quickshell.Hyprland
 import qs.Common
 import qs.Services
-import qs.Widgets
 
 Item {
     id: root
@@ -264,7 +263,7 @@ Item {
 
     PanelWindow {
         id: launcherWindow
-        visible: root._windowEnabled && (spotlightOpen || isClosing)
+        visible: root._windowEnabled && (!SettingsData.dankLauncherV2UnloadOnClose || spotlightOpen || isClosing)
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 

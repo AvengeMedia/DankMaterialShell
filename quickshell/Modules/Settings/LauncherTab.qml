@@ -416,6 +416,15 @@ Item {
                 }
 
                 SettingsToggleRow {
+                    settingKey: "dankLauncherV2UnloadOnClose"
+                    tags: ["launcher", "unload", "close", "memory", "vram"]
+                    text: I18n.tr("Unload on Close")
+                    description: I18n.tr("Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.")
+                    checked: SettingsData.dankLauncherV2UnloadOnClose
+                    onToggled: checked => SettingsData.set("dankLauncherV2UnloadOnClose", checked)
+                }
+
+                SettingsToggleRow {
                     settingKey: "dankLauncherV2BorderEnabled"
                     tags: ["launcher", "border", "outline"]
                     text: I18n.tr("Border", "launcher border option")

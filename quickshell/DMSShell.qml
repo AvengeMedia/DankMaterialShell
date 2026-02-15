@@ -533,7 +533,8 @@ Item {
             }
 
             onDialogClosed: {
-                PopoutService.unloadDankLauncherV2();
+                if (SettingsData.dankLauncherV2UnloadOnClose)
+                    PopoutService.unloadDankLauncherV2();
             }
         }
     }

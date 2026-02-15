@@ -47,6 +47,7 @@ Item {
             sections = [];
             flatModel = [];
             selectedItem = null;
+            _clearModeCache();
         }
     }
 
