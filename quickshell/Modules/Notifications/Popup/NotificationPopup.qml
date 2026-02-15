@@ -41,6 +41,7 @@ PanelWindow {
     readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real contentBottomClearance: 5
+    readonly property real actionRowOffset: 5
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) + contentBottomClearance
     readonly property real privacyCollapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2) + contentBottomClearance
@@ -554,7 +555,7 @@ PanelWindow {
                         elide: descriptionExpanded ? Text.ElideNone : Text.ElideRight
                         horizontalAlignment: Text.AlignLeft
                         maximumLineCount: descriptionExpanded ? -1 : (compactMode ? 1 : 2)
-                        wrapMode: Text.WordWrap
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         visible: text.length > 0
                         opacity: (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) ? 0 : 1
                         linkColor: Theme.primary
@@ -634,7 +635,7 @@ PanelWindow {
                 anchors.right: clearButton.visible ? clearButton.left : parent.right
                 anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
                 anchors.top: notificationContent.bottom
-                anchors.topMargin: contentSpacing
+                anchors.topMargin: contentSpacing + actionRowOffset
                 spacing: contentSpacing
                 z: 20
 
@@ -702,7 +703,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
                 anchors.top: notificationContent.bottom
-                anchors.topMargin: contentSpacing
+                anchors.topMargin: contentSpacing + actionRowOffset
                 width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
                 radius: Theme.notificationButtonCornerRadius

@@ -595,7 +595,7 @@ Rectangle {
                                         width: parent.width
                                         elide: messageExpanded ? Text.ElideNone : Text.ElideRight
                                         maximumLineCount: messageExpanded ? -1 : 2
-                                        wrapMode: Text.WordWrap
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                         visible: text.length > 0
                                         linkColor: Theme.primary
                                         onLinkActivated: link => Qt.openUrlExternally(link)
@@ -778,7 +778,7 @@ Rectangle {
         anchors.right: clearButton.visible ? clearButton.left : parent.right
         anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
         anchors.top: collapsedContent.bottom
-        anchors.topMargin: contentSpacing
+        anchors.topMargin: contentSpacing + collapsedDismissOffset
         spacing: contentSpacing
 
         Repeater {
