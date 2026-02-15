@@ -90,10 +90,15 @@ Item {
         }
     }
 
-    Item {
-        id: rippleContainer
+    // VRAM optimization: Use clip instead of layer+MultiEffect for rounded corners
+    // The layer.enabled approach creates an offscreen texture for every clickable element
+    // with rounded corners, which adds 200-400MB VRAM across the UI.
+    // Using clip: true is GPU-native and much cheaper.
+    Rectangle {
         anchors.fill: parent
-        visible: root.cornerRadius <= 0
+        radius: root.cornerRadius
+        color: "transparent"
+        clip: root.cornerRadius > 0
 
         Rectangle {
             id: ripple
@@ -107,30 +112,5 @@ Item {
                 y: -ripple.height / 2
             }
         }
-    }
-
-    Item {
-        id: rippleMask
-        anchors.fill: parent
-        layer.enabled: root.cornerRadius > 0
-        layer.smooth: true
-        visible: false
-
-        Rectangle {
-            anchors.fill: parent
-            radius: root.cornerRadius
-            color: "black"
-            antialiasing: true
-        }
-    }
-
-    MultiEffect {
-        anchors.fill: parent
-        source: rippleContainer
-        maskEnabled: true
-        maskSource: rippleMask
-        maskThresholdMin: 0.5
-        maskSpreadAtMin: 1.0
-        visible: root.cornerRadius > 0 && rippleAnim.running
     }
 }
