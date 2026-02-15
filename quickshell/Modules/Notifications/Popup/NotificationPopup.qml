@@ -41,7 +41,6 @@ PanelWindow {
     readonly property real popupIconSize: compactMode ? Theme.notificationIconSizeCompact : Theme.notificationIconSizeNormal
     readonly property real contentSpacing: compactMode ? Theme.spacingXS : Theme.spacingS
     readonly property real contentBottomClearance: 5
-    readonly property real actionRowOffset: 5
     readonly property real actionButtonHeight: compactMode ? 20 : 24
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) + contentBottomClearance
     readonly property real privacyCollapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2) + contentBottomClearance
@@ -635,7 +634,7 @@ PanelWindow {
                 anchors.right: clearButton.visible ? clearButton.left : parent.right
                 anchors.rightMargin: clearButton.visible ? contentSpacing : Theme.spacingL
                 anchors.top: notificationContent.bottom
-                anchors.topMargin: contentSpacing + actionRowOffset
+                anchors.topMargin: contentSpacing
                 spacing: contentSpacing
                 z: 20
 
@@ -703,7 +702,7 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.spacingL
                 anchors.top: notificationContent.bottom
-                anchors.topMargin: contentSpacing + actionRowOffset
+                anchors.topMargin: contentSpacing
                 width: Math.max(clearTextLabel.implicitWidth + Theme.spacingM, Theme.notificationActionMinWidth)
                 height: actionButtonHeight
                 radius: Theme.notificationButtonCornerRadius
