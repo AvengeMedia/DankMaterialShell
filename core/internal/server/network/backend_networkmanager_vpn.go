@@ -304,6 +304,51 @@ func (b *NetworkManagerBackend) ConnectVPN(uuidOrName string, singleActive bool)
 		if err := b.handleOpenVPNUsernameAuth(targetConn, connName, targetUUID, vpnServiceType); err != nil {
 			return err
 		}
+	case "gp_saml":
+		gateway := vpnData["gateway"]
+		protocol := vpnData["protocol"]
+		if protocol != "gp" {
+			return fmt.Errorf("GlobalProtect SAML authentication only supported for protocol=gp, got: %s", protocol)
+		}
+
+		log.Infof("[ConnectVPN] GlobalProtect SAML/SSO authentication required for %s (gateway=%s)", connName, gateway)
+
+		samlCtx, samlCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		authResult, err := b.runGlobalProtectSAMLAuth(samlCtx, gateway, protocol)
+		samlCancel()
+		if err != nil {
+			errMsg := err.Error()
+			switch {
+			case strings.Contains(errMsg, "not installed"):
+				return fmt.Errorf("gp-saml-gui is not installed (required for GlobalProtect SAML/SSO VPN)")
+			case strings.Contains(errMsg, "timed out") || strings.Contains(errMsg, "cancelled"):
+				return fmt.Errorf("GlobalProtect SAML authentication timed out — please try again")
+			case strings.Contains(errMsg, "no cookie"):
+				return fmt.Errorf("GlobalProtect SAML login did not complete — browser was closed before authentication finished")
+			case strings.Contains(errMsg, "convert prelogin-cookie"):
+				return fmt.Errorf("GlobalProtect VPN authentication succeeded but cookie exchange failed: %w", err)
+			default:
+				return fmt.Errorf("GlobalProtect SAML authentication failed: %w", err)
+			}
+		}
+
+		b.cachedGPSamlMu.Lock()
+		b.cachedGPSamlCookie = &cachedGPSamlCookie{
+			ConnectionUUID: targetUUID,
+			Cookie:         authResult.Cookie,
+			Host:           authResult.Host,
+			User:           authResult.User,
+			Fingerprint:    authResult.Fingerprint,
+		}
+		b.cachedGPSamlMu.Unlock()
+
+		if err := targetConn.ClearSecrets(); err != nil {
+			log.Warnf("[ConnectVPN] ClearSecrets failed (non-fatal): %v", err)
+		} else {
+			log.Infof("[ConnectVPN] Cleared stale stored secrets for %s", connName)
+		}
+
+		log.Infof("[ConnectVPN] GlobalProtect SAML cookie cached for %s, proceeding with activation", connName)
 	}
 
 	b.stateMutex.Lock()
@@ -339,6 +384,16 @@ func detectVPNAuthAction(serviceType string, data map[string]string) string {
 	}
 
 	switch {
+	case strings.Contains(serviceType, "openconnect"):
+		protocol := data["protocol"]
+		if needsExternalBrowserAuth(protocol, data["authtype"], data["username"], data) {
+			switch protocol {
+			case "gp":
+				return "gp_saml"
+			default:
+				log.Infof("[VPN] External browser auth detected for protocol '%s' but only GlobalProtect (gp) is currently supported", protocol)
+			}
+		}
 	case strings.Contains(serviceType, "openvpn"):
 		connType := data["connection-type"]
 		username := data["username"]
@@ -670,10 +725,13 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.LastError = ""
 				b.stateMutex.Unlock()
 
-				// Clear cached PKCS11 PIN on success
+				// Clear cached PKCS11 PIN and SAML cookie on success
 				b.cachedPKCS11Mu.Lock()
 				b.cachedPKCS11PIN = nil
 				b.cachedPKCS11Mu.Unlock()
+				b.cachedGPSamlMu.Lock()
+				b.cachedGPSamlCookie = nil
+				b.cachedGPSamlMu.Unlock()
 
 				b.pendingVPNSaveMu.Lock()
 				pending := b.pendingVPNSave
@@ -692,10 +750,13 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 				b.state.LastError = "VPN connection failed"
 				b.stateMutex.Unlock()
 
-				// Clear cached PKCS11 PIN on failure
+				// Clear cached PKCS11 PIN and SAML cookie on failure
 				b.cachedPKCS11Mu.Lock()
 				b.cachedPKCS11PIN = nil
 				b.cachedPKCS11Mu.Unlock()
+				b.cachedGPSamlMu.Lock()
+				b.cachedGPSamlCookie = nil
+				b.cachedGPSamlMu.Unlock()
 				return
 			}
 		}
@@ -709,10 +770,13 @@ func (b *NetworkManagerBackend) updateVPNConnectionState() {
 		b.state.LastError = "VPN connection failed"
 		b.stateMutex.Unlock()
 
-		// Clear cached PKCS11 PIN
+		// Clear cached PKCS11 PIN and SAML cookie
 		b.cachedPKCS11Mu.Lock()
 		b.cachedPKCS11PIN = nil
 		b.cachedPKCS11Mu.Unlock()
+		b.cachedGPSamlMu.Lock()
+		b.cachedGPSamlCookie = nil
+		b.cachedGPSamlMu.Unlock()
 	}
 }
 
