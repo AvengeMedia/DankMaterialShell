@@ -158,10 +158,7 @@ Singleton {
                     continue;
                 const urg = typeof item.urgency === "number" ? item.urgency : 1;
                 const body = item.body || "";
-                let htmlBody = item.htmlBody || "";
-                if (!htmlBody && body) {
-                    htmlBody = (body.includes('<') && body.includes('>')) ? body : Markdown2Html.markdownToHtml(body);
-                }
+                const htmlBody = item.htmlBody || _resolveHtmlBody(body);
                 loaded.push({
                     id: item.id || "",
                     summary: item.summary || "",
@@ -725,13 +722,7 @@ Singleton {
         required property Notification notification
         readonly property string summary: notification?.summary ?? ""
         readonly property string body: notification?.body ?? ""
-        readonly property string htmlBody: {
-            if (!body)
-                return "";
-            if (body.includes('<') && body.includes('>'))
-                return body;
-            return Markdown2Html.markdownToHtml(body);
-        }
+        readonly property string htmlBody: root._resolveHtmlBody(body)
         readonly property string appIcon: notification?.appIcon ?? ""
         readonly property string appName: {
             if (!notification)
@@ -913,6 +904,43 @@ Singleton {
                 } catch (e) {}
             });
         }
+    }
+
+    function _hasHtmlTags(s) {
+        return /<\/?[a-z][\s\S]*>/i.test(s);
+    }
+
+    function _hasHtmlEntities(s) {
+        return /&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(s);
+    }
+
+    function _unescapeHtml(s) {
+        s = s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)));
+        s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCodePoint(parseInt(n, 16)));
+
+        const named = {
+            "lt": "<",
+            "gt": ">",
+            "amp": "&",
+            "quot": "\"",
+            "apos": "'",
+            "nbsp": "\u00A0"
+        };
+        return s.replace(/&([a-zA-Z][a-zA-Z0-9]+);/g, (_, name) => named[name] !== undefined ? named[name] : "&" + name + ";");
+    }
+
+    function _resolveHtmlBody(body) {
+        if (!body)
+            return "";
+        if (_hasHtmlTags(body))
+            return body;
+        if (_hasHtmlEntities(body)) {
+            const decoded = _unescapeHtml(body);
+            if (_hasHtmlTags(decoded))
+                return decoded;
+            return Markdown2Html.markdownToHtml(decoded);
+        }
+        return Markdown2Html.markdownToHtml(body);
     }
 
     function getGroupKey(wrapper) {
