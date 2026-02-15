@@ -906,37 +906,83 @@ Singleton {
         }
     }
 
-    function _hasHtmlTags(s) {
-        return /<\/?[a-z][\s\S]*>/i.test(s);
-    }
-
-    function _hasHtmlEntities(s) {
-        return /&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(s);
-    }
-
-    function _unescapeHtml(s) {
+    function _decodeEntities(s) {
         s = s.replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)));
         s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCodePoint(parseInt(n, 16)));
-
-        const named = {
-            "lt": "<",
-            "gt": ">",
-            "amp": "&",
-            "quot": "\"",
-            "apos": "'",
-            "nbsp": "\u00A0"
-        };
-        return s.replace(/&([a-zA-Z][a-zA-Z0-9]+);/g, (_, name) => named[name] !== undefined ? named[name] : "&" + name + ";");
+        return s.replace(/&([a-zA-Z][a-zA-Z0-9]*);/g, (match, name) => {
+            switch (name) {
+            case "amp":
+                return "&";
+            case "lt":
+                return "<";
+            case "gt":
+                return ">";
+            case "quot":
+                return "\"";
+            case "apos":
+                return "'";
+            case "nbsp":
+                return "\u00A0";
+            case "ndash":
+                return "\u2013";
+            case "mdash":
+                return "\u2014";
+            case "lsquo":
+                return "\u2018";
+            case "rsquo":
+                return "\u2019";
+            case "ldquo":
+                return "\u201C";
+            case "rdquo":
+                return "\u201D";
+            case "bull":
+                return "\u2022";
+            case "hellip":
+                return "\u2026";
+            case "trade":
+                return "\u2122";
+            case "copy":
+                return "\u00A9";
+            case "reg":
+                return "\u00AE";
+            case "deg":
+                return "\u00B0";
+            case "plusmn":
+                return "\u00B1";
+            case "times":
+                return "\u00D7";
+            case "divide":
+                return "\u00F7";
+            case "micro":
+                return "\u00B5";
+            case "middot":
+                return "\u00B7";
+            case "laquo":
+                return "\u00AB";
+            case "raquo":
+                return "\u00BB";
+            case "larr":
+                return "\u2190";
+            case "rarr":
+                return "\u2192";
+            case "uarr":
+                return "\u2191";
+            case "darr":
+                return "\u2193";
+            default:
+                return match;
+            }
+        });
     }
 
     function _resolveHtmlBody(body) {
         if (!body)
             return "";
-        if (_hasHtmlTags(body))
+        if (/<\/?[a-z][\s\S]*>/i.test(body))
             return body;
-        if (_hasHtmlEntities(body)) {
-            const decoded = _unescapeHtml(body);
-            if (_hasHtmlTags(decoded))
+        if (/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(body)) {
+            const decoded = _decodeEntities(body);
+            if (/<\/?[a-z][\s\S]*>/i.test(decoded))
                 return decoded;
             return Markdown2Html.markdownToHtml(decoded);
         }
