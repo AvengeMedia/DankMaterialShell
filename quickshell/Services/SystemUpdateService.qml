@@ -265,7 +265,7 @@ Singleton {
             var finalCommand = [terminal];
             if (termClass.length > 0) {
                 finalCommand = finalCommand.concat(termClass.split(" "));
-        
+            }
             finalCommand.push("-e");
             finalCommand.push("sh");
             finalCommand.push("-c");
