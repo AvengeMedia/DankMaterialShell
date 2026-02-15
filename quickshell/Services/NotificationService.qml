@@ -22,7 +22,7 @@ Singleton {
 
     property list<NotifWrapper> notificationQueue: []
     property list<NotifWrapper> visibleNotifications: []
-    property int maxVisibleNotifications: 3
+    property int maxVisibleNotifications: 4
     property bool addGateBusy: false
     property int enterAnimMs: 400
     property int seqCounter: 0
@@ -253,7 +253,9 @@ Singleton {
             return timeStr;
         try {
             const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
-            const weekday = date.toLocaleDateString(localeName, { weekday: "long" });
+            const weekday = date.toLocaleDateString(localeName, {
+                weekday: "long"
+            });
             return weekday + ", " + timeStr;
         } catch (e) {
             return timeStr;
@@ -488,7 +490,7 @@ Singleton {
 
     Timer {
         id: addGate
-        interval: enterAnimMs + 50
+        interval: 80
         running: false
         repeat: false
         onTriggered: {
@@ -694,7 +696,9 @@ Singleton {
 
             try {
                 const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
-                const weekday = time.toLocaleDateString(localeName, { weekday: "long" });
+                const weekday = time.toLocaleDateString(localeName, {
+                    weekday: "long"
+                });
                 return `${weekday}, ${formatTime(time)}`;
             } catch (e) {
                 return formatTime(time);
@@ -843,39 +847,54 @@ Singleton {
         }
     }
 
-    function processQueue() {
-        if (addGateBusy) {
-            return;
-        }
-        if (popupsDisabled) {
-            return;
-        }
-        if (SessionData.doNotDisturb) {
-            return;
-        }
-        if (notificationQueue.length === 0) {
-            return;
-        }
+    property bool _processingQueue: false
 
-        const activePopupCount = visibleNotifications.filter(n => n && n.popup).length;
-        if (activePopupCount >= maxVisibleNotifications) {
+    function processQueue() {
+        if (addGateBusy || _processingQueue)
             return;
-        }
+        if (popupsDisabled)
+            return;
+        if (SessionData.doNotDisturb)
+            return;
+        if (notificationQueue.length === 0)
+            return;
+
+        _processingQueue = true;
 
         const next = notificationQueue.shift();
-        if (!next)
+        if (!next) {
+            _processingQueue = false;
             return;
+        }
 
         next.seq = ++seqCounter;
-        visibleNotifications = [...visibleNotifications, next];
+
+        const activePopups = visibleNotifications.filter(n => n && n.popup);
+        let evicted = null;
+        if (activePopups.length >= maxVisibleNotifications) {
+            const unhovered = activePopups.filter(n => n.timer?.running);
+            const pool = unhovered.length > 0 ? unhovered : activePopups;
+            evicted = pool.reduce((min, n) => (n.seq < min.seq) ? n : min, pool[0]);
+            if (evicted)
+                evicted.removedByLimit = true;
+        }
+
+        if (evicted) {
+            visibleNotifications = [...visibleNotifications.filter(n => n !== evicted), next];
+        } else {
+            visibleNotifications = [...visibleNotifications, next];
+        }
+
+        if (evicted)
+            evicted.popup = false;
         next.popup = true;
 
-        if (next.timer.interval > 0) {
+        if (next.timer.interval > 0)
             next.timer.start();
-        }
 
         addGateBusy = true;
         addGate.restart();
+        _processingQueue = false;
     }
 
     function removeFromVisibleNotifications(wrapper) {

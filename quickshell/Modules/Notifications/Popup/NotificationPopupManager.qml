@@ -15,20 +15,14 @@ QtObject {
     readonly property real popupSpacing: compactMode ? 0 : Theme.spacingXS
     readonly property real collapsedContentHeight: Math.max(popupIconSize, Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2))
     readonly property int baseNotificationHeight: cardPadding * 2 + collapsedContentHeight + actionButtonHeight + contentSpacing + popupSpacing
-    property int maxTargetNotifications: 4
-    property var popupWindows: [] // strong refs to windows (live until exitFinished)
+    property var popupWindows: []
     property var destroyingWindows: new Set()
     property var pendingDestroys: []
     property int destroyDelayMs: 100
-    property var pendingCreates: []
-    property int createDelayMs: 50
-    property bool createBusy: false
     property Component popupComponent
 
     popupComponent: Component {
         NotificationPopup {
-            onEntered: manager._onPopupEntered(this)
-            onExitStarted: manager._onPopupExitStarted(this)
             onExitFinished: manager._onPopupExitFinished(this)
             onPopupHeightChanged: manager._onPopupHeightChanged(this)
         }
@@ -74,36 +68,6 @@ QtObject {
             destroyTimer.restart();
     }
 
-    property Timer createTimer: Timer {
-        interval: createDelayMs
-        running: false
-        repeat: false
-        onTriggered: manager._processCreateQueue()
-    }
-
-    function _processCreateQueue() {
-        createBusy = false;
-        if (pendingCreates.length === 0)
-            return;
-        const wrapper = pendingCreates.shift();
-        if (wrapper)
-            _doInsertNewestAtTop(wrapper);
-        if (pendingCreates.length > 0) {
-            createBusy = true;
-            createTimer.restart();
-        }
-    }
-
-    function _scheduleCreate(wrapper) {
-        if (!wrapper)
-            return;
-        pendingCreates.push(wrapper);
-        if (!createBusy) {
-            createBusy = true;
-            createTimer.restart();
-        }
-    }
-
     sweeper: Timer {
         interval: 500
         running: false
@@ -129,11 +93,10 @@ QtObject {
             }
             if (toRemove.length) {
                 popupWindows = popupWindows.filter(p => toRemove.indexOf(p) === -1);
-                _repositionAllActivePopups();
+                _repositionAll();
             }
-            if (popupWindows.length === 0) {
+            if (popupWindows.length === 0)
                 sweeper.stop();
-            }
         }
     }
 
@@ -145,98 +108,29 @@ QtObject {
         return p && p.status !== Component.Null && !p._isDestroying && p.hasValidData;
     }
 
-    function _canMakeRoomFor(wrapper) {
-        const activeWindows = _active();
-        if (activeWindows.length < maxTargetNotifications) {
-            return true;
-        }
-        if (!wrapper || !wrapper.notification) {
-            return false;
-        }
-        const incomingUrgency = wrapper.urgency || 0;
-        for (const p of activeWindows) {
-            if (!p.notificationData || !p.notificationData.notification) {
-                continue;
-            }
-            const existingUrgency = p.notificationData.urgency || 0;
-            if (existingUrgency < incomingUrgency) {
-                return true;
-            }
-            if (existingUrgency === incomingUrgency) {
-                const timer = p.notificationData.timer;
-                if (timer && !timer.running) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    function _makeRoomForNew(wrapper) {
-        const activeWindows = _active();
-        if (activeWindows.length < maxTargetNotifications) {
-            return;
-        }
-        const toRemove = _selectPopupToRemove(activeWindows, wrapper);
-        if (toRemove && !toRemove.exiting) {
-            toRemove.notificationData.removedByLimit = true;
-            toRemove.notificationData.popup = false;
-            if (toRemove.notificationData.timer) {
-                toRemove.notificationData.timer.stop();
-            }
-        }
-    }
-
-    function _selectPopupToRemove(activeWindows, incomingWrapper) {
-        const sortedWindows = activeWindows.slice().sort((a, b) => {
-            const aUrgency = (a.notificationData) ? a.notificationData.urgency || 0 : 0;
-            const bUrgency = (b.notificationData) ? b.notificationData.urgency || 0 : 0;
-            if (aUrgency !== bUrgency) {
-                return aUrgency - bUrgency;
-            }
-            const aTimer = a.notificationData && a.notificationData.timer;
-            const bTimer = b.notificationData && b.notificationData.timer;
-            const aRunning = aTimer && aTimer.running;
-            const bRunning = bTimer && bTimer.running;
-            if (aRunning !== bRunning) {
-                return aRunning ? 1 : -1;
-            }
-            return b.screenY - a.screenY;
-        });
-        return sortedWindows[0];
-    }
-
     function _sync(newWrappers) {
-        for (const w of newWrappers) {
-            if (w && !_hasWindowFor(w)) {
-                insertNewestAtTop(w);
-            }
-        }
         for (const p of popupWindows.slice()) {
-            if (!_isValidWindow(p)) {
+            if (!_isValidWindow(p) || p.exiting)
                 continue;
-            }
-            if (p.notificationData && newWrappers.indexOf(p.notificationData) === -1 && !p.exiting) {
+            if (p.notificationData && newWrappers.indexOf(p.notificationData) === -1) {
                 p.notificationData.removedByLimit = true;
                 p.notificationData.popup = false;
             }
         }
-    }
-
-    function insertNewestAtTop(wrapper) {
-        if (!wrapper)
-            return;
-        if (createBusy || pendingCreates.length > 0) {
-            _scheduleCreate(wrapper);
-            return;
+        for (const w of newWrappers) {
+            if (w && !_hasWindowFor(w))
+                _insertAtTop(w);
         }
-        _doInsertNewestAtTop(wrapper);
     }
 
-    function _doInsertNewestAtTop(wrapper) {
+    function _popupHeight(p) {
+        return (p.alignedHeight || p.implicitHeight || (baseNotificationHeight - popupSpacing)) + popupSpacing;
+    }
+
+    function _insertAtTop(wrapper) {
         if (!wrapper)
             return;
-        const notificationId = wrapper && wrapper.notification ? wrapper.notification.id : "";
+        const notificationId = wrapper?.notification ? wrapper.notification.id : "";
         const win = popupComponent.createObject(null, {
             "notificationData": wrapper,
             "notificationId": notificationId,
@@ -250,85 +144,69 @@ QtObject {
             return;
         }
         popupWindows.unshift(win);
-
-        _repositionAllActivePopups();
-
-        createBusy = true;
-        createTimer.restart();
+        _repositionAll();
         if (!sweeper.running)
             sweeper.start();
     }
 
-    function _active() {
-        return popupWindows.filter(p => _isValidWindow(p) && p.notificationData && p.notificationData.popup && !p.exiting);
-    }
+    function _repositionAll() {
+        const active = popupWindows.filter(p => _isValidWindow(p) && p.notificationData?.popup && !p.exiting);
 
-    function _bottom() {
-        let b = null;
-        let maxY = -1;
-        for (const p of _active()) {
-            if (p.screenY > maxY) {
-                maxY = p.screenY;
-                b = p;
-            }
+        const pinnedSlots = [];
+        for (const p of active) {
+            if (!p.hovered)
+                continue;
+            pinnedSlots.push({
+                y: p.screenY,
+                end: p.screenY + _popupHeight(p)
+            });
         }
-        return b;
-    }
+        pinnedSlots.sort((a, b) => a.y - b.y);
 
-    function _onPopupEntered(p) {
+        let currentY = topMargin;
+        for (const win of active) {
+            if (win.hovered)
+                continue;
+            for (const slot of pinnedSlots) {
+                if (currentY >= slot.y - 1 && currentY < slot.end)
+                    currentY = slot.end;
+            }
+            win.screenY = currentY;
+            currentY += _popupHeight(win);
+        }
     }
 
     function _onPopupHeightChanged(p) {
         if (!p || p.exiting || p._isDestroying)
             return;
-        _repositionAllActivePopups();
-    }
-
-    function _repositionAllActivePopups() {
-        const activeWindows = _active().sort((a, b) => a.screenY - b.screenY);
-        let currentY = topMargin;
-        for (const win of activeWindows) {
-            win.screenY = currentY;
-            const popupHeight = win.alignedHeight || win.implicitHeight;
-            currentY += popupHeight + popupSpacing;
-        }
-    }
-
-    function _onPopupExitStarted(p) {
-        if (!p)
+        if (popupWindows.indexOf(p) === -1)
             return;
-        _repositionAllActivePopups();
+        _repositionAll();
     }
 
     function _onPopupExitFinished(p) {
-        if (!p) {
+        if (!p)
             return;
-        }
         const windowId = p.toString();
-        if (destroyingWindows.has(windowId)) {
+        if (destroyingWindows.has(windowId))
             return;
-        }
         destroyingWindows.add(windowId);
         const i = popupWindows.indexOf(p);
         if (i !== -1) {
             popupWindows.splice(i, 1);
             popupWindows = popupWindows.slice();
         }
-        if (NotificationService.releaseWrapper && p.notificationData) {
+        if (NotificationService.releaseWrapper && p.notificationData)
             NotificationService.releaseWrapper(p.notificationData);
-        }
         _scheduleDestroy(p);
         Qt.callLater(() => destroyingWindows.delete(windowId));
-        _repositionAllActivePopups();
+        _repositionAll();
     }
 
     function cleanupAllWindows() {
         sweeper.stop();
         destroyTimer.stop();
-        createTimer.stop();
         pendingDestroys = [];
-        pendingCreates = [];
-        createBusy = false;
         for (const p of popupWindows.slice()) {
             if (p) {
                 try {

@@ -16,6 +16,7 @@ PanelWindow {
     required property var notificationData
     required property string notificationId
     readonly property bool hasValidData: notificationData && notificationData.notification
+    readonly property alias hovered: cardHoverHandler.hovered
     property int screenY: 0
     property bool exiting: false
     property bool _isDestroying: false
@@ -48,7 +49,7 @@ PanelWindow {
     signal entered
     signal exitStarted
     signal exitFinished
-    signal popupHeightChanged()
+    signal popupHeightChanged
 
     function startExit() {
         if (exiting || _isDestroying) {
@@ -428,14 +429,14 @@ PanelWindow {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.topMargin: {
-                    if (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) {
-                        const headerSummary = Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2;
-                        return Math.max(0, headerSummary / 2 - popupIconSize / 2);
+                        if (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded) {
+                            const headerSummary = Theme.fontSizeSmall * 1.2 + Theme.fontSizeMedium * 1.2;
+                            return Math.max(0, headerSummary / 2 - popupIconSize / 2);
+                        }
+                        if (descriptionExpanded)
+                            return Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - popupIconSize / 2);
+                        return Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2);
                     }
-                    if (descriptionExpanded)
-                        return Math.max(0, Theme.fontSizeSmall * 1.2 + (Theme.fontSizeMedium * 1.2 + Theme.fontSizeSmall * 1.2 * (compactMode ? 1 : 2)) / 2 - popupIconSize / 2);
-                    return Math.max(0, Theme.fontSizeSmall * 1.2 + (textContainer.height - Theme.fontSizeSmall * 1.2) / 2 - popupIconSize / 2);
-                }
 
                     imageSource: {
                         if (!notificationData)
