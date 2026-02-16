@@ -170,7 +170,7 @@ func syncGreeter() error {
 	}
 
 	greeterGroup := greeter.DetectGreeterGroup()
-	greeterGroupExists := checkGroupExists(greeterGroup)
+	greeterGroupExists := utils.HasGroup(greeterGroup)
 	if greeterGroupExists {
 		currentUser, err := user.Current()
 		if err != nil {
@@ -244,21 +244,6 @@ func syncGreeter() error {
 	fmt.Println("The changes will be visible on the next login screen.")
 
 	return nil
-}
-
-func checkGroupExists(groupName string) bool {
-	data, err := os.ReadFile("/etc/group")
-	if err != nil {
-		return false
-	}
-
-	lines := strings.SplitSeq(string(data), "\n")
-	for line := range lines {
-		if strings.HasPrefix(line, groupName+":") {
-			return true
-		}
-	}
-	return false
 }
 
 func disableDisplayManager(dmName string) (bool, error) {

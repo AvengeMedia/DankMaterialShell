@@ -22,13 +22,18 @@ func DetectDMSPath() (string, error) {
 	return config.LocateDMSConfig()
 }
 
-// Tries to figure out the name of the
-// user and group used by greetd
 func DetectGreeterGroup() string {
-	osInfo, err := distros.GetOSInfo()
-	if err == nil && osInfo.Distribution.ID == "debian" {
-		return "_greetd"
+	data, err := os.ReadFile("/etc/group")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "⚠ Warning: could not read /etc/group, defaulting to greeter")
+		return "greeter"
 	}
+
+	if group, found := utils.FindGroupData(string(data), "greeter", "greetd", "_greeter"); found {
+		return group
+	}
+
+	fmt.Fprintln(os.Stderr, "⚠ Warning: no greeter group found in /etc/group, defaulting to greeter")
 	return "greeter"
 }
 
@@ -214,7 +219,7 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 	if err := runSudoCmd(sudoPassword, "chmod", "755", cacheDir); err != nil {
 		return fmt.Errorf("failed to set cache directory permissions: %w", err)
 	}
-	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, permissions: 755)", owner, cacheDir))
+	logFunc(fmt.Sprintf("✓ Created cache directory %s (owner: %s, permissions: 755)", cacheDir, owner))
 
 	return nil
 }
