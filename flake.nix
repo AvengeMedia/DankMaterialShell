@@ -48,6 +48,7 @@
           sonnet
           qtmultimedia
           qtimageformats
+          kimageformats
         ];
     in
     {
