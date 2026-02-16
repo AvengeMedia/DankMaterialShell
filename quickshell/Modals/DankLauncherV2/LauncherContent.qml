@@ -279,9 +279,6 @@ FocusScope {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.leftMargin: root.parentModal?.borderWidth ?? 1
-            anchors.rightMargin: root.parentModal?.borderWidth ?? 1
-            anchors.bottomMargin: root.parentModal?.borderWidth ?? 1
             readonly property bool showFooter: SettingsData.dankLauncherV2Size !== "micro" && SettingsData.dankLauncherV2ShowFooter
             height: showFooter ? 36 : 0
             visible: showFooter
@@ -290,7 +287,7 @@ FocusScope {
             Rectangle {
                 anchors.fill: parent
                 anchors.topMargin: -Theme.cornerRadius
-                color: Theme.surfaceContainerHigh
+                color: Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
                 radius: Theme.cornerRadius
             }
 

@@ -246,6 +246,11 @@ Item {
             bottom: root.useSingleWindow
         }
 
+        BackgroundEffect.blurRegion: Region {
+            item: shouldBeVisible ? modalContainer : null
+            radius: root.cornerRadius
+        }
+
         WlrLayershell.margins {
             left: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedX - shadowBuffer, dpr))
             top: root.useSingleWindow ? 0 : Math.max(0, Theme.snap(root.alignedY - shadowBuffer, dpr))
@@ -380,9 +385,9 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         color: root.backgroundColor
-                        border.color: root.borderColor
-                        border.width: root.borderWidth
                         radius: root.cornerRadius
+                        border.color: Theme.outline
+                        border.width: 1
                     }
 
                     FocusScope {

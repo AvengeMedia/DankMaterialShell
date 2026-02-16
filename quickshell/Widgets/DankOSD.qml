@@ -104,6 +104,12 @@ PanelWindow {
     }
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+    BackgroundEffect.blurRegion: Region {
+        item: shouldBeVisible ? osdContainer : null
+        radius: Theme.cornerRadius
+    }
+
     color: "transparent"
 
     readonly property real dpr: CompositorService.getScreenScale(screen)

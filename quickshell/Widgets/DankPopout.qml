@@ -345,6 +345,11 @@ Item {
             bottom: !useBackgroundWindow
         }
 
+        BackgroundEffect.blurRegion: Region {
+            item: shouldBeVisible ? contentContainer : null
+            radius: Theme.cornerRadius
+        }
+
         WlrLayershell.margins {
             left: useBackgroundWindow ? (root.alignedX - shadowBuffer) : 0
             top: useBackgroundWindow ? (root.alignedY - shadowBuffer) : 0
@@ -470,7 +475,7 @@ Item {
                     anchors.fill: parent
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    border.color: Theme.outlineMedium
+                    border.color: Theme.outline
                     border.width: 1
                 }
 

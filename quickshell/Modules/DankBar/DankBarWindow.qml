@@ -96,6 +96,10 @@ PanelWindow {
         }
     }
 
+    BackgroundEffect.blurRegion: Region {
+        item: barUnitInset
+    }
+
     WlrLayershell.layer: dBarLayer
     WlrLayershell.namespace: "dms:bar"
 

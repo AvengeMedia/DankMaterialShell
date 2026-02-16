@@ -13,6 +13,14 @@ PanelWindow {
 
     WlrLayershell.namespace: "dms:notification-popup"
 
+    BackgroundEffect.blurRegion: Region {
+        x: content.x + bgShadowLayer.x
+        y: content.y + bgShadowLayer.y
+        width: bgShadowLayer.width
+        height: bgShadowLayer.height
+        radius: !win._finalized && !win.exiting ? Theme.cornerRadius : 0
+    }
+
     required property var notificationData
     required property string notificationId
     readonly property bool hasValidData: notificationData && notificationData.notification
@@ -265,6 +273,14 @@ PanelWindow {
                     const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
                     return Theme.withAlpha(baseColor, content.effectiveShadowAlpha);
                 }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.cornerRadius
+                color: "transparent"
+                border.color: Theme.outline
+                border.width: 1
             }
 
             Rectangle {

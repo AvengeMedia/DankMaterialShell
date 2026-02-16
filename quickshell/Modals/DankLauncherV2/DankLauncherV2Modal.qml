@@ -291,6 +291,14 @@ Item {
             right: true
         }
 
+        BackgroundEffect.blurRegion: Region {
+            x: contentVisible ? root.modalX : 0
+            y: contentVisible ? root.modalY : 0
+            width: contentVisible ? root.modalWidth : 0
+            height: contentVisible ? root.modalHeight : 0
+            radius: root.cornerRadius
+        }
+
         mask: Region {
             item: spotlightOpen ? fullScreenMask : null
         }
@@ -359,8 +367,6 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 color: root.backgroundColor
-                border.color: root.borderColor
-                border.width: root.borderWidth
                 radius: root.cornerRadius
             }
 
@@ -385,6 +391,14 @@ Item {
                     root.hide();
                     event.accepted = true;
                 }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: root.cornerRadius
+                color: "transparent"
+                border.color: Theme.outline
+                border.width: 1
             }
         }
     }
