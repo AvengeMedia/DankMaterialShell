@@ -421,6 +421,11 @@ Singleton {
     property bool syncModeWithPortal: true
     property bool terminalsAlwaysDark: false
 
+    property string muxType: "tmux"
+    property bool muxUseCustomCommand: false
+    property string muxCustomCommand: ""
+    property string muxSessionFilter: ""
+
     property bool runDmsMatugenTemplates: true
     property bool matugenTemplateGtk: true
     property bool matugenTemplateNiri: true

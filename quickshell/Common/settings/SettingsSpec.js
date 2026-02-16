@@ -246,6 +246,11 @@ var SPEC = {
     syncModeWithPortal: { def: true },
     terminalsAlwaysDark: { def: false, onChange: "regenSystemThemes" },
 
+    muxType: { def: "tmux" },
+    muxUseCustomCommand: { def: false },
+    muxCustomCommand: { def: "" },
+    muxSessionFilter: { def: "" },
+
     runDmsMatugenTemplates: { def: true },
     matugenTemplateGtk: { def: true },
     matugenTemplateNiri: { def: true },
