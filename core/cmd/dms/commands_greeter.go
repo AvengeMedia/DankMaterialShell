@@ -169,7 +169,8 @@ func syncGreeter() error {
 		return fmt.Errorf("greeter cache directory not found at %s\nPlease install the greeter first", cacheDir)
 	}
 
-	greeterGroupExists := checkGroupExists("greeter")
+	greeterGroup := greeter.DetectGreeterGroup()
+	greeterGroupExists := checkGroupExists(greeterGroup)
 	if greeterGroupExists {
 		currentUser, err := user.Current()
 		if err != nil {
@@ -182,27 +183,27 @@ func syncGreeter() error {
 			return fmt.Errorf("failed to check groups: %w", err)
 		}
 
-		inGreeterGroup := strings.Contains(string(groupsOutput), "greeter")
+		inGreeterGroup := isGroupListed(groupsOutput, greeterGroup)
 		if !inGreeterGroup {
-			fmt.Println("\n⚠ Warning: You are not in the greeter group.")
-			fmt.Print("Would you like to add your user to the greeter group? (Y/n): ")
+			fmt.Printf("\n⚠ Warning: You are not in the %s group.\n", greeterGroup)
+			fmt.Printf("Would you like to add your user to the %s group? (Y/n): ", greeterGroup)
 
 			var response string
 			fmt.Scanln(&response)
 			response = strings.ToLower(strings.TrimSpace(response))
 
 			if response != "n" && response != "no" {
-				fmt.Println("\nAdding user to greeter group...")
-				addUserCmd := exec.Command("sudo", "usermod", "-aG", "greeter", currentUser.Username)
+				fmt.Printf("\nAdding user to %s group...\n", greeterGroup)
+				addUserCmd := exec.Command("sudo", "usermod", "-aG", greeterGroup, currentUser.Username)
 				addUserCmd.Stdout = os.Stdout
 				addUserCmd.Stderr = os.Stderr
 				if err := addUserCmd.Run(); err != nil {
-					return fmt.Errorf("failed to add user to greeter group: %w", err)
+					return fmt.Errorf("failed to add user to %s group: %w", greeterGroup, err)
 				}
-				fmt.Println("✓ User added to greeter group")
+				fmt.Printf("✓ User added to %s group\n", greeterGroup)
 				fmt.Println("⚠ You will need to log out and back in for the group change to take effect")
 			} else {
-				return fmt.Errorf("aborted: user must be in the greeter group before syncing")
+				return fmt.Errorf("aborted: user must be in the %s group before syncing", greeterGroup)
 			}
 		}
 	}
@@ -257,6 +258,16 @@ func checkGroupExists(groupName string) bool {
 			return true
 		}
 	}
+	return false
+}
+
+func isGroupListed(groupsOutput []byte, groupName string) bool {
+	for _, token := range strings.Fields(string(groupsOutput)) {
+		if strings.Trim(token, ":") == groupName {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -518,11 +529,16 @@ func enableGreeter() error {
 	fmt.Printf("✓ Backed up config to %s\n", backupPath)
 
 	lines := strings.Split(configContent, "\n")
+	greeterUser := greeter.DetectGreeterUser()
 	var newLines []string
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if !strings.HasPrefix(trimmed, "command =") && !strings.HasPrefix(trimmed, "command=") {
-			newLines = append(newLines, line)
+			if strings.HasPrefix(trimmed, "user =") || strings.HasPrefix(trimmed, "user=") {
+				newLines = append(newLines, fmt.Sprintf(`user = "%s"`, greeterUser))
+			} else {
+				newLines = append(newLines, line)
+			}
 		}
 	}
 
@@ -703,12 +719,13 @@ func checkGreeterStatus() error {
 		return fmt.Errorf("failed to check groups: %w", err)
 	}
 
-	inGreeterGroup := strings.Contains(string(groupsOutput), "greeter")
+	greeterGroup := greeter.DetectGreeterGroup()
+	inGreeterGroup := isGroupListed(groupsOutput, greeterGroup)
 	if inGreeterGroup {
-		fmt.Println("  ✓ User is in greeter group")
+		fmt.Printf("  ✓ User is in %s group\n", greeterGroup)
 	} else {
-		fmt.Println("  ✗ User is NOT in greeter group")
-		fmt.Println("    Run 'dms greeter install' to add user to greeter group")
+		fmt.Printf("  ✗ User is NOT in %s group\n", greeterGroup)
+		fmt.Printf("    Run 'dms greeter install' to add user to %s group\n", greeterGroup)
 	}
 
 	cacheDir := "/var/cache/dms-greeter"
