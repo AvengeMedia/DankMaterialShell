@@ -50,5 +50,6 @@ in
 
     services.power-profiles-daemon.enable = lib.mkDefault true;
     services.accounts-daemon.enable = lib.mkDefault true;
+    security.polkit.enable = lib.mkDefault true;
   };
 }
