@@ -138,6 +138,7 @@ DankModal {
             message: I18n.tr("Please write a name for your new %1 session").arg(MuxService.displayName),
             onConfirm: function (name) {
                 MuxService.createSession(name)
+                hide()
             }
         })
     }
