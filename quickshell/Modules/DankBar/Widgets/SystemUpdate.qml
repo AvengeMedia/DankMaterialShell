@@ -10,6 +10,45 @@ BasePill {
     property bool isActive: false
     readonly property bool hasUpdates: SystemUpdateService.updateCount > 0
     readonly property bool isChecking: SystemUpdateService.isChecking
+    readonly property bool shouldHide: SettingsData.updaterHideWidget && !hasUpdates && !isChecking && !SystemUpdateService.hasError
+
+    opacity: shouldHide ? 0 : 1
+
+    states: [
+        State {
+            name: "hidden_horizontal"
+            when: root.shouldHide && !isVerticalOrientation
+            PropertyChanges {
+                target: root
+                width: 0
+            }
+        },
+        State {
+            name: "hidden_vertical"
+            when: root.shouldHide && isVerticalOrientation
+            PropertyChanges {
+                target: root
+                height: 0
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            NumberAnimation {
+                properties: "width,height"
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+    ]
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
 
     Ref {
         service: SystemUpdateService
