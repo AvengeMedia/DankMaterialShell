@@ -170,6 +170,8 @@ DankModal {
                         return 40 + bindCount * 28;
                     }
 
+                    property var categoryKeys: Object.keys(categories);
+
                     function distributeCategories(cols) {
                         const columns = [];
                         const heights = [];
@@ -177,7 +179,7 @@ DankModal {
                             columns.push([]);
                             heights.push(0);
                         }
-                        const sorted = [...Object.keys(categories)].sort((a, b) => estimateCategoryHeight(b) - estimateCategoryHeight(a));
+                        const sorted = [...categoryKeys].sort((a, b) => estimateCategoryHeight(b) - estimateCategoryHeight(a));
                         for (const cat of sorted) {
                             let minIdx = 0;
                             for (let i = 1; i < cols; i++) {
