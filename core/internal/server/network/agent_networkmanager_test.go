@@ -185,27 +185,27 @@ func TestVpnFieldMeta_GPSaml(t *testing.T) {
 
 func TestVpnFieldMeta_StandardFields(t *testing.T) {
 	tests := []struct {
-		field         string
-		vpnService    string
-		expectedLabel string
+		field          string
+		vpnService     string
+		expectedLabel  string
 		expectedSecret bool
 	}{
 		{
-			field:         "username",
-			vpnService:    "org.freedesktop.NetworkManager.openconnect",
-			expectedLabel: "Username",
+			field:          "username",
+			vpnService:     "org.freedesktop.NetworkManager.openconnect",
+			expectedLabel:  "Username",
 			expectedSecret: false,
 		},
 		{
-			field:         "password",
-			vpnService:    "org.freedesktop.NetworkManager.openconnect",
-			expectedLabel: "Password",
+			field:          "password",
+			vpnService:     "org.freedesktop.NetworkManager.openconnect",
+			expectedLabel:  "Password",
 			expectedSecret: true,
 		},
 		{
-			field:         "key_pass",
-			vpnService:    "org.freedesktop.NetworkManager.openconnect",
-			expectedLabel: "PIN",
+			field:          "key_pass",
+			vpnService:     "org.freedesktop.NetworkManager.openconnect",
+			expectedLabel:  "PIN",
 			expectedSecret: true,
 		},
 	}
@@ -323,10 +323,10 @@ func TestInferVPNFields_GPSaml(t *testing.T) {
 			vpnSettings := make(nmVariantMap)
 			vpnSettings["data"] = dbus.MakeVariant(tt.dataMap)
 			vpnSettings["service-type"] = dbus.MakeVariant(tt.vpnService)
-			
+
 			conn := make(map[string]nmVariantMap)
 			conn["vpn"] = vpnSettings
-			
+
 			fields := inferVPNFields(conn, tt.vpnService)
 
 			assert.Len(t, fields, tt.expectedLen, "unexpected number of fields")
