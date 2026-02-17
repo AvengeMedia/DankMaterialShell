@@ -2575,8 +2575,8 @@ Singleton {
     property alias settingsFile: settingsFile
 
     Timer {
-        id: settingsFileReloadTimeout
-        interval: 1
+        id: settingsFileReloadDebounce
+        interval: 50
         onTriggered: settingsFile.reload()
         repeat: false
     }
@@ -2588,8 +2588,8 @@ Singleton {
         blockLoading: true
         blockWrites: true
         atomicWrites: true
-        watchChanges: true // !isGreeterMode
-        onFileChanged: settingsFileReloadTimeout.restart()
+        watchChanges: true
+        onFileChanged: settingsFileReloadDebounce.restart()
         onLoaded: {
             if (isGreeterMode)
                 return;
