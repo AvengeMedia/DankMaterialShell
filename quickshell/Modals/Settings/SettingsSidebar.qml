@@ -209,7 +209,7 @@ Rectangle {
             "children": [
                 {
                     "id": "display_config",
-                    "text": I18n.tr("Configuration") + " (Beta)",
+                    "text": I18n.tr("Configuration"),
                     "icon": "display_settings",
                     "tabIndex": 24
                 },

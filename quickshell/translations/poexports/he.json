@@ -2089,6 +2089,9 @@
   "Format Legend": {
     "Format Legend": "מקרא תבניות"
   },
+  "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+  },
   "Frequency": {
     "Frequency": "תדירות"
   },
@@ -4988,6 +4991,9 @@
   },
   "Unknown Title": {
     "Unknown Title": ""
+  },
+  "Unload on Close": {
+    "Unload on Close": ""
   },
   "Unnamed Rule": {
     "Unnamed Rule": ""

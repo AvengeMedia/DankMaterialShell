@@ -210,7 +210,7 @@ func runShellInteractive(session bool) {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORMTHEME_QT6=gtk3")
 	}
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
-		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland")
+		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
 
 	cmd.Stdin = os.Stdin
@@ -450,7 +450,7 @@ func runShellDaemon(session bool) {
 		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORMTHEME_QT6=gtk3")
 	}
 	if os.Getenv("QT_QPA_PLATFORM") == "" {
-		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland")
+		cmd.Env = append(cmd.Env, "QT_QPA_PLATFORM=wayland;xcb")
 	}
 
 	devNull, err := os.OpenFile("/dev/null", os.O_RDWR, 0)

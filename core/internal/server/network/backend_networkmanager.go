@@ -69,12 +69,14 @@ type NetworkManagerBackend struct {
 	lastFailedTime int64
 	failedMutex    sync.RWMutex
 
-	pendingVPNSave   *pendingVPNCredentials
-	pendingVPNSaveMu sync.Mutex
-	cachedVPNCreds   *cachedVPNCredentials
-	cachedVPNCredsMu sync.Mutex
-	cachedPKCS11PIN  *cachedPKCS11PIN
-	cachedPKCS11Mu   sync.Mutex
+	pendingVPNSave     *pendingVPNCredentials
+	pendingVPNSaveMu   sync.Mutex
+	cachedVPNCreds     *cachedVPNCredentials
+	cachedVPNCredsMu   sync.Mutex
+	cachedPKCS11PIN    *cachedPKCS11PIN
+	cachedPKCS11Mu     sync.Mutex
+	cachedGPSamlCookie *cachedGPSamlCookie
+	cachedGPSamlMu     sync.Mutex
 
 	onStateChange func()
 }
@@ -95,6 +97,14 @@ type cachedVPNCredentials struct {
 type cachedPKCS11PIN struct {
 	ConnectionUUID string
 	PIN            string
+}
+
+type cachedGPSamlCookie struct {
+	ConnectionUUID string
+	Cookie         string
+	Host           string
+	User           string
+	Fingerprint    string
 }
 
 func NewNetworkManagerBackend(nmConn ...gonetworkmanager.NetworkManager) (*NetworkManagerBackend, error) {

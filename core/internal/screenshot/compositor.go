@@ -21,6 +21,7 @@ const (
 	CompositorNiri
 	CompositorDWL
 	CompositorScroll
+	CompositorMiracle
 )
 
 var detectedCompositor Compositor = -1
@@ -34,6 +35,7 @@ func DetectCompositor() Compositor {
 	niriSocket := os.Getenv("NIRI_SOCKET")
 	swaySocket := os.Getenv("SWAYSOCK")
 	scrollSocket := os.Getenv("SCROLLSOCK")
+	miracleSocket := os.Getenv("MIRACLESOCK")
 
 	switch {
 	case niriSocket != "":
@@ -46,7 +48,11 @@ func DetectCompositor() Compositor {
 			detectedCompositor = CompositorScroll
 			return detectedCompositor
 		}
-
+	case miracleSocket != "":
+		if _, err := os.Stat(miracleSocket); err == nil {
+			detectedCompositor = CompositorMiracle
+			return detectedCompositor
+		}
 	case swaySocket != "":
 		if _, err := os.Stat(swaySocket); err == nil {
 			detectedCompositor = CompositorSway
@@ -260,6 +266,25 @@ func getScrollFocusedMonitor() string {
 	return ""
 }
 
+func getMiracleFocusedMonitor() string {
+	output, err := exec.Command("miraclemsg", "-t", "get_workspaces").Output()
+	if err != nil {
+		return ""
+	}
+
+	var workspaces []swayWorkspace
+	if err := json.Unmarshal(output, &workspaces); err != nil {
+		return ""
+	}
+
+	for _, ws := range workspaces {
+		if ws.Focused {
+			return ws.Output
+		}
+	}
+	return ""
+}
+
 type niriWorkspace struct {
 	Output    string `json:"output"`
 	IsFocused bool   `json:"is_focused"`
@@ -407,6 +432,8 @@ func GetFocusedMonitor() string {
 		return getSwayFocusedMonitor()
 	case CompositorScroll:
 		return getScrollFocusedMonitor()
+	case CompositorMiracle:
+		return getMiracleFocusedMonitor()
 	case CompositorNiri:
 		return getNiriFocusedMonitor()
 	case CompositorDWL:

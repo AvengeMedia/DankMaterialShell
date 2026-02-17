@@ -32,8 +32,10 @@ type SecretAgent struct {
 	backend *NetworkManagerBackend
 }
 
-type nmVariantMap map[string]dbus.Variant
-type nmSettingMap map[string]nmVariantMap
+type (
+	nmVariantMap map[string]dbus.Variant
+	nmSettingMap map[string]nmVariantMap
+)
 
 const introspectXML = `
 <node>
@@ -308,6 +310,63 @@ func (a *SecretAgent) GetSecrets(
 			return out, nil
 		}
 		a.backend.cachedVPNCredsMu.Unlock()
+
+		a.backend.cachedGPSamlMu.Lock()
+		cachedGPSaml := a.backend.cachedGPSamlCookie
+		if cachedGPSaml != nil && cachedGPSaml.ConnectionUUID == connUuid {
+			a.backend.cachedGPSamlMu.Unlock()
+
+			log.Infof("[SecretAgent] Using cached GlobalProtect SAML cookie for %s", connUuid)
+
+			return buildGPSamlSecretsResponse(settingName, cachedGPSaml.Cookie, cachedGPSaml.Host, cachedGPSaml.Fingerprint), nil
+		}
+		a.backend.cachedGPSamlMu.Unlock()
+
+		if len(fields) == 1 && fields[0] == "gp-saml" {
+			gateway := ""
+			protocol := ""
+			if vpnSettings, ok := conn["vpn"]; ok {
+				if dataVariant, ok := vpnSettings["data"]; ok {
+					if dataMap, ok := dataVariant.Value().(map[string]string); ok {
+						if gw, ok := dataMap["gateway"]; ok {
+							gateway = gw
+						}
+						if proto, ok := dataMap["protocol"]; ok && proto != "" {
+							protocol = proto
+						}
+					}
+				}
+			}
+
+			if protocol != "gp" {
+				return nil, dbus.MakeFailedError(fmt.Errorf("gp-saml auth only supported for GlobalProtect (protocol=gp), got: %s", protocol))
+			}
+
+			log.Infof("[SecretAgent] Starting GlobalProtect SAML authentication for gateway=%s", gateway)
+
+			samlCtx, samlCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+			defer samlCancel()
+
+			authResult, err := a.backend.runGlobalProtectSAMLAuth(samlCtx, gateway, protocol)
+			if err != nil {
+				log.Warnf("[SecretAgent] GlobalProtect SAML authentication failed: %v", err)
+				return nil, dbus.MakeFailedError(fmt.Errorf("GlobalProtect SAML authentication failed: %w", err))
+			}
+
+			log.Infof("[SecretAgent] GlobalProtect SAML authentication successful, returning cookie to NetworkManager")
+
+			a.backend.cachedGPSamlMu.Lock()
+			a.backend.cachedGPSamlCookie = &cachedGPSamlCookie{
+				ConnectionUUID: connUuid,
+				Cookie:         authResult.Cookie,
+				Host:           authResult.Host,
+				User:           authResult.User,
+				Fingerprint:    authResult.Fingerprint,
+			}
+			a.backend.cachedGPSamlMu.Unlock()
+
+			return buildGPSamlSecretsResponse(settingName, authResult.Cookie, authResult.Host, authResult.Fingerprint), nil
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
@@ -659,12 +718,25 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 
 	switch {
 	case strings.Contains(vpnService, "openconnect"):
+		protocol := dataMap["protocol"]
 		authType := dataMap["authtype"]
-		userCert := dataMap["usercert"]
-		if authType == "cert" && strings.HasPrefix(userCert, "pkcs11:") {
+		username := dataMap["username"]
+
+		if authType == "cert" && strings.HasPrefix(dataMap["usercert"], "pkcs11:") {
 			return []string{"key_pass"}
 		}
-		if dataMap["username"] == "" {
+
+		if needsExternalBrowserAuth(protocol, authType, username, dataMap) {
+			switch protocol {
+			case "gp":
+				log.Infof("[SecretAgent] GlobalProtect SAML auth detected")
+				return []string{"gp-saml"}
+			default:
+				log.Infof("[SecretAgent] External browser auth detected for protocol '%s' but only GlobalProtect (gp) SAML is currently supported, falling back to credentials", protocol)
+			}
+		}
+
+		if username == "" {
 			fields = []string{"username", "password"}
 		}
 	case strings.Contains(vpnService, "openvpn"):
@@ -683,8 +755,31 @@ func inferVPNFields(conn map[string]nmVariantMap, vpnService string) []string {
 	return fields
 }
 
+func needsExternalBrowserAuth(protocol, authType, username string, data map[string]string) bool {
+	if method, ok := data["saml-auth-method"]; ok {
+		if method == "REDIRECT" || method == "POST" {
+			return true
+		}
+	}
+
+	if authType != "" && authType != "password" && authType != "cert" {
+		return true
+	}
+
+	switch protocol {
+	case "gp":
+		if authType == "" && username == "" {
+			return true
+		}
+	}
+
+	return false
+}
+
 func vpnFieldMeta(field, vpnService string) (label string, isSecret bool) {
 	switch field {
+	case "gp-saml":
+		return "GlobalProtect SAML/SSO", false
 	case "key_pass":
 		return "PIN", true
 	case "password":
@@ -784,4 +879,19 @@ func reasonFromFlags(flags uint32) string {
 		return "user-requested"
 	}
 	return "required"
+}
+
+func buildGPSamlSecretsResponse(settingName, cookie, host, fingerprint string) nmSettingMap {
+	out := nmSettingMap{}
+	vpnSec := nmVariantMap{}
+
+	secrets := map[string]string{
+		"cookie":  cookie,
+		"gateway": host,
+		"gwcert":  fingerprint,
+	}
+	vpnSec["secrets"] = dbus.MakeVariant(secrets)
+
+	out[settingName] = vpnSec
+	return out
 }

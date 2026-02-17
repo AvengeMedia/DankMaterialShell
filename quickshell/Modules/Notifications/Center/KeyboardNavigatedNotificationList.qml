@@ -11,13 +11,61 @@ DankListView {
     property bool autoScrollDisabled: false
     property bool isAnimatingExpansion: false
     property alias listContentHeight: listView.contentHeight
+    property real stableContentHeight: 0
     property bool cardAnimateExpansion: true
     property bool listInitialized: false
+    property int swipingCardIndex: -1
+    property real swipingCardOffset: 0
+    property real __pendingStableHeight: 0
+    property real __heightUpdateThreshold: 20
 
     Component.onCompleted: {
         Qt.callLater(() => {
-            listInitialized = true;
+            if (listView) {
+                listView.listInitialized = true;
+                listView.stableContentHeight = listView.contentHeight;
+            }
         });
+    }
+
+    Timer {
+        id: heightUpdateDebounce
+        interval: Theme.mediumDuration + 20
+        repeat: false
+        onTriggered: {
+            if (!listView.isAnimatingExpansion && Math.abs(listView.__pendingStableHeight - listView.stableContentHeight) > listView.__heightUpdateThreshold) {
+                listView.stableContentHeight = listView.__pendingStableHeight;
+            }
+        }
+    }
+
+    onContentHeightChanged: {
+        if (!isAnimatingExpansion) {
+            __pendingStableHeight = contentHeight;
+            if (Math.abs(contentHeight - stableContentHeight) > __heightUpdateThreshold) {
+                heightUpdateDebounce.restart();
+            } else {
+                stableContentHeight = contentHeight;
+            }
+        }
+    }
+
+    onIsAnimatingExpansionChanged: {
+        if (isAnimatingExpansion) {
+            heightUpdateDebounce.stop();
+            let delta = 0;
+            for (let i = 0; i < count; i++) {
+                const item = itemAtIndex(i);
+                if (item && item.children[0] && item.children[0].isAnimating)
+                    delta += item.children[0].targetHeight - item.height;
+            }
+            const targetHeight = contentHeight + delta;
+            // During expansion, always update immediately without threshold check
+            stableContentHeight = targetHeight;
+        } else {
+            __pendingStableHeight = contentHeight;
+            heightUpdateDebounce.restart();
+        }
     }
 
     clip: true
@@ -86,29 +134,47 @@ DankListView {
         readonly property real dismissThreshold: width * 0.35
         property bool __delegateInitialized: false
 
+        readonly property bool isAdjacentToSwipe: listView.count >= 2 && listView.swipingCardIndex !== -1 &&
+            (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
+        readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? listView.swipingCardOffset * 0.10 : 0
+        readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(listView.swipingCardOffset) / width * 0.02 : 1.0
+        readonly property real swipeFadeStartOffset: width * 0.75
+        readonly property real swipeFadeDistance: Math.max(1, width - swipeFadeStartOffset)
+
         Component.onCompleted: {
             Qt.callLater(() => {
-                __delegateInitialized = true;
+                if (delegateRoot)
+                    delegateRoot.__delegateInitialized = true;
             });
         }
 
         width: ListView.view.width
-        height: isDismissing ? 0 : notificationCard.targetHeight
-        clip: isDismissing || notificationCard.isAnimating
+        height: notificationCard.height
+        clip: notificationCard.isAnimating
 
         NotificationCard {
             id: notificationCard
             width: parent.width
-            x: delegateRoot.swipeOffset
+            x: delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
+            listLevelAdjacentScaleInfluence: delegateRoot.adjacentScaleInfluence
+            listLevelScaleAnimationsEnabled: listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe
             notificationGroup: modelData
             keyboardNavigationActive: listView.keyboardActive
             animateExpansion: listView.cardAnimateExpansion && listView.listInitialized
-            opacity: 1 - Math.abs(delegateRoot.swipeOffset) / (delegateRoot.width * 0.5)
+            opacity: {
+                const swipeAmount = Math.abs(delegateRoot.swipeOffset);
+                if (swipeAmount <= delegateRoot.swipeFadeStartOffset)
+                    return 1;
+                const fadeProgress = (swipeAmount - delegateRoot.swipeFadeStartOffset) / delegateRoot.swipeFadeDistance;
+                return Math.max(0, 1 - fadeProgress);
+            }
             onIsAnimatingChanged: {
                 if (isAnimating) {
                     listView.isAnimatingExpansion = true;
                 } else {
                     Qt.callLater(() => {
+                        if (!notificationCard || !listView)
+                            return;
                         let anyAnimating = false;
                         for (let i = 0; i < listView.count; i++) {
                             const item = listView.itemAtIndex(i);
@@ -139,7 +205,7 @@ DankListView {
             }
 
             Behavior on x {
-                enabled: !swipeDragHandler.active && listView.listInitialized
+                enabled: !swipeDragHandler.active && !delegateRoot.isDismissing && (listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe) && listView.listInitialized
                 NumberAnimation {
                     duration: Theme.shortDuration
                     easing.type: Theme.standardEasing
@@ -161,12 +227,18 @@ DankListView {
             xAxis.enabled: true
 
             onActiveChanged: {
-                if (active || delegateRoot.isDismissing)
+                if (active) {
+                    listView.swipingCardIndex = index;
+                    return;
+                }
+                listView.swipingCardIndex = -1;
+                listView.swipingCardOffset = 0;
+                if (delegateRoot.isDismissing)
                     return;
                 if (Math.abs(delegateRoot.swipeOffset) > delegateRoot.dismissThreshold) {
                     delegateRoot.isDismissing = true;
-                    delegateRoot.swipeOffset = delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width;
-                    dismissTimer.start();
+                    swipeDismissAnim.to = delegateRoot.swipeOffset > 0 ? delegateRoot.width : -delegateRoot.width;
+                    swipeDismissAnim.start();
                 } else {
                     delegateRoot.swipeOffset = 0;
                 }
@@ -176,13 +248,18 @@ DankListView {
                 if (delegateRoot.isDismissing)
                     return;
                 delegateRoot.swipeOffset = translation.x;
+                listView.swipingCardOffset = translation.x;
             }
         }
 
-        Timer {
-            id: dismissTimer
-            interval: Theme.shortDuration
-            onTriggered: NotificationService.dismissGroup(delegateRoot.modelData?.key || "")
+        NumberAnimation {
+            id: swipeDismissAnim
+            target: delegateRoot
+            property: "swipeOffset"
+            to: 0
+            duration: Theme.shortDuration
+            easing.type: Easing.OutCubic
+            onStopped: NotificationService.dismissGroup(delegateRoot.modelData?.key || "")
         }
     }
 

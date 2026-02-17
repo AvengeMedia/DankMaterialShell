@@ -52,11 +52,31 @@ func (m *Manager) initializeScreensaver() error {
 		return nil
 	}
 
+	screensaverIface := introspect.Interface{
+		Name: dbusScreensaverInterface,
+		Methods: []introspect.Method{
+			{
+				Name: "Inhibit",
+				Args: []introspect.Arg{
+					{Name: "application_name", Type: "s", Direction: "in"},
+					{Name: "reason_for_inhibit", Type: "s", Direction: "in"},
+					{Name: "cookie", Type: "u", Direction: "out"},
+				},
+			},
+			{
+				Name: "UnInhibit",
+				Args: []introspect.Arg{
+					{Name: "cookie", Type: "u", Direction: "in"},
+				},
+			},
+		},
+	}
+
 	introNode := &introspect.Node{
 		Name: dbusScreensaverPath,
 		Interfaces: []introspect.Interface{
 			introspect.IntrospectData,
-			{Name: dbusScreensaverInterface},
+			screensaverIface,
 		},
 	}
 	if err := m.sessionConn.Export(introspect.NewIntrospectable(introNode), dbusScreensaverPath, "org.freedesktop.DBus.Introspectable"); err != nil {
@@ -67,7 +87,7 @@ func (m *Manager) initializeScreensaver() error {
 		Name: dbusScreensaverPath2,
 		Interfaces: []introspect.Interface{
 			introspect.IntrospectData,
-			{Name: dbusScreensaverInterface},
+			screensaverIface,
 		},
 	}
 	if err := m.sessionConn.Export(introspect.NewIntrospectable(introNode2), dbusScreensaverPath2, "org.freedesktop.DBus.Introspectable"); err != nil {

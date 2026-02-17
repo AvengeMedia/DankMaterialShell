@@ -15,8 +15,13 @@ func TestSwayProviderName(t *testing.T) {
 
 func TestSwayProviderDefaultPath(t *testing.T) {
 	provider := NewSwayProvider("")
-	if provider.configPath != "$HOME/.config/sway" {
-		t.Errorf("configPath = %q, want %q", provider.configPath, "$HOME/.config/sway")
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		t.Skip("UserConfigDir not available")
+	}
+	expected := filepath.Join(configDir, "sway")
+	if provider.configPath != expected {
+		t.Errorf("configPath = %q, want %q", provider.configPath, expected)
 	}
 }
 

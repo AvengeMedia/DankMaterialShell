@@ -75,7 +75,9 @@ var SPEC = {
 
     vpnLastConnected: { def: "" },
 
-    deviceMaxVolumes: { def: {} }
+    deviceMaxVolumes: { def: {} },
+    hiddenOutputDeviceNames: { def: [] },
+    hiddenInputDeviceNames: { def: [] }
 };
 
 function getValidKeys() {

@@ -472,6 +472,8 @@ Singleton {
     property bool dockShowOverflowBadge: true
 
     property bool notificationOverlayEnabled: false
+    property bool notificationPopupShadowEnabled: true
+    property bool notificationPopupPrivacyMode: false
     property int overviewRows: 2
     property int overviewColumns: 5
     property real overviewScale: 0.16
@@ -501,6 +503,8 @@ Singleton {
     property int notificationTimeoutCritical: 0
     property bool notificationCompactMode: false
     property int notificationPopupPosition: SettingsData.Position.Top
+    property int notificationAnimationSpeed: SettingsData.AnimationSpeed.Short
+    property int notificationCustomAnimationDuration: 400
     property bool notificationHistoryEnabled: true
     property int notificationHistoryMaxCount: 50
     property int notificationHistoryMaxAgeDays: 7
@@ -1010,6 +1014,42 @@ Singleton {
     function applyStoredIconTheme() {
         updateGtkIconTheme();
         updateQtIconTheme();
+        updateCosmicIconTheme();
+    }
+
+    function updateCosmicIconTheme() {
+        let cosmicThemeName = (iconTheme === "System Default") ? systemDefaultIconTheme : iconTheme;
+        if (!cosmicThemeName || cosmicThemeName === "System Default") {
+            const detectScript = `if command -v gsettings >/dev/null 2>&1; then
+            gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null | sed "s/'//g"
+            elif command -v dconf >/dev/null 2>&1; then
+            dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
+            fi`;
+            Proc.runCommand("detectCosmicIconTheme", ["sh", "-c", detectScript], (output, exitCode) => {
+                if (exitCode !== 0)
+                    return;
+                const detected = (output || "").trim();
+                if (!detected || detected === "System Default")
+                    return;
+                const detectedEscaped = detected.replace(/'/g, "'\\''");
+                const writeScript = `mkdir -p ${_configDir}/cosmic/com.system76.CosmicTk/v1
+                printf '"%s"\\n' '${detectedEscaped}' > ${_configDir}/cosmic/com.system76.CosmicTk/v1/icon_theme 2>/dev/null || true`;
+                Quickshell.execDetached(["sh", "-lc", writeScript]);
+            });
+            return;
+        }
+
+        const cosmicThemeNameEscaped = cosmicThemeName.replace(/'/g, "'\\''");
+        const script = `mkdir -p ${_configDir}/cosmic/com.system76.CosmicTk/v1
+        printf '"%s"\\n' '${cosmicThemeNameEscaped}' > ${_configDir}/cosmic/com.system76.CosmicTk/v1/icon_theme 2>/dev/null || true`;
+        Quickshell.execDetached(["sh", "-lc", script]);
+    }
+
+    function updateCosmicThemeMode(isLightMode) {
+        const isDark = isLightMode ? "false" : "true";
+        const script = `mkdir -p ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1
+        printf '%s\\n' ${isDark} > ${_configDir}/cosmic/com.system76.CosmicTheme.Mode/v1/is_dark 2>/dev/null || true`;
+        Quickshell.execDetached(["sh", "-lc", script]);
     }
 
     function updateGtkIconTheme() {
@@ -1816,6 +1856,7 @@ Singleton {
         iconTheme = themeName;
         updateGtkIconTheme();
         updateQtIconTheme();
+        updateCosmicIconTheme();
         saveSettings();
         if (typeof Theme !== "undefined" && Theme.currentTheme === Theme.dynamic)
             Theme.generateSystemThemesFromCurrentTheme();
@@ -2138,6 +2179,9 @@ Singleton {
         saveSettings();
     }
 
+    property bool _pendingExpandNotificationRules: false
+    property int _pendingNotificationRuleIndex: -1
+
     function addNotificationRule() {
         var rules = JSON.parse(JSON.stringify(notificationRules || []));
         rules.push({
@@ -2145,11 +2189,95 @@ Singleton {
             field: "appName",
             pattern: "",
             matchType: "contains",
+            action: "default",
+            urgency: "default"
+        });
+        notificationRules = rules;
+        saveSettings();
+    }
+
+    function addNotificationRuleForNotification(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
+        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
+        var rule = {
+            enabled: true,
+            field: pattern ? field : "appName",
+            pattern: pattern || "",
+            matchType: pattern ? "exact" : "contains",
+            action: "default",
+            urgency: "default"
+        };
+        rules.push(rule);
+        notificationRules = rules;
+        saveSettings();
+        var index = rules.length - 1;
+        _pendingExpandNotificationRules = true;
+        _pendingNotificationRuleIndex = index;
+        return index;
+    }
+
+    function addMuteRuleForApp(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        var pattern = (desktopEntry && desktopEntry !== "") ? desktopEntry : (appName || "");
+        var field = (desktopEntry && desktopEntry !== "") ? "desktopEntry" : "appName";
+        if (pattern === "")
+            return;
+        rules.push({
+            enabled: true,
+            field: field,
+            pattern: pattern,
+            matchType: "exact",
             action: "mute",
             urgency: "default"
         });
         notificationRules = rules;
         saveSettings();
+    }
+
+    function isAppMuted(appName, desktopEntry) {
+        const rules = notificationRules || [];
+        const pat = (desktopEntry && desktopEntry !== "" ? desktopEntry : appName || "").toString().toLowerCase();
+        if (!pat)
+            return false;
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            if ((r.action || "").toString().toLowerCase() !== "mute" || r.enabled === false)
+                continue;
+            const field = (r.field || "appName").toString().toLowerCase();
+            const rulePat = (r.pattern || "").toString().toLowerCase();
+            if (!rulePat)
+                continue;
+            const useDesktop = field === "desktopentry";
+            const matches = (useDesktop && desktopEntry) ? (desktopEntry.toString().toLowerCase() === rulePat) : (appName && appName.toString().toLowerCase() === rulePat);
+            if (matches)
+                return true;
+            if (rulePat === pat)
+                return true;
+        }
+        return false;
+    }
+
+    function removeMuteRuleForApp(appName, desktopEntry) {
+        var rules = JSON.parse(JSON.stringify(notificationRules || []));
+        const app = (appName || "").toString().toLowerCase();
+        const desktop = (desktopEntry || "").toString().toLowerCase();
+        if (!app && !desktop)
+            return;
+        for (let i = rules.length - 1; i >= 0; i--) {
+            const r = rules[i];
+            if ((r.action || "").toString().toLowerCase() !== "mute")
+                continue;
+            const rulePat = (r.pattern || "").toString().toLowerCase();
+            if (!rulePat)
+                continue;
+            if (rulePat === app || rulePat === desktop) {
+                rules.splice(i, 1);
+                notificationRules = rules;
+                saveSettings();
+                return;
+            }
+        }
     }
 
     function updateNotificationRule(index, ruleData) {

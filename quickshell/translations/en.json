@@ -668,7 +668,7 @@
   {
     "term": "App Customizations",
     "context": "App Customizations",
-    "reference": "Modules/Settings/LauncherTab.qml:947",
+    "reference": "Modules/Settings/LauncherTab.qml:956",
     "comment": ""
   },
   {
@@ -716,7 +716,7 @@
   {
     "term": "Applications",
     "context": "Applications",
-    "reference": "Modals/DankLauncherV2/Controller.qml:143, Modules/Settings/ThemeColorsTab.qml:1928, Modules/Dock/DockLauncherButton.qml:25",
+    "reference": "Modals/DankLauncherV2/Controller.qml:144, Modules/Settings/ThemeColorsTab.qml:1928, Modules/Dock/DockLauncherButton.qml:25",
     "comment": ""
   },
   {
@@ -770,13 +770,13 @@
   {
     "term": "Apps are ordered by usage frequency, then last used, then alphabetically.",
     "context": "Apps are ordered by usage frequency, then last used, then alphabetically.",
-    "reference": "Modules/Settings/LauncherTab.qml:1093",
+    "reference": "Modules/Settings/LauncherTab.qml:1102",
     "comment": ""
   },
   {
     "term": "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.",
     "context": "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.",
-    "reference": "Modules/Settings/LauncherTab.qml:970",
+    "reference": "Modules/Settings/LauncherTab.qml:979",
     "comment": ""
   },
   {
@@ -950,7 +950,7 @@
   {
     "term": "Auto-close Niri overview when launching apps.",
     "context": "Auto-close Niri overview when launching apps.",
-    "reference": "Modules/Settings/LauncherTab.qml:489",
+    "reference": "Modules/Settings/LauncherTab.qml:498",
     "comment": ""
   },
   {
@@ -1292,7 +1292,7 @@
   {
     "term": "Border",
     "context": "launcher border option",
-    "reference": "Modules/Settings/DockTab.qml:571, Modules/Settings/DockTab.qml:577, Modules/Settings/LauncherTab.qml:421, Modules/Settings/DankBarTab.qml:1234",
+    "reference": "Modules/Settings/DockTab.qml:571, Modules/Settings/DockTab.qml:577, Modules/Settings/LauncherTab.qml:430, Modules/Settings/DankBarTab.qml:1234",
     "comment": ""
   },
   {
@@ -1388,7 +1388,7 @@
   {
     "term": "Browse",
     "context": "theme category option",
-    "reference": "Modals/DankLauncherV2/Controller.qml:150, Modals/DankLauncherV2/Controller.qml:1058, Modules/Settings/ThemeColorsTab.qml:284, Modules/Settings/PluginsTab.qml:209",
+    "reference": "Modals/DankLauncherV2/Controller.qml:151, Modals/DankLauncherV2/Controller.qml:1059, Modules/Settings/ThemeColorsTab.qml:284, Modules/Settings/PluginsTab.qml:209",
     "comment": ""
   },
   {
@@ -1496,7 +1496,7 @@
   {
     "term": "Calculator",
     "context": "Calculator",
-    "reference": "Modals/DankLauncherV2/Controller.qml:129",
+    "reference": "Modals/DankLauncherV2/Controller.qml:130",
     "comment": ""
   },
   {
@@ -1886,7 +1886,7 @@
   {
     "term": "Close Overview on Launch",
     "context": "Close Overview on Launch",
-    "reference": "Modules/Settings/LauncherTab.qml:488",
+    "reference": "Modules/Settings/LauncherTab.qml:497",
     "comment": ""
   },
   {
@@ -1898,7 +1898,7 @@
   {
     "term": "Color",
     "context": "border color",
-    "reference": "Modules/Settings/LauncherTab.qml:448, Modules/Settings/DankBarTab.qml:1145, Modules/Settings/DankBarTab.qml:1219, Modules/Settings/DankBarTab.qml:1242, Modules/Settings/DankBarTab.qml:1330, Modules/Settings/Widgets/SettingsColorPicker.qml:29",
+    "reference": "Modules/Settings/LauncherTab.qml:457, Modules/Settings/DankBarTab.qml:1145, Modules/Settings/DankBarTab.qml:1219, Modules/Settings/DankBarTab.qml:1242, Modules/Settings/DankBarTab.qml:1330, Modules/Settings/Widgets/SettingsColorPicker.qml:29",
     "comment": ""
   },
   {
@@ -2030,7 +2030,7 @@
   {
     "term": "Commands",
     "context": "Commands",
-    "reference": "Modals/DankLauncherV2/Controller.qml:164",
+    "reference": "Modals/DankLauncherV2/Controller.qml:165",
     "comment": ""
   },
   {
@@ -2294,7 +2294,7 @@
   {
     "term": "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.",
     "context": "Control which plugins appear in 'All' mode without requiring a trigger prefix. Drag to reorder.",
-    "reference": "Modules/Settings/LauncherTab.qml:638",
+    "reference": "Modules/Settings/LauncherTab.qml:647",
     "comment": ""
   },
   {
@@ -2348,7 +2348,7 @@
   {
     "term": "Copy",
     "context": "Copy",
-    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:937",
+    "reference": "dms-plugins/DankLauncherKeys/DankLauncherKeys.qml:170, Modals/DankLauncherV2/Controller.qml:938",
     "comment": ""
   },
   {
@@ -2390,7 +2390,7 @@
   {
     "term": "Copy path",
     "context": "Copy path",
-    "reference": "Modals/DankLauncherV2/Controller.qml:930",
+    "reference": "Modals/DankLauncherV2/Controller.qml:931",
     "comment": ""
   },
   {
@@ -3470,7 +3470,7 @@
   {
     "term": "Enable Overview Overlay",
     "context": "Enable Overview Overlay",
-    "reference": "Modules/Settings/LauncherTab.qml:497",
+    "reference": "Modules/Settings/LauncherTab.qml:506",
     "comment": ""
   },
   {
@@ -3962,7 +3962,7 @@
   {
     "term": "Failed to parse plugin_settings.json",
     "context": "Failed to parse plugin_settings.json",
-    "reference": "Common/SettingsData.qml:1195",
+    "reference": "Common/SettingsData.qml:1196",
     "comment": ""
   },
   {
@@ -3974,7 +3974,7 @@
   {
     "term": "Failed to parse settings.json",
     "context": "Failed to parse settings.json",
-    "reference": "Common/SettingsData.qml:1133, Common/SettingsData.qml:2489",
+    "reference": "Common/SettingsData.qml:1134, Common/SettingsData.qml:2490",
     "comment": ""
   },
   {
@@ -4244,7 +4244,7 @@
   {
     "term": "Files",
     "context": "Files",
-    "reference": "Modals/DankLauncherV2/Controller.qml:157, Modals/DankLauncherV2/Controller.qml:865, Modals/DankLauncherV2/LauncherContent.qml:317",
+    "reference": "Modals/DankLauncherV2/Controller.qml:158, Modals/DankLauncherV2/Controller.qml:866, Modals/DankLauncherV2/LauncherContent.qml:317",
     "comment": ""
   },
   {
@@ -4485,6 +4485,12 @@
     "term": "Format Legend",
     "context": "Format Legend",
     "reference": "Modules/Settings/TimeWeatherTab.qml:260",
+    "comment": ""
+  },
+  {
+    "term": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.",
+    "context": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.",
+    "reference": "Modules/Settings/LauncherTab.qml:422",
     "comment": ""
   },
   {
@@ -4808,7 +4814,7 @@
   {
     "term": "Hidden Apps",
     "context": "Hidden Apps",
-    "reference": "Modules/Settings/LauncherTab.qml:829",
+    "reference": "Modules/Settings/LauncherTab.qml:838",
     "comment": ""
   },
   {
@@ -4820,7 +4826,7 @@
   {
     "term": "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.",
     "context": "Hidden apps won't appear in the launcher. Right-click an app and select 'Hide App' to hide it.",
-    "reference": "Modules/Settings/LauncherTab.qml:859",
+    "reference": "Modules/Settings/LauncherTab.qml:868",
     "comment": ""
   },
   {
@@ -5138,7 +5144,7 @@
   {
     "term": "Include desktop actions (shortcuts) in search results.",
     "context": "Include desktop actions (shortcuts) in search results.",
-    "reference": "Modules/Settings/LauncherTab.qml:819",
+    "reference": "Modules/Settings/LauncherTab.qml:828",
     "comment": ""
   },
   {
@@ -5456,31 +5462,31 @@
   {
     "term": "Last launched %1",
     "context": "Last launched %1",
-    "reference": "Modules/Settings/LauncherTab.qml:1186",
+    "reference": "Modules/Settings/LauncherTab.qml:1195",
     "comment": ""
   },
   {
     "term": "Last launched %1 day%2 ago",
     "context": "Last launched %1 day%2 ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1185",
+    "reference": "Modules/Settings/LauncherTab.qml:1194",
     "comment": ""
   },
   {
     "term": "Last launched %1 hour%2 ago",
     "context": "Last launched %1 hour%2 ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1183",
+    "reference": "Modules/Settings/LauncherTab.qml:1192",
     "comment": ""
   },
   {
     "term": "Last launched %1 minute%2 ago",
     "context": "Last launched %1 minute%2 ago",
-    "reference": "Modules/Settings/LauncherTab.qml:1181",
+    "reference": "Modules/Settings/LauncherTab.qml:1190",
     "comment": ""
   },
   {
     "term": "Last launched just now",
     "context": "Last launched just now",
-    "reference": "Modules/Settings/LauncherTab.qml:1179",
+    "reference": "Modules/Settings/LauncherTab.qml:1188",
     "comment": ""
   },
   {
@@ -5492,7 +5498,7 @@
   {
     "term": "Launch",
     "context": "Launch",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:918",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:919",
     "comment": ""
   },
   {
@@ -6494,7 +6500,7 @@
   {
     "term": "Niri Integration",
     "context": "Niri Integration",
-    "reference": "Modules/Settings/LauncherTab.qml:482",
+    "reference": "Modules/Settings/LauncherTab.qml:491",
     "comment": ""
   },
   {
@@ -6656,7 +6662,7 @@
   {
     "term": "No app customizations.",
     "context": "No app customizations.",
-    "reference": "Modules/Settings/LauncherTab.qml:1044",
+    "reference": "Modules/Settings/LauncherTab.qml:1053",
     "comment": ""
   },
   {
@@ -6668,7 +6674,7 @@
   {
     "term": "No apps have been launched yet.",
     "context": "No apps have been launched yet.",
-    "reference": "Modules/Settings/LauncherTab.qml:1214",
+    "reference": "Modules/Settings/LauncherTab.qml:1223",
     "comment": ""
   },
   {
@@ -6758,7 +6764,7 @@
   {
     "term": "No hidden apps.",
     "context": "No hidden apps.",
-    "reference": "Modules/Settings/LauncherTab.qml:934",
+    "reference": "Modules/Settings/LauncherTab.qml:943",
     "comment": ""
   },
   {
@@ -6794,7 +6800,7 @@
   {
     "term": "No launcher plugins installed.",
     "context": "No launcher plugins installed.",
-    "reference": "Modules/Settings/LauncherTab.qml:800",
+    "reference": "Modules/Settings/LauncherTab.qml:809",
     "comment": ""
   },
   {
@@ -6908,7 +6914,7 @@
   {
     "term": "No trigger",
     "context": "No trigger",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1060, Modules/Settings/LauncherTab.qml:731",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1061, Modules/Settings/LauncherTab.qml:740",
     "comment": ""
   },
   {
@@ -6920,7 +6926,7 @@
   {
     "term": "No wallpapers found\n\nClick the folder icon below to browse",
     "context": "No wallpapers found\n\nClick the folder icon below to browse",
-    "reference": "Modules/DankDash/WallpaperTab.qml:498",
+    "reference": "Modules/DankDash/WallpaperTab.qml:499",
     "comment": ""
   },
   {
@@ -7220,7 +7226,7 @@
   {
     "term": "Open",
     "context": "Open",
-    "reference": "Modals/DankLauncherV2/Controller.qml:922, Modals/DankLauncherV2/Controller.qml:926, Modals/DankLauncherV2/Controller.qml:930, Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1199, Modules/Settings/NetworkTab.qml:1437, Modules/ControlCenter/Details/NetworkDetail.qml:601",
+    "reference": "Modals/DankLauncherV2/Controller.qml:923, Modals/DankLauncherV2/Controller.qml:927, Modals/DankLauncherV2/Controller.qml:931, Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1199, Modules/Settings/NetworkTab.qml:1437, Modules/ControlCenter/Details/NetworkDetail.qml:601",
     "comment": ""
   },
   {
@@ -7250,7 +7256,7 @@
   {
     "term": "Open folder",
     "context": "Open folder",
-    "reference": "Modals/DankLauncherV2/Controller.qml:930",
+    "reference": "Modals/DankLauncherV2/Controller.qml:931",
     "comment": ""
   },
   {
@@ -7334,7 +7340,7 @@
   {
     "term": "Outline",
     "context": "outline color",
-    "reference": "Modules/Settings/LauncherTab.qml:466",
+    "reference": "Modules/Settings/LauncherTab.qml:475",
     "comment": ""
   },
   {
@@ -7664,7 +7670,7 @@
   {
     "term": "Pinned",
     "context": "Pinned",
-    "reference": "Modals/DankLauncherV2/Controller.qml:136, Modules/ControlCenter/Details/BluetoothDetail.qml:357, Modules/ControlCenter/Details/BrightnessDetail.qml:207, Modules/ControlCenter/Details/AudioInputDetail.qml:274, Modules/ControlCenter/Details/AudioOutputDetail.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:675",
+    "reference": "Modals/DankLauncherV2/Controller.qml:137, Modules/ControlCenter/Details/BluetoothDetail.qml:357, Modules/ControlCenter/Details/BrightnessDetail.qml:207, Modules/ControlCenter/Details/AudioInputDetail.qml:274, Modules/ControlCenter/Details/AudioOutputDetail.qml:292, Modules/ControlCenter/Details/NetworkDetail.qml:675",
     "comment": ""
   },
   {
@@ -7760,7 +7766,7 @@
   {
     "term": "Plugin Visibility",
     "context": "Plugin Visibility",
-    "reference": "Modules/Settings/LauncherTab.qml:592",
+    "reference": "Modules/Settings/LauncherTab.qml:601",
     "comment": ""
   },
   {
@@ -7988,7 +7994,7 @@
   {
     "term": "Primary",
     "context": "button color option | color option | primary color | tile color option",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, Modules/Settings/ThemeColorsTab.qml:1512, Modules/Settings/ThemeColorsTab.qml:1522, Modules/Settings/ThemeColorsTab.qml:1544, Modules/Settings/ThemeColorsTab.qml:1554, Modules/Settings/DockTab.qml:377, Modules/Settings/DockTab.qml:587, Modules/Settings/LauncherTab.qml:179, Modules/Settings/LauncherTab.qml:466, Modules/Settings/WorkspacesTab.qml:359, Modules/Settings/NetworkTab.qml:227, Modules/Settings/DankBarTab.qml:1163, Modules/Settings/Widgets/SettingsColorPicker.qml:42",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:39, Modules/Settings/ThemeColorsTab.qml:1512, Modules/Settings/ThemeColorsTab.qml:1522, Modules/Settings/ThemeColorsTab.qml:1544, Modules/Settings/ThemeColorsTab.qml:1554, Modules/Settings/DockTab.qml:377, Modules/Settings/DockTab.qml:587, Modules/Settings/LauncherTab.qml:179, Modules/Settings/LauncherTab.qml:475, Modules/Settings/WorkspacesTab.qml:359, Modules/Settings/NetworkTab.qml:227, Modules/Settings/DankBarTab.qml:1163, Modules/Settings/Widgets/SettingsColorPicker.qml:42",
     "comment": ""
   },
   {
@@ -8246,7 +8252,7 @@
   {
     "term": "Recently Used Apps",
     "context": "Recently Used Apps",
-    "reference": "Modules/Settings/LauncherTab.qml:1057",
+    "reference": "Modules/Settings/LauncherTab.qml:1066",
     "comment": ""
   },
   {
@@ -8804,13 +8810,13 @@
   {
     "term": "Search App Actions",
     "context": "Search App Actions",
-    "reference": "Modules/Settings/LauncherTab.qml:818",
+    "reference": "Modules/Settings/LauncherTab.qml:827",
     "comment": ""
   },
   {
     "term": "Search Options",
     "context": "Search Options",
-    "reference": "Modules/Settings/LauncherTab.qml:812",
+    "reference": "Modules/Settings/LauncherTab.qml:821",
     "comment": ""
   },
   {
@@ -8876,7 +8882,7 @@
   {
     "term": "Secondary",
     "context": "button color option | color option | secondary color | tile color option",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, Modules/Settings/ThemeColorsTab.qml:1512, Modules/Settings/ThemeColorsTab.qml:1518, Modules/Settings/ThemeColorsTab.qml:1528, Modules/Settings/ThemeColorsTab.qml:1544, Modules/Settings/ThemeColorsTab.qml:1550, Modules/Settings/ThemeColorsTab.qml:1560, Modules/Settings/DockTab.qml:587, Modules/Settings/LauncherTab.qml:466, Modules/Settings/WorkspacesTab.qml:359, Modules/Settings/DankBarTab.qml:1163, Modules/Settings/Widgets/SettingsColorPicker.qml:47",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeatherSettings.qml:43, Modules/Settings/ThemeColorsTab.qml:1512, Modules/Settings/ThemeColorsTab.qml:1518, Modules/Settings/ThemeColorsTab.qml:1528, Modules/Settings/ThemeColorsTab.qml:1544, Modules/Settings/ThemeColorsTab.qml:1550, Modules/Settings/ThemeColorsTab.qml:1560, Modules/Settings/DockTab.qml:587, Modules/Settings/LauncherTab.qml:475, Modules/Settings/WorkspacesTab.qml:359, Modules/Settings/DankBarTab.qml:1163, Modules/Settings/Widgets/SettingsColorPicker.qml:47",
     "comment": ""
   },
   {
@@ -8900,7 +8906,7 @@
   {
     "term": "Select",
     "context": "Select",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1193",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1194",
     "comment": ""
   },
   {
@@ -8954,7 +8960,7 @@
   {
     "term": "Select Wallpaper Directory",
     "context": "wallpaper directory file browser title",
-    "reference": "Modules/DankDash/WallpaperTab.qml:319",
+    "reference": "Modules/DankDash/WallpaperTab.qml:320",
     "comment": ""
   },
   {
@@ -9608,7 +9614,7 @@
   {
     "term": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
     "context": "Show launcher overlay when typing in Niri overview. Disable to use another launcher.",
-    "reference": "Modules/Settings/LauncherTab.qml:498",
+    "reference": "Modules/Settings/LauncherTab.qml:507",
     "comment": ""
   },
   {
@@ -10238,7 +10244,7 @@
   {
     "term": "Text",
     "context": "shadow color option | text color",
-    "reference": "Modals/Clipboard/ClipboardEntry.qml:119, Modules/Settings/LauncherTab.qml:466, Modules/Settings/DankBarTab.qml:1163",
+    "reference": "Modals/Clipboard/ClipboardEntry.qml:119, Modules/Settings/LauncherTab.qml:475, Modules/Settings/DankBarTab.qml:1163",
     "comment": ""
   },
   {
@@ -10292,7 +10298,7 @@
   {
     "term": "Thickness",
     "context": "border thickness",
-    "reference": "Modules/Settings/LauncherTab.qml:434, Modules/Settings/WorkspacesTab.qml:393, Modules/Settings/DankBarTab.qml:1300, Modules/Settings/DankBarTab.qml:1388",
+    "reference": "Modules/Settings/LauncherTab.qml:443, Modules/Settings/WorkspacesTab.qml:393, Modules/Settings/DankBarTab.qml:1300, Modules/Settings/DankBarTab.qml:1388",
     "comment": ""
   },
   {
@@ -10598,7 +10604,7 @@
   {
     "term": "Trigger",
     "context": "Trigger",
-    "reference": "Modules/Settings/LauncherTab.qml:571",
+    "reference": "Modules/Settings/LauncherTab.qml:580",
     "comment": ""
   },
   {
@@ -10610,7 +10616,7 @@
   {
     "term": "Trigger: %1",
     "context": "Trigger: %1",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1059, Modules/Settings/LauncherTab.qml:731",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1060, Modules/Settings/LauncherTab.qml:740",
     "comment": ""
   },
   {
@@ -10773,6 +10779,12 @@
     "term": "Unknown Title",
     "context": "Unknown Title",
     "reference": "Modules/OSD/MediaPlaybackOSD.qml:257",
+    "comment": ""
+  },
+  {
+    "term": "Unload on Close",
+    "context": "Unload on Close",
+    "reference": "Modules/Settings/LauncherTab.qml:421",
     "comment": ""
   },
   {

@@ -644,7 +644,7 @@ func (cd *ConfigDeployer) transformHyprlandConfigForNonSystemd(config, terminalC
 		if strings.HasPrefix(trimmed, "exec-once = systemctl --user start") {
 			startupSectionFound = true
 			result = append(result, "exec-once = dms run")
-			result = append(result, "env = QT_QPA_PLATFORM,wayland")
+			result = append(result, "env = QT_QPA_PLATFORM,wayland;xcb")
 			result = append(result, "env = ELECTRON_OZONE_PLATFORM_HINT,auto")
 			result = append(result, "env = QT_QPA_PLATFORMTHEME,gtk3")
 			result = append(result, "env = QT_QPA_PLATFORMTHEME_QT6,gtk3")
@@ -659,7 +659,7 @@ func (cd *ConfigDeployer) transformHyprlandConfigForNonSystemd(config, terminalC
 			if strings.Contains(line, "STARTUP APPS") {
 				insertLines := []string{
 					"exec-once = dms run",
-					"env = QT_QPA_PLATFORM,wayland",
+					"env = QT_QPA_PLATFORM,wayland;xcb",
 					"env = ELECTRON_OZONE_PLATFORM_HINT,auto",
 					"env = QT_QPA_PLATFORMTHEME,gtk3",
 					"env = QT_QPA_PLATFORMTHEME_QT6,gtk3",
@@ -677,7 +677,7 @@ func (cd *ConfigDeployer) transformHyprlandConfigForNonSystemd(config, terminalC
 func (cd *ConfigDeployer) transformNiriConfigForNonSystemd(config, terminalCommand string) string {
 	envVars := fmt.Sprintf(`environment {
   XDG_CURRENT_DESKTOP "niri"
-  QT_QPA_PLATFORM "wayland"
+  QT_QPA_PLATFORM "wayland;xcb"
   ELECTRON_OZONE_PLATFORM_HINT "auto"
   QT_QPA_PLATFORMTHEME "gtk3"
   QT_QPA_PLATFORMTHEME_QT6 "gtk3"

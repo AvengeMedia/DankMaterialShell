@@ -10,6 +10,17 @@ DankPopout {
 
     property bool notificationHistoryVisible: false
     property var triggerScreen: null
+    property real stablePopupHeight: 400
+    property real _lastAlignedContentHeight: -1
+
+    function updateStablePopupHeight() {
+        const item = contentLoader.item;
+        const target = item ? Theme.px(item.implicitHeight, dpr) : 400;
+        if (Math.abs(target - _lastAlignedContentHeight) < 0.5)
+            return;
+        _lastAlignedContentHeight = target;
+        stablePopupHeight = target;
+    }
 
     NotificationKeyboardController {
         id: keyboardController
@@ -20,11 +31,12 @@ DankPopout {
         }
     }
 
-    popupWidth: 400
-    popupHeight: contentLoader.item ? contentLoader.item.implicitHeight : 400
+    popupWidth: triggerScreen ? Math.min(500, Math.max(380, triggerScreen.width - 48)) : 400
+    popupHeight: stablePopupHeight
     positioning: ""
     animationScaleCollapsed: 1.0
     animationOffset: 0
+    suspendShadowWhileResizing: true
 
     screen: triggerScreen
     shouldBeVisible: notificationHistoryVisible
@@ -68,19 +80,32 @@ DankPopout {
     Connections {
         target: contentLoader
         function onLoaded() {
+            root.updateStablePopupHeight();
             if (root.shouldBeVisible)
                 Qt.callLater(root.setupKeyboardNavigation);
         }
     }
 
+    Connections {
+        target: contentLoader.item
+        function onImplicitHeightChanged() {
+            root.updateStablePopupHeight();
+        }
+    }
+
+    onDprChanged: updateStablePopupHeight()
+
     onShouldBeVisibleChanged: {
         if (shouldBeVisible) {
             NotificationService.onOverlayOpen();
+            updateStablePopupHeight();
             if (contentLoader.item)
                 Qt.callLater(setupKeyboardNavigation);
         } else {
             NotificationService.onOverlayClose();
             keyboardController.keyboardNavigationActive = false;
+            NotificationService.expandedGroups = {};
+            NotificationService.expandedMessages = {};
         }
     }
 
@@ -113,7 +138,7 @@ DankPopout {
                 baseHeight += Theme.spacingM * 2;
 
                 const settingsHeight = notificationSettings.expanded ? notificationSettings.contentHeight : 0;
-                let listHeight = notificationHeader.currentTab === 0 ? notificationList.listContentHeight : Math.max(200, NotificationService.historyList.length * 80);
+                let listHeight = notificationHeader.currentTab === 0 ? notificationList.stableContentHeight : Math.max(200, NotificationService.historyList.length * 80);
                 if (notificationHeader.currentTab === 0 && NotificationService.groupedNotifications.length === 0) {
                     listHeight = 200;
                 }

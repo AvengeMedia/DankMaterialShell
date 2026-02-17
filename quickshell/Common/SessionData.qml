@@ -123,6 +123,8 @@ Singleton {
     property string vpnLastConnected: ""
 
     property var deviceMaxVolumes: ({})
+    property var hiddenOutputDeviceNames: []
+    property var hiddenInputDeviceNames: []
 
     Component.onCompleted: {
         if (!isGreeterMode) {
@@ -1066,6 +1068,20 @@ Singleton {
             updated[nodeName] = clamped;
         }
         deviceMaxVolumes = updated;
+        saveSettings();
+    }
+
+    function setHiddenOutputDeviceNames(deviceNames) {
+        if (!Array.isArray(deviceNames))
+            return;
+        hiddenOutputDeviceNames = deviceNames;
+        saveSettings();
+    }
+
+    function setHiddenInputDeviceNames(deviceNames) {
+        if (!Array.isArray(deviceNames))
+            return;
+        hiddenInputDeviceNames = deviceNames;
         saveSettings();
     }
 

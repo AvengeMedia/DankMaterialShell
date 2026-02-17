@@ -884,7 +884,7 @@
     "Clipboard Manager": "Gestore Appunti"
   },
   "Clipboard behavior setting description": {
-    "Press Enter to paste, Shift+Enter to copy": ""
+    "Press Enter to paste, Shift+Enter to copy": "Premi Invio per incollare, Shift+Invio per copiare"
   },
   "Clipboard service not available": {
     "Clipboard service not available": "Servizio degli appunti non disponibile"
@@ -1727,7 +1727,7 @@
     "Enter this passkey on ": "Inserisci questa passkey su "
   },
   "Enter to Paste": {
-    "Enter to Paste": ""
+    "Enter to Paste": "Invio per Incollare"
   },
   "Enterprise": {
     "Enterprise": "Enterprise"
@@ -2088,6 +2088,9 @@
   },
   "Format Legend": {
     "Format Legend": "Legenda Formato"
+  },
+  "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
   },
   "Frequency": {
     "Frequency": "Frequenza"
@@ -2656,8 +2659,8 @@
     "Keyboard Shortcuts": "Scorciatoie da Tastiera"
   },
   "Keyboard hints when enter-to-paste is enabled": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "",
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": ""
+    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Invio: Copia • Shift+Canc: Cancella Tutto • Esc: Chiudi",
+    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Naviga • Invio: Incolla • Canc: Elimina • F10: Aiuto"
   },
   "Keys": {
     "Keys": "Tasti"
@@ -4201,7 +4204,7 @@
     "Select Bar": "Seleziona Barra"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": ""
+    "Select Dock Launcher Logo": "Seleziona Logo Launcher della Dock"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Seleziona Logo Launcher"
@@ -4988,6 +4991,9 @@
   },
   "Unknown Title": {
     "Unknown Title": "Titolo Sconosciuto"
+  },
+  "Unload on Close": {
+    "Unload on Close": ""
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Regola Senza Nome"

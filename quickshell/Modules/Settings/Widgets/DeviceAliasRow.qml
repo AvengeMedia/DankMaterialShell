@@ -14,8 +14,12 @@ Rectangle {
     required property var deviceNode
     property string deviceType: "output"
 
+    property bool showHideButton: false
+    property bool isHidden: false
+
     signal editRequested(var deviceNode)
     signal resetRequested(var deviceNode)
+    signal hideRequested(var deviceNode)
 
     width: parent?.width ?? 0
     height: deviceRowContent.height + Theme.spacingM * 2
@@ -128,6 +132,21 @@ Rectangle {
             }
 
             DankActionButton {
+                id: hideButton
+                visible: root.showHideButton
+                buttonSize: 36
+                iconName: root.isHidden ? "visibility" : "visibility_off"
+                iconSize: 20
+                backgroundColor: Theme.surfaceContainerHigh
+                iconColor: root.isHidden ? Theme.primary : Theme.surfaceVariantText
+                tooltipText: root.isHidden ? I18n.tr("Show device") : I18n.tr("Hide device")
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    root.hideRequested(root.deviceNode);
+                }
+            }
+
+            DankActionButton {
                 id: editButton
                 buttonSize: 36
                 iconName: "edit"
@@ -136,6 +155,7 @@ Rectangle {
                 iconColor: Theme.buttonText
                 tooltipText: I18n.tr("Set custom name")
                 anchors.verticalCenter: parent.verticalCenter
+                visible: !root.isHidden
                 onClicked: {
                     root.editRequested(root.deviceNode);
                 }

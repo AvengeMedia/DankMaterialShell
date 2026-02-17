@@ -74,6 +74,8 @@ Card {
                             return "on Sway";
                         if (CompositorService.isScroll)
                             return "on Scroll";
+                        if (CompositorService.isMiracle)
+                            return "on Miracle WM";
                         return "";
                     }
                     font.pixelSize: Theme.fontSizeSmall

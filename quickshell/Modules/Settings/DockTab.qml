@@ -264,6 +264,8 @@ Item {
                                         modes.push("Sway");
                                     } else if (CompositorService.isScroll) {
                                         modes.push("Scroll");
+                                    } else if (CompositorService.isMiracle) {
+                                        modes.push("Miracle");
                                     } else {
                                         modes.push(I18n.tr("Compositor"));
                                     }
