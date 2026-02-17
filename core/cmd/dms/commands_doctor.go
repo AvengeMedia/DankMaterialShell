@@ -649,40 +649,73 @@ func checkI2CAvailability() checkResult {
 	return checkResult{catOptionalFeatures, "I2C/DDC", statusOK, fmt.Sprintf("%d monitor(s) detected", len(devices)), "External monitor brightness control", doctorDocsURL + "#optional-features"}
 }
 
-func checkKImageFormats() checkResult {
+func checkImageFormatPlugins() []checkResult {
 	url := doctorDocsURL + "#optional-features"
-	desc := "Extra image format support (AVIF, HEIF, JXL)"
 
 	pluginDir := findQtPluginDir()
 	if pluginDir == "" {
-		return checkResult{catOptionalFeatures, "kimageformats", statusInfo, "Cannot detect (qtpaths not found)", desc, url}
-	}
-
-	imageFormatsDir := filepath.Join(pluginDir, "imageformats")
-	keyPlugins := []struct{ file, format string }{
-		{"kimg_avif.so", "AVIF"},
-		{"kimg_heif.so", "HEIF"},
-		{"kimg_jxl.so", "JXL"},
-		{"kimg_exr.so", "EXR"},
-	}
-
-	var found []string
-	for _, p := range keyPlugins {
-		if _, err := os.Stat(filepath.Join(imageFormatsDir, p.file)); err == nil {
-			found = append(found, p.format)
+		return []checkResult{
+			{catOptionalFeatures, "qt6-imageformats", statusInfo, "Cannot detect (plugin dir not found)", "WebP, TIFF, JP2 support", url},
+			{catOptionalFeatures, "kimageformats", statusInfo, "Cannot detect (plugin dir not found)", "AVIF, HEIF, JXL support", url},
 		}
 	}
 
-	if len(found) == 0 {
-		return checkResult{catOptionalFeatures, "kimageformats", statusWarn, "Not installed", desc, url}
+	imageFormatsDir := filepath.Join(pluginDir, "imageformats")
+
+	type pluginCheck struct {
+		name    string
+		desc    string
+		plugins []struct{ file, format string }
 	}
 
-	details := ""
-	if doctorVerbose {
-		details = fmt.Sprintf("Formats: %s (%s)", strings.Join(found, ", "), imageFormatsDir)
+	checks := []pluginCheck{
+		{
+			name: "qt6-imageformats",
+			desc: "WebP, TIFF, GIF, JP2 support",
+			plugins: []struct{ file, format string }{
+				{"libqwebp.so", "WebP"},
+				{"libqtiff.so", "TIFF"},
+				{"libqgif.so", "GIF"},
+				{"libqjp2.so", "JP2"},
+				{"libqicns.so", "ICNS"},
+			},
+		},
+		{
+			name: "kimageformats",
+			desc: "AVIF, HEIF, JXL support",
+			plugins: []struct{ file, format string }{
+				{"kimg_avif.so", "AVIF"},
+				{"kimg_heif.so", "HEIF"},
+				{"kimg_jxl.so", "JXL"},
+				{"kimg_exr.so", "EXR"},
+			},
+		},
 	}
 
-	return checkResult{catOptionalFeatures, "kimageformats", statusOK, fmt.Sprintf("Installed (%d formats)", len(found)), details, url}
+	var results []checkResult
+	for _, c := range checks {
+		var found []string
+		for _, p := range c.plugins {
+			if _, err := os.Stat(filepath.Join(imageFormatsDir, p.file)); err == nil {
+				found = append(found, p.format)
+			}
+		}
+
+		var result checkResult
+		switch {
+		case len(found) == 0:
+			result = checkResult{catOptionalFeatures, c.name, statusWarn, "Not installed", c.desc, url}
+		default:
+			details := ""
+			if doctorVerbose {
+				details = fmt.Sprintf("Formats: %s (%s)", strings.Join(found, ", "), imageFormatsDir)
+			}
+			result = checkResult{catOptionalFeatures, c.name, statusOK, fmt.Sprintf("Installed (%d formats)", len(found)), details, url}
+		}
+		results = append(results, result)
+	}
+
+	return results
 }
 
 func findQtPluginDir() string {
@@ -773,7 +806,7 @@ func checkOptionalDependencies() []checkResult {
 	results = append(results, checkResult{catOptionalFeatures, "cups-pk-helper", cupsPkStatus, cupsPkMsg, "Printer management", optionalFeaturesURL})
 
 	results = append(results, checkI2CAvailability())
-	results = append(results, checkKImageFormats())
+	results = append(results, checkImageFormatPlugins()...)
 
 	terminals := []string{"ghostty", "kitty", "alacritty", "foot", "wezterm"}
 	if idx := slices.IndexFunc(terminals, utils.CommandExists); idx >= 0 {

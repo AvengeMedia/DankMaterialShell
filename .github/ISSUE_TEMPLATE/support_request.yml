@@ -30,9 +30,9 @@ body:
   - type: textarea
     id: dms_doctor
     attributes:
-      label: dms doctor -v
-      description: Output of `dms doctor -v` command
-      placeholder: Paste the output of `dms doctor -v` here
+      label: dms doctor -vC
+      description: Output of `dms doctor -vC` command
+      placeholder: Paste the output of `dms doctor -vC` here
     validations:
       required: false
   - type: textarea
