@@ -1,4 +1,6 @@
+import "../Common/fzf.js" as Fzf
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Common
@@ -69,11 +71,35 @@ DankModal {
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingL
 
-                StyledText {
-                    text: KeybindsService.cheatsheet.title || "Keybinds"
-                    font.pixelSize: Theme.fontSizeLarge
-                    font.weight: Font.Bold
-                    color: Theme.primary
+                GridLayout {
+                    columns: 2
+                    width: parent.width
+
+                    StyledText {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        text: KeybindsService.cheatsheet.title || "Keybinds"
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Bold
+                        color: Theme.primary
+                    }
+
+                    DankTextField {
+                        id: searchField
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        leftIconName: "search"
+                        onTextEdited: searchDebounce.restart()
+                    }
+                }
+
+                Timer {
+                    id: searchDebounce
+                    interval: 50
+                    repeat: false
+                    onTriggered: {
+                        mainFlickable.categories = mainFlickable.generateCategories(searchField.text);
+                    }
                 }
 
                 DankFlickable {
@@ -87,41 +113,65 @@ DankModal {
                     Component.onCompleted: root.activeFlickable = mainFlickable
 
                     property var rawBinds: KeybindsService.cheatsheet.binds || {}
-                    property var categories: {
-                        const processed = {};
+
+                    function generateCategories(query) {
+                        // flatten all keybinds in an array for use by fuzzy finder
+                        const allBinds = [];
                         for (const cat in rawBinds) {
                             const binds = rawBinds[cat];
-                            const subcats = {};
-                            let hasSubcats = false;
-
                             for (let i = 0; i < binds.length; i++) {
                                 const bind = binds[i];
                                 if (bind.hideOnOverlay)
                                     continue;
-                                if (bind.subcat) {
-                                    hasSubcats = true;
-                                    if (!subcats[bind.subcat])
-                                        subcats[bind.subcat] = [];
-                                    subcats[bind.subcat].push(bind);
-                                } else {
-                                    if (!subcats["_root"])
-                                        subcats["_root"] = [];
-                                    subcats["_root"].push(bind);
-                                }
+                                allBinds.push({
+                                    cat: cat,
+                                    theBind: bind
+                                });
                             }
-
-                            if (Object.keys(subcats).length === 0)
-                                continue;
-
-                            processed[cat] = {
-                                hasSubcats: hasSubcats,
-                                subcats: subcats,
-                                subcatKeys: Object.keys(subcats)
-                            };
                         }
+
+                        // NOTE: This is a very blunt selector that could certainly be improved.
+                        // In my tests, selecting by key does not work well which is problematic (even
+                        // when other elements are removed from the selector, see note below). Selecting
+                        // by querying the action works fine.
+                        const selector = bind => `${bind.theBind.key || ""}:${bind.theBind.action || ""}:${bind.theBind.desc || ""}:${bind.cat || ""}:${bind.theBind.subcat || ""}`;
+                        const fzfFinder = new Fzf.Finder(allBinds, {
+                            selector: selector,
+                            casing: "case-insensitive"
+                        });
+
+                        // NOTE: for some reason, I do not get the same results here
+                        // and using fzf separately in a node shell with the same inputs.
+                        // In particular, a query like "Mod+C" will not give priority to "Mod+C" or
+                        // "Mod+Comma" in my config, but rather to "Mod+B". I do not know the reason...
+                        const filteredBinds = fzfFinder.find(query).map(r => r.item);
+
+                        const processed = {};
+                        for (let i = 0; i < filteredBinds.length; i++) {
+                            const bind = filteredBinds[i].theBind;
+                            const cat = filteredBinds[i].cat;
+                            if (!processed[cat]) {
+                                processed[cat] = {
+                                    hasSubcats: false,
+                                    subcats: {},
+                                    subcatKeys: [],
+                                };
+                            }
+                            const subcat = bind.subcat || "_root";
+                            if (bind.subcat) {
+                                processed[cat].hasSubcats = true;
+                            }
+                            if (!processed[cat].subcats[subcat]) {
+                                processed[cat].subcats[subcat] = [];
+                                processed[cat].subcatKeys.push(subcat);
+                            }
+                            processed[cat].subcats[subcat].push(bind);
+                        }
+
                         return processed;
                     }
-                    property var categoryKeys: Object.keys(categories)
+
+                    property var categories: generateCategories("");
 
                     function estimateCategoryHeight(catName) {
                         const catData = categories[catName];
@@ -143,7 +193,7 @@ DankModal {
                             columns.push([]);
                             heights.push(0);
                         }
-                        const sorted = [...categoryKeys].sort((a, b) => estimateCategoryHeight(b) - estimateCategoryHeight(a));
+                        const sorted = [...Object.keys(categories)].sort((a, b) => estimateCategoryHeight(b) - estimateCategoryHeight(a));
                         for (const cat of sorted) {
                             let minIdx = 0;
                             for (let i = 1; i < cols; i++) {
