@@ -216,14 +216,18 @@ QtObject {
             }
 
             const pluginComponent = PluginService.pluginWidgetComponents[plugin.id];
-            if (!pluginComponent || typeof pluginComponent.createObject !== 'function') {
+            if (!pluginComponent)
                 continue;
-            }
 
-            const tempInstance = pluginComponent.createObject(null);
-            if (!tempInstance) {
+            let tempInstance;
+            try {
+                tempInstance = pluginComponent.createObject(null);
+            } catch (e) {
+                PluginService.reloadPlugin(plugin.id);
                 continue;
             }
+            if (!tempInstance)
+                continue;
 
             const hasCCWidget = tempInstance.ccWidgetIcon && tempInstance.ccWidgetIcon.length > 0;
             tempInstance.destroy();

@@ -945,22 +945,31 @@ Column {
                 }
             }
 
-            Component.onCompleted: {
-                Qt.callLater(() => {
-                    const pluginComponent = PluginService.pluginWidgetComponents[pluginId];
-                    if (pluginComponent) {
-                        const instance = pluginComponent.createObject(null, {
-                            "pluginId": pluginId,
-                            "pluginService": PluginService,
-                            "visible": false,
-                            "width": 0,
-                            "height": 0
-                        });
-                        if (instance) {
-                            pluginInstance = instance;
-                        }
+            function tryCreatePluginInstance() {
+                const pluginComponent = PluginService.pluginWidgetComponents[pluginId];
+                if (!pluginComponent)
+                    return false;
+                try {
+                    const instance = pluginComponent.createObject(null, {
+                        "pluginId": pluginId,
+                        "pluginService": PluginService,
+                        "visible": false,
+                        "width": 0,
+                        "height": 0
+                    });
+                    if (instance) {
+                        pluginInstance = instance;
+                        return true;
                     }
-                });
+                } catch (e) {
+                    console.warn("DragDropGrid: stale plugin component for", pluginId, "- reloading");
+                    PluginService.reloadPlugin(pluginId);
+                }
+                return false;
+            }
+
+            Component.onCompleted: {
+                Qt.callLater(() => tryCreatePluginInstance());
             }
 
             Connections {
@@ -969,6 +978,11 @@ Column {
                     if (changedPluginId === pluginId && pluginInstance) {
                         pluginInstance.loadPluginData();
                     }
+                }
+                function onPluginLoaded(loadedPluginId) {
+                    if (loadedPluginId !== pluginId || pluginInstance)
+                        return;
+                    Qt.callLater(() => tryCreatePluginInstance());
                 }
             }
 

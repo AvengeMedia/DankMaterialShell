@@ -13,8 +13,8 @@ Row {
     property Item popoutContent: null
 
     signal addWidget(string widgetId)
-    signal resetToDefault()
-    signal clearAll()
+    signal resetToDefault
+    signal clearAll
 
     height: 48
     spacing: Theme.spacingS
@@ -28,7 +28,7 @@ Row {
         y: parent ? Math.round((parent.height - height) / 2) : 0
         width: 400
         height: 300
-        modal: true
+        modal: false
         focus: true
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
 
@@ -133,7 +133,7 @@ Row {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            root.addWidget(modelData.id)
+                            root.addWidget(modelData.id);
                         }
                     }
                 }
