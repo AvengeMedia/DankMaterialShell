@@ -81,6 +81,12 @@ function calculateNextIndex(flatModel, selectedFlatIndex, sectionId, viewMode, g
         return bounds.start + newPosInSection;
     }
 
+    var currentRow = Math.floor(posInSection / cols);
+    var lastRow = Math.floor((bounds.count - 1) / cols);
+    if (currentRow < lastRow) {
+        return bounds.start + bounds.count - 1;
+    }
+
     var nextSection = findNextNonHeaderIndex(flatModel, bounds.end + 1);
     return nextSection !== -1 ? nextSection : selectedFlatIndex;
 }

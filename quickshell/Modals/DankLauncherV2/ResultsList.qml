@@ -130,24 +130,17 @@ Item {
         if (!entry || entry.isHeader)
             return;
         var rowIndex = _flatIndexToRowMap[index];
-        if (rowIndex === undefined || rowIndex >= _cumulativeHeights.length)
-            return;
-        var row = _visualRows[rowIndex];
-        if (!row)
+        if (rowIndex === undefined)
             return;
 
-        var rowY = _cumulativeHeights[rowIndex];
-        var rowHeight = row.height;
-        var scrollY = mainListView.contentY - mainListView.originY;
-        var viewHeight = mainListView.height;
-        var headerH = stickyHeader.height;
+        mainListView.positionViewAtIndex(rowIndex, ListView.Contain);
 
-        if (rowY < scrollY + headerH) {
-            mainListView.contentY = Math.max(mainListView.originY, rowY - headerH + mainListView.originY);
-            return;
-        }
-        if (rowY + rowHeight > scrollY + viewHeight) {
-            mainListView.contentY = rowY + rowHeight - viewHeight + mainListView.originY;
+        if (stickyHeader.visible && rowIndex < _cumulativeHeights.length) {
+            var rowY = _cumulativeHeights[rowIndex];
+            var scrollY = mainListView.contentY - mainListView.originY;
+            if (rowY < scrollY + stickyHeader.height) {
+                mainListView.contentY = Math.max(mainListView.originY, rowY - stickyHeader.height + mainListView.originY);
+            }
         }
     }
 
