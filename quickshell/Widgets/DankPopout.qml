@@ -30,7 +30,10 @@ Item {
     property var customKeyboardFocus: null
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
+    property bool fullHeightSurface: false
     property bool _resizeActive: false
+    property real _surfaceMarginLeft: 0
+    property real _surfaceW: 0
 
     property real storedBarThickness: Theme.barHeight - 4
     property real storedBarSpacing: 4
@@ -125,6 +128,10 @@ Item {
         _lastOpenedScreen = screen;
 
         shouldBeVisible = true;
+        if (useBackgroundWindow) {
+            _surfaceMarginLeft = alignedX - shadowBuffer;
+            _surfaceW = alignedWidth + shadowBuffer * 2;
+        }
         Qt.callLater(() => {
             if (shouldBeVisible && screen) {
                 if (useBackgroundWindow)
@@ -360,20 +367,38 @@ Item {
             return WlrKeyboardFocus.Exclusive;
         }
 
+        readonly property bool _fullHeight: useBackgroundWindow && root.fullHeightSurface
+
         anchors {
             left: true
             top: true
             right: !useBackgroundWindow
-            bottom: !useBackgroundWindow
+            bottom: _fullHeight || !useBackgroundWindow
         }
 
         WlrLayershell.margins {
-            left: useBackgroundWindow ? (root.alignedX - shadowBuffer) : 0
-            top: useBackgroundWindow ? (root.alignedY - shadowBuffer) : 0
+            left: useBackgroundWindow ? root._surfaceMarginLeft : 0
+            top: (useBackgroundWindow && !_fullHeight) ? (root.alignedY - shadowBuffer) : 0
         }
 
-        implicitWidth: useBackgroundWindow ? (root.alignedWidth + (shadowBuffer * 2)) : 0
-        implicitHeight: useBackgroundWindow ? (root.alignedHeight + (shadowBuffer * 2)) : 0
+        implicitWidth: useBackgroundWindow ? root._surfaceW : 0
+        implicitHeight: (useBackgroundWindow && !_fullHeight) ? (root.alignedHeight + shadowBuffer * 2) : 0
+
+        mask: (useBackgroundWindow && _fullHeight) ? contentInputMask : null
+
+        Region {
+            id: contentInputMask
+            item: contentMaskRect
+        }
+
+        Item {
+            id: contentMaskRect
+            visible: false
+            x: contentContainer.x - root.shadowBuffer
+            y: contentContainer.y - root.shadowBuffer
+            width: root.alignedWidth + root.shadowBuffer * 2
+            height: root.alignedHeight + root.shadowBuffer * 2
+        }
 
         MouseArea {
             anchors.fill: parent
@@ -393,7 +418,7 @@ Item {
         Item {
             id: contentContainer
             x: useBackgroundWindow ? shadowBuffer : root.alignedX
-            y: useBackgroundWindow ? shadowBuffer : root.alignedY
+            y: (useBackgroundWindow && !contentWindow._fullHeight) ? shadowBuffer : root.alignedY
             width: root.alignedWidth
             height: root.alignedHeight
 
