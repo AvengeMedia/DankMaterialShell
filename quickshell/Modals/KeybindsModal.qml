@@ -1,4 +1,3 @@
-import "../Common/fzf.js" as Fzf
 import QtQml
 import QtQuick
 import QtQuick.Layouts
@@ -113,57 +112,44 @@ DankModal {
                     property var rawBinds: KeybindsService.cheatsheet.binds || {}
 
                     function generateCategories(query) {
-                        // flatten all keybinds in an array for use by fuzzy finder
-                        const allBinds = [];
+                        const lowerQuery = query ? query.toLowerCase().trim() : "";
+                        const processed = {};
+
                         for (const cat in rawBinds) {
                             const binds = rawBinds[cat];
+                            const catLower = cat.toLowerCase();
+                            const subcats = {};
+                            let hasSubcats = false;
                             for (let i = 0; i < binds.length; i++) {
                                 const bind = binds[i];
+                                const keyLower = bind.key.toLowerCase();
+                                const descLower = bind.desc.toLowerCase();
+                                const actionLower = bind.action.toLowerCase();
+                                if (!(lowerQuery.length === 0 || keyLower.includes(lowerQuery) || descLower.includes(lowerQuery) || catLower.includes(lowerQuery) || actionLower.includes(lowerQuery)))
+                                    continue;
                                 if (bind.hideOnOverlay)
                                     continue;
-                                allBinds.push({
-                                    cat: cat,
-                                    theBind: bind
-                                });
-                            }
-                        }
 
-                        // NOTE: This is a very blunt selector that could certainly be improved.
-                        // In my tests, selecting by key does not work well which is problematic (even
-                        // when other elements are removed from the selector, see note below). Selecting
-                        // by querying the action works fine.
-                        const selector = bind => `${bind.theBind.key || ""}:${bind.theBind.action || ""}:${bind.theBind.desc || ""}:${bind.cat || ""}:${bind.theBind.subcat || ""}`;
-                        const fzfFinder = new Fzf.Finder(allBinds, {
-                            selector: selector,
-                            casing: "case-insensitive"
-                        });
+                                if (bind.subcat) {
+                                    hasSubcats = true;
+                                    if (!subcats[bind.subcat])
+                                        subcats[bind.subcat] = [];
+                                    subcats[bind.subcat].push(bind);
+                                } else {
+                                    if (!subcats["_root"])
+                                        subcats["_root"] = [];
+                                    subcats["_root"].push(bind);
+                                }
+                            }
 
-                        // NOTE: for some reason, I do not get the same results here
-                        // and using fzf separately in a node shell with the same inputs.
-                        // In particular, a query like "Mod+C" will not give priority to "Mod+C" or
-                        // "Mod+Comma" in my config, but rather to "Mod+B". I do not know the reason...
-                        const filteredBinds = fzfFinder.find(query).map(r => r.item);
+                            if (Object.keys(subcats).length === 0)
+                                continue;
 
-                        const processed = {};
-                        for (let i = 0; i < filteredBinds.length; i++) {
-                            const bind = filteredBinds[i].theBind;
-                            const cat = filteredBinds[i].cat;
-                            if (!processed[cat]) {
-                                processed[cat] = {
-                                    hasSubcats: false,
-                                    subcats: {},
-                                    subcatKeys: [],
-                                };
-                            }
-                            const subcat = bind.subcat || "_root";
-                            if (bind.subcat) {
-                                processed[cat].hasSubcats = true;
-                            }
-                            if (!processed[cat].subcats[subcat]) {
-                                processed[cat].subcats[subcat] = [];
-                                processed[cat].subcatKeys.push(subcat);
-                            }
-                            processed[cat].subcats[subcat].push(bind);
+                            processed[cat] = {
+                                hasSubcats: hasSubcats,
+                                subcats: subcats,
+                                subcatKeys: Object.keys(subcats)
+                            };
                         }
 
                         return processed;
