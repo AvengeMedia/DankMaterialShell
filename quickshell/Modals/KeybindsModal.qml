@@ -1,4 +1,5 @@
 import "../Common/fzf.js" as Fzf
+import QtQml
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Hyprland
@@ -71,13 +72,11 @@ DankModal {
                 anchors.margins: Theme.spacingL
                 spacing: Theme.spacingL
 
-                GridLayout {
-                    columns: 2
+                RowLayout {
                     width: parent.width
 
                     StyledText {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
+                        Layout.alignment: Qt.AlignLeft
                         text: KeybindsService.cheatsheet.title || "Keybinds"
                         font.pixelSize: Theme.fontSizeLarge
                         font.weight: Font.Bold
@@ -86,8 +85,7 @@ DankModal {
 
                     DankTextField {
                         id: searchField
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
+                        Layout.alignment: Qt.AlignRight
                         leftIconName: "search"
                         onTextEdited: searchDebounce.restart()
                     }
