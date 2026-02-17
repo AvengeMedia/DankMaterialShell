@@ -924,8 +924,13 @@ Item {
                         return loadedIsUrgent;
                     return false;
                 }
-                property var loadedIconData: null
-                property bool loadedHasIcon: false
+                readonly property var loadedIconData: {
+                    if (isPlaceholder) return null;
+                    const name = modelData?.name;
+                    if (!name) return null;
+                    return SettingsData.getWorkspaceNameIcon(name);
+                }
+                readonly property bool loadedHasIcon: loadedIconData !== null
                 property var loadedIcons: []
 
                 readonly property int stableIconCount: {
@@ -986,8 +991,8 @@ Item {
                 readonly property real baseHeight: root.isVertical ? (isActive ? root.widgetHeight * 1.05 : root.widgetHeight * 0.7) : (SettingsData.showWorkspaceApps ? Math.max(widgetHeight * 0.7, root.appIconSize + Theme.spacingXS * 2) : widgetHeight * 0.5)
                 readonly property bool hasWorkspaceName: SettingsData.showWorkspaceName && modelData?.name && modelData.name !== ""
                 readonly property bool workspaceNamesEnabled: SettingsData.showWorkspaceName && (CompositorService.isNiri || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle)
-                readonly property real contentImplicitWidth: (hasWorkspaceName || loadedHasIcon) ? (appIconsLoader.item?.contentWidth ?? 0) : 0
-                readonly property real contentImplicitHeight: (workspaceNamesEnabled || loadedHasIcon) ? (appIconsLoader.item?.contentHeight ?? 0) : 0
+                readonly property real contentImplicitWidth: hasWorkspaceName ? (appIconsLoader.item?.contentWidth ?? 0) : 0
+                readonly property real contentImplicitHeight: workspaceNamesEnabled ? (appIconsLoader.item?.contentHeight ?? 0) : 0
 
                 readonly property real iconsExtraWidth: {
                     if (!root.isVertical && SettingsData.showWorkspaceApps && stableIconCount > 0) {
@@ -1222,8 +1227,6 @@ Item {
                     onTriggered: {
                         if (isPlaceholder) {
                             delegateRoot.loadedWorkspaceData = null;
-                            delegateRoot.loadedIconData = null;
-                            delegateRoot.loadedHasIcon = false;
                             delegateRoot.loadedIcons = [];
                             delegateRoot.loadedIsUrgent = false;
                             return;
@@ -1248,13 +1251,6 @@ Item {
                         } else {
                             delegateRoot.loadedIsUrgent = wsData?.urgent ?? false;
                         }
-
-                        var icData = null;
-                        if (wsData?.name) {
-                            icData = SettingsData.getWorkspaceNameIcon(wsData.name);
-                        }
-                        delegateRoot.loadedIconData = icData;
-                        delegateRoot.loadedHasIcon = icData !== null;
 
                         if (SettingsData.showWorkspaceApps) {
                             if (CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
@@ -1420,7 +1416,7 @@ Item {
 
                                     Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "icon"
-                                        width: wsIcon.width + (isActive && loadedIcons.length > 0 ? 4 : 0)
+                                        width: wsIcon.width
                                         height: root.appIconSize
 
                                         DankIcon {
@@ -1435,7 +1431,7 @@ Item {
 
                                     Item {
                                         visible: loadedHasIcon && loadedIconData?.type === "text"
-                                        width: wsText.implicitWidth + (isActive && loadedIcons.length > 0 ? 4 : 0)
+                                        width: wsText.implicitWidth
                                         height: root.appIconSize
 
                                         StyledText {
@@ -1449,14 +1445,14 @@ Item {
                                     }
 
                                     Item {
-                                        visible: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon
-                                        width: wsIndexText.implicitWidth + (isActive && loadedIcons.length > 0 ? 4 : 0)
+                                        visible: ((SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon) || (loadedHasIcon && SettingsData.showWorkspaceName && hasWorkspaceName)
+                                        width: wsIndexText.implicitWidth
                                         height: root.appIconSize
 
                                         StyledText {
                                             id: wsIndexText
                                             anchors.verticalCenter: parent.verticalCenter
-                                            text: root.getWorkspaceIndex(modelData, index)
+                                            text: loadedHasIcon ? (modelData?.name ?? "") : root.getWorkspaceIndex(modelData, index)
                                             color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                             font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
                                             font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
@@ -1574,9 +1570,9 @@ Item {
                                     }
 
                                     StyledText {
-                                        visible: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon
+                                        visible: ((SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon) || (loadedHasIcon && SettingsData.showWorkspaceName && hasWorkspaceName)
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        text: root.getWorkspaceIndex(modelData, index)
+                                        text: loadedHasIcon ? (root.isVertical ? (modelData?.name ?? "").charAt(0) : (modelData?.name ?? "")) : root.getWorkspaceIndex(modelData, index)
                                         color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
                                         font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
                                         font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
@@ -1670,55 +1666,6 @@ Item {
                         }
                     }
 
-                    // Loader for Custom Name Icon
-                    Loader {
-                        id: customIconLoader
-                        anchors.fill: parent
-                        active: !isPlaceholder && loadedHasIcon && loadedIconData.type === "icon" && !SettingsData.showWorkspaceApps
-                        sourceComponent: Item {
-                            DankIcon {
-                                anchors.centerIn: parent
-                                name: loadedIconData ? loadedIconData.value : "" // NULL CHECK
-                                size: Theme.fontSizeSmall
-                                color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
-                                weight: isActive && !isPlaceholder ? 500 : 400
-                            }
-                        }
-                    }
-
-                    // Loader for Custom Name Text
-                    Loader {
-                        id: customTextLoader
-                        anchors.fill: parent
-                        active: !isPlaceholder && loadedHasIcon && loadedIconData.type === "text" && !SettingsData.showWorkspaceApps
-                        sourceComponent: Item {
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: loadedIconData ? loadedIconData.value : "" // NULL CHECK
-                                color: isActive ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : Theme.surfaceTextMedium
-                                font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
-                                font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
-                            }
-                        }
-                    }
-
-                    // Loader for Workspace Index
-                    Loader {
-                        id: indexLoader
-                        anchors.fill: parent
-                        active: (SettingsData.showWorkspaceIndex || SettingsData.showWorkspaceName) && !loadedHasIcon && !SettingsData.showWorkspaceApps
-                        sourceComponent: Item {
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: {
-                                    return root.getWorkspaceIndex(modelData, index);
-                                }
-                                color: (isActive || isUrgent) ? Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 0.95) : isPlaceholder ? Theme.surfaceTextAlpha : Theme.surfaceTextMedium
-                                font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
-                                font.weight: (isActive && !isPlaceholder) ? Font.DemiBold : Font.Normal
-                            }
-                        }
-                    }
                 }
 
                 Component.onCompleted: updateAllData()
