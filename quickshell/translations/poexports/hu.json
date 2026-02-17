@@ -884,7 +884,7 @@
     "Clipboard Manager": "Vágólapkezelő"
   },
   "Clipboard behavior setting description": {
-    "Press Enter to paste, Shift+Enter to copy": ""
+    "Press Enter to paste, Shift+Enter to copy": "Nyomd meg az Entert a beillesztéshez, Shift+Entert a másoláshoz"
   },
   "Clipboard service not available": {
     "Clipboard service not available": "A vágólap szolgáltatások nem elérhetők"
@@ -1727,7 +1727,7 @@
     "Enter this passkey on ": "Írd be ezt a jelszót ehhez: "
   },
   "Enter to Paste": {
-    "Enter to Paste": ""
+    "Enter to Paste": "Enter a beillesztéshez"
   },
   "Enterprise": {
     "Enterprise": "Vállalati"
@@ -2088,6 +2088,9 @@
   },
   "Format Legend": {
     "Format Legend": "Formátum magyarázat"
+  },
+  "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
   },
   "Frequency": {
     "Frequency": "Frekvencia"
@@ -2656,8 +2659,8 @@
     "Keyboard Shortcuts": "Gyorsbillentyűk"
   },
   "Keyboard hints when enter-to-paste is enabled": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "",
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": ""
+    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Enter: Másolás • Shift+Del: Összes törlése • Esc: Bezárás",
+    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Navigálás • Enter: Beillesztés • Del: Törlés • F10: Súgó"
   },
   "Keys": {
     "Keys": "Billentyűk"
@@ -4201,7 +4204,7 @@
     "Select Bar": "Sáv kiválasztása"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": ""
+    "Select Dock Launcher Logo": "Dokkindító logó kiválasztása"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Indító logó kiválasztása"
@@ -4988,6 +4991,9 @@
   },
   "Unknown Title": {
     "Unknown Title": "Ismeretlen cím"
+  },
+  "Unload on Close": {
+    "Unload on Close": ""
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Névtelen szabály"

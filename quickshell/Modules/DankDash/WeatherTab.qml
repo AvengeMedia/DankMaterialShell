@@ -12,7 +12,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     implicitWidth: 700
-    implicitHeight: root.available ? mainColumn.implicitHeight : unavailableColumn.implicitHeight + Theme.spacingXL * 2
+    implicitHeight: 410
     property bool syncing: false
     property bool showHourly: false
     property bool available: WeatherService.weather.available
@@ -848,6 +848,7 @@ Item {
         }
 
         Item {
+            id: chipsRow
             width: parent.width
             height: forecastChips.height
 
@@ -939,7 +940,7 @@ Item {
 
         Item {
             width: parent.width
-            height: root.showHourly ? ((hourlyLoader.item?.cardHeight ?? (Theme.fontSizeLarge * 6)) + Theme.spacingXS) : ((dailyLoader.item?.cardHeight ?? (Theme.fontSizeLarge * 6)) + Theme.spacingXS)
+            height: root.height - heroCard.height - skyDateRow.height - chipsRow.height - mainColumn.spacing * 3
 
             Loader {
                 id: dailyLoader
@@ -981,8 +982,7 @@ Item {
         id: hourlyComponent
         ListView {
             id: hourlyList
-            width: parent.width
-            height: cardHeight + Theme.spacingXS
+            anchors.fill: parent
             orientation: ListView.Horizontal
             spacing: Theme.spacingS
             clip: true
@@ -990,10 +990,8 @@ Item {
             highlightRangeMode: ListView.StrictlyEnforceRange
             highlightMoveDuration: 0
             interactive: true
-            contentHeight: cardHeight
-            contentWidth: cardWidth
 
-            property var cardHeight: Theme.fontSizeLarge * 6
+            property var cardHeight: height
             property var cardWidth: ((hourlyList.width + hourlyList.spacing) / hourlyList.visibleCount) - hourlyList.spacing
             property int initialIndex: (new Date()).getHours()
             property bool dense: !SessionData.weatherHourlyDetailed
@@ -1070,8 +1068,7 @@ Item {
         id: dailyComponent
         ListView {
             id: dailyList
-            width: parent.width
-            height: cardHeight + Theme.spacingXS
+            anchors.fill: parent
             orientation: ListView.Horizontal
             spacing: Theme.spacingS
             clip: true
@@ -1079,10 +1076,8 @@ Item {
             highlightRangeMode: ListView.StrictlyEnforceRange
             highlightMoveDuration: 0
             interactive: true
-            contentHeight: cardHeight
-            contentWidth: cardWidth
 
-            property var cardHeight: Theme.fontSizeLarge * 6
+            property var cardHeight: height
             property var cardWidth: ((dailyList.width + dailyList.spacing) / dailyList.visibleCount) - dailyList.spacing
             property int initialIndex: 0
             property bool dense: false

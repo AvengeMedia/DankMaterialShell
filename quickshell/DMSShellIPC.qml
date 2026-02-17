@@ -197,7 +197,7 @@ Item {
             if (CompositorService.isNiri && NiriService.currentOutput) {
                 return NiriService.currentOutput;
             }
-            if ((CompositorService.isSway || CompositorService.isScroll) && I3.workspaces?.values) {
+            if ((CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) && I3.workspaces?.values) {
                 const focusedWs = I3.workspaces.values.find(ws => ws.focused === true);
                 return focusedWs?.monitor?.name || "";
             }

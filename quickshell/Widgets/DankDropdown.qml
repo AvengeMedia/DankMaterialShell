@@ -55,6 +55,10 @@ Item {
 
     signal valueChanged(string value)
 
+    function closeDropdownMenu() {
+        dropdownMenu.close();
+    }
+
     width: compactMode ? dropdownWidth : parent.width
     implicitHeight: compactMode ? 40 : Math.max(60, labelColumn.implicitHeight + Theme.spacingM)
 
@@ -409,7 +413,7 @@ Item {
                             onClicked: {
                                 root.currentValue = delegateRoot.modelData;
                                 root.valueChanged(delegateRoot.modelData);
-                                dropdownMenu.close();
+                                root.closeDropdownMenu();
                             }
                         }
                     }

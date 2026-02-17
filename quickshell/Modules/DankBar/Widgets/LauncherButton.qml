@@ -55,7 +55,7 @@ BasePill {
             }
 
             IconImage {
-                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isLabwc)
+                visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
                 width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
                 height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
@@ -72,6 +72,8 @@ BasePill {
                         return "file://" + Theme.shellDir + "/assets/sway.svg";
                     } else if (CompositorService.isScroll) {
                         return "file://" + Theme.shellDir + "/assets/sway.svg";
+                    } else if (CompositorService.isMiracle) {
+                        return "file://" + Theme.shellDir + "/assets/miraclewm.svg";
                     } else if (CompositorService.isLabwc) {
                         return "file://" + Theme.shellDir + "/assets/labwc.png";
                     }

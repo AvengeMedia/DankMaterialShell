@@ -14,7 +14,7 @@ dms-greeter - DankMaterialShell greeter launcher
 Usage: dms-greeter --command COMPOSITOR [OPTIONS]
 
 Required:
-    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, scroll, mango, or labwc)
+    --command COMPOSITOR    Compositor to use (niri, hyprland, sway, scroll, miracle, mango, or labwc)
 
 Options:
     -C, --config PATH       Custom compositor config file
@@ -244,6 +244,24 @@ SCROLL_EOF
         exec scroll -c "$COMPOSITOR_CONFIG"
         ;;
 
+    miracle|miracle-wm)
+        if [[ -z "$COMPOSITOR_CONFIG" ]]; then
+            TEMP_CONFIG=$(mktemp)
+            cat > "$TEMP_CONFIG" << MIRACLE_EOF
+exec "$QS_CMD; miraclemsg exit"
+MIRACLE_EOF
+            COMPOSITOR_CONFIG="$TEMP_CONFIG"
+        else
+            TEMP_CONFIG=$(mktemp)
+            cat "$COMPOSITOR_CONFIG" > "$TEMP_CONFIG"
+            cat >> "$TEMP_CONFIG" << MIRACLE_EOF
+
+exec "$QS_CMD; miraclemsg exit"
+MIRACLE_EOF
+            COMPOSITOR_CONFIG="$TEMP_CONFIG"
+        fi
+        exec miracle-wm -c "$COMPOSITOR_CONFIG"
+        ;;
 
     labwc)
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
@@ -263,7 +281,7 @@ SCROLL_EOF
 
     *)
         echo "Error: Unsupported compositor: $COMPOSITOR" >&2
-        echo "Supported compositors: niri, hyprland, sway, scroll, mango, labwc" >&2
+        echo "Supported compositors: niri, hyprland, sway, scroll, miracle, mango, labwc" >&2
         exit 1
         ;;
 esac

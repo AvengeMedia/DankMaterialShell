@@ -21,8 +21,9 @@ Rectangle {
                 continue;
             const x = output.logical.x;
             const y = output.logical.y;
-            const w = output.logical.width || 1920;
-            const h = output.logical.height || 1080;
+            const size = DisplayConfigState.getLogicalSize(output);
+            const w = size.w || 1920;
+            const h = size.h || 1080;
             minX = Math.min(minX, x);
             minY = Math.min(minY, y);
             maxX = Math.max(maxX, x + w);

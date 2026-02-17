@@ -5236,6 +5236,13 @@
     "comment": ""
   },
   {
+    "term": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Frequency",
     "translation": "",
     "context": "",
@@ -12566,6 +12573,13 @@
   },
   {
     "term": "Unknown Title",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Unload on Close",
     "translation": "",
     "context": "",
     "reference": "",

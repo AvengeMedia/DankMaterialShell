@@ -103,7 +103,7 @@ Item {
                 }, (_, i) => i);
             }
             return DwlService.getVisibleTags(barWindow.screenName);
-        } else if (CompositorService.isSway || CompositorService.isScroll) {
+        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const workspaces = I3.workspaces?.values || [];
             if (workspaces.length === 0)
                 return [
@@ -145,7 +145,7 @@ Item {
                 return 0;
             const activeTags = DwlService.getActiveTags(barWindow.screenName);
             return activeTags.length > 0 ? activeTags[0] : 0;
-        } else if (CompositorService.isSway || CompositorService.isScroll) {
+        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             if (!barWindow.screenName || SettingsData.workspaceFollowFocus) {
                 const focusedWs = I3.workspaces?.values?.find(ws => ws.focused === true);
                 return focusedWs ? focusedWs.num : 1;
@@ -194,7 +194,7 @@ Item {
             if (nextIndex !== validIndex) {
                 DwlService.switchToTag(barWindow.screenName, realWorkspaces[nextIndex]);
             }
-        } else if (CompositorService.isSway || CompositorService.isScroll) {
+        } else if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
             const currentWs = getCurrentWorkspace();
             const currentIndex = realWorkspaces.findIndex(ws => ws.num === currentWs);
             const validIndex = currentIndex === -1 ? 0 : currentIndex;

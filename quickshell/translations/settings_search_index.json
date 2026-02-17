@@ -2110,6 +2110,35 @@
     ]
   },
   {
+    "section": "dankLauncherV2UnloadOnClose",
+    "label": "Unload on Close",
+    "tabIndex": 9,
+    "category": "Launcher",
+    "keywords": [
+      "app drawer",
+      "app menu",
+      "applications",
+      "cause",
+      "close",
+      "closed",
+      "day",
+      "delay",
+      "drawer",
+      "free",
+      "launcher",
+      "light mode",
+      "memory",
+      "menu",
+      "reopening",
+      "slight",
+      "start",
+      "start menu",
+      "unload",
+      "vram"
+    ],
+    "description": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening."
+  },
+  {
     "section": "matugenTemplateAlacritty",
     "label": "Alacritty",
     "tabIndex": 10,
@@ -4647,6 +4676,50 @@
       "toast"
     ],
     "description": "Use smaller notification cards"
+  },
+  {
+    "section": "notificationAnimationSpeed",
+    "label": "Animation Speed",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "animate",
+      "animation",
+      "duration",
+      "fast",
+      "messages",
+      "motion",
+      "notif",
+      "notification",
+      "notifications",
+      "popup",
+      "speed",
+      "toast"
+    ],
+    "description": "Control animation duration for notification popups and history"
+  },
+  {
+    "section": "notificationCustomAnimationDuration",
+    "label": "Animation Duration",
+    "tabIndex": 17,
+    "category": "Notifications",
+    "keywords": [
+      "alert",
+      "animate",
+      "animation",
+      "custom",
+      "duration",
+      "messages",
+      "ms",
+      "notif",
+      "notification",
+      "notifications",
+      "popup",
+      "speed",
+      "toast"
+    ],
+    "description": "Base duration for notification animations"
   },
   {
     "section": "notificationHistorySaveCritical",

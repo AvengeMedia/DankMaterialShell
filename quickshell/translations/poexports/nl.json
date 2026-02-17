@@ -884,7 +884,7 @@
     "Clipboard Manager": "Klembordbeheer"
   },
   "Clipboard behavior setting description": {
-    "Press Enter to paste, Shift+Enter to copy": ""
+    "Press Enter to paste, Shift+Enter to copy": "Druk Enter om te plakken, Shift+Enter om te kopiëren"
   },
   "Clipboard service not available": {
     "Clipboard service not available": "Klembord-service niet beschikbaar"
@@ -1727,7 +1727,7 @@
     "Enter this passkey on ": "Voer deze toegangscode in op "
   },
   "Enter to Paste": {
-    "Enter to Paste": ""
+    "Enter to Paste": "Enter om te plakken"
   },
   "Enterprise": {
     "Enterprise": "Enterprise"
@@ -2088,6 +2088,9 @@
   },
   "Format Legend": {
     "Format Legend": "Legenda voor notatie"
+  },
+  "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
   },
   "Frequency": {
     "Frequency": "Frequentie"
@@ -2656,8 +2659,8 @@
     "Keyboard Shortcuts": "Sneltoetsen"
   },
   "Keyboard hints when enter-to-paste is enabled": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "",
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": ""
+    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Enter: Kopiëren • Shift+Del: Alles leegmaken • Esc: Sluiten",
+    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: Navigeren • Enter: Plakken • Del: Verwijderen • F10: Help"
   },
   "Keys": {
     "Keys": "Toetsen"
@@ -4201,7 +4204,7 @@
     "Select Bar": "Balk selecteren"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": ""
+    "Select Dock Launcher Logo": "Kies Dock launcher Logo"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "Startlogo selecteren"
@@ -4988,6 +4991,9 @@
   },
   "Unknown Title": {
     "Unknown Title": "Onbekende titel"
+  },
+  "Unload on Close": {
+    "Unload on Close": ""
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Naamloze regel"

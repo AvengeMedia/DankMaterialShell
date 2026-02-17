@@ -73,6 +73,7 @@ in
         "labwc"
         "mango"
         "scroll"
+        "miracle"
       ];
       description = "Compositor to run greeter in";
     };

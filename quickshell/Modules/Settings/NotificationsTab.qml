@@ -6,6 +6,25 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    Component.onCompleted: {
+        if (SettingsData._pendingExpandNotificationRules) {
+            SettingsData._pendingExpandNotificationRules = false;
+            notificationRulesCard.userToggledCollapse = true;
+            notificationRulesCard.expanded = true;
+            SettingsData._pendingNotificationRuleIndex = -1;
+        }
+    }
+
+    readonly property var mutedRules: {
+        var rules = SettingsData.notificationRules || [];
+        var out = [];
+        for (var i = 0; i < rules.length; i++) {
+            if ((rules[i].action || "").toString().toLowerCase() === "mute")
+                out.push({ rule: rules[i], index: i });
+        }
+        return out;
+    }
+
     readonly property var timeoutOptions: [
         {
             text: I18n.tr("Never"),
@@ -201,22 +220,33 @@ Item {
                             return I18n.tr("Top Left", "screen position option");
                         case SettingsData.Position.Right:
                             return I18n.tr("Bottom Right", "screen position option");
+                        case SettingsData.Position.BottomCenter:
+                            return I18n.tr("Bottom Center", "screen position option");
                         default:
                             return I18n.tr("Top Right", "screen position option");
                         }
                     }
-                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
+                    options: [I18n.tr("Top Right", "screen position option"), I18n.tr("Top Left", "screen position option"), I18n.tr("Top Center", "screen position option"), I18n.tr("Bottom Center", "screen position option"), I18n.tr("Bottom Right", "screen position option"), I18n.tr("Bottom Left", "screen position option")]
                     onValueChanged: value => {
-                        if (value === I18n.tr("Top Right", "screen position option")) {
+                        switch (value) {
+                        case I18n.tr("Top Right", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Top);
-                        } else if (value === I18n.tr("Top Left", "screen position option")) {
+                            break;
+                        case I18n.tr("Top Left", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Left);
-                        } else if (value === I18n.tr("Top Center", "screen position option")) {
+                            break;
+                        case I18n.tr("Top Center", "screen position option"):
                             SettingsData.set("notificationPopupPosition", -1);
-                        } else if (value === I18n.tr("Bottom Right", "screen position option")) {
+                            break;
+                        case I18n.tr("Bottom Center", "screen position option"):
+                            SettingsData.set("notificationPopupPosition", SettingsData.Position.BottomCenter);
+                            break;
+                        case I18n.tr("Bottom Right", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Right);
-                        } else if (value === I18n.tr("Bottom Left", "screen position option")) {
+                            break;
+                        case I18n.tr("Bottom Left", "screen position option"):
                             SettingsData.set("notificationPopupPosition", SettingsData.Position.Bottom);
+                            break;
                         }
                         SettingsData.sendTestNotifications();
                     }
@@ -239,6 +269,95 @@ Item {
                     checked: SettingsData.notificationCompactMode
                     onToggled: checked => SettingsData.set("notificationCompactMode", checked)
                 }
+
+                SettingsToggleRow {
+                    settingKey: "notificationPopupShadowEnabled"
+                    tags: ["notification", "popup", "shadow", "radius", "rounded"]
+                    text: I18n.tr("Popup Shadow")
+                    description: I18n.tr("Show drop shadow on notification popups")
+                    checked: SettingsData.notificationPopupShadowEnabled
+                    onToggled: checked => SettingsData.set("notificationPopupShadowEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "notificationPopupPrivacyMode"
+                    tags: ["notification", "popup", "privacy", "body", "content", "hide"]
+                    text: I18n.tr("Privacy Mode")
+                    description: I18n.tr("Hide notification content until expanded; popups show collapsed by default")
+                    checked: SettingsData.notificationPopupPrivacyMode
+                    onToggled: checked => SettingsData.set("notificationPopupPrivacyMode", checked)
+                }
+
+                Item {
+                    width: parent.width
+                    height: notificationAnimationColumn.implicitHeight + Theme.spacingM * 2
+
+                    Column {
+                        id: notificationAnimationColumn
+                        width: parent.width - Theme.spacingM * 2
+                        x: Theme.spacingM
+                        anchors.top: parent.top
+                        anchors.topMargin: Theme.spacingM
+                        spacing: Theme.spacingS
+
+                        StyledText {
+                            text: I18n.tr("Animation Speed")
+                            font.pixelSize: Theme.fontSizeMedium
+                            font.weight: Font.Medium
+                            color: Theme.surfaceText
+                            width: parent.width
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Control animation duration for notification popups and history")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceVariantText
+                            wrapMode: Text.WordWrap
+                            width: parent.width
+                        }
+
+                        DankButtonGroup {
+                            id: notificationSpeedGroup
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            buttonPadding: parent.width < 480 ? Theme.spacingS : Theme.spacingM
+                            minButtonWidth: parent.width < 480 ? 44 : 56
+                            textSize: parent.width < 480 ? Theme.fontSizeSmall : Theme.fontSizeMedium
+                            model: [I18n.tr("None"), I18n.tr("Short"), I18n.tr("Medium"), I18n.tr("Long"), I18n.tr("Custom")]
+                            selectionMode: "single"
+                            currentIndex: SettingsData.notificationAnimationSpeed
+                            onSelectionChanged: (index, selected) => {
+                                if (!selected)
+                                    return;
+                                SettingsData.set("notificationAnimationSpeed", index);
+                            }
+
+                            Connections {
+                                target: SettingsData
+                                function onNotificationAnimationSpeedChanged() {
+                                    notificationSpeedGroup.currentIndex = SettingsData.notificationAnimationSpeed;
+                                }
+                            }
+                        }
+
+                        SettingsSliderRow {
+                            settingKey: "notificationCustomAnimationDuration"
+                            tags: ["notification", "animation", "duration", "custom", "speed"]
+                            text: I18n.tr("Duration")
+                            description: I18n.tr("Base duration for animations (drag to use Custom)")
+                            minimum: 100
+                            maximum: 800
+                            value: Theme.notificationAnimationBaseDuration
+                            unit: "ms"
+                            defaultValue: 400
+                            onSliderValueChanged: newValue => {
+                                if (SettingsData.notificationAnimationSpeed !== SettingsData.AnimationSpeed.Custom) {
+                                    SettingsData.set("notificationAnimationSpeed", SettingsData.AnimationSpeed.Custom);
+                                }
+                                SettingsData.set("notificationCustomAnimationDuration", newValue);
+                            }
+                        }
+                    }
+                }
             }
 
             SettingsCard {
@@ -258,6 +377,7 @@ Item {
             }
 
             SettingsCard {
+                id: notificationRulesCard
                 width: parent.width
                 iconName: "rule_settings"
                 title: I18n.tr("Notification Rules")
@@ -282,7 +402,11 @@ Item {
                         iconSize: 20
                         backgroundColor: Theme.surfaceContainer
                         iconColor: Theme.primary
-                        onClicked: SettingsData.addNotificationRule()
+                        onClicked: {
+                            SettingsData.addNotificationRule();
+                            notificationRulesCard.userToggledCollapse = true;
+                            notificationRulesCard.expanded = true;
+                        }
                     }
                 ]
 
@@ -291,7 +415,7 @@ Item {
                     spacing: Theme.spacingS
 
                     StyledText {
-                        text: I18n.tr("Create rules to mute, ignore, hide from history, or override notification priority.")
+                        text: I18n.tr("Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.")
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         wrapMode: Text.WordWrap
@@ -407,6 +531,7 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 165
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleFieldOptions, modelData.field, root.notificationRuleFieldOptions[0].label)
                                             options: root.notificationRuleFieldOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "field", root.getRuleOptionValue(root.notificationRuleFieldOptions, value, "appName"))
@@ -447,6 +572,7 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 170
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleActionOptions, modelData.action, root.notificationRuleActionOptions[0].label)
                                             options: root.notificationRuleActionOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "action", root.getRuleOptionValue(root.notificationRuleActionOptions, value, "default"))
@@ -467,10 +593,100 @@ Item {
                                             width: parent.width
                                             compactMode: true
                                             dropdownWidth: parent.width
+                                            popupWidth: 165
                                             currentValue: root.getRuleOptionLabel(root.notificationRuleUrgencyOptions, modelData.urgency, root.notificationRuleUrgencyOptions[0].label)
                                             options: root.notificationRuleUrgencyOptions.map(o => o.label)
                                             onValueChanged: value => SettingsData.updateNotificationRuleField(index, "urgency", root.getRuleOptionValue(root.notificationRuleUrgencyOptions, value, "default"))
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                width: parent.width
+                iconName: "volume_off"
+                title: I18n.tr("Muted Apps")
+                settingKey: "mutedApps"
+                tags: ["notification", "mute", "unmute", "popup"]
+
+                Column {
+                    width: parent.width
+                    spacing: Theme.spacingS
+
+                    StyledText {
+                        text: mutedRules.length > 0 ? I18n.tr("Apps with notification popups muted. Unmute or delete to remove.") : I18n.tr("No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.surfaceVariantText
+                        wrapMode: Text.WordWrap
+                        width: parent.width
+                        bottomPadding: Theme.spacingS
+                    }
+
+                    Repeater {
+                        model: mutedRules
+
+                        delegate: Rectangle {
+                            width: parent.width
+                            height: mutedRow.implicitHeight + Theme.spacingS * 2
+                            radius: Theme.cornerRadius
+                            color: Theme.withAlpha(Theme.surfaceContainer, 0.5)
+
+                            Row {
+                                id: mutedRow
+                                anchors.fill: parent
+                                anchors.margins: Theme.spacingS
+                                spacing: Theme.spacingM
+
+                                StyledText {
+                                    id: mutedAppLabel
+                                    text: (modelData.rule && modelData.rule.pattern) ? modelData.rule.pattern : I18n.tr("Unknown")
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Item {
+                                    width: Math.max(0, parent.width - parent.spacing - mutedAppLabel.width - unmuteBtn.width - deleteBtn.width - Theme.spacingS * 5)
+                                    height: 1
+                                }
+
+                                DankButton {
+                                    id: unmuteBtn
+                                    text: I18n.tr("Unmute")
+                                    backgroundColor: Theme.surfaceContainer
+                                    textColor: Theme.primary
+                                    onClicked: SettingsData.removeNotificationRule(modelData.index)
+                                }
+
+                                Item {
+                                    id: deleteBtn
+                                    width: 28
+                                    height: 28
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: Theme.cornerRadius
+                                        color: deleteArea.containsMouse ? Theme.withAlpha(Theme.error, 0.2) : "transparent"
+                                    }
+
+                                    DankIcon {
+                                        anchors.centerIn: parent
+                                        name: "delete"
+                                        size: 18
+                                        color: deleteArea.containsMouse ? Theme.error : Theme.surfaceVariantText
+                                    }
+
+                                    MouseArea {
+                                        id: deleteArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: SettingsData.removeNotificationRule(modelData.index)
                                     }
                                 }
                             }

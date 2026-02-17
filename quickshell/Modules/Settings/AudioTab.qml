@@ -18,6 +18,22 @@ Item {
     property string editingDeviceType: ""
     property string newDeviceName: ""
     property bool isReloadingAudio: false
+    property var hiddenOutputDeviceNames: SessionData.hiddenOutputDeviceNames ?? []
+    property var hiddenInputDeviceNames: SessionData.hiddenInputDeviceNames ?? []
+    property bool showHiddenOutputDevices: false
+    property bool showHiddenInputDevices: false
+
+    function persistHiddenOutputDeviceNames(deviceNames) {
+        const uniqueNames = [...new Set(deviceNames)];
+        hiddenOutputDeviceNames = uniqueNames;
+        SessionData.setHiddenOutputDeviceNames(uniqueNames);
+    }
+
+    function persistHiddenInputDeviceNames(deviceNames) {
+        const uniqueNames = [...new Set(deviceNames)];
+        hiddenInputDeviceNames = uniqueNames;
+        SessionData.setHiddenInputDeviceNames(uniqueNames);
+    }
 
     function updateDeviceList() {
         const allNodes = Pipewire.nodes.values;
@@ -56,6 +72,8 @@ Item {
     }
 
     Component.onCompleted: {
+        hiddenOutputDeviceNames = SessionData.hiddenOutputDeviceNames ?? [];
+        hiddenInputDeviceNames = SessionData.hiddenInputDeviceNames ?? [];
         updateDeviceList();
     }
 
@@ -132,7 +150,7 @@ Item {
                     }
 
                     Repeater {
-                        model: root.outputDevices
+                        model: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name))
 
                         delegate: Column {
                             required property var modelData
@@ -142,6 +160,7 @@ Item {
                             DeviceAliasRow {
                                 deviceNode: modelData
                                 deviceType: "output"
+                                showHideButton: true
 
                                 onEditRequested: device => {
                                     root.editingDevice = device;
@@ -153,6 +172,10 @@ Item {
                                 onResetRequested: device => {
                                     AudioService.removeDeviceAlias(device.name);
                                 }
+
+                                onHideRequested: device => {
+                                    root.persistHiddenOutputDeviceNames([...root.hiddenOutputDeviceNames, device.name]);
+                                }
                             }
 
                             Item {
@@ -161,7 +184,7 @@ Item {
 
                                 StyledText {
                                     id: maxVolLabel
-                                    text: I18n.tr("Max Volume", "Audio settings: maximum volume limit per device")
+                                    text: I18n.tr("Max Volume", "Audio settings: maximum volume limit per device") + " · " + maxVolSlider.value + "%"
                                     anchors.left: parent.left
                                     anchors.leftMargin: Theme.spacingM + Theme.iconSize + Theme.spacingM
                                     anchors.verticalCenter: parent.verticalCenter
@@ -182,6 +205,8 @@ Item {
                                     maximum: 200
                                     step: 5
                                     showValue: true
+                                    wheelEnabled: false
+                                    centerMinimum: true
                                     unit: "%"
                                     onSliderValueChanged: newValue => {
                                         SessionData.setDeviceMaxVolume(modelData.name, newValue);
@@ -204,8 +229,86 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         horizontalAlignment: Text.AlignHCenter
-                        visible: root.outputDevices.length === 0
+                        visible: root.outputDevices.filter(d => !root.hiddenOutputDeviceNames.includes(d.name)).length === 0 && root.hiddenOutputDeviceNames.length === 0
                         topPadding: Theme.spacingM
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: 0
+                        visible: root.hiddenOutputDeviceNames.length > 0
+
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: Theme.outline
+                            opacity: 0.15
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: 36
+
+                            Row {
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.spacingS
+
+                                DankIcon {
+                                    name: "visibility_off"
+                                    size: Theme.iconSize - 4
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Hidden (%1)").arg(root.hiddenOutputDeviceNames.length)
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            DankIcon {
+                                name: root.showHiddenOutputDevices ? "expand_less" : "expand_more"
+                                size: Theme.iconSize - 4
+                                color: Theme.surfaceVariantText
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.showHiddenOutputDevices = !root.showHiddenOutputDevices
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: 0
+                            visible: root.showHiddenOutputDevices
+
+                            Repeater {
+                                model: root.outputDevices.filter(d => root.hiddenOutputDeviceNames.includes(d.name))
+
+                                delegate: DeviceAliasRow {
+                                    required property var modelData
+                                    deviceNode: modelData
+                                    deviceType: "output"
+                                    isHidden: true
+                                    showHideButton: true
+
+                                    onHideRequested: device => {
+                                        root.persistHiddenOutputDeviceNames(root.hiddenOutputDeviceNames.filter(n => n !== device.name));
+                                    }
+
+                                    onResetRequested: device => {
+                                        AudioService.removeDeviceAlias(device.name);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -238,13 +341,14 @@ Item {
                     }
 
                     Repeater {
-                        model: root.inputDevices
+                        model: root.inputDevices.filter(d => !root.hiddenInputDeviceNames.includes(d.name))
 
                         delegate: DeviceAliasRow {
                             required property var modelData
 
                             deviceNode: modelData
                             deviceType: "input"
+                            showHideButton: true
 
                             onEditRequested: device => {
                                 root.editingDevice = device;
@@ -256,6 +360,10 @@ Item {
                             onResetRequested: device => {
                                 AudioService.removeDeviceAlias(device.name);
                             }
+
+                            onHideRequested: device => {
+                                root.persistHiddenInputDeviceNames([...root.hiddenInputDeviceNames, device.name]);
+                            }
                         }
                     }
 
@@ -265,8 +373,86 @@ Item {
                         font.pixelSize: Theme.fontSizeSmall
                         color: Theme.surfaceVariantText
                         horizontalAlignment: Text.AlignHCenter
-                        visible: root.inputDevices.length === 0
+                        visible: root.inputDevices.filter(d => !root.hiddenInputDeviceNames.includes(d.name)).length === 0 && root.hiddenInputDeviceNames.length === 0
                         topPadding: Theme.spacingM
+                    }
+
+                    Column {
+                        width: parent.width
+                        spacing: 0
+                        visible: root.hiddenInputDeviceNames.length > 0
+
+                        Rectangle {
+                            width: parent.width
+                            height: 1
+                            color: Theme.outline
+                            opacity: 0.15
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: 36
+
+                            Row {
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: Theme.spacingS
+
+                                DankIcon {
+                                    name: "visibility_off"
+                                    size: Theme.iconSize - 4
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                StyledText {
+                                    text: I18n.tr("Hidden (%1)").arg(root.hiddenInputDeviceNames.length)
+                                    font.pixelSize: Theme.fontSizeSmall
+                                    color: Theme.surfaceVariantText
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            DankIcon {
+                                name: root.showHiddenInputDevices ? "expand_less" : "expand_more"
+                                size: Theme.iconSize - 4
+                                color: Theme.surfaceVariantText
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.showHiddenInputDevices = !root.showHiddenInputDevices
+                            }
+                        }
+
+                        Column {
+                            width: parent.width
+                            spacing: 0
+                            visible: root.showHiddenInputDevices
+
+                            Repeater {
+                                model: root.inputDevices.filter(d => root.hiddenInputDeviceNames.includes(d.name))
+
+                                delegate: DeviceAliasRow {
+                                    required property var modelData
+                                    deviceNode: modelData
+                                    deviceType: "input"
+                                    isHidden: true
+                                    showHideButton: true
+
+                                    onHideRequested: device => {
+                                        root.persistHiddenInputDeviceNames(root.hiddenInputDeviceNames.filter(n => n !== device.name));
+                                    }
+
+                                    onResetRequested: device => {
+                                        AudioService.removeDeviceAlias(device.name);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

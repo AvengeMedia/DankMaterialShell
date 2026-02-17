@@ -16,6 +16,7 @@ Item {
     property bool showValue: true
     property bool isDragging: false
     property bool wheelEnabled: true
+    property bool centerMinimum: false
     property real valueOverride: -1
     property bool alwaysShowValue: false
     readonly property bool containsMouse: sliderMouseArea.containsMouse
@@ -30,6 +31,8 @@ Item {
 
     function updateValueFromPosition(x) {
         let ratio = Math.max(0, Math.min(1, (x - sliderHandle.width / 2) / (sliderTrack.width - sliderHandle.width)));
+        if (centerMinimum)
+            ratio = Math.max(0, (ratio - 0.5) * 2);
         let rawValue = minimum + ratio * (maximum - minimum);
         let newValue = step > 1 ? Math.round(rawValue / step) * step : Math.round(rawValue);
         newValue = Math.max(minimum, Math.min(maximum, newValue));
@@ -70,7 +73,9 @@ Item {
                 height: parent.height
                 radius: Theme.cornerRadius
                 width: {
-                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum);
+                    const range = slider.maximum - slider.minimum;
+                    const rawRatio = range === 0 ? 0 : (slider.value - slider.minimum) / range;
+                    const ratio = slider.centerMinimum ? (0.5 + rawRatio * 0.5) : rawRatio;
                     const travel = sliderTrack.width - sliderHandle.width;
                     const center = (travel * ratio) + sliderHandle.width / 2;
                     return Math.max(0, Math.min(sliderTrack.width, center));
@@ -87,7 +92,9 @@ Item {
                 height: 24
                 radius: Theme.cornerRadius
                 x: {
-                    const ratio = (slider.value - slider.minimum) / (slider.maximum - slider.minimum);
+                    const range = slider.maximum - slider.minimum;
+                    const rawRatio = range === 0 ? 0 : (slider.value - slider.minimum) / range;
+                    const ratio = slider.centerMinimum ? (0.5 + rawRatio * 0.5) : rawRatio;
                     const travel = sliderTrack.width - width;
                     return Math.max(0, Math.min(travel, travel * ratio));
                 }

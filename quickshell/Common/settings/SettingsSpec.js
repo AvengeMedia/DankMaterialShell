@@ -297,6 +297,8 @@ var SPEC = {
     dockShowOverflowBadge: { def: true },
 
     notificationOverlayEnabled: { def: false },
+    notificationPopupShadowEnabled: { def: true },
+    notificationPopupPrivacyMode: { def: false },
     overviewRows: { def: 2, persist: false },
     overviewColumns: { def: 5, persist: false },
     overviewScale: { def: 0.16, persist: false },
@@ -325,6 +327,8 @@ var SPEC = {
     notificationTimeoutCritical: { def: 0 },
     notificationCompactMode: { def: false },
     notificationPopupPosition: { def: 0 },
+    notificationAnimationSpeed: { def: 1 },
+    notificationCustomAnimationDuration: { def: 400 },
     notificationHistoryEnabled: { def: true },
     notificationHistoryMaxCount: { def: 50 },
     notificationHistoryMaxAgeDays: { def: 7 },

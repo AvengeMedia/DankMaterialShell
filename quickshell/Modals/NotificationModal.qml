@@ -70,8 +70,8 @@ DankModal {
         NotificationService.dismissAllPopups();
     }
 
-    modalWidth: 500
-    modalHeight: 700
+    modalWidth: Math.min(500, screenWidth - 48)
+    modalHeight: Math.min(700, screenHeight * 0.85)
     backgroundColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
     visible: false
     onBackgroundClicked: hide()

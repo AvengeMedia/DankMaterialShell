@@ -1493,6 +1493,10 @@ Singleton {
         }
 
         const original = originalOutputs ? JSON.parse(JSON.stringify(originalOutputs)) : buildOutputsWithPendingChanges();
+        for (const name in savedOutputs) {
+            if (!original[name])
+                original[name] = JSON.parse(JSON.stringify(savedOutputs[name]));
+        }
         backendWriteOutputsConfig(original);
         clearPendingChanges();
         if (originalOutputs)

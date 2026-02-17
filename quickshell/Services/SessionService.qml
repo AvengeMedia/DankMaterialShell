@@ -314,7 +314,7 @@ Singleton {
                 return;
             }
 
-            if (CompositorService.isSway || CompositorService.isScroll) {
+            if (CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle) {
                 try {
                     I3.dispatch("exit");
                 } catch (_) {}
