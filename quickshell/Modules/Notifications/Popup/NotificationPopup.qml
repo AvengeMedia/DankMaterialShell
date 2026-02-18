@@ -22,6 +22,8 @@ PanelWindow {
     property bool _isDestroying: false
     property bool _finalized: false
     property real _lastReportedAlignedHeight: -1
+    property real _storedTopMargin: 0
+    property real _storedBottomMargin: 0
     readonly property string clearText: I18n.tr("Dismiss")
     property bool descriptionExpanded: false
     readonly property bool hasExpandableBody: (notificationData?.htmlBody || "").replace(/<[^>]*>/g, "").trim().length > 0
@@ -146,6 +148,8 @@ PanelWindow {
     }
     Component.onCompleted: {
         _lastReportedAlignedHeight = Theme.px(implicitHeight, dpr);
+        _storedTopMargin = getTopMargin();
+        _storedBottomMargin = getBottomMargin();
         if (SettingsData.notificationPopupPrivacyMode)
             descriptionExpanded = false;
         if (hasValidData) {
@@ -179,14 +183,30 @@ PanelWindow {
     property bool isBottomCenter: SettingsData.notificationPopupPosition === SettingsData.Position.BottomCenter
     property bool isCenterPosition: isTopCenter || isBottomCenter
 
-    anchors.top: isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left
-    anchors.bottom: isBottomCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom || SettingsData.notificationPopupPosition === SettingsData.Position.Right
+    anchors.top: true
+    anchors.bottom: true
     anchors.left: SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom
     anchors.right: SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Right
 
+    mask: contentInputMask
+
+    Region {
+        id: contentInputMask
+        item: contentMaskRect
+    }
+
+    Item {
+        id: contentMaskRect
+        visible: false
+        x: content.x
+        y: content.y
+        width: alignedWidth
+        height: alignedHeight
+    }
+
     margins {
-        top: getTopMargin()
-        bottom: getBottomMargin()
+        top: _storedTopMargin
+        bottom: _storedBottomMargin
         left: getLeftMargin()
         right: getRightMargin()
     }
@@ -263,7 +283,14 @@ PanelWindow {
         id: content
 
         x: Theme.snap((win.width - alignedWidth) / 2, dpr)
-        y: Theme.snap((win.height - alignedHeight) / 2, dpr)
+        y: {
+            const isTop = isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left;
+            if (isTop) {
+                return Theme.snap(screenY, dpr);
+            } else {
+                return Theme.snap(win.height - alignedHeight - screenY, dpr);
+            }
+        }
         width: alignedWidth
         height: alignedHeight
         visible: !win._finalized
