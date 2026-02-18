@@ -19,7 +19,7 @@ StyledRect {
         spacing: 4
 
         StyledText {
-            text: "Quick Access"
+            text: I18n.tr("Quick Access")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceTextMedium
             font.weight: Font.Medium

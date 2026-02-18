@@ -1033,11 +1033,11 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 model: [
                                     {
-                                        "text": "Time",
+                                        "text": I18n.tr("Time", "theme auto mode tab"),
                                         "icon": "access_time"
                                     },
                                     {
-                                        "text": "Location",
+                                        "text": I18n.tr("Location", "theme auto mode tab"),
                                         "icon": "place"
                                     }
                                 ]
@@ -2328,7 +2328,7 @@ Item {
                     tags: ["matugen", "neovim", "terminal", "template"]
                     settingKey: "matugenTemplateNeovim"
                     text: "neovim"
-                    description: getTemplateDescription("nvim", "Requires lazy plugin manager")
+                    description: getTemplateDescription("nvim", I18n.tr("Requires lazy plugin manager", "neovim template description"))
                     descriptionColor: getTemplateDescriptionColor("nvim")
                     visible: SettingsData.runDmsMatugenTemplates
                     checked: SettingsData.matugenTemplateNeovim
@@ -2457,7 +2457,7 @@ Item {
                     onValueChanged: value => {
                         SettingsData.setIconTheme(value);
                         if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
-                            ToastService.showError("Missing Environment Variables", "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.");
+                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
                         }
                     }
                 }

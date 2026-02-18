@@ -255,7 +255,7 @@
     "All": "Tutto"
   },
   "All Monitors": {
-    "All Monitors": "Tutti i Monitor"
+    "All Monitors": "Tutti gli Schermi"
   },
   "All day": {
     "All day": "Tutto il giorno"
@@ -357,7 +357,7 @@
     "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "App con nome visualizzato, icona o opzioni di avvio personalizzati. Fai clic con il tasto destro su un'app e seleziona 'Modifica app' per personalizzare."
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": ""
+    "Apps with notification popups muted. Unmute or delete to remove.": "App con popup di notifica silenziati. Riattiva o elimina per rimuovere."
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Disponi gli schermi e configura risoluzione, frequenza di aggiornamento e VRR"
@@ -563,7 +563,7 @@
     "Bar Transparency": "Trasparenza Barra"
   },
   "Base duration for animations (drag to use Custom)": {
-    "Base duration for animations (drag to use Custom)": ""
+    "Base duration for animations (drag to use Custom)": "Durata base delle animazioni (trascina per personalizzare)"
   },
   "Battery": {
     "Battery": "Batteria"
@@ -809,7 +809,7 @@
     "Choose which displays show this widget": "Scegli su quali schermi mostrare questo widget"
   },
   "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": {
-    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Scegli quale monitor mostra l'interfaccia della schermata di blocco. Gli altri monitor visualizzeranno un colore solido per proteggere gli schermi OLED dal burn-in."
+    "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "Scegli quale schermo mostra l'interfaccia della schermata di blocco. Gli altri schermi visualizzeranno un colore solido per proteggere gli schermi OLED dal burn-in."
   },
   "Chroma Style": {
     "Chroma Style": "Stile Chroma"
@@ -1082,7 +1082,7 @@
     "Control Center Tile Color": "Colore riquadri Centro di Controllo"
   },
   "Control animation duration for notification popups and history": {
-    "Control animation duration for notification popups and history": ""
+    "Control animation duration for notification popups and history": "Controlla la durata dell'animazione per i popup di notifica e la cronologia"
   },
   "Control currently playing media": {
     "Control currently playing media": "Controlla media in riproduzione"
@@ -1175,7 +1175,7 @@
     "Create rules to mute, ignore, hide from history, or override notification priority.": "Crea regole per silenziare, ignorare, nascondere dalla cronologia o sovrascrivere la priorità delle notifiche."
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": ""
+    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Crea regole per silenziare, ignorare, nascondere dalla cronologia o sovrascrivere la priorità delle notifiche. L'impostazione predefinita sovrascrive solo la priorità; le notifiche appaiono comunque normalmente."
   },
   "Creating...": {
     "Creating...": "Creando..."
@@ -1220,7 +1220,7 @@
     "Cursor Theme": "Tema Cursore"
   },
   "Custom": {
-    "Custom": "Personalizzato"
+    "Custom": "Personalizzata"
   },
   "Custom Color": {
     "Custom Color": "Colore Personalizzato"
@@ -1589,7 +1589,7 @@
     "Duplicate Wallpaper with Blur": "Duplica Sfondo con Sfocatura"
   },
   "Duration": {
-    "Duration": ""
+    "Duration": "Durata"
   },
   "Dusk (Astronomical Twilight)": {
     "Dusk (Astronomical Twilight)": "Crepuscolo (Crepuscolo Astronomico)"
@@ -1784,7 +1784,7 @@
     "Fade to lock screen": "Dissolvenza verso la schermata di blocco"
   },
   "Fade to monitor off": {
-    "Fade to monitor off": "Dissolvenza fino allo spegnimento del monitor"
+    "Fade to monitor off": "Dissolvenza fino allo spegnimento dello schermo"
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Impossibile attivare la configurazione"
@@ -2045,7 +2045,7 @@
     "Focused Window": "Finestra Attiva"
   },
   "Follow Monitor Focus": {
-    "Follow Monitor Focus": "Segui il Monitor Attivo"
+    "Follow Monitor Focus": "Segui lo Schermo Attivo"
   },
   "Follow focus": {
     "Follow focus": "Segui il focus"
@@ -2105,7 +2105,7 @@
     "Format Legend": "Legenda Formato"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Libera VRAM/memoria alla chiusura del launcher. Potrebbe causare un leggero ritardo alla riapertura."
   },
   "Frequency": {
     "Frequency": "Frequenza"
@@ -2159,7 +2159,7 @@
     "Gradually fade the screen before locking with a configurable grace period": "Dissolvi gradualmente lo schermo prima del blocco, con un periodo di tolleranza configurabile"
   },
   "Gradually fade the screen before turning off monitors with a configurable grace period": {
-    "Gradually fade the screen before turning off monitors with a configurable grace period": "Dissolvi gradualmente lo schermo prima di spegnere i monitor, con un periodo di tolleranza configurabile"
+    "Gradually fade the screen before turning off monitors with a configurable grace period": "Dissolvi gradualmente lo schermo prima di spegnere gli schermi, con un periodo di tolleranza configurabile"
   },
   "Graph Time Range": {
     "Graph Time Range": "Intervallo Temporale del Grafico"
@@ -2201,7 +2201,7 @@
     "HDR Tone Mapping": "Mappatura dei Toni HDR"
   },
   "HDR mode is experimental. Verify your monitor supports HDR before enabling.": {
-    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": "La modalità HDR è sperimentale. Verifica che il monitor supporti l’HDR prima di abilitarla."
+    "HDR mode is experimental. Verify your monitor supports HDR before enabling.": "La modalità HDR è sperimentale. Verifica che lo schermo supporti l’HDR prima di abilitarla."
   },
   "HSV": {
     "HSV": "HSV"
@@ -2231,7 +2231,7 @@
     "Hidden": "Nascosto"
   },
   "Hidden (%1)": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Nascosti (%1)"
   },
   "Hidden Apps": {
     "Hidden Apps": "App Nascoste"
@@ -2273,13 +2273,13 @@
     "Hide cursor when using touch input": "Nascondi il cursore quando si usa l'input touch"
   },
   "Hide device": {
-    "Hide device": ""
+    "Hide device": "Nascondi dispositivo"
   },
   "Hide notification content until expanded": {
-    "Hide notification content until expanded": ""
+    "Hide notification content until expanded": "Nascondi il contenuto della notifica finché non viene espansa"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
-    "Hide notification content until expanded; popups show collapsed by default": ""
+    "Hide notification content until expanded; popups show collapsed by default": "Nascondi il contenuto della notifica finché non viene espansa; i popup appaiono ridotti per impostazione predefinita"
   },
   "Hide on Touch": {
     "Hide on Touch": "Nascondi al Tocco"
@@ -2390,7 +2390,7 @@
     "Import VPN": "Importa una VPN"
   },
   "Inactive Monitor Color": {
-    "Inactive Monitor Color": "Colore del Monitor Inattivo"
+    "Inactive Monitor Color": "Colore dello Schermo Inattivo"
   },
   "Include Transitions": {
     "Include Transitions": "Includi Transizioni"
@@ -2834,7 +2834,7 @@
     "Log Out": "Termina Sessione"
   },
   "Long": {
-    "Long": "Lungo"
+    "Long": "Lunga"
   },
   "Long Text": {
     "Long Text": "Testo Lungo"
@@ -2999,7 +2999,7 @@
     "Media Volume": "Volume Media"
   },
   "Medium": {
-    "Medium": "Medio"
+    "Medium": "Media"
   },
   "Memory": {
     "Memory": "Memoria"
@@ -3068,10 +3068,10 @@
     "Monitor": "Schermo"
   },
   "Monitor Configuration": {
-    "Monitor Configuration": "Configurazione Monitor"
+    "Monitor Configuration": "Configurazione Schermo"
   },
   "Monitor fade grace period": {
-    "Monitor fade grace period": "Periodo di attesa per la dissolvenza del monitor"
+    "Monitor fade grace period": "Periodo di attesa per la dissolvenza dello schermo"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Monitor il cui sfondo determina i colori del tema dinamico"
@@ -3104,10 +3104,10 @@
     "Moving to Paused": "Messa in Pausa"
   },
   "Mute popups for %1": {
-    "Mute popups for %1": ""
+    "Mute popups for %1": "Silenzia popup per %1"
   },
   "Muted Apps": {
-    "Muted Apps": ""
+    "Muted Apps": "App Silenziate"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Tavolozza sobria con toni sommessi e calmanti."
@@ -3260,7 +3260,7 @@
     "No apps have been launched yet.": "Nessuna app è stata ancora avviata."
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": ""
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Nessuna app silenziata. Fai clic destro su una notifica e scegli \"Silenzia popup\" per aggiungerne una qui."
   },
   "No battery": {
     "No battery": "Nessuna batteria"
@@ -3458,7 +3458,7 @@
     "Only adjust gamma based on time or location rules.": "Regola la gamma solo in base alle regole di tempo o di posizione."
   },
   "Only show windows from the current monitor on each dock": {
-    "Only show windows from the current monitor on each dock": "Mostra solo le finestre del monitor corrente su ogni dock"
+    "Only show windows from the current monitor on each dock": "Mostra solo le finestre dello schermo corrente su ogni dock"
   },
   "Only visible if hibernate is supported by your system": {
     "Only visible if hibernate is supported by your system": "Visibile solo se l'ibernazione è supportata dal tuo sistema"
@@ -3605,7 +3605,7 @@
     "Per-Monitor Wallpapers": "Sfondi per Schermi"
   },
   "Per-Monitor Workspaces": {
-    "Per-Monitor Workspaces": "Spazi di Lavoro per Monitor"
+    "Per-Monitor Workspaces": "Spazi di Lavoro per Schermo"
   },
   "Percentage": {
     "Percentage": "Percentuale"
@@ -3754,7 +3754,7 @@
     "Popup Position": "Posizione Popup"
   },
   "Popup Shadow": {
-    "Popup Shadow": ""
+    "Popup Shadow": "Ombra Popup"
   },
   "Popup Transparency": {
     "Popup Transparency": "Trasparenza Popup"
@@ -3865,7 +3865,7 @@
     "Privacy Indicator": "Indicatore Privacy"
   },
   "Privacy Mode": {
-    "Privacy Mode": ""
+    "Privacy Mode": "Modalità Privacy"
   },
   "Private Key Password": {
     "Private Key Password": "Password Della Chiave Privata"
@@ -4279,7 +4279,7 @@
     "Select font weight for UI text": "Seleziona lo spessore del font per il testo dell'interfaccia utente"
   },
   "Select monitor to configure wallpaper": {
-    "Select monitor to configure wallpaper": "Seleziona il monitor per configurare lo sfondo"
+    "Select monitor to configure wallpaper": "Seleziona lo shcermo per configurare lo sfondo"
   },
   "Select monospace font for process list and technical displays": {
     "Select monospace font for process list and technical displays": "Seleziona font a larghezza fissa per lista processi e visualizzazioni tecniche"
@@ -4315,7 +4315,7 @@
     "Set custom name": "Imposta nome personalizzato"
   },
   "Set different wallpapers for each connected monitor": {
-    "Set different wallpapers for each connected monitor": "Imposta sfondi differenti per ogni monitor connesso"
+    "Set different wallpapers for each connected monitor": "Imposta sfondi differenti per ogni schermo connesso"
   },
   "Set different wallpapers for light and dark mode": {
     "Set different wallpapers for light and dark mode": "Imposta sfondi differenti per modalità chiara e scura"
@@ -4324,7 +4324,7 @@
     "Set key and action to save": "Imposta tasto e azione per salvare"
   },
   "Set notification rules": {
-    "Set notification rules": ""
+    "Set notification rules": "Imposta regole di notifica"
   },
   "Setup": {
     "Setup": "Configurazione"
@@ -4498,13 +4498,13 @@
     "Show darkened overlay behind modal dialogs": "Mostra la sovrapposizione oscurata dietro le finestre di dialogo modali"
   },
   "Show device": {
-    "Show device": ""
+    "Show device": "Mostra dispositivo"
   },
   "Show dock when floating windows don't overlap its area": {
     "Show dock when floating windows don't overlap its area": "Mostra la dock quando le finestre fluttuanti non ne sovrappongono l’area"
   },
   "Show drop shadow on notification popups": {
-    "Show drop shadow on notification popups": ""
+    "Show drop shadow on notification popups": "Mostra ombra sui popup di notifica"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Mostra la sovrapposizione del launcher durante la digitazione nella panoramica di Niri. Disabilita per usare un altro launcher."
@@ -4558,7 +4558,7 @@
     "Show only apps running in current workspace": "Mostra solo app in esecuzione nello spazio di lavoro attuale"
   },
   "Show only workspaces belonging to each specific monitor.": {
-    "Show only workspaces belonging to each specific monitor.": "Mostra solo gli spazi di lavoro appartenenti a ciascun monitor specifico."
+    "Show only workspaces belonging to each specific monitor.": "Mostra solo gli spazi di lavoro appartenenti a ciascun schermo specifico."
   },
   "Show password": {
     "Show password": "Mostra password"
@@ -4573,7 +4573,7 @@
     "Show workspace name on horizontal bars, and first letter on vertical bars": "Mostra il nome dello spazio di lavoro nelle barre orizzontali e la prima lettera in quelle verticali"
   },
   "Show workspaces of the currently focused monitor": {
-    "Show workspaces of the currently focused monitor": "Mostra gli spazi di lavoro del monitor attualmente attivo"
+    "Show workspaces of the currently focused monitor": "Mostra gli spazi di lavoro dello schermo attualmente attivo"
   },
   "Shows all running applications with focus indication": {
     "Shows all running applications with focus indication": "Mostra tutte le applicazioni in esecuzione con indicazione focus"
@@ -4750,7 +4750,7 @@
     "System App Theming": "Theming App Sistema"
   },
   "System Monitor Unavailable": {
-    "System Monitor Unavailable": "Monitor Sistema Non Disponibile"
+    "System Monitor Unavailable": "Monitor Sistema non Disponibile"
   },
   "System Sounds": {
     "System Sounds": "Suoni di Sistema"
@@ -5035,7 +5035,7 @@
     "Unknown Device": "Dispositivo sconosciuto"
   },
   "Unknown Monitor": {
-    "Unknown Monitor": "Monitor sconosciuto"
+    "Unknown Monitor": "Schermo Sconosciuto"
   },
   "Unknown Network": {
     "Unknown Network": "Rete sconosciuta"
@@ -5044,13 +5044,13 @@
     "Unknown Title": "Titolo Sconosciuto"
   },
   "Unload on Close": {
-    "Unload on Close": ""
+    "Unload on Close": "Scarica alla chiusura"
   },
   "Unmute": {
-    "Unmute": ""
+    "Unmute": "Riattiva"
   },
   "Unmute popups for %1": {
-    "Unmute popups for %1": ""
+    "Unmute popups for %1": "Riattiva popup per %1"
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Regola Senza Nome"
@@ -5548,7 +5548,7 @@
     "Active tile background and icon color": "Colore sfondo e icona dei riquadri attivi"
   },
   "count of hidden audio devices": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Nascosti (%1)"
   },
   "current theme label": {
     "Current Theme: %1": "Tema corrente: %1"
@@ -5740,7 +5740,7 @@
     "Control Center": "Centro di Controllo",
     "Display Control": "Controllo Schermo",
     "Dynamic Theming": "Theming Dinamico",
-    "Multi-Monitor": "Multi-Monitor",
+    "Multi-Monitor": "Multi-Schermo",
     "System Tray": "Area di Notifica",
     "Theme Registry": "Registro dei Temi"
   },
@@ -5965,7 +5965,7 @@
     "Enable History": "Abilita Cronologia"
   },
   "notification privacy mode placeholder": {
-    "Message Content": ""
+    "Message Content": "Contenuto messaggio"
   },
   "notification rule action option": {
     "Ignore Completely": "Ignora Completamente",
@@ -6120,7 +6120,7 @@
     "Search themes...": "Cerca temi..."
   },
   "this app": {
-    "this app": ""
+    "this app": "questa app"
   },
   "tile color option": {
     "Primary Container": "Contenitore Primario",
@@ -6245,5 +6245,188 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - Anno (2024)"
+  },
+  "2 seconds": {
+    "2 seconds": "2 secondi"
+  },
+  "4 seconds": {
+    "4 seconds": "4 secondi"
+  },
+  "20 seconds": {
+    "20 seconds": "20 secondi"
+  },
+  "25 seconds": {
+    "25 seconds": "25 secondi"
+  },
+  "35 seconds": {
+    "35 seconds": "35 secondi"
+  },
+  "40 seconds": {
+    "40 seconds": "40 secondi"
+  },
+  "45 seconds": {
+    "45 seconds": "45 secondi"
+  },
+  "50 seconds": {
+    "50 seconds": "50 secondi"
+  },
+  "55 seconds": {
+    "55 seconds": "55 secondi"
+  },
+  "3 minutes": {
+    "3 minutes": "3 minuti"
+  },
+  "15 minutes": {
+    "15 minutes": "15 minuti"
+  },
+  "20 minutes": {
+    "20 minutes": "20 minuti"
+  },
+  "30 minutes": {
+    "30 minutes": "30 minuti"
+  },
+  "1 hour": {
+    "1 hour": "1 ora"
+  },
+  "1 hour 30 minutes": {
+    "1 hour 30 minutes": "1 ora e 30 minuti"
+  },
+  "2 hours": {
+    "2 hours": "2 ore"
+  },
+  "3 hours": {
+    "3 hours": "3 ore"
+  },
+  "4 hours": {
+    "4 hours": "4 ore"
+  },
+  "6 hours": {
+    "6 hours": "6 ore"
+  },
+  "8 hours": {
+    "8 hours": "8 ore"
+  },
+  "12 hours": {
+    "12 hours": "12 ore"
+  },
+  "AC Power": {
+    "AC Power": "Alimentazione CA"
+  },
+  "Suspend then Hibernate": {
+    "Suspend then Hibernate": "Sospendi e poi Iberna"
+  },
+  "Choose Wallpaper Color": {
+    "Choose Wallpaper Color": "Scegli Colore Sfondo"
+  },
+  "No wallpaper selected": {
+    "No wallpaper selected": "Nessuno sfondo selezionato"
+  },
+  "Choose Light Mode Color": {
+    "Choose Light Mode Color": "Scegli Colore Modalità Chiara"
+  },
+  "Choose Dark Mode Color": {
+    "Choose Dark Mode Color": "Scegli Colore Modalità Scura"
+  },
+  "Not set": {
+    "Not set": "Non impostato"
+  },
+  "No monitors": {
+    "No monitors": "Nessuno schermo"
+  },
+  "Time": {
+    "Time": "Tempo"
+  },
+  "Clear Sky": {
+    "Clear Sky": "Sereno"
+  },
+  "Partly Cloudy": {
+    "Partly Cloudy": "Parzialmente Nuvoloso"
+  },
+  "Overcast": {
+    "Overcast": "Coperto"
+  },
+  "Fog": {
+    "Fog": "Nebbia"
+  },
+  "Drizzle": {
+    "Drizzle": "Pioviggine"
+  },
+  "Freezing Drizzle": {
+    "Freezing Drizzle": "Pioviggine Congelantesi"
+  },
+  "Light Rain": {
+    "Light Rain": "Pioggia Leggera"
+  },
+  "Rain": {
+    "Rain": "Pioggia"
+  },
+  "Heavy Rain": {
+    "Heavy Rain": "Pioggia Forte"
+  },
+  "Light Snow": {
+    "Light Snow": "Neve Leggera"
+  },
+  "Snow": {
+    "Snow": "Neve"
+  },
+  "Heavy Snow": {
+    "Heavy Snow": "Neve Abbondante"
+  },
+  "Light Snow Showers": {
+    "Light Snow Showers": "Deboli Rovesci di Neve"
+  },
+  "Heavy Snow Showers": {
+    "Heavy Snow Showers": "Forti Rovesci di Neve"
+  },
+  "Thunderstorm": {
+    "Thunderstorm": "Temporale"
+  },
+  "Thunderstorm with Hail": {
+    "Thunderstorm with Hail": "Temporale con Grandine"
+  },
+  "Quick Access": {
+    "Quick Access": "Accesso Rapido"
+  },
+  "Home": {
+    "Home": "Home"
+  },
+  "Documents": {
+    "Documents": "Documenti"
+  },
+  "Downloads": {
+    "Downloads": "Scaricati"
+  },
+  "Pictures": {
+    "Pictures": "Immagini"
+  },
+  "Music": {
+    "Music": "Musica"
+  },
+  "Videos": {
+    "Videos": "Video"
+  },
+  "Desktop": {
+    "Desktop": "Scrivania"
+  },
+  "on Niri": {
+    "on Niri": "su Niri"
+  },
+  "on Hyprland": {
+    "on Hyprland": "su Hyprland"
+  },
+  "on MangoWC": {
+    "on MangoWC": "su MangoWC"
+  },
+  "on Sway": {
+    "on Sway": "su Sway"
+  },
+  "on Scroll": {
+    "on Scroll": "su Scroll"
+  },
+  "on Miracle WM": {
+    "on Miracle WM": "su Miracle WM"
+  },
+  "up": {
+    "up": "acceso da"
   }
 }
