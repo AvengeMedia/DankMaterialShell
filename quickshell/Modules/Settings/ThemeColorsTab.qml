@@ -16,7 +16,7 @@ Item {
     property var cachedCursorThemes: SettingsData.availableCursorThemes
     property var cachedMatugenSchemes: Theme.availableMatugenSchemes.map(option => option.label)
     property var installedRegistryThemes: []
-    property var templateDetection: ({})
+    property var templateDetection: []
 
     property var cursorIncludeStatus: ({
             "exists": false,
@@ -106,9 +106,10 @@ Item {
     }
 
     function isTemplateDetected(templateId) {
-        if (!templateDetection || Object.keys(templateDetection).length === 0)
+        if (!templateDetection || templateDetection.length === 0)
             return true;
-        return templateDetection[templateId] !== false;
+        var item = templateDetection.find(i => i.id === templateId);
+        return !item || item.detected !== false;
     }
 
     function getTemplateDescription(templateId, baseDescription) {
@@ -145,28 +146,15 @@ Item {
             DMSService.listInstalledThemes();
         if (PopoutService.pendingThemeInstall)
             Qt.callLater(() => showThemeBrowser());
-        templateCheckProcess.running = true;
+        Proc.runCommand("template-check", ["dms", "matugen", "check"], (output, exitCode) => {
+            if (exitCode !== 0)
+                return;
+            try {
+                themeColorsTab.templateDetection = JSON.parse(output.trim());
+            } catch (e) {}
+        });
         if (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl)
             checkCursorIncludeStatus();
-    }
-
-    Process {
-        id: templateCheckProcess
-        command: ["dms", "matugen", "check"]
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    const results = JSON.parse(text);
-                    const detection = {};
-                    for (const item of results) {
-                        detection[item.id] = item.detected;
-                    }
-                    themeColorsTab.templateDetection = detection;
-                } catch (e) {}
-            }
-        }
     }
 
     Connections {

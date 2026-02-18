@@ -7,7 +7,7 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
-    readonly property var timeoutOptions: ["Never", "1 minute", "2 minutes", "3 minutes", "5 minutes", "10 minutes", "15 minutes", "20 minutes", "30 minutes", "1 hour", "1 hour 30 minutes", "2 hours", "3 hours"]
+    readonly property var timeoutOptions: [I18n.tr("Never"), I18n.tr("1 minute"), I18n.tr("2 minutes"), I18n.tr("3 minutes"), I18n.tr("5 minutes"), I18n.tr("10 minutes"), I18n.tr("15 minutes"), I18n.tr("20 minutes"), I18n.tr("30 minutes"), I18n.tr("1 hour"), I18n.tr("1 hour 30 minutes"), I18n.tr("2 hours"), I18n.tr("3 hours")]
     readonly property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
 
     function getTimeoutIndex(timeout) {
@@ -56,7 +56,7 @@ Item {
                         id: powerCategory
                         anchors.verticalCenter: parent.verticalCenter
                         visible: BatteryService.batteryAvailable
-                        model: ["AC Power", "Battery"]
+                        model: [I18n.tr("AC Power"), I18n.tr("Battery")]
                         currentIndex: 0
                         selectionMode: "single"
                         checkEnabled: false
@@ -100,7 +100,7 @@ Item {
                     id: fadeGracePeriodDropdown
                     settingKey: "fadeToLockGracePeriod"
                     tags: ["fade", "grace", "period", "timeout", "lock"]
-                    property var periodOptions: ["1 second", "2 seconds", "3 seconds", "4 seconds", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds"]
+                    property var periodOptions: [I18n.tr("1 second"), I18n.tr("2 seconds"), I18n.tr("3 seconds"), I18n.tr("4 seconds"), I18n.tr("5 seconds"), I18n.tr("10 seconds"), I18n.tr("15 seconds"), I18n.tr("20 seconds"), I18n.tr("30 seconds")]
                     property var periodValues: [1, 2, 3, 4, 5, 10, 15, 20, 30]
 
                     text: I18n.tr("Lock fade grace period")
@@ -111,7 +111,7 @@ Item {
                     Component.onCompleted: {
                         const currentPeriod = SettingsData.fadeToLockGracePeriod;
                         const index = periodValues.indexOf(currentPeriod);
-                        currentValue = index >= 0 ? periodOptions[index] : "5 seconds";
+                        currentValue = index >= 0 ? periodOptions[index] : I18n.tr("5 seconds");
                     }
 
                     onValueChanged: value => {
@@ -126,7 +126,7 @@ Item {
                     id: fadeDpmsGracePeriodDropdown
                     settingKey: "fadeToDpmsGracePeriod"
                     tags: ["fade", "grace", "period", "timeout", "dpms", "monitor"]
-                    property var periodOptions: ["1 second", "2 seconds", "3 seconds", "4 seconds", "5 seconds", "10 seconds", "15 seconds", "20 seconds", "30 seconds"]
+                    property var periodOptions: [I18n.tr("1 second"), I18n.tr("2 seconds"), I18n.tr("3 seconds"), I18n.tr("4 seconds"), I18n.tr("5 seconds"), I18n.tr("10 seconds"), I18n.tr("15 seconds"), I18n.tr("20 seconds"), I18n.tr("30 seconds")]
                     property var periodValues: [1, 2, 3, 4, 5, 10, 15, 20, 30]
 
                     text: I18n.tr("Monitor fade grace period")
@@ -137,7 +137,7 @@ Item {
                     Component.onCompleted: {
                         const currentPeriod = SettingsData.fadeToDpmsGracePeriod;
                         const index = periodValues.indexOf(currentPeriod);
-                        currentValue = index >= 0 ? periodOptions[index] : "5 seconds";
+                        currentValue = index >= 0 ? periodOptions[index] : I18n.tr("5 seconds");
                     }
 
                     onValueChanged: value => {
@@ -308,7 +308,7 @@ Item {
                     DankButtonGroup {
                         id: suspendBehaviorSelector
                         anchors.horizontalCenter: parent.horizontalCenter
-                        model: ["Suspend", "Hibernate", "Suspend then Hibernate"]
+                        model: [I18n.tr("Suspend"), I18n.tr("Hibernate"), I18n.tr("Suspend then Hibernate")]
                         selectionMode: "single"
                         checkEnabled: false
 
@@ -375,13 +375,13 @@ Item {
                     settingKey: "powerMenuDefaultAction"
                     tags: ["power", "menu", "default", "action", "reboot", "logout", "shutdown"]
                     text: I18n.tr("Default selected action")
-                    options: ["Reboot", "Log Out", "Power Off", "Lock", "Suspend", "Restart DMS", "Hibernate"]
+                    options: [I18n.tr("Reboot"), I18n.tr("Log Out"), I18n.tr("Power Off"), I18n.tr("Lock"), I18n.tr("Suspend"), I18n.tr("Restart DMS"), I18n.tr("Hibernate")]
                     property var actionValues: ["reboot", "logout", "poweroff", "lock", "suspend", "restart", "hibernate"]
 
                     Component.onCompleted: {
                         const currentAction = SettingsData.powerMenuDefaultAction || "logout";
                         const index = actionValues.indexOf(currentAction);
-                        currentValue = index >= 0 ? options[index] : "Log Out";
+                        currentValue = index >= 0 ? options[index] : I18n.tr("Log Out");
                     }
 
                     onValueChanged: value => {
@@ -479,7 +479,7 @@ Item {
                     id: holdDurationDropdown
                     settingKey: "powerActionHoldDuration"
                     tags: ["power", "hold", "duration", "confirm", "time"]
-                    property var durationOptions: ["250 ms", "500 ms", "750 ms", "1 second", "2 seconds", "3 seconds", "5 seconds", "10 seconds"]
+                    property var durationOptions: [I18n.tr("250 ms"), I18n.tr("500 ms"), I18n.tr("750 ms"), I18n.tr("1 second"), I18n.tr("2 seconds"), I18n.tr("3 seconds"), I18n.tr("5 seconds"), I18n.tr("10 seconds")]
                     property var durationValues: [0.25, 0.5, 0.75, 1, 2, 3, 5, 10]
 
                     text: I18n.tr("Hold Duration")
@@ -489,7 +489,7 @@ Item {
                     Component.onCompleted: {
                         const currentDuration = SettingsData.powerActionHoldDuration;
                         const index = durationValues.indexOf(currentDuration);
-                        currentValue = index >= 0 ? durationOptions[index] : "500 ms";
+                        currentValue = index >= 0 ? durationOptions[index] : I18n.tr("500 ms");
                     }
 
                     onValueChanged: value => {
