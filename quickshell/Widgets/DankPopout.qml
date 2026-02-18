@@ -214,7 +214,6 @@ Item {
         onTriggered: root._resizeActive = false
     }
 
-
     readonly property real alignedX: Theme.snap((() => {
             const useAutoGaps = storedBarConfig?.popupGapsAuto !== undefined ? storedBarConfig.popupGapsAuto : true;
             const manualGapValue = storedBarConfig?.popupGapsManual !== undefined ? storedBarConfig.popupGapsManual : 4;
@@ -470,6 +469,44 @@ Item {
                 }
             }
 
+            Rectangle {
+                id: shadowSource
+                anchors.centerIn: parent
+                width: parent.width
+                height: parent.height
+                radius: Theme.cornerRadius
+                color: "black"
+                visible: false
+                opacity: contentWrapper.opacity
+                scale: contentWrapper.scale
+                x: contentWrapper.x
+                y: contentWrapper.y
+
+                property real shadowBlurPx: 10
+                property real shadowSpreadPx: 0
+                property real shadowBaseAlpha: 0.60
+                readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
+                readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
+                readonly property int blurMax: 64
+
+                layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                layer.smooth: false
+
+                layer.effect: MultiEffect {
+                    id: shadowFx
+                    autoPaddingEnabled: true
+                    shadowEnabled: true
+                    blurEnabled: false
+                    maskEnabled: false
+                    shadowBlur: Math.max(0, Math.min(1, shadowSource.shadowBlurPx / shadowSource.blurMax))
+                    shadowScale: 1 + (2 * shadowSource.shadowSpreadPx) / Math.max(1, Math.min(shadowSource.width, shadowSource.height))
+                    shadowColor: {
+                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
+                        return Theme.withAlpha(baseColor, shadowSource.effectiveShadowAlpha);
+                    }
+                }
+            }
+
             Item {
                 id: contentWrapper
                 anchors.centerIn: parent
@@ -481,30 +518,9 @@ Item {
                 x: Theme.snap(contentContainer.animX + (parent.width - width) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
                 y: Theme.snap(contentContainer.animY + (parent.height - height) * (1 - contentContainer.scaleValue) * 0.5, root.dpr)
 
-                property real shadowBlurPx: 10
-                property real shadowSpreadPx: 0
-                property real shadowBaseAlpha: 0.60
-                readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-                readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
-                readonly property int blurMax: 64
-
-                layer.enabled: contentWrapper.opacity < 1 && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                layer.enabled: contentWrapper.opacity < 1
                 layer.smooth: false
                 layer.textureSize: root.dpr > 1 ? Qt.size(Math.ceil(width * root.dpr), Math.ceil(height * root.dpr)) : Qt.size(0, 0)
-
-                layer.effect: MultiEffect {
-                    id: shadowFx
-                    autoPaddingEnabled: true
-                    shadowEnabled: true
-                    blurEnabled: false
-                    maskEnabled: false
-                    shadowBlur: Math.max(0, Math.min(1, contentWrapper.shadowBlurPx / contentWrapper.blurMax))
-                    shadowScale: 1 + (2 * contentWrapper.shadowSpreadPx) / Math.max(1, Math.min(contentWrapper.width, contentWrapper.height))
-                    shadowColor: {
-                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                        return Theme.withAlpha(baseColor, contentWrapper.effectiveShadowAlpha);
-                    }
-                }
 
                 Behavior on opacity {
                     NumberAnimation {
