@@ -99,6 +99,44 @@ BasePill {
     property bool suppressShiftAnimation: false
     readonly property bool hasHiddenItems: allTrayItems.length > mainBarItems.length
     visible: allTrayItems.length > 0
+    opacity: allTrayItems.length > 0 ? 1 : 0
+
+    states: [
+        State {
+            name: "hidden_horizontal"
+            when: allTrayItems.length === 0 && !isVerticalOrientation
+            PropertyChanges {
+                target: root
+                width: 0
+            }
+        },
+        State {
+            name: "hidden_vertical"
+            when: allTrayItems.length === 0 && isVerticalOrientation
+            PropertyChanges {
+                target: root
+                height: 0
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            NumberAnimation {
+                properties: "width,height"
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+    ]
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
     readonly property real trayItemSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) + 6
 
     readonly property real minTooltipY: {
