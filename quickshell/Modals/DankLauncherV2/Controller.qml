@@ -126,13 +126,6 @@ Item {
 
     readonly property var sectionDefinitions: [
         {
-            id: "calculator",
-            title: I18n.tr("Calculator"),
-            icon: "calculate",
-            priority: 0,
-            defaultViewMode: "list"
-        },
-        {
             id: "favorites",
             title: I18n.tr("Pinned"),
             icon: "push_pin",
@@ -681,12 +674,6 @@ Item {
             return;
         }
 
-        var calculatorResult = evaluateCalculator(searchQuery);
-        if (calculatorResult) {
-            calculatorResult._preScored = 12000;
-            allItems.push(calculatorResult);
-        }
-
         var apps = searchApps(searchQuery);
         for (var i = 0; i < apps.length; i++) {
             if (searchQuery)
@@ -929,13 +916,6 @@ Item {
 
     function transformFileResult(file) {
         return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"));
-    }
-
-    function evaluateCalculator(query) {
-        var calc = Utils.evaluateCalculator(query);
-        if (!calc)
-            return null;
-        return Transform.createCalculatorItem(calc, query, I18n.tr("Copy"));
     }
 
     function detectTrigger(query) {
@@ -1558,9 +1538,6 @@ Item {
             break;
         case "file":
             openFile(item.data?.path);
-            break;
-        case "calculator":
-            copyToClipboard(item.name);
             break;
         default:
             return;
