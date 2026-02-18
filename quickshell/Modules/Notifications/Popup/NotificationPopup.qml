@@ -814,7 +814,7 @@ PanelWindow {
         Behavior on swipeOffset {
             enabled: !content.swipeActive && !content.swipeDismissing
             NumberAnimation {
-                duration: Theme.shortDuration
+                duration: Theme.notificationExitDuration
                 easing.type: Theme.standardEasing
             }
         }
@@ -824,7 +824,7 @@ PanelWindow {
             target: content
             property: "swipeOffset"
             to: isTopCenter ? -content.height : isBottomCenter ? content.height : (SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom ? -content.width : content.width)
-            duration: Theme.shortDuration
+            duration: Theme.notificationExitDuration
             easing.type: Easing.OutCubic
             onStopped: {
                 NotificationService.dismissNotification(notificationData);

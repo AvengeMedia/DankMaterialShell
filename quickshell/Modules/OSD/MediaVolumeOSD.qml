@@ -8,13 +8,20 @@ DankOSD {
 
     readonly property bool useVertical: isVerticalLayout
     readonly property var player: MprisController.activePlayer
-    readonly property int currentVolume: player ? Math.min(100, Math.round(player.volume * 100)) : 0
     readonly property bool volumeSupported: player?.volumeSupported ?? false
     property bool _suppressNewPlayer: false
+    property int _displayVolume: 0
+
+    function _syncVolume() {
+        if (!player)
+            return;
+        _displayVolume = Math.min(100, Math.round(player.volume * 100));
+    }
 
     onPlayerChanged: {
         _suppressNewPlayer = true;
         _suppressTimer.restart();
+        _syncVolume();
     }
 
     Timer {
@@ -37,25 +44,25 @@ DankOSD {
     }
 
     function toggleMute() {
-        if (player) {
-            player.volume = player.volume > 0 ? 0 : 1;
-        }
+        if (!player)
+            return;
+        player.volume = player.volume > 0 ? 0 : 1;
     }
 
     function setVolume(volumePercent) {
-        if (player) {
-            player.volume = volumePercent / 100;
-            resetHideTimer();
-        }
+        if (!player)
+            return;
+        player.volume = volumePercent / 100;
+        resetHideTimer();
     }
 
     Connections {
         target: player
 
         function onVolumeChanged() {
-            if (SettingsData.osdMediaVolumeEnabled && volumeSupported && !_suppressNewPlayer) {
+            root._syncVolume();
+            if (SettingsData.osdMediaVolumeEnabled && volumeSupported && !_suppressNewPlayer)
                 root.show();
-            }
         }
     }
 
@@ -96,9 +103,7 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: toggleMute()
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || volumeSlider.containsMouse);
-                    }
+                    onContainsMouseChanged: setChildHovered(containsMouse || volumeSlider.containsMouse)
                 }
             }
 
@@ -115,29 +120,21 @@ DankOSD {
                 showValue: true
                 unit: "%"
                 thumbOutlineColor: Theme.surfaceContainer
-                valueOverride: currentVolume
+                valueOverride: root._displayVolume
                 alwaysShowValue: SettingsData.osdAlwaysShowValue
 
                 Component.onCompleted: {
-                    value = currentVolume;
+                    root._syncVolume();
+                    value = root._displayVolume;
                 }
 
-                onSliderValueChanged: newValue => {
-                    setVolume(newValue);
-                }
+                onSliderValueChanged: newValue => setVolume(newValue)
 
-                onContainsMouseChanged: {
-                    setChildHovered(containsMouse || muteButton.containsMouse);
-                }
+                onContainsMouseChanged: setChildHovered(containsMouse || muteButton.containsMouse)
 
-                Connections {
-                    target: player
-
-                    function onVolumeChanged() {
-                        if (volumeSlider && !volumeSlider.pressed) {
-                            volumeSlider.value = currentVolume;
-                        }
-                    }
+                Binding on value {
+                    value: root._displayVolume
+                    when: !volumeSlider.pressed
                 }
             }
         }
@@ -172,9 +169,7 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: toggleMute()
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || vertSliderArea.containsMouse);
-                    }
+                    onContainsMouseChanged: setChildHovered(containsMouse || vertSliderArea.containsMouse)
                 }
             }
 
@@ -186,7 +181,7 @@ DankOSD {
                 y: gap * 2 + Theme.iconSize
 
                 property bool dragging: false
-                property int value: currentVolume
+                property int value: root._displayVolume
 
                 Rectangle {
                     id: vertTrack
@@ -231,43 +226,26 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || muteButtonVert.containsMouse);
-                    }
+                    onContainsMouseChanged: setChildHovered(containsMouse || muteButtonVert.containsMouse)
 
                     onPressed: mouse => {
                         vertSlider.dragging = true;
                         updateVolume(mouse);
                     }
 
-                    onReleased: {
-                        vertSlider.dragging = false;
-                    }
+                    onReleased: vertSlider.dragging = false
 
                     onPositionChanged: mouse => {
-                        if (pressed) {
+                        if (pressed)
                             updateVolume(mouse);
-                        }
                     }
 
-                    onClicked: mouse => {
-                        updateVolume(mouse);
-                    }
+                    onClicked: mouse => updateVolume(mouse)
 
                     function updateVolume(mouse) {
                         const ratio = 1.0 - (mouse.y / height);
                         const volume = Math.max(0, Math.min(100, Math.round(ratio * 100)));
                         setVolume(volume);
-                    }
-                }
-
-                Connections {
-                    target: player
-
-                    function onVolumeChanged() {
-                        if (!vertSlider.dragging) {
-                            vertSlider.value = currentVolume;
-                        }
                     }
                 }
             }
@@ -280,17 +258,6 @@ DankOSD {
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
                 visible: SettingsData.osdAlwaysShowValue
-            }
-        }
-    }
-
-    onOsdShown: {
-        if (player && contentLoader.item && contentLoader.item.item) {
-            if (!useVertical) {
-                const slider = contentLoader.item.item.children[0].children[1];
-                if (slider && slider.value !== undefined) {
-                    slider.value = currentVolume;
-                }
             }
         }
     }

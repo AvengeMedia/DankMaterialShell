@@ -13,16 +13,16 @@ import (
 )
 
 var (
-	ssOutputName    string
-	ssIncludeCursor bool
-	ssFormat        string
-	ssQuality       int
-	ssOutputDir     string
-	ssFilename      string
-	ssNoClipboard   bool
-	ssNoFile        bool
-	ssNoNotify      bool
-	ssStdout        bool
+	ssOutputName  string
+	ssCursor      string
+	ssFormat      string
+	ssQuality     int
+	ssOutputDir   string
+	ssFilename    string
+	ssNoClipboard bool
+	ssNoFile      bool
+	ssNoNotify    bool
+	ssStdout      bool
 )
 
 var screenshotCmd = &cobra.Command{
@@ -52,7 +52,7 @@ Examples:
   dms screenshot last                # Last region (pre-selected)
   dms screenshot --no-clipboard      # Save file only
   dms screenshot --no-file           # Clipboard only
-  dms screenshot --cursor            # Include cursor
+  dms screenshot --cursor=on         # Include cursor
   dms screenshot -f jpg -q 85        # JPEG with quality 85`,
 }
 
@@ -111,7 +111,7 @@ var notifyActionCmd = &cobra.Command{
 
 func init() {
 	screenshotCmd.PersistentFlags().StringVarP(&ssOutputName, "output", "o", "", "Output name for 'output' mode")
-	screenshotCmd.PersistentFlags().BoolVar(&ssIncludeCursor, "cursor", false, "Include cursor in screenshot")
+	screenshotCmd.PersistentFlags().StringVar(&ssCursor, "cursor", "off", "Include cursor in screenshot (on/off)")
 	screenshotCmd.PersistentFlags().StringVarP(&ssFormat, "format", "f", "png", "Output format (png, jpg, ppm)")
 	screenshotCmd.PersistentFlags().IntVarP(&ssQuality, "quality", "q", 90, "JPEG quality (1-100)")
 	screenshotCmd.PersistentFlags().StringVarP(&ssOutputDir, "dir", "d", "", "Output directory")
@@ -136,7 +136,9 @@ func getScreenshotConfig(mode screenshot.Mode) screenshot.Config {
 	config := screenshot.DefaultConfig()
 	config.Mode = mode
 	config.OutputName = ssOutputName
-	config.IncludeCursor = ssIncludeCursor
+	if strings.EqualFold(ssCursor, "on") {
+		config.Cursor = screenshot.CursorOn
+	}
 	config.Clipboard = !ssNoClipboard
 	config.SaveFile = !ssNoFile
 	config.Notify = !ssNoNotify

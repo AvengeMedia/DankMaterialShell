@@ -28,6 +28,10 @@ PanelWindow {
     function show() {
         if (SessionData.suppressOSD)
             return;
+        if (shouldBeVisible) {
+            hideTimer.restart();
+            return;
+        }
         OSDManager.showOSD(root);
         closeTimer.stop();
         shouldBeVisible = true;
@@ -257,7 +261,7 @@ PanelWindow {
         property real shadowSpreadPx: 0
         property real shadowBaseAlpha: 0.60
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-        readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha * osdContainer.opacity))
+        readonly property real effectiveShadowAlpha: shouldBeVisible ? Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha)) : 0
 
         Rectangle {
             id: background

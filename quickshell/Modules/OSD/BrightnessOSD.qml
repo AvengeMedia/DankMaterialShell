@@ -7,9 +7,10 @@ DankOSD {
     id: root
 
     readonly property bool useVertical: isVerticalLayout
-    property int targetBrightness: {
-        DisplayService.brightnessVersion;
-        return DisplayService.brightnessLevel;
+    property int _displayBrightness: 0
+
+    function _syncBrightness() {
+        _displayBrightness = DisplayService.brightnessLevel;
     }
 
     osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, Screen.width - Theme.spacingM * 2)
@@ -20,9 +21,9 @@ DankOSD {
     Connections {
         target: DisplayService
         function onBrightnessChanged(showOsd) {
-            if (showOsd && SettingsData.osdBrightnessEnabled) {
+            root._syncBrightness();
+            if (showOsd && SettingsData.osdBrightnessEnabled)
                 root.show();
-            }
         }
     }
 
@@ -53,13 +54,11 @@ DankOSD {
                     anchors.centerIn: parent
                     name: {
                         const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc") {
+                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc")
                             return "brightness_medium";
-                        } else if (deviceInfo.name.includes("kbd")) {
+                        if (deviceInfo.name.includes("kbd"))
                             return "keyboard";
-                        } else {
-                            return "lightbulb";
-                        }
+                        return "lightbulb";
                     }
                     size: Theme.iconSize
                     color: Theme.primary
@@ -77,20 +76,16 @@ DankOSD {
                     const deviceInfo = DisplayService.getCurrentDeviceInfo();
                     if (!deviceInfo)
                         return 1;
-                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id);
-                    if (isExponential) {
+                    if (SessionData.getBrightnessExponential(deviceInfo.id))
                         return 1;
-                    }
                     return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0;
                 }
                 maximum: {
                     const deviceInfo = DisplayService.getCurrentDeviceInfo();
                     if (!deviceInfo)
                         return 100;
-                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id);
-                    if (isExponential) {
+                    if (SessionData.getBrightnessExponential(deviceInfo.id))
                         return 100;
-                    }
                     return deviceInfo.displayMax || 100;
                 }
                 enabled: DisplayService.brightnessAvailable
@@ -99,28 +94,24 @@ DankOSD {
                     const deviceInfo = DisplayService.getCurrentDeviceInfo();
                     if (!deviceInfo)
                         return "%";
-                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id);
-                    if (isExponential) {
+                    if (SessionData.getBrightnessExponential(deviceInfo.id))
                         return "%";
-                    }
                     return deviceInfo.class === "ddc" ? "" : "%";
                 }
                 thumbOutlineColor: Theme.surfaceContainer
                 alwaysShowValue: SettingsData.osdAlwaysShowValue
 
                 onSliderValueChanged: newValue => {
-                    if (DisplayService.brightnessAvailable) {
-                        DisplayService.setBrightness(newValue, DisplayService.lastIpcDevice, true);
-                        resetHideTimer();
-                    }
+                    if (!DisplayService.brightnessAvailable)
+                        return;
+                    DisplayService.setBrightness(newValue, DisplayService.lastIpcDevice, true);
+                    resetHideTimer();
                 }
 
-                onContainsMouseChanged: {
-                    setChildHovered(containsMouse);
-                }
+                onContainsMouseChanged: setChildHovered(containsMouse)
 
                 Binding on value {
-                    value: root.targetBrightness
+                    value: root._displayBrightness
                     when: !brightnessSlider.isDragging
                 }
             }
@@ -146,13 +137,11 @@ DankOSD {
                     anchors.centerIn: parent
                     name: {
                         const deviceInfo = DisplayService.getCurrentDeviceInfo();
-                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc") {
+                        if (!deviceInfo || deviceInfo.class === "backlight" || deviceInfo.class === "ddc")
                             return "brightness_medium";
-                        } else if (deviceInfo.name.includes("kbd")) {
+                        if (deviceInfo.name.includes("kbd"))
                             return "keyboard";
-                        } else {
-                            return "lightbulb";
-                        }
+                        return "lightbulb";
                     }
                     size: Theme.iconSize
                     color: Theme.primary
@@ -170,7 +159,7 @@ DankOSD {
                 property int value: 50
 
                 Binding on value {
-                    value: root.targetBrightness
+                    value: root._displayBrightness
                     when: !vertSlider.dragging
                 }
 
@@ -178,8 +167,7 @@ DankOSD {
                     const deviceInfo = DisplayService.getCurrentDeviceInfo();
                     if (!deviceInfo)
                         return 1;
-                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id);
-                    if (isExponential)
+                    if (SessionData.getBrightnessExponential(deviceInfo.id))
                         return 1;
                     return (deviceInfo.class === "backlight" || deviceInfo.class === "ddc") ? 1 : 0;
                 }
@@ -188,8 +176,7 @@ DankOSD {
                     const deviceInfo = DisplayService.getCurrentDeviceInfo();
                     if (!deviceInfo)
                         return 100;
-                    const isExponential = SessionData.getBrightnessExponential(deviceInfo.id);
-                    if (isExponential)
+                    if (SessionData.getBrightnessExponential(deviceInfo.id))
                         return 100;
                     return deviceInfo.displayMax || 100;
                 }
@@ -240,33 +227,25 @@ DankOSD {
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse);
-                    }
+                    onContainsMouseChanged: setChildHovered(containsMouse)
 
                     onPressed: mouse => {
                         vertSlider.dragging = true;
                         updateBrightness(mouse);
                     }
 
-                    onReleased: {
-                        vertSlider.dragging = false;
-                    }
+                    onReleased: vertSlider.dragging = false
 
                     onPositionChanged: mouse => {
-                        if (pressed) {
+                        if (pressed)
                             updateBrightness(mouse);
-                        }
                     }
 
-                    onClicked: mouse => {
-                        updateBrightness(mouse);
-                    }
+                    onClicked: mouse => updateBrightness(mouse)
 
                     function updateBrightness(mouse) {
-                        if (!DisplayService.brightnessAvailable) {
+                        if (!DisplayService.brightnessAvailable)
                             return;
-                        }
                         const ratio = 1.0 - (mouse.y / height);
                         const newValue = Math.round(vertSlider.minimum + ratio * (vertSlider.maximum - vertSlider.minimum));
                         vertSlider.value = newValue;

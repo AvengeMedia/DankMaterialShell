@@ -18,36 +18,41 @@ Column {
     property bool isInitialized: false
 
     function loadValue() {
-        const settings = findSettings()
+        const settings = findSettings();
         if (settings && settings.pluginService) {
-            const loadedValue = settings.loadValue(settingKey, defaultValue)
-            value = loadedValue
-            textField.text = loadedValue
-            isInitialized = true
+            const loadedValue = settings.loadValue(settingKey, defaultValue);
+            if (textField.activeFocus && isInitialized)
+                return;
+            value = loadedValue;
+            textField.text = loadedValue;
+            isInitialized = true;
         }
     }
 
     Component.onCompleted: {
-        Qt.callLater(loadValue)
+        Qt.callLater(loadValue);
     }
 
-    onValueChanged: {
-        if (!isInitialized) return
-        const settings = findSettings()
-        if (settings) {
-            settings.saveValue(settingKey, value)
-        }
+    function commit() {
+        if (!isInitialized)
+            return;
+        if (textField.text === value)
+            return;
+        value = textField.text;
+        const settings = findSettings();
+        if (settings)
+            settings.saveValue(settingKey, value);
     }
 
     function findSettings() {
-        let item = parent
+        let item = parent;
         while (item) {
             if (item.saveValue !== undefined && item.loadValue !== undefined) {
-                return item
+                return item;
             }
-            item = item.parent
+            item = item.parent;
         }
-        return null
+        return null;
     }
 
     StyledText {
@@ -70,16 +75,10 @@ Column {
         id: textField
         width: parent.width
         placeholderText: root.placeholder
-        onTextEdited: {
-            root.value = text
-        }
-        onEditingFinished: {
-            root.value = text
-        }
+        onEditingFinished: root.commit()
         onActiveFocusChanged: {
-            if (!activeFocus) {
-                root.value = text
-            }
+            if (!activeFocus)
+                root.commit();
         }
     }
 }

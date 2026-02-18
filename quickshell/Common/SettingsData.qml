@@ -60,6 +60,7 @@ Singleton {
     property bool _hasLoaded: false
     property bool _isReadOnly: false
     property bool _hasUnsavedChanges: false
+    property bool _selfWrite: false
     property var _loadedSettingsSnapshot: null
     property var pluginSettings: ({})
     property var builtInPluginSettings: ({})
@@ -1243,6 +1244,7 @@ Singleton {
     function saveSettings() {
         if (_loading || _parseError || !_hasLoaded)
             return;
+        _selfWrite = true;
         settingsFile.setText(JSON.stringify(Store.toJson(root), null, 2));
         if (_isReadOnly)
             _checkSettingsWritable();
@@ -2589,7 +2591,13 @@ Singleton {
         blockWrites: true
         atomicWrites: true
         watchChanges: true
-        onFileChanged: settingsFileReloadDebounce.restart()
+        onFileChanged: {
+            if (_selfWrite) {
+                _selfWrite = false;
+                return;
+            }
+            settingsFileReloadDebounce.restart();
+        }
         onLoaded: {
             if (isGreeterMode)
                 return;
