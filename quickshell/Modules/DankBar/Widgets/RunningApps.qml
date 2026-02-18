@@ -155,6 +155,7 @@ BasePill {
     property real touchpadThreshold: 500
 
     onWheel: function (wheelEvent) {
+        wheelEvent.accepted = true;
         const deltaY = wheelEvent.angleDelta.y;
         const isMouseWheel = Math.abs(deltaY) >= 120 && (Math.abs(deltaY) % 120) === 0;
 
