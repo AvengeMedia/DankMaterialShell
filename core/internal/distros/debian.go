@@ -430,7 +430,7 @@ func (d *DebianDistribution) enableOBSRepos(ctx context.Context, obsPkgs []Packa
 			}
 
 			// Add repository
-			repoLine := fmt.Sprintf("deb [signed-by=%s, arch=%s] %s/ /", keyringPath, runtime.GOARCH, baseURL)
+			repoLine := fmt.Sprintf("deb [signed-by=%s arch=%s] %s/ /", keyringPath, runtime.GOARCH, baseURL)
 
 			progressChan <- InstallProgressMsg{
 				Phase:       PhaseSystemPackages,
