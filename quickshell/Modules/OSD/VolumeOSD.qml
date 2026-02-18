@@ -7,6 +7,13 @@ DankOSD {
     id: root
 
     readonly property bool useVertical: isVerticalLayout
+    property int _displayVolume: 0
+
+    function _syncVolume() {
+        if (!AudioService.sink?.audio)
+            return;
+        _displayVolume = Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100));
+    }
 
     osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(260, Screen.width - Theme.spacingM * 2)
     osdHeight: useVertical ? Math.min(260, Screen.height - Theme.spacingM * 2) : (40 + Theme.spacingS * 2)
@@ -14,18 +21,17 @@ DankOSD {
     enableMouseInteraction: true
 
     Connections {
-        target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
+        target: AudioService.sink?.audio ?? null
 
         function onVolumeChanged() {
-            if (SettingsData.osdVolumeEnabled) {
+            root._syncVolume();
+            if (SettingsData.osdVolumeEnabled)
                 root.show();
-            }
         }
 
         function onMutedChanged() {
-            if (SettingsData.osdVolumeEnabled) {
+            if (SettingsData.osdVolumeEnabled)
                 root.show();
-            }
         }
     }
 
@@ -33,9 +39,9 @@ DankOSD {
         target: AudioService
 
         function onSinkChanged() {
-            if (root.shouldBeVisible && SettingsData.osdVolumeEnabled) {
+            root._syncVolume();
+            if (root.shouldBeVisible && SettingsData.osdVolumeEnabled)
                 root.show();
-            }
         }
     }
 
@@ -64,7 +70,7 @@ DankOSD {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: AudioService.sink && AudioService.sink.audio && AudioService.sink.audio.muted ? "volume_off" : "volume_up"
+                    name: AudioService.sink?.audio?.muted ? "volume_off" : "volume_up"
                     size: Theme.iconSize
                     color: muteButton.containsMouse ? Theme.primary : Theme.surfaceText
                 }
@@ -75,20 +81,13 @@ DankOSD {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        AudioService.toggleMute();
-                    }
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || volumeSlider.containsMouse);
-                    }
+                    onClicked: AudioService.toggleMute()
+                    onContainsMouseChanged: setChildHovered(containsMouse || volumeSlider.containsMouse)
                 }
             }
 
             DankSlider {
                 id: volumeSlider
-
-                readonly property real actualVolumePercent: AudioService.sink && AudioService.sink.audio ? Math.round(AudioService.sink.audio.volume * 100) : 0
-                readonly property real displayPercent: actualVolumePercent
 
                 width: parent.width - Theme.iconSize - parent.gap * 3
                 height: 40
@@ -96,39 +95,31 @@ DankOSD {
                 anchors.verticalCenter: parent.verticalCenter
                 minimum: 0
                 maximum: AudioService.sinkMaxVolume
-                enabled: AudioService.sink && AudioService.sink.audio
+                enabled: AudioService.sink?.audio
                 showValue: true
                 unit: "%"
                 thumbOutlineColor: Theme.surfaceContainer
-                valueOverride: displayPercent
+                valueOverride: root._displayVolume
                 alwaysShowValue: SettingsData.osdAlwaysShowValue
 
                 Component.onCompleted: {
-                    if (AudioService.sink && AudioService.sink.audio) {
-                        value = Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100));
-                    }
+                    root._syncVolume();
+                    value = root._displayVolume;
                 }
 
                 onSliderValueChanged: newValue => {
-                    if (AudioService.sink && AudioService.sink.audio) {
-                        SessionData.suppressOSDTemporarily();
-                        AudioService.sink.audio.volume = newValue / 100;
-                        resetHideTimer();
-                    }
+                    if (!AudioService.sink?.audio)
+                        return;
+                    SessionData.suppressOSDTemporarily();
+                    AudioService.sink.audio.volume = newValue / 100;
+                    resetHideTimer();
                 }
 
-                onContainsMouseChanged: {
-                    setChildHovered(containsMouse || muteButton.containsMouse);
-                }
+                onContainsMouseChanged: setChildHovered(containsMouse || muteButton.containsMouse)
 
-                Connections {
-                    target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
-
-                    function onVolumeChanged() {
-                        if (volumeSlider && !volumeSlider.pressed) {
-                            volumeSlider.value = Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100));
-                        }
-                    }
+                Binding on value {
+                    value: root._displayVolume
+                    when: !volumeSlider.pressed
                 }
             }
         }
@@ -151,7 +142,7 @@ DankOSD {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: AudioService.sink && AudioService.sink.audio && AudioService.sink.audio.muted ? "volume_off" : "volume_up"
+                    name: AudioService.sink?.audio?.muted ? "volume_off" : "volume_up"
                     size: Theme.iconSize
                     color: muteButtonVert.containsMouse ? Theme.primary : Theme.surfaceText
                 }
@@ -162,12 +153,8 @@ DankOSD {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        AudioService.toggleMute();
-                    }
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || vertSliderArea.containsMouse);
-                    }
+                    onClicked: AudioService.toggleMute()
+                    onContainsMouseChanged: setChildHovered(containsMouse || vertSliderArea.containsMouse)
                 }
             }
 
@@ -179,7 +166,7 @@ DankOSD {
                 y: gap * 2 + Theme.iconSize
 
                 property bool dragging: false
-                property int value: AudioService.sink && AudioService.sink.audio ? Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100)) : 0
+                property int value: root._displayVolume
 
                 Rectangle {
                     id: vertTrack
@@ -220,50 +207,35 @@ DankOSD {
                     id: vertSliderArea
                     anchors.fill: parent
                     anchors.margins: -12
-                    enabled: AudioService.sink && AudioService.sink.audio
+                    enabled: AudioService.sink?.audio
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
 
-                    onContainsMouseChanged: {
-                        setChildHovered(containsMouse || muteButtonVert.containsMouse);
-                    }
+                    onContainsMouseChanged: setChildHovered(containsMouse || muteButtonVert.containsMouse)
 
                     onPressed: mouse => {
                         vertSlider.dragging = true;
                         updateVolume(mouse);
                     }
 
-                    onReleased: {
-                        vertSlider.dragging = false;
-                    }
+                    onReleased: vertSlider.dragging = false
 
                     onPositionChanged: mouse => {
-                        if (pressed) {
+                        if (pressed)
                             updateVolume(mouse);
-                        }
                     }
 
-                    onClicked: mouse => {
-                        updateVolume(mouse);
-                    }
+                    onClicked: mouse => updateVolume(mouse)
 
                     function updateVolume(mouse) {
-                        if (AudioService.sink && AudioService.sink.audio) {
-                            const maxVol = AudioService.sinkMaxVolume;
-                            const ratio = 1.0 - (mouse.y / height);
-                            const volume = Math.max(0, Math.min(maxVol, Math.round(ratio * maxVol)));
-                            SessionData.suppressOSDTemporarily();
-                            AudioService.sink.audio.volume = volume / 100;
-                            resetHideTimer();
-                        }
-                    }
-                }
-
-                Connections {
-                    target: AudioService.sink && AudioService.sink.audio ? AudioService.sink.audio : null
-
-                    function onVolumeChanged() {
-                        vertSlider.value = Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100));
+                        if (!AudioService.sink?.audio)
+                            return;
+                        const maxVol = AudioService.sinkMaxVolume;
+                        const ratio = 1.0 - (mouse.y / height);
+                        const volume = Math.max(0, Math.min(maxVol, Math.round(ratio * maxVol)));
+                        SessionData.suppressOSDTemporarily();
+                        AudioService.sink.audio.volume = volume / 100;
+                        resetHideTimer();
                     }
                 }
             }
@@ -276,17 +248,6 @@ DankOSD {
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.surfaceText
                 visible: SettingsData.osdAlwaysShowValue
-            }
-        }
-    }
-
-    onOsdShown: {
-        if (AudioService.sink && AudioService.sink.audio && contentLoader.item && contentLoader.item.item) {
-            if (!useVertical) {
-                const slider = contentLoader.item.item.children[0].children[1];
-                if (slider && slider.value !== undefined) {
-                    slider.value = Math.min(AudioService.sinkMaxVolume, Math.round(AudioService.sink.audio.volume * 100));
-                }
             }
         }
     }
