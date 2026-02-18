@@ -188,6 +188,94 @@ dms ipc call mpris playPause
 dms ipc call mpris next
 ```
 
+## Target: `media`
+
+Custom media source control for non-MPRIS media players. This allows external tools (like rmpc, cmus, mpv) to push media metadata to DMS and control playback through shell commands.
+
+The custom source integrates seamlessly with MPRIS players - DMS automatically selects the active source based on which one has content loaded. Custom source takes precedence when it has a track title set.
+
+### Functions
+
+**`update <jsonData>`**
+- Update the current media state with JSON data
+- Parameters: `jsonData` - JSON string with media information
+- Supported JSON fields:
+  - `title` - Track title
+  - `artist` - Artist name
+  - `album` - Album name
+  - `artUrl` - URL or path to album art
+  - `state` - Playback state (0=stopped, 1=playing, 2=paused)
+  - `position` / `elapsed` - Current position in seconds
+  - `length` / `duration` - Total length in seconds
+  - `volume` - Volume level (0.0-1.0)
+  - `available` - Whether the source is available (true/false)
+  - `identity` - Player identity/name
+  - `sourceId` - Unique source identifier
+- Returns: "MEDIA_UPDATE_SUCCESS" or error message
+
+**`setCommands <jsonData>`**
+- Set shell commands to execute for playback control
+- Parameters: `jsonData` - JSON string with command mappings
+- Supported commands:
+  - `play` - Command to start playback
+  - `pause` - Command to pause playback
+  - `toggle` - Command to toggle play/pause
+  - `next` - Command to skip to next track
+  - `previous` / `prev` - Command to go to previous track
+- Returns: "MEDIA_COMMANDS_SET_SUCCESS" or error message
+
+**`clear`**
+- Clear the current media state
+- Returns: "MEDIA_CLEAR_SUCCESS"
+
+**`status`**
+- Get current custom media source status
+- Returns: JSON object with current media state
+
+**`play`**
+- Execute the configured play command
+
+**`pause`**
+- Execute the configured pause command
+
+**`playPause`**
+- Execute the configured toggle command
+
+**`next`**
+- Execute the configured next track command
+
+**`previous`**
+- Execute the configured previous track command
+
+### Examples
+
+**Setting up rmpc integration with hooks (recommended):**
+
+1. Create a hook script (`~/.config/rmpc/dms_hook`):
+```bash
+#!/bin/bash
+# Set playback commands (idempotent - safe to call every time)
+dms ipc call media setCommands '{"play":"rmpc play","pause":"rmpc pause","toggle":"rmpc togglepause","next":"rmpc next","prev":"rmpc prev"}'
+
+# Push current track info to DMS
+dms ipc call media update "{\"title\":\"$TITLE\",\"artist\":\"$ARTIST\",\"album\":\"$ALBUM\",\"duration\":$DURATION,\"state\":1,\"available\":true,\"sourceId\":\"rmpc\",\"identity\":\"RMPC\"}"
+```
+
+2. Make it executable and add to rmpc's `on_song_change` hook in `~/.config/rmpc/config.ron`:
+```ron
+on_song_change: [
+    "~/.config/rmpc/dms_hook"
+]
+```
+
+The hook sets playback commands on every call (idempotent) and pushes track updates. This ensures commands are always available even after DMS restarts.
+
+**Query current status:**
+```bash
+dms ipc call media status
+# Returns: {"available":true,"sourceId":"rmpc","title":"Song","artist":"Artist",...}
+```
+
 ## Target: `lock`
 
 Screen lock control and status.

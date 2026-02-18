@@ -13,8 +13,9 @@ Item {
     LayoutMirroring.enabled: I18n.isRtl
     LayoutMirroring.childrenInherit: true
 
-    property MprisPlayer activePlayer: MprisController.activePlayer
+    property var activePlayer: MprisController.currentPlayer
     property var allPlayers: MprisController.availablePlayers
+    property var allSources: MprisController.allSources
     property var targetScreen: null
     property real popoutX: 0
     property real popoutY: 0
@@ -26,7 +27,7 @@ Item {
 
     signal showVolumeDropdown(point pos, var screen, bool rightEdge, var player, var players)
     signal showAudioDevicesDropdown(point pos, var screen, bool rightEdge)
-    signal showPlayersDropdown(point pos, var screen, bool rightEdge, var player, var players)
+    signal showPlayersDropdown(point pos, var screen, bool rightEdge, var player, var players, bool isCustom)
     signal hideDropdowns
     signal volumeButtonExited
 
@@ -66,7 +67,7 @@ Item {
     // Derived "no players" state: always correct, no timers.
     readonly property int _playerCount: allPlayers ? allPlayers.length : 0
     readonly property bool _noneAvailable: _playerCount === 0
-    readonly property bool _trulyIdle: activePlayer && activePlayer.playbackState === MprisPlaybackState.Stopped && !activePlayer.trackTitle && !activePlayer.trackArtist
+    readonly property bool _trulyIdle: activePlayer && activePlayer.playbackState === 0 && !activePlayer.trackTitle && !activePlayer.trackArtist
     readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || _trulyIdle)
 
     property bool _switchHold: false
@@ -191,7 +192,7 @@ Item {
 
     Timer {
         interval: 1000
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: activePlayer?.playbackState === 1 && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionChanged()
     }
@@ -516,7 +517,7 @@ Item {
 
                                 DankIcon {
                                     anchors.centerIn: parent
-                                    name: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
+                                    name: MprisController.currentIsPlaying ? "pause" : "play_arrow"
                                     size: 28
                                     color: Theme.background
                                     weight: 500
@@ -641,7 +642,7 @@ Item {
         border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.3)
         border.width: 1
         z: 100
-        visible: (allPlayers?.length || 0) >= 1
+        visible: (allSources?.length || 0) >= 1
 
         DankIcon {
             anchors.centerIn: parent
@@ -666,7 +667,7 @@ Item {
                 const btnY = playerSelectorButton.y + playerSelectorButton.height / 2;
                 const screenX = buttonsOnRight ? (popoutX + popoutWidth) : popoutX;
                 const screenY = popoutY + contentOffsetY + btnY;
-                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allPlayers);
+                showPlayersDropdown(Qt.point(screenX, screenY), targetScreen, buttonsOnRight, activePlayer, allSources, MprisController.useCustomSource);
             }
             onEntered: sharedTooltip.show("Media Players", playerSelectorButton, 0, 0, isRightEdge ? "right" : "left")
             onExited: sharedTooltip.hide()

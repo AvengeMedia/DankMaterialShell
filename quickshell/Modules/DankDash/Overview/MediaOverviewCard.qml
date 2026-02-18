@@ -12,7 +12,7 @@ Card {
 
     signal clicked()
 
-    property MprisPlayer activePlayer: MprisController.activePlayer
+    property var activePlayer: MprisController.currentPlayer
     property real currentPosition: activePlayer?.positionSupported ? activePlayer.position : 0
     property real displayPosition: currentPosition
 
@@ -33,7 +33,7 @@ Card {
 
     Timer {
         interval: 300
-        running: activePlayer?.playbackState === MprisPlaybackState.Playing && !isSeeking
+        running: activePlayer?.playbackState === 1 && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionSupported && activePlayer.positionChanged()
     }
@@ -165,7 +165,7 @@ Card {
 
                 DankIcon {
                     anchors.centerIn: parent
-                    name: activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
+                    name: MprisController.currentIsPlaying ? "pause" : "play_arrow"
                     size: 16
                     color: Theme.background
                 }

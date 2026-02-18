@@ -32,7 +32,8 @@ Singleton {
 
         loading = true;
         const localUrl = url;
-        const filePath = url.startsWith("file://") ? url.substring(7) : url;
+        // Remove query parameters for file existence check
+        const filePath = url.startsWith("file://") ? url.substring(7).split("?")[0] : url.split("?")[0];
         Proc.runCommand("trackart", ["test", "-f", filePath], (output, exitCode) => {
             if (_lastArtUrl !== localUrl)
                 return;
@@ -41,9 +42,17 @@ Singleton {
         }, 200);
     }
 
-    property MprisPlayer activePlayer: MprisController.activePlayer
+    property var activePlayer: MprisController.currentPlayer
 
     onActivePlayerChanged: {
         loadArtwork(activePlayer?.trackArtUrl ?? "");
+    }
+
+    // Watch for artwork changes on CustomMediaSource
+    Connections {
+        target: MprisController.useCustomSource ? CustomMediaSource : null
+        function onArtworkChanged() {
+            loadArtwork(CustomMediaSource.trackArtUrl);
+        }
     }
 }
