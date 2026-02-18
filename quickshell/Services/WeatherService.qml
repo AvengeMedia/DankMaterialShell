@@ -119,36 +119,36 @@ Singleton {
 
     function getWeatherCondition(code) {
         const conditions = {
-            "0": "Clear",
-            "1": "Clear",
-            "2": "Partly cloudy",
-            "3": "Overcast",
-            "45": "Fog",
-            "48": "Fog",
-            "51": "Drizzle",
-            "53": "Drizzle",
-            "55": "Drizzle",
-            "56": "Freezing drizzle",
-            "57": "Freezing drizzle",
-            "61": "Light rain",
-            "63": "Rain",
-            "65": "Heavy rain",
-            "66": "Light rain",
-            "67": "Heavy rain",
-            "71": "Light snow",
-            "73": "Snow",
-            "75": "Heavy snow",
-            "77": "Snow",
-            "80": "Light rain",
-            "81": "Rain",
-            "82": "Heavy rain",
-            "85": "Light snow showers",
-            "86": "Heavy snow showers",
-            "95": "Thunderstorm",
-            "96": "Thunderstorm with hail",
-            "99": "Thunderstorm with hail"
+            "0": I18n.tr("Clear Sky"),
+            "1": I18n.tr("Clear Sky"),
+            "2": I18n.tr("Partly Cloudy"),
+            "3": I18n.tr("Overcast"),
+            "45": I18n.tr("Fog"),
+            "48": I18n.tr("Fog"),
+            "51": I18n.tr("Drizzle"),
+            "53": I18n.tr("Drizzle"),
+            "55": I18n.tr("Drizzle"),
+            "56": I18n.tr("Freezing Drizzle"),
+            "57": I18n.tr("Freezing Drizzle"),
+            "61": I18n.tr("Light Rain"),
+            "63": I18n.tr("Rain"),
+            "65": I18n.tr("Heavy Rain"),
+            "66": I18n.tr("Light Rain"),
+            "67": I18n.tr("Heavy Rain"),
+            "71": I18n.tr("Light Snow"),
+            "73": I18n.tr("Snow"),
+            "75": I18n.tr("Heavy Snow"),
+            "77": I18n.tr("Snow"),
+            "80": I18n.tr("Light Rain"),
+            "81": I18n.tr("Rain"),
+            "82": I18n.tr("Heavy Rain"),
+            "85": I18n.tr("Light Snow Showers"),
+            "86": I18n.tr("Heavy Snow Showers"),
+            "95": I18n.tr("Thunderstorm"),
+            "96": I18n.tr("Thunderstorm with Hail"),
+            "99": I18n.tr("Thunderstorm with Hail")
         };
-        return conditions[String(code)] || "Unknown";
+        return conditions[String(code)] || I18n.tr("Unknown");
     }
 
     property var moonPhaseNames: ["moon_new", "moon_waxing_crescent", "moon_first_quarter", "moon_waxing_gibbous", "moon_full", "moon_waning_gibbous", "moon_last_quarter", "moon_waning_crescent"]
@@ -647,8 +647,8 @@ Singleton {
                     const address = data.address || {};
 
                     root.location = {
-                        city: address.hamlet || address.city || address.town || address.village || "Unknown",
-                        country: address.country || "Unknown",
+                        city: address.hamlet || address.city || address.town || address.village || I18n.tr("Unknown"),
+                        country: address.country || I18n.tr("Unknown"),
                         latitude: parseFloat(data.lat),
                         longitude: parseFloat(data.lon)
                     };
@@ -807,8 +807,8 @@ Singleton {
                         "tempF": Math.round(tempF),
                         "feelsLike": Math.round(feelsLikeC),
                         "feelsLikeF": Math.round(feelsLikeF),
-                        "city": root.location?.city || "Unknown",
-                        "country": root.location?.country || "Unknown",
+                        "city": root.location?.city || I18n.tr("Unknown"),
+                        "country": root.location?.country || I18n.tr("Unknown"),
                         "wCode": current.weather_code || 0,
                         "humidity": Math.round(current.relative_humidity_2m || 0),
                         "wind": Math.round(current.wind_speed_10m || 0),
