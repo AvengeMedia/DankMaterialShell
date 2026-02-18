@@ -338,7 +338,7 @@ PanelWindow {
             id: bgShadowLayer
             anchors.fill: parent
             anchors.margins: Theme.snap(4, win.dpr)
-            layer.enabled: !win._isDestroying && win.screenValid && !implicitHeightAnim.running
+            layer.enabled: !win._isDestroying && win.screenValid
             layer.smooth: false
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
