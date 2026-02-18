@@ -8,8 +8,37 @@ DankPopout {
 
     layerNamespace: "dms:app-launcher"
 
+    property string _pendingMode: ""
+    property string _pendingQuery: ""
+
     function show() {
         open();
+    }
+
+    function openWithMode(mode) {
+        _pendingMode = mode || "";
+        open();
+    }
+
+    function toggleWithMode(mode) {
+        if (shouldBeVisible) {
+            close();
+            return;
+        }
+        openWithMode(mode);
+    }
+
+    function openWithQuery(query) {
+        _pendingQuery = query || "";
+        open();
+    }
+
+    function toggleWithQuery(query) {
+        if (shouldBeVisible) {
+            close();
+            return;
+        }
+        openWithQuery(query);
     }
 
     popupWidth: 560
@@ -30,15 +59,25 @@ DankPopout {
         var lc = contentLoader.item?.launcherContent;
         if (!lc)
             return;
+
+        const query = _pendingQuery;
+        const mode = _pendingMode || "apps";
+        _pendingMode = "";
+        _pendingQuery = "";
+
         if (lc.searchField) {
-            lc.searchField.text = "";
+            lc.searchField.text = query;
             lc.searchField.forceActiveFocus();
         }
         if (lc.controller) {
-            lc.controller.searchMode = "apps";
+            lc.controller.searchMode = mode;
             lc.controller.pluginFilter = "";
             lc.controller.searchQuery = "";
-            lc.controller.performSearch();
+            if (query) {
+                lc.controller.setSearchQuery(query);
+            } else {
+                lc.controller.performSearch();
+            }
         }
         lc.resetScroll?.();
         lc.actionPanel?.hide();
