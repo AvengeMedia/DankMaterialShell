@@ -83,9 +83,9 @@ FloatingWindow {
 
     objectName: "processListModal"
     title: I18n.tr("System Monitor", "sysmon window title")
-    minimumSize: Qt.size(750, 550)
-    implicitWidth: 1000
-    implicitHeight: 720
+    minimumSize: Qt.size(Math.min(Math.round(Theme.fontSizeMedium * 48), Screen.width), Math.min(Math.round(Theme.fontSizeMedium * 34), Screen.height))
+    implicitWidth: Math.round(Theme.fontSizeMedium * 71)
+    implicitHeight: Math.round(Theme.fontSizeMedium * 51)
     color: Theme.surfaceContainer
     visible: false
 
@@ -236,7 +236,7 @@ FloatingWindow {
 
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 48
+                Layout.preferredHeight: Math.round(Theme.fontSizeMedium * 3.4)
 
                 MouseArea {
                     anchors.fill: parent
@@ -293,10 +293,10 @@ FloatingWindow {
 
             RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 52
+                Layout.preferredHeight: Math.round(Theme.fontSizeMedium * 3.7)
                 Layout.leftMargin: Theme.spacingL
                 Layout.rightMargin: Theme.spacingL
-                spacing: Theme.spacingL
+                spacing: Theme.spacingM
 
                 Row {
                     spacing: 2
@@ -322,14 +322,15 @@ FloatingWindow {
                         ]
 
                         Rectangle {
-                            width: 120
-                            height: 44
+                            width: tabRowContent.implicitWidth + Theme.spacingM * 2
+                            height: Math.round(Theme.fontSizeMedium * 3.1)
                             radius: Theme.cornerRadius
                             color: currentTab === index ? Theme.primaryPressed : (tabMouseArea.containsMouse ? Theme.primaryHoverLight : "transparent")
                             border.color: currentTab === index ? Theme.primary : "transparent"
                             border.width: currentTab === index ? 1 : 0
 
                             Row {
+                                id: tabRowContent
                                 anchors.centerIn: parent
                                 spacing: Theme.spacingXS
 
@@ -373,11 +374,13 @@ FloatingWindow {
 
                 DankButtonGroup {
                     id: processFilterGroup
-                    Layout.minimumWidth: implicitWidth + 8
                     model: [I18n.tr("All"), I18n.tr("User"), I18n.tr("System")]
                     currentIndex: 0
                     checkEnabled: false
-                    buttonHeight: 36
+                    buttonHeight: Math.round(Theme.fontSizeSmall * 2.6)
+                    minButtonWidth: 0
+                    buttonPadding: Theme.spacingS
+                    textSize: Theme.fontSizeSmall
                     visible: currentTab === 0
                     onSelectionChanged: (index, selected) => {
                         if (!selected)
@@ -400,9 +403,9 @@ FloatingWindow {
                 DankTextField {
                     id: searchField
                     Layout.fillWidth: true
-                    Layout.maximumWidth: 250
-                    Layout.minimumWidth: 120
-                    Layout.preferredHeight: 40
+                    Layout.maximumWidth: Math.round(Theme.fontSizeMedium * 18)
+                    Layout.minimumWidth: Theme.fontSizeMedium * 4
+                    Layout.preferredHeight: Math.round(Theme.fontSizeMedium * 2.8)
                     placeholderText: I18n.tr("Search processes...", "process search placeholder")
                     leftIconName: "search"
                     showClearButton: true
@@ -470,7 +473,7 @@ FloatingWindow {
 
             Rectangle {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 32
+                Layout.preferredHeight: Math.round(Theme.fontSizeSmall * 2.7)
                 Layout.leftMargin: Theme.spacingL
                 Layout.rightMargin: Theme.spacingL
                 Layout.bottomMargin: Theme.spacingM

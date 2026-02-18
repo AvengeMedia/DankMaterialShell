@@ -26,8 +26,8 @@ DankPopout {
         open();
     }
 
-    popupWidth: 650
-    popupHeight: 550
+    popupWidth: Math.round(Theme.fontSizeMedium * 46)
+    popupHeight: Math.round(Theme.fontSizeMedium * 39)
     triggerWidth: 55
     positioning: ""
     screen: triggerScreen
@@ -151,11 +151,13 @@ DankPopout {
 
                     DankButtonGroup {
                         id: processFilterGroup
-                        Layout.minimumWidth: implicitWidth + 8
+                        Layout.minimumWidth: implicitWidth
                         model: [I18n.tr("All"), I18n.tr("User"), I18n.tr("System")]
                         currentIndex: 0
                         checkEnabled: false
-                        buttonHeight: Math.round(Theme.fontSizeMedium * 2.2)
+                        buttonHeight: Math.round(Theme.fontSizeSmall * 2.4)
+                        minButtonWidth: 0
+                        buttonPadding: Theme.spacingM
                         textSize: Theme.fontSizeSmall
                         onSelectionChanged: (index, selected) => {
                             if (!selected)
@@ -177,7 +179,8 @@ DankPopout {
 
                     DankTextField {
                         id: searchField
-                        Layout.preferredWidth: Theme.fontSizeMedium * 14
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: Theme.fontSizeMedium * 8
                         Layout.preferredHeight: Theme.fontSizeMedium * 2.5
                         placeholderText: I18n.tr("Search...")
                         leftIconName: "search"
