@@ -257,7 +257,7 @@ DankListView {
             target: delegateRoot
             property: "swipeOffset"
             to: 0
-            duration: Theme.shortDuration
+            duration: Theme.notificationExitDuration
             easing.type: Easing.OutCubic
             onStopped: NotificationService.dismissGroup(delegateRoot.modelData?.key || "")
         }

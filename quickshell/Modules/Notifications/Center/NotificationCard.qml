@@ -764,7 +764,7 @@ Rectangle {
                         target: expandedDelegateWrapper
                         property: "swipeOffset"
                         to: expandedDelegateWrapper.swipeOffset > 0 ? expandedDelegateWrapper.width : -expandedDelegateWrapper.width
-                        duration: Theme.shortDuration
+                        duration: Theme.notificationExitDuration
                         easing.type: Easing.OutCubic
                         onStopped: NotificationService.dismissNotification(modelData)
                     }

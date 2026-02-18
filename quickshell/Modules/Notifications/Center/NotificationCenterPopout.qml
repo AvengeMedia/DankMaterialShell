@@ -35,9 +35,9 @@ DankPopout {
     popupWidth: triggerScreen ? Math.min(500, Math.max(380, triggerScreen.width - 48)) : 400
     popupHeight: stablePopupHeight
     positioning: ""
-    animationScaleCollapsed: 1.0
+    animationScaleCollapsed: 0.94
     animationOffset: 0
-    suspendShadowWhileResizing: true
+    suspendShadowWhileResizing: false
 
     screen: triggerScreen
     shouldBeVisible: notificationHistoryVisible

@@ -453,10 +453,7 @@ func (s *Screenshoter) blitBuffer(dst, src *ShmBuffer, dstX, dstY int, yInverted
 }
 
 func (s *Screenshoter) captureWholeOutput(output *WaylandOutput) (*CaptureResult, error) {
-	cursor := int32(0)
-	if s.config.IncludeCursor {
-		cursor = 1
-	}
+	cursor := int32(s.config.Cursor)
 
 	frame, err := s.screencopy.CaptureOutput(cursor, output.wlOutput)
 	if err != nil {
@@ -624,10 +621,7 @@ func (s *Screenshoter) captureRegionOnOutput(output *WaylandOutput, region Regio
 		}
 	}
 
-	cursor := int32(0)
-	if s.config.IncludeCursor {
-		cursor = 1
-	}
+	cursor := int32(s.config.Cursor)
 
 	frame, err := s.screencopy.CaptureOutputRegion(cursor, output.wlOutput, localX, localY, w, h)
 	if err != nil {

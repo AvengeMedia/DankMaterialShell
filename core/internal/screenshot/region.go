@@ -108,7 +108,7 @@ func NewRegionSelector(s *Screenshoter) *RegionSelector {
 		screenshoter:       s,
 		outputs:            make(map[uint32]*WaylandOutput),
 		preCapture:         make(map[*WaylandOutput]*PreCapture),
-		showCapturedCursor: true,
+		showCapturedCursor: s.config.Cursor == CursorOn,
 	}
 }
 

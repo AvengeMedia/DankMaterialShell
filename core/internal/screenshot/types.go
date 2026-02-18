@@ -19,6 +19,13 @@ const (
 	FormatPPM
 )
 
+type CursorMode int
+
+const (
+	CursorOff CursorMode = iota
+	CursorOn
+)
+
 type Region struct {
 	X      int32  `json:"x"`
 	Y      int32  `json:"y"`
@@ -42,29 +49,29 @@ type Output struct {
 }
 
 type Config struct {
-	Mode          Mode
-	OutputName    string
-	IncludeCursor bool
-	Format        Format
-	Quality       int
-	OutputDir     string
-	Filename      string
-	Clipboard     bool
-	SaveFile      bool
-	Notify        bool
-	Stdout        bool
+	Mode       Mode
+	OutputName string
+	Cursor     CursorMode
+	Format     Format
+	Quality    int
+	OutputDir  string
+	Filename   string
+	Clipboard  bool
+	SaveFile   bool
+	Notify     bool
+	Stdout     bool
 }
 
 func DefaultConfig() Config {
 	return Config{
-		Mode:          ModeRegion,
-		IncludeCursor: false,
-		Format:        FormatPNG,
-		Quality:       90,
-		OutputDir:     "",
-		Filename:      "",
-		Clipboard:     true,
-		SaveFile:      true,
-		Notify:        true,
+		Mode:      ModeRegion,
+		Cursor:    CursorOff,
+		Format:    FormatPNG,
+		Quality:   90,
+		OutputDir: "",
+		Filename:  "",
+		Clipboard: true,
+		SaveFile:  true,
+		Notify:    true,
 	}
 }

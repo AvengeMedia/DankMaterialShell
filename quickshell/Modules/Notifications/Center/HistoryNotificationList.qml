@@ -278,7 +278,7 @@ Item {
                     Behavior on x {
                         enabled: !swipeDragHandler.active && delegateRoot.__delegateInitialized
                         NumberAnimation {
-                            duration: Theme.shortDuration
+                            duration: Theme.notificationExitDuration
                             easing.type: Theme.standardEasing
                         }
                     }
@@ -286,7 +286,7 @@ Item {
                     Behavior on opacity {
                         enabled: delegateRoot.__delegateInitialized
                         NumberAnimation {
-                            duration: delegateRoot.__delegateInitialized ? Theme.shortDuration : 0
+                            duration: delegateRoot.__delegateInitialized ? Theme.notificationExitDuration : 0
                         }
                     }
                 }
