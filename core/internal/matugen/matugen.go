@@ -33,6 +33,7 @@ const (
 	TemplateKindTerminal
 	TemplateKindGTK
 	TemplateKindVSCode
+	TemplateKindEmacs
 )
 
 type TemplateDef struct {
@@ -65,7 +66,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "dgop", Commands: []string{"dgop"}, ConfigFile: "dgop.toml"},
 	{ID: "kcolorscheme", ConfigFile: "kcolorscheme.toml", RunUnconditionally: true},
 	{ID: "vscode", Kind: TemplateKindVSCode},
-	{ID: "emacs", Commands: []string{"emacs"}, ConfigFile: "emacs.toml"},
+	{ID: "emacs", Commands: []string{"emacs"}, ConfigFile: "emacs.toml", Kind: TemplateKindEmacs},
 }
 
 func (c *ColorMode) GTKTheme() string {
@@ -78,7 +79,8 @@ func (c *ColorMode) GTKTheme() string {
 }
 
 var (
-	matugenVersionOnce sync.Once
+	matugenVersionMu   sync.Mutex
+	matugenVersionOK   bool
 	matugenSupportsCOE bool
 	matugenIsV4        bool
 )
@@ -334,6 +336,10 @@ output_path = '%s'
 			appendVSCodeConfig(cfgFile, "cursor", filepath.Join(homeDir, ".cursor/extensions"), opts.ShellDir)
 			appendVSCodeConfig(cfgFile, "windsurf", filepath.Join(homeDir, ".windsurf/extensions"), opts.ShellDir)
 			appendVSCodeConfig(cfgFile, "vscode-insiders", filepath.Join(homeDir, ".vscode-insiders/extensions"), opts.ShellDir)
+		case TemplateKindEmacs:
+			if utils.EmacsConfigDir() != "" {
+				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
+			}
 		default:
 			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
 		}
@@ -491,6 +497,9 @@ func substituteVars(content, shellDir string) string {
 	result = strings.ReplaceAll(result, "'CONFIG_DIR/", "'"+utils.XDGConfigHome()+"/")
 	result = strings.ReplaceAll(result, "'DATA_DIR/", "'"+utils.XDGDataHome()+"/")
 	result = strings.ReplaceAll(result, "'CACHE_DIR/", "'"+utils.XDGCacheHome()+"/")
+	if emacsDir := utils.EmacsConfigDir(); emacsDir != "" {
+		result = strings.ReplaceAll(result, "'EMACS_DIR/", "'"+emacsDir+"/")
+	}
 	return result
 }
 
@@ -511,78 +520,159 @@ func extractTOMLSection(content, startMarker, endMarker string) string {
 	return content[startIdx : startIdx+endIdx]
 }
 
-func checkMatugenVersion() {
-	matugenVersionOnce.Do(func() {
-		cmd := exec.Command("matugen", "--version")
-		output, err := cmd.Output()
-		if err != nil {
-			return
-		}
-
-		versionStr := strings.TrimSpace(string(output))
-		versionStr = strings.TrimPrefix(versionStr, "matugen ")
-
-		parts := strings.Split(versionStr, ".")
-		if len(parts) < 2 {
-			return
-		}
-
-		major, err := strconv.Atoi(parts[0])
-		if err != nil {
-			return
-		}
-
-		minor, err := strconv.Atoi(parts[1])
-		if err != nil {
-			return
-		}
-
-		matugenSupportsCOE = major > 3 || (major == 3 && minor >= 1)
-		matugenIsV4 = major >= 4
-		if matugenSupportsCOE {
-			log.Infof("Matugen %s supports --continue-on-error", versionStr)
-		}
-		if matugenIsV4 {
-			log.Infof("Matugen %s: using v4 flags", versionStr)
-		}
-	})
+type matugenFlags struct {
+	supportsCOE bool
+	isV4        bool
 }
 
-func runMatugen(args []string) error {
-	checkMatugenVersion()
+func detectMatugenVersion() (matugenFlags, error) {
+	matugenVersionMu.Lock()
+	defer matugenVersionMu.Unlock()
+
+	if matugenVersionOK {
+		return matugenFlags{matugenSupportsCOE, matugenIsV4}, nil
+	}
+
+	return detectMatugenVersionLocked()
+}
+
+func redetectMatugenVersion(old matugenFlags) (matugenFlags, bool) {
+	matugenVersionMu.Lock()
+	defer matugenVersionMu.Unlock()
+
+	matugenVersionOK = false
+	flags, err := detectMatugenVersionLocked()
+	if err != nil {
+		return old, false
+	}
+	changed := flags.supportsCOE != old.supportsCOE || flags.isV4 != old.isV4
+	return flags, changed
+}
+
+func detectMatugenVersionLocked() (matugenFlags, error) {
+	cmd := exec.Command("matugen", "--version")
+	output, err := cmd.Output()
+	if err != nil {
+		return matugenFlags{}, fmt.Errorf("failed to get matugen version: %w", err)
+	}
+
+	versionStr := strings.TrimSpace(string(output))
+	versionStr = strings.TrimPrefix(versionStr, "matugen ")
+
+	parts := strings.Split(versionStr, ".")
+	if len(parts) < 2 {
+		return matugenFlags{}, fmt.Errorf("unexpected matugen version format: %q", versionStr)
+	}
+
+	major, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return matugenFlags{}, fmt.Errorf("failed to parse matugen major version %q: %w", parts[0], err)
+	}
+
+	minor, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return matugenFlags{}, fmt.Errorf("failed to parse matugen minor version %q: %w", parts[1], err)
+	}
+
+	matugenSupportsCOE = major > 3 || (major == 3 && minor >= 1)
+	matugenIsV4 = major >= 4
+	matugenVersionOK = true
 
 	if matugenSupportsCOE {
-		args = append([]string{"--continue-on-error"}, args...)
+		log.Infof("Matugen %s supports --continue-on-error", versionStr)
 	}
 	if matugenIsV4 {
+		log.Infof("Matugen %s: using v4 flags", versionStr)
+	}
+	return matugenFlags{matugenSupportsCOE, matugenIsV4}, nil
+}
+
+func buildMatugenArgs(baseArgs []string, flags matugenFlags) []string {
+	args := make([]string, 0, len(baseArgs)+4)
+	if flags.supportsCOE {
+		args = append(args, "--continue-on-error")
+	}
+	args = append(args, baseArgs...)
+	if flags.isV4 {
 		args = append(args, "--source-color-index", "0")
 	}
+	return args
+}
 
+func runMatugen(baseArgs []string) error {
+	flags, err := detectMatugenVersion()
+	if err != nil {
+		return err
+	}
+
+	args := buildMatugenArgs(baseArgs, flags)
 	cmd := exec.Command("matugen", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	runErr := cmd.Run()
+	if runErr == nil {
+		return nil
+	}
+
+	log.Warnf("Matugen failed (v4=%v): %v", flags.isV4, runErr)
+
+	newFlags, changed := redetectMatugenVersion(flags)
+	if !changed {
+		return runErr
+	}
+
+	log.Warnf("Matugen version changed (v4: %v -> %v), retrying", flags.isV4, newFlags.isV4)
+	args = buildMatugenArgs(baseArgs, newFlags)
+	retryCmd := exec.Command("matugen", args...)
+	retryCmd.Stdout = os.Stdout
+	retryCmd.Stderr = os.Stderr
+	return retryCmd.Run()
 }
 
 func runMatugenDryRun(opts *Options) (string, error) {
-	checkMatugenVersion()
-
-	var args []string
-	switch opts.Kind {
-	case "hex":
-		args = []string{"color", "hex", opts.Value}
-	default:
-		args = []string{opts.Kind, opts.Value}
-	}
-	args = append(args, "-m", "dark", "-t", opts.MatugenType, "--json", "hex", "--dry-run")
-	if matugenIsV4 {
-		args = append(args, "--source-color-index", "0", "--old-json-output")
-	}
-
-	cmd := exec.Command("matugen", args...)
-	output, err := cmd.Output()
+	flags, err := detectMatugenVersion()
 	if err != nil {
 		return "", err
+	}
+
+	output, dryErr := execDryRun(opts, flags)
+	if dryErr == nil {
+		return output, nil
+	}
+
+	log.Warnf("Matugen dry-run failed (v4=%v): %v", flags.isV4, dryErr)
+
+	newFlags, changed := redetectMatugenVersion(flags)
+	if !changed {
+		return "", dryErr
+	}
+
+	log.Warnf("Matugen version changed (v4: %v -> %v), retrying dry-run", flags.isV4, newFlags.isV4)
+	return execDryRun(opts, newFlags)
+}
+
+func execDryRun(opts *Options, flags matugenFlags) (string, error) {
+	var baseArgs []string
+	switch opts.Kind {
+	case "hex":
+		baseArgs = []string{"color", "hex", opts.Value}
+	default:
+		baseArgs = []string{opts.Kind, opts.Value}
+	}
+	baseArgs = append(baseArgs, "-m", "dark", "-t", opts.MatugenType, "--json", "hex", "--dry-run")
+	if flags.isV4 {
+		baseArgs = append(baseArgs, "--source-color-index", "0", "--old-json-output")
+	}
+
+	cmd := exec.Command("matugen", baseArgs...)
+	var stderr strings.Builder
+	cmd.Stderr = &stderr
+	output, err := cmd.Output()
+	if err != nil {
+		if stderr.Len() > 0 {
+			return "", fmt.Errorf("matugen %v failed (v4=%v): %s", baseArgs, flags.isV4, strings.TrimSpace(stderr.String()))
+		}
+		return "", fmt.Errorf("matugen %v failed (v4=%v): %w", baseArgs, flags.isV4, err)
 	}
 	return strings.ReplaceAll(string(output), "\n", ""), nil
 }
@@ -819,6 +909,8 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 			detected = true
 		case tmpl.Kind == TemplateKindVSCode:
 			detected = checkVSCodeExtension(homeDir)
+		case tmpl.Kind == TemplateKindEmacs:
+			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && utils.EmacsConfigDir() != ""
 		default:
 			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks)
 		}

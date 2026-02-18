@@ -101,35 +101,6 @@ function detectIconType(iconName) {
     return "material";
 }
 
-function evaluateCalculator(query) {
-    if (!query || query.length === 0)
-        return null;
-
-    var mathExpr = query.replace(/[^0-9+\-*/().%\s^]/g, "");
-    if (mathExpr.length < 2)
-        return null;
-
-    var hasMath = /[+\-*/^%]/.test(query) && /\d/.test(query);
-    if (!hasMath)
-        return null;
-
-    try {
-        var sanitized = mathExpr.replace(/\^/g, "**");
-        var result = Function('"use strict"; return (' + sanitized + ')')();
-
-        if (typeof result === "number" && isFinite(result)) {
-            var displayResult = Number.isInteger(result) ? result.toString() : result.toFixed(6).replace(/\.?0+$/, "");
-            return {
-                expression: query,
-                result: result,
-                displayResult: displayResult
-            };
-        }
-    } catch (e) { }
-
-    return null;
-}
-
 function sortPluginIdsByOrder(pluginIds, order) {
     if (!order || order.length === 0)
         return pluginIds;

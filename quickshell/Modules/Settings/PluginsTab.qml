@@ -376,19 +376,9 @@ FocusScope {
                 return;
             var isLauncher = plugin.type === "launcher" || (plugin.capabilities && plugin.capabilities.includes("launcher"));
             if (isLauncher) {
-                pluginReloadTimer.pendingPluginId = pluginId;
-                pluginReloadTimer.restart();
+                pluginsTab.isReloading = true;
+                PluginService.reloadPlugin(pluginId);
             }
-        }
-    }
-
-    Timer {
-        id: pluginReloadTimer
-        property string pendingPluginId: ""
-        interval: 500
-        onTriggered: {
-            if (pendingPluginId)
-                PluginService.reloadPlugin(pendingPluginId);
         }
     }
 

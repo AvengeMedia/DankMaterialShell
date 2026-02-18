@@ -178,8 +178,6 @@ Rectangle {
                         if (!root.item)
                             return "";
                         switch (root.item.type) {
-                        case "calculator":
-                            return I18n.tr("Calc");
                         case "plugin":
                             return I18n.tr("Plugin");
                         case "file":

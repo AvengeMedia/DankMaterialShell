@@ -91,7 +91,12 @@ DankModal {
                         id: searchField
                         Layout.alignment: Qt.AlignRight
                         leftIconName: "search"
+                        keyForwardTargets: [root.modalFocusScope]
                         onTextEdited: searchDebounce.restart()
+                        Keys.onEscapePressed: event => {
+                            root.close();
+                            event.accepted = true;
+                        }
                     }
                 }
 

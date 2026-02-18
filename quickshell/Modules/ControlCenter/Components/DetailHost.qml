@@ -15,18 +15,22 @@ Item {
     property var pluginDetailInstance: null
     property var widgetModel: null
     property var collapseCallback: null
+    property real maxAvailableHeight: 9999
 
     function getDetailHeight(section) {
-        const maxAvailable = parent ? parent.height - Theme.spacingS : 9999;
         switch (true) {
         case section === "wifi":
         case section === "bluetooth":
         case section === "builtin_vpn":
-            return Math.min(350, maxAvailable);
+            return Math.min(350, maxAvailableHeight);
         case section.startsWith("brightnessSlider_"):
-            return Math.min(400, maxAvailable);
+            return Math.min(400, maxAvailableHeight);
+        case section.startsWith("plugin_"):
+            if (pluginDetailInstance?.ccDetailHeight)
+                return Math.min(pluginDetailInstance.ccDetailHeight, maxAvailableHeight);
+            return Math.min(250, maxAvailableHeight);
         default:
-            return Math.min(250, maxAvailable);
+            return Math.min(250, maxAvailableHeight);
         }
     }
 
