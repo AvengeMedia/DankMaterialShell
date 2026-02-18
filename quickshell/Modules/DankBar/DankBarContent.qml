@@ -642,24 +642,52 @@ Item {
             popoutTarget: appDrawerLoader.item
             parentScreen: barWindow.screen
             hyprlandOverviewLoader: barWindow ? barWindow.hyprlandOverviewLoader : null
-            onClicked: {
+
+            function _preparePopout() {
                 appDrawerLoader.active = true;
-                // Use topBarContent.barConfig directly since widget barConfig binding doesn't work in Components
+                if (!appDrawerLoader.item)
+                    return false;
                 const effectiveBarConfig = topBarContent.barConfig;
-                // Calculate barPosition from axis.edge
                 const barPosition = barWindow.axis?.edge === "left" ? 2 : (barWindow.axis?.edge === "right" ? 3 : (barWindow.axis?.edge === "top" ? 0 : 1));
-                if (appDrawerLoader.item && appDrawerLoader.item.setBarContext) {
+                if (appDrawerLoader.item.setBarContext)
                     appDrawerLoader.item.setBarContext(barPosition, effectiveBarConfig?.bottomGap ?? 0);
-                }
-                if (appDrawerLoader.item && appDrawerLoader.item.setTriggerPosition) {
+                if (appDrawerLoader.item.setTriggerPosition) {
                     const globalPos = launcherButton.visualContent.mapToItem(null, 0, 0);
                     const currentScreen = barWindow.screen;
                     const pos = SettingsData.getPopupTriggerPosition(globalPos, currentScreen, barWindow.effectiveBarThickness, launcherButton.visualWidth, effectiveBarConfig?.spacing ?? 4, barPosition, effectiveBarConfig);
                     appDrawerLoader.item.setTriggerPosition(pos.x, pos.y, pos.width, launcherButton.section, currentScreen, barPosition, barWindow.effectiveBarThickness, effectiveBarConfig?.spacing ?? 4, effectiveBarConfig);
                 }
-                if (appDrawerLoader.item) {
-                    PopoutManager.requestPopout(appDrawerLoader.item, undefined, "appDrawer");
-                }
+                return true;
+            }
+
+            function openWithMode(mode) {
+                if (!_preparePopout())
+                    return;
+                appDrawerLoader.item.openWithMode(mode);
+            }
+
+            function toggleWithMode(mode) {
+                if (!_preparePopout())
+                    return;
+                appDrawerLoader.item.toggleWithMode(mode);
+            }
+
+            function openWithQuery(query) {
+                if (!_preparePopout())
+                    return;
+                appDrawerLoader.item.openWithQuery(query);
+            }
+
+            function toggleWithQuery(query) {
+                if (!_preparePopout())
+                    return;
+                appDrawerLoader.item.toggleWithQuery(query);
+            }
+
+            onClicked: {
+                if (!_preparePopout())
+                    return;
+                PopoutManager.requestPopout(appDrawerLoader.item, undefined, "appDrawer");
             }
         }
     }

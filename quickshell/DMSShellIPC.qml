@@ -859,6 +859,70 @@ Item {
             return success ? `WIDGET_TOGGLE_SUCCESS: ${widgetId}` : `WIDGET_TOGGLE_FAILED: ${widgetId}`;
         }
 
+        function openWith(widgetId: string, mode: string): string {
+            if (!widgetId)
+                return "ERROR: No widget ID specified";
+            if (!BarWidgetService.hasWidget(widgetId))
+                return `WIDGET_NOT_FOUND: ${widgetId}`;
+
+            const widget = BarWidgetService.getWidgetOnFocusedScreen(widgetId);
+            if (!widget)
+                return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
+            if (typeof widget.openWithMode !== "function")
+                return `WIDGET_OPEN_WITH_NOT_SUPPORTED: ${widgetId}`;
+
+            widget.openWithMode(mode || "all");
+            return `WIDGET_OPEN_WITH_SUCCESS: ${widgetId} ${mode}`;
+        }
+
+        function toggleWith(widgetId: string, mode: string): string {
+            if (!widgetId)
+                return "ERROR: No widget ID specified";
+            if (!BarWidgetService.hasWidget(widgetId))
+                return `WIDGET_NOT_FOUND: ${widgetId}`;
+
+            const widget = BarWidgetService.getWidgetOnFocusedScreen(widgetId);
+            if (!widget)
+                return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
+            if (typeof widget.toggleWithMode !== "function")
+                return `WIDGET_TOGGLE_WITH_NOT_SUPPORTED: ${widgetId}`;
+
+            widget.toggleWithMode(mode || "all");
+            return `WIDGET_TOGGLE_WITH_SUCCESS: ${widgetId} ${mode}`;
+        }
+
+        function openQuery(widgetId: string, query: string): string {
+            if (!widgetId)
+                return "ERROR: No widget ID specified";
+            if (!BarWidgetService.hasWidget(widgetId))
+                return `WIDGET_NOT_FOUND: ${widgetId}`;
+
+            const widget = BarWidgetService.getWidgetOnFocusedScreen(widgetId);
+            if (!widget)
+                return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
+            if (typeof widget.openWithQuery !== "function")
+                return `WIDGET_OPEN_QUERY_NOT_SUPPORTED: ${widgetId}`;
+
+            widget.openWithQuery(query || "");
+            return `WIDGET_OPEN_QUERY_SUCCESS: ${widgetId}`;
+        }
+
+        function toggleQuery(widgetId: string, query: string): string {
+            if (!widgetId)
+                return "ERROR: No widget ID specified";
+            if (!BarWidgetService.hasWidget(widgetId))
+                return `WIDGET_NOT_FOUND: ${widgetId}`;
+
+            const widget = BarWidgetService.getWidgetOnFocusedScreen(widgetId);
+            if (!widget)
+                return `WIDGET_NOT_AVAILABLE: ${widgetId}`;
+            if (typeof widget.toggleWithQuery !== "function")
+                return `WIDGET_TOGGLE_QUERY_NOT_SUPPORTED: ${widgetId}`;
+
+            widget.toggleWithQuery(query || "");
+            return `WIDGET_TOGGLE_QUERY_SUCCESS: ${widgetId}`;
+        }
+
         function list(): string {
             const widgets = BarWidgetService.getRegisteredWidgetIds();
             if (widgets.length === 0)
