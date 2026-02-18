@@ -258,7 +258,7 @@ func (i *ExtWorkspaceManagerV1) Dispatch(opcode uint32, fd int, data []byte) {
 		l := 0
 		objectID := client.Uint32(data[l : l+4])
 		proxy := i.Context().GetProxy(objectID)
-		if proxy != nil {
+		if proxy != nil && !proxy.IsZombie() {
 			e.WorkspaceGroup = proxy.(*ExtWorkspaceGroupHandleV1)
 		} else {
 			groupHandle := &ExtWorkspaceGroupHandleV1{}
@@ -278,7 +278,7 @@ func (i *ExtWorkspaceManagerV1) Dispatch(opcode uint32, fd int, data []byte) {
 		l := 0
 		objectID := client.Uint32(data[l : l+4])
 		proxy := i.Context().GetProxy(objectID)
-		if proxy != nil {
+		if proxy != nil && !proxy.IsZombie() {
 			e.Workspace = proxy.(*ExtWorkspaceHandleV1)
 		} else {
 			wsHandle := &ExtWorkspaceHandleV1{}
