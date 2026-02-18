@@ -6315,6 +6315,24 @@
   "Suspend then Hibernate": {
     "Suspend then Hibernate": "Sospendi e poi Iberna"
   },
+  "Choose Wallpaper Color": {
+    "Choose Wallpaper Color": "Scegli Colore Sfondo"
+  },
+  "No wallpaper selected": {
+    "No wallpaper selected": "Nessuno sfondo selezionato"
+  },
+  "Choose Light Mode Color": {
+    "Choose Light Mode Color": "Scegli Colore Modalità Chiara"
+  },
+  "Choose Dark Mode Color": {
+    "Choose Dark Mode Color": "Scegli Colore Modalità Scura"
+  },
+  "Not set": {
+    "Not set": "Non impostato"
+  },
+  "No monitors": {
+    "No monitors": "Nessuno schermo"
+  },
   "Time": {
     "Time": "Tempo"
   },
@@ -6389,5 +6407,26 @@
   },
   "Desktop": {
     "Desktop": "Scrivania"
+  },
+  "on Niri": {
+    "on Niri": "su Niri"
+  },
+  "on Hyprland": {
+    "on Hyprland": "su Hyprland"
+  },
+  "on MangoWC": {
+    "on MangoWC": "su MangoWC"
+  },
+  "on Sway": {
+    "on Sway": "su Sway"
+  },
+  "on Scroll": {
+    "on Scroll": "su Scroll"
+  },
+  "on Miracle WM": {
+    "on Miracle WM": "su Miracle WM"
+  },
+  "up": {
+    "up": "acceso da"
   }
 }
