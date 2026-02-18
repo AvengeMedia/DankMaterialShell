@@ -38,6 +38,22 @@ func XDGConfigHome() string {
 	return filepath.Join(home, ".config")
 }
 
+func EmacsConfigDir() string {
+	home, _ := os.UserHomeDir()
+
+	emacsD := filepath.Join(home, ".emacs.d")
+	if info, err := os.Stat(emacsD); err == nil && info.IsDir() {
+		return emacsD
+	}
+
+	xdgEmacs := filepath.Join(XDGConfigHome(), "emacs")
+	if info, err := os.Stat(xdgEmacs); err == nil && info.IsDir() {
+		return xdgEmacs
+	}
+
+	return ""
+}
+
 func ExpandPath(path string) (string, error) {
 	expanded := os.ExpandEnv(path)
 	expanded = filepath.Clean(expanded)

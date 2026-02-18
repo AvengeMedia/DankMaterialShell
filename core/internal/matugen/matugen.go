@@ -33,6 +33,7 @@ const (
 	TemplateKindTerminal
 	TemplateKindGTK
 	TemplateKindVSCode
+	TemplateKindEmacs
 )
 
 type TemplateDef struct {
@@ -65,7 +66,7 @@ var templateRegistry = []TemplateDef{
 	{ID: "dgop", Commands: []string{"dgop"}, ConfigFile: "dgop.toml"},
 	{ID: "kcolorscheme", ConfigFile: "kcolorscheme.toml", RunUnconditionally: true},
 	{ID: "vscode", Kind: TemplateKindVSCode},
-	{ID: "emacs", Commands: []string{"emacs"}, ConfigFile: "emacs.toml"},
+	{ID: "emacs", Commands: []string{"emacs"}, ConfigFile: "emacs.toml", Kind: TemplateKindEmacs},
 }
 
 func (c *ColorMode) GTKTheme() string {
@@ -334,6 +335,10 @@ output_path = '%s'
 			appendVSCodeConfig(cfgFile, "cursor", filepath.Join(homeDir, ".cursor/extensions"), opts.ShellDir)
 			appendVSCodeConfig(cfgFile, "windsurf", filepath.Join(homeDir, ".windsurf/extensions"), opts.ShellDir)
 			appendVSCodeConfig(cfgFile, "vscode-insiders", filepath.Join(homeDir, ".vscode-insiders/extensions"), opts.ShellDir)
+		case TemplateKindEmacs:
+			if utils.EmacsConfigDir() != "" {
+				appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
+			}
 		default:
 			appendConfig(opts, cfgFile, tmpl.Commands, tmpl.Flatpaks, tmpl.ConfigFile)
 		}
@@ -491,6 +496,9 @@ func substituteVars(content, shellDir string) string {
 	result = strings.ReplaceAll(result, "'CONFIG_DIR/", "'"+utils.XDGConfigHome()+"/")
 	result = strings.ReplaceAll(result, "'DATA_DIR/", "'"+utils.XDGDataHome()+"/")
 	result = strings.ReplaceAll(result, "'CACHE_DIR/", "'"+utils.XDGCacheHome()+"/")
+	if emacsDir := utils.EmacsConfigDir(); emacsDir != "" {
+		result = strings.ReplaceAll(result, "'EMACS_DIR/", "'"+emacsDir+"/")
+	}
 	return result
 }
 
@@ -819,6 +827,8 @@ func CheckTemplates(checker utils.AppChecker) []TemplateCheck {
 			detected = true
 		case tmpl.Kind == TemplateKindVSCode:
 			detected = checkVSCodeExtension(homeDir)
+		case tmpl.Kind == TemplateKindEmacs:
+			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks) && utils.EmacsConfigDir() != ""
 		default:
 			detected = appExists(checker, tmpl.Commands, tmpl.Flatpaks)
 		}
