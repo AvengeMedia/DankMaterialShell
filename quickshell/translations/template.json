@@ -140,6 +140,13 @@
     "comment": ""
   },
   {
+    "term": "(Default)",
+    "translation": "",
+    "context": "default monitor label suffix",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "(Unnamed)",
     "translation": "",
     "context": "",
@@ -182,9 +189,23 @@
     "comment": ""
   },
   {
+    "term": "1 hour",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "1 hour 30 minutes",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "1 minute",
     "translation": "",
-    "context": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -212,7 +233,7 @@
   {
     "term": "10 seconds",
     "translation": "",
-    "context": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -224,6 +245,13 @@
     "comment": ""
   },
   {
+    "term": "12 hours",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "14 days",
     "translation": "",
     "context": "notification history retention option",
@@ -231,9 +259,16 @@
     "comment": ""
   },
   {
+    "term": "15 minutes",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "15 seconds",
     "translation": "",
-    "context": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -245,9 +280,37 @@
     "comment": ""
   },
   {
+    "term": "2 hours",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "2 minutes",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "2 seconds",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "20 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "20 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -260,6 +323,20 @@
   },
   {
     "term": "24-hour format",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "25 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "250 ms",
     "translation": "",
     "context": "",
     "reference": "",
@@ -280,6 +357,20 @@
     "comment": ""
   },
   {
+    "term": "3 hours",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "3 minutes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "3 seconds",
     "translation": "",
     "context": "",
@@ -294,9 +385,23 @@
     "comment": ""
   },
   {
+    "term": "30 minutes",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "30 seconds",
     "translation": "",
-    "context": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "35 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -308,16 +413,72 @@
     "comment": ""
   },
   {
-    "term": "5 minutes",
+    "term": "4 hours",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "4 seconds",
     "translation": "",
     "context": "",
     "reference": "",
     "comment": ""
   },
   {
+    "term": "40 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "45 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "5 minutes",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "5 seconds",
     "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "50 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "500 ms",
+    "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "55 seconds",
+    "translation": "",
+    "context": "wallpaper interval",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "6 hours",
+    "translation": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -325,6 +486,20 @@
     "term": "7 days",
     "translation": "",
     "context": "notification history filter | notification history retention option",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "750 ms",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "8 hours",
+    "translation": "",
+    "context": "wallpaper interval",
     "reference": "",
     "comment": ""
   },
@@ -360,6 +535,13 @@
     "term": "A modern desktop shell for Wayland compositors",
     "translation": "",
     "context": "greeter welcome page tagline",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "AC Power",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -1743,20 +1925,6 @@
     "comment": ""
   },
   {
-    "term": "Calc",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Calculator",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "Camera",
     "translation": "",
     "context": "",
@@ -1897,6 +2065,13 @@
     "comment": ""
   },
   {
+    "term": "Choose Dark Mode Color",
+    "translation": "",
+    "context": "dark mode wallpaper color picker title",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Choose Dock Launcher Logo Color",
     "translation": "",
     "context": "",
@@ -1907,6 +2082,20 @@
     "term": "Choose Launcher Logo Color",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose Light Mode Color",
+    "translation": "",
+    "context": "light mode wallpaper color picker title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Choose Wallpaper Color",
+    "translation": "",
+    "context": "wallpaper color picker title",
     "reference": "",
     "comment": ""
   },
@@ -2038,6 +2227,13 @@
   },
   {
     "term": "Clear History?",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Clear Sky",
     "translation": "",
     "context": "",
     "reference": "",
@@ -3444,6 +3640,13 @@
     "comment": ""
   },
   {
+    "term": "Desktop",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Desktop Clock",
     "translation": "",
     "context": "Desktop clock widget name",
@@ -3864,6 +4067,13 @@
     "comment": ""
   },
   {
+    "term": "Documents",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Domain (optional)",
     "translation": "",
     "context": "",
@@ -3892,6 +4102,13 @@
     "comment": ""
   },
   {
+    "term": "Downloads",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Drag to Reorder",
     "translation": "",
     "context": "",
@@ -3914,6 +4131,13 @@
   },
   {
     "term": "Driver",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Drizzle",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5117,6 +5341,13 @@
     "comment": ""
   },
   {
+    "term": "Fog",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Follow Monitor Focus",
     "translation": "",
     "context": "",
@@ -5258,6 +5489,13 @@
   },
   {
     "term": "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Freezing Drizzle",
     "translation": "",
     "context": "",
     "reference": "",
@@ -5593,6 +5831,27 @@
     "comment": ""
   },
   {
+    "term": "Heavy Rain",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Heavy Snow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Heavy Snow Showers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Height",
     "translation": "",
     "context": "",
@@ -5832,6 +6091,13 @@
   },
   {
     "term": "Hold to confirm (%1s)",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Home",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6246,7 +6512,7 @@
   {
     "term": "Interval",
     "translation": "",
-    "context": "",
+    "context": "wallpaper cycling mode tab",
     "reference": "",
     "comment": ""
   },
@@ -6545,6 +6811,27 @@
     "comment": ""
   },
   {
+    "term": "Light Rain",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light Snow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Light Snow Showers",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Line",
     "translation": "",
     "context": "dock indicator style option",
@@ -6624,7 +6911,7 @@
   {
     "term": "Location",
     "translation": "",
-    "context": "",
+    "context": "theme auto mode tab",
     "reference": "",
     "comment": ""
   },
@@ -7266,6 +7553,13 @@
     "comment": ""
   },
   {
+    "term": "Missing Environment Variables",
+    "translation": "",
+    "context": "qt theme env error title",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Modal Background",
     "translation": "",
     "context": "",
@@ -7423,6 +7717,13 @@
     "term": "Multi-Monitor",
     "translation": "",
     "context": "greeter feature card title",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Music",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -8036,6 +8337,13 @@
     "comment": ""
   },
   {
+    "term": "No monitors",
+    "translation": "",
+    "context": "no monitors available label",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No mount points found",
     "translation": "",
     "context": "empty state in disk mounts list",
@@ -8249,6 +8557,13 @@
     "term": "Not paired",
     "translation": "",
     "context": "KDE Connect not paired status",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Not set",
+    "translation": "",
+    "context": "wallpaper not set label",
     "reference": "",
     "comment": ""
   },
@@ -8687,6 +9002,13 @@
     "comment": ""
   },
   {
+    "term": "Overcast",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Overflow",
     "translation": "",
     "context": "",
@@ -8855,6 +9177,13 @@
     "comment": ""
   },
   {
+    "term": "Partly Cloudy",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Passkey:",
     "translation": "",
     "context": "",
@@ -8984,6 +9313,13 @@
     "term": "Phone number",
     "translation": "",
     "context": "KDE Connect SMS phone input placeholder",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Pictures",
+    "translation": "",
+    "context": "",
     "reference": "",
     "comment": ""
   },
@@ -9611,6 +9947,13 @@
     "comment": ""
   },
   {
+    "term": "Quick Access",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Quick access to application launcher",
     "translation": "",
     "context": "",
@@ -9654,6 +9997,13 @@
   },
   {
     "term": "Radius",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Rain",
     "translation": "",
     "context": "",
     "reference": "",
@@ -9866,6 +10216,13 @@
     "term": "Requires DWL compositor",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Requires lazy plugin manager",
+    "translation": "",
+    "context": "neovim template description",
     "reference": "",
     "comment": ""
   },
@@ -11599,6 +11956,13 @@
     "comment": ""
   },
   {
+    "term": "Snow",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Some plugins require a newer version of DMS:",
     "translation": "",
     "context": "",
@@ -11852,6 +12216,13 @@
   },
   {
     "term": "Suspend system after",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Suspend then Hibernate",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12194,6 +12565,20 @@
     "comment": ""
   },
   {
+    "term": "Thunderstorm",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Thunderstorm with Hail",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Tile",
     "translation": "",
     "context": "wallpaper fill mode",
@@ -12232,6 +12617,13 @@
     "term": "Tiling",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Time",
+    "translation": "",
+    "context": "theme auto mode tab | wallpaper cycling mode tab",
     "reference": "",
     "comment": ""
   },
@@ -13181,6 +13573,13 @@
     "comment": ""
   },
   {
+    "term": "Videos",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "View Mode",
     "translation": "",
     "context": "",
@@ -13762,6 +14161,13 @@
     "comment": ""
   },
   {
+    "term": "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.",
+    "translation": "",
+    "context": "qt theme env error body",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "You're All Set!",
     "translation": "",
     "context": "greeter completion page title",
@@ -13770,6 +14176,13 @@
   },
   {
     "term": "actions",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "brandon",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13923,6 +14336,48 @@
     "comment": ""
   },
   {
+    "term": "on Hyprland",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "on MangoWC",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "on Miracle WM",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "on Niri",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "on Scroll",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "on Sway",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "open",
     "translation": "",
     "context": "",
@@ -13952,6 +14407,13 @@
   },
   {
     "term": "this app",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "up",
     "translation": "",
     "context": "",
     "reference": "",
@@ -14073,440 +14535,6 @@
     "term": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
     "translation": "",
     "context": "Keyboard hints when enter-to-paste is enabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "2 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "4 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "20 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "25 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "35 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "40 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "45 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "50 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "55 seconds",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "3 minutes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "15 minutes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "20 minutes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "30 minutes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "1 hour",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "1 hour 30 minutes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "2 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "3 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "4 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "6 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "8 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "12 hours",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "AC Power",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Suspend then Hibernate",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Choose Wallpaper Color",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "No wallpaper selected",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Choose Light Mode Color",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Choose Dark Mode Color",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Not set",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "No monitors",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Time",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Requires lazy plugin manager",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Clear Sky",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Partly Cloudy",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Overcast",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Fog",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Drizzle",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Freezing Drizzle",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Light Rain",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Rain",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Heavy Rain",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Light Snow",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Snow",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Heavy Snow",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Light Snow Showers",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Heavy Snow Showers",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Thunderstorm",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Thunderstorm with Hail",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Quick Access",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Home",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Documents",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Downloads",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Pictures",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Music",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Videos",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Desktop",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on Niri",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on Hyprland",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on MangoWC",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on Sway",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on Scroll",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "on Miracle WM",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "up",
-    "translation": "",
-    "context": "",
     "reference": "",
     "comment": ""
   }

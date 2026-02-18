@@ -104,17 +104,29 @@
   "2 minutes": {
     "2 minutes": "2 分钟"
   },
+  "2 seconds": {
+    "2 seconds": ""
+  },
+  "20 minutes": {
+    "20 minutes": ""
+  },
   "24-Hour Format": {
     "24-Hour Format": "24小时制"
   },
   "24-hour format": {
     "24-hour format": "24小时制"
   },
+  "250 ms": {
+    "250 ms": ""
+  },
   "270°": {
     "270°": "270°"
   },
   "3 days": {
     "3 days": "3天"
+  },
+  "3 minutes": {
+    "3 minutes": ""
   },
   "3 seconds": {
     "3 seconds": "3 秒"
@@ -128,14 +140,23 @@
   "3rd party": {
     "3rd party": "第三方"
   },
+  "4 seconds": {
+    "4 seconds": ""
+  },
   "5 minutes": {
     "5 minutes": "5 分钟"
   },
   "5 seconds": {
     "5 seconds": "5 秒"
   },
+  "500 ms": {
+    "500 ms": ""
+  },
   "7 days": {
     "7 days": "7天"
+  },
+  "750 ms": {
+    "750 ms": ""
   },
   "8 seconds": {
     "8 seconds": "8 秒"
@@ -148,6 +169,9 @@
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "已存在同名文件，是否覆盖？"
+  },
+  "AC Power": {
+    "AC Power": ""
   },
   "API": {
     "API": "API"
@@ -835,6 +859,9 @@
   "Clear History?": {
     "Clear History?": "是否清除历史？"
   },
+  "Clear Sky": {
+    "Clear Sky": ""
+  },
   "Clear all history when server starts": {
     "Clear all history when server starts": "当服务器启动时清除所有纪录"
   },
@@ -1079,7 +1106,7 @@
     "Control Center": "控制中心"
   },
   "Control Center Tile Color": {
-    "Control Center Tile Color": ""
+    "Control Center Tile Color": "控制中心平铺颜色"
   },
   "Control animation duration for notification popups and history": {
     "Control animation duration for notification popups and history": ""
@@ -1100,13 +1127,13 @@
     "Cooldown": "冷却"
   },
   "Copied GIF": {
-    "Copied GIF": ""
+    "Copied GIF": "已复制的动图"
   },
   "Copied MP4": {
-    "Copied MP4": ""
+    "Copied MP4": "已复制的MP4"
   },
   "Copied WebP": {
-    "Copied WebP": ""
+    "Copied WebP": "已复制的WebP"
   },
   "Copied to clipboard": {
     "Copied to clipboard": "复制到剪切板"
@@ -1387,6 +1414,9 @@
   "Description": {
     "Description": "描述"
   },
+  "Desktop": {
+    "Desktop": ""
+  },
   "Desktop Clock": {
     "Desktop Clock": "桌面时钟"
   },
@@ -1558,6 +1588,9 @@
   "Docs": {
     "Docs": "文档"
   },
+  "Documents": {
+    "Documents": ""
+  },
   "Domain (optional)": {
     "Domain (optional)": "域（可选）"
   },
@@ -1570,6 +1603,9 @@
   "Door Open": {
     "Door Open": "打印机维护口已打开"
   },
+  "Downloads": {
+    "Downloads": ""
+  },
   "Drag to Reorder": {
     "Drag to Reorder": ""
   },
@@ -1581,6 +1617,9 @@
   },
   "Driver": {
     "Driver": "驱动程序"
+  },
+  "Drizzle": {
+    "Drizzle": ""
   },
   "Duplicate": {
     "Duplicate": "复制"
@@ -2044,6 +2083,9 @@
   "Focused Window": {
     "Focused Window": "当前窗口"
   },
+  "Fog": {
+    "Fog": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "遵守显示器聚焦"
   },
@@ -2106,6 +2148,9 @@
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+  },
+  "Freezing Drizzle": {
+    "Freezing Drizzle": ""
   },
   "Frequency": {
     "Frequency": "频率"
@@ -2212,6 +2257,15 @@
   "Health": {
     "Health": "电池健康"
   },
+  "Heavy Rain": {
+    "Heavy Rain": ""
+  },
+  "Heavy Snow": {
+    "Heavy Snow": ""
+  },
+  "Heavy Snow Showers": {
+    "Heavy Snow Showers": ""
+  },
   "Height": {
     "Height": ""
   },
@@ -2310,6 +2364,9 @@
   },
   "Hold to confirm (%1s)": {
     "Hold to confirm (%1s)": "按住以确认 (%1s)"
+  },
+  "Home": {
+    "Home": ""
   },
   "Hot Corners": {
     "Hot Corners": "热区"
@@ -2500,7 +2557,7 @@
     "Connected": "已连接"
   },
   "KDE Connect connected status | network status": {
-    "Connected": ""
+    "Connected": "已连接"
   },
   "KDE Connect daemon hint": {
     "Start kdeconnectd to use this plugin": "启动kdeconnectd以使用此插件"
@@ -2757,6 +2814,15 @@
   },
   "Light Mode": {
     "Light Mode": "浅色模式"
+  },
+  "Light Rain": {
+    "Light Rain": ""
+  },
+  "Light Snow": {
+    "Light Snow": ""
+  },
+  "Light Snow Showers": {
+    "Light Snow Showers": ""
   },
   "Linear": {
     "Linear": "线性"
@@ -3102,6 +3168,9 @@
   },
   "Moving to Paused": {
     "Moving to Paused": "正在暂停打印机"
+  },
+  "Music": {
+    "Music": ""
   },
   "Mute popups for %1": {
     "Mute popups for %1": ""
@@ -3520,6 +3589,9 @@
   "Outputs Include Missing": {
     "Outputs Include Missing": "输出包括缺失"
   },
+  "Overcast": {
+    "Overcast": ""
+  },
   "Overflow": {
     "Overflow": ""
   },
@@ -3576,6 +3648,9 @@
   },
   "Pairing...": {
     "Pairing...": "配对中..."
+  },
+  "Partly Cloudy": {
+    "Partly Cloudy": ""
   },
   "Passkey:": {
     "Passkey:": "密钥："
@@ -3683,6 +3758,9 @@
   },
   "Phone Connect unavailable status": {
     "Unavailable": ""
+  },
+  "Pictures": {
+    "Pictures": ""
   },
   "Pin": {
     "Pin": "固定"
@@ -3909,6 +3987,9 @@
   "Protocol": {
     "Protocol": "协议"
   },
+  "Quick Access": {
+    "Quick Access": ""
+  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "快捷访问应用启动器"
   },
@@ -3926,6 +4007,9 @@
   },
   "Radius": {
     "Radius": ""
+  },
+  "Rain": {
+    "Rain": ""
   },
   "Rain Chance": {
     "Rain Chance": "降雨概率"
@@ -4626,6 +4710,9 @@
   "Snap": {
     "Snap": ""
   },
+  "Snow": {
+    "Snow": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "有些插件需要更新版的 DMS："
   },
@@ -4721,6 +4808,9 @@
   },
   "Suspend system after": {
     "Suspend system after": "在此时间后挂起系统"
+  },
+  "Suspend then Hibernate": {
+    "Suspend then Hibernate": ""
   },
   "Swap": {
     "Swap": "虚拟内存"
@@ -4859,6 +4949,12 @@
   },
   "This will permanently remove this saved clipboard item. This action cannot be undone.": {
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "此操作会永久移除已保存的剪贴板项目。此操作将无法撤销。"
+  },
+  "Thunderstorm": {
+    "Thunderstorm": ""
+  },
+  "Thunderstorm with Hail": {
+    "Thunderstorm with Hail": ""
   },
   "Tiled": {
     "Tiled": ""
@@ -5250,6 +5346,9 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "充满活力的调色板，有着俏皮的饱和度。"
   },
+  "Videos": {
+    "Videos": ""
+  },
   "View Mode": {
     "View Mode": "查看模式"
   },
@@ -5493,9 +5592,9 @@
     "Shadow": "阴影"
   },
   "battery status": {
-    "Charging": "",
-    "Discharging": "",
-    "Empty": "",
+    "Charging": "充电",
+    "Discharging": "放电",
+    "Empty": "空白",
     "Fully Charged": "",
     "No Battery": "",
     "Pending Charge": "",
@@ -5503,21 +5602,24 @@
     "Plugged In": ""
   },
   "bluetooth status": {
-    "Bluetooth": "",
-    "Connected Device": "",
+    "Bluetooth": "蓝牙",
+    "Connected Device": "已连接的设备",
     "Enabled": "",
     "No adapter": "",
     "No adapters": "",
     "Off": ""
   },
   "bluetooth status | lock screen notification mode option": {
-    "Disabled": ""
+    "Disabled": "禁用"
   },
   "border color": {
     "Color": "颜色"
   },
   "border thickness": {
     "Thickness": "厚度"
+  },
+  "brandon": {
+    "brandon": ""
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "浏览主题"
@@ -5545,7 +5647,7 @@
     "Surface": ""
   },
   "control center tile color setting description": {
-    "Active tile background and icon color": ""
+    "Active tile background and icon color": "激活平铺背景与图标颜色"
   },
   "count of hidden audio devices": {
     "Hidden (%1)": ""
@@ -5562,13 +5664,16 @@
   "custom theme file hint": {
     "Click to select a custom theme JSON file": "点击以选择自定义主题的JSON文件"
   },
+  "dark mode wallpaper color picker title": {
+    "Choose Dark Mode Color": ""
+  },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "选择壁纸"
   },
   "date format option": {
-    "Custom...": "",
-    "Day Date": "",
-    "Day Month Date": "",
+    "Custom...": "自定义...",
+    "Day Date": "日 日期",
+    "Day Month Date": "日 月份 日期",
     "Full Day & Month": "",
     "Full with Year": "",
     "ISO Date": "",
@@ -5579,6 +5684,9 @@
   },
   "days": {
     "days": "天"
+  },
+  "default monitor label suffix": {
+    "(Default)": ""
   },
   "dgop not available": {
     "dgop not available": "dgop不可用"
@@ -5609,11 +5717,11 @@
     "dms/outputs config exists but is not included in your compositor config. Display changes won't persist.": "dms/输出配置存在，但不包含在你的合成器配置里。显示更改不会保留。"
   },
   "dock indicator style option": {
-    "Circle": "",
+    "Circle": "圆形",
     "Line": ""
   },
   "dock position option": {
-    "Bottom": "",
+    "Bottom": "底部",
     "Left": "",
     "Right": "",
     "Top": ""
@@ -5845,6 +5953,9 @@
   "leave empty for default": {
     "leave empty for default": "留空使用默认"
   },
+  "light mode wallpaper color picker title": {
+    "Choose Light Mode Color": ""
+  },
   "loading indicator": {
     "Loading...": "加载中..."
   },
@@ -5868,7 +5979,7 @@
     "loginctl not available - lock integration requires DMS socket connection": "loginctl 不可用 - 启用锁定集成需连接 DMS socket"
   },
   "matugen color scheme option": {
-    "Content": "",
+    "Content": "内容",
     "Expressive": "",
     "Fidelity": "",
     "Fruit Salad": "",
@@ -5888,8 +5999,8 @@
     "Matugen Missing": "未找到matugen"
   },
   "media scroll wheel option": {
-    "Change Song": "",
-    "Change Volume": "",
+    "Change Song": "切换歌曲",
+    "Change Volume": "切换音量",
     "Nothing": ""
   },
   "minutes": {
@@ -5904,9 +6015,12 @@
   "nav": {
     "nav": "向导"
   },
+  "neovim template description": {
+    "Requires lazy plugin manager": ""
+  },
   "network status": {
     "Connected": "",
-    "Disabling WiFi...": "",
+    "Disabling WiFi...": "正在禁用WiFi...",
     "Enabling WiFi...": "",
     "Ethernet": "",
     "Not connected": "",
@@ -5916,6 +6030,9 @@
   },
   "no custom theme file status": {
     "No custom theme file": "缺失自定义主题文件"
+  },
+  "no monitors available label": {
+    "No monitors": ""
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "未安装主题。从注册表浏览并安装。"
@@ -5997,6 +6114,24 @@
   "official": {
     "official": "官方"
   },
+  "on Hyprland": {
+    "on Hyprland": ""
+  },
+  "on MangoWC": {
+    "on MangoWC": ""
+  },
+  "on Miracle WM": {
+    "on Miracle WM": ""
+  },
+  "on Niri": {
+    "on Niri": ""
+  },
+  "on Scroll": {
+    "on Scroll": ""
+  },
+  "on Sway": {
+    "on Sway": ""
+  },
   "open": {
     "open": "打开"
   },
@@ -6019,13 +6154,13 @@
     "Search plugins...": "插件搜索中..."
   },
   "power profile description": {
-    "Balance power and performance": "",
-    "Custom power profile": "",
+    "Balance power and performance": "平衡与性能电源模式",
+    "Custom power profile": "自定义电源配置",
     "Extend battery life": "",
     "Prioritize performance": ""
   },
   "power profile option": {
-    "Balanced": "",
+    "Balanced": "平衡",
     "Performance": "",
     "Power Saver": ""
   },
@@ -6044,6 +6179,12 @@
   "profile image file browser title": {
     "Select Profile Image": "选择个人信息图像"
   },
+  "qt theme env error body": {
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+  },
+  "qt theme env error title": {
+    "Missing Environment Variables": ""
+  },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "设置处于只读状态。更改将不会保存。"
   },
@@ -6051,9 +6192,9 @@
     "Color theme from DMS registry": "DMS注册表的颜色主题"
   },
   "screen position option": {
-    "Bottom Center": "",
-    "Bottom Left": "",
-    "Bottom Right": "",
+    "Bottom Center": "底部中间",
+    "Bottom Left": "底部左侧",
+    "Bottom Right": "底部右侧",
     "Left Center": "",
     "Right Center": "",
     "Top Center": "",
@@ -6101,13 +6242,19 @@
     "Kernel": "内核",
     "Load Average": "平均负载"
   },
+  "theme auto mode tab": {
+    "Location": ""
+  },
+  "theme auto mode tab | wallpaper cycling mode tab": {
+    "Time": ""
+  },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "从DMS主题注册表安装色彩主题"
   },
   "theme category option": {
-    "Auto": "",
-    "Browse": "",
-    "Custom": "",
+    "Auto": "自动",
+    "Browse": "浏览",
+    "Custom": "自定义",
     "Generic": ""
   },
   "theme installation confirmation": {
@@ -6141,6 +6288,9 @@
   "unknown author": {
     "Unknown": "未知"
   },
+  "up": {
+    "up": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "更新 DMS 以集成 NM"
   },
@@ -6152,6 +6302,12 @@
   },
   "version requirement": {
     "Requires %1": "需要%1"
+  },
+  "wallpaper color picker title": {
+    "Choose Wallpaper Color": ""
+  },
+  "wallpaper cycling mode tab": {
+    "Interval": ""
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "选择壁纸位置"
@@ -6171,6 +6327,34 @@
     "Tile H": "",
     "Tile V": ""
   },
+  "wallpaper interval": {
+    "1 hour": "",
+    "1 hour 30 minutes": "",
+    "1 minute": "",
+    "10 seconds": "",
+    "12 hours": "",
+    "15 minutes": "",
+    "15 seconds": "",
+    "2 hours": "",
+    "20 seconds": "",
+    "25 seconds": "",
+    "3 hours": "",
+    "30 minutes": "",
+    "30 seconds": "",
+    "35 seconds": "",
+    "4 hours": "",
+    "40 seconds": "",
+    "45 seconds": "",
+    "5 minutes": "",
+    "5 seconds": "",
+    "50 seconds": "",
+    "55 seconds": "",
+    "6 hours": "",
+    "8 hours": ""
+  },
+  "wallpaper not set label": {
+    "Not set": ""
+  },
   "wallpaper processing error": {
     "Wallpaper processing failed": "壁纸处理失败"
   },
@@ -6184,7 +6368,7 @@
     "External Wallpaper Management": "外部壁纸管理"
   },
   "wallpaper transition option": {
-    "Disc": "",
+    "Disc": "Disc",
     "Fade": "",
     "Iris Bloom": "",
     "None": "",
@@ -6198,8 +6382,8 @@
     "Feels Like %1°": "体感 %1°"
   },
   "widget style option": {
-    "Colorful": "",
-    "Default": ""
+    "Colorful": "彩色",
+    "Default": "默认"
   },
   "wtype not available - install wtype for paste support": {
     "wtype not available - install wtype for paste support": "wtype不可用，为支持粘贴，请安装wtype"
