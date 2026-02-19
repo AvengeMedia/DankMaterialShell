@@ -813,7 +813,7 @@ Item {
                         }
 
                         Rectangle {
-                            width: 80
+                            width: resetContentRow.implicitWidth + Theme.spacingM * 2
                             height: 28
                             radius: Theme.cornerRadius
                             color: resetArea.containsMouse ? Theme.surfacePressed : Theme.surfaceVariant
@@ -821,6 +821,7 @@ Item {
                             border.width: 0
 
                             Row {
+                                id: resetContentRow
                                 anchors.centerIn: parent
                                 spacing: Theme.spacingXS
 
