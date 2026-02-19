@@ -17,6 +17,7 @@ Item {
 
     property string text: ""
     property string description: ""
+    property string resetText: I18n.tr("Reset")
 
     readonly property bool isHighlighted: settingKey !== "" && SettingsSearchService.highlightSection === settingKey
 
@@ -112,19 +113,18 @@ Item {
 
             Item {
                 id: resetButtonContainer
-                width: root.defaultValue >= 0 ? 36 : 0
+                width: root.defaultValue >= 0 ? resetButton.implicitWidth : 0
                 height: 36
                 anchors.verticalCenter: parent.verticalCenter
 
-                DankActionButton {
+                DankButton {
                     id: resetButton
                     anchors.centerIn: parent
-                    buttonSize: 36
-                    iconName: "restart_alt"
-                    iconSize: 20
+                    text: root.resetText
+                    backgroundColor: Theme.surfaceHover
+                    textColor: Theme.surfaceText
+                    buttonHeight: 36
                     visible: root.defaultValue >= 0 && slider.value !== root.defaultValue
-                    backgroundColor: Theme.surfaceContainerHigh
-                    iconColor: Theme.surfaceVariantText
                     onClicked: {
                         slider.value = root.defaultValue;
                         root.sliderValueChanged(root.defaultValue);
