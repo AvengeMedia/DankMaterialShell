@@ -1250,6 +1250,23 @@ Item {
         CacheData.saveLauncherCache(serializable);
     }
 
+    function _actionsFromDesktopEntry(appId) {
+        if (!appId)
+            return [];
+        var entry = DesktopEntries.heuristicLookup(appId);
+        if (!entry || !entry.actions || entry.actions.length === 0)
+            return [];
+        var result = [];
+        for (var i = 0; i < entry.actions.length; i++) {
+            result.push({
+                name: entry.actions[i].name,
+                icon: "play_arrow",
+                actionData: entry.actions[i]
+            });
+        }
+        return result;
+    }
+
     function _loadDiskCache() {
         var cached = CacheData.loadLauncherCache();
         if (!cached || !Array.isArray(cached) || cached.length === 0)
@@ -1277,8 +1294,12 @@ Item {
                     data: {
                         id: it.id
                     },
-                    actions: [],
-                    primaryAction: null,
+                    actions: _actionsFromDesktopEntry(it.id),
+                    primaryAction: it.type === "app" && !it.isCore ? {
+                        name: I18n.tr("Launch"),
+                        icon: "open_in_new",
+                        action: "launch"
+                    } : null,
                     _diskCached: true,
                     _hName: "",
                     _hSub: "",
