@@ -2,17 +2,26 @@
   "%1 Animation Speed": {
     "%1 Animation Speed": "Velocità Animazione %1"
   },
-  "%1 DMS bind(s) may be overridden by config binds that come after the include.": {
-    "%1 DMS bind(s) may be overridden by config binds that come after the include.": "%1 associazione/i tasti di DMS potrebbe/ero essere sovrascritta/e da scorciatoie di config successive all'inclusione."
+  "%1 DMS bind may be overridden by config binds that come after the include.": {
+    "%1 DMS bind may be overridden by config binds that come after the include.": "%1 associazione tasti di DMS potrebbe essere sovrascritta da scorciatoie di config successive all'inclusione."
   },
-  "%1 adapter(s), none connected": {
-    "%1 adapter(s), none connected": "%1 adattatore/i, nessuno connesso"
+  "%1 DMS binds may be overridden by config binds that come after the include.": {
+    "%1 DMS binds may be overridden by config binds that come after the include.": "%1 associazioni tasti di DMS potrebbero essere sovrascritte da scorciatoie di config successive all'inclusione."
+  },
+  "%1 adapter, none connected": {
+    "%1 adapter, none connected": "%1 adattatore, nessuno connesso"
+  },
+  "%1 adapters, none connected": {
+    "%1 adapters, none connected": "%1 adattatori, nessuno connesso"
   },
   "%1 characters": {
     "%1 characters": "%1 caratteri"
   },
-  "%1 class(es)": {
-    "%1 class(es)": "%1 classe/i"
+  "%1 class": {
+    "%1 class": "%1 classe"
+  },
+  "%1 classes": {
+    "%1 classes": "%1 classi"
   },
   "%1 connected": {
     "%1 connected": "%1 connesso"
@@ -29,8 +38,11 @@
   "%1 disconnected (hidden)": {
     "%1 disconnected (hidden)": "%1 disconnesso (nascosto)"
   },
-  "%1 display(s)": {
-    "%1 display(s)": "%1 schermo/i"
+  "%1 display": {
+    "%1 display": "%1 schermo"
+  },
+  "%1 displays": {
+    "%1 displays": "%1 schermi"
   },
   "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": {
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": "%1 esiste ma non è incluso nella configurazione. Le scorciatoie personalizzate non funzioneranno finché non sarà risolto."
@@ -41,14 +53,20 @@
   "%1 is now included in config": {
     "%1 is now included in config": "%1 è ora incluso nella configurazione"
   },
-  "%1 job(s)": {
-    "%1 job(s)": "%1 stampa/e"
+  "%1 job": {
+    "%1 job": "%1 stampa"
+  },
+  "%1 jobs": {
+    "%1 jobs": "%1 stampe"
   },
   "%1 notifications": {
     "%1 notifications": "%1 notifiche"
   },
-  "%1 printer(s)": {
-    "%1 printer(s)": "%1 stampante/i"
+  "%1 printer": {
+    "%1 printer": "%1 stampante"
+  },
+  "%1 printers": {
+    "%1 printers": "%1 stampanti"
   },
   "%1 variants": {
     "%1 variants": "%1 varianti"
@@ -2767,14 +2785,23 @@
   "Last launched %1": {
     "Last launched %1": "Ultimo avvio %1"
   },
-  "Last launched %1 day%2 ago": {
-    "Last launched %1 day%2 ago": "Ultimo avvio %1 giorno/i fa"
+  "Last launched %1 day ago": {
+    "Last launched %1 day ago": "Ultimo avvio %1 giorno fa"
   },
-  "Last launched %1 hour%2 ago": {
-    "Last launched %1 hour%2 ago": "Ultimo avvio %1 ora/e fa"
+  "Last launched %1 days ago": {
+    "Last launched %1 days ago": "Ultimo avvio %1 giorni fa"
   },
-  "Last launched %1 minute%2 ago": {
-    "Last launched %1 minute%2 ago": "Ultimo avvio %1 minuto/i fa"
+  "Last launched %1 hour ago": {
+    "Last launched %1 hour ago": "Ultimo avvio %1 ora fa"
+  },
+  "Last launched %1 hours ago": {
+    "Last launched %1 hours ago": "Ultimo avvio %1 ore fa"
+  },
+  "Last launched %1 minute ago": {
+    "Last launched %1 minute ago": "Ultimo avvio %1 minuto fa"
+  },
+  "Last launched %1 minutes ago": {
+    "Last launched %1 minutes ago": "Ultimo avvio %1 minuti fa"
   },
   "Last launched just now": {
     "Last launched just now": "Appena avviato"
