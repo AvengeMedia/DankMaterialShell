@@ -1061,7 +1061,7 @@ Singleton {
 
     function getHyprlandOutputIdentifier(output, outputName) {
         if (SettingsData.displayNameMode === "model" && output?.make && output?.model)
-            return "desc:" + output.make + " " + output.model;
+            return "desc:" + output.make + " " + output.model + " " + (output?.serial || "Unknown");
         return outputName;
     }
 
