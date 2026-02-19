@@ -1614,25 +1614,41 @@ Item {
         itemExecuted();
     }
 
-    function launchApp(app) {
+    function _resolveDesktopEntry(app) {
         if (!app)
+            return null;
+        if (app.command)
+            return app;
+        var id = app.id || app.execString || app.exec || "";
+        if (!id)
+            return null;
+        return DesktopEntries.heuristicLookup(id);
+    }
+
+    function launchApp(app) {
+        var entry = _resolveDesktopEntry(app);
+        if (!entry)
             return;
-        SessionService.launchDesktopEntry(app);
-        AppUsageHistoryData.addAppUsage(app);
+        SessionService.launchDesktopEntry(entry);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function launchAppWithNvidia(app) {
-        if (!app)
+        var entry = _resolveDesktopEntry(app);
+        if (!entry)
             return;
-        SessionService.launchDesktopEntry(app, true);
-        AppUsageHistoryData.addAppUsage(app);
+        SessionService.launchDesktopEntry(entry, true);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function launchAppAction(actionItem) {
-        if (!actionItem || !actionItem.parentApp || !actionItem.actionData)
+        if (!actionItem || !actionItem.actionData)
             return;
-        SessionService.launchDesktopAction(actionItem.parentApp, actionItem.actionData);
-        AppUsageHistoryData.addAppUsage(actionItem.parentApp);
+        var entry = _resolveDesktopEntry(actionItem.parentApp);
+        if (!entry)
+            return;
+        SessionService.launchDesktopAction(entry, actionItem.actionData);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function openFile(path) {
