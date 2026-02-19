@@ -105,10 +105,10 @@
     "2 minutes": "۲ دقیقه"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "۲ ثانیه"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "۲۰ دقیقه"
   },
   "24-Hour Format": {
     "24-Hour Format": "قالب ۲۴ ساعته"
@@ -117,7 +117,7 @@
     "24-hour format": "قالب ۲۴ ساعته"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "۲۵۰ ms"
   },
   "270°": {
     "270°": "۲۷۰°"
@@ -126,7 +126,7 @@
     "3 days": "۳ روز"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "۳ دقیقه"
   },
   "3 seconds": {
     "3 seconds": "۳ ثانیه"
@@ -141,7 +141,7 @@
     "3rd party": "شخص ثالث"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "۴ ثانیه"
   },
   "5 minutes": {
     "5 minutes": "‍۵ دقیقه"
@@ -150,13 +150,13 @@
     "5 seconds": "۵ ثانیه"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "۵۰۰ ms"
   },
   "7 days": {
     "7 days": "۷ روز"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "۷۵۰ ms"
   },
   "8 seconds": {
     "8 seconds": "۸ ثانیه"
@@ -171,7 +171,7 @@
     "A file with this name already exists. Do you want to overwrite it?": "فایلی با این نام از قبل وجود دارد. آیا می‌خواهید آن را بازنویسی کنید؟"
   },
   "AC Power": {
-    "AC Power": ""
+    "AC Power": "برق AC"
   },
   "API": {
     "API": "API"
@@ -381,7 +381,7 @@
     "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "برنامه‌ها با نام نمایشی، آیکون و گزینه‌های اجرای سفارشی. روی یک برنامه راست‌کلیک کرده و «ویرایش برنامه» را برای سفارشی‌سازی انتخاب کنید."
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": ""
+    "Apps with notification popups muted. Unmute or delete to remove.": "برنامه‌هایی که پاپ‌آپ اعلان آن‌ها بی‌صدا شده است. برای حذف، بی‌صدا را بردارید یا برنامه را حذف کنید."
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "چیدمان نمایشگرها و پیکربندی وضوح، نرخ تازه‌سازی و VRR"
@@ -524,7 +524,7 @@
     "Automatically cycle through wallpapers in the same folder": "تصاویر پس‌زمینه را در همان پوشه به صورت خودکار تغییر بده"
   },
   "Automatically delete entries older than this": {
-    "Automatically delete entries older than this": "ورودی‌های قدیمی‌تر از این را به صورت خودکار پاک کن"
+    "Automatically delete entries older than this": "مدخل‌های قدیمی‌تر از این را به صورت خودکار پاک کن"
   },
   "Automatically detect location based on IP address": {
     "Automatically detect location based on IP address": "تشخیص خودکار موقعیت مکانی بر اساس آدرس IP"
@@ -587,7 +587,7 @@
     "Bar Transparency": "شفافیت نوار"
   },
   "Base duration for animations (drag to use Custom)": {
-    "Base duration for animations (drag to use Custom)": ""
+    "Base duration for animations (drag to use Custom)": "مدت زمان پایه برای انیمیشن‌ها (برای استفاده سفارشی بکشید)"
   },
   "Battery": {
     "Battery": "باتری"
@@ -617,10 +617,10 @@
     "Bit Depth": "عمق بیت"
   },
   "Block Out": {
-    "Block Out": ""
+    "Block Out": "مسدود کردن خروج"
   },
   "Block Out From": {
-    "Block Out From": ""
+    "Block Out From": "مسدود کردن خروج از"
   },
   "Block notifications": {
     "Block notifications": "مسدود‌کردن اعلان‌ها"
@@ -665,7 +665,7 @@
     "Border Thickness": "ضخامت حاشیه"
   },
   "Border with BG": {
-    "Border with BG": ""
+    "Border with BG": "حاشیه با پس‌زمینه"
   },
   "Bottom": {
     "Bottom": "پایین"
@@ -737,7 +737,7 @@
     "CUPS not available": "CUPS در دسترس نیست"
   },
   "Calc": {
-    "Calc": ""
+    "Calc": "ماشین حساب"
   },
   "Calculator": {
     "Calculator": "ماشین حساب"
@@ -768,6 +768,9 @@
   },
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "نشانگر Caps Lock"
+  },
+  "Caps Lock is on": {
+    "Caps Lock is on": ""
   },
   "Center Section": {
     "Center Section": "بخش مرکزی"
@@ -836,7 +839,7 @@
     "Choose which monitor shows the lock screen interface. Other monitors will display a solid color for OLED burn-in protection.": "انتخاب کنید که کدام مانیتور رابط صفحه قفل را نشان دهد. مانیتورهای دیگر برای محافظت در برابر سوختگی OLED، رنگ ثابتی را نمایش می‌دهند."
   },
   "Chroma Style": {
-    "Chroma Style": ""
+    "Chroma Style": "استایل رنگی"
   },
   "Cipher": {
     "Cipher": "رمزگذار"
@@ -860,7 +863,7 @@
     "Clear History?": "تاریخچه پاک شود؟"
   },
   "Clear Sky": {
-    "Clear Sky": ""
+    "Clear Sky": "آسمان پاک"
   },
   "Clear all history when server starts": {
     "Clear all history when server starts": "هنگام راه‌اندازی سرور تمام تاریخچه را پاک کن"
@@ -917,7 +920,7 @@
     "Clipboard Manager": "مدیریت کلیپ‌بورد"
   },
   "Clipboard behavior setting description": {
-    "Press Enter to paste, Shift+Enter to copy": ""
+    "Press Enter to paste, Shift+Enter to copy": "برای الصاق Enter، برای کپی Shift+Enter را فشار دهید"
   },
   "Clipboard service not available": {
     "Clipboard service not available": "سرویس کلیپ‌بورد در دسترس نیست"
@@ -977,16 +980,16 @@
     "Color temperature for night mode": "دمای رنگ برای حالت شب"
   },
   "Color theme for syntax highlighting.": {
-    "Color theme for syntax highlighting.": ""
+    "Color theme for syntax highlighting.": "تم رنگی برای برجسته‌سازی کد."
   },
   "Color theme for syntax highlighting. %1 themes available.": {
-    "Color theme for syntax highlighting. %1 themes available.": ""
+    "Color theme for syntax highlighting. %1 themes available.": "تم رنگی برای برجسته‌سازی کد. %1 تم دردسترس است."
   },
   "Colorful mix of bright contrasting accents.": {
     "Colorful mix of bright contrasting accents.": "ترکیب رنگارنگ از رنگ‌های تأکیدی متضاد."
   },
   "Colorize Active": {
-    "Colorize Active": ""
+    "Colorize Active": "رنگ‌آمیزی حالت فعال"
   },
   "Column": {
     "Column": "ستون"
@@ -1049,7 +1052,7 @@
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "آیکون‌ها را برای محیط‌کارهای نام‌دار تنظیم کنید. آیکون‌ها بر شماره‌ها هنگامی که هر دو فعال باشند اولویت دارند."
   },
   "Configure match criteria and actions": {
-    "Configure match criteria and actions": "پیکربندی معیارهای انطباق و اقدامات"
+    "Configure match criteria and actions": "پیکربندی انطباق معیار و اقدامات"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": "تنظیم کنید که کدام نمایشگر‌ها «%1» را نشان دهند"
@@ -1109,7 +1112,7 @@
     "Control Center Tile Color": "رنگ کاشی مرکز کنترل"
   },
   "Control animation duration for notification popups and history": {
-    "Control animation duration for notification popups and history": ""
+    "Control animation duration for notification popups and history": "مدت زمان انیمیشن را برای پاپ‌آپ اعلان‌ها و تاریخچه مشخص کنید"
   },
   "Control currently playing media": {
     "Control currently playing media": "کنترل رسانه درحال پخش"
@@ -1202,7 +1205,7 @@
     "Create rules to mute, ignore, hide from history, or override notification priority.": "برای بی‌صدا کردن، نادیده گرفتن، پنهان‌سازی از تاریخچه و یا تغییر اولویت اعلان قاعده ایجاد کنید."
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": ""
+    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "برای بی‌صدا کردن، نادیده گرفتن، مخفی‌سازی از تاریخچه، یا تغییر اولویت اعلان‌ها قواعدی ایجاد کنید. در حالت پیش‌فرض، تنها اولویت تغییر می‌کند؛ اعلان‌ها همچنان به‌صورت عادی نمایش داده می‌شوند."
   },
   "Creating...": {
     "Creating...": "درحال ایجاد..."
@@ -1238,7 +1241,7 @@
     "Cursor Config Not Configured": "پیکربندی اشاره‌گر موس تنظیم نشده"
   },
   "Cursor Include Missing": {
-    "Cursor Include Missing": ""
+    "Cursor Include Missing": "دستور include اشاره‌گر موس یافت نشد"
   },
   "Cursor Size": {
     "Cursor Size": "اندازه اشاره‌گر موس"
@@ -1319,7 +1322,7 @@
     "DWL service not available": "سرویس DWL در دسترس نیست"
   },
   "Daily": {
-    "Daily": ""
+    "Daily": "روزانه"
   },
   "Daily Forecast": {
     "Daily Forecast": "پیش‌بینی روزانه"
@@ -1415,7 +1418,7 @@
     "Description": "توضیحات"
   },
   "Desktop": {
-    "Desktop": ""
+    "Desktop": "دسکتاپ"
   },
   "Desktop Clock": {
     "Desktop Clock": "ساعت دسکتاپ"
@@ -1589,7 +1592,7 @@
     "Docs": "مستندات"
   },
   "Documents": {
-    "Documents": ""
+    "Documents": "اسناد"
   },
   "Domain (optional)": {
     "Domain (optional)": "دامنه (اختیاری)"
@@ -1604,7 +1607,7 @@
     "Door Open": "درب باز"
   },
   "Downloads": {
-    "Downloads": ""
+    "Downloads": "بارگیری‌ها"
   },
   "Drag to Reorder": {
     "Drag to Reorder": "نگه‌داشتن برای بازآرایی"
@@ -1619,7 +1622,7 @@
     "Driver": "درایور"
   },
   "Drizzle": {
-    "Drizzle": ""
+    "Drizzle": "باران‌ریزه"
   },
   "Duplicate": {
     "Duplicate": "تکثیر"
@@ -1628,7 +1631,7 @@
     "Duplicate Wallpaper with Blur": "تصویر پس‌زمینه تکراری با تاری"
   },
   "Duration": {
-    "Duration": ""
+    "Duration": "مدت زمان"
   },
   "Dusk (Astronomical Twilight)": {
     "Dusk (Astronomical Twilight)": "غروب (گرگ و میش نجومی)"
@@ -1781,16 +1784,16 @@
     "Enter this passkey on ": "ورود این کلید عبور در "
   },
   "Enter to Paste": {
-    "Enter to Paste": ""
+    "Enter to Paste": "Enter برای الصاق"
   },
   "Enterprise": {
     "Enterprise": "شرکت"
   },
   "Entry pinned": {
-    "Entry pinned": "ورودی سنجاق شد"
+    "Entry pinned": "مدخل سنجاق شد"
   },
   "Entry unpinned": {
-    "Entry unpinned": "سنجاق ورودی برداشته شد"
+    "Entry unpinned": "سنجاق مدخل برداشته شد"
   },
   "Environment Variables": {
     "Environment Variables": "متغیر‌های محیطی"
@@ -1811,7 +1814,7 @@
     "Exponential": "نمایی"
   },
   "Extra Arguments": {
-    "Extra Arguments": ""
+    "Extra Arguments": "آرگومان‌های اضافی"
   },
   "F1/I: Toggle • F10: Help": {
     "F1/I: Toggle • F10: Help": "F1/I: تغییر حالت • F10: راهنما"
@@ -1853,7 +1856,7 @@
     "Failed to connect to %1": "اتصال به %1 ناموفق بود"
   },
   "Failed to copy entry": {
-    "Failed to copy entry": "کپی ورودی ناموفق بود"
+    "Failed to copy entry": "کپی مدخل ناموفق بود"
   },
   "Failed to create printer": {
     "Failed to create printer": "ایجاد چاپگر ناموفق بود"
@@ -1925,7 +1928,7 @@
     "Failed to pause printer": "توقف چاپگر ناموفق بود"
   },
   "Failed to pin entry": {
-    "Failed to pin entry": "سنجاق کردن ورودی ناموفق بود"
+    "Failed to pin entry": "سنجاق کردن مدخل ناموفق بود"
   },
   "Failed to print test page": {
     "Failed to print test page": "چاپ صفحه تست ناموفق بود"
@@ -1982,7 +1985,7 @@
     "Failed to start connection to %1": "شروع اتصال به %1 ناموفق بود"
   },
   "Failed to unpin entry": {
-    "Failed to unpin entry": "برداشتن سنجاق ورودی ناموفق بود"
+    "Failed to unpin entry": "برداشتن سنجاق مدخل ناموفق بود"
   },
   "Failed to update VPN": {
     "Failed to update VPN": "بروزرسانی VPN ناموفق بود"
@@ -2084,7 +2087,7 @@
     "Focused Window": "پنجره فوکوس‌شده"
   },
   "Fog": {
-    "Fog": ""
+    "Fog": "مه"
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "فوکوس مانیتور را دنبال کن"
@@ -2144,13 +2147,13 @@
     "Forgot network %1": "فراموشی شبکه %1"
   },
   "Format Legend": {
-    "Format Legend": "قالب فهرست علائم"
+    "Format Legend": "راهنمای قالب‌بندی"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "هنگامی که لانچر بسته شد VRAM/حافظه را آزاد کن. ممکن است باعث اندکی تأخیر هنگام باز کردن مجدد شود."
   },
   "Freezing Drizzle": {
-    "Freezing Drizzle": ""
+    "Freezing Drizzle": "باران‌ریزه یخ‌زن"
   },
   "Frequency": {
     "Frequency": "فرکانس"
@@ -2258,13 +2261,13 @@
     "Health": "سلامت"
   },
   "Heavy Rain": {
-    "Heavy Rain": ""
+    "Heavy Rain": "باران سنگین"
   },
   "Heavy Snow": {
-    "Heavy Snow": ""
+    "Heavy Snow": "برف سنگین"
   },
   "Heavy Snow Showers": {
-    "Heavy Snow Showers": ""
+    "Heavy Snow Showers": "برف سنگین پراکنده"
   },
   "Height": {
     "Height": "ارتفاع"
@@ -2285,7 +2288,7 @@
     "Hidden": "پنهان"
   },
   "Hidden (%1)": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "پنهان (%1)"
   },
   "Hidden Apps": {
     "Hidden Apps": "برنامه‌های پنهان"
@@ -2327,13 +2330,13 @@
     "Hide cursor when using touch input": "اشاره‌گر موس را هنگام استفاده از ورودی لمسی پنهان کن"
   },
   "Hide device": {
-    "Hide device": ""
+    "Hide device": "پنهان کردن دستگاه"
   },
   "Hide notification content until expanded": {
-    "Hide notification content until expanded": ""
+    "Hide notification content until expanded": "پنهان کردن محتوای اعلان را تا هنگام گسترش"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
-    "Hide notification content until expanded; popups show collapsed by default": ""
+    "Hide notification content until expanded; popups show collapsed by default": "محتوای اعلان را تا هنگام گسترش پنهان کن؛ پاپ‌آپ‌ها به طور پیش‌فرض گسترش‌یافته نمایش داده می‌شوند"
   },
   "Hide on Touch": {
     "Hide on Touch": "هنگام لمس پنهان کن"
@@ -2348,7 +2351,7 @@
     "History Settings": "تنظیمات تاریخچه"
   },
   "History cleared. %1 pinned entries kept.": {
-    "History cleared. %1 pinned entries kept.": "تاریخچه پاک شد. %1 ورودی سنجاق شده نگه داشته شد."
+    "History cleared. %1 pinned entries kept.": "تاریخچه پاک شد. %1 مدخل سنجاق شده نگه داشته شد."
   },
   "Hold Duration": {
     "Hold Duration": "مدت زمان نگه‌داشتن"
@@ -2366,7 +2369,7 @@
     "Hold to confirm (%1s)": "برای تأیید نگه‌دارید (%1s)"
   },
   "Home": {
-    "Home": ""
+    "Home": "خانه"
   },
   "Hot Corners": {
     "Hot Corners": "گوشه‌های فعال"
@@ -2728,13 +2731,13 @@
     "Key": "کلید"
   },
   "Keybind Sources": {
-    "Keybind Sources": ""
+    "Keybind Sources": "منابع نگاشت‌کلیدها"
   },
   "Keybinds Search Settings": {
     "Keybinds Search Settings": "تنظیمات نگاشت‌کلیدهای جستجو"
   },
   "Keybinds shown alongside regular search results": {
-    "Keybinds shown alongside regular search results": ""
+    "Keybinds shown alongside regular search results": "نگاشت‌کلیدها همراه نتایج عادی جستجو نمایش داده می‌شوند"
   },
   "Keyboard Layout Name": {
     "Keyboard Layout Name": "نام چیدمان صفحه‌کلید"
@@ -2743,8 +2746,8 @@
     "Keyboard Shortcuts": "میانبر‌های صفحه‌کلید"
   },
   "Keyboard hints when enter-to-paste is enabled": {
-    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "",
-    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": ""
+    "Shift+Enter: Copy • Shift+Del: Clear All • Esc: Close": "Shift+Enter: کپی • Shift+Del: پاک‌کردن همه • Esc: بستن",
+    "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help": "↑/↓: پیمایش • Enter: الصاق • Del: حذف • F10: راهنما"
   },
   "Keys": {
     "Keys": "کلیدها"
@@ -2816,13 +2819,13 @@
     "Light Mode": "حالت روشن"
   },
   "Light Rain": {
-    "Light Rain": ""
+    "Light Rain": "باران سبک"
   },
   "Light Snow": {
-    "Light Snow": ""
+    "Light Snow": "برف سبک"
   },
   "Light Snow Showers": {
-    "Light Snow Showers": ""
+    "Light Snow Showers": "برف پراکنده"
   },
   "Linear": {
     "Linear": "خطی"
@@ -2960,10 +2963,10 @@
     "Marker Waste Full": "ضایعات مارکر پر است"
   },
   "Match Criteria": {
-    "Match Criteria": ""
+    "Match Criteria": "انطباق معیار"
   },
   "Matches profile: %1": {
-    "Matches profile: %1": ""
+    "Matches profile: %1": "منطبق با پروفایل: %1"
   },
   "Material Colors": {
     "Material Colors": "رنگ‌های Material"
@@ -3005,31 +3008,31 @@
     "Max to Edges": "بیشینه تا لبه‌ها"
   },
   "Maximize": {
-    "Maximize": ""
+    "Maximize": "بزرگ‌کردن پنجره"
   },
   "Maximize Detection": {
     "Maximize Detection": "تشخیص بزرگ‌شدن پنجره"
   },
   "Maximum Entry Size": {
-    "Maximum Entry Size": "حداکثر اندازه ورودی"
+    "Maximum Entry Size": "حداکثر اندازه مدخل"
   },
   "Maximum History": {
     "Maximum History": "حداکثر تاریخچه"
   },
   "Maximum Pinned Entries": {
-    "Maximum Pinned Entries": "بیشینه ورودی‌های سنجاق شده"
+    "Maximum Pinned Entries": "بیشینه مدخل‌های سنجاق شده"
   },
   "Maximum number of clipboard entries to keep": {
-    "Maximum number of clipboard entries to keep": "بیشینه تعداد ورودی‌های کلیپ‌بورد برای نگه‌داری"
+    "Maximum number of clipboard entries to keep": "بیشینه تعداد مدخل‌های کلیپ‌بورد برای نگه‌داری"
   },
   "Maximum number of entries that can be saved": {
-    "Maximum number of entries that can be saved": "بیشینه تعداد ورودی‌هایی که می‌توانند ذخیره شوند"
+    "Maximum number of entries that can be saved": "بیشینه تعداد مدخل‌هایی که می‌توانند ذخیره شوند"
   },
   "Maximum pinned entries reached": {
-    "Maximum pinned entries reached": "به بیشینه ورودی‌های سنجاق شده رسیدید"
+    "Maximum pinned entries reached": "به بیشینه مدخل‌های سنجاق شده رسیدید"
   },
   "Maximum size per clipboard entry": {
-    "Maximum size per clipboard entry": "بیشینه اندازه برای هر ورودی کلیپ‌بورد"
+    "Maximum size per clipboard entry": "بیشینه اندازه برای هر مدخل کلیپ‌بورد"
   },
   "Media": {
     "Media": "رسانه"
@@ -3050,7 +3053,7 @@
     "Media Needed": "مدیا مورد نیاز است"
   },
   "Media Playback": {
-    "Media Playback": ""
+    "Media Playback": "پخش رسانه"
   },
   "Media Player": {
     "Media Player": "پخش‌کننده رسانه"
@@ -3170,13 +3173,13 @@
     "Moving to Paused": "انتقال به حالت متوقف شده"
   },
   "Music": {
-    "Music": ""
+    "Music": "موسیقی"
   },
   "Mute popups for %1": {
-    "Mute popups for %1": ""
+    "Mute popups for %1": "بی‌صدا کردن پاپ‌آپ‌ها را برای %1"
   },
   "Muted Apps": {
-    "Muted Apps": ""
+    "Muted Apps": "برنامه‌های بی‌صدا"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "پالت رنگی ساکت با تن‌های ملایم و آرامش‌بخش."
@@ -3329,7 +3332,7 @@
     "No apps have been launched yet.": "هیچ برنامه‌ای هنوز اجرا نشده است."
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": ""
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "هیچ برنامه‌ای بی‌صدا نشده است. برای افزودن یکی به اینجا روی اعلان راست‌کلیک کرده و «بی‌صدا کردن پاپ‌آپ‌ها» را انتخاب کنید."
   },
   "No battery": {
     "No battery": "بدون باتری"
@@ -3341,7 +3344,7 @@
     "No changes": "بدون تغییرات"
   },
   "No clipboard entries found": {
-    "No clipboard entries found": "هیچ ورودی کلیپ‌بوردی پیدا نشد"
+    "No clipboard entries found": "هیچ مدخل کلیپ‌بوردی پیدا نشد"
   },
   "No devices found": {
     "No devices found": "دستگاهی یافت نشد"
@@ -3374,7 +3377,7 @@
     "No launcher plugins installed.": "هیچ افزونه‌ لانچری نصب نشده است."
   },
   "No match criteria": {
-    "No match criteria": ""
+    "No match criteria": "هیچ انطباق معیاری یافت نشد"
   },
   "No matches": {
     "No matches": "موردی پیدا نشد"
@@ -3401,13 +3404,13 @@
     "No profiles": "هیچ پروفایلی یافت نشد"
   },
   "No recent clipboard entries found": {
-    "No recent clipboard entries found": "هیچ ورودی کلیپ‌بورد اخیری یافت نشد"
+    "No recent clipboard entries found": "هیچ مدخل کلیپ‌بورد اخیری یافت نشد"
   },
   "No results found": {
     "No results found": "هیچ نتیجه‌ای یافت نشد"
   },
   "No saved clipboard entries": {
-    "No saved clipboard entries": "هیچ ورودی کلیپ‌بوردی ذخیره نشده است"
+    "No saved clipboard entries": "هیچ مدخل کلیپ‌بوردی ذخیره نشده است"
   },
   "No trigger": {
     "No trigger": "بدون راه‌انداز"
@@ -3536,7 +3539,7 @@
     "Opacity": "شفافیت"
   },
   "Opaque": {
-    "Opaque": ""
+    "Opaque": "کدر"
   },
   "Open": {
     "Open": "باز‌کردن"
@@ -3590,7 +3593,7 @@
     "Outputs Include Missing": "Include خروجی‌ها یافت نشد"
   },
   "Overcast": {
-    "Overcast": ""
+    "Overcast": "کاملاْ ابری"
   },
   "Overflow": {
     "Overflow": "سرریزی"
@@ -3629,7 +3632,7 @@
     "PIN": "PIN"
   },
   "Pad Hours": {
-    "Pad Hours": ""
+    "Pad Hours": "حاشیه‌گذاری ساعات"
   },
   "Padding": {
     "Padding": "فاصله درونی"
@@ -3650,7 +3653,7 @@
     "Pairing...": "درحال جفت شدن..."
   },
   "Partly Cloudy": {
-    "Partly Cloudy": ""
+    "Partly Cloudy": "نیمه ابری"
   },
   "Passkey:": {
     "Passkey:": "کلید عبور:"
@@ -3714,7 +3717,7 @@
     "Failed to send ping": "ارسال پینگ ناموفق بود",
     "Failed to share": "اشتراک‌گذاری ناموفق بود",
     "Pairing failed": "جفت‌سازی ناموفق بود",
-    "Unpair failed": ""
+    "Unpair failed": "جدا‌سازی ناموفق بود"
   },
   "Phone Connect file send": {
     "Sending": "درحال ارسال"
@@ -3760,7 +3763,7 @@
     "Unavailable": "دردسترس نیست"
   },
   "Pictures": {
-    "Pictures": ""
+    "Pictures": "تصاویر"
   },
   "Pin": {
     "Pin": "سنجاق"
@@ -3832,7 +3835,7 @@
     "Popup Position": "مکان پاپ‌آپ"
   },
   "Popup Shadow": {
-    "Popup Shadow": ""
+    "Popup Shadow": "سایه پاپ‌آپ"
   },
   "Popup Transparency": {
     "Popup Transparency": "شفافیت پاپ‌آپ"
@@ -3943,7 +3946,7 @@
     "Privacy Indicator": "نشانگر حریم خصوصی"
   },
   "Privacy Mode": {
-    "Privacy Mode": ""
+    "Privacy Mode": "حالت حریم خصوصی"
   },
   "Private Key Password": {
     "Private Key Password": "کلید خصوصی گذرواژه"
@@ -3988,7 +3991,7 @@
     "Protocol": "پروتکل"
   },
   "Quick Access": {
-    "Quick Access": ""
+    "Quick Access": "دسترسی سریع"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "دسترسی سریع به لانچر برنامه"
@@ -4009,7 +4012,7 @@
     "Radius": "شعاع"
   },
   "Rain": {
-    "Rain": ""
+    "Rain": "باران"
   },
   "Rain Chance": {
     "Rain Chance": "احتمال بارش"
@@ -4279,10 +4282,10 @@
     "Search Options": "گزینه‌های جستجو"
   },
   "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": ""
+    "Search by key combo, description, or action name.\n\nDefault action copies the keybind to clipboard.\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "با ترکیب کلید‌ها، توضیحات یا نام اقدام‌ جستجو کنید.\n\nاقدام پیش‌فرض نگاشت‌کلید را در کلیپ‌بورد کپی می‌کند.\nبرای سنجاق‌ کردن نگاشت‌کلید‌های پر استفاده راست‌کلیک کنید یا پیکان راست را فشار دهید - آن‌ها هنگام جستجو نکردن در بالای لیست ظاهر خواهند شد."
   },
   "Search by key combo, description, or action name.\\n\\nDefault action copies the keybind to clipboard.\\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": {
-    "Search by key combo, description, or action name.\\n\\nDefault action copies the keybind to clipboard.\\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "با ترکیب کلید‌ها، توضیحات یا نام اقدام‌ جستجو کنید.\\n\\اقدام پیش‌فرض نگاشت‌کلید را در کلیپ‌بورد کپی می‌کند.\\nبرای سنجاق‌ کردن نگاشت‌کلید‌های پر استفاده راست‌کلیک کنید یا پیکان راست را فشار دهید - آن‌ها هنگام جستجو نکردن در بالا ظاهر خواهند شد."
+    "Search by key combo, description, or action name.\\n\\nDefault action copies the keybind to clipboard.\\nRight-click or press Right Arrow to pin frequently used keybinds - they'll appear at the top when not searching.": "با ترکیب کلید‌ها، توضیحات یا نام اقدام‌ جستجو کنید.\\n\\اقدام پیش‌فرض نگاشت‌کلید را در کلیپ‌بورد کپی می‌کند.\\nبرای سنجاق‌ کردن نگاشت‌کلید‌های پر استفاده راست‌کلیک کنید یا پیکان راست را فشار دهید - آن‌ها هنگام جستجو نکردن در بالای لیست ظاهر خواهند شد."
   },
   "Search file contents": {
     "Search file contents": "جستجو در محتوای فایل"
@@ -4330,7 +4333,7 @@
     "Select Bar": "انتخاب نوار"
   },
   "Select Dock Launcher Logo": {
-    "Select Dock Launcher Logo": ""
+    "Select Dock Launcher Logo": "لوگوی لانچر داک را انتخاب کنید"
   },
   "Select Launcher Logo": {
     "Select Launcher Logo": "انتخاب لوگوی لانچر"
@@ -4378,7 +4381,7 @@
     "Select the palette algorithm used for wallpaper-based colors": "انتخاب الگوریتم پالت رنگی استفاده شده برای رنگ‌های بر اساس تصویر پس‌زمینه"
   },
   "Select which keybind providers to include": {
-    "Select which keybind providers to include": ""
+    "Select which keybind providers to include": "انتخاب کنید که کدام ارائه دهنده نگاشت‌کلید‌ها include شود"
   },
   "Select which transitions to include in randomization": {
     "Select which transitions to include in randomization": "انتخاب کنید کدام گذارها در تصادفی‌سازی باشند"
@@ -4408,13 +4411,13 @@
     "Set key and action to save": "کلید و اقدام را برای ذخیره تنظیم کنید"
   },
   "Set notification rules": {
-    "Set notification rules": ""
+    "Set notification rules": "تنظیم قوانین اعلان‌ها"
   },
   "Setup": {
     "Setup": "راه‌اندازی"
   },
   "Share Gamma Control Settings": {
-    "Share Gamma Control Settings": ""
+    "Share Gamma Control Settings": "اشتراک‌گذاری تنظیمات کنترل گاما"
   },
   "Shell": {
     "Shell": "شِل"
@@ -4582,13 +4585,13 @@
     "Show darkened overlay behind modal dialogs": "لایه overlay تیره پشت پنجره مودال نمایش بده"
   },
   "Show device": {
-    "Show device": ""
+    "Show device": "نمایش دستگاه"
   },
   "Show dock when floating windows don't overlap its area": {
     "Show dock when floating windows don't overlap its area": "داک را هنگامی که پنجره‌های شناور با محیط آن همپوشانی ندارند نمایش بده"
   },
   "Show drop shadow on notification popups": {
-    "Show drop shadow on notification popups": ""
+    "Show drop shadow on notification popups": "سایه‌افتاده را برای پاپ‌آپ اعلان‌ها نمایش بده"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "لایه overlay لانچر را هنگام تایپ در نمای کلی نیری نمایش بده. برای استفاده از لانچر دیگری غیرفعال کنید."
@@ -4687,7 +4690,7 @@
     "Size": "اندازه"
   },
   "Size Constraints": {
-    "Size Constraints": ""
+    "Size Constraints": "محدودیت‌های اندازه"
   },
   "Size Offset": {
     "Size Offset": "آفست اندازه"
@@ -4711,7 +4714,7 @@
     "Snap": "چسباندن"
   },
   "Snow": {
-    "Snow": ""
+    "Snow": "برف"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "برخی افزونه‌ها نیازمند نسخه جدیدتر DMS هستند:"
@@ -4810,7 +4813,7 @@
     "Suspend system after": "تعلیق پس از"
   },
   "Suspend then Hibernate": {
-    "Suspend then Hibernate": ""
+    "Suspend then Hibernate": "تعلیق سپس هایبرنیت"
   },
   "Swap": {
     "Swap": "سواپ"
@@ -4942,7 +4945,7 @@
     "This widget prevents GPU power off states, which can significantly impact battery life on laptops. It is not recommended to use this on laptops with hybrid graphics.": "این ابزارک از حالت‌های خاموش شدن GPU جلوگیری می‌کند، که ​​می‌تواند به طور قابل توجهی بر عمر باتری لپ‌تاپ‌ها تأثیر بگذارد. استفاده از این ابزارک در لپ‌تاپ‌هایی با گرافیک هیبریدی توصیه نمی‌شود."
   },
   "This will delete all unpinned entries. %1 pinned entries will be kept.": {
-    "This will delete all unpinned entries. %1 pinned entries will be kept.": "این همه ورودی‌های سنجاق نشده را پاک می‌کند. %1 ورودی سنجاق شده نگه داشته می‌شوند."
+    "This will delete all unpinned entries. %1 pinned entries will be kept.": "این همه مدخل‌های سنجاق نشده را پاک می‌کند. %1 مدخل سنجاق شده نگه داشته می‌شوند."
   },
   "This will permanently delete all clipboard history.": {
     "This will permanently delete all clipboard history.": "این کار تمام تاریخچه کلیپ‌بورد را برای همیشه حذف می‌کند."
@@ -4951,16 +4954,16 @@
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "این به طور دائمی این مورد کلیپ‌بورد را حذف خواهد کرد. این عمل برگشت‌ناپذیر است."
   },
   "Thunderstorm": {
-    "Thunderstorm": ""
+    "Thunderstorm": "رعد و برق"
   },
   "Thunderstorm with Hail": {
-    "Thunderstorm with Hail": ""
+    "Thunderstorm with Hail": "رعد و برق با تگرگ"
   },
   "Tiled": {
-    "Tiled": ""
+    "Tiled": "کاشی‌شده"
   },
   "Tiled State": {
-    "Tiled State": ""
+    "Tiled State": "حالت کاشی‌شده"
   },
   "Tiling": {
     "Tiling": "تایلینگ"
@@ -5140,13 +5143,13 @@
     "Unknown Title": "عنوان ناشناس"
   },
   "Unload on Close": {
-    "Unload on Close": ""
+    "Unload on Close": "خالی‌کردن هنگام بستن"
   },
   "Unmute": {
-    "Unmute": ""
+    "Unmute": "صدادار کردن"
   },
   "Unmute popups for %1": {
-    "Unmute popups for %1": ""
+    "Unmute popups for %1": "صدادار کردن پاپ‌آپ‌ها را برای %1"
   },
   "Unnamed Rule": {
     "Unnamed Rule": "قاعده بی‌نام"
@@ -5347,7 +5350,7 @@
     "Vibrant palette with playful saturation.": "پالتر رنگی پر جنب و جوش با اشباع رنگی سرزنده."
   },
   "Videos": {
-    "Videos": ""
+    "Videos": "ویدئوها"
   },
   "View Mode": {
     "View Mode": "حالت نمایش"
@@ -5619,7 +5622,7 @@
     "Thickness": "ضخامت"
   },
   "brandon": {
-    "brandon": ""
+    "brandon": "براندون"
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "مرور تم‌ها"
@@ -5650,7 +5653,7 @@
     "Active tile background and icon color": "رنگ کاشی پس‌زمینه فعال و آیکون"
   },
   "count of hidden audio devices": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "پنهان (%1)"
   },
   "current theme label": {
     "Current Theme: %1": "تم کنونی: %1"
@@ -5665,7 +5668,7 @@
     "Click to select a custom theme JSON file": "برای انتخاب یک فایل JSON قالب سفارشی کلیک کنید"
   },
   "dark mode wallpaper color picker title": {
-    "Choose Dark Mode Color": ""
+    "Choose Dark Mode Color": "انتخاب رنگ حالت تاریک"
   },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "انتخاب تصویر پس‌زمینه"
@@ -5686,7 +5689,7 @@
     "days": "روز"
   },
   "default monitor label suffix": {
-    "(Default)": ""
+    "(Default)": "(پیش‌فرض)"
   },
   "dgop not available": {
     "dgop not available": "dgop در دسترس نیست"
@@ -5754,7 +5757,7 @@
     "No GPUs detected": "هیچ GPUای شناسایی نشد"
   },
   "empty state in process list": {
-    "No matching processes": ""
+    "No matching processes": "فرآیند موردنظر یافت نشد"
   },
   "empty theme list": {
     "No themes found": "هیچ تمی یافت نشد"
@@ -5954,7 +5957,7 @@
     "leave empty for default": "برای پیش‌فرض خالی رها کنید"
   },
   "light mode wallpaper color picker title": {
-    "Choose Light Mode Color": ""
+    "Choose Light Mode Color": "انتخاب رنگ حالت روشن"
   },
   "loading indicator": {
     "Loading...": "درحال بارگذاری..."
@@ -6016,7 +6019,7 @@
     "nav": "جهت"
   },
   "neovim template description": {
-    "Requires lazy plugin manager": ""
+    "Requires lazy plugin manager": "به مدیریت افزونه lazy نیاز دارد"
   },
   "network status": {
     "Connected": "متصل",
@@ -6032,7 +6035,7 @@
     "No custom theme file": "هیچ تم سفارشی یافت نشد"
   },
   "no monitors available label": {
-    "No monitors": ""
+    "No monitors": "بدون مانیتور"
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "هیچ تمی نصب نشده. تم‌ها را برای نصب از مخزن مرور کنید."
@@ -6082,7 +6085,7 @@
     "Enable History": "فعال‌کردن تاریخچه"
   },
   "notification privacy mode placeholder": {
-    "Message Content": ""
+    "Message Content": "محتوای پیام"
   },
   "notification rule action option": {
     "Ignore Completely": "کلاً نادیده بگیر",
@@ -6095,7 +6098,7 @@
   },
   "notification rule match field option": {
     "Body": "بدنه",
-    "Desktop Entry": "",
+    "Desktop Entry": "مدخل دسکتاپ",
     "Summary": "خلاصه"
   },
   "notification rule match type option": {
@@ -6115,22 +6118,22 @@
     "official": "رسمی"
   },
   "on Hyprland": {
-    "on Hyprland": ""
+    "on Hyprland": "در Hyprland"
   },
   "on MangoWC": {
-    "on MangoWC": ""
+    "on MangoWC": "در MangoWC"
   },
   "on Miracle WM": {
-    "on Miracle WM": ""
+    "on Miracle WM": "در Miracle WM"
   },
   "on Niri": {
-    "on Niri": ""
+    "on Niri": "در Niri"
   },
   "on Scroll": {
-    "on Scroll": ""
+    "on Scroll": "در Scroll"
   },
   "on Sway": {
-    "on Sway": ""
+    "on Sway": "در Sway"
   },
   "open": {
     "open": "باز کردن"
@@ -6180,10 +6183,10 @@
     "Select Profile Image": "انتخاب تصویر نمایه"
   },
   "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "لازم است یکی از مقادیر زیر را به عنوان متغیر محیطی تنظیم نمایید:\nQT_QPA_PLATFORMTHEME=gtk3 یا\nQT_QPA_PLATFORMTHEME=qt6ct\nو پس از آن، شل را مجدداً راه‌اندازی کنید.\n\nبسته qt6ct نیازمند نصب qt6ct-kde است."
   },
   "qt theme env error title": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "متغیر‌های محیطی یافت نشد"
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "تنظیمات فقط قابل خواندن هستند. تغییرات حفظ نخواهند شد."
@@ -6243,10 +6246,10 @@
     "Load Average": "متوسط بارگذاری"
   },
   "theme auto mode tab": {
-    "Location": ""
+    "Location": "مکان"
   },
   "theme auto mode tab | wallpaper cycling mode tab": {
-    "Time": ""
+    "Time": "زمان"
   },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "نصب تم رنگ‌ها از مخزن تم DMS"
@@ -6267,7 +6270,7 @@
     "Search themes...": "جستجوی تم‌ها..."
   },
   "this app": {
-    "this app": ""
+    "this app": "این برنامه"
   },
   "tile color option": {
     "Primary Container": "زمینه اصلی",
@@ -6289,7 +6292,7 @@
     "Unknown": "ناشناخته"
   },
   "up": {
-    "up": ""
+    "up": "روشن"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "DMS را برای یکپارچه‌سازی NM بروز کنید."
@@ -6304,10 +6307,10 @@
     "Requires %1": "به %1 نیاز دارد"
   },
   "wallpaper color picker title": {
-    "Choose Wallpaper Color": ""
+    "Choose Wallpaper Color": "انتخاب رنگ تصویر پس‌زمینه"
   },
   "wallpaper cycling mode tab": {
-    "Interval": ""
+    "Interval": "وقفه"
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "انتخاب دایرکتوری تصاویر پس‌زمینه"
@@ -6328,32 +6331,32 @@
     "Tile V": "کاشی عمودی"
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "۱ ساعت",
+    "1 hour 30 minutes": "۱ ساعت و نیم",
+    "1 minute": "۱ دقیقه",
+    "10 seconds": "۱۰ ثانیه",
+    "12 hours": "۱۲ ساعت",
+    "15 minutes": "۱۵ دقیقه",
+    "15 seconds": "۱۵ ثانیه",
+    "2 hours": "۲ ساعت",
+    "20 seconds": "۲۰ ثانیه",
+    "25 seconds": "۲۵ ثانیه",
+    "3 hours": "۳ ساعت",
+    "30 minutes": "۳۰ دقیقه",
+    "30 seconds": "۳۰ ثانیه",
+    "35 seconds": "۳۵ ثانیه",
+    "4 hours": "۴ ساعت",
+    "40 seconds": "۴۰ ثانیه",
+    "45 seconds": "۴۵ ثانیه",
+    "5 minutes": "۵ دقیقه",
+    "5 seconds": "۵ ثانیه",
+    "50 seconds": "۵۰ ثانیه",
+    "55 seconds": "۵۵ ثانیه",
+    "6 hours": "۶ ساعت",
+    "8 hours": "۸ ساعت"
   },
   "wallpaper not set label": {
-    "Not set": ""
+    "Not set": "تنظیم نشده"
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "پردازش تصویر پس‌زمینه ناموفق بود"
@@ -6429,5 +6432,8 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - سال (2024)"
+  },
+  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
   }
 }

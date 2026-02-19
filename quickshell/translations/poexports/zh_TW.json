@@ -769,6 +769,9 @@
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "大小寫鎖定指示器"
   },
+  "Caps Lock is on": {
+    "Caps Lock is on": ""
+  },
   "Center Section": {
     "Center Section": "中間區塊"
   },
@@ -6429,5 +6432,8 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - 年 (2024)"
+  },
+  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
   }
 }
