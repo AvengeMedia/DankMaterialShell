@@ -1170,7 +1170,7 @@ Item {
                                     spacing: 2
 
                                     StyledText {
-                                        text: modelData.name || "Unknown App"
+                                        text: modelData.name || I18n.tr("Unknown App")
                                         font.pixelSize: Theme.fontSizeMedium
                                         font.weight: Font.Medium
                                         color: Theme.surfaceText
@@ -1179,7 +1179,7 @@ Item {
                                     StyledText {
                                         text: {
                                             if (!modelData.lastUsed)
-                                                return "Never used";
+                                                return I18n.tr("Never used");
                                             var date = new Date(modelData.lastUsed);
                                             var now = new Date();
                                             var diffMs = now - date;
@@ -1189,11 +1189,17 @@ Item {
                                             if (diffMins < 1)
                                                 return I18n.tr("Last launched just now");
                                             if (diffMins < 60)
-                                                return I18n.tr("Last launched %1 minute%2 ago").arg(diffMins).arg(diffMins === 1 ? "" : "s");
+                                                return diffMins === 1
+                                                    ? I18n.tr("Last launched %1 minute ago").arg(diffMins)
+                                                    : I18n.tr("Last launched %1 minutes ago").arg(diffMins);
                                             if (diffHours < 24)
-                                                return I18n.tr("Last launched %1 hour%2 ago").arg(diffHours).arg(diffHours === 1 ? "" : "s");
+                                                return diffHours === 1
+                                                    ? I18n.tr("Last launched %1 hour ago").arg(diffHours)
+                                                    : I18n.tr("Last launched %1 hours ago").arg(diffHours);
                                             if (diffDays < 7)
-                                                return I18n.tr("Last launched %1 day%2 ago").arg(diffDays).arg(diffDays === 1 ? "" : "s");
+                                                return diffDays === 1
+                                                    ? I18n.tr("Last launched %1 day ago").arg(diffDays)
+                                                    : I18n.tr("Last launched %1 days ago").arg(diffDays);
                                             return I18n.tr("Last launched %1").arg(date.toLocaleDateString());
                                         }
                                         font.pixelSize: Theme.fontSizeSmall
