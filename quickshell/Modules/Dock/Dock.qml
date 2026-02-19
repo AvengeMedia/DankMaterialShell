@@ -553,15 +553,7 @@ Variants {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, backgroundTransparency)
-                            border.color: Theme.outlineMedium
-                            border.width: 1
-                            radius: Theme.cornerRadius
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Qt.rgba(Theme.surfaceTint.r, Theme.surfaceTint.g, Theme.surfaceTint.b, 0.04)
+                            color: Theme.withAlpha(Theme.surfaceContainer, backgroundTransparency)
                             radius: Theme.cornerRadius
                         }
                     }
