@@ -105,10 +105,10 @@
     "2 minutes": "2 minuti"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 secondi"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 minuti"
   },
   "24-Hour Format": {
     "24-Hour Format": "Formato 24 Ore"
@@ -117,7 +117,7 @@
     "24-hour format": "formato 24 ore"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250 mms"
   },
   "270°": {
     "270°": "270°"
@@ -126,7 +126,7 @@
     "3 days": "3 giorni"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 minuti"
   },
   "3 seconds": {
     "3 seconds": "3 secondi"
@@ -141,7 +141,7 @@
     "3rd party": "terze parti"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 secondi"
   },
   "5 minutes": {
     "5 minutes": "5 minuti"
@@ -150,13 +150,13 @@
     "5 seconds": "5 secondi"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500 ms"
   },
   "7 days": {
     "7 days": "7 giorni"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750 ms"
   },
   "8 seconds": {
     "8 seconds": "8 secondi"
@@ -171,7 +171,7 @@
     "A file with this name already exists. Do you want to overwrite it?": "Esiste già un file con questo nome. Vuoi sovrascriverlo?"
   },
   "AC Power": {
-    "AC Power": ""
+    "AC Power": "Alimentazione CA"
   },
   "API": {
     "API": "API"
@@ -860,7 +860,7 @@
     "Clear History?": "Cancellare la Cronologia?"
   },
   "Clear Sky": {
-    "Clear Sky": ""
+    "Clear Sky": "Sereno"
   },
   "Clear all history when server starts": {
     "Clear all history when server starts": "Cancella tutta la cronologia all'avvio del server"
@@ -1415,7 +1415,7 @@
     "Description": "Descrizione"
   },
   "Desktop": {
-    "Desktop": ""
+    "Desktop": "Scrivania"
   },
   "Desktop Clock": {
     "Desktop Clock": "Orologio Desktop"
@@ -1589,7 +1589,7 @@
     "Docs": "Documentazione"
   },
   "Documents": {
-    "Documents": ""
+    "Documents": "Documenti"
   },
   "Domain (optional)": {
     "Domain (optional)": "Dominio (opzionale)"
@@ -1604,7 +1604,7 @@
     "Door Open": "Sportello Aperto"
   },
   "Downloads": {
-    "Downloads": ""
+    "Downloads": "Scaricati"
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Trascina per Riordinare"
@@ -1619,7 +1619,7 @@
     "Driver": "Driver"
   },
   "Drizzle": {
-    "Drizzle": ""
+    "Drizzle": "Pioviggine"
   },
   "Duplicate": {
     "Duplicate": "Duplica"
@@ -2084,7 +2084,7 @@
     "Focused Window": "Finestra Attiva"
   },
   "Fog": {
-    "Fog": ""
+    "Fog": "Nebbia"
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Segui lo Schermo Attivo"
@@ -2150,7 +2150,7 @@
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "Libera VRAM/memoria alla chiusura del launcher. Potrebbe causare un leggero ritardo alla riapertura."
   },
   "Freezing Drizzle": {
-    "Freezing Drizzle": ""
+    "Freezing Drizzle": "Pioviggine Congelantesi"
   },
   "Frequency": {
     "Frequency": "Frequenza"
@@ -2258,13 +2258,13 @@
     "Health": "Salute"
   },
   "Heavy Rain": {
-    "Heavy Rain": ""
+    "Heavy Rain": "Pioggia Forte"
   },
   "Heavy Snow": {
-    "Heavy Snow": ""
+    "Heavy Snow": "Neve Abbondante"
   },
   "Heavy Snow Showers": {
-    "Heavy Snow Showers": ""
+    "Heavy Snow Showers": "Forti Rovesci di Neve"
   },
   "Height": {
     "Height": "Altezza"
@@ -2366,7 +2366,7 @@
     "Hold to confirm (%1s)": "Tieni premuto per confermare (%1s)"
   },
   "Home": {
-    "Home": ""
+    "Home": "Home"
   },
   "Hot Corners": {
     "Hot Corners": "Angoli Attivi"
@@ -2816,13 +2816,13 @@
     "Light Mode": "Modalità Chiara"
   },
   "Light Rain": {
-    "Light Rain": ""
+    "Light Rain": "Pioggia Leggera"
   },
   "Light Snow": {
-    "Light Snow": ""
+    "Light Snow": "Neve Leggera"
   },
   "Light Snow Showers": {
-    "Light Snow Showers": ""
+    "Light Snow Showers": "Deboli Rovesci di Neve"
   },
   "Linear": {
     "Linear": "Lineare"
@@ -3170,7 +3170,7 @@
     "Moving to Paused": "Messa in Pausa"
   },
   "Music": {
-    "Music": ""
+    "Music": "Musica"
   },
   "Mute popups for %1": {
     "Mute popups for %1": "Silenzia popup per %1"
@@ -3590,7 +3590,7 @@
     "Outputs Include Missing": "Inclusione Output Mancanti"
   },
   "Overcast": {
-    "Overcast": ""
+    "Overcast": "Coperto"
   },
   "Overflow": {
     "Overflow": "Overflow"
@@ -3650,7 +3650,7 @@
     "Pairing...": "Associazione in Corso..."
   },
   "Partly Cloudy": {
-    "Partly Cloudy": ""
+    "Partly Cloudy": "Parzialmente Nuvoloso"
   },
   "Passkey:": {
     "Passkey:": "Passkey:"
@@ -3760,7 +3760,7 @@
     "Unavailable": "Non Disponibile"
   },
   "Pictures": {
-    "Pictures": ""
+    "Pictures": "Immagini"
   },
   "Pin": {
     "Pin": "Fissa"
@@ -3988,7 +3988,7 @@
     "Protocol": "Protocollo"
   },
   "Quick Access": {
-    "Quick Access": ""
+    "Quick Access": "Accesso Rapido"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Accesso veloce al launcher applicazioni"
@@ -4009,7 +4009,7 @@
     "Radius": "Raggio"
   },
   "Rain": {
-    "Rain": ""
+    "Rain": "Pioggia"
   },
   "Rain Chance": {
     "Rain Chance": "Prob. Pioggia"
@@ -4711,7 +4711,7 @@
     "Snap": "Aggancia"
   },
   "Snow": {
-    "Snow": ""
+    "Snow": "Neve"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Alcuni plugin richiedono una versione più recente di DMS:"
@@ -4810,7 +4810,7 @@
     "Suspend system after": "Sospendi sistema dopo"
   },
   "Suspend then Hibernate": {
-    "Suspend then Hibernate": ""
+    "Suspend then Hibernate": "Sospendi e poi Iberna"
   },
   "Swap": {
     "Swap": "Swap"
@@ -4951,10 +4951,10 @@
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "Questo rimuoverà definitivamente questo elemento degli appunti salvato. Questa azione non può essere annullata."
   },
   "Thunderstorm": {
-    "Thunderstorm": ""
+    "Thunderstorm": "Temporale"
   },
   "Thunderstorm with Hail": {
-    "Thunderstorm with Hail": ""
+    "Thunderstorm with Hail": "Temporale con Grandine"
   },
   "Tiled": {
     "Tiled": "Affiancato"
@@ -5347,7 +5347,7 @@
     "Vibrant palette with playful saturation.": "Tavolozza vibrante con saturazione giocosa."
   },
   "Videos": {
-    "Videos": ""
+    "Videos": "Video"
   },
   "View Mode": {
     "View Mode": "Modalità Visualizzazione"
@@ -5619,7 +5619,7 @@
     "Thickness": "Spessore"
   },
   "brandon": {
-    "brandon": ""
+    "brandon": "brandon"
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "Sfoglia Temi"
@@ -5665,7 +5665,7 @@
     "Click to select a custom theme JSON file": "Clicca per selezionare un file tema JSON personalizzato"
   },
   "dark mode wallpaper color picker title": {
-    "Choose Dark Mode Color": ""
+    "Choose Dark Mode Color": "Scegli Colore Modalità Scura"
   },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "Seleziona Sfondo"
@@ -5686,7 +5686,7 @@
     "days": "giorni"
   },
   "default monitor label suffix": {
-    "(Default)": ""
+    "(Default)": "(Predefinito)"
   },
   "dgop not available": {
     "dgop not available": "dgop non disponibile"
@@ -5954,7 +5954,7 @@
     "leave empty for default": "lascia vuoto per il valore predefinito"
   },
   "light mode wallpaper color picker title": {
-    "Choose Light Mode Color": ""
+    "Choose Light Mode Color": "Scegli Colore Modalità Chiara"
   },
   "loading indicator": {
     "Loading...": "Caricamento..."
@@ -6016,7 +6016,7 @@
     "nav": "nav"
   },
   "neovim template description": {
-    "Requires lazy plugin manager": ""
+    "Requires lazy plugin manager": "Richiede lazy plugin manager"
   },
   "network status": {
     "Connected": "Connesso",
@@ -6032,7 +6032,7 @@
     "No custom theme file": "Nessun file tema personalizzato"
   },
   "no monitors available label": {
-    "No monitors": ""
+    "No monitors": "Nessun monitor"
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "Nessun tema installato. Sfoglia i temi dal registro per installarli."
@@ -6115,22 +6115,22 @@
     "official": "ufficiale"
   },
   "on Hyprland": {
-    "on Hyprland": ""
+    "on Hyprland": "su Hyprland"
   },
   "on MangoWC": {
-    "on MangoWC": ""
+    "on MangoWC": "su MangoWC"
   },
   "on Miracle WM": {
-    "on Miracle WM": ""
+    "on Miracle WM": "su Miracle WM"
   },
   "on Niri": {
-    "on Niri": ""
+    "on Niri": "su Niri"
   },
   "on Scroll": {
-    "on Scroll": ""
+    "on Scroll": "su Scroll"
   },
   "on Sway": {
-    "on Sway": ""
+    "on Sway": "su Sway"
   },
   "open": {
     "open": "apri"
@@ -6180,10 +6180,10 @@
     "Select Profile Image": "Seleziona Immagine Profilo"
   },
   "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "Devi impostare una delle seguenti come variabili d'ambiente:  \nQT_QPA_PLATFORMTHEME=gtk3 OPPURE  \nQT_QPA_PLATFORMTHEME=qt6ct,  \ne poi riavviare la shell.\n\nqt6ct richiede che qt6ct-kde sia installato."
   },
   "qt theme env error title": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "Variabili di Ambiente Mancanti"
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "Le impostazioni sono in sola lettura. Le modifiche non verranno salvate."
@@ -6243,10 +6243,10 @@
     "Load Average": "Carico Medio"
   },
   "theme auto mode tab": {
-    "Location": ""
+    "Location": "Posizione"
   },
   "theme auto mode tab | wallpaper cycling mode tab": {
-    "Time": ""
+    "Time": "Tempo"
   },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "Installa temi colore dal registro temi DMS"
@@ -6289,7 +6289,7 @@
     "Unknown": "Autore Sconosciuto"
   },
   "up": {
-    "up": ""
+    "up": "acceso da"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "aggiorna dms per l'integrazione NM."
@@ -6304,10 +6304,10 @@
     "Requires %1": "Richiede %1"
   },
   "wallpaper color picker title": {
-    "Choose Wallpaper Color": ""
+    "Choose Wallpaper Color": "Scegli Colore Sfondo"
   },
   "wallpaper cycling mode tab": {
-    "Interval": ""
+    "Interval": "Intervallo"
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "Seleziona Cartella Sfondo"
@@ -6328,32 +6328,32 @@
     "Tile V": "Affianca Vert."
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "1 ora",
+    "1 hour 30 minutes": "1 ora 30 minuti",
+    "1 minute": "1 minuto",
+    "10 seconds": "10 secondi",
+    "12 hours": "12 ore",
+    "15 minutes": "15 minuti",
+    "15 seconds": "15 secondi",
+    "2 hours": "2 ore",
+    "20 seconds": "20 secondi",
+    "25 seconds": "25 secondi",
+    "3 hours": "3 ore",
+    "30 minutes": "30 minuti",
+    "30 seconds": "30 secondi",
+    "35 seconds": "35 secondi",
+    "4 hours": "4 ore",
+    "40 seconds": "40 secondi",
+    "45 seconds": "45 secondi",
+    "5 minutes": "5 minuti",
+    "5 seconds": "5 secondi",
+    "50 seconds": "50 secondi",
+    "55 seconds": "55 secondi",
+    "6 hours": "6 ore",
+    "8 hours": "8 ore"
   },
   "wallpaper not set label": {
-    "Not set": ""
+    "Not set": "Non impostato"
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "Elaborazione dello sfondo fallita"
