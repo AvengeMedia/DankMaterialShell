@@ -470,9 +470,6 @@ FocusScope {
 
                     onTextChanged: {
                         controller.setSearchQuery(text);
-                        if (text.length === 0) {
-                            controller.restorePreviousMode();
-                        }
                         if (actionPanel.expanded) {
                             actionPanel.hide();
                         }
