@@ -31,10 +31,25 @@ Column {
 
     spacing: editMode ? Theme.spacingL : Theme.spacingS
 
+    property real maxPopoutHeight: 9999
     property var currentRowWidgets: []
     property real currentRowWidth: 0
     property int expandedRowIndex: -1
     property var colorPickerModal: null
+
+    readonly property real _maxDetailHeight: {
+        const rows = layoutResult.rows;
+        let totalRowHeight = 0;
+        for (let i = 0; i < rows.length; i++) {
+            const sliderOnly = rows[i].every(w => {
+                const id = w.id || "";
+                return id === "volumeSlider" || id === "brightnessSlider" || id === "inputVolumeSlider";
+            });
+            totalRowHeight += sliderOnly ? 36 : 60;
+        }
+        const rowSpacing = Math.max(0, rows.length - 1) * spacing;
+        return Math.max(100, maxPopoutHeight - totalRowHeight - rowSpacing);
+    }
 
     function calculateRowsAndWidgets() {
         return LayoutUtils.calculateRowsAndWidgets(root, expandedSection, expandedWidgetIndex);
@@ -163,6 +178,7 @@ Column {
             DetailHost {
                 id: detailHost
                 width: parent.width
+                maxAvailableHeight: root._maxDetailHeight
                 height: active ? (getDetailHeight(root.expandedSection) + Theme.spacingS) : 0
                 property bool active: {
                     if (root.expandedSection === "")

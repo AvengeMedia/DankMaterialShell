@@ -190,32 +190,6 @@ function transformPluginItem(item, pluginId, selectLabel) {
     };
 }
 
-function createCalculatorItem(calc, query, copyLabel) {
-    return {
-        id: "calculator_result",
-        type: "calculator",
-        name: calc.displayResult,
-        subtitle: query + " =",
-        icon: "calculate",
-        iconType: "material",
-        section: "calculator",
-        data: {
-            expression: calc.expression,
-            result: calc.result
-        },
-        actions: [],
-        primaryAction: {
-            name: copyLabel,
-            icon: "content_copy",
-            action: "copy"
-        },
-        _hName: "",
-        _hSub: "",
-        _hRich: false,
-        _preScored: undefined
-    };
-}
-
 function createPluginBrowseItem(pluginId, plugin, trigger, isBuiltIn, isAllowed, browseLabel, triggerLabel, noTriggerLabel) {
     var rawIcon = isBuiltIn ? (plugin.cornerIcon || "extension") : (plugin.icon || "extension");
     return {

@@ -116,6 +116,7 @@ DankPopout {
             property alias bluetoothCodecSelector: bluetoothCodecSelector
 
             color: "transparent"
+            clip: true
 
             Rectangle {
                 anchors.fill: parent
@@ -166,6 +167,10 @@ DankPopout {
                     id: widgetGrid
                     width: parent.width
                     editMode: root.editMode
+                    maxPopoutHeight: {
+                        const screenHeight = (root.triggerScreen?.height ?? 1080);
+                        return screenHeight - 100 - Theme.spacingL - headerPane.height - Theme.spacingS;
+                    }
                     expandedSection: root.expandedSection
                     expandedWidgetIndex: root.expandedWidgetIndex
                     expandedWidgetData: root.expandedWidgetData

@@ -21,7 +21,7 @@
     "%1 custom animation duration": ""
   },
   "%1 days ago": {
-    "%1 days ago": ""
+    "%1 days ago": "%1 dni temu"
   },
   "%1 disconnected": {
     "%1 disconnected": ""
@@ -57,7 +57,7 @@
     "%1 widgets": "%1 widżetów"
   },
   "%1m ago": {
-    "%1m ago": ""
+    "%1m ago": "%1m temu"
   },
   "(Unnamed)": {
     "(Unnamed)": "(Bez nazwy)"
@@ -104,17 +104,29 @@
   "2 minutes": {
     "2 minutes": "2 minuty"
   },
+  "2 seconds": {
+    "2 seconds": ""
+  },
+  "20 minutes": {
+    "20 minutes": ""
+  },
   "24-Hour Format": {
     "24-Hour Format": "Format 24-godzinny"
   },
   "24-hour format": {
     "24-hour format": "format 24-godzinny"
   },
+  "250 ms": {
+    "250 ms": ""
+  },
   "270°": {
     "270°": "270°"
   },
   "3 days": {
     "3 days": "3 dni"
+  },
+  "3 minutes": {
+    "3 minutes": ""
   },
   "3 seconds": {
     "3 seconds": "3 sekundy"
@@ -128,14 +140,23 @@
   "3rd party": {
     "3rd party": "strona trzecia"
   },
+  "4 seconds": {
+    "4 seconds": ""
+  },
   "5 minutes": {
     "5 minutes": "5 minut"
   },
   "5 seconds": {
     "5 seconds": "5 sekund"
   },
+  "500 ms": {
+    "500 ms": ""
+  },
   "7 days": {
     "7 days": "7 dni"
+  },
+  "750 ms": {
+    "750 ms": ""
   },
   "8 seconds": {
     "8 seconds": "8 sekund"
@@ -148,6 +169,9 @@
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Plik o takiej nazwie już istnieje. Czy chcesz go nadpisać?"
+  },
+  "AC Power": {
+    "AC Power": ""
   },
   "API": {
     "API": "API"
@@ -835,6 +859,9 @@
   "Clear History?": {
     "Clear History?": ""
   },
+  "Clear Sky": {
+    "Clear Sky": ""
+  },
   "Clear all history when server starts": {
     "Clear all history when server starts": "Wyczyść historię gdy serwer startuje"
   },
@@ -1387,6 +1414,9 @@
   "Description": {
     "Description": "Opis"
   },
+  "Desktop": {
+    "Desktop": ""
+  },
   "Desktop Clock": {
     "Desktop Clock": "Zegar na pulpicie"
   },
@@ -1558,6 +1588,9 @@
   "Docs": {
     "Docs": "Dokumenty"
   },
+  "Documents": {
+    "Documents": ""
+  },
   "Domain (optional)": {
     "Domain (optional)": "Domena (opcjonalnie)"
   },
@@ -1570,6 +1603,9 @@
   "Door Open": {
     "Door Open": "Drzwi otwarte"
   },
+  "Downloads": {
+    "Downloads": ""
+  },
   "Drag to Reorder": {
     "Drag to Reorder": ""
   },
@@ -1581,6 +1617,9 @@
   },
   "Driver": {
     "Driver": "Sterownik"
+  },
+  "Drizzle": {
+    "Drizzle": ""
   },
   "Duplicate": {
     "Duplicate": "Duplikuj"
@@ -2044,6 +2083,9 @@
   "Focused Window": {
     "Focused Window": "Aktywne okno"
   },
+  "Fog": {
+    "Fog": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": ""
   },
@@ -2106,6 +2148,9 @@
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+  },
+  "Freezing Drizzle": {
+    "Freezing Drizzle": ""
   },
   "Frequency": {
     "Frequency": "Częstotliwość"
@@ -2177,7 +2222,7 @@
     "Group": ""
   },
   "Group Workspace Apps": {
-    "Group Workspace Apps": ""
+    "Group Workspace Apps": "Aplikacje obszaru roboczego grupy"
   },
   "Group by App": {
     "Group by App": "Grupuj według aplikacji"
@@ -2189,7 +2234,7 @@
     "Group removed": ""
   },
   "Group repeated application icons in unfocused workspaces": {
-    "Group repeated application icons in unfocused workspaces": ""
+    "Group repeated application icons in unfocused workspaces": "Grupuj powtarzające się ikony aplikacji w nieaktywnych obszarach roboczych"
   },
   "Groups": {
     "Groups": ""
@@ -2211,6 +2256,15 @@
   },
   "Health": {
     "Health": "Stan"
+  },
+  "Heavy Rain": {
+    "Heavy Rain": ""
+  },
+  "Heavy Snow": {
+    "Heavy Snow": ""
+  },
+  "Heavy Snow Showers": {
+    "Heavy Snow Showers": ""
   },
   "Height": {
     "Height": ""
@@ -2310,6 +2364,9 @@
   },
   "Hold to confirm (%1s)": {
     "Hold to confirm (%1s)": "Przytrzymaj, aby potwierdzić (%1s)"
+  },
+  "Home": {
+    "Home": ""
   },
   "Hot Corners": {
     "Hot Corners": "Gorące Narożniki"
@@ -2758,6 +2815,15 @@
   "Light Mode": {
     "Light Mode": "Jasny Motyw"
   },
+  "Light Rain": {
+    "Light Rain": ""
+  },
+  "Light Snow": {
+    "Light Snow": ""
+  },
+  "Light Snow Showers": {
+    "Light Snow Showers": ""
+  },
   "Linear": {
     "Linear": "Liniowy"
   },
@@ -3102,6 +3168,9 @@
   },
   "Moving to Paused": {
     "Moving to Paused": "Przechodzenie w stan wstrzymania"
+  },
+  "Music": {
+    "Music": ""
   },
   "Mute popups for %1": {
     "Mute popups for %1": ""
@@ -3520,6 +3589,9 @@
   "Outputs Include Missing": {
     "Outputs Include Missing": "Wyjścia zawierają brakujące"
   },
+  "Overcast": {
+    "Overcast": ""
+  },
   "Overflow": {
     "Overflow": ""
   },
@@ -3576,6 +3648,9 @@
   },
   "Pairing...": {
     "Pairing...": "Parowanie..."
+  },
+  "Partly Cloudy": {
+    "Partly Cloudy": ""
   },
   "Passkey:": {
     "Passkey:": "Klucz dostępu:"
@@ -3683,6 +3758,9 @@
   },
   "Phone Connect unavailable status": {
     "Unavailable": ""
+  },
+  "Pictures": {
+    "Pictures": ""
   },
   "Pin": {
     "Pin": "Przypnij"
@@ -3909,6 +3987,9 @@
   "Protocol": {
     "Protocol": "Protokół"
   },
+  "Quick Access": {
+    "Quick Access": ""
+  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Szybki dostęp do uruchamiania aplikacji"
   },
@@ -3926,6 +4007,9 @@
   },
   "Radius": {
     "Radius": ""
+  },
+  "Rain": {
+    "Rain": ""
   },
   "Rain Chance": {
     "Rain Chance": "Szansa na deszcz"
@@ -4183,7 +4267,7 @@
     "Scroll title if it doesn't fit in widget": "Przewijaj tytuł jeśli nie mieści się w widżecie"
   },
   "Scroll wheel behavior on media widget": {
-    "Scroll wheel behavior on media widget": ""
+    "Scroll wheel behavior on media widget": "Zachowanie kółka przewijania w widżecie multimediów"
   },
   "Scrolling": {
     "Scrolling": "Przewijanie"
@@ -4570,7 +4654,7 @@
     "Show workspace index numbers in the top bar workspace switcher": "Pokaż numery indeksów obszarów roboczych na górnym pasku przełącznika obszarów roboczych"
   },
   "Show workspace name on horizontal bars, and first letter on vertical bars": {
-    "Show workspace name on horizontal bars, and first letter on vertical bars": ""
+    "Show workspace name on horizontal bars, and first letter on vertical bars": "Pokaż nazwę obszaru roboczego na paskach poziomych i pierwszą literę na paskach pionowych"
   },
   "Show workspaces of the currently focused monitor": {
     "Show workspaces of the currently focused monitor": ""
@@ -4618,13 +4702,16 @@
     "Small": ""
   },
   "Smartcard Authentication": {
-    "Smartcard Authentication": ""
+    "Smartcard Authentication": "Uwierzytelnianie za pomocą karty inteligentnej"
   },
   "Smartcard PIN": {
-    "Smartcard PIN": ""
+    "Smartcard PIN": "PIN karty inteligentnej"
   },
   "Snap": {
     "Snap": ""
+  },
+  "Snow": {
+    "Snow": ""
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Niektóre pluginy wymagają nowszej wersji DMS:"
@@ -4721,6 +4808,9 @@
   },
   "Suspend system after": {
     "Suspend system after": "Wstrzymaj system po"
+  },
+  "Suspend then Hibernate": {
+    "Suspend then Hibernate": ""
   },
   "Swap": {
     "Swap": "Swap"
@@ -4859,6 +4949,12 @@
   },
   "This will permanently remove this saved clipboard item. This action cannot be undone.": {
     "This will permanently remove this saved clipboard item. This action cannot be undone.": ""
+  },
+  "Thunderstorm": {
+    "Thunderstorm": ""
+  },
+  "Thunderstorm with Hail": {
+    "Thunderstorm with Hail": ""
   },
   "Tiled": {
     "Tiled": ""
@@ -5250,6 +5346,9 @@
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Wibrująca paleta z zabawnym nasyceniem."
   },
+  "Videos": {
+    "Videos": ""
+  },
   "View Mode": {
     "View Mode": ""
   },
@@ -5433,7 +5532,7 @@
     "Workspace Index Numbers": "Numery indeksów obszarów roboczych"
   },
   "Workspace Names": {
-    "Workspace Names": ""
+    "Workspace Names": "Nazwy obszarów roboczych"
   },
   "Workspace Padding": {
     "Workspace Padding": "Dopełnienie Obszarów Roboczych"
@@ -5519,6 +5618,9 @@
   "border thickness": {
     "Thickness": ""
   },
+  "brandon": {
+    "brandon": ""
+  },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "Przeglądaj Motywy"
   },
@@ -5562,6 +5664,9 @@
   "custom theme file hint": {
     "Click to select a custom theme JSON file": "Kliknij by wybrać plik JSON niestandardowego motywu"
   },
+  "dark mode wallpaper color picker title": {
+    "Choose Dark Mode Color": ""
+  },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "Wybierz tapetę"
   },
@@ -5579,6 +5684,9 @@
   },
   "days": {
     "days": "dni"
+  },
+  "default monitor label suffix": {
+    "(Default)": ""
   },
   "dgop not available": {
     "dgop not available": "dgop niedostępne"
@@ -5845,6 +5953,9 @@
   "leave empty for default": {
     "leave empty for default": "pozostaw puste dla domyślnej wartości"
   },
+  "light mode wallpaper color picker title": {
+    "Choose Light Mode Color": ""
+  },
   "loading indicator": {
     "Loading...": "Ładowanie..."
   },
@@ -5904,6 +6015,9 @@
   "nav": {
     "nav": ""
   },
+  "neovim template description": {
+    "Requires lazy plugin manager": ""
+  },
   "network status": {
     "Connected": "",
     "Disabling WiFi...": "",
@@ -5917,6 +6031,9 @@
   "no custom theme file status": {
     "No custom theme file": "Brak niestandardowego pliku motywu"
   },
+  "no monitors available label": {
+    "No monitors": ""
+  },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "Motywy nie są zainstalowane. Przeglądaj by zainstalować motywy z rejestru."
   },
@@ -5928,7 +6045,7 @@
     "History": ""
   },
   "notification history filter": {
-    "All": "",
+    "All": "Wszystko",
     "Last hour": "",
     "Today": "",
     "Yesterday": ""
@@ -5937,23 +6054,23 @@
     "Older": ""
   },
   "notification history filter | notification history retention option": {
-    "30 days": "",
-    "7 days": ""
+    "30 days": "30 dni",
+    "7 days": "7 dni"
   },
   "notification history limit": {
     "Maximum number of notifications to keep": ""
   },
   "notification history retention option": {
-    "1 day": "",
-    "14 days": "",
-    "3 days": "",
+    "1 day": "1 dzień",
+    "14 days": "14 dni",
+    "3 days": "3 dni",
     "Forever": ""
   },
   "notification history retention settings label": {
     "History Retention": ""
   },
   "notification history setting": {
-    "Auto-delete notifications older than this": "",
+    "Auto-delete notifications older than this": "Automatyczne usuwanie powiadomień starszych niż",
     "Save critical priority notifications to history": "",
     "Save low priority notifications to history": "",
     "Save normal priority notifications to history": ""
@@ -5962,7 +6079,7 @@
     "Save dismissed notifications to history": ""
   },
   "notification history toggle label": {
-    "Enable History": ""
+    "Enable History": "Włącz historię"
   },
   "notification privacy mode placeholder": {
     "Message Content": ""
@@ -5996,6 +6113,24 @@
   },
   "official": {
     "official": "oficjalny"
+  },
+  "on Hyprland": {
+    "on Hyprland": ""
+  },
+  "on MangoWC": {
+    "on MangoWC": ""
+  },
+  "on Miracle WM": {
+    "on Miracle WM": ""
+  },
+  "on Niri": {
+    "on Niri": ""
+  },
+  "on Scroll": {
+    "on Scroll": ""
+  },
+  "on Sway": {
+    "on Sway": ""
   },
   "open": {
     "open": ""
@@ -6044,8 +6179,14 @@
   "profile image file browser title": {
     "Select Profile Image": "Wybierz obraz profilowy"
   },
+  "qt theme env error body": {
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+  },
+  "qt theme env error title": {
+    "Missing Environment Variables": ""
+  },
   "read-only settings warning for NixOS home-manager users": {
-    "Settings are read-only. Changes will not persist.": ""
+    "Settings are read-only. Changes will not persist.": "Ustawienia są tylko do odczytu. Zmiany nie zostaną zapisane."
   },
   "registry theme description": {
     "Color theme from DMS registry": "Motyw z rejestru DMS"
@@ -6101,6 +6242,12 @@
     "Kernel": "",
     "Load Average": ""
   },
+  "theme auto mode tab": {
+    "Location": ""
+  },
+  "theme auto mode tab | wallpaper cycling mode tab": {
+    "Time": ""
+  },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "Zainstaluj motywy z rejestru DMS"
   },
@@ -6141,6 +6288,9 @@
   "unknown author": {
     "Unknown": "Nieznany"
   },
+  "up": {
+    "up": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "zaktualizuj dms dla integracji z NM."
   },
@@ -6152,6 +6302,12 @@
   },
   "version requirement": {
     "Requires %1": ""
+  },
+  "wallpaper color picker title": {
+    "Choose Wallpaper Color": ""
+  },
+  "wallpaper cycling mode tab": {
+    "Interval": ""
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "Wybierz katalog z tapetami"
@@ -6170,6 +6326,34 @@
     "Tile": "",
     "Tile H": "",
     "Tile V": ""
+  },
+  "wallpaper interval": {
+    "1 hour": "",
+    "1 hour 30 minutes": "",
+    "1 minute": "",
+    "10 seconds": "",
+    "12 hours": "",
+    "15 minutes": "",
+    "15 seconds": "",
+    "2 hours": "",
+    "20 seconds": "",
+    "25 seconds": "",
+    "3 hours": "",
+    "30 minutes": "",
+    "30 seconds": "",
+    "35 seconds": "",
+    "4 hours": "",
+    "40 seconds": "",
+    "45 seconds": "",
+    "5 minutes": "",
+    "5 seconds": "",
+    "50 seconds": "",
+    "55 seconds": "",
+    "6 hours": "",
+    "8 hours": ""
+  },
+  "wallpaper not set label": {
+    "Not set": ""
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "Przetwarzanie tapety nie powiodło się"

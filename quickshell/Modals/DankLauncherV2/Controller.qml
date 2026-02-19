@@ -126,13 +126,6 @@ Item {
 
     readonly property var sectionDefinitions: [
         {
-            id: "calculator",
-            title: I18n.tr("Calculator"),
-            icon: "calculate",
-            priority: 0,
-            defaultViewMode: "list"
-        },
-        {
             id: "favorites",
             title: I18n.tr("Pinned"),
             icon: "push_pin",
@@ -681,12 +674,6 @@ Item {
             return;
         }
 
-        var calculatorResult = evaluateCalculator(searchQuery);
-        if (calculatorResult) {
-            calculatorResult._preScored = 12000;
-            allItems.push(calculatorResult);
-        }
-
         var apps = searchApps(searchQuery);
         for (var i = 0; i < apps.length; i++) {
             if (searchQuery)
@@ -929,13 +916,6 @@ Item {
 
     function transformFileResult(file) {
         return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"));
-    }
-
-    function evaluateCalculator(query) {
-        var calc = Utils.evaluateCalculator(query);
-        if (!calc)
-            return null;
-        return Transform.createCalculatorItem(calc, query, I18n.tr("Copy"));
     }
 
     function detectTrigger(query) {
@@ -1270,6 +1250,23 @@ Item {
         CacheData.saveLauncherCache(serializable);
     }
 
+    function _actionsFromDesktopEntry(appId) {
+        if (!appId)
+            return [];
+        var entry = DesktopEntries.heuristicLookup(appId);
+        if (!entry || !entry.actions || entry.actions.length === 0)
+            return [];
+        var result = [];
+        for (var i = 0; i < entry.actions.length; i++) {
+            result.push({
+                name: entry.actions[i].name,
+                icon: "play_arrow",
+                actionData: entry.actions[i]
+            });
+        }
+        return result;
+    }
+
     function _loadDiskCache() {
         var cached = CacheData.loadLauncherCache();
         if (!cached || !Array.isArray(cached) || cached.length === 0)
@@ -1297,8 +1294,12 @@ Item {
                     data: {
                         id: it.id
                     },
-                    actions: [],
-                    primaryAction: null,
+                    actions: _actionsFromDesktopEntry(it.id),
+                    primaryAction: it.type === "app" && !it.isCore ? {
+                        name: I18n.tr("Launch"),
+                        icon: "open_in_new",
+                        action: "launch"
+                    } : null,
                     _diskCached: true,
                     _hName: "",
                     _hSub: "",
@@ -1559,9 +1560,6 @@ Item {
         case "file":
             openFile(item.data?.path);
             break;
-        case "calculator":
-            copyToClipboard(item.name);
-            break;
         default:
             return;
         }
@@ -1616,25 +1614,41 @@ Item {
         itemExecuted();
     }
 
-    function launchApp(app) {
+    function _resolveDesktopEntry(app) {
         if (!app)
+            return null;
+        if (app.command)
+            return app;
+        var id = app.id || app.execString || app.exec || "";
+        if (!id)
+            return null;
+        return DesktopEntries.heuristicLookup(id);
+    }
+
+    function launchApp(app) {
+        var entry = _resolveDesktopEntry(app);
+        if (!entry)
             return;
-        SessionService.launchDesktopEntry(app);
-        AppUsageHistoryData.addAppUsage(app);
+        SessionService.launchDesktopEntry(entry);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function launchAppWithNvidia(app) {
-        if (!app)
+        var entry = _resolveDesktopEntry(app);
+        if (!entry)
             return;
-        SessionService.launchDesktopEntry(app, true);
-        AppUsageHistoryData.addAppUsage(app);
+        SessionService.launchDesktopEntry(entry, true);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function launchAppAction(actionItem) {
-        if (!actionItem || !actionItem.parentApp || !actionItem.actionData)
+        if (!actionItem || !actionItem.actionData)
             return;
-        SessionService.launchDesktopAction(actionItem.parentApp, actionItem.actionData);
-        AppUsageHistoryData.addAppUsage(actionItem.parentApp);
+        var entry = _resolveDesktopEntry(actionItem.parentApp);
+        if (!entry)
+            return;
+        SessionService.launchDesktopAction(entry, actionItem.actionData);
+        AppUsageHistoryData.addAppUsage(entry);
     }
 
     function openFile(path) {

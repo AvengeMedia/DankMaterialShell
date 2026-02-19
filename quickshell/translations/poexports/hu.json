@@ -104,17 +104,29 @@
   "2 minutes": {
     "2 minutes": "2 perc"
   },
+  "2 seconds": {
+    "2 seconds": ""
+  },
+  "20 minutes": {
+    "20 minutes": ""
+  },
   "24-Hour Format": {
     "24-Hour Format": "24 órás formátum"
   },
   "24-hour format": {
     "24-hour format": "24 órás formátum"
   },
+  "250 ms": {
+    "250 ms": ""
+  },
   "270°": {
     "270°": "270 fok"
   },
   "3 days": {
     "3 days": "3 nap"
+  },
+  "3 minutes": {
+    "3 minutes": ""
   },
   "3 seconds": {
     "3 seconds": "3 másodperc"
@@ -128,14 +140,23 @@
   "3rd party": {
     "3rd party": "Harmadik fél"
   },
+  "4 seconds": {
+    "4 seconds": ""
+  },
   "5 minutes": {
     "5 minutes": "5 perc"
   },
   "5 seconds": {
     "5 seconds": "5 másodperc"
   },
+  "500 ms": {
+    "500 ms": ""
+  },
   "7 days": {
     "7 days": "7 nap"
+  },
+  "750 ms": {
+    "750 ms": ""
   },
   "8 seconds": {
     "8 seconds": "8 másodperc"
@@ -148,6 +169,9 @@
   },
   "A file with this name already exists. Do you want to overwrite it?": {
     "A file with this name already exists. Do you want to overwrite it?": "Már létezik ilyen nevű fájl. Felül szeretnéd írni?"
+  },
+  "AC Power": {
+    "AC Power": ""
   },
   "API": {
     "API": "API"
@@ -357,7 +381,7 @@
     "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Egyedi megjelenített névvel, ikonnal vagy indítási beállításokkal rendelkező alkalmazások. Kattints jobb gombbal egy alkalmazásra, és válaszd az „Alkalmazás szerkesztése” lehetőséget a testreszabáshoz."
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": ""
+    "Apps with notification popups muted. Unmute or delete to remove.": "Alkalmazások elnémított értesítési felugró ablakokkal. A visszakapcsoláshoz oldd fel a némítást vagy töröld őket."
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Képernyő-elrendezés és a felbontás, frissítési frekvencia, valamint VRR beállítása"
@@ -563,7 +587,7 @@
     "Bar Transparency": "Sáv átlátszósága"
   },
   "Base duration for animations (drag to use Custom)": {
-    "Base duration for animations (drag to use Custom)": ""
+    "Base duration for animations (drag to use Custom)": "Animációk alapértelmezett időtartama (húzd az egyéni beállításhoz)"
   },
   "Battery": {
     "Battery": "Akkumulátor"
@@ -835,6 +859,9 @@
   "Clear History?": {
     "Clear History?": "Előzmények törlése?"
   },
+  "Clear Sky": {
+    "Clear Sky": ""
+  },
   "Clear all history when server starts": {
     "Clear all history when server starts": "Minden előzmény törlése a szerver indításakor"
   },
@@ -1082,7 +1109,7 @@
     "Control Center Tile Color": "Vezérlőközpont csempeszíne"
   },
   "Control animation duration for notification popups and history": {
-    "Control animation duration for notification popups and history": ""
+    "Control animation duration for notification popups and history": "Az értesítési felugró ablakok és az előzmények animációs időtartamának szabályozása"
   },
   "Control currently playing media": {
     "Control currently playing media": "Jelenleg játszott média vezérlése"
@@ -1175,7 +1202,7 @@
     "Create rules to mute, ignore, hide from history, or override notification priority.": "Szabályok létrehozása az értesítések némításához, mellőzéséhez, az előzményekből való elrejtéséhez vagy prioritásuk felülbírálásához."
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": ""
+    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Szabályokat hozhatsz létre a némításhoz, figyelmen kívül hagyáshoz, az előzményekből való elrejtéshez vagy az értesítések prioritásának felülbírálásához. Az alapértelmezett beállítás csak a prioritást bírálja felül; az értesítések továbbra is normálisan megjelennek."
   },
   "Creating...": {
     "Creating...": "Létrehozás…"
@@ -1387,6 +1414,9 @@
   "Description": {
     "Description": "Leírás"
   },
+  "Desktop": {
+    "Desktop": ""
+  },
   "Desktop Clock": {
     "Desktop Clock": "Asztali óra"
   },
@@ -1558,6 +1588,9 @@
   "Docs": {
     "Docs": "Dokumentumok"
   },
+  "Documents": {
+    "Documents": ""
+  },
   "Domain (optional)": {
     "Domain (optional)": "Tartomány (opcionális)"
   },
@@ -1569,6 +1602,9 @@
   },
   "Door Open": {
     "Door Open": "Ajtó nyitva"
+  },
+  "Downloads": {
+    "Downloads": ""
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Húzd az átrendezéshez"
@@ -1582,6 +1618,9 @@
   "Driver": {
     "Driver": "Illesztőprogram"
   },
+  "Drizzle": {
+    "Drizzle": ""
+  },
   "Duplicate": {
     "Duplicate": "Kettőzés"
   },
@@ -1589,7 +1628,7 @@
     "Duplicate Wallpaper with Blur": "Háttérkép megkettőzése elmosással"
   },
   "Duration": {
-    "Duration": ""
+    "Duration": "Időtartam"
   },
   "Dusk (Astronomical Twilight)": {
     "Dusk (Astronomical Twilight)": "Szürkület (csillagászati szürkület)"
@@ -2044,6 +2083,9 @@
   "Focused Window": {
     "Focused Window": "Fókuszált ablak"
   },
+  "Fog": {
+    "Fog": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Monitor fókuszának követése"
   },
@@ -2105,7 +2147,10 @@
     "Format Legend": "Formátum magyarázat"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/memória felszabadítása az indító bezárásakor. Az újranyitáskor némi késést okozhat."
+  },
+  "Freezing Drizzle": {
+    "Freezing Drizzle": ""
   },
   "Frequency": {
     "Frequency": "Frekvencia"
@@ -2212,6 +2257,15 @@
   "Health": {
     "Health": "Állapot"
   },
+  "Heavy Rain": {
+    "Heavy Rain": ""
+  },
+  "Heavy Snow": {
+    "Heavy Snow": ""
+  },
+  "Heavy Snow Showers": {
+    "Heavy Snow Showers": ""
+  },
   "Height": {
     "Height": "Magasság"
   },
@@ -2231,7 +2285,7 @@
     "Hidden": "Rejtett"
   },
   "Hidden (%1)": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Rejtett (%1)"
   },
   "Hidden Apps": {
     "Hidden Apps": "Rejtett alkalmazások"
@@ -2273,13 +2327,13 @@
     "Hide cursor when using touch input": "Kurzor elrejtése érintéses bevitel használatakor"
   },
   "Hide device": {
-    "Hide device": ""
+    "Hide device": "Eszköz elrejtése"
   },
   "Hide notification content until expanded": {
-    "Hide notification content until expanded": ""
+    "Hide notification content until expanded": "Értesítés tartalmának elrejtése a kibontásig"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
-    "Hide notification content until expanded; popups show collapsed by default": ""
+    "Hide notification content until expanded; popups show collapsed by default": "Értesítés tartalmának elrejtése a kibontásig; a felugró ablakok alapértelmezés szerint összecsukva jelennek meg"
   },
   "Hide on Touch": {
     "Hide on Touch": "Elrejtés érintéskor"
@@ -2310,6 +2364,9 @@
   },
   "Hold to confirm (%1s)": {
     "Hold to confirm (%1s)": "Tartsd lenyomva a megerősítéshez (%1mp)"
+  },
+  "Home": {
+    "Home": ""
   },
   "Hot Corners": {
     "Hot Corners": "Aktív sarkok"
@@ -2758,6 +2815,15 @@
   "Light Mode": {
     "Light Mode": "Világos mód"
   },
+  "Light Rain": {
+    "Light Rain": ""
+  },
+  "Light Snow": {
+    "Light Snow": ""
+  },
+  "Light Snow Showers": {
+    "Light Snow Showers": ""
+  },
   "Linear": {
     "Linear": "Lineáris"
   },
@@ -3103,11 +3169,14 @@
   "Moving to Paused": {
     "Moving to Paused": "Szüneteltetésre váltás"
   },
+  "Music": {
+    "Music": ""
+  },
   "Mute popups for %1": {
-    "Mute popups for %1": ""
+    "Mute popups for %1": "Felugró ablakok némítása ehhez: %1"
   },
   "Muted Apps": {
-    "Muted Apps": ""
+    "Muted Apps": "Némított alkalmazások"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Visszafogott paletta, tompa, nyugtató tónusokkal."
@@ -3260,7 +3329,7 @@
     "No apps have been launched yet.": "Még nem indult el alkalmazás."
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": ""
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Nincsenek némított alkalmazások. Kattints jobb gombbal egy értesítésre, és válaszd a „Felugró ablakok némítása” lehetőséget a hozzáadáshoz."
   },
   "No battery": {
     "No battery": "Nincs akkumulátor"
@@ -3520,6 +3589,9 @@
   "Outputs Include Missing": {
     "Outputs Include Missing": "Az outputs include bejegyzés hiányzik"
   },
+  "Overcast": {
+    "Overcast": ""
+  },
   "Overflow": {
     "Overflow": "Túlcsordulás"
   },
@@ -3576,6 +3648,9 @@
   },
   "Pairing...": {
     "Pairing...": "Párosítás…"
+  },
+  "Partly Cloudy": {
+    "Partly Cloudy": ""
   },
   "Passkey:": {
     "Passkey:": "Jelszó:"
@@ -3684,6 +3759,9 @@
   "Phone Connect unavailable status": {
     "Unavailable": "Nem elérhető"
   },
+  "Pictures": {
+    "Pictures": ""
+  },
   "Pin": {
     "Pin": "Rögzítés"
   },
@@ -3754,7 +3832,7 @@
     "Popup Position": "Felugró ablak pozíciója"
   },
   "Popup Shadow": {
-    "Popup Shadow": ""
+    "Popup Shadow": "Felugró ablak árnyéka"
   },
   "Popup Transparency": {
     "Popup Transparency": "Felugró ablak átlátszósága"
@@ -3865,7 +3943,7 @@
     "Privacy Indicator": "Adatvédelmi jelző"
   },
   "Privacy Mode": {
-    "Privacy Mode": ""
+    "Privacy Mode": "Adatvédelmi mód"
   },
   "Private Key Password": {
     "Private Key Password": "Titkos kulcs jelszava"
@@ -3909,6 +3987,9 @@
   "Protocol": {
     "Protocol": "Protokoll"
   },
+  "Quick Access": {
+    "Quick Access": ""
+  },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Gyors hozzáférés az alkalmazásindítóhoz"
   },
@@ -3926,6 +4007,9 @@
   },
   "Radius": {
     "Radius": "Sugár"
+  },
+  "Rain": {
+    "Rain": ""
   },
   "Rain Chance": {
     "Rain Chance": "Esély esőre"
@@ -4324,7 +4408,7 @@
     "Set key and action to save": "Állítsd be a billentyűt és a műveletet a mentéshez"
   },
   "Set notification rules": {
-    "Set notification rules": ""
+    "Set notification rules": "Értesítési szabályok beállítása"
   },
   "Setup": {
     "Setup": "Beállítás"
@@ -4498,13 +4582,13 @@
     "Show darkened overlay behind modal dialogs": "Sötétített átfedés megjelenítése a modális párbeszédablakok mögött"
   },
   "Show device": {
-    "Show device": ""
+    "Show device": "Eszköz megjelenítése"
   },
   "Show dock when floating windows don't overlap its area": {
     "Show dock when floating windows don't overlap its area": "Dokk megjelenítése, ha a lebegő ablakok nem takarják el a területét"
   },
   "Show drop shadow on notification popups": {
-    "Show drop shadow on notification popups": ""
+    "Show drop shadow on notification popups": "Árnyék megjelenítése az értesítési felugró ablakokon"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Indító átfedés megjelenítése, amikor gépelsz a Niri-áttekintésben. Kapcsold ki, ha másik indítót használsz."
@@ -4626,6 +4710,9 @@
   "Snap": {
     "Snap": "Illesztés"
   },
+  "Snow": {
+    "Snow": ""
+  },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Néhány bővítmény a DMS újabb verzióját igényli:"
   },
@@ -4721,6 +4808,9 @@
   },
   "Suspend system after": {
     "Suspend system after": "Felfüggesztés ennyi idő után"
+  },
+  "Suspend then Hibernate": {
+    "Suspend then Hibernate": ""
   },
   "Swap": {
     "Swap": "Csere"
@@ -4859,6 +4949,12 @@
   },
   "This will permanently remove this saved clipboard item. This action cannot be undone.": {
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "Ez véglegesen eltávolítja ezt a mentett vágólapelemet. A művelet nem vonható vissza."
+  },
+  "Thunderstorm": {
+    "Thunderstorm": ""
+  },
+  "Thunderstorm with Hail": {
+    "Thunderstorm with Hail": ""
   },
   "Tiled": {
     "Tiled": "Csempézett"
@@ -5044,13 +5140,13 @@
     "Unknown Title": "Ismeretlen cím"
   },
   "Unload on Close": {
-    "Unload on Close": ""
+    "Unload on Close": "Kiürítés bezáráskor"
   },
   "Unmute": {
-    "Unmute": ""
+    "Unmute": "Némítás feloldása"
   },
   "Unmute popups for %1": {
-    "Unmute popups for %1": ""
+    "Unmute popups for %1": "Felugró ablakok némításának feloldása ehhez: %1"
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Névtelen szabály"
@@ -5249,6 +5345,9 @@
   },
   "Vibrant palette with playful saturation.": {
     "Vibrant palette with playful saturation.": "Élénk paletta játékos telítettséggel."
+  },
+  "Videos": {
+    "Videos": ""
   },
   "View Mode": {
     "View Mode": "Nézetmód"
@@ -5519,6 +5618,9 @@
   "border thickness": {
     "Thickness": "Vastagság"
   },
+  "brandon": {
+    "brandon": ""
+  },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "Témák böngészése"
   },
@@ -5548,7 +5650,7 @@
     "Active tile background and icon color": "Aktív csempe háttér- és ikonszíne"
   },
   "count of hidden audio devices": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Rejtett (%1)"
   },
   "current theme label": {
     "Current Theme: %1": "Jelenlegi téma: %1"
@@ -5561,6 +5663,9 @@
   },
   "custom theme file hint": {
     "Click to select a custom theme JSON file": "Kattints egy egyéni téma JSON fájl kiválasztásához"
+  },
+  "dark mode wallpaper color picker title": {
+    "Choose Dark Mode Color": ""
   },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "Háttérkép kiválasztása"
@@ -5579,6 +5684,9 @@
   },
   "days": {
     "days": "nap"
+  },
+  "default monitor label suffix": {
+    "(Default)": ""
   },
   "dgop not available": {
     "dgop not available": "dgop nem elérhető"
@@ -5845,6 +5953,9 @@
   "leave empty for default": {
     "leave empty for default": "hagyd üresen az alapértelmezéshez"
   },
+  "light mode wallpaper color picker title": {
+    "Choose Light Mode Color": ""
+  },
   "loading indicator": {
     "Loading...": "Betöltés…"
   },
@@ -5904,6 +6015,9 @@
   "nav": {
     "nav": "navigáció"
   },
+  "neovim template description": {
+    "Requires lazy plugin manager": ""
+  },
   "network status": {
     "Connected": "Csatlakoztatva",
     "Disabling WiFi...": "Wi-Fi kikapcsolása...",
@@ -5916,6 +6030,9 @@
   },
   "no custom theme file status": {
     "No custom theme file": "Nincs egyéni témafájl"
+  },
+  "no monitors available label": {
+    "No monitors": ""
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "Nincsenek telepített témák. Böngéssz a regiszterben a telepíthető témákért."
@@ -5965,7 +6082,7 @@
     "Enable History": "Előzmények engedélyezése"
   },
   "notification privacy mode placeholder": {
-    "Message Content": ""
+    "Message Content": "Üzenet tartalma"
   },
   "notification rule action option": {
     "Ignore Completely": "Teljes mellőzés",
@@ -5996,6 +6113,24 @@
   },
   "official": {
     "official": "hivatalos"
+  },
+  "on Hyprland": {
+    "on Hyprland": ""
+  },
+  "on MangoWC": {
+    "on MangoWC": ""
+  },
+  "on Miracle WM": {
+    "on Miracle WM": ""
+  },
+  "on Niri": {
+    "on Niri": ""
+  },
+  "on Scroll": {
+    "on Scroll": ""
+  },
+  "on Sway": {
+    "on Sway": ""
   },
   "open": {
     "open": "megnyitás"
@@ -6043,6 +6178,12 @@
   },
   "profile image file browser title": {
     "Select Profile Image": "Profilkép kiválasztása"
+  },
+  "qt theme env error body": {
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+  },
+  "qt theme env error title": {
+    "Missing Environment Variables": ""
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "A beállítások csak olvashatók. A módosítások nem fognak megmaradni."
@@ -6101,6 +6242,12 @@
     "Kernel": "Rendszermag",
     "Load Average": "Átlagos terhelés"
   },
+  "theme auto mode tab": {
+    "Location": ""
+  },
+  "theme auto mode tab | wallpaper cycling mode tab": {
+    "Time": ""
+  },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "Színtémák telepítése a DMS téma-regiszterből"
   },
@@ -6120,7 +6267,7 @@
     "Search themes...": "Témák keresése…"
   },
   "this app": {
-    "this app": ""
+    "this app": "ez az alkalmazás"
   },
   "tile color option": {
     "Primary Container": "Elsődleges tároló",
@@ -6141,6 +6288,9 @@
   "unknown author": {
     "Unknown": "Ismeretlen"
   },
+  "up": {
+    "up": ""
+  },
   "update dms for NM integration.": {
     "update dms for NM integration.": "dms frissítése a NM integrációhoz."
   },
@@ -6152,6 +6302,12 @@
   },
   "version requirement": {
     "Requires %1": "%1 szükséges"
+  },
+  "wallpaper color picker title": {
+    "Choose Wallpaper Color": ""
+  },
+  "wallpaper cycling mode tab": {
+    "Interval": ""
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "Háttérkép könyvtár kiválasztása"
@@ -6170,6 +6326,34 @@
     "Tile": "Mozaik",
     "Tile H": "Vízszintes mozaik",
     "Tile V": "Függőleges mozaik"
+  },
+  "wallpaper interval": {
+    "1 hour": "",
+    "1 hour 30 minutes": "",
+    "1 minute": "",
+    "10 seconds": "",
+    "12 hours": "",
+    "15 minutes": "",
+    "15 seconds": "",
+    "2 hours": "",
+    "20 seconds": "",
+    "25 seconds": "",
+    "3 hours": "",
+    "30 minutes": "",
+    "30 seconds": "",
+    "35 seconds": "",
+    "4 hours": "",
+    "40 seconds": "",
+    "45 seconds": "",
+    "5 minutes": "",
+    "5 seconds": "",
+    "50 seconds": "",
+    "55 seconds": "",
+    "6 hours": "",
+    "8 hours": ""
+  },
+  "wallpaper not set label": {
+    "Not set": ""
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "A háttérkép feldolgozása sikertelen"

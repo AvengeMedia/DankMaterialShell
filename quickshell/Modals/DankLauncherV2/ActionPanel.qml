@@ -56,17 +56,17 @@ Rectangle {
         case "app":
             if (selectedItem?.isCore)
                 break;
-            if (selectedItem?.actions) {
-                for (var i = 0; i < selectedItem.actions.length; i++) {
-                    result.push(selectedItem.actions[i]);
-                }
-            }
             if (SessionService.nvidiaCommand) {
                 result.push({
                     name: I18n.tr("Launch on dGPU"),
                     icon: "memory",
                     action: "launch_dgpu"
                 });
+            }
+            if (selectedItem?.actions) {
+                for (var i = 0; i < selectedItem.actions.length; i++) {
+                    result.push(selectedItem.actions[i]);
+                }
             }
             break;
         }

@@ -3614,15 +3614,20 @@
     "keywords": [
       "appearance",
       "colors",
+      "lazy",
       "look",
+      "manager",
       "matugen",
       "neovim",
+      "plugin",
+      "requires",
       "scheme",
       "style",
       "template",
       "terminal",
       "theme"
-    ]
+    ],
+    "description": "Requires lazy plugin manager"
   },
   {
     "section": "matugenTemplateNiri",

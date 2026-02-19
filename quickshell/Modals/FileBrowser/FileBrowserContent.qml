@@ -238,37 +238,37 @@ FocusScope {
 
     property var quickAccessLocations: [
         {
-            "name": "Home",
+            "name": I18n.tr("Home"),
             "path": homeDir,
             "icon": "home"
         },
         {
-            "name": "Documents",
+            "name": I18n.tr("Documents"),
             "path": docsDir,
             "icon": "description"
         },
         {
-            "name": "Downloads",
+            "name": I18n.tr("Downloads"),
             "path": downloadDir,
             "icon": "download"
         },
         {
-            "name": "Pictures",
+            "name": I18n.tr("Pictures"),
             "path": picsDir,
             "icon": "image"
         },
         {
-            "name": "Music",
+            "name": I18n.tr("Music"),
             "path": musicDir,
             "icon": "music_note"
         },
         {
-            "name": "Videos",
+            "name": I18n.tr("Videos"),
             "path": videosDir,
             "icon": "movie"
         },
         {
-            "name": "Desktop",
+            "name": I18n.tr("Desktop"),
             "path": desktopDir,
             "icon": "computer"
         }
