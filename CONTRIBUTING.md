@@ -22,7 +22,7 @@ nix develop
 
 This will provide:
 
-- Go 1.24 toolchain (go, gopls, delve, go-tools) and GNU Make
+- Go 1.25+ toolchain (go, gopls, delve, go-tools) and GNU Make
 - Quickshell and required QML packages
 - Properly configured QML2_IMPORT_PATH
 

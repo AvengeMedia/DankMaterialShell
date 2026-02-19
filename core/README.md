@@ -96,7 +96,7 @@ The on-screen preview displays the selected format. JSON output includes hex, RG
 
 ## Building
 
-Requires Go 1.24+
+Requires Go 1.25+
 
 **Development build:**
 
