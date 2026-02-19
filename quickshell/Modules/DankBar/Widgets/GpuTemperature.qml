@@ -167,13 +167,6 @@ BasePill {
                     width: implicitWidth
                     height: implicitHeight
 
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
                     StyledTextMetrics {
                         id: gpuTempBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)

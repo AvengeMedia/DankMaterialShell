@@ -288,9 +288,9 @@ Singleton {
             const cpu = data.cpu;
             cpuSampleCount++;
 
-            cpuUsage = cpu.usage || 0;
-            cpuFrequency = cpu.frequency || 0;
-            cpuTemperature = cpu.temperature || 0;
+            cpuUsage = Math.round((cpu.usage || 0) * 10) / 10;
+            cpuFrequency = Math.round(cpu.frequency || 0);
+            cpuTemperature = Math.round(cpu.temperature || 0);
             cpuCores = cpu.count || 1;
             cpuModel = cpu.model || "";
             perCoreCpuUsage = cpu.coreUsage || [];
@@ -308,11 +308,12 @@ Singleton {
             const freeKB = mem.free || 0;
             const usedKB = mem.used !== undefined ? mem.used : (totalKB - availableKB);
 
-            totalMemoryMB = totalKB / 1024;
-            availableMemoryMB = availableKB / 1024;
-            freeMemoryMB = freeKB / 1024;
-            usedMemoryMB = usedKB / 1024;
-            memoryUsage = mem.usedPercent !== undefined ? mem.usedPercent : (totalKB > 0 ? ((totalKB - availableKB) / totalKB) * 100 : 0);
+            totalMemoryMB = Math.round(totalKB / 1024);
+            availableMemoryMB = Math.round(availableKB / 1024);
+            freeMemoryMB = Math.round(freeKB / 1024);
+            usedMemoryMB = Math.round(usedKB / 1024);
+            const rawMemUsage = mem.usedPercent !== undefined ? mem.usedPercent : (totalKB > 0 ? ((totalKB - availableKB) / totalKB) * 100 : 0);
+            memoryUsage = Math.round(rawMemUsage * 10) / 10;
 
             totalMemoryKB = totalKB;
             usedMemoryKB = usedKB;

@@ -181,7 +181,7 @@
             buildInputs =
               with pkgs;
               [
-                go_1_24
+                go_1_25
                 gopls
                 delve
                 go-tools
@@ -189,6 +189,7 @@
 
                 prek
                 uv # for prek
+                shellcheck
 
                 # Nix development tools
                 nixd

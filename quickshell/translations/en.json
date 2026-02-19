@@ -1514,7 +1514,7 @@
   {
     "term": "Bottom Section",
     "context": "Bottom Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1005",
+    "reference": "Modules/Settings/WidgetsTab.qml:1006",
     "comment": ""
   },
   {
@@ -1550,7 +1550,7 @@
   {
     "term": "Browse",
     "context": "theme category option",
-    "reference": "Modals/DankLauncherV2/Controller.qml:144, Modals/DankLauncherV2/Controller.qml:1039, Modules/Settings/ThemeColorsTab.qml:272, Modules/Settings/PluginsTab.qml:209",
+    "reference": "Modals/DankLauncherV2/Controller.qml:144, Modals/DankLauncherV2/Controller.qml:1042, Modules/Settings/ThemeColorsTab.qml:272, Modules/Settings/PluginsTab.qml:209",
     "comment": ""
   },
   {
@@ -1704,9 +1704,15 @@
     "comment": ""
   },
   {
+    "term": "Caps Lock is on",
+    "context": "Caps Lock is on",
+    "reference": "Modules/Lock/LockScreenContent.qml:1068",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "context": "Center Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:947",
+    "reference": "Modules/Settings/WidgetsTab.qml:948",
     "comment": ""
   },
   {
@@ -2054,7 +2060,7 @@
   {
     "term": "Close All Windows",
     "context": "Close All Windows",
-    "reference": "Modules/DankBar/Widgets/AppsDockContextMenu.qml:445",
+    "reference": "Modules/Dock/DockContextMenu.qml:537, Modules/DankBar/Widgets/AppsDockContextMenu.qml:445",
     "comment": ""
   },
   {
@@ -2066,7 +2072,7 @@
   {
     "term": "Close Window",
     "context": "Close Window",
-    "reference": "dms-plugins/DankHyprlandWindows/DankHyprlandWindows.qml:141, Modules/DankBar/Widgets/AppsDockContextMenu.qml:447",
+    "reference": "dms-plugins/DankHyprlandWindows/DankHyprlandWindows.qml:141, Modules/Dock/DockContextMenu.qml:537, Modules/DankBar/Widgets/AppsDockContextMenu.qml:447",
     "comment": ""
   },
   {
@@ -2570,7 +2576,7 @@
   {
     "term": "Copy path",
     "context": "Copy path",
-    "reference": "Modals/DankLauncherV2/Controller.qml:918",
+    "reference": "Modals/DankLauncherV2/Controller.qml:921",
     "comment": ""
   },
   {
@@ -3530,7 +3536,7 @@
   {
     "term": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
     "context": "Drag widgets to reorder within sections. Use the eye icon to hide/show widgets (maintains spacing), or X to remove them completely.",
-    "reference": "Modules/Settings/WidgetsTab.qml:866",
+    "reference": "Modules/Settings/WidgetsTab.qml:867",
     "comment": ""
   },
   {
@@ -4454,7 +4460,7 @@
   {
     "term": "Files",
     "context": "Files",
-    "reference": "Modals/DankLauncherV2/Controller.qml:151, Modals/DankLauncherV2/Controller.qml:853, Modals/DankLauncherV2/LauncherContent.qml:317",
+    "reference": "Modals/DankLauncherV2/Controller.qml:151, Modals/DankLauncherV2/Controller.qml:856, Modals/DankLauncherV2/LauncherContent.qml:317",
     "comment": ""
   },
   {
@@ -5768,7 +5774,7 @@
   {
     "term": "Launch",
     "context": "Launch",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:906",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:154, Modals/DankLauncherV2/Controller.qml:909, Modals/DankLauncherV2/Controller.qml:1302",
     "comment": ""
   },
   {
@@ -5780,7 +5786,7 @@
   {
     "term": "Launch on dGPU",
     "context": "Launch on dGPU",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:146, Modals/DankLauncherV2/ActionPanel.qml:66, Modules/Dock/DockContextMenu.qml:457, Modules/DankBar/Widgets/AppsDockContextMenu.qml:401",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:146, Modals/DankLauncherV2/ActionPanel.qml:61, Modules/Dock/DockContextMenu.qml:482, Modules/DankBar/Widgets/AppsDockContextMenu.qml:401",
     "comment": ""
   },
   {
@@ -5828,7 +5834,7 @@
   {
     "term": "Left Section",
     "context": "Left Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:889",
+    "reference": "Modules/Settings/WidgetsTab.qml:890",
     "comment": ""
   },
   {
@@ -6440,7 +6446,7 @@
   {
     "term": "Middle Section",
     "context": "Middle Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:947",
+    "reference": "Modules/Settings/WidgetsTab.qml:948",
     "comment": ""
   },
   {
@@ -7244,7 +7250,7 @@
   {
     "term": "No trigger",
     "context": "No trigger",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1041, Modules/Settings/LauncherTab.qml:742",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1044, Modules/Settings/LauncherTab.qml:742",
     "comment": ""
   },
   {
@@ -7562,7 +7568,7 @@
   {
     "term": "Open",
     "context": "Open",
-    "reference": "Modals/DankLauncherV2/Controller.qml:910, Modals/DankLauncherV2/Controller.qml:914, Modals/DankLauncherV2/Controller.qml:918, Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1199, Modules/Settings/NetworkTab.qml:1437, Modules/ControlCenter/Details/NetworkDetail.qml:609",
+    "reference": "Modals/DankLauncherV2/Controller.qml:913, Modals/DankLauncherV2/Controller.qml:917, Modals/DankLauncherV2/Controller.qml:921, Modules/Notepad/NotepadTextEditor.qml:779, Modules/Settings/NetworkTab.qml:1199, Modules/Settings/NetworkTab.qml:1437, Modules/ControlCenter/Details/NetworkDetail.qml:609",
     "comment": ""
   },
   {
@@ -7592,7 +7598,7 @@
   {
     "term": "Open folder",
     "context": "Open folder",
-    "reference": "Modals/DankLauncherV2/Controller.qml:918",
+    "reference": "Modals/DankLauncherV2/Controller.qml:921",
     "comment": ""
   },
   {
@@ -8000,7 +8006,7 @@
   {
     "term": "Pin to Dock",
     "context": "Pin to Dock",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:103, Modules/Dock/DockContextMenu.qml:397, Modules/DankBar/Widgets/AppsDockContextMenu.qml:341",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:103, Modules/Dock/DockContextMenu.qml:409, Modules/DankBar/Widgets/AppsDockContextMenu.qml:341",
     "comment": ""
   },
   {
@@ -8288,7 +8294,7 @@
   {
     "term": "Precip",
     "context": "Precip",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:437",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:441",
     "comment": ""
   },
   {
@@ -8336,7 +8342,7 @@
   {
     "term": "Pressure",
     "context": "Pressure",
-    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:449, Modules/DankDash/WeatherTab.qml:94, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:980",
+    "reference": "dms-plugins/DankDesktopWeather/DankDesktopWeather.qml:453, Modules/DankDash/WeatherTab.qml:94, Modules/DankDash/WeatherForecastCard.qml:90, Modules/Settings/TimeWeatherTab.qml:980",
     "comment": ""
   },
   {
@@ -8774,7 +8780,7 @@
   {
     "term": "Reset",
     "context": "Reset",
-    "reference": "Modals/DankLauncherV2/LauncherContent.qml:815, Modules/Settings/WidgetsTab.qml:835, Modules/ControlCenter/Components/EditControls.qml:232",
+    "reference": "Modals/DankLauncherV2/LauncherContent.qml:815, Modules/Settings/WidgetsTab.qml:836, Modules/ControlCenter/Components/EditControls.qml:232",
     "comment": ""
   },
   {
@@ -8870,7 +8876,7 @@
   {
     "term": "Right Section",
     "context": "Right Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:1005",
+    "reference": "Modules/Settings/WidgetsTab.qml:1006",
     "comment": ""
   },
   {
@@ -9290,7 +9296,7 @@
   {
     "term": "Select",
     "context": "Select",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1174",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1177",
     "comment": ""
   },
   {
@@ -10994,7 +11000,7 @@
   {
     "term": "Top Section",
     "context": "Top Section",
-    "reference": "Modules/Settings/WidgetsTab.qml:889",
+    "reference": "Modules/Settings/WidgetsTab.qml:890",
     "comment": ""
   },
   {
@@ -11048,7 +11054,7 @@
   {
     "term": "Trigger: %1",
     "context": "Trigger: %1",
-    "reference": "Modals/DankLauncherV2/Controller.qml:1040, Modules/Settings/LauncherTab.qml:742",
+    "reference": "Modals/DankLauncherV2/Controller.qml:1043, Modules/Settings/LauncherTab.qml:742",
     "comment": ""
   },
   {
@@ -11258,7 +11264,7 @@
   {
     "term": "Unpin from Dock",
     "context": "Unpin from Dock",
-    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:103, Modules/Dock/DockContextMenu.qml:397, Modules/DankBar/Widgets/AppsDockContextMenu.qml:341",
+    "reference": "Modals/DankLauncherV2/LauncherContextMenu.qml:103, Modules/Dock/DockContextMenu.qml:409, Modules/DankBar/Widgets/AppsDockContextMenu.qml:341",
     "comment": ""
   },
   {
@@ -12453,6 +12459,12 @@
     "term": "• yyyy - Year (2024)",
     "context": "• yyyy - Year (2024)",
     "reference": "Modules/Settings/TimeWeatherTab.qml:326",
+    "comment": ""
+  },
+  {
+    "term": "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text",
+    "context": "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text",
+    "reference": "Modules/Notifications/Center/NotificationKeyboardHints.qml:26",
     "comment": ""
   },
   {

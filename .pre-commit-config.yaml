@@ -5,11 +5,13 @@ repos:
       - id: trailing-whitespace
       - id: check-yaml
       - id: end-of-file-fixer
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+  - repo: local
     hooks:
       - id: shellcheck
-        args: [-e, SC2164, -e, SC2001, -e, SC2012, -e, SC2317]
+        name: shellcheck
+        entry: shellcheck -e SC2164 -e SC2001 -e SC2012 -e SC2317
+        language: system
+        types: [shell]
   - repo: local
     hooks:
       - id: go-mod-tidy
