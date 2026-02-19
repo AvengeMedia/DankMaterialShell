@@ -23,7 +23,7 @@ Rectangle {
         spacing: 2
 
         StyledText {
-            text: "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text"
+            text: I18n.tr("↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text")
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.surfaceText
             width: parent.width

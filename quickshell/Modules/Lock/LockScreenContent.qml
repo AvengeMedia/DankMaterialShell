@@ -1065,7 +1065,7 @@ Item {
             }
 
             StyledText {
-                text: "Caps Lock is on"
+                text: I18n.tr("Caps Lock is on")
                 font.pixelSize: Theme.fontSizeSmall
                 color: Theme.error
                 anchors.verticalCenter: parent.verticalCenter
