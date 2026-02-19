@@ -769,6 +769,9 @@
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "Caps Lock-indicator"
   },
+  "Caps Lock is on": {
+    "Caps Lock is on": ""
+  },
   "Center Section": {
     "Center Section": "Middensectie"
   },
@@ -6429,5 +6432,8 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - Jaar (2024)"
+  },
+  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
   }
 }

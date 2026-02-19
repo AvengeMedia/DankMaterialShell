@@ -105,10 +105,10 @@
     "2 minutes": "2 perc"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 másodperc"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 perc"
   },
   "24-Hour Format": {
     "24-Hour Format": "24 órás formátum"
@@ -117,7 +117,7 @@
     "24-hour format": "24 órás formátum"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250 ms"
   },
   "270°": {
     "270°": "270 fok"
@@ -126,7 +126,7 @@
     "3 days": "3 nap"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 perc"
   },
   "3 seconds": {
     "3 seconds": "3 másodperc"
@@ -141,7 +141,7 @@
     "3rd party": "Harmadik fél"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 másodperc"
   },
   "5 minutes": {
     "5 minutes": "5 perc"
@@ -150,13 +150,13 @@
     "5 seconds": "5 másodperc"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500 ms"
   },
   "7 days": {
     "7 days": "7 nap"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750 ms"
   },
   "8 seconds": {
     "8 seconds": "8 másodperc"
@@ -768,6 +768,9 @@
   },
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "Caps Lock jelző"
+  },
+  "Caps Lock is on": {
+    "Caps Lock is on": ""
   },
   "Center Section": {
     "Center Section": "Középső rész"
@@ -5686,7 +5689,7 @@
     "days": "nap"
   },
   "default monitor label suffix": {
-    "(Default)": ""
+    "(Default)": "(Alapértelmezett)"
   },
   "dgop not available": {
     "dgop not available": "dgop nem elérhető"
@@ -6328,29 +6331,29 @@
     "Tile V": "Függőleges mozaik"
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "1 óra",
+    "1 hour 30 minutes": "1 óra 30 perc",
+    "1 minute": "1 perc",
+    "10 seconds": "10 másodperc",
+    "12 hours": "12 óra",
+    "15 minutes": "15 perc",
+    "15 seconds": "15 másodperc",
+    "2 hours": "2 óra",
+    "20 seconds": "20 másodperc",
+    "25 seconds": "25 másodperc",
+    "3 hours": "3 óra",
+    "30 minutes": "30 perc",
+    "30 seconds": "30 másodperc",
+    "35 seconds": "35 másodperc",
+    "4 hours": "4 óra",
+    "40 seconds": "40 másodperc",
+    "45 seconds": "45 másodperc",
+    "5 minutes": "5 perc",
+    "5 seconds": "5 másodperc",
+    "50 seconds": "50 másodperc",
+    "55 seconds": "55 másodperc",
+    "6 hours": "6 óra",
+    "8 hours": "8 óra"
   },
   "wallpaper not set label": {
     "Not set": ""
@@ -6429,5 +6432,8 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - Év (2024)"
+  },
+  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
   }
 }

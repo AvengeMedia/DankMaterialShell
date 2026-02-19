@@ -769,6 +769,9 @@
   "Caps Lock Indicator": {
     "Caps Lock Indicator": "Wskaźnik caps locka"
   },
+  "Caps Lock is on": {
+    "Caps Lock is on": ""
+  },
   "Center Section": {
     "Center Section": "Sekcja środkowa"
   },
@@ -6429,5 +6432,8 @@
   },
   "• yyyy - Year (2024)": {
     "• yyyy - Year (2024)": "• yyyy - Rok (2024)"
+  },
+  "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
   }
 }
