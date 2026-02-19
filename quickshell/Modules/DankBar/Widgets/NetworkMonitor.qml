@@ -110,13 +110,6 @@ BasePill {
                         }
 
                         width: Math.max(rxBaseline.width, paintedWidth)
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 120
-                                easing.type: Easing.OutCubic
-                            }
-                        }
                     }
                 }
 
@@ -146,13 +139,6 @@ BasePill {
                         }
 
                         width: Math.max(txBaseline.width, paintedWidth)
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 120
-                                easing.type: Easing.OutCubic
-                            }
-                        }
                     }
                 }
             }
