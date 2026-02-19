@@ -684,12 +684,15 @@ Item {
         if (searchMode === "all") {
             if (searchQuery && searchQuery.length >= 2) {
                 _pluginPhasePending = true;
-                _pluginPhaseForceFirst = shouldResetSelection;
-                _phase1Items = allItems;
+                _phase1Items = allItems.slice();
                 pluginPhaseTimer.restart();
-                isSearching = true;
-                searchCompleted();
-                return;
+                if (allItems.length === 0) {
+                    _pluginPhaseForceFirst = shouldResetSelection;
+                    isSearching = true;
+                    searchCompleted();
+                    return;
+                }
+                _pluginPhaseForceFirst = false;
             } else if (!searchQuery) {
                 var emptyTriggerOrdered = getEmptyTriggerPluginsOrdered();
                 for (var i = 0; i < emptyTriggerOrdered.length; i++) {

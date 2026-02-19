@@ -242,7 +242,7 @@ Variants {
             Image {
                 id: nextWallpaper
                 anchors.fill: parent
-                visible: true
+                visible: source !== ""
                 opacity: 0
                 layer.enabled: false
                 asynchronous: true
@@ -512,14 +512,18 @@ Variants {
                 }
             }
 
-            MultiEffect {
+            Loader {
                 anchors.fill: parent
-                source: effectLoader.active ? effectLoader.item : currentWallpaper
-                visible: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
-                blurEnabled: true
-                blur: 0.8
-                blurMax: 75
-                autoPaddingEnabled: false
+                active: CompositorService.isNiri && SettingsData.blurWallpaperOnOverview && NiriService.inOverview && currentWallpaper.source !== ""
+
+                sourceComponent: MultiEffect {
+                    anchors.fill: parent
+                    source: effectLoader.active ? effectLoader.item : currentWallpaper
+                    blurEnabled: true
+                    blur: 0.8
+                    blurMax: 75
+                    autoPaddingEnabled: false
+                }
             }
         }
     }

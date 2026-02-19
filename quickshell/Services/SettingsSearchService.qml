@@ -16,6 +16,7 @@ Singleton {
     property var registeredCards: ({})
     property var settingsIndex: []
     property bool indexLoaded: false
+    property var _translatedCache: []
 
     readonly property var conditionMap: ({
             "isNiri": () => CompositorService.isNiri,
@@ -38,9 +39,11 @@ Singleton {
             try {
                 root.settingsIndex = JSON.parse(text());
                 root.indexLoaded = true;
+                root._rebuildTranslationCache();
             } catch (e) {
                 console.warn("SettingsSearchService: Failed to parse index:", e);
                 root.settingsIndex = [];
+                root._translatedCache = [];
             }
         }
         onLoadFailed: error => console.warn("SettingsSearchService: Failed to load index:", error)
@@ -131,6 +134,27 @@ Singleton {
         };
     }
 
+    function _rebuildTranslationCache() {
+        var cache = [];
+        for (var i = 0; i < settingsIndex.length; i++) {
+            var item = settingsIndex[i];
+            var t = translateItem(item);
+            cache.push({
+                section: t.section,
+                label: t.label,
+                tabIndex: t.tabIndex,
+                category: t.category,
+                keywords: t.keywords,
+                icon: t.icon,
+                description: t.description,
+                conditionKey: t.conditionKey,
+                labelLower: t.label.toLowerCase(),
+                categoryLower: t.category.toLowerCase()
+            });
+        }
+        _translatedCache = cache;
+    }
+
     function search(text) {
         query = text;
         if (!text) {
@@ -138,18 +162,19 @@ Singleton {
             return;
         }
 
-        const queryLower = text.toLowerCase().trim();
-        const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
-        const scored = [];
+        var queryLower = text.toLowerCase().trim();
+        var queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+        var scored = [];
+        var cache = _translatedCache;
 
-        for (const item of settingsIndex) {
-            if (!checkCondition(item))
+        for (var i = 0; i < cache.length; i++) {
+            var entry = cache[i];
+            if (!checkCondition(entry))
                 continue;
 
-            const translated = translateItem(item);
-            const labelLower = translated.label.toLowerCase();
-            const categoryLower = translated.category.toLowerCase();
-            let score = 0;
+            var labelLower = entry.labelLower;
+            var categoryLower = entry.categoryLower;
+            var score = 0;
 
             if (labelLower === queryLower) {
                 score = 10000;
@@ -162,24 +187,32 @@ Singleton {
             }
 
             if (score === 0) {
-                for (const keyword of item.keywords) {
-                    if (keyword.startsWith(queryLower)) {
-                        score = Math.max(score, 800);
+                var keywords = entry.keywords;
+                for (var k = 0; k < keywords.length; k++) {
+                    if (keywords[k].startsWith(queryLower)) {
+                        score = 800;
                         break;
                     }
-                    if (keyword.includes(queryLower)) {
-                        score = Math.max(score, 400);
+                    if (keywords[k].includes(queryLower) && score < 400) {
+                        score = 400;
                     }
                 }
             }
 
             if (score === 0 && queryWords.length > 1) {
-                let allMatch = true;
-                for (const word of queryWords) {
-                    const inLabel = labelLower.includes(word);
-                    const inKeywords = item.keywords.some(k => k.includes(word));
-                    const inCategory = categoryLower.includes(word);
-                    if (!inLabel && !inKeywords && !inCategory) {
+                var allMatch = true;
+                for (var w = 0; w < queryWords.length; w++) {
+                    var word = queryWords[w];
+                    if (labelLower.includes(word))
+                        continue;
+                    var inKeywords = false;
+                    for (var k = 0; k < entry.keywords.length; k++) {
+                        if (entry.keywords[k].includes(word)) {
+                            inKeywords = true;
+                            break;
+                        }
+                    }
+                    if (!inKeywords && !categoryLower.includes(word)) {
                         allMatch = false;
                         break;
                     }
@@ -190,7 +223,7 @@ Singleton {
 
             if (score > 0) {
                 scored.push({
-                    item: translated,
+                    item: entry,
                     score: score
                 });
             }
