@@ -92,6 +92,13 @@ DankModal {
                         Layout.alignment: Qt.AlignRight
                         leftIconName: "search"
                         onTextEdited: searchDebounce.restart()
+
+                        Keys.onEscapePressed: event => {
+                            if (root.shouldHaveFocus) {
+                                root.close();
+                                event.accepted = true;
+                            }
+                        }
                     }
                 }
 
