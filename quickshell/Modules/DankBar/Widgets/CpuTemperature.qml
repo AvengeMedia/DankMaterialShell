@@ -99,13 +99,6 @@ BasePill {
                     width: implicitWidth
                     height: implicitHeight
 
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.shortDuration
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
                     StyledTextMetrics {
                         id: tempBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)

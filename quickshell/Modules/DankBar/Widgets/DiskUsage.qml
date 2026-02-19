@@ -193,13 +193,6 @@ BasePill {
                     }
 
                     width: Math.max(diskBaseline.width, paintedWidth)
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: 120
-                            easing.type: Easing.OutCubic
-                        }
-                    }
                 }
             }
         }
