@@ -123,6 +123,7 @@ DankModal {
 
                     function generateCategories(query) {
                         const lowerQuery = query ? query.toLowerCase().trim() : "";
+                        const lowerQueryWords = query.split(/\s+/);
                         const processed = {};
 
                         for (const cat in rawBinds) {
@@ -135,9 +136,24 @@ DankModal {
                                 const keyLower = bind.key.toLowerCase();
                                 const descLower = bind.desc.toLowerCase();
                                 const actionLower = bind.action.toLowerCase();
-                                if (!(lowerQuery.length === 0 || keyLower.includes(lowerQuery) || descLower.includes(lowerQuery) || catLower.includes(lowerQuery) || actionLower.includes(lowerQuery)))
-                                    continue;
+
                                 if (bind.hideOnOverlay)
+                                    continue;
+                                let shouldContinue = false;
+                                for (let j = 0; j < lowerQueryWords.length; j++) {
+                                    const word = lowerQueryWords[j];
+                                    if (!(
+                                        word.length === 0 ||
+                                        keyLower.includes(word) ||
+                                        descLower.includes(word) ||
+                                        catLower.includes(word) ||
+                                        actionLower.includes(word)
+                                    )) {
+                                        shouldContinue = true;
+                                        break;
+                                    }
+                                }
+                                if (shouldContinue)
                                     continue;
 
                                 if (bind.subcat) {
