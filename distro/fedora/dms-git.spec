@@ -28,7 +28,7 @@ Requires:       accountsservice
 Requires:       dms-cli = %{epoch}:%{version}-%{release}
 Requires:       dgop
 
-# Core utilities (Highly recommended for DMS functionality)
+# Core utilities (Recommended for DMS functionality)
 Recommends:     cava
 Recommends:     danksearch
 Recommends:     matugen
@@ -64,6 +64,13 @@ Provides native DBus bindings, NetworkManager integration, and system utilities.
 # Build DMS CLI from source (core/subdirectory)
 VERSION="%{version}"
 COMMIT=$(echo "%{version}" | grep -oP '[a-f0-9]{7,}' | head -n1 || echo "unknown")
+
+# Pin go.mod and vendor/modules.txt to the installed Go toolchain version
+GO_INSTALLED=$(go version | grep -oP 'go\K[0-9]+\.[0-9]+')
+sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/go ${GO_INSTALLED}/" core/go.mod
+# Only patch vendor/modules.txt when a vendor dir exists (OBS/offline builds)
+[ -f core/vendor/modules.txt ] && \
+  sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/\1${GO_INSTALLED}/" core/vendor/modules.txt || true
 
 cd core
 make dist VERSION="$VERSION" COMMIT="$COMMIT"

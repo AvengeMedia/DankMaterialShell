@@ -55,8 +55,10 @@ mkdir -p $HOME $GOCACHE $GOMODCACHE
 # OBS has no network access, so use local toolchain only
 export GOTOOLCHAIN=local
 
-# Patch go.mod to use base Go version (e.g., go 1.24 instead of go 1.24.6)
-sed -i 's/^go 1\.24\.[0-9]*/go 1.24/' core/go.mod
+# Pin go.mod and vendor/modules.txt to the installed Go toolchain version
+GO_INSTALLED=$(go version | grep -oP 'go\K[0-9]+\.[0-9]+')
+sed -i "s/^go [0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/go ${GO_INSTALLED}/" core/go.mod
+sed -i "s/^\(## explicit; go \)[0-9]\+\.[0-9]\+\(\.[0-9]*\)\?$/\1${GO_INSTALLED}/" core/vendor/modules.txt
 
 # Extract version info for embedding in binary
 VERSION="%{version}"
