@@ -39,6 +39,7 @@ type ScreensaverInhibitor struct {
 
 type ScreensaverState struct {
 	Available  bool                   `json:"available"`
+	Active     bool                   `json:"active"`
 	Inhibited  bool                   `json:"inhibited"`
 	Inhibitors []ScreensaverInhibitor `json:"inhibitors"`
 }
@@ -50,14 +51,16 @@ type FreedeskState struct {
 }
 
 type Manager struct {
-	state                    *FreedeskState
-	stateMutex               sync.RWMutex
-	systemConn               *dbus.Conn
-	sessionConn              *dbus.Conn
-	accountsObj              dbus.BusObject
-	settingsObj              dbus.BusObject
-	currentUID               uint64
-	subscribers              syncmap.Map[string, chan FreedeskState]
-	screensaverSubscribers   syncmap.Map[string, chan ScreensaverState]
-	screensaverCookieCounter uint32
+	state                         *FreedeskState
+	stateMutex                    sync.RWMutex
+	systemConn                    *dbus.Conn
+	sessionConn                   *dbus.Conn
+	accountsObj                   dbus.BusObject
+	settingsObj                   dbus.BusObject
+	currentUID                    uint64
+	subscribers                   syncmap.Map[string, chan FreedeskState]
+	screensaverSubscribers        syncmap.Map[string, chan ScreensaverState]
+	screensaverCookieCounter      uint32
+	screensaverFreedesktopClaimed bool
+	screensaverGnomeClaimed       bool
 }

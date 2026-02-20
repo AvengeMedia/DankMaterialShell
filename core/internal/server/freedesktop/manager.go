@@ -191,6 +191,12 @@ func (m *Manager) Close() {
 		return true
 	})
 
+	m.screensaverSubscribers.Range(func(key string, ch chan ScreensaverState) bool {
+		close(ch)
+		m.screensaverSubscribers.Delete(key)
+		return true
+	})
+
 	if m.systemConn != nil {
 		m.systemConn.Close()
 	}
