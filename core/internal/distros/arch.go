@@ -26,6 +26,9 @@ func init() {
 	Register("cachyos", "#08A283", FamilyArch, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewArchDistribution(config, logChan)
 	})
+	Register("catos", "#1793D1", FamilyArch, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewArchDistribution(config, logChan)
+	})
 	Register("endeavouros", "#7F3FBF", FamilyArch, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewArchDistribution(config, logChan)
 	})
