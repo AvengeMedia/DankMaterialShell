@@ -57,7 +57,7 @@ body:
     attributes:
       label: Was your original Installation method different?
       options:
-        - Yes
+        - "Yes"
         - No (specify below)
     validations:
       required: false
