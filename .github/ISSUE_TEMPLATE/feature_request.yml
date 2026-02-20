@@ -23,7 +23,7 @@ body:
       placeholder: Why is this feature important?
     validations:
       required: false
-  - type: checkboxes
+  - type: dropdown
     id: compositor
     attributes:
       label: Compositor(s)
@@ -35,6 +35,13 @@ body:
         - label: MangoWC (dwl)
         - label: Sway
         - label: Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: compositor_other
+    attributes:
+      label: If Other, please specify
+      placeholder: e.g., Wayfire, Mutter, etc.
     validations:
       required: false
   - type: textarea
