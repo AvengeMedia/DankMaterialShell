@@ -341,6 +341,8 @@ func (n *NiriProvider) buildActionFromNode(bindNode *document.Node) string {
 		val := arg.ValueString()
 		if val == "" {
 			parts = append(parts, `""`)
+		} else if strings.ContainsAny(val, " \t") {
+			parts = append(parts, `"`+strings.ReplaceAll(val, `"`, `\"`)+`"`)
 		} else {
 			parts = append(parts, val)
 		}
