@@ -67,7 +67,7 @@ Item {
     // Derived "no players" state: always correct, no timers.
     readonly property int _playerCount: allPlayers ? allPlayers.length : 0
     readonly property bool _noneAvailable: _playerCount === 0
-    readonly property bool _trulyIdle: activePlayer && activePlayer.playbackState === 0 && !activePlayer.trackTitle && !activePlayer.trackArtist
+    readonly property bool _trulyIdle: activePlayer && activePlayer.playbackState === CustomMediaSource.stateStopped && !activePlayer.trackTitle && !activePlayer.trackArtist
     readonly property bool showNoPlayerNow: (!_switchHold) && (_noneAvailable || _trulyIdle)
 
     property bool _switchHold: false
@@ -192,7 +192,7 @@ Item {
 
     Timer {
         interval: 1000
-        running: activePlayer?.playbackState === 1 && !isSeeking
+        running: activePlayer?.playbackState === CustomMediaSource.statePlaying && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionChanged()
     }

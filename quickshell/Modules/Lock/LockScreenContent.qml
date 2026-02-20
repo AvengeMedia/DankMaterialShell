@@ -1190,7 +1190,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     Loader {
-                        active: MprisController.currentPlayer?.playbackState === 1
+                        active: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying
 
                         sourceComponent: Component {
                             Ref {
@@ -1200,7 +1200,7 @@ Item {
                     }
 
                     Timer {
-                        running: !CavaService.cavaAvailable && MprisController.currentPlayer?.playbackState === 1
+                        running: !CavaService.cavaAvailable && MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying
                         interval: 256
                         repeat: true
                         onTriggered: {
@@ -1219,7 +1219,7 @@ Item {
 
                                 width: 2
                                 height: {
-                                    if (MprisController.currentPlayer?.playbackState === 1 && CavaService.values.length > index) {
+                                    if (MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying && CavaService.values.length > index) {
                                         const rawLevel = CavaService.values[index] || 0;
                                         const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100;
                                         const maxHeight = Theme.iconSize - 2;
@@ -1298,14 +1298,14 @@ Item {
                         height: 24
                         radius: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        color: MprisController.currentPlayer?.playbackState === 1 ? Qt.rgba(255, 255, 255, 0.9) : Qt.rgba(255, 255, 255, 0.2)
+                        color: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? Qt.rgba(255, 255, 255, 0.9) : Qt.rgba(255, 255, 255, 0.2)
                         visible: MprisController.currentPlayer
 
                         DankIcon {
                             anchors.centerIn: parent
-                            name: MprisController.currentPlayer?.playbackState === 1 ? "pause" : "play_arrow"
+                            name: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? "pause" : "play_arrow"
                             size: 14
-                            color: MprisController.currentPlayer?.playbackState === 1 ? "black" : "white"
+                            color: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? "black" : "white"
                         }
 
                         MouseArea {

@@ -29,7 +29,7 @@ Singleton {
 
     // Direct property bindings for reliable UI updates (QML doesn't track nested var properties well)
     readonly property int currentPlaybackState: useCustomSource ? CustomMediaSource.playbackState : (activePlayer ? activePlayer.playbackState : 0)
-    readonly property bool currentIsPlaying: currentPlaybackState === 1
+    readonly property bool currentIsPlaying: currentPlaybackState === CustomMediaSource.statePlaying
     readonly property string currentTrackTitle: useCustomSource ? CustomMediaSource.trackTitle : (activePlayer ? activePlayer.trackTitle : "")
     readonly property string currentTrackArtist: useCustomSource ? CustomMediaSource.trackArtist : (activePlayer ? activePlayer.trackArtist : "")
     readonly property string currentTrackAlbum: useCustomSource ? CustomMediaSource.trackAlbum : (activePlayer ? activePlayer.trackAlbum : "")

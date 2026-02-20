@@ -22,7 +22,7 @@ Item {
     }
 
     Loader {
-        active: activePlayer?.playbackState === 1 && showAnimation
+        active: activePlayer?.playbackState === CustomMediaSource.statePlaying && showAnimation
         sourceComponent: Component {
             Ref {
                 service: CavaService
@@ -35,7 +35,7 @@ Item {
         width: parent.width * 1.1
         height: parent.height * 1.1
         anchors.centerIn: parent
-        visible: CavaService.cavaAvailable && activePlayer?.playbackState === 1 && showAnimation
+        visible: CavaService.cavaAvailable && activePlayer?.playbackState === CustomMediaSource.statePlaying && showAnimation
         asynchronous: false
         antialiasing: true
         preferredRendererType: Shape.CurveRenderer

@@ -33,7 +33,7 @@ Card {
 
     Timer {
         interval: 300
-        running: activePlayer?.playbackState === 1 && !isSeeking
+        running: activePlayer?.playbackState === CustomMediaSource.statePlaying && !isSeeking
         repeat: true
         onTriggered: activePlayer?.positionSupported && activePlayer.positionChanged()
     }
