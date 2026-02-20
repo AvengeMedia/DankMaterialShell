@@ -12,7 +12,7 @@ Singleton {
     readonly property int popoutWidth: 550
     readonly property int popoutHeight: 500
     readonly property int itemHeight: 72
-    readonly property int thumbnailSize: 48
+    readonly property int thumbnailSize: 100
     readonly property int retryInterval: 50
     readonly property int viewportBuffer: 100
     readonly property int extendedBuffer: 200
