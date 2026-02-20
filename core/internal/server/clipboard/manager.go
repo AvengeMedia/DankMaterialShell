@@ -232,7 +232,14 @@ func (m *Manager) setupDataDeviceSync() {
 			return
 		}
 
+		prevOffer := m.currentOffer
 		m.currentOffer = offer
+
+		if prevOffer != nil && prevOffer != offer {
+			m.offerMutex.Lock()
+			delete(m.offerMimeTypes, prevOffer)
+			m.offerMutex.Unlock()
+		}
 
 		m.offerMutex.RLock()
 		mimes := m.offerMimeTypes[offer]
@@ -587,20 +594,26 @@ func (m *Manager) uriListPreview(data []byte) (string, bool) {
 		uris = strings.Split(text, "\n")
 	}
 
+	if len(uris) > 1 {
+		return fmt.Sprintf("[[ %d files ]]", len(uris)), false
+	}
+
 	if len(uris) == 1 && strings.HasPrefix(uris[0], "file://") {
 		filePath := strings.TrimPrefix(uris[0], "file://")
-		if info, err := os.Stat(filePath); err == nil && !info.IsDir() {
+		info, err := os.Stat(filePath)
+		if err != nil || info.IsDir() {
+			return m.textPreview(data), false
+		}
+
+		cfg := m.getConfig()
+		if info.Size() <= cfg.MaxEntrySize {
 			if imgData, err := os.ReadFile(filePath); err == nil {
 				if config, imgFmt, err := image.DecodeConfig(bytes.NewReader(imgData)); err == nil {
 					return fmt.Sprintf("[[ file %s %s %dx%d ]]", filepath.Base(filePath), imgFmt, config.Width, config.Height), true
 				}
 			}
-			return fmt.Sprintf("[[ file %s ]]", filepath.Base(filePath)), false
 		}
-	}
-
-	if len(uris) > 1 {
-		return fmt.Sprintf("[[ %d files ]]", len(uris)), false
+		return fmt.Sprintf("[[ file %s ]]", filepath.Base(filePath)), false
 	}
 
 	return m.textPreview(data), false
@@ -620,6 +633,11 @@ func (m *Manager) tryReadImageFromURI(data []byte) ([]byte, string, bool) {
 	filePath := strings.TrimPrefix(uris[0], "file://")
 	info, err := os.Stat(filePath)
 	if err != nil || info.IsDir() {
+		return nil, "", false
+	}
+
+	cfg := m.getConfig()
+	if info.Size() > cfg.MaxEntrySize {
 		return nil, "", false
 	}
 
