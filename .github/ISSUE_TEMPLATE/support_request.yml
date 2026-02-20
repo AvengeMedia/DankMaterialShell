@@ -66,6 +66,7 @@ body:
       options:
         - "Yes"
         - No (specify below)
+      default: 0
     validations:
       required: false
   - type: input
