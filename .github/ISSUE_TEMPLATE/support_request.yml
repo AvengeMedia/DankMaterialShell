@@ -11,13 +11,12 @@ body:
     id: compositor
     attributes:
       label: Compositor
-      description: Which compositor(s) are you using? (support may apply to multiple)
       options:
-        - label: Niri
-        - label: Hyprland
-        - label: MangoWC (dwl)
-        - label: Sway
-        - label: Other (specify below)
+        - Niri
+        - Hyprland
+        - MangoWC (dwl)
+        - Sway
+        - Other (specify below)
     validations:
       required: true
   - type: input

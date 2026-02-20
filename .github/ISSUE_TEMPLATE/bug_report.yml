@@ -13,10 +13,10 @@ body:
     attributes:
       label: Compositor
       options:
-        - label: Niri
-        - label: Hyprland
-        - label: MangoWC (dwl)
-        - label: Sway
+        - Niri
+        - Hyprland
+        - MangoWC (dwl)
+        - Sway
     validations:
       required: true
   - type: dropdown
@@ -24,15 +24,15 @@ body:
     attributes:
       label: Distribution
       options:
-        - label: Arch Linux
-        - label: CachyOS
-        - label: Fedora
-        - label: NixOS
-        - label: Debian
-        - label: Ubuntu
-        - label: Gentoo
-        - label: OpenSUSE
-        - label: Other (specify below)
+        - Arch Linux
+        - CachyOS
+        - Fedora
+        - NixOS
+        - Debian
+        - Ubuntu
+        - Gentoo
+        - OpenSUSE
+        - Other (specify below)
     validations:
       required: true
   - type: input
