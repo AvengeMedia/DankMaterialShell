@@ -16,4 +16,8 @@ const (
 	dbusScreensaverPath      = "/ScreenSaver"
 	dbusScreensaverPath2     = "/org/freedesktop/ScreenSaver"
 	dbusScreensaverInterface = "org.freedesktop.ScreenSaver"
+
+	dbusGnomeScreensaverName      = "org.gnome.ScreenSaver"
+	dbusGnomeScreensaverPath      = "/org/gnome/ScreenSaver"
+	dbusGnomeScreensaverInterface = "org.gnome.ScreenSaver"
 )
