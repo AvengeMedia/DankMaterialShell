@@ -71,32 +71,10 @@ func (m *Manager) initializeScreensaver() error {
 
 	handler := &screensaverHandler{manager: m}
 
-	// Try to claim org.freedesktop.ScreenSaver (may fail if the compositor
-	// or another process already owns this name).
-	if reply, err := m.sessionConn.RequestName(dbusScreensaverName, dbus.NameFlagDoNotQueue); err != nil {
-		log.Warnf("Failed to request screensaver name %s: %v", dbusScreensaverName, err)
-	} else if reply != dbus.RequestNameReplyPrimaryOwner {
-		log.Warnf("Screensaver name %s already owned by another process", dbusScreensaverName)
-	} else if err := m.exportScreensaverOnPaths(handler, dbusScreensaverInterface,
-		dbusScreensaverPath, dbusScreensaverPath2); err != nil {
-		log.Warnf("Failed to export freedesktop screensaver: %v", err)
-	} else {
-		m.screensaverFreedesktopClaimed = true
-		log.Infof("Claimed %s on session bus", dbusScreensaverName)
-	}
-
-	// Try to claim org.gnome.ScreenSaver independently as a fallback.
-	if reply, err := m.sessionConn.RequestName(dbusGnomeScreensaverName, dbus.NameFlagDoNotQueue); err != nil {
-		log.Warnf("Failed to request screensaver name %s: %v", dbusGnomeScreensaverName, err)
-	} else if reply != dbus.RequestNameReplyPrimaryOwner {
-		log.Warnf("Screensaver name %s already owned by another process", dbusGnomeScreensaverName)
-	} else if err := m.exportScreensaverOnPaths(handler, dbusGnomeScreensaverInterface,
-		dbusGnomeScreensaverPath); err != nil {
-		log.Warnf("Failed to export gnome screensaver: %v", err)
-	} else {
-		m.screensaverGnomeClaimed = true
-		log.Infof("Claimed %s on session bus", dbusGnomeScreensaverName)
-	}
+	m.screensaverFreedesktopClaimed = m.claimScreensaverName(handler,
+		dbusScreensaverName, dbusScreensaverInterface, dbusScreensaverPath, dbusScreensaverPath2)
+	m.screensaverGnomeClaimed = m.claimScreensaverName(handler,
+		dbusGnomeScreensaverName, dbusGnomeScreensaverInterface, dbusGnomeScreensaverPath)
 
 	if !m.screensaverFreedesktopClaimed && !m.screensaverGnomeClaimed {
 		log.Warn("No screensaver interface could be claimed")
@@ -117,6 +95,24 @@ func (m *Manager) initializeScreensaver() error {
 
 	log.Info("Screensaver listener initialized")
 	return nil
+}
+
+func (m *Manager) claimScreensaverName(handler *screensaverHandler, name, iface string, paths ...dbus.ObjectPath) bool {
+	reply, err := m.sessionConn.RequestName(name, dbus.NameFlagDoNotQueue)
+	if err != nil {
+		log.Warnf("Failed to request screensaver name %s: %v", name, err)
+		return false
+	}
+	if reply != dbus.RequestNameReplyPrimaryOwner {
+		log.Warnf("Screensaver name %s already owned by another process", name)
+		return false
+	}
+	if err := m.exportScreensaverOnPaths(handler, iface, paths...); err != nil {
+		log.Warnf("Failed to export screensaver on %s: %v", name, err)
+		return false
+	}
+	log.Infof("Claimed %s on session bus", name)
+	return true
 }
 
 // exportScreensaverOnPaths exports the handler and introspection on the given
@@ -321,8 +317,6 @@ func (h *screensaverHandler) Lock() *dbus.Error {
 	return nil
 }
 
-// SetScreenLockActive updates the screensaver active (locked) state and emits
-// ActiveChanged on all claimed session bus interfaces.
 func (m *Manager) SetScreenLockActive(active bool) {
 	m.stateMutex.Lock()
 	changed := m.state.Screensaver.Active != active
@@ -334,22 +328,22 @@ func (m *Manager) SetScreenLockActive(active bool) {
 	}
 
 	log.Infof("Screen lock active changed: %v", active)
+	defer m.NotifyScreensaverSubscribers()
 
-	if m.sessionConn != nil {
-		if m.screensaverFreedesktopClaimed {
-			if err := m.sessionConn.Emit(dbusScreensaverPath, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
-				log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath, err)
-			}
-			if err := m.sessionConn.Emit(dbusScreensaverPath2, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
-				log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath2, err)
-			}
+	if m.sessionConn == nil {
+		return
+	}
+	if m.screensaverFreedesktopClaimed {
+		if err := m.sessionConn.Emit(dbusScreensaverPath, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath, err)
 		}
-		if m.screensaverGnomeClaimed {
-			if err := m.sessionConn.Emit(dbusGnomeScreensaverPath, dbusGnomeScreensaverInterface+".ActiveChanged", active); err != nil {
-				log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusGnomeScreensaverPath, err)
-			}
+		if err := m.sessionConn.Emit(dbusScreensaverPath2, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath2, err)
 		}
 	}
-
-	m.NotifyScreensaverSubscribers()
+	if m.screensaverGnomeClaimed {
+		if err := m.sessionConn.Emit(dbusGnomeScreensaverPath, dbusGnomeScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusGnomeScreensaverPath, err)
+		}
+	}
 }
