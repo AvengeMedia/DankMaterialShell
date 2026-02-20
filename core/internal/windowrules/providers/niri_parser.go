@@ -864,10 +864,12 @@ func (p *NiriWritableProvider) formatRule(rule windowrules.WindowRule) string {
 
 func formatSizeProperty(name, value string) string {
 	parts := strings.SplitN(value, " ", 2)
-	if len(parts) != 2 {
-		return fmt.Sprintf("    %s { }", name)
+	if len(parts) == 2 {
+		return fmt.Sprintf("    %s { %s %s; }", name, parts[0], parts[1])
 	}
-	sizeType := parts[0]
-	sizeValue := parts[1]
-	return fmt.Sprintf("    %s { %s %s; }", name, sizeType, sizeValue)
+	// Bare number without type prefix — default to "fixed"
+	if _, err := strconv.Atoi(value); err == nil {
+		return fmt.Sprintf("    %s { fixed %s; }", name, value)
+	}
+	return fmt.Sprintf("    %s { }", name)
 }

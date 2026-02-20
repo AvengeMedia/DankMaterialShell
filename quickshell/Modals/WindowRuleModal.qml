@@ -631,7 +631,7 @@ FloatingWindow {
                                 anchors.fill: parent
                                 font.pixelSize: Theme.fontSizeSmall
                                 textColor: Theme.surfaceText
-                                placeholderText: "fixed 800"
+                                placeholderText: "800"
                                 backgroundColor: "transparent"
                                 enabled: root.visible
                             }
@@ -658,7 +658,7 @@ FloatingWindow {
                                 anchors.fill: parent
                                 font.pixelSize: Theme.fontSizeSmall
                                 textColor: Theme.surfaceText
-                                placeholderText: "fixed 600"
+                                placeholderText: "600"
                                 backgroundColor: "transparent"
                                 enabled: root.visible
                             }
