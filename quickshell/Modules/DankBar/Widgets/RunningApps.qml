@@ -138,15 +138,13 @@ BasePill {
     readonly property real iconCellSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) + 6
 
     readonly property string focusedAppId: {
-        const toplevels = CompositorService.sortedToplevels;
-        if (!toplevels)
+        if (!sortedToplevels || sortedToplevels.length === 0)
             return "";
-        let result = "";
-        for (let i = 0; i < toplevels.length; i++) {
-            if (toplevels[i].activated)
-                result = toplevels[i].appId || "";
+        for (let i = 0; i < sortedToplevels.length; i++) {
+            if (sortedToplevels[i].activated)
+                return sortedToplevels[i].appId || "";
         }
-        return result;
+        return "";
     }
 
     visible: windowCount > 0

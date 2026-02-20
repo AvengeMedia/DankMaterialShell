@@ -963,48 +963,34 @@ Singleton {
         return enrichedToplevels;
     }
 
-    function filterCurrentWorkspace(toplevels, screenName) {
-        let currentWorkspaceId = null;
-
-        for (var i = 0; i < allWorkspaces.length; i++) {
-            const ws = allWorkspaces[i];
-            if (ws.output === screenName && ws.is_active) {
-                currentWorkspaceId = ws.id;
-                break;
-            }
-        }
-
-        if (currentWorkspaceId === null)
-            return toplevels;
-
-        const workspaceWindows = windows.filter(niriWindow => niriWindow.workspace_id === currentWorkspaceId);
+    function _matchAndEnrichToplevels(toplevels, niriWindows) {
         const usedToplevels = new Set();
         const result = [];
 
-        for (const niriWindow of workspaceWindows) {
+        for (const niriWindow of niriWindows) {
             let bestMatch = null;
             let bestScore = -1;
 
             for (const toplevel of toplevels) {
                 if (usedToplevels.has(toplevel))
                     continue;
-                if (toplevel.appId === niriWindow.app_id) {
-                    let score = 1;
+                if (toplevel.appId !== niriWindow.app_id)
+                    continue;
 
-                    if (niriWindow.title && toplevel.title) {
-                        if (toplevel.title === niriWindow.title) {
-                            score = 3;
-                        } else if (toplevel.title.includes(niriWindow.title) || niriWindow.title.includes(toplevel.title)) {
-                            score = 2;
-                        }
+                let score = 1;
+                if (niriWindow.title && toplevel.title) {
+                    if (toplevel.title === niriWindow.title) {
+                        score = 3;
+                    } else if (toplevel.title.includes(niriWindow.title) || niriWindow.title.includes(toplevel.title)) {
+                        score = 2;
                     }
+                }
 
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMatch = toplevel;
-                        if (score === 3)
-                            break;
-                    }
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMatch = toplevel;
+                    if (score === 3)
+                        break;
                 }
             }
 
@@ -1025,23 +1011,41 @@ Singleton {
                     return NiriService.focusWindow(niriWindow.id);
                 },
                 "close": function () {
-                    if (bestMatch.close) {
+                    if (bestMatch.close)
                         return bestMatch.close();
-                    }
                     return false;
                 }
             };
 
             for (let prop in bestMatch) {
-                if (!(prop in enrichedToplevel)) {
+                if (!(prop in enrichedToplevel))
                     enrichedToplevel[prop] = bestMatch[prop];
-                }
             }
 
             result.push(enrichedToplevel);
         }
 
         return result;
+    }
+
+    function filterCurrentWorkspace(toplevels, screenName) {
+        let currentWorkspaceId = null;
+
+        for (var i = 0; i < allWorkspaces.length; i++) {
+            const ws = allWorkspaces[i];
+            if (ws.output === screenName && ws.is_active) {
+                currentWorkspaceId = ws.id;
+                break;
+            }
+        }
+
+        if (currentWorkspaceId === null)
+            return toplevels;
+
+        if (toplevels.length > 0 && toplevels[0].niriWorkspaceId !== undefined)
+            return toplevels.filter(t => t.niriWorkspaceId === currentWorkspaceId);
+
+        return _matchAndEnrichToplevels(toplevels, windows.filter(nw => nw.workspace_id === currentWorkspaceId));
     }
 
     function filterCurrentDisplay(toplevels, screenName) {
@@ -1058,71 +1062,10 @@ Singleton {
         if (outputWorkspaceIds.size === 0)
             return toplevels;
 
-        const displayWindows = windows.filter(niriWindow => outputWorkspaceIds.has(niriWindow.workspace_id));
-        const usedToplevels = new Set();
-        const result = [];
+        if (toplevels.length > 0 && toplevels[0].niriWorkspaceId !== undefined)
+            return toplevels.filter(t => outputWorkspaceIds.has(t.niriWorkspaceId));
 
-        for (const niriWindow of displayWindows) {
-            let bestMatch = null;
-            let bestScore = -1;
-
-            for (const toplevel of toplevels) {
-                if (usedToplevels.has(toplevel))
-                    continue;
-                if (toplevel.appId === niriWindow.app_id) {
-                    let score = 1;
-
-                    if (niriWindow.title && toplevel.title) {
-                        if (toplevel.title === niriWindow.title) {
-                            score = 3;
-                        } else if (toplevel.title.includes(niriWindow.title) || niriWindow.title.includes(toplevel.title)) {
-                            score = 2;
-                        }
-                    }
-
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMatch = toplevel;
-                        if (score === 3)
-                            break;
-                    }
-                }
-            }
-
-            if (!bestMatch)
-                continue;
-            usedToplevels.add(bestMatch);
-
-            const workspace = workspaces[niriWindow.workspace_id];
-            const isFocused = niriWindow.is_focused ?? (workspace && workspace.active_window_id === niriWindow.id) ?? false;
-
-            const enrichedToplevel = {
-                "appId": bestMatch.appId,
-                "title": bestMatch.title,
-                "activated": isFocused,
-                "niriWindowId": niriWindow.id,
-                "niriWorkspaceId": niriWindow.workspace_id,
-                "activate": function () {
-                    return NiriService.focusWindow(niriWindow.id);
-                },
-                "close": function () {
-                    if (bestMatch.close) {
-                        return bestMatch.close();
-                    }
-                    return false;
-                }
-            };
-
-            for (let prop in bestMatch) {
-                if (!(prop in enrichedToplevel)) {
-                    enrichedToplevel[prop] = bestMatch[prop];
-                }
-            }
-
-            result.push(enrichedToplevel);
-        }
-
-        return result;
+        return _matchAndEnrichToplevels(toplevels, windows.filter(nw => outputWorkspaceIds.has(nw.workspace_id)));
     }
 
     function generateNiriLayoutConfig() {
