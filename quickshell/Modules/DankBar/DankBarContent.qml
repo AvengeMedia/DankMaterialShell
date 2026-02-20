@@ -811,7 +811,7 @@ Item {
                     } else {
                         dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
                     }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 0, (effectiveBarConfig?.id ?? "default") + "-0");
+                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 0, (effectiveBarConfig?.id ?? "default") + "-" + section + "-0");
                 }
             }
         }
@@ -867,7 +867,7 @@ Item {
                     } else {
                         dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
                     }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 1, (effectiveBarConfig?.id ?? "default") + "-1");
+                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 1, (effectiveBarConfig?.id ?? "default") + "-" + section + "-1");
                 }
             }
         }
@@ -926,7 +926,7 @@ Item {
                     } else {
                         dankDashPopoutLoader.item.triggerScreen = barWindow.screen;
                     }
-                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 3, (effectiveBarConfig?.id ?? "default") + "-3");
+                    PopoutManager.requestPopout(dankDashPopoutLoader.item, 3, (effectiveBarConfig?.id ?? "default") + "-" + section + "-3");
                 }
             }
         }

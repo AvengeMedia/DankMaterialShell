@@ -109,6 +109,13 @@ Item {
 
     readonly property bool useBackgroundWindow: !CompositorService.isHyprland || CompositorService.useHyprlandFocusGrab
 
+    function updateSurfacePosition() {
+        if (useBackgroundWindow && shouldBeVisible) {
+            _surfaceMarginLeft = alignedX - shadowBuffer;
+            _surfaceW = alignedWidth + shadowBuffer * 2;
+        }
+    }
+
     function open() {
         if (!screen)
             return;
