@@ -40,7 +40,7 @@ DankModal {
             deleteQRCodeFile(themedQrCodePath);
         }
         if (normalQrCodePath !== "") {
-            // deleteQRCodeFile(normalQrCodePath);
+            deleteQRCodeFile(normalQrCodePath);
         }
         close();
     }
