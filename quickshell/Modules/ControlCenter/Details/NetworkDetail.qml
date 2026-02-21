@@ -651,6 +651,7 @@ Rectangle {
             }
 
             Rectangle {
+                id: pinButton
                 anchors.right: parent.right
                 anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS
                 anchors.verticalCenter: parent.verticalCenter
@@ -711,6 +712,19 @@ Rectangle {
                 }
             }
 
+            DankActionButton {
+                id: qrCodeButton
+                visible: modelData.secured && modelData.saved
+                anchors.right: parent.right
+                anchors.rightMargin: optionsButton.width + pinWifiRow.width + 3 * Theme.spacingM + Theme.spacingS
+                anchors.verticalCenter: parent.verticalCenter
+                iconName: "qr_code"
+                buttonSize: 28
+                onClicked: {
+                    PopoutService.showWifiQRCodeModal(modelData.ssid);
+                }
+            }
+
             DankRipple {
                 id: wifiRipple
                 cornerRadius: parent.radius
@@ -719,7 +733,7 @@ Rectangle {
             MouseArea {
                 id: networkMouseArea
                 anchors.fill: parent
-                anchors.rightMargin: optionsButton.width + Theme.spacingM + Theme.spacingS + pinWifiRow.width + Theme.spacingS * 4
+                anchors.rightMargin: optionsButton.width + pinWifiRow.width + (qrCodeButton.visible ? qrCodeButton.width : 0) + Theme.spacingS * 5 + Theme.spacingM
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onPressed: mouse => wifiRipple.trigger(mouse.x, mouse.y)
