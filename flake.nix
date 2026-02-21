@@ -182,6 +182,7 @@
               with pkgs;
               [
                 go_1_25
+                go-mockery_2
                 gopls
                 delve
                 go-tools
