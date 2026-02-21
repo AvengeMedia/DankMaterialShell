@@ -112,3 +112,7 @@ func (b *IWDBackend) getWiFiDevicesLocked() []WiFiDevice {
 		Networks:  b.state.WiFiNetworks,
 	}}
 }
+
+func (b *IWDBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	return "", fmt.Errorf("WiFi QR code not supported by iwd backend")
+}

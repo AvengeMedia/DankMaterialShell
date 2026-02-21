@@ -1062,6 +1062,62 @@ func (_c *MockBackend_GetWiFiNetworkDetails_Call) RunAndReturn(run func(string) 
 	return _c
 }
 
+// GetWiFiQRCodeContent provides a mock function with given fields: ssid
+func (_m *MockBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	ret := _m.Called(ssid)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetWiFiQRCodeContent")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string) (string, error)); ok {
+		return rf(ssid)
+	}
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(ssid)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(ssid)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockBackend_GetWiFiQRCodeContent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetWiFiQRCodeContent'
+type MockBackend_GetWiFiQRCodeContent_Call struct {
+	*mock.Call
+}
+
+// GetWiFiQRCodeContent is a helper method to define mock.On call
+//   - ssid string
+func (_e *MockBackend_Expecter) GetWiFiQRCodeContent(ssid interface{}) *MockBackend_GetWiFiQRCodeContent_Call {
+	return &MockBackend_GetWiFiQRCodeContent_Call{Call: _e.mock.On("GetWiFiQRCodeContent", ssid)}
+}
+
+func (_c *MockBackend_GetWiFiQRCodeContent_Call) Run(run func(ssid string)) *MockBackend_GetWiFiQRCodeContent_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiQRCodeContent_Call) Return(_a0 string, _a1 error) *MockBackend_GetWiFiQRCodeContent_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockBackend_GetWiFiQRCodeContent_Call) RunAndReturn(run func(string) (string, error)) *MockBackend_GetWiFiQRCodeContent_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetWiredConnections provides a mock function with no fields
 func (_m *MockBackend) GetWiredConnections() ([]network.WiredConnection, error) {
 	ret := _m.Called()

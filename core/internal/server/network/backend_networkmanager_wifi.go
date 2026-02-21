@@ -196,6 +196,97 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 	}, nil
 }
 
+func (b *NetworkManagerBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	if b.wifiDevice == nil {
+		return "", fmt.Errorf("no WiFi device available")
+	}
+
+	if err := b.ensureWiFiDevice(); err != nil {
+		return "", err
+	}
+
+	s := b.settings
+	if s == nil {
+		s, err := gonetworkmanager.NewSettings()
+		if err != nil {
+			return "", fmt.Errorf("failed to get settings: %w", err)
+		}
+		b.settings = s
+	}
+
+	settingsMgr := s.(gonetworkmanager.Settings)
+	connections, err := settingsMgr.ListConnections()
+	if err != nil {
+		return "", fmt.Errorf("failed to get connections: %w", err)
+	}
+
+	for _, conn := range connections {
+		connSettings, err := conn.GetSettings()
+		if err != nil {
+			continue
+		}
+
+		if connMeta, ok := connSettings["connection"]; ok {
+			if connType, ok := connMeta["type"].(string); ok && connType == "802-11-wireless" {
+				if wifiSettings, ok := connSettings["802-11-wireless"]; ok {
+					if wifiSecuritySettings, ok := connSettings["802-11-wireless-security"]; ok {
+						if ssidBytes, ok := wifiSettings["ssid"].([]byte); ok {
+							savedSSID := string(ssidBytes)
+							if savedSSID != ssid {
+								continue
+							}
+
+							securityType := ""
+							if keyMgmt, ok := wifiSecuritySettings["key-mgmt"].(string); ok {
+								switch keyMgmt {
+								case "none":
+									if authAlg, ok := wifiSecuritySettings["auth-alg"].(string); ok {
+										if authAlg != "open" {
+											securityType = "WEP"
+										} else {
+											securityType = "nopass"
+										}
+									}
+								case "ieee8021x":
+									securityType = "WEP"
+								default:
+									securityType = "WPA"
+								}
+							}
+							if securityType == "" {
+								return "", fmt.Errorf("failed to identify security type of network `%s`", ssid)
+							}
+							if securityType != "WPA" {
+								return "", fmt.Errorf("DMS only supports QR Code generation for WPA connections, which `%s` is not", ssid)
+							}
+
+							foundPwd := false
+							pwd := ""
+							wifiSecrets, err := conn.GetSecrets("802-11-wireless-security")
+							if err != nil {
+								return "", fmt.Errorf("failed to retrieve connection secrets for `%s`: %w", ssid, err)
+							}
+							if wifiSecrets, ok := wifiSecrets["802-11-wireless-security"]; ok {
+								pwd, ok = wifiSecrets["psk"].(string)
+								if ok {
+									foundPwd = true
+								}
+							}
+							if !foundPwd {
+								return "", fmt.Errorf("failed to retrieve password for `%s`", ssid)
+							}
+
+							return fmt.Sprintf("WIFI:T:%s;S:%s;P:%s;;", securityType, ssid, pwd), nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("failed to get qr code from unsaved network %s", ssid)
+}
+
 func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 	devInfo, err := b.getWifiDeviceForConnection(req.Device)
 	if err != nil {
