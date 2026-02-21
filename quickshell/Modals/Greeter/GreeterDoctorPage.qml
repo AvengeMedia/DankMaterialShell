@@ -225,7 +225,13 @@ Item {
                     }
 
                     StyledText {
-                        text: root.errorCount > 0 ? I18n.tr("%1 issue(s) found", "greeter doctor page error count").arg(root.errorCount) : I18n.tr("All checks passed", "greeter doctor page success")
+                        text: {
+                            if (root.errorCount === 0)
+                                return I18n.tr("All checks passed", "greeter doctor page success");
+                            return root.errorCount === 1
+                                ? I18n.tr("%1 issue found", "greeter doctor page error count").arg(root.errorCount)
+                                : I18n.tr("%1 issues found", "greeter doctor page error count").arg(root.errorCount);
+                        }
                         font.pixelSize: Theme.fontSizeMedium
                         color: root.errorCount > 0 ? Theme.error : Theme.surfaceVariantText
                     }
