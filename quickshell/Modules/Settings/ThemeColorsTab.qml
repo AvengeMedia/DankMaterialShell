@@ -1898,6 +1898,7 @@ Item {
                 tags: ["modal", "darken", "background", "overlay"]
                 title: I18n.tr("Modal Background")
                 settingKey: "modalBackground"
+                iconName: "layers"
 
                 SettingsToggleRow {
                     tab: "theme"
@@ -1915,7 +1916,7 @@ Item {
                 tags: ["applications", "portal", "dark", "terminal"]
                 title: I18n.tr("Applications")
                 settingKey: "applications"
-                iconName: "terminal"
+                iconName: "apps"
 
                 SettingsToggleRow {
                     tab: "theme"
@@ -2442,6 +2443,7 @@ Item {
                 tags: ["icon", "theme", "system"]
                 title: I18n.tr("Icon Theme")
                 settingKey: "iconTheme"
+                iconName: "interests"
 
                 SettingsDropdownRow {
                     tab: "theme"
@@ -2468,7 +2470,7 @@ Item {
                 tags: ["system", "app", "theming", "gtk", "qt"]
                 title: I18n.tr("System App Theming")
                 settingKey: "systemAppTheming"
-                iconName: "extension"
+                iconName: "brush"
                 visible: Theme.matugenAvailable
 
                 Row {
