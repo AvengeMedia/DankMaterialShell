@@ -961,10 +961,7 @@ Singleton {
         }
 
         if (!isGreeterMode) {
-            // Skip with matugen because, our script runner will do it.
-            if (!matugenAvailable) {
-                PortalService.setLightMode(light);
-            }
+            PortalService.setLightMode(light);
             if (typeof SettingsData !== "undefined") {
                 SettingsData.updateCosmicThemeMode(light);
             }
