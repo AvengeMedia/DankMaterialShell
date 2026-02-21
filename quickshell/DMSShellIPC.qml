@@ -373,6 +373,68 @@ Item {
     }
 
     IpcHandler {
+        function update(jsonData: string): string {
+            try {
+                const data = JSON.parse(jsonData)
+                CustomMediaSource.update(data)
+                return "MEDIA_UPDATE_SUCCESS"
+            } catch (e) {
+                return "MEDIA_UPDATE_ERROR: " + e.message
+            }
+        }
+
+        function setCommands(jsonData: string): string {
+            try {
+                const cmds = JSON.parse(jsonData)
+                CustomMediaSource.setCommands(cmds)
+                return "MEDIA_COMMANDS_SET_SUCCESS"
+            } catch (e) {
+                return "MEDIA_COMMANDS_ERROR: " + e.message
+            }
+        }
+
+        function clear(): string {
+            CustomMediaSource.clear()
+            return "MEDIA_CLEAR_SUCCESS"
+        }
+
+        function status(): string {
+            return JSON.stringify({
+                available: CustomMediaSource.available,
+                sourceId: CustomMediaSource.sourceId,
+                title: CustomMediaSource.trackTitle,
+                artist: CustomMediaSource.trackArtist,
+                album: CustomMediaSource.trackAlbum,
+                state: CustomMediaSource.playbackState,
+                position: CustomMediaSource.position,
+                length: CustomMediaSource.length
+            })
+        }
+
+        function play(): void {
+            CustomMediaSource.play()
+        }
+
+        function pause(): void {
+            CustomMediaSource.pause()
+        }
+
+        function playPause(): void {
+            CustomMediaSource.togglePlaying()
+        }
+
+        function next(): void {
+            CustomMediaSource.next()
+        }
+
+        function previous(): void {
+            CustomMediaSource.previous()
+        }
+
+        target: "media"
+    }
+
+    IpcHandler {
         function toggle(provider: string): string {
             if (!provider)
                 return "ERROR: No provider specified";

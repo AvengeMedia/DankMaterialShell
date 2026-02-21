@@ -8,7 +8,7 @@ import qs.Widgets
 BasePill {
     id: root
 
-    readonly property MprisPlayer activePlayer: MprisController.activePlayer
+    readonly property var activePlayer: MprisController.currentPlayer
     readonly property bool playerAvailable: activePlayer !== null
     readonly property bool __isChromeBrowser: {
         if (!activePlayer?.identity)
@@ -191,15 +191,15 @@ BasePill {
                     height: 24
                     radius: 12
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: activePlayer && activePlayer.playbackState === 1 ? Theme.primary : Theme.primaryHover
+                    color: MprisController.currentIsPlaying ? Theme.primary : Theme.primaryHover
                     visible: root.playerAvailable
                     opacity: activePlayer ? 1 : 0.3
 
                     DankIcon {
                         anchors.centerIn: parent
-                        name: activePlayer && activePlayer.playbackState === 1 ? "pause" : "play_arrow"
+                        name: MprisController.currentIsPlaying ? "pause" : "play_arrow"
                         size: 14
-                        color: activePlayer && activePlayer.playbackState === 1 ? Theme.background : Theme.primary
+                        color: MprisController.currentIsPlaying ? Theme.background : Theme.primary
                     }
 
                     MouseArea {
@@ -381,15 +381,15 @@ BasePill {
                         height: 24
                         radius: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        color: activePlayer && activePlayer.playbackState === 1 ? Theme.primary : Theme.primaryHover
+                        color: MprisController.currentIsPlaying ? Theme.primary : Theme.primaryHover
                         visible: root.playerAvailable
                         opacity: activePlayer ? 1 : 0.3
 
                         DankIcon {
                             anchors.centerIn: parent
-                            name: activePlayer && activePlayer.playbackState === 1 ? "pause" : "play_arrow"
+                            name: MprisController.currentIsPlaying ? "pause" : "play_arrow"
                             size: 14
-                            color: activePlayer && activePlayer.playbackState === 1 ? Theme.background : Theme.primary
+                            color: MprisController.currentIsPlaying ? Theme.background : Theme.primary
                         }
 
                         MouseArea {

@@ -7,7 +7,7 @@ DankOSD {
     id: root
 
     readonly property bool useVertical: isVerticalLayout
-    readonly property var player: MprisController.activePlayer
+    readonly property var player: MprisController.currentPlayer
     readonly property bool volumeSupported: player?.volumeSupported ?? false
     property bool _suppressNewPlayer: false
     property int _displayVolume: 0

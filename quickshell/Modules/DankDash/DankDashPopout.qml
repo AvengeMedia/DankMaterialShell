@@ -28,6 +28,7 @@ DankPopout {
     property bool __dropdownRightEdge: false
     property var __dropdownPlayer: null
     property var __dropdownPlayers: []
+    property bool __dropdownPlayerIsCustom: false
 
     function __showVolumeDropdown(pos, rightEdge, player, players) {
         __dropdownAnchor = pos;
@@ -43,11 +44,12 @@ DankPopout {
         __dropdownType = 2;
     }
 
-    function __showPlayersDropdown(pos, rightEdge, player, players) {
+    function __showPlayersDropdown(pos, rightEdge, player, players, isCustom) {
         __dropdownAnchor = pos;
         __dropdownRightEdge = rightEdge;
         __dropdownPlayer = player;
         __dropdownPlayers = players;
+        __dropdownPlayerIsCustom = isCustom || false;
         __dropdownType = 3;
     }
 
@@ -82,6 +84,7 @@ DankPopout {
             isRightEdge: root.__dropdownRightEdge
             activePlayer: root.__dropdownPlayer
             allPlayers: root.__dropdownPlayers
+            activeIsCustom: root.__dropdownPlayerIsCustom
             onCloseRequested: root.__hideDropdowns()
             onPanelEntered: root.__stopCloseTimer()
             onPanelExited: root.__startCloseTimer()
@@ -95,12 +98,12 @@ DankPopout {
                     AudioService.sink.audio.volume = volume;
                 }
             }
-            onPlayerSelected: player => {
-                const currentPlayer = MprisController.activePlayer;
-                if (currentPlayer && currentPlayer !== player && currentPlayer.canPause) {
+            onPlayerSelected: source => {
+                const currentPlayer = MprisController.currentPlayer;
+                if (currentPlayer && !source?.isCustom && currentPlayer !== source?.player && currentPlayer.canPause) {
                     currentPlayer.pause();
                 }
-                MprisController.activePlayer = player;
+                MprisController.selectSource(source);
                 root.__hideDropdowns();
             }
             onDeviceSelected: device => {
@@ -382,8 +385,8 @@ DankPopout {
                                 onShowAudioDevicesDropdown: (pos, screen, rightEdge) => {
                                     root.__showAudioDevicesDropdown(pos, rightEdge);
                                 }
-                                onShowPlayersDropdown: (pos, screen, rightEdge, player, players) => {
-                                    root.__showPlayersDropdown(pos, rightEdge, player, players);
+                                onShowPlayersDropdown: (pos, screen, rightEdge, player, players, isCustom) => {
+                                    root.__showPlayersDropdown(pos, rightEdge, player, players, isCustom);
                                 }
                                 onHideDropdowns: root.__hideDropdowns()
                                 onVolumeButtonExited: root.__startCloseTimer()

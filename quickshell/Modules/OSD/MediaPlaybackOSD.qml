@@ -9,7 +9,8 @@ DankOSD {
     id: root
 
     readonly property bool useVertical: isVerticalLayout
-    readonly property var player: MprisController.activePlayer
+    readonly property var player: MprisController.currentPlayer
+    readonly property bool isCustomSource: MprisController.useCustomSource
 
     osdWidth: useVertical ? (40 + Theme.spacingS * 2) : Math.min(280, Screen.width - Theme.spacingM * 2)
     osdHeight: useVertical ? (Theme.iconSize * 2) : (40 + Theme.spacingS * 2)
@@ -26,11 +27,11 @@ DankOSD {
         }
         let icon = "music_note";
         switch (player.playbackState) {
-        case MprisPlaybackState.Playing:
+        case CustomMediaSource.statePlaying:
             icon = "play_arrow";
             break;
-        case MprisPlaybackState.Paused:
-        case MprisPlaybackState.Stopped:
+        case CustomMediaSource.statePaused:
+        case CustomMediaSource.stateStopped:
             icon = "pause";
             break;
         }
@@ -97,42 +98,60 @@ DankOSD {
         }
     }
 
-    Connections {
-        target: player
+    // Unified update handler for both MPRIS and CustomSource
+    function handlePlaybackUpdate() {
+        if (!root.player?.trackTitle)
+            return;
+        if (!SettingsData.osdMediaPlaybackEnabled)
+            return;
 
-        function handleUpdate() {
-            if (!root.player?.trackTitle)
-                return;
-            if (!SettingsData.osdMediaPlaybackEnabled)
-                return;
+        root.updatePlaybackIcon();
+        TrackArtService.loadArtwork(player.trackArtUrl);
 
-            root.updatePlaybackIcon();
-            TrackArtService.loadArtwork(player.trackArtUrl);
-
-            if (!player.trackArtUrl || player.trackArtUrl === "") {
-                root.show();
-                return;
-            }
-            if (TrackArtService.loading) {
-                root._pendingShow = true;
-                return;
-            }
-            if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
-                root.show();
-                return;
-            }
-            root._pendingShow = true;
+        if (!player.trackArtUrl || player.trackArtUrl === "") {
+            root.show();
+            return;
         }
+        if (TrackArtService.loading) {
+            root._pendingShow = true;
+            return;
+        }
+        if (!TrackArtService._bgArtSource || artPreloader.status === Image.Ready) {
+            root.show();
+            return;
+        }
+        root._pendingShow = true;
+    }
+
+    // Connections for MPRIS player
+    Connections {
+        target: isCustomSource ? null : player
 
         function onTrackArtUrlChanged() {
             TrackArtService.loadArtwork(player.trackArtUrl);
         }
         function onIsPlayingChanged() {
-            handleUpdate();
+            handlePlaybackUpdate();
         }
         function onTrackChanged() {
             if (!useVertical)
-                handleUpdate();
+                handlePlaybackUpdate();
+        }
+    }
+
+    // Connections for CustomMediaSource
+    Connections {
+        target: isCustomSource ? CustomMediaSource : null
+
+        function onPlayingStateChanged() {
+            handlePlaybackUpdate();
+        }
+        function onTrackInfoChanged() {
+            if (!useVertical)
+                handlePlaybackUpdate();
+        }
+        function onArtworkChanged() {
+            TrackArtService.loadArtwork(player.trackArtUrl);
         }
     }
 
