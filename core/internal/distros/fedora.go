@@ -13,6 +13,9 @@ func init() {
 	Register("fedora", "#0B57A4", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewFedoraDistribution(config, logChan)
 	})
+	Register("evernight", "#72B8DC", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
+		return NewFedoraDistribution(config, logChan)
+	})
 	Register("nobara", "#0B57A4", FamilyFedora, func(config DistroConfig, logChan chan<- string) Distribution {
 		return NewFedoraDistribution(config, logChan)
 	})
