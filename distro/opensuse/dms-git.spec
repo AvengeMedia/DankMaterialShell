@@ -25,6 +25,7 @@ Recommends:     matugen
 Recommends:     quickshell-git
 Recommends:     NetworkManager
 Recommends:     qt6-qtmultimedia
+Suggests:       cups-pk-helper
 Suggests:       qt6ct
 
 Provides:       dms

@@ -162,6 +162,11 @@ Item {
         }
     ]
 
+    property string fileSearchType: "all"
+    property string fileSearchExt: ""
+    property string fileSearchFolder: ""
+    property string fileSearchSort: "score"
+
     property string pluginFilter: ""
     property string activePluginName: ""
     property var activePluginCategories: []
@@ -346,6 +351,10 @@ Item {
         previousSearchMode = "all";
         autoSwitchedToFiles = false;
         isFileSearching = false;
+        fileSearchType = "all";
+        fileSearchExt = "";
+        fileSearchFolder = "";
+        fileSearchSort = "score";
         sections = [];
         flatModel = [];
         selectedFlatIndex = 0;
@@ -397,6 +406,34 @@ Item {
         activePluginCategory = categoryId;
         AppSearchService.setPluginLauncherCategory(activePluginId, categoryId);
         performSearch();
+    }
+
+    function setFileSearchType(type) {
+        if (fileSearchType === type)
+            return;
+        fileSearchType = type;
+        performFileSearch();
+    }
+
+    function setFileSearchExt(ext) {
+        if (fileSearchExt === ext)
+            return;
+        fileSearchExt = ext;
+        performFileSearch();
+    }
+
+    function setFileSearchFolder(folder) {
+        if (fileSearchFolder === folder)
+            return;
+        fileSearchFolder = folder;
+        performFileSearch();
+    }
+
+    function setFileSearchSort(sort) {
+        if (fileSearchSort === sort)
+            return;
+        fileSearchSort = sort;
+        performFileSearch();
     }
 
     function clearPluginFilter() {
@@ -832,9 +869,19 @@ Item {
         var params = {
             limit: 20,
             fuzzy: true,
-            sort: "score",
+            sort: fileSearchSort || "score",
             desc: true
         };
+
+        if (DSearchService.supportsTypeFilter) {
+            params.type = (fileSearchType && fileSearchType !== "all") ? fileSearchType : "all";
+        }
+        if (fileSearchExt) {
+            params.ext = fileSearchExt;
+        }
+        if (fileSearchFolder) {
+            params.folder = fileSearchFolder;
+        }
 
         DSearchService.search(fileQuery, params, function (response) {
             isFileSearching = false;
@@ -845,34 +892,73 @@ Item {
 
             for (var i = 0; i < hits.length; i++) {
                 var hit = hits[i];
+                var docTypes = hit.locations?.doc_type;
+                var isDir = docTypes ? !!docTypes["dir"] : false;
                 fileItems.push(transformFileResult({
                     path: hit.id || "",
-                    score: hit.score || 0
+                    score: hit.score || 0,
+                    is_dir: isDir
                 }));
             }
 
-            var fileSection = {
-                id: "files",
-                title: I18n.tr("Files"),
-                icon: "folder",
-                priority: 4,
-                items: fileItems,
-                collapsed: collapsedSections["files"] || false,
-                flatStartIndex: 0
-            };
+            var fileSections = [];
+            var showType = fileSearchType || "all";
+
+            if (showType === "all" && DSearchService.supportsTypeFilter) {
+                var onlyFiles = [];
+                var onlyDirs = [];
+                for (var j = 0; j < fileItems.length; j++) {
+                    if (fileItems[j].data?.is_dir)
+                        onlyDirs.push(fileItems[j]);
+                    else
+                        onlyFiles.push(fileItems[j]);
+                }
+                if (onlyFiles.length > 0) {
+                    fileSections.push({
+                        id: "files",
+                        title: I18n.tr("Files"),
+                        icon: "insert_drive_file",
+                        priority: 4,
+                        items: onlyFiles,
+                        collapsed: collapsedSections["files"] || false,
+                        flatStartIndex: 0
+                    });
+                }
+                if (onlyDirs.length > 0) {
+                    fileSections.push({
+                        id: "folders",
+                        title: I18n.tr("Folders"),
+                        icon: "folder",
+                        priority: 4.1,
+                        items: onlyDirs,
+                        collapsed: collapsedSections["folders"] || false,
+                        flatStartIndex: 0
+                    });
+                }
+            } else {
+                var filesIcon = showType === "dir" ? "folder" : showType === "file" ? "insert_drive_file" : "folder";
+                var filesTitle = showType === "dir" ? I18n.tr("Folders") : I18n.tr("Files");
+                if (fileItems.length > 0) {
+                    fileSections.push({
+                        id: "files",
+                        title: filesTitle,
+                        icon: filesIcon,
+                        priority: 4,
+                        items: fileItems,
+                        collapsed: collapsedSections["files"] || false,
+                        flatStartIndex: 0
+                    });
+                }
+            }
 
             var newSections;
             if (searchMode === "files") {
-                newSections = fileItems.length > 0 ? [fileSection] : [];
+                newSections = fileSections;
             } else {
                 var existingNonFile = sections.filter(function (s) {
-                    return s.id !== "files";
+                    return s.id !== "files" && s.id !== "folders";
                 });
-                if (fileItems.length > 0) {
-                    newSections = existingNonFile.concat([fileSection]);
-                } else {
-                    newSections = existingNonFile;
-                }
+                newSections = existingNonFile.concat(fileSections);
             }
             newSections.sort(function (a, b) {
                 return a.priority - b.priority;
@@ -918,7 +1004,7 @@ Item {
     }
 
     function transformFileResult(file) {
-        return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"));
+        return Transform.transformFileResult(file, I18n.tr("Open"), I18n.tr("Open folder"), I18n.tr("Copy path"), I18n.tr("Open in terminal"));
     }
 
     function detectTrigger(query) {
@@ -1586,6 +1672,9 @@ Item {
         case "copy_path":
             copyToClipboard(item.data.path);
             break;
+        case "open_terminal":
+            openTerminal(item.data.path);
+            break;
         case "copy":
             copyToClipboard(item.name);
             break;
@@ -1665,6 +1754,16 @@ Item {
             return;
         var folder = path.substring(0, path.lastIndexOf("/"));
         Qt.openUrlExternally("file://" + folder);
+    }
+
+    function openTerminal(path) {
+        if (!path)
+            return;
+        var terminal = Quickshell.env("TERMINAL") || "xterm";
+        Quickshell.execDetached({
+            command: [terminal],
+            workingDirectory: path
+        });
     }
 
     function copyToClipboard(text) {

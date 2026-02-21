@@ -435,7 +435,15 @@ Item {
                     var mode = root.controller?.searchMode ?? "all";
                     switch (mode) {
                     case "files":
-                        return "folder_open";
+                        var fileType = root.controller?.fileSearchType ?? "all";
+                        switch (fileType) {
+                        case "dir":
+                            return "folder_open";
+                        case "file":
+                            return "insert_drive_file";
+                        default:
+                            return "folder_open";
+                        }
                     case "plugins":
                         return "extension";
                     case "apps":
@@ -465,7 +473,15 @@ Item {
                             return I18n.tr("Type to search files");
                         if (root.controller.searchQuery.length < 2)
                             return I18n.tr("Type at least 2 characters");
-                        return I18n.tr("No files found");
+                        var fileType = root.controller?.fileSearchType ?? "all";
+                        switch (fileType) {
+                        case "dir":
+                            return I18n.tr("No folders found");
+                        case "file":
+                            return I18n.tr("No files found");
+                        default:
+                            return I18n.tr("No results found");
+                        }
                     case "plugins":
                         return hasQuery ? I18n.tr("No plugin results") : I18n.tr("Browse or search plugins");
                     case "apps":

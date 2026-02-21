@@ -107,6 +107,10 @@ Item {
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
             spotlightContent.controller.pluginFilter = "";
+            spotlightContent.controller.fileSearchType = "all";
+            spotlightContent.controller.fileSearchExt = "";
+            spotlightContent.controller.fileSearchFolder = "";
+            spotlightContent.controller.fileSearchSort = "score";
             spotlightContent.controller.collapsedSections = {};
             spotlightContent.controller.selectedFlatIndex = 0;
             spotlightContent.controller.selectedItem = null;

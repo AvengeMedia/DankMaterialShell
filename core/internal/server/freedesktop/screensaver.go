@@ -1,6 +1,7 @@
 package freedesktop
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
@@ -15,45 +16,9 @@ type screensaverHandler struct {
 	manager *Manager
 }
 
-func (m *Manager) initializeScreensaver() error {
-	if m.sessionConn == nil {
-		m.stateMutex.Lock()
-		m.state.Screensaver.Available = false
-		m.stateMutex.Unlock()
-		return nil
-	}
-
-	reply, err := m.sessionConn.RequestName(dbusScreensaverName, dbus.NameFlagDoNotQueue)
-	if err != nil {
-		log.Warnf("Failed to request screensaver name: %v", err)
-		m.stateMutex.Lock()
-		m.state.Screensaver.Available = false
-		m.stateMutex.Unlock()
-		return nil
-	}
-
-	if reply != dbus.RequestNameReplyPrimaryOwner {
-		log.Warnf("Screensaver name already owned by another process")
-		m.stateMutex.Lock()
-		m.state.Screensaver.Available = false
-		m.stateMutex.Unlock()
-		return nil
-	}
-
-	handler := &screensaverHandler{manager: m}
-
-	if err := m.sessionConn.Export(handler, dbusScreensaverPath, dbusScreensaverInterface); err != nil {
-		log.Warnf("Failed to export screensaver on %s: %v", dbusScreensaverPath, err)
-		return nil
-	}
-
-	if err := m.sessionConn.Export(handler, dbusScreensaverPath2, dbusScreensaverInterface); err != nil {
-		log.Warnf("Failed to export screensaver on %s: %v", dbusScreensaverPath2, err)
-		return nil
-	}
-
-	screensaverIface := introspect.Interface{
-		Name: dbusScreensaverInterface,
+func screensaverIntrospectIface(ifaceName string) introspect.Interface {
+	return introspect.Interface{
+		Name: ifaceName,
 		Methods: []introspect.Method{
 			{
 				Name: "Inhibit",
@@ -69,40 +34,106 @@ func (m *Manager) initializeScreensaver() error {
 					{Name: "cookie", Type: "u", Direction: "in"},
 				},
 			},
+			{
+				Name: "GetActive",
+				Args: []introspect.Arg{
+					{Name: "active", Type: "b", Direction: "out"},
+				},
+			},
+			{
+				Name: "SetActive",
+				Args: []introspect.Arg{
+					{Name: "active", Type: "b", Direction: "in"},
+				},
+			},
+			{
+				Name: "Lock",
+			},
 		},
+		Signals: []introspect.Signal{
+			{
+				Name: "ActiveChanged",
+				Args: []introspect.Arg{
+					{Name: "new_value", Type: "b"},
+				},
+			},
+		},
+	}
+}
+
+func (m *Manager) initializeScreensaver() error {
+	if m.sessionConn == nil {
+		m.stateMutex.Lock()
+		m.state.Screensaver.Available = false
+		m.stateMutex.Unlock()
+		return nil
 	}
 
-	introNode := &introspect.Node{
-		Name: dbusScreensaverPath,
-		Interfaces: []introspect.Interface{
-			introspect.IntrospectData,
-			screensaverIface,
-		},
-	}
-	if err := m.sessionConn.Export(introspect.NewIntrospectable(introNode), dbusScreensaverPath, "org.freedesktop.DBus.Introspectable"); err != nil {
-		log.Warnf("Failed to export introspectable on %s: %v", dbusScreensaverPath, err)
-	}
+	handler := &screensaverHandler{manager: m}
 
-	introNode2 := &introspect.Node{
-		Name: dbusScreensaverPath2,
-		Interfaces: []introspect.Interface{
-			introspect.IntrospectData,
-			screensaverIface,
-		},
-	}
-	if err := m.sessionConn.Export(introspect.NewIntrospectable(introNode2), dbusScreensaverPath2, "org.freedesktop.DBus.Introspectable"); err != nil {
-		log.Warnf("Failed to export introspectable on %s: %v", dbusScreensaverPath2, err)
+	m.screensaverFreedesktopClaimed = m.claimScreensaverName(handler,
+		dbusScreensaverName, dbusScreensaverInterface, dbusScreensaverPath, dbusScreensaverPath2)
+	m.screensaverGnomeClaimed = m.claimScreensaverName(handler,
+		dbusGnomeScreensaverName, dbusGnomeScreensaverInterface, dbusGnomeScreensaverPath)
+
+	if !m.screensaverFreedesktopClaimed && !m.screensaverGnomeClaimed {
+		log.Warn("No screensaver interface could be claimed")
+		m.stateMutex.Lock()
+		m.state.Screensaver.Available = false
+		m.stateMutex.Unlock()
+		return nil
 	}
 
 	go m.watchPeerDisconnects()
 
 	m.stateMutex.Lock()
 	m.state.Screensaver.Available = true
+	m.state.Screensaver.Active = false
 	m.state.Screensaver.Inhibited = false
 	m.state.Screensaver.Inhibitors = []ScreensaverInhibitor{}
 	m.stateMutex.Unlock()
 
-	log.Info("Screensaver inhibit listener initialized")
+	log.Info("Screensaver listener initialized")
+	return nil
+}
+
+func (m *Manager) claimScreensaverName(handler *screensaverHandler, name, iface string, paths ...dbus.ObjectPath) bool {
+	reply, err := m.sessionConn.RequestName(name, dbus.NameFlagDoNotQueue)
+	if err != nil {
+		log.Warnf("Failed to request screensaver name %s: %v", name, err)
+		return false
+	}
+	if reply != dbus.RequestNameReplyPrimaryOwner {
+		log.Warnf("Screensaver name %s already owned by another process", name)
+		return false
+	}
+	if err := m.exportScreensaverOnPaths(handler, iface, paths...); err != nil {
+		log.Warnf("Failed to export screensaver on %s: %v", name, err)
+		return false
+	}
+	log.Infof("Claimed %s on session bus", name)
+	return true
+}
+
+// exportScreensaverOnPaths exports the handler and introspection on the given
+// paths under the specified interface name.
+func (m *Manager) exportScreensaverOnPaths(handler *screensaverHandler, ifaceName string, paths ...dbus.ObjectPath) error {
+	iface := screensaverIntrospectIface(ifaceName)
+	for _, path := range paths {
+		if err := m.sessionConn.Export(handler, path, ifaceName); err != nil {
+			return fmt.Errorf("export handler on %s: %w", path, err)
+		}
+		node := &introspect.Node{
+			Name: string(path),
+			Interfaces: []introspect.Interface{
+				introspect.IntrospectData,
+				iface,
+			},
+		}
+		if err := m.sessionConn.Export(introspect.NewIntrospectable(node), path, "org.freedesktop.DBus.Introspectable"); err != nil {
+			log.Warnf("Failed to export introspectable on %s: %v", path, err)
+		}
+	}
 	return nil
 }
 
@@ -267,4 +298,52 @@ func (m *Manager) NotifyScreensaverSubscribers() {
 		}
 		return true
 	})
+}
+
+func (h *screensaverHandler) GetActive() (bool, *dbus.Error) {
+	h.manager.stateMutex.RLock()
+	active := h.manager.state.Screensaver.Active
+	h.manager.stateMutex.RUnlock()
+	return active, nil
+}
+
+func (h *screensaverHandler) SetActive(active bool) *dbus.Error {
+	h.manager.SetScreenLockActive(active)
+	return nil
+}
+
+func (h *screensaverHandler) Lock() *dbus.Error {
+	h.manager.SetScreenLockActive(true)
+	return nil
+}
+
+func (m *Manager) SetScreenLockActive(active bool) {
+	m.stateMutex.Lock()
+	changed := m.state.Screensaver.Active != active
+	m.state.Screensaver.Active = active
+	m.stateMutex.Unlock()
+
+	if !changed {
+		return
+	}
+
+	log.Infof("Screen lock active changed: %v", active)
+	defer m.NotifyScreensaverSubscribers()
+
+	if m.sessionConn == nil {
+		return
+	}
+	if m.screensaverFreedesktopClaimed {
+		if err := m.sessionConn.Emit(dbusScreensaverPath, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath, err)
+		}
+		if err := m.sessionConn.Emit(dbusScreensaverPath2, dbusScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusScreensaverPath2, err)
+		}
+	}
+	if m.screensaverGnomeClaimed {
+		if err := m.sessionConn.Emit(dbusGnomeScreensaverPath, dbusGnomeScreensaverInterface+".ActiveChanged", active); err != nil {
+			log.Warnf("Failed to emit ActiveChanged on %s: %v", dbusGnomeScreensaverPath, err)
+		}
+	}
 }

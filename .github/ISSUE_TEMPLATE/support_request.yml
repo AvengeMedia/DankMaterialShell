@@ -7,32 +7,87 @@ body:
     attributes:
       value: |
         ## DankMaterialShell Support Request
-  - type: checkboxes
+  - type: dropdown
     id: compositor
     attributes:
       label: Compositor
       options:
-        - label: Niri
-        - label: Hyprland
-        - label: MangoWC (dwl)
-        - label: Sway
-        - label: Other (specify below)
+        - Niri
+        - Hyprland
+        - MangoWC (dwl)
+        - Sway
+        - Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: compositor_other
+    attributes:
+      label: If Other, please specify
+      placeholder: e.g., Wayfire, Mutter, etc.
     validations:
       required: false
-  - type: input
+  - type: dropdown
     id: distribution
     attributes:
       label: Distribution
-      description: Which Linux distribution are you using? (e.g., Arch, Fedora, Debian, etc.)
-      placeholder: Your Linux distribution
+      options:
+        - Arch Linux
+        - CachyOS
+        - Fedora
+        - NixOS
+        - Debian
+        - Ubuntu
+        - Gentoo
+        - OpenSUSE
+        - Other (specify below)
+    validations:
+      required: true
+  - type: input
+    id: distribution_other
+    attributes:
+      label: If Other, please specify
+      placeholder: e.g., PikaOS, Void Linux, etc.
+    validations:
+      required: false
+  - type: dropdown
+    id: installation_method
+    attributes:
+      label: Select your Installation Method
+      options:
+        - DankInstaller
+        - Distro Packaging
+        - Source
+    validations:
+      required: true
+  - type: dropdown
+    id: original_installation_method_different
+    attributes:
+      label: Was your original Installation method different?
+      options:
+        - "Yes"
+        - No (specify below)
+      default: 0
+    validations:
+      required: false
+  - type: input
+    id: original_installation_method_specify
+    attributes:
+      label: If no, specify
+      placeholder: e.g., Distro Packaging, then Source
     validations:
       required: false
   - type: textarea
     id: dms_doctor
     attributes:
       label: dms doctor -vC
-      description: Output of `dms doctor -vC` command
+      description: Output of `dms doctor -vC` command — paste between the lines below to keep it collapsed in the issue
       placeholder: Paste the output of `dms doctor -vC` here
+      value: |
+        <details>
+        <summary>Click to expand</summary>
+
+
+        </details>
     validations:
       required: false
   - type: textarea

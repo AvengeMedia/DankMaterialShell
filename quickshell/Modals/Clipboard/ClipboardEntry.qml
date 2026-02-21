@@ -84,7 +84,8 @@ Rectangle {
         anchors.right: actionButtons.left
         anchors.rightMargin: Theme.spacingM
         anchors.verticalCenter: parent.verticalCenter
-        height: contentColumn.implicitHeight
+        // height: contentColumn.implicitHeight
+        height: ClipboardConstants.itemHeight
         clip: true
 
         ClipboardThumbnail {
@@ -92,7 +93,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             width: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
-            height: entryType === "image" ? ClipboardConstants.thumbnailSize : Theme.iconSize
+            height: entryType === "image" ? ClipboardConstants.itemHeight - 4 : Theme.iconSize // 100 - 4 = 96, 96:72 = 4:3
             entry: root.entry
             entryType: root.entryType
             modal: root.modal

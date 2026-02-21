@@ -116,31 +116,43 @@ function transformBuiltInLauncherItem(item, pluginId, openLabel) {
     };
 }
 
-function transformFileResult(file, openLabel, openFolderLabel, copyPathLabel) {
+function transformFileResult(file, openLabel, openFolderLabel, copyPathLabel, openTerminalLabel) {
     var filename = file.path ? file.path.split("/").pop() : "";
     var dirname = file.path ? file.path.substring(0, file.path.lastIndexOf("/")) : "";
+    var isDir = file.is_dir || false;
+
+    var actions = [];
+    if (isDir) {
+        if (openTerminalLabel) {
+            actions.push({
+                name: openTerminalLabel,
+                icon: "terminal",
+                action: "open_terminal"
+            });
+        }
+    } else {
+        actions.push({
+            name: openFolderLabel,
+            icon: "folder_open",
+            action: "open_folder"
+        });
+    }
+    actions.push({
+        name: copyPathLabel,
+        icon: "content_copy",
+        action: "copy_path"
+    });
 
     return {
         id: file.path || "",
         type: "file",
         name: filename,
         subtitle: dirname,
-        icon: Utils.getFileIcon(filename),
+        icon: isDir ? "folder" : Utils.getFileIcon(filename),
         iconType: "material",
         section: "files",
         data: file,
-        actions: [
-            {
-                name: openFolderLabel,
-                icon: "folder_open",
-                action: "open_folder"
-            },
-            {
-                name: copyPathLabel,
-                icon: "content_copy",
-                action: "copy_path"
-            }
-        ],
+        actions: actions,
         primaryAction: {
             name: openLabel,
             icon: "open_in_new",

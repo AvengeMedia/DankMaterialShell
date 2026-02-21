@@ -28,8 +28,17 @@ override_dh_auto_build:
 	# Launchpad build environment has no internet access
 	test -d dms-git-repo || (echo "ERROR: dms-git-repo directory not found!" && exit 1)
 
-	# Patch go.mod to use Go 1.24 base version (Ubuntu has 1.24.4, project requires 1.24.6)
-	sed -i 's/^go 1\.24\.[0-9]*/go 1.24/' dms-git-repo/core/go.mod
+	# Patch go.mod for Launchpad: align go directive w/latest Go toolchain
+	GO_VERSION=$$(go env GOVERSION | sed -E 's/^go([0-9]+\.[0-9]+).*/\1/'); \
+	if [ -n "$$GO_VERSION" ]; then \
+		sed -E -i "s/^go 1\.[0-9]+(\.[0-9]+)?/go $$GO_VERSION/" dms-git-repo/core/go.mod; \
+		if [ -f dms-git-repo/core/vendor/modules.txt ]; then \
+			sed -E -i "s/^(## explicit; go )1\.[0-9]+(\.[0-9]+)?$$/\1$$GO_VERSION/" dms-git-repo/core/vendor/modules.txt; \
+		fi; \
+	else \
+		echo "Warning: Could not detect Go version, leaving go.mod go directive unchanged"; \
+	fi
+	sed -E -i '/^toolchain go[0-9.]+$$/d' dms-git-repo/core/go.mod
 
 	# Build dms-cli from source
 	# Detect architecture

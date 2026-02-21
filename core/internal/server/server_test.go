@@ -162,7 +162,7 @@ func TestCleanupStaleSockets(t *testing.T) {
 	tempDir := t.TempDir()
 	t.Setenv("XDG_RUNTIME_DIR", tempDir)
 
-	staleSocket := filepath.Join(tempDir, "danklinux-999999.sock")
+	staleSocket := filepath.Join(tempDir, "danklinux-4194305.sock")
 	err := os.WriteFile(staleSocket, []byte{}, 0o600)
 	require.NoError(t, err)
 

@@ -113,6 +113,7 @@ Rectangle {
                 font.family: Theme.fontFamily
                 color: Theme.surfaceVariantText
                 elide: Text.ElideRight
+                clip: true
                 visible: (root.item?.subtitle ?? "").length > 0
                 horizontalAlignment: Text.AlignLeft
             }
@@ -181,7 +182,7 @@ Rectangle {
                         case "plugin":
                             return I18n.tr("Plugin");
                         case "file":
-                            return I18n.tr("File");
+                            return root.item.data?.is_dir ? I18n.tr("Folder") : I18n.tr("File");
                         default:
                             return "";
                         }
