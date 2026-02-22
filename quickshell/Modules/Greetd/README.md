@@ -7,7 +7,7 @@ A greeter for [greetd](https://github.com/kennylevinsen/greetd) that follows the
 - **Multi user**: Login with any system user
 - **dms sync**: Sync settings with dms for consistent styling between shell and greeter
 - **Multiple compositors**: Supports niri, Hyprland, Sway, or mangowc.
-- **Custom PAM**: Supports custom PAM configuration in `/etc/pam.d/dankshell`
+- **Custom PAM**: Supports custom PAM configuration in `/etc/pam.d/greetd`
 - **Session Memory**: Remembers last selected session and user
 
 ## Installation
@@ -22,11 +22,32 @@ paru -S greetd-dms-greeter-git
 yay -S greetd-dms-greeter-git
 ```
 
-Once installed, disable any existing display manager and enable greetd:
+### Debian / openSUSE
+
+Official packages are available from the [DankLinux OBS repository](https://software.opensuse.org/download/package?package=dms-greeter&project=home%3AAvengeMedia%3Adanklinux). Add the repo for your distribution and install:
 
 ```bash
-sudo systemctl disable gdm sddm lightdm
-sudo systemctl enable greetd
+# Debian 13
+sudo apt install dms-greeter   # after adding the repo
+
+# openSUSE Tumbleweed
+zypper install dms-greeter     # after adding the repo
+```
+
+See the [Installation guide](https://danklinux.com/docs/dankgreeter/installation) for full repository setup.
+
+If you previously installed manually, remove legacy files first:
+
+```bash
+sudo rm -f /usr/local/bin/dms-greeter
+sudo rm -rf /etc/xdg/quickshell/dms-greeter
+```
+
+Then complete setup:
+
+```bash
+dms greeter enable
+dms greeter sync
 ```
 
 #### Syncing themes (Optional)
@@ -79,43 +100,32 @@ The package automatically:
 - Sets up directories and permissions
 - Configures greetd with auto-detected compositor
 - Applies SELinux contexts
-- Installs the `dms-greeter-sync` helper script
 
-Then disable existing display manager and enable greetd:
+Then complete setup:
 
 ```bash
-sudo systemctl disable gdm sddm lightdm
-sudo systemctl enable greetd
+dms greeter enable
+dms greeter sync
 ```
 
 #### Syncing themes (Optional)
 
-The RPM package includes the `dms-greeter-sync` helper for easy theme syncing:
+Run:
 
 ```bash
-dms-greeter-sync
+dms greeter sync
 ```
 
-Then logout/login to see your wallpaper on the greeter!
-
-<details>
-<summary>What does dms-greeter-sync do?</summary>
-
-The `dms-greeter-sync` helper automatically:
-- Adds you to the greeter group
-- Sets minimal ACL permissions on parent directories (traverse only)
-- Sets group ownership on your DMS config directories
-- Creates symlinks to share your theme files with the greeter
-
-This uses standard Linux ACLs (Access Control Lists) - the same security model used by GNOME, KDE, and systemd. The greeter user only gets traverse permission through your directories and can only read the specific theme files you share.
-
-</details>
+Then logout/login to see your wallpaper on the greeter.
 
 ### Automatic
 
 The easiest thing is to run `dms greeter install` or `dms` for interactive installation.
+On Debian/openSUSE, this now prefers the `dms-greeter` package when the OBS repo is configured.
 
-### Manual
+### Manual (fallback only)
+
+Use this only if no package is available for your distro.
 
 1. Install `greetd` (in most distro's standard repositories) and `quickshell`
 
@@ -211,7 +221,7 @@ vt = 1
 
 [default_session]
 user = "greeter"
-command = "/usr/local/bin/dms-greeter --command niri"
+command = "/usr/bin/dms-greeter --command niri"
 ```
 
 ### Manual usage
@@ -234,7 +244,7 @@ Simply edit `/etc/greetd/dms-niri.kdl` or `/etc/greetd/dms-hypr.conf` to change 
 
 The greeter can be personalized with wallpapers, themes, weather, clock formats, and more - configured exactly the same as dms.
 
-**Easiest method:** Run `dms-greeter-sync` to automatically sync your DMS theme with the greeter.
+**Easiest method:** Run `dms greeter sync` to automatically sync your DMS theme with the greeter.
 
 **Manual method:** You can manually synchronize configurations if you want greeter settings to always mirror your shell:
 

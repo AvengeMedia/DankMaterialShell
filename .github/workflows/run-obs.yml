@@ -10,6 +10,7 @@ on:
         options:
           - dms
           - dms-git
+          - dms-greeter
           - all
         default: "dms"
       rebuild_release:
@@ -72,12 +73,27 @@ jobs:
             fi
           }
 
+          # Helper function to check dms-greeter stable tag
+          check_dms_greeter_stable() {
+            LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
+            local OBS_SPEC=$(curl -s -u "$OBS_USERNAME:$OBS_PASSWORD" "https://api.opensuse.org/source/home:AvengeMedia:danklinux/dms-greeter/dms-greeter.spec" 2>/dev/null || echo "")
+            local OBS_VERSION=$(echo "$OBS_SPEC" | grep "^Version:" | awk '{print $2}' | xargs | sed 's/^v//')
+
+            if [[ -n "$LATEST_TAG" && "$LATEST_TAG" == "v$OBS_VERSION" ]]; then
+              echo "📋 dms-greeter: Tag $LATEST_TAG already exists, skipping"
+              return 1  # No update needed
+            else
+              echo "📋 dms-greeter: New tag ${LATEST_TAG:-unknown} (OBS has ${OBS_VERSION:-none})"
+              return 0  # Update needed
+            fi
+          }
+
           # Main logic
           REBUILD="${{ github.event.inputs.rebuild_release }}"
 
-          if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
-            # Tag selected or pushed - always update stable package
-            echo "packages=dms" >> $GITHUB_OUTPUT
+          if [[ "${{ github.ref }}" =~ ^refs/tags/ ]] && [[ -z "${{ github.event.inputs.package }}" ]]; then
+            # Run from tag with no package specified - update both stable packages
+            echo "packages=dms dms-greeter" >> $GITHUB_OUTPUT
             VERSION="${GITHUB_REF#refs/tags/}"
             echo "version=$VERSION" >> $GITHUB_OUTPUT
             echo "has_updates=true" >> $GITHUB_OUTPUT
@@ -112,6 +128,10 @@ jobs:
                   echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
                 fi
               fi
+              if check_dms_greeter_stable; then
+                PACKAGES_TO_UPDATE+=("dms-greeter")
+                [[ -n "$LATEST_TAG" ]] && echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+              fi
 
               if [[ ${#PACKAGES_TO_UPDATE[@]} -gt 0 ]]; then
                 echo "packages=${PACKAGES_TO_UPDATE[*]}" >> $GITHUB_OUTPUT
@@ -134,6 +154,18 @@ jobs:
 
             elif [[ "$PKG" == "dms" ]]; then
               if check_dms_stable; then
+                echo "packages=$PKG" >> $GITHUB_OUTPUT
+                echo "has_updates=true" >> $GITHUB_OUTPUT
+                if [[ -n "$LATEST_TAG" ]]; then
+                  echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+                fi
+              else
+                echo "packages=" >> $GITHUB_OUTPUT
+                echo "has_updates=false" >> $GITHUB_OUTPUT
+              fi
+
+            elif [[ "$PKG" == "dms-greeter" ]]; then
+              if check_dms_greeter_stable; then
                 echo "packages=$PKG" >> $GITHUB_OUTPUT
                 echo "has_updates=true" >> $GITHUB_OUTPUT
                 if [[ -n "$LATEST_TAG" ]]; then
@@ -171,15 +203,8 @@ jobs:
       - name: Determine packages to update
         id: packages
         run: |
-          # Check if GITHUB_REF points to a tag (works for both push events and workflow_dispatch with tag selected)
-          if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
-            # Tag selected or pushed - use the tag from GITHUB_REF
-            echo "packages=dms" >> $GITHUB_OUTPUT
-            VERSION="${GITHUB_REF#refs/tags/}"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
-            echo "Using tag from GITHUB_REF: $VERSION"
-          # Check if check-updates already determined a version (from auto-detection)
-          elif [[ -n "${{ needs.check-updates.outputs.version }}" ]]; then
+          # Use check-updates outputs when available
+          if [[ -n "${{ needs.check-updates.outputs.version }}" ]]; then
             # Use version from check-updates job
             echo "packages=${{ needs.check-updates.outputs.packages }}" >> $GITHUB_OUTPUT
             echo "version=${{ needs.check-updates.outputs.version }}" >> $GITHUB_OUTPUT
@@ -191,40 +216,16 @@ jobs:
           elif [[ -n "${{ github.event.inputs.package }}" ]]; then
             # Manual workflow dispatch
 
-            # Determine version for dms stable
-            if [[ "${{ github.event.inputs.package }}" == "dms" ]]; then
-              # Use github.ref if tag selected, otherwise auto-detect latest
-              if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
-                VERSION="${GITHUB_REF#refs/tags/}"
-                echo "version=$VERSION" >> $GITHUB_OUTPUT
-                echo "Using tag from GITHUB_REF: $VERSION"
+            # Determine version for dms stable and dms-greeter using the API
+            # GITHUB_REF is unreliable when "Use workflow from" a tag; API works from any ref
+            if [[ "${{ github.event.inputs.package }}" == "dms" ]] || [[ "${{ github.event.inputs.package }}" == "dms-greeter" ]] || [[ "${{ github.event.inputs.package }}" == "all" ]]; then
+              LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
+              if [[ -n "$LATEST_TAG" ]]; then
+                echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
+                echo "Using latest release from API: $LATEST_TAG"
               else
-                # Auto-detect latest release for dms
-                LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
-                if [[ -n "$LATEST_TAG" ]]; then
-                  echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
-                  echo "Auto-detected latest release: $LATEST_TAG"
-                else
-                  echo "ERROR: Could not auto-detect latest release"
-                  exit 1
-                fi
-              fi
-            elif [[ "${{ github.event.inputs.package }}" == "all" ]]; then
-              # Use github.ref if tag selected, otherwise auto-detect latest
-              if [[ "${{ github.ref }}" =~ ^refs/tags/ ]]; then
-                VERSION="${GITHUB_REF#refs/tags/}"
-                echo "version=$VERSION" >> $GITHUB_OUTPUT
-                echo "Using tag from GITHUB_REF: $VERSION"
-              else
-                # Auto-detect latest release for "all"
-                LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
-                if [[ -n "$LATEST_TAG" ]]; then
-                  echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
-                  echo "Auto-detected latest release: $LATEST_TAG"
-                else
-                  echo "ERROR: Could not auto-detect latest release"
-                  exit 1
-                fi
+                echo "ERROR: Could not fetch latest release from API"
+                exit 1
               fi
             fi
 
@@ -283,54 +284,65 @@ jobs:
             echo " -- Avenge Media <AvengeMedia.US@gmail.com>  $CHANGELOG_DATE"
           } > "distro/debian/dms-git/debian/changelog"
 
-      - name: Update dms stable version
+      - name: Update stable version (dms + dms-greeter)
         if: steps.packages.outputs.version != ''
         run: |
           VERSION="${{ steps.packages.outputs.version }}"
           VERSION_NO_V="${VERSION#v}"
+          PACKAGES="${{ steps.packages.outputs.packages }}"
           echo "==> Updating packaging files to version: $VERSION_NO_V"
 
-          # Update spec file
-          sed -i "s/^Version:.*/Version:        $VERSION_NO_V/" distro/opensuse/dms.spec
+          # Update dms spec and changelog when dms is in the upload list
+          if [[ "$PACKAGES" == *"dms"* ]]; then
+            sed -i "s/^Version:.*/Version:        $VERSION_NO_V/" distro/opensuse/dms.spec
+            UPDATED_VERSION=$(grep -oP '^Version:\s+\K[0-9.]+' distro/opensuse/dms.spec | head -1)
+            echo "✓ dms spec now shows Version: $UPDATED_VERSION"
 
-          # Verify the update
-          UPDATED_VERSION=$(grep -oP '^Version:\s+\K[0-9.]+' distro/opensuse/dms.spec | head -1)
-          echo "✓ Spec file now shows Version: $UPDATED_VERSION"
+            DATE_STR=$(date "+%a %b %d %Y")
+            LOCAL_SPEC_HEAD=$(sed -n '1,/%changelog/{ /%changelog/d; p }' distro/opensuse/dms.spec)
+            {
+              echo "$LOCAL_SPEC_HEAD"
+              echo "%changelog"
+              echo "* $DATE_STR AvengeMedia <maintainer@avengemedia.com> - ${VERSION_NO_V}-1"
+              echo "- Update to stable $VERSION release"
+            } > distro/opensuse/dms.spec
 
-          # Single changelog entry (full history on OBS website)
-          DATE_STR=$(date "+%a %b %d %Y")
-          LOCAL_SPEC_HEAD=$(sed -n '1,/%changelog/{ /%changelog/d; p }' distro/opensuse/dms.spec)
-          {
-            echo "$LOCAL_SPEC_HEAD"
-            echo "%changelog"
-            echo "* $DATE_STR AvengeMedia <maintainer@avengemedia.com> - ${VERSION_NO_V}-1"
-            echo "- Update to stable $VERSION release"
-          } > distro/opensuse/dms.spec
-
-          # Update Debian _service files (both tar_scm and download_url formats)
-          for service in distro/debian/*/_service; do
-            if [[ -f "$service" ]]; then
-              # Update tar_scm revision parameter (for dms-git)
-              sed -i "s|<param name=\"revision\">v[0-9.]*</param>|<param name=\"revision\">$VERSION</param>|" "$service"
-
-              # Update download_url paths (for dms stable)
-              sed -i "s|/v[0-9.]\+/|/$VERSION/|g" "$service"
-              sed -i "s|/tags/v[0-9.]\+\.tar\.gz|/tags/$VERSION.tar.gz|g" "$service"
+            if [[ -f "distro/debian/dms/debian/changelog" ]]; then
+              CHANGELOG_DATE=$(date -R)
+              {
+                echo "dms (${VERSION_NO_V}db1) stable; urgency=medium"
+                echo ""
+                echo "  * Update to $VERSION stable release"
+                echo ""
+                echo " -- Avenge Media <AvengeMedia.US@gmail.com>  $CHANGELOG_DATE"
+              } > "distro/debian/dms/debian/changelog"
+              echo "✓ Updated dms changelog to ${VERSION_NO_V}db1"
             fi
-          done
+          fi
 
-          # Update Debian changelog for dms stable (single entry, history on OBS website)
-          if [[ -f "distro/debian/dms/debian/changelog" ]]; then
+          # Update dms-greeter changelog when dms-greeter is in the upload list
+          if [[ "$PACKAGES" == *"dms-greeter"* ]] && [[ -f "distro/debian/dms-greeter/debian/changelog" ]]; then
             CHANGELOG_DATE=$(date -R)
             {
-              echo "dms (${VERSION_NO_V}db1) stable; urgency=medium"
+              echo "dms-greeter (${VERSION_NO_V}db1) unstable; urgency=medium"
               echo ""
               echo "  * Update to $VERSION stable release"
               echo ""
               echo " -- Avenge Media <AvengeMedia.US@gmail.com>  $CHANGELOG_DATE"
-            } > "distro/debian/dms/debian/changelog"
-            echo "✓ Updated Debian changelog to ${VERSION_NO_V}db1"
+            } > "distro/debian/dms-greeter/debian/changelog"
+            echo "✓ Updated dms-greeter changelog to ${VERSION_NO_V}db1"
           fi
+
+          # Update Debian _service files for packages in upload list (download_url paths)
+          for service in distro/debian/*/_service; do
+            if [[ -f "$service" ]]; then
+              # Update tar_scm revision parameter (for dms-git)
+              sed -i "s|<param name=\"revision\">v[0-9.]*</param>|<param name=\"revision\">$VERSION</param>|" "$service"
+              # Update download_url paths (for dms, dms-greeter stable)
+              sed -i "s|/v[0-9.]\+/|/$VERSION/|g" "$service"
+              sed -i "s|/tags/v[0-9.]\+\.tar\.gz|/tags/$VERSION.tar.gz|g" "$service"
+            fi
+          done
 
       - name: Install Go
         uses: actions/setup-go@v5
@@ -354,6 +366,7 @@ jobs:
           chmod 600 ~/.config/osc/oscrc
 
       - name: Upload to OBS
+        id: upload
         env:
           REBUILD_RELEASE: ${{ github.event.inputs.rebuild_release }}
           TAG_VERSION: ${{ steps.packages.outputs.version }}
@@ -362,6 +375,8 @@ jobs:
 
           if [[ -z "$PACKAGES" ]]; then
             echo "✓ No packages need uploading. All up to date!"
+            echo "uploaded_packages=" >> $GITHUB_OUTPUT
+            echo "skipped_packages=" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -370,6 +385,9 @@ jobs:
             MESSAGE="Update to ${{ steps.packages.outputs.version }}"
             echo "==> Version being uploaded: ${{ steps.packages.outputs.version }}"
           fi
+
+          UPLOADED_PACKAGES=()
+          SKIPPED_PACKAGES=()
 
           # PACKAGES can be space-separated list (e.g., "dms-git dms" from "all" check)
           # Loop through each package and upload
@@ -382,12 +400,36 @@ jobs:
             fi
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
+            LOG_FILE=$(mktemp)
+            set +e
             if [[ "$PKG" == "dms-git" ]]; then
-              bash distro/scripts/obs-upload.sh dms-git "Automated git update"
+              bash distro/scripts/obs-upload.sh dms-git "Automated git update" >"$LOG_FILE" 2>&1
             else
-              bash distro/scripts/obs-upload.sh "$PKG" "$MESSAGE"
+              bash distro/scripts/obs-upload.sh "$PKG" "$MESSAGE" >"$LOG_FILE" 2>&1
             fi
+            STATUS=$?
+            set -e
+
+            cat "$LOG_FILE"
+
+            if [[ $STATUS -ne 0 ]]; then
+              rm -f "$LOG_FILE"
+              echo "❌ Upload failed for $PKG"
+              exit $STATUS
+            fi
+
+            if grep -Eq "Exiting gracefully \(no changes needed\)|No changes needed for this package\. Exiting gracefully\." "$LOG_FILE"; then
+              echo "ℹ️  $PKG is already up to date. Skipped."
+              SKIPPED_PACKAGES+=("$PKG")
+            else
+              UPLOADED_PACKAGES+=("$PKG")
+            fi
+
+            rm -f "$LOG_FILE"
           done
+
+          echo "uploaded_packages=${UPLOADED_PACKAGES[*]}" >> $GITHUB_OUTPUT
+          echo "skipped_packages=${SKIPPED_PACKAGES[*]}" >> $GITHUB_OUTPUT
 
       - name: Summary
         if: always()
@@ -402,20 +444,59 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "All packages are current. Run completed successfully." >> $GITHUB_STEP_SUMMARY
           else
-            echo "**Packages Uploaded:**" >> $GITHUB_STEP_SUMMARY
+            UPLOADED_PACKAGES="${{ steps.upload.outputs.uploaded_packages }}"
+            SKIPPED_PACKAGES="${{ steps.upload.outputs.skipped_packages }}"
+            TOTAL_COUNT=$(wc -w <<<"$PACKAGES" | tr -d ' ')
+            UPLOADED_COUNT=0
+            SKIPPED_COUNT=0
+            if [[ -n "$UPLOADED_PACKAGES" ]]; then
+              UPLOADED_COUNT=$(wc -w <<<"$UPLOADED_PACKAGES" | tr -d ' ')
+            fi
+            if [[ -n "$SKIPPED_PACKAGES" ]]; then
+              SKIPPED_COUNT=$(wc -w <<<"$SKIPPED_PACKAGES" | tr -d ' ')
+            fi
+            in_list() {
+              local item="$1"
+              local list="$2"
+              [[ " $list " == *" $item "* ]]
+            }
+
+            if [[ "${{ job.status }}" == "success" ]]; then
+              echo "**Status:** ✅ Completed successfully" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "**Status:** ❌ Completed with errors" >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Processed:** $TOTAL_COUNT package(s)" >> $GITHUB_STEP_SUMMARY
+            echo "**Uploaded:** $UPLOADED_COUNT package(s)" >> $GITHUB_STEP_SUMMARY
+            echo "**Skipped (up to date):** $SKIPPED_COUNT package(s)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Packages:**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
 
             for PKG in $PACKAGES; do
+              STATUS_ICON="✅"
+              STATUS_TEXT="uploaded"
+              if in_list "$PKG" "$SKIPPED_PACKAGES"; then
+                STATUS_ICON="ℹ️"
+                STATUS_TEXT="up to date (skipped)"
+              elif ! in_list "$PKG" "$UPLOADED_PACKAGES"; then
+                STATUS_ICON="❌"
+                STATUS_TEXT="failed"
+              fi
+
               case "$PKG" in
                 dms)
-                  echo "- ✅ **dms** → [View builds](https://build.opensuse.org/package/show/home:AvengeMedia:dms/dms)" >> $GITHUB_STEP_SUMMARY
+                  echo "- $STATUS_ICON **dms** ($STATUS_TEXT) → [View builds](https://build.opensuse.org/package/show/home:AvengeMedia:dms/dms)" >> $GITHUB_STEP_SUMMARY
                   ;;
                 dms-git)
-                  echo "- ✅ **dms-git** → [View builds](https://build.opensuse.org/package/show/home:AvengeMedia:dms-git/dms-git)" >> $GITHUB_STEP_SUMMARY
+                  echo "- $STATUS_ICON **dms-git** ($STATUS_TEXT) → [View builds](https://build.opensuse.org/package/show/home:AvengeMedia:dms-git/dms-git)" >> $GITHUB_STEP_SUMMARY
+                  ;;
+                dms-greeter)
+                  echo "- $STATUS_ICON **dms-greeter** ($STATUS_TEXT) → [View builds](https://build.opensuse.org/package/show/home:AvengeMedia:danklinux/dms-greeter)" >> $GITHUB_STEP_SUMMARY
                   ;;
               esac
             done
-
             echo "" >> $GITHUB_STEP_SUMMARY
 
             if [[ -n "${{ github.event.inputs.rebuild_release }}" ]]; then

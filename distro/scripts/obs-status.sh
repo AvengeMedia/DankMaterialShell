@@ -11,7 +11,7 @@
 OBS_BASE_PROJECT="home:AvengeMedia"
 OBS_BASE="$HOME/.cache/osc-checkouts"
 
-ALL_PACKAGES=(dms dms-git)
+ALL_PACKAGES=(dms dms-git dms-greeter)
 
 REPOS=("Debian_13" "openSUSE_Tumbleweed" "16.0")
 ARCHES=("x86_64" "aarch64")
@@ -40,6 +40,9 @@ for pkg in "${PACKAGES[@]}"; do
         ;;
     dms-git)
         PROJECT="$OBS_BASE_PROJECT:dms-git"
+        ;;
+    dms-greeter)
+        PROJECT="$OBS_BASE_PROJECT:danklinux"
         ;;
     *)
         echo "Error: Unknown package '$pkg'"
@@ -74,10 +77,14 @@ for pkg in "${PACKAGES[@]}"; do
                         COLOR="\033[0;32m" # Green
                         SYMBOL="✅"
                         ;;
-                    failed)
+                    failed|broken|broken*)
                         COLOR="\033[0;31m" # Red
                         SYMBOL="❌"
                         FAILED_BUILDS+=("$repo $arch")
+                        ;;
+                    blocked)
+                        COLOR="\033[0;33m" # Yellow
+                        SYMBOL="⏸️"
                         ;;
                     unresolvable)
                         COLOR="\033[0;33m" # Yellow

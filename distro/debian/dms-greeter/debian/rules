@@ -1,0 +1,48 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+DEB_VERSION := $(shell dpkg-parsechangelog -S Version)
+UPSTREAM_VERSION := $(shell echo $(DEB_VERSION) | sed 's/-[^-]*$$//')
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	: nothing to build, we use prebuilt tarball content
+
+override_dh_auto_install:
+	# Same pattern as dms: upstream from combined tarball (native format)
+	# Build root is either . (we're inside dms-qml) or has dms-qml/ subdir
+	SOURCE_DIR=""; \
+	if [ -d dms-qml ]; then SOURCE_DIR="dms-qml"; \
+	elif [ -f Modules/Greetd/assets/dms-greeter ]; then SOURCE_DIR="."; \
+	fi; \
+	if [ -n "$$SOURCE_DIR" ]; then \
+		mkdir -p debian/dms-greeter/usr/share/quickshell/dms-greeter && \
+		( cd $$SOURCE_DIR && tar cf - --exclude=debian . ) | \
+		( cd debian/dms-greeter/usr/share/quickshell/dms-greeter && tar xf - ) && \
+		install -Dm755 $$SOURCE_DIR/Modules/Greetd/assets/dms-greeter \
+			debian/dms-greeter/usr/bin/dms-greeter && \
+		install -Dm644 $$SOURCE_DIR/Modules/Greetd/README.md \
+			debian/dms-greeter/usr/share/doc/dms-greeter/README.md && \
+		install -Dm644 $$SOURCE_DIR/LICENSE \
+			debian/dms-greeter/usr/share/doc/dms-greeter/LICENSE && \
+		install -Dpm0644 $$SOURCE_DIR/systemd/tmpfiles-dms-greeter.conf \
+			debian/dms-greeter/usr/lib/tmpfiles.d/dms-greeter.conf; \
+	else \
+		echo "ERROR: No upstream source (dms-qml or Modules/Greetd/assets/dms-greeter)!" && \
+		echo "Contents of current directory:" && ls -la && exit 1; \
+	fi
+
+	# Remove build and development files
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/core
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/distro
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/.git*
+	rm -f debian/dms-greeter/usr/share/quickshell/dms-greeter/.gitignore
+	rm -rf debian/dms-greeter/usr/share/quickshell/dms-greeter/.github
+
+override_dh_auto_clean:
+	rm -rf dms-qml
+	# When build root is dms-qml itself, we're inside it - nothing extra to remove
+	dh_auto_clean
