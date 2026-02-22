@@ -127,7 +127,7 @@ Rectangle {
                 elide: Text.ElideRight
             }
 
-            StyledText {
+            Text {
                 text: entryPreview
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
@@ -135,6 +135,7 @@ Rectangle {
                 wrapMode: Text.WordWrap
                 maximumLineCount: entryType === "long_text" ? 3 : 1
                 elide: Text.ElideRight
+                textFormat: Text.PlainText
             }
         }
     }
