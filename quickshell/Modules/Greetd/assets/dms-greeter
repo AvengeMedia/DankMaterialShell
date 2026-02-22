@@ -35,6 +35,14 @@ Examples:
 EOF
 }
 
+require_command() {
+    local cmd="$1"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Error: required command '$cmd' was not found in PATH" >&2
+        exit 1
+    fi
+}
+
 while [[ $# -gt 0 ]]; do
     case $1 in
         --command)
@@ -107,14 +115,23 @@ export DMS_GREET_CFG_DIR="$CACHE_DIR"
 
 mkdir -p "$CACHE_DIR"
 
-QS_CMD="qs"
+if command -v qs >/dev/null 2>&1; then
+    QS_BIN="qs"
+elif command -v quickshell >/dev/null 2>&1; then
+    QS_BIN="quickshell"
+else
+    echo "Error: neither 'qs' nor 'quickshell' was found in PATH" >&2
+    exit 1
+fi
+
+QS_CMD="$QS_BIN"
 if [[ "$DMS_PATH" == /* ]]; then
-    QS_CMD="qs -p $DMS_PATH"
+    QS_CMD="$QS_BIN -p $DMS_PATH"
 else
     RESOLVED_PATH=$(locate_dms_config "$DMS_PATH")
     if [[ $? -eq 0 && -n "$RESOLVED_PATH" ]]; then
         echo "Located DMS config at: $RESOLVED_PATH" >&2
-        QS_CMD="qs -p $RESOLVED_PATH"
+        QS_CMD="$QS_BIN -p $RESOLVED_PATH"
     else
         echo "Error: Could not find DMS config '$DMS_PATH' (shell.qml) in any valid config path" >&2
         exit 1
@@ -123,6 +140,7 @@ fi
 
 case "$COMPOSITOR" in
     niri)
+        require_command "niri"
         if [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
 			# base/default config
@@ -178,6 +196,10 @@ NIRI_EOF
         ;;
 
     hyprland)
+        if ! command -v start-hyprland >/dev/null 2>&1 && ! command -v Hyprland >/dev/null 2>&1; then
+            echo "Error: neither 'start-hyprland' nor 'Hyprland' was found in PATH" >&2
+            exit 1
+        fi
         if [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
             cat > "$TEMP_CONFIG" << HYPRLAND_EOF
@@ -207,6 +229,7 @@ HYPRLAND_EOF
         ;;
 
     sway)
+        require_command "sway"
         if [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
             cat > "$TEMP_CONFIG" << SWAY_EOF
@@ -226,6 +249,7 @@ SWAY_EOF
         ;;
 
     scroll)
+        require_command "scroll"
         if [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
             cat > "$TEMP_CONFIG" << SCROLL_EOF
@@ -245,6 +269,7 @@ SCROLL_EOF
         ;;
 
     miracle|miracle-wm)
+        require_command "miracle-wm"
         if [[ -z "$COMPOSITOR_CONFIG" ]]; then
             TEMP_CONFIG=$(mktemp)
             cat > "$TEMP_CONFIG" << MIRACLE_EOF
@@ -264,6 +289,7 @@ MIRACLE_EOF
         ;;
 
     labwc)
+        require_command "labwc"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
             exec labwc --config "$COMPOSITOR_CONFIG" --session "$QS_CMD"
         else
@@ -272,6 +298,7 @@ MIRACLE_EOF
         ;;
 
     mango|mangowc)
+        require_command "mango"
         if [[ -n "$COMPOSITOR_CONFIG" ]]; then
             exec mango -c "$COMPOSITOR_CONFIG" -s "$QS_CMD && mmsg -d quit"
         else

@@ -1,0 +1,108 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Create greeter user/group if they don't exist
+        if ! getent group greeter >/dev/null; then
+            addgroup --system greeter
+        fi
+
+        if ! getent passwd greeter >/dev/null; then
+            adduser --system --ingroup greeter --home /var/lib/greeter \
+                --shell /bin/bash --gecos "System Greeter" greeter
+        fi
+
+        if [ -d /var/cache/dms-greeter ]; then
+            chown -R greeter:greeter /var/cache/dms-greeter 2>/dev/null || true
+        fi
+
+        if [ -d /var/lib/greeter ]; then
+            chown -R greeter:greeter /var/lib/greeter 2>/dev/null || true
+        fi
+
+        # Check and set graphical.target as default
+        CURRENT_TARGET=$(systemctl get-default 2>/dev/null || echo "unknown")
+        if [ "$CURRENT_TARGET" != "graphical.target" ]; then
+            systemctl set-default graphical.target >/dev/null 2>&1 || true
+            TARGET_STATUS="Set to graphical.target (was: $CURRENT_TARGET) ✓"
+        else
+            TARGET_STATUS="Already graphical.target ✓"
+        fi
+
+        GREETD_CONFIG="/etc/greetd/config.toml"
+        CONFIG_STATUS="Not modified (already configured)"
+
+        # Check if niri or hyprland exists
+        COMPOSITOR="niri"
+        if ! command -v niri >/dev/null 2>&1; then
+            if command -v Hyprland >/dev/null 2>&1; then
+                COMPOSITOR="hyprland"
+            fi
+        fi
+
+        # If config doesn't exist, create a default one
+        if [ ! -f "$GREETD_CONFIG" ]; then
+            mkdir -p /etc/greetd
+            cat > "$GREETD_CONFIG" << 'GREETD_EOF'
+[terminal]
+vt = 1
+
+[default_session]
+user = "greeter"
+command = "/usr/bin/dms-greeter --command COMPOSITOR_PLACEHOLDER"
+GREETD_EOF
+            sed -i "s|COMPOSITOR_PLACEHOLDER|$COMPOSITOR|" "$GREETD_CONFIG"
+            CONFIG_STATUS="Created new config with $COMPOSITOR ✓"
+        elif ! grep -q "dms-greeter" "$GREETD_CONFIG"; then
+            # Backup existing config
+            BACKUP_FILE="${GREETD_CONFIG}.backup-$(date +%Y%m%d-%H%M%S)"
+            cp "$GREETD_CONFIG" "$BACKUP_FILE" 2>/dev/null || true
+
+            # Update command in default_session section
+            sed -i "/^\[default_session\]/,/^\[/ s|^command =.*|command = \"/usr/bin/dms-greeter --command $COMPOSITOR\"|" "$GREETD_CONFIG"
+            sed -i '/^\[default_session\]/,/^\[/ s|^user =.*|user = "greeter"|' "$GREETD_CONFIG"
+            CONFIG_STATUS="Updated existing config (backed up) with $COMPOSITOR ✓"
+        fi
+
+        # Only show banner on initial install
+        if [ -z "$2" ]; then
+            cat << 'EOF'
+
+=========================================================================
+        DMS Greeter Installation Complete!
+=========================================================================
+
+Status:
+EOF
+            echo "    ✓ Greetd config: $CONFIG_STATUS"
+            echo "    ✓ Default target: $TARGET_STATUS"
+            cat << 'EOF'
+    ✓ Greeter user: Created
+    ✓ Greeter directories: /var/cache/dms-greeter, /var/lib/greeter
+
+Next steps:
+
+1. Enable the greeter:
+     dms greeter enable
+     (This will automatically disable conflicting display managers,
+      set graphical.target, and enable greetd)
+
+2. Sync your theme with the greeter (optional):
+     dms greeter sync
+
+3. Check your setup:
+     dms greeter status
+
+Ready to test? Run: sudo systemctl start greetd
+Documentation: https://danklinux.com/docs/dankgreeter/
+=========================================================================
+
+EOF
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
