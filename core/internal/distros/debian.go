@@ -61,6 +61,7 @@ func (d *DebianDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	dependencies = append(dependencies, d.detectGit())
 	dependencies = append(dependencies, d.detectWindowManager(wm))
 	dependencies = append(dependencies, d.detectQuickshell())
+	dependencies = append(dependencies, d.detectDMSGreeter())
 	dependencies = append(dependencies, d.detectXDGPortal())
 	dependencies = append(dependencies, d.detectAccountsService())
 
@@ -86,6 +87,10 @@ func (d *DebianDistribution) detectAccountsService() deps.Dependency {
 	return d.detectPackage("accountsservice", "D-Bus interface for user account query and manipulation", d.packageInstalled("accountsservice"))
 }
 
+func (d *DebianDistribution) detectDMSGreeter() deps.Dependency {
+	return d.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", d.packageInstalled("dms-greeter"))
+}
+
 func (d *DebianDistribution) packageInstalled(pkg string) bool {
 	cmd := exec.Command("dpkg", "-l", pkg)
 	err := cmd.Run()
@@ -108,6 +113,7 @@ func (d *DebianDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		// DMS packages from OBS with variant support
 		"dms (DankMaterialShell)": d.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"quickshell":              d.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"dgop":                    {Name: "dgop", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},

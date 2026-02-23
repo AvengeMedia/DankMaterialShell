@@ -78,6 +78,7 @@ func (f *FedoraDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	dependencies = append(dependencies, f.detectGit())
 	dependencies = append(dependencies, f.detectWindowManager(wm))
 	dependencies = append(dependencies, f.detectQuickshell())
+	dependencies = append(dependencies, f.detectDMSGreeter())
 	dependencies = append(dependencies, f.detectXDGPortal())
 	dependencies = append(dependencies, f.detectAccountsService())
 
@@ -123,6 +124,7 @@ func (f *FedoraDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 
 		// COPR packages
 		"quickshell":              f.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
 		"dms (DankMaterialShell)": f.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"dgop":                    {Name: "dgop", Repository: RepoTypeCOPR, RepoURL: "avengemedia/danklinux"},
@@ -192,6 +194,10 @@ func (f *FedoraDistribution) detectAccountsService() deps.Dependency {
 		Description: "D-Bus interface for user account query and manipulation",
 		Required:    true,
 	}
+}
+
+func (f *FedoraDistribution) detectDMSGreeter() deps.Dependency {
+	return f.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", f.packageInstalled("dms-greeter"))
 }
 
 func (f *FedoraDistribution) getPrerequisites() []string {
