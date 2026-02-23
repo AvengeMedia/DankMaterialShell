@@ -234,16 +234,7 @@ Rectangle {
                         spacing: Theme.spacingS
 
                         DankIcon {
-                            name: {
-                                if (modelData.name.includes("bluez"))
-                                    return "headset";
-                                else if (modelData.name.includes("hdmi"))
-                                    return "tv";
-                                else if (modelData.name.includes("usb"))
-                                    return "headset";
-                                else
-                                    return "speaker";
-                            }
+                            name: AudioService.sinkIcon(modelData)
                             size: Theme.iconSize - 4
                             color: modelData === AudioService.sink ? Theme.primary : Theme.surfaceText
                             anchors.verticalCenter: parent.verticalCenter
