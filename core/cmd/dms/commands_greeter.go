@@ -151,11 +151,22 @@ func installGreeter() error {
 		return err
 	}
 
+	if err := ensureGraphicalTarget(); err != nil {
+		return err
+	}
+
+	if err := handleConflictingDisplayManagers(); err != nil {
+		return err
+	}
+
+	if err := ensureGreetdEnabled(); err != nil {
+		return err
+	}
+
 	fmt.Println("\n=== Installation Complete ===")
-	fmt.Println("\nTo test the greeter, run:")
+	fmt.Println("\nTo start the greeter now, run:")
 	fmt.Println("  sudo systemctl start greetd")
-	fmt.Println("\nTo enable on boot, run:")
-	fmt.Println("  sudo systemctl enable --now greetd")
+	fmt.Println("\nOr reboot to see the greeter at next boot.")
 
 	return nil
 }
