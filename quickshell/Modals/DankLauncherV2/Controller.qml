@@ -676,8 +676,6 @@ Item {
 
         var apps = searchApps(searchQuery);
         for (var i = 0; i < apps.length; i++) {
-            if (searchQuery)
-                apps[i]._preScored = 11000 - i;
             allItems.push(apps[i]);
         }
 
@@ -685,14 +683,11 @@ Item {
             if (searchQuery && searchQuery.length >= 2) {
                 _pluginPhasePending = true;
                 _phase1Items = allItems.slice();
+                _pluginPhaseForceFirst = shouldResetSelection;
                 pluginPhaseTimer.restart();
-                if (allItems.length === 0) {
-                    _pluginPhaseForceFirst = shouldResetSelection;
-                    isSearching = true;
-                    searchCompleted();
-                    return;
-                }
-                _pluginPhaseForceFirst = false;
+                isSearching = true;
+                searchCompleted();
+                return;
             } else if (!searchQuery) {
                 var emptyTriggerOrdered = getEmptyTriggerPluginsOrdered();
                 for (var i = 0; i < emptyTriggerOrdered.length; i++) {

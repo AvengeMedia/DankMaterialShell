@@ -494,7 +494,7 @@ Singleton {
                 textScore = 5000;
                 matchType = "prefix";
             } else if (wordBoundaryMatch(name, queryLower)) {
-                textScore = 1000;
+                textScore = 3000;
                 matchType = "word_boundary";
             } else if (name.includes(queryLower)) {
                 textScore = 500;
@@ -551,7 +551,7 @@ Singleton {
         }
 
         for (const result of results) {
-            const frecencyBonus = result.frecency > 0 ? Math.min(result.frecency / 10, 2000) : 0;
+            const frecencyBonus = result.frecency > 0 ? Math.min(result.frecency, 2000) : 0;
             const recencyBonus = result.daysSinceUsed < 1 ? 1500 : result.daysSinceUsed < 7 ? 1000 : result.daysSinceUsed < 30 ? 500 : 0;
 
             const finalScore = result.textScore + frecencyBonus + recencyBonus;
