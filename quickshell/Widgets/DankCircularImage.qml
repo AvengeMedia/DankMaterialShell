@@ -30,7 +30,7 @@ Rectangle {
     border.color: "transparent"
     border.width: 0
 
-    Image {
+    AnimatedImage {
         id: internalImage
         anchors.fill: parent
         anchors.margins: 2
