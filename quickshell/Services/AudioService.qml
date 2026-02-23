@@ -32,11 +32,7 @@ Singleton {
     property var mediaDevicesConnections: null
 
     property var deviceAliases: ({})
-    property string wireplumberConfigPath: {
-        const homeUrl = StandardPaths.writableLocation(StandardPaths.HomeLocation);
-        const homePath = homeUrl.toString().replace("file://", "");
-        return homePath + "/.config/wireplumber/wireplumber.conf.d/51-dms-audio-aliases.conf";
-    }
+    property string wireplumberConfigPath: Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/wireplumber/wireplumber.conf.d/51-dms-audio-aliases.conf"
     property bool wireplumberReloading: false
 
     readonly property int sinkMaxVolume: {
@@ -146,9 +142,7 @@ Singleton {
     }
 
     function writeWireplumberConfig() {
-        const homeUrl = StandardPaths.writableLocation(StandardPaths.HomeLocation);
-        const homePath = homeUrl.toString().replace("file://", "");
-        const configDir = homePath + "/.config/wireplumber/wireplumber.conf.d";
+        const configDir = Paths.strip(StandardPaths.writableLocation(StandardPaths.ConfigLocation)) + "/wireplumber/wireplumber.conf.d";
         const configContent = generateWireplumberConfig();
 
         const shellCmd = `mkdir -p "${configDir}" && cat > "${wireplumberConfigPath}" << 'EOFCONFIG'
@@ -282,9 +276,7 @@ EOFCONFIG
     }
 
     function loadDeviceAliases() {
-        const homeUrl = StandardPaths.writableLocation(StandardPaths.HomeLocation);
-        const homePath = homeUrl.toString().replace("file://", "");
-        const configPath = homePath + "/.config/wireplumber/wireplumber.conf.d/51-dms-audio-aliases.conf";
+        const configPath = wireplumberConfigPath;
 
         Proc.runCommand("readWireplumberConfig", ["cat", configPath], (output, exitCode) => {
             if (exitCode !== 0) {
@@ -658,34 +650,38 @@ EOFCONFIG
         }
     }
 
+    function isMediaPlaying() {
+        return MprisController.activePlayer?.isPlaying ?? false;
+    }
+
     function playVolumeChangeSound() {
-        if (soundsAvailable && volumeChangeSound && !notificationsAudioMuted) {
-            volumeChangeSound.play();
-        }
+        if (!soundsAvailable || !volumeChangeSound || notificationsAudioMuted || isMediaPlaying())
+            return;
+        volumeChangeSound.play();
     }
 
     function playPowerPlugSound() {
-        if (soundsAvailable && powerPlugSound && !notificationsAudioMuted) {
-            powerPlugSound.play();
-        }
+        if (!soundsAvailable || !powerPlugSound || notificationsAudioMuted || isMediaPlaying())
+            return;
+        powerPlugSound.play();
     }
 
     function playPowerUnplugSound() {
-        if (soundsAvailable && powerUnplugSound && !notificationsAudioMuted) {
-            powerUnplugSound.play();
-        }
+        if (!soundsAvailable || !powerUnplugSound || notificationsAudioMuted || isMediaPlaying())
+            return;
+        powerUnplugSound.play();
     }
 
     function playNormalNotificationSound() {
-        if (soundsAvailable && normalNotificationSound && !SessionData.doNotDisturb && !notificationsAudioMuted) {
-            normalNotificationSound.play();
-        }
+        if (!soundsAvailable || !normalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || isMediaPlaying())
+            return;
+        normalNotificationSound.play();
     }
 
     function playCriticalNotificationSound() {
-        if (soundsAvailable && criticalNotificationSound && !SessionData.doNotDisturb && !notificationsAudioMuted) {
-            criticalNotificationSound.play();
-        }
+        if (!soundsAvailable || !criticalNotificationSound || SessionData.doNotDisturb || notificationsAudioMuted || isMediaPlaying())
+            return;
+        criticalNotificationSound.play();
     }
 
     function playVolumeChangeSoundIfEnabled() {
