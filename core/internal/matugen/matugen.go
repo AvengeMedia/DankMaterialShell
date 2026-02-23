@@ -160,12 +160,14 @@ func Run(opts Options) error {
 
 	log.Infof("Building theme: %s %s (%s)", opts.Kind, opts.Value, opts.Mode)
 
-	if err := buildOnce(&opts); err != nil {
-		return err
-	}
+	buildErr := buildOnce(&opts)
 
 	if opts.SyncModeWithPortal {
 		syncColorScheme(opts.Mode)
+	}
+
+	if buildErr != nil {
+		return buildErr
 	}
 
 	log.Info("Done")
