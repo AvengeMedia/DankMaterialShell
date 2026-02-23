@@ -22,27 +22,14 @@ DankOSD {
         text: root.deviceName
     }
 
-    function getIconForSink(sink) {
-        if (!sink)
-            return "speaker";
-        const name = sink.name || "";
-        if (name.includes("bluez"))
-            return "headset";
-        if (name.includes("hdmi"))
-            return "tv";
-        if (name.includes("usb"))
-            return "headset";
-        return "speaker";
-    }
-
     Connections {
         target: AudioService
 
-        function onAudioOutputCycled(name) {
+        function onAudioOutputCycled(name, icon) {
             if (!SettingsData.osdAudioOutputEnabled)
                 return;
             root.deviceName = name;
-            root.deviceIcon = getIconForSink(AudioService.sink);
+            root.deviceIcon = icon;
             root.show();
         }
     }
