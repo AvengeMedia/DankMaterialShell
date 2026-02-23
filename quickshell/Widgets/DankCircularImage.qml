@@ -10,14 +10,17 @@ Rectangle {
     property string fallbackIcon: "notifications"
     property string fallbackText: ""
     property bool hasImage: imageSource !== ""
-    property alias imageStatus: internalImage.status
+    // Probe with AnimatedImage first; once loaded, check frameCount to decide.
+    readonly property bool isAnimated: probe.status === Image.Ready && probe.frameCount > 1
+    readonly property var activeImage: isAnimated ? probe : staticImage
+    property int imageStatus: activeImage.status
 
     signal imageSaved(string filePath)
 
     function saveImageToFile(filePath) {
-        if (internalImage.status !== Image.Ready)
+        if (activeImage.status !== Image.Ready)
             return false;
-        internalImage.grabToImage(function (result) {
+        activeImage.grabToImage(function (result) {
             if (result && result.saveToFile(filePath)) {
                 root.imageSaved(filePath);
             }
@@ -30,8 +33,9 @@ Rectangle {
     border.color: "transparent"
     border.width: 0
 
+    // Probe: loads as AnimatedImage to detect frame count.
     AnimatedImage {
-        id: internalImage
+        id: probe
         anchors.fill: parent
         anchors.margins: 2
         asynchronous: true
@@ -43,13 +47,46 @@ Rectangle {
         source: root.imageSource
     }
 
+    // Static fallback: used once probe confirms the image is not animated.
+    Image {
+        id: staticImage
+        anchors.fill: parent
+        anchors.margins: 2
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        smooth: true
+        mipmap: true
+        cache: true
+        visible: false
+        source: ""
+    }
+
+    // Once the probe loads, if not animated, hand off to Image and unload probe.
+    Connections {
+        target: probe
+        function onStatusChanged() {
+            if (probe.status !== Image.Ready)
+                return;
+            if (probe.frameCount <= 1) {
+                staticImage.source = root.imageSource;
+                probe.source = "";
+            }
+        }
+    }
+
+    // If imageSource changes, reset: re-probe with AnimatedImage.
+    onImageSourceChanged: {
+        staticImage.source = "";
+        probe.source = root.imageSource;
+    }
+
     MultiEffect {
         anchors.fill: parent
         anchors.margins: 2
-        source: internalImage
+        source: root.activeImage
         maskEnabled: true
         maskSource: circularMask
-        visible: internalImage.status === Image.Ready && root.imageSource !== ""
+        visible: root.activeImage.status === Image.Ready && root.imageSource !== ""
         maskThresholdMin: 0.5
         maskSpreadAtMin: 1
     }
@@ -75,7 +112,7 @@ Rectangle {
         anchors.centerIn: parent
         width: Math.round(parent.width * 0.75)
         height: width
-        visible: (internalImage.status !== Image.Ready || root.imageSource === "") && root.fallbackIcon !== ""
+        visible: (root.activeImage.status !== Image.Ready || root.imageSource === "") && root.fallbackIcon !== ""
         iconValue: root.fallbackIcon
         iconSize: width
         iconColor: Theme.surfaceVariantText
