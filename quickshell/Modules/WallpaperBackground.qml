@@ -351,6 +351,15 @@ Variants {
             property real currentScrollX: 50.0
             property real currentScrollY: 50.0
 
+            function publishScrollPosition() {
+                if (effectiveScrolling) {
+                    SessionData.setMonitorScrollPosition(modelData.name, currentScrollX, currentScrollY);
+                } else {
+                    // Not scrolling - publish centered (50, 50)
+                    SessionData.setMonitorScrollPosition(modelData.name, 50, 50);
+                }
+            }
+
             FrameAnimation {
                 id: frameAnim
                 running: false
@@ -360,6 +369,8 @@ Variants {
                 onRunningChanged: {
                     if (running) {
                         currentTime = Date.now() / 1000.0;
+                    } else {
+                        root.publishScrollPosition();  // Animation settled
                     }
                 }
 
@@ -391,6 +402,12 @@ Variants {
                 if (scrollingEnabled) {
                     updateWorkspaceData();
                 }
+
+                Qt.callLater(publishScrollPosition);
+            }
+
+            Component.onDestruction: {
+                SessionData.clearMonitorScrollPosition(modelData.name);
             }
 
             onScrollingEnabledChanged: {
@@ -399,6 +416,10 @@ Variants {
                 } else {
                     frameAnim.stop();
                 }
+            }
+
+            onEffectiveScrollingChanged: {
+                publishScrollPosition();
             }
 
             onSourceChanged: {
