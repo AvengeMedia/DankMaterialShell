@@ -670,6 +670,30 @@ Rectangle {
         }
 
         MenuItem {
+            text: bluetoothContextMenu.currentDevice?.trusted ? I18n.tr("Untrust") : I18n.tr("Trust")
+            height: 32
+
+            contentItem: StyledText {
+                text: parent.text
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.surfaceText
+                leftPadding: Theme.spacingS
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            background: Rectangle {
+                color: parent.hovered ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.08) : "transparent"
+                radius: Theme.cornerRadius / 2
+            }
+
+            onTriggered: {
+                if (!bluetoothContextMenu.hasDevice)
+                    return;
+                bluetoothContextMenu.currentDevice.trusted = !bluetoothContextMenu.currentDevice.trusted;
+            }
+        }
+
+        MenuItem {
             text: I18n.tr("Forget Device")
             height: 32
 
