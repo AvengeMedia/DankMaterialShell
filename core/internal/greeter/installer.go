@@ -990,6 +990,8 @@ user = "%s"
 		wrapperCmd = "/usr/local/bin/dms-greeter"
 	}
 
+	// Build command based on compositor and dms path
+	// When dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	compositorLower := strings.ToLower(compositor)
 	var command string
 	if dmsPath == "" {
