@@ -970,7 +970,7 @@ Variants {
 
                 sourceComponent: MultiEffect {
                     anchors.fill: parent
-                    source: effectLoader.active ? effectLoader.item : currentWallpaper
+                    source: effectLoader.active ? effectLoader.item : (parallaxLoader.active ? parallaxLoader.item : currentWallpaper)
                     blurEnabled: true
                     blur: 0.8
                     blurMax: 75
