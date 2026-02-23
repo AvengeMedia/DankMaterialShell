@@ -358,7 +358,7 @@ Singleton {
     }
 
     function createEmptyFile(path, callback) {
-        var cleanPath = path.toString()
+        var cleanPath = decodeURI(path.toString())
 
         if (!cleanPath.startsWith("/")) {
             cleanPath = baseDir + "/" + cleanPath
