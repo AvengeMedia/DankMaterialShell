@@ -656,7 +656,9 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                         if [[ "$PACKAGE" == "dms-greeter" ]] && [[ -f "Modules/Greetd/assets/dms-greeter" ]]; then
                             mkdir -p dms-qml
                             for f in *; do
-                                [[ -e "$f" && "$f" != "dms-qml" && "$f" != "source-archive" ]] && mv "$f" dms-qml/ 2>/dev/null || true
+                                if [[ -e "$f" && "$f" != "dms-qml" && "$f" != "source-archive" ]]; then
+                                    mv "$f" dms-qml/ 2>/dev/null || true
+                                fi
                             done
                             SOURCE_DIR="dms-qml"
                         fi
