@@ -26,7 +26,14 @@ Item {
     property bool usePlayerVolume: activePlayer && activePlayer.volumeSupported && !__isChromeBrowser
     property real currentVolume: usePlayerVolume ? activePlayer.volume : (AudioService.sink?.audio?.volume ?? 0)
     property bool volumeAvailable: (activePlayer && activePlayer.volumeSupported && !__isChromeBrowser) || (AudioService.sink && AudioService.sink.audio)
-    property var availableDevices: Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream)
+    property var availableDevices: {
+        const hidden = SessionData.hiddenOutputDeviceNames ?? [];
+        return Pipewire.nodes.values.filter(node => {
+            if (!node.audio || !node.isSink || node.isStream)
+                return false;
+            return !hidden.includes(node.name);
+        });
+    }
 
     signal closeRequested
     signal deviceSelected(var device)
