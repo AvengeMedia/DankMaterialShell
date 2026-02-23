@@ -61,7 +61,7 @@ DankPopout {
             return;
 
         const query = _pendingQuery;
-        const mode = _pendingMode || "apps";
+        const mode = _pendingMode || SessionData.appDrawerLastMode || "apps";
         _pendingMode = "";
         _pendingQuery = "";
 
@@ -81,6 +81,15 @@ DankPopout {
         }
         lc.resetScroll?.();
         lc.actionPanel?.hide();
+    }
+
+    Connections {
+        target: contentLoader.item?.launcherContent?.controller ?? null
+        function onModeChanged(mode) {
+            if (contentLoader.item.launcherContent.controller.autoSwitchedToFiles)
+                return;
+            SessionData.setAppDrawerLastMode(mode);
+        }
     }
 
     content: Component {
