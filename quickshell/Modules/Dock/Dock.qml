@@ -34,6 +34,8 @@ Variants {
         property bool groupByApp: SettingsData.dockGroupByApp
         readonly property int borderThickness: SettingsData.dockBorderEnabled ? SettingsData.dockBorderThickness : 0
 
+        readonly property int hasApps: dockApps.implicitWidth > 0 || dockApps.implicitHeight > 0
+
         readonly property real widgetHeight: SettingsData.dockIconSize
         readonly property real effectiveBarHeight: widgetHeight + SettingsData.dockSpacing * 2 + 10 + borderThickness * 2
         function getBarHeight(barConfig) {
@@ -564,7 +566,7 @@ Variants {
                         y: dockBackground.y - borderThickness
                         width: dockBackground.width + borderThickness * 2
                         height: dockBackground.height + borderThickness * 2
-                        visible: SettingsData.dockBorderEnabled
+                        visible: SettingsData.dockBorderEnabled && dock.hasApps
                         preferredRendererType: Shape.CurveRenderer
 
                         readonly property real borderThickness: Math.max(1, dock.borderThickness)
