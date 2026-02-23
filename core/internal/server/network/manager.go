@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
+	"github.com/yeqown/go-qrcode/v2"
+	"github.com/yeqown/go-qrcode/writer/standard"
 )
 
 func NewManager() (*Manager, error) {
@@ -436,6 +438,43 @@ func (m *Manager) GetNetworkInfo(ssid string) (*WiFiNetwork, error) {
 
 func (m *Manager) GetNetworkInfoDetailed(ssid string) (*NetworkInfoResponse, error) {
 	return m.backend.GetWiFiNetworkDetails(ssid)
+}
+
+func (m *Manager) GetNetworkQRCode(ssid string) ([2]string, error) {
+	content, err := m.backend.GetWiFiQRCodeContent(ssid)
+	if err != nil {
+		return [2]string{}, err
+	}
+
+	qrc, err := qrcode.New(content)
+	if err != nil {
+		return [2]string{}, fmt.Errorf("failed to create QR code for `%s`: %w", ssid, err)
+	}
+
+	pathThemed, pathNormal := qrCodePaths(ssid)
+
+	wThemed, err := standard.New(
+		pathThemed,
+		standard.WithBuiltinImageEncoder(standard.PNG_FORMAT),
+		standard.WithBgTransparent(),
+		standard.WithFgColorRGBHex("#ffffff"),
+	)
+	if err != nil {
+		return [2]string{}, fmt.Errorf("failed to create QR code writer: %w", err)
+	}
+	if err := qrc.Save(wThemed); err != nil {
+		return [2]string{}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
+	}
+
+	wNormal, err := standard.New(pathNormal, standard.WithBuiltinImageEncoder(standard.PNG_FORMAT))
+	if err != nil {
+		return [2]string{}, fmt.Errorf("failed to create QR code writer: %w", err)
+	}
+	if err := qrc.Save(wNormal); err != nil {
+		return [2]string{}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
+	}
+
+	return [2]string{pathThemed, pathNormal}, nil
 }
 
 func (m *Manager) ToggleWiFi() error {

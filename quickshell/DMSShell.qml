@@ -342,6 +342,23 @@ Item {
     }
 
     LazyLoader {
+        id: wifiQRCodeModalLoader
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.wifiQRCodeModalLoader = wifiQRCodeModalLoader;
+        }
+
+        WifiQRCodeModal {
+            id: wifiQRCodeModalItem
+
+            Component.onCompleted: {
+                PopoutService.wifiQRCodeModal = wifiQRCodeModalItem;
+            }
+        }
+    }
+
+    LazyLoader {
         id: polkitAuthModalLoader
         active: false
 

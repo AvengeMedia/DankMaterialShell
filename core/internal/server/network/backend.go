@@ -10,6 +10,7 @@ type Backend interface {
 	ScanWiFi() error
 	ScanWiFiDevice(device string) error
 	GetWiFiNetworkDetails(ssid string) (*NetworkInfoResponse, error)
+	GetWiFiQRCodeContent(ssid string) (string, error)
 	GetWiFiDevices() []WiFiDevice
 
 	ConnectWiFi(req ConnectionRequest) error

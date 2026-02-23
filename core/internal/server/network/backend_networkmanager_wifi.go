@@ -196,6 +196,65 @@ func (b *NetworkManagerBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInfo
 	}, nil
 }
 
+func (b *NetworkManagerBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	conn, err := b.findConnection(ssid)
+	if err != nil {
+		return "", fmt.Errorf("no saved connection for `%s`: %w", ssid, err)
+	}
+
+	connSettings, err := conn.GetSettings()
+	if err != nil {
+		return "", fmt.Errorf("failed to get settings for `%s`: %w", ssid, err)
+	}
+
+	secSettings, ok := connSettings["802-11-wireless-security"]
+	if !ok {
+		return "", fmt.Errorf("network `%s` has no security settings", ssid)
+	}
+
+	keyMgmt, ok := secSettings["key-mgmt"].(string)
+	if !ok {
+		return "", fmt.Errorf("failed to identify security type of network `%s`", ssid)
+	}
+
+	var securityType string
+	switch keyMgmt {
+	case "none":
+		authAlg, _ := secSettings["auth-alg"].(string)
+		switch authAlg {
+		case "open":
+			securityType = "nopass"
+		default:
+			securityType = "WEP"
+		}
+	case "ieee8021x":
+		securityType = "WEP"
+	default:
+		securityType = "WPA"
+	}
+
+	if securityType != "WPA" {
+		return "", fmt.Errorf("QR code generation only supports WPA connections, `%s` uses %s", ssid, securityType)
+	}
+
+	secrets, err := conn.GetSecrets("802-11-wireless-security")
+	if err != nil {
+		return "", fmt.Errorf("failed to retrieve connection secrets for `%s`: %w", ssid, err)
+	}
+
+	secSecrets, ok := secrets["802-11-wireless-security"]
+	if !ok {
+		return "", fmt.Errorf("failed to retrieve password for `%s`", ssid)
+	}
+
+	psk, ok := secSecrets["psk"].(string)
+	if !ok {
+		return "", fmt.Errorf("failed to retrieve password for `%s`", ssid)
+	}
+
+	return FormatWiFiQRString(securityType, ssid, psk), nil
+}
+
 func (b *NetworkManagerBackend) ConnectWiFi(req ConnectionRequest) error {
 	devInfo, err := b.getWifiDeviceForConnection(req.Device)
 	if err != nil {
