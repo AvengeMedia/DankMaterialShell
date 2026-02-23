@@ -181,13 +181,15 @@ Variants {
                 scrollAnim.startAnimation(newTargetX, newTargetY);
             }
 
+            property bool firstScrollUpdate: true
+
             QtObject {
                 id: scrollAnim
                 property real startTime: 0
-                property real startX: 50.0
-                property real startY: 50.0
-                property real targetX: 50.0
-                property real targetY: 50.0
+                property real startX: 0.0
+                property real startY: 0.0
+                property real targetX: 0.0
+                property real targetY: 0.0
 
                 property real damping: CompositorService.isNiri ? 63.25 : 89.44
                 property real stiffness: CompositorService.isNiri ? 1000.0 : 2000.0
@@ -221,7 +223,19 @@ Variants {
                     const currentY = springPositionJS(t, startY, targetY);
 
                     if (Math.abs(newTargetX - currentX) < 0.01 && Math.abs(newTargetY - currentY) < 0.01) {
+                        if (root.firstScrollUpdate) root.firstScrollUpdate = false;
                         return;
+                    }
+
+                    // First update: use much stiffer spring for quick snap-to
+                    if (root.firstScrollUpdate) {
+                        root.firstScrollUpdate = false;
+                        damping = 200.0;
+                        stiffness = 8000.0;
+                    } else {
+                        // Restore normal spring parameters
+                        damping = CompositorService.isNiri ? 63.25 : 89.44;
+                        stiffness = CompositorService.isNiri ? 1000.0 : 2000.0;
                     }
 
                     startX = currentX;
@@ -237,8 +251,9 @@ Variants {
             }
 
             // CPU-side scroll position - computed once per frame instead of per-pixel in shader
-            property real currentScrollX: 50.0
-            property real currentScrollY: 50.0
+            // Initialize at (0, 0) to avoid pillarbox flash; first update will snap to correct position
+            property real currentScrollX: 0.0
+            property real currentScrollY: 0.0
 
             function publishScrollPosition() {
                 if (effectiveScrolling) {
@@ -301,6 +316,7 @@ Variants {
 
             onScrollingEnabledChanged: {
                 if (scrollingEnabled) {
+                    firstScrollUpdate = true;
                     updateWorkspaceData();
                 } else {
                     frameAnim.stop();
@@ -337,6 +353,17 @@ Variants {
                 root.effectActive = false;
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
+
+                // Reset scroll state for new image - will snap to correct position on first update
+                if (scrollingEnabled) {
+                    firstScrollUpdate = true;
+                    currentScrollX = 0.0;
+                    currentScrollY = 0.0;
+                    scrollAnim.startX = 0.0;
+                    scrollAnim.startY = 0.0;
+                    scrollAnim.targetX = 0.0;
+                    scrollAnim.targetY = 0.0;
+                }
             }
 
             function startTransition() {
@@ -508,7 +535,7 @@ Variants {
             Image {
                 id: currentWallpaper
                 anchors.fill: parent
-                visible: true
+                visible: !root.effectiveScrolling
                 opacity: 1
                 layer.enabled: false
                 asynchronous: true
