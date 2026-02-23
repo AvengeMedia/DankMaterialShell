@@ -19,7 +19,7 @@ Singleton {
     property var availableSoundThemes: []
     property string currentSoundTheme: ""
     property var soundFilePaths: ({})
-
+    property int lastCycledIndex: -1
     property var volumeChangeSound: null
     property var powerPlugSound: null
     property var powerUnplugSound: null
@@ -67,7 +67,8 @@ Singleton {
     }
 
     function getAvailableSinks() {
-        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream);
+        const hidden = SessionData.hiddenOutputDeviceNames ?? [];
+        return Pipewire.nodes.values.filter(node => node.audio && node.isSink && !node.isStream && !hidden.includes(node.name));
     }
 
     function cycleAudioOutput() {
@@ -75,16 +76,8 @@ Singleton {
         if (sinks.length < 2)
             return null;
 
-        const currentSink = root.sink;
-        let currentIndex = -1;
-        for (let i = 0; i < sinks.length; i++) {
-            if (sinks[i] === currentSink) {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        const nextIndex = (currentIndex + 1) % sinks.length;
+        const nextIndex = (lastCycledIndex + 1) % sinks.length;
+        lastCycledIndex = nextIndex;
         const nextSink = sinks[nextIndex];
         Pipewire.preferredDefaultAudioSink = nextSink;
         const name = displayName(nextSink);
