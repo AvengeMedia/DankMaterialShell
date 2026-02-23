@@ -311,6 +311,10 @@ func (m *Manager) handleDevicePropertiesChanged(path dbus.ObjectPath, changed ma
 				select {
 				case m.eventQueue <- func() {
 					time.Sleep(300 * time.Millisecond)
+					log.Infof("[Bluetooth] Auto-trusting newly paired device: %s", devicePath)
+					if err := m.TrustDevice(devicePath, true); err != nil {
+						log.Warnf("[Bluetooth] Auto-trust failed: %v", err)
+					}
 					log.Infof("[Bluetooth] Auto-connecting newly paired device: %s", devicePath)
 					if err := m.ConnectDevice(devicePath); err != nil {
 						log.Warnf("[Bluetooth] Auto-connect failed: %v", err)
