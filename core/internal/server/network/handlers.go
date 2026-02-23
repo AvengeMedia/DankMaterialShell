@@ -348,8 +348,12 @@ func handleDeleteQRCode(conn net.Conn, req models.Request, _ *Manager) {
 		return
 	}
 
-	err = os.Remove(path)
-	if err != nil {
+	if !isValidQRCodePath(path) {
+		models.RespondError(conn, req.ID, "invalid QR code path")
+		return
+	}
+
+	if err := os.Remove(path); err != nil {
 		models.RespondError(conn, req.ID, err.Error())
 		return
 	}

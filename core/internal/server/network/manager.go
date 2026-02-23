@@ -443,16 +443,15 @@ func (m *Manager) GetNetworkInfoDetailed(ssid string) (*NetworkInfoResponse, err
 func (m *Manager) GetNetworkQRCode(ssid string) ([2]string, error) {
 	content, err := m.backend.GetWiFiQRCodeContent(ssid)
 	if err != nil {
-		return [2]string{"", ""}, err
+		return [2]string{}, err
 	}
 
 	qrc, err := qrcode.New(content)
 	if err != nil {
-		return [2]string{"", ""}, fmt.Errorf("failed to create QR code for `%s`: %w", ssid, err)
+		return [2]string{}, fmt.Errorf("failed to create QR code for `%s`: %w", ssid, err)
 	}
 
-	pathThemed := "/tmp/dank-wifi-qrcode-themed.png"
-	pathNormal := "/tmp/dank-wifi-qrcode-normal.png"
+	pathThemed, pathNormal := qrCodePaths(ssid)
 
 	wThemed, err := standard.New(
 		pathThemed,
@@ -461,18 +460,18 @@ func (m *Manager) GetNetworkQRCode(ssid string) ([2]string, error) {
 		standard.WithFgColorRGBHex("#ffffff"),
 	)
 	if err != nil {
-		return [2]string{"", ""}, fmt.Errorf("failed to create QR code writer: %w", err)
+		return [2]string{}, fmt.Errorf("failed to create QR code writer: %w", err)
 	}
 	if err := qrc.Save(wThemed); err != nil {
-		return [2]string{"", ""}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
+		return [2]string{}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
 	}
 
 	wNormal, err := standard.New(pathNormal, standard.WithBuiltinImageEncoder(standard.PNG_FORMAT))
 	if err != nil {
-		return [2]string{"", ""}, fmt.Errorf("failed to create QR code writer: %w", err)
+		return [2]string{}, fmt.Errorf("failed to create QR code writer: %w", err)
 	}
 	if err := qrc.Save(wNormal); err != nil {
-		return [2]string{"", ""}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
+		return [2]string{}, fmt.Errorf("failed to save QR code for `%s`: %w", ssid, err)
 	}
 
 	return [2]string{pathThemed, pathNormal}, nil
