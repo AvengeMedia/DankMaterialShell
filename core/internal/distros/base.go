@@ -102,6 +102,19 @@ func (b *BaseDistribution) detectPackage(name, description string, installed boo
 	}
 }
 
+func (b *BaseDistribution) detectOptionalPackage(name, description string, installed bool) deps.Dependency {
+	status := deps.StatusMissing
+	if installed {
+		status = deps.StatusInstalled
+	}
+	return deps.Dependency{
+		Name:        name,
+		Status:      status,
+		Description: description,
+		Required:    false,
+	}
+}
+
 func (b *BaseDistribution) detectGit() deps.Dependency {
 	return b.detectCommand("git", "Version control system")
 }
