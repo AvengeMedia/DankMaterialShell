@@ -282,7 +282,7 @@ Item {
 
             onFileSelected: path => {
                 root.fileDialogOpen = false;
-                const cleanPath = path.toString().replace(/^file:\/\//, '');
+                const cleanPath = decodeURI(path.toString().replace(/^file:\/\//, ''));
                 const fileName = cleanPath.split('/').pop();
                 const fileUrl = "file://" + cleanPath;
 
