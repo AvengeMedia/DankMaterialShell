@@ -3,7 +3,7 @@
 const Weights = {
     exactMatch: 10000,
     prefixMatch: 5000,
-    wordBoundary: 1000,
+    wordBoundary: 3000,
     substring: 500,
     fuzzy: 100,
     frecency: 2000,
@@ -99,8 +99,8 @@ function getTimeBucketWeight(daysSinceUsed) {
 function calculateTextScore(name, query) {
     if (name === query) return Weights.exactMatch
     if (name.startsWith(query)) return Weights.prefixMatch
-    if (name.includes(query)) return Weights.substring
     if (hasWordBoundaryMatch(name, query)) return Weights.wordBoundary
+    if (name.includes(query)) return Weights.substring
 
     if (query.length >= 3) {
         var fs = fuzzyScore(name, query)
@@ -140,7 +140,7 @@ function score(item, query, frecencyData) {
 
     if (textScore === 0) return 0
 
-    var usageBonus = frecencyData ? Math.min(frecencyData.usageCount * 10, Weights.frecency) : 0
+    var usageBonus = frecencyData ? Math.min(frecencyData.usageCount * 50, Weights.frecency) : 0
 
     return textScore + usageBonus + typeBonus
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"os"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
@@ -40,6 +41,10 @@ func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 		handleSetPreference(conn, req, manager)
 	case "network.info":
 		handleGetNetworkInfo(conn, req, manager)
+	case "network.qrcode":
+		handleGetNetworkQRCode(conn, req, manager)
+	case "network.delete-qrcode":
+		handleDeleteQRCode(conn, req, manager)
 	case "network.ethernet.info":
 		handleGetWiredNetworkInfo(conn, req, manager)
 	case "network.subscribe":
@@ -318,6 +323,42 @@ func handleGetNetworkInfo(conn net.Conn, req models.Request, manager *Manager) {
 	}
 
 	models.Respond(conn, req.ID, network)
+}
+
+func handleGetNetworkQRCode(conn net.Conn, req models.Request, manager *Manager) {
+	ssid, err := params.String(req.Params, "ssid")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	content, err := manager.GetNetworkQRCode(ssid)
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, content)
+}
+
+func handleDeleteQRCode(conn net.Conn, req models.Request, _ *Manager) {
+	path, err := params.String(req.Params, "path")
+	if err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	if !isValidQRCodePath(path) {
+		models.RespondError(conn, req.ID, "invalid QR code path")
+		return
+	}
+
+	if err := os.Remove(path); err != nil {
+		models.RespondError(conn, req.ID, err.Error())
+		return
+	}
+
+	models.Respond(conn, req.ID, models.SuccessResult{Success: true, Message: "QR code file deleted"})
 }
 
 func handleGetWiredNetworkInfo(conn net.Conn, req models.Request, manager *Manager) {

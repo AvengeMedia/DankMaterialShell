@@ -18,6 +18,10 @@ func (b *SystemdNetworkdBackend) GetWiFiNetworkDetails(ssid string) (*NetworkInf
 	return nil, fmt.Errorf("WiFi details not supported by networkd backend")
 }
 
+func (b *SystemdNetworkdBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	return "", fmt.Errorf("WiFi QR Code not supported by networkd backend")
+}
+
 func (b *SystemdNetworkdBackend) ConnectWiFi(req ConnectionRequest) error {
 	return fmt.Errorf("WiFi connect not supported by networkd backend")
 }

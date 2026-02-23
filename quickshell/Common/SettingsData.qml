@@ -518,7 +518,7 @@ Singleton {
     property int osdPosition: SettingsData.Position.BottomCenter
     property bool osdVolumeEnabled: true
     property bool osdMediaVolumeEnabled: true
-    property bool osdMediaPlaybackEnabled: true
+    property bool osdMediaPlaybackEnabled: false
     property bool osdBrightnessEnabled: true
     property bool osdIdleInhibitorEnabled: true
     property bool osdMicMuteEnabled: true
@@ -1026,6 +1026,7 @@ Singleton {
             elif command -v dconf >/dev/null 2>&1; then
             dconf read /org/gnome/desktop/interface/icon-theme 2>/dev/null | sed "s/'//g"
             fi`;
+
             Proc.runCommand("detectCosmicIconTheme", ["sh", "-c", detectScript], (output, exitCode) => {
                 if (exitCode !== 0)
                     return;

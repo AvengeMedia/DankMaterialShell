@@ -111,6 +111,10 @@ func (b *HybridIwdNetworkdBackend) GetWiFiNetworkDetails(ssid string) (*NetworkI
 	return b.wifi.GetWiFiNetworkDetails(ssid)
 }
 
+func (b *HybridIwdNetworkdBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	return b.wifi.GetWiFiQRCodeContent(ssid)
+}
+
 func (b *HybridIwdNetworkdBackend) ConnectWiFi(req ConnectionRequest) error {
 	if err := b.wifi.ConnectWiFi(req); err != nil {
 		return err

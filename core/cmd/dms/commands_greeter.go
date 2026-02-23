@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
@@ -77,6 +78,28 @@ func installGreeter() error {
 		return err
 	}
 
+	// Debian/openSUSE
+	greeter.TryInstallGreeterPackage(logFunc, "")
+	if isPackageOnlyGreeterDistro() && !greeter.IsGreeterPackaged() {
+		return fmt.Errorf("dms-greeter must be installed from distro packages on this distribution. %s", packageInstallHint())
+	}
+	if greeter.IsGreeterPackaged() && greeter.HasLegacyLocalGreeterWrapper() {
+		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
+	}
+
+	// If already fully configured, prompt the user
+	if isGreeterEnabled() {
+		fmt.Print("\nGreeter is already installed and configured. Re-run to re-sync settings and permissions? [Y/n]: ")
+		var response string
+		fmt.Scanln(&response)
+		response = strings.TrimSpace(strings.ToLower(response))
+		if response == "n" || response == "no" {
+			fmt.Println("Run 'dms greeter sync' to re-sync theme and settings at any time.")
+			return nil
+		}
+		fmt.Println()
+	}
+
 	fmt.Println("\nDetecting DMS installation...")
 	dmsPath, err := greeter.DetectDMSPath()
 	if err != nil {
@@ -114,7 +137,12 @@ func installGreeter() error {
 	}
 
 	fmt.Println("\nConfiguring greetd...")
-	if err := greeter.ConfigureGreetd(dmsPath, selectedCompositor, logFunc, ""); err != nil {
+	// Use empty path when packaged (greeter finds /usr/share/quickshell/dms-greeter); else use user's DMS path
+	greeterPathForConfig := ""
+	if !greeter.IsGreeterPackaged() {
+		greeterPathForConfig = dmsPath
+	}
+	if err := greeter.ConfigureGreetd(greeterPathForConfig, selectedCompositor, logFunc, ""); err != nil {
 		return err
 	}
 
@@ -123,11 +151,22 @@ func installGreeter() error {
 		return err
 	}
 
+	if err := ensureGraphicalTarget(); err != nil {
+		return err
+	}
+
+	if err := handleConflictingDisplayManagers(); err != nil {
+		return err
+	}
+
+	if err := ensureGreetdEnabled(); err != nil {
+		return err
+	}
+
 	fmt.Println("\n=== Installation Complete ===")
-	fmt.Println("\nTo test the greeter, run:")
+	fmt.Println("\nTo start the greeter now, run:")
 	fmt.Println("  sudo systemctl start greetd")
-	fmt.Println("\nTo enable on boot, run:")
-	fmt.Println("  sudo systemctl enable --now greetd")
+	fmt.Println("\nOr reboot to see the greeter at next boot.")
 
 	return nil
 }
@@ -327,20 +366,29 @@ func ensureGreetdEnabled() error {
 		fmt.Println("  ✓ Unmasked greetd")
 	}
 
-	switch state.EnabledState {
-	case "disabled", "masked", "masked-runtime":
+	if state.EnabledState == "enabled" || state.EnabledState == "enabled-runtime" {
+		fmt.Println("  Reasserting greetd as active display manager...")
+	} else {
 		fmt.Println("  Enabling greetd service...")
-		enableCmd := exec.Command("sudo", "systemctl", "enable", "greetd")
-		enableCmd.Stdout = os.Stdout
-		enableCmd.Stderr = os.Stderr
-		if err := enableCmd.Run(); err != nil {
-			return fmt.Errorf("failed to enable greetd: %w", err)
+	}
+
+	enableCmd := exec.Command("sudo", "systemctl", "enable", "--force", "greetd")
+	enableCmd.Stdout = os.Stdout
+	enableCmd.Stderr = os.Stderr
+	if err := enableCmd.Run(); err != nil {
+		return fmt.Errorf("failed to enable greetd: %w", err)
+	}
+
+	enabledState, _, verifyErr := checkSystemdServiceEnabled("greetd")
+	if verifyErr != nil {
+		fmt.Printf("  ⚠ Warning: Could not verify greetd enabled state: %v\n", verifyErr)
+	} else {
+		switch enabledState {
+		case "enabled", "enabled-runtime", "static", "indirect", "alias":
+			fmt.Printf("  ✓ greetd enabled (state: %s)\n", enabledState)
+		default:
+			return fmt.Errorf("greetd is still in state '%s' after enable operation", enabledState)
 		}
-		fmt.Println("  ✓ Enabled greetd service")
-	case "enabled", "enabled-runtime":
-		fmt.Println("  ✓ greetd is already enabled")
-	default:
-		fmt.Printf("  ℹ greetd is in state '%s' (should work, no action needed)\n", state.EnabledState)
 	}
 
 	return nil
@@ -446,6 +494,10 @@ func enableGreeter() error {
 	}
 
 	configContent := string(data)
+	if greeter.IsGreeterPackaged() && greeter.HasLegacyLocalGreeterWrapper() {
+		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
+	}
+
 	configAlreadyCorrect := strings.Contains(configContent, "dms-greeter")
 
 	if configAlreadyCorrect {
@@ -611,6 +663,48 @@ func detectConfiguredCompositor() string {
 	return ""
 }
 
+func packageInstallHint() string {
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return "Install package: dms-greeter"
+	}
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return "Install package: dms-greeter"
+	}
+
+	switch config.Family {
+	case distros.FamilyDebian:
+		return "Install with 'sudo apt install dms-greeter' (requires DankLinux OBS repo — see https://danklinux.com/docs/dankgreeter/installation#debian)"
+	case distros.FamilySUSE:
+		return "Install with 'sudo zypper install dms-greeter' (requires DankLinux OBS repo — see https://danklinux.com/docs/dankgreeter/installation#opensuse)"
+	case distros.FamilyUbuntu:
+		return "Install with 'sudo apt install dms-greeter' (requires ppa:avengemedia/danklinux: sudo add-apt-repository ppa:avengemedia/danklinux)"
+	case distros.FamilyFedora:
+		return "Install with 'sudo dnf install dms-greeter' (requires COPR: sudo dnf copr enable avengemedia/danklinux)"
+	case distros.FamilyArch:
+		return "Install from AUR with 'paru -S greetd-dms-greeter-git' or 'yay -S greetd-dms-greeter-git'"
+	default:
+		return "Run 'dms greeter install' to install greeter"
+	}
+}
+
+func isPackageOnlyGreeterDistro() bool {
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return false
+	}
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return false
+	}
+	return config.Family == distros.FamilyDebian ||
+		config.Family == distros.FamilySUSE ||
+		config.Family == distros.FamilyUbuntu ||
+		config.Family == distros.FamilyFedora ||
+		config.Family == distros.FamilyArch
+}
+
 func promptCompositorChoice(compositors []string) (string, error) {
 	fmt.Println("\nMultiple compositors detected:")
 	for i, comp := range compositors {
@@ -679,7 +773,7 @@ func checkGreeterStatus() error {
 		}
 	} else {
 		fmt.Println("  ✗ Greeter config not found")
-		fmt.Println("    Run 'dms greeter install' to install greeter")
+		fmt.Printf("    %s\n", packageInstallHint())
 	}
 
 	fmt.Println("\nGroup Membership:")
@@ -689,12 +783,13 @@ func checkGreeterStatus() error {
 		return fmt.Errorf("failed to check groups: %w", err)
 	}
 
-	inGreeterGroup := strings.Contains(string(groupsOutput), "greeter")
+	greeterGroup := greeter.DetectGreeterGroup()
+	inGreeterGroup := strings.Contains(string(groupsOutput), greeterGroup)
 	if inGreeterGroup {
-		fmt.Println("  ✓ User is in greeter group")
+		fmt.Printf("  ✓ User is in %s group\n", greeterGroup)
 	} else {
-		fmt.Println("  ✗ User is NOT in greeter group")
-		fmt.Println("    Run 'dms greeter install' to add user to greeter group")
+		fmt.Printf("  ✗ User is NOT in %s group\n", greeterGroup)
+		fmt.Println("    Run 'dms greeter sync' to set up group membership and permissions")
 	}
 
 	cacheDir := "/var/cache/dms-greeter"
@@ -703,7 +798,7 @@ func checkGreeterStatus() error {
 		fmt.Printf("  ✓ %s exists\n", cacheDir)
 	} else {
 		fmt.Printf("  ✗ %s not found\n", cacheDir)
-		fmt.Println("    Run 'dms greeter install' to create cache directory")
+		fmt.Printf("    %s\n", packageInstallHint())
 		return nil
 	}
 

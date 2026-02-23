@@ -31,6 +31,8 @@ Singleton {
     property var notificationModal: null
     property var wifiPasswordModal: null
     property var wifiPasswordModalLoader: null
+    property var wifiQRCodeModal: null
+    property var wifiQRCodeModalLoader: null
     property var polkitAuthModal: null
     property var polkitAuthModalLoader: null
     property var bluetoothPairingModal: null
@@ -579,6 +581,13 @@ Singleton {
             wifiPasswordModalLoader.active = true;
         if (wifiPasswordModal)
             wifiPasswordModal.show(ssid);
+    }
+
+    function showWifiQRCodeModal(ssid) {
+        if (wifiQRCodeModalLoader)
+            wifiQRCodeModalLoader.active = true;
+        if (wifiQRCodeModal)
+            wifiQRCodeModal.show(ssid);
     }
 
     function showHiddenNetworkModal() {
