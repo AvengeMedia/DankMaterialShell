@@ -135,6 +135,7 @@ Rectangle {
                 wrapMode: Text.WordWrap
                 maximumLineCount: entryType === "long_text" ? 3 : 1
                 elide: Text.ElideRight
+                textFormat: Text.PlainText
             }
         }
     }
