@@ -97,6 +97,7 @@ func (a *ArchDistribution) DetectDependenciesWithTerminal(ctx context.Context, w
 	dependencies = append(dependencies, a.detectGit())
 	dependencies = append(dependencies, a.detectWindowManager(wm))
 	dependencies = append(dependencies, a.detectQuickshell())
+	dependencies = append(dependencies, a.detectDMSGreeter())
 	dependencies = append(dependencies, a.detectXDGPortal())
 	dependencies = append(dependencies, a.detectAccountsService())
 
@@ -124,6 +125,10 @@ func (a *ArchDistribution) detectAccountsService() deps.Dependency {
 	return a.detectPackage("accountsservice", "D-Bus interface for user account query and manipulation", a.packageInstalled("accountsservice"))
 }
 
+func (a *ArchDistribution) detectDMSGreeter() deps.Dependency {
+	return a.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", a.packageInstalled("greetd-dms-greeter-git"))
+}
+
 func (a *ArchDistribution) packageInstalled(pkg string) bool {
 	cmd := exec.Command("pacman", "-Q", pkg)
 	err := cmd.Run()
@@ -139,6 +144,7 @@ func (a *ArchDistribution) GetPackageMappingWithVariants(wm deps.WindowManager, 
 		"dms (DankMaterialShell)": a.getDMSMapping(variants["dms (DankMaterialShell)"]),
 		"git":                     {Name: "git", Repository: RepoTypeSystem},
 		"quickshell":              a.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":             {Name: "greetd-dms-greeter-git", Repository: RepoTypeAUR},
 		"matugen":                 a.getMatugenMapping(variants["matugen"]),
 		"dgop":                    {Name: "dgop", Repository: RepoTypeSystem},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeSystem},

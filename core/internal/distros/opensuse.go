@@ -71,6 +71,7 @@ func (o *OpenSUSEDistribution) DetectDependenciesWithTerminal(ctx context.Contex
 	dependencies = append(dependencies, o.detectGit())
 	dependencies = append(dependencies, o.detectWindowManager(wm))
 	dependencies = append(dependencies, o.detectQuickshell())
+	dependencies = append(dependencies, o.detectDMSGreeter())
 	dependencies = append(dependencies, o.detectXDGPortal())
 	dependencies = append(dependencies, o.detectAccountsService())
 
@@ -100,6 +101,10 @@ func (o *OpenSUSEDistribution) packageInstalled(pkg string) bool {
 	return err == nil
 }
 
+func (o *OpenSUSEDistribution) detectDMSGreeter() deps.Dependency {
+	return o.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", o.packageInstalled("dms-greeter"))
+}
+
 func (o *OpenSUSEDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {
 	return o.GetPackageMappingWithVariants(wm, make(map[string]deps.PackageVariant))
 }
@@ -116,6 +121,7 @@ func (o *OpenSUSEDistribution) GetPackageMappingWithVariants(wm deps.WindowManag
 		// DMS packages from OBS
 		"dms (DankMaterialShell)": o.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"quickshell":              o.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},
 		"dgop":                    {Name: "dgop", Repository: RepoTypeOBS, RepoURL: "home:AvengeMedia:danklinux"},

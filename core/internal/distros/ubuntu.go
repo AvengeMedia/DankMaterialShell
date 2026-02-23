@@ -63,6 +63,7 @@ func (u *UbuntuDistribution) DetectDependenciesWithTerminal(ctx context.Context,
 	dependencies = append(dependencies, u.detectGit())
 	dependencies = append(dependencies, u.detectWindowManager(wm))
 	dependencies = append(dependencies, u.detectQuickshell())
+	dependencies = append(dependencies, u.detectDMSGreeter())
 	dependencies = append(dependencies, u.detectXDGPortal())
 	dependencies = append(dependencies, u.detectAccountsService())
 
@@ -94,6 +95,10 @@ func (u *UbuntuDistribution) detectAccountsService() deps.Dependency {
 	return u.detectPackage("accountsservice", "D-Bus interface for user account query and manipulation", u.packageInstalled("accountsservice"))
 }
 
+func (u *UbuntuDistribution) detectDMSGreeter() deps.Dependency {
+	return u.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", u.packageInstalled("dms-greeter"))
+}
+
 func (u *UbuntuDistribution) packageInstalled(pkg string) bool {
 	cmd := exec.Command("dpkg", "-l", pkg)
 	err := cmd.Run()
@@ -116,6 +121,7 @@ func (u *UbuntuDistribution) GetPackageMappingWithVariants(wm deps.WindowManager
 		// DMS packages from PPAs
 		"dms (DankMaterialShell)": u.getDmsMapping(variants["dms (DankMaterialShell)"]),
 		"quickshell":              u.getQuickshellMapping(variants["quickshell"]),
+		"dms-greeter":             {Name: "dms-greeter", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"matugen":                 {Name: "matugen", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"dgop":                    {Name: "dgop", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},
 		"ghostty":                 {Name: "ghostty", Repository: RepoTypePPA, RepoURL: "ppa:avengemedia/danklinux"},

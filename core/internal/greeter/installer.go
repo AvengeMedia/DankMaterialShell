@@ -79,9 +79,18 @@ func PromptCompositorChoice(compositors []string) (string, error) {
 	}
 }
 
-// EnsureGreetdInstalled checks if greetd is installed and installs it if not
+// EnsureGreetdInstalled checks if greetd is installed - greetd is a daemon in /usr/sbin on Debian/Ubuntu
 func EnsureGreetdInstalled(logFunc func(string), sudoPassword string) error {
-	if utils.CommandExists("greetd") {
+	greetdFound := utils.CommandExists("greetd")
+	if !greetdFound {
+		for _, p := range []string{"/usr/sbin/greetd", "/sbin/greetd"} {
+			if _, err := os.Stat(p); err == nil {
+				greetdFound = true
+				break
+			}
+		}
+	}
+	if greetdFound {
 		logFunc("✓ greetd is already installed")
 		return nil
 	}
@@ -142,6 +151,14 @@ func EnsureGreetdInstalled(logFunc func(string), sudoPassword string) error {
 			installCmd = exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "greetd")
 		}
 
+	case distros.FamilyGentoo:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword,
+				"emerge --ask n sys-apps/greetd")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "emerge", "--ask", "n", "sys-apps/greetd")
+		}
+
 	case distros.FamilyNix:
 		return fmt.Errorf("on NixOS, please add greetd to your configuration.nix")
 
@@ -158,6 +175,119 @@ func EnsureGreetdInstalled(logFunc func(string), sudoPassword string) error {
 
 	logFunc("✓ greetd installed successfully")
 	return nil
+}
+
+// IsGreeterPackaged returns true if dms-greeter was installed from a system package.
+func IsGreeterPackaged() bool {
+	if !utils.CommandExists("dms-greeter") {
+		return false
+	}
+	packagedPath := "/usr/share/quickshell/dms-greeter"
+	info, err := os.Stat(packagedPath)
+	return err == nil && info.IsDir()
+}
+
+// HasLegacyLocalGreeterWrapper returns true when a manually installed wrapper exists.
+func HasLegacyLocalGreeterWrapper() bool {
+	info, err := os.Stat("/usr/local/bin/dms-greeter")
+	return err == nil && !info.IsDir()
+}
+
+// TryInstallGreeterPackage attempts to install dms-greeter from the distro's official repo.
+func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return false
+	}
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return false
+	}
+
+	if IsGreeterPackaged() {
+		logFunc("✓ dms-greeter package already installed")
+		return true
+	}
+
+	ctx := context.Background()
+	var installCmd *exec.Cmd
+	var failHint string
+
+	switch config.Family {
+	case distros.FamilyDebian:
+		obsSlug := getDebianOBSSlug(osInfo)
+		keyURL := fmt.Sprintf("https://download.opensuse.org/repositories/home:AvengeMedia:danklinux/%s/Release.key", obsSlug)
+		repoLine := fmt.Sprintf("deb [signed-by=/etc/apt/keyrings/danklinux.gpg] https://download.opensuse.org/repositories/home:/AvengeMedia:/danklinux/%s/ /", obsSlug)
+		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Add OBS repo manually:\ncurl -fsSL %s | sudo gpg --dearmor -o /etc/apt/keyrings/danklinux.gpg\necho '%s' | sudo tee /etc/apt/sources.list.d/danklinux.list\nsudo apt update && sudo apt install dms-greeter", keyURL, repoLine)
+		logFunc(fmt.Sprintf("Adding DankLinux OBS repository (%s)...", obsSlug))
+		addKeyCmd := exec.CommandContext(ctx, "bash", "-c",
+			fmt.Sprintf(`curl -fsSL %s | sudo gpg --dearmor -o /etc/apt/keyrings/danklinux.gpg`, keyURL))
+		addKeyCmd.Stdout = os.Stdout
+		addKeyCmd.Stderr = os.Stderr
+		addKeyCmd.Run()
+		addRepoCmd := exec.CommandContext(ctx, "bash", "-c",
+			fmt.Sprintf(`echo '%s' | sudo tee /etc/apt/sources.list.d/danklinux.list`, repoLine))
+		addRepoCmd.Stdout = os.Stdout
+		addRepoCmd.Stderr = os.Stderr
+		addRepoCmd.Run()
+		exec.CommandContext(ctx, "sudo", "apt-get", "update").Run()
+		installCmd = exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "dms-greeter")
+	case distros.FamilySUSE:
+		repoURL := getOpenSUSEOBSRepoURL(osInfo)
+		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Add OBS repo manually:\nsudo zypper addrepo %s\nsudo zypper refresh && sudo zypper install dms-greeter", repoURL)
+		logFunc("Adding DankLinux OBS repository...")
+		addRepoCmd := exec.CommandContext(ctx, "sudo", "zypper", "addrepo", repoURL)
+		addRepoCmd.Stdout = os.Stdout
+		addRepoCmd.Stderr = os.Stderr
+		addRepoCmd.Run()
+		exec.CommandContext(ctx, "sudo", "zypper", "refresh").Run()
+		installCmd = exec.CommandContext(ctx, "sudo", "zypper", "install", "-y", "dms-greeter")
+	case distros.FamilyUbuntu:
+		failHint = "⚠ dms-greeter install failed. Add PPA manually: sudo add-apt-repository ppa:avengemedia/danklinux && sudo apt-get update && sudo apt-get install dms-greeter"
+		logFunc("Enabling PPA ppa:avengemedia/danklinux...")
+		ppacmd := exec.CommandContext(ctx, "sudo", "add-apt-repository", "-y", "ppa:avengemedia/danklinux")
+		ppacmd.Stdout = os.Stdout
+		ppacmd.Stderr = os.Stderr
+		ppacmd.Run()
+		exec.CommandContext(ctx, "sudo", "apt-get", "update").Run()
+		installCmd = exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "dms-greeter")
+	case distros.FamilyFedora:
+		failHint = "⚠ dms-greeter install failed. Enable COPR manually: sudo dnf copr enable avengemedia/danklinux && sudo dnf install dms-greeter"
+		logFunc("Enabling COPR avengemedia/danklinux...")
+		coprcmd := exec.CommandContext(ctx, "sudo", "dnf", "copr", "enable", "-y", "avengemedia/danklinux")
+		coprcmd.Stdout = os.Stdout
+		coprcmd.Stderr = os.Stderr
+		coprcmd.Run()
+		installCmd = exec.CommandContext(ctx, "sudo", "dnf", "install", "-y", "dms-greeter")
+	case distros.FamilyArch:
+		aurHelper := ""
+		for _, helper := range []string{"paru", "yay"} {
+			if _, err := exec.LookPath(helper); err == nil {
+				aurHelper = helper
+				break
+			}
+		}
+		if aurHelper == "" {
+			logFunc("⚠ No AUR helper found (paru/yay). Install greetd-dms-greeter-git from AUR: https://aur.archlinux.org/packages/greetd-dms-greeter-git")
+			return false
+		}
+		failHint = fmt.Sprintf("⚠ dms-greeter install failed. Install from AUR: %s -S greetd-dms-greeter-git", aurHelper)
+		installCmd = exec.CommandContext(ctx, aurHelper, "-S", "--noconfirm", "greetd-dms-greeter-git")
+	default:
+		return false
+	}
+
+	logFunc("Installing dms-greeter from official repository...")
+	installCmd.Stdout = os.Stdout
+	installCmd.Stderr = os.Stderr
+
+	if err := installCmd.Run(); err != nil {
+		logFunc(failHint)
+		return false
+	}
+
+	logFunc("✓ dms-greeter package installed")
+	return true
 }
 
 // CopyGreeterFiles installs the dms-greeter wrapper and sets up cache directory
@@ -393,7 +523,7 @@ func SyncDMSConfigs(dmsPath, compositor string, logFunc func(string), sudoPasswo
 			}
 		}
 
-		runSudoCmd(sudoPassword, "rm", "-f", link.target) //nolint:errcheck
+		_ = runSudoCmd(sudoPassword, "rm", "-f", link.target)
 
 		if err := runSudoCmd(sudoPassword, "ln", "-sf", link.source, link.target); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to create symlink for %s: %v", link.desc, err))
@@ -794,8 +924,14 @@ user = "%s"
 	}
 
 	// Build command based on compositor and dms path
+	// When dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	compositorLower := strings.ToLower(compositor)
-	command := fmt.Sprintf(`command = "%s --command %s -p %s"`, wrapperCmd, compositorLower, dmsPath)
+	var command string
+	if dmsPath == "" {
+		command = fmt.Sprintf(`command = "%s --command %s"`, wrapperCmd, compositorLower)
+	} else {
+		command = fmt.Sprintf(`command = "%s --command %s -p %s"`, wrapperCmd, compositorLower, dmsPath)
+	}
 
 	var finalLines []string
 	inDefaultSession := false
@@ -832,7 +968,11 @@ user = "%s"
 		return fmt.Errorf("failed to move config to /etc/greetd: %w", err)
 	}
 
-	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s --command %s -p %s)", greeterUser, wrapperCmd, compositorLower, dmsPath))
+	cmdDesc := fmt.Sprintf("%s --command %s", wrapperCmd, compositorLower)
+	if dmsPath != "" {
+		cmdDesc = fmt.Sprintf("%s -p %s", cmdDesc, dmsPath)
+	}
+	logFunc(fmt.Sprintf("✓ Updated greetd configuration (user: %s, command: %s)", greeterUser, cmdDesc))
 	return nil
 }
 
@@ -865,6 +1005,47 @@ func stripConfigFlag(command string) string {
 	}
 
 	return command
+}
+
+// getDebianOBSSlug returns the OBS repository slug for the running Debian version.
+func getDebianOBSSlug(osInfo *distros.OSInfo) string {
+	versionID := strings.ToLower(osInfo.VersionID)
+	codename := strings.ToLower(osInfo.VersionCodename)
+	prettyName := strings.ToLower(osInfo.PrettyName)
+
+	if strings.Contains(prettyName, "sid") || strings.Contains(prettyName, "unstable") ||
+		codename == "sid" || versionID == "sid" {
+		return "Debian_Unstable"
+	}
+	if versionID == "testing" || codename == "testing" {
+		return "Debian_Testing"
+	}
+	if versionID != "" {
+		return "Debian_" + versionID // "Debian_13"
+	}
+	return "Debian_Unstable"
+}
+
+// getOpenSUSEOBSRepoURL returns the OBS .repo file URL for the running openSUSE variant.
+func getOpenSUSEOBSRepoURL(osInfo *distros.OSInfo) string {
+	const base = "https://download.opensuse.org/repositories/home:AvengeMedia:danklinux"
+	var slug string
+	switch osInfo.Distribution.ID {
+	case "opensuse-leap":
+		v := osInfo.VersionID
+		if v != "" && !strings.Contains(v, ".") {
+			v += ".0" // "16" → "16.0"
+		}
+		if v == "" {
+			v = "16.0"
+		}
+		slug = v
+	case "opensuse-slowroll":
+		slug = "openSUSE_Slowroll"
+	default: // opensuse-tumbleweed || unknown version
+		slug = "openSUSE_Tumbleweed"
+	}
+	return fmt.Sprintf("%s/%s/home:AvengeMedia:danklinux.repo", base, slug)
 }
 
 func runSudoCmd(sudoPassword string, command string, args ...string) error {
