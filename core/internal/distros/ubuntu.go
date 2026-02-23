@@ -96,7 +96,7 @@ func (u *UbuntuDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (u *UbuntuDistribution) detectDMSGreeter() deps.Dependency {
-	return u.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", u.packageInstalled("dms-greeter"))
+	return u.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", u.packageInstalled("dms-greeter"))
 }
 
 func (u *UbuntuDistribution) packageInstalled(pkg string) bool {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/deps"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/distros"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/greeter"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -80,19 +81,24 @@ func (m Model) viewDependencyReview() string {
 				}
 			}
 
+			note := ""
+			if dep.Name == "dms-greeter" {
+				note = m.styles.Subtle.Render(" (selection replaces your current display manager)")
+			}
+
 			var line string
 			if i == m.selectedDep {
 				line = fmt.Sprintf("▶ %s%s%-25s %s", reinstallMarker, variantMarker, dep.Name, status)
 				if dep.Version != "" {
 					line += fmt.Sprintf(" (%s)", dep.Version)
 				}
-				line = m.styles.SelectedOption.Render(line)
+				line = m.styles.SelectedOption.Render(line) + note
 			} else {
 				line = fmt.Sprintf("  %s%s%-25s %s", reinstallMarker, variantMarker, dep.Name, status)
 				if dep.Version != "" {
 					line += fmt.Sprintf(" (%s)", dep.Version)
 				}
-				line = m.styles.Normal.Render(line)
+				line = m.styles.Normal.Render(line) + note
 			}
 
 			b.WriteString(line)
@@ -115,6 +121,13 @@ func (m Model) updateDetectingDepsState(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.state = StateError
 		} else {
 			m.dependencies = depsMsg.deps
+			// dms-greeter is opt-in skipped by default
+			for _, dep := range depsMsg.deps {
+				if dep.Name == "dms-greeter" {
+					m.disabledItems["dms-greeter"] = true
+					break
+				}
+			}
 			m.state = StateDependencyReview
 		}
 		return m, m.listenForLogs()
@@ -230,6 +243,41 @@ func (m Model) installPackages() tea.Cmd {
 		// Convert installer messages to TUI messages
 		go func() {
 			for msg := range installerProgressChan {
+				// Run optional greeter setup
+				if msg.Phase == distros.PhaseComplete && msg.IsComplete && msg.Error == nil {
+					greeterSelected := false
+					for _, dep := range m.dependencies {
+						if dep.Name == "dms-greeter" && !m.disabledItems["dms-greeter"] {
+							greeterSelected = true
+							break
+						}
+					}
+					if greeterSelected {
+						compositorName := "niri"
+						if m.selectedWM == 1 {
+							compositorName = "Hyprland"
+						}
+						m.packageProgressChan <- packageInstallProgressMsg{
+							progress:  0.92,
+							step:      "Configuring DMS greeter...",
+							logOutput: "Starting automated greeter setup...",
+						}
+						greeterLogFunc := func(line string) {
+							m.packageProgressChan <- packageInstallProgressMsg{
+								progress:  0.94,
+								step:      "Configuring DMS greeter...",
+								logOutput: line,
+							}
+						}
+						if err := greeter.AutoSetupGreeter(compositorName, m.sudoPassword, greeterLogFunc); err != nil {
+							m.packageProgressChan <- packageInstallProgressMsg{
+								progress:  0.96,
+								step:      "Greeter setup warning",
+								logOutput: fmt.Sprintf("⚠ Greeter auto-setup warning (non-fatal): %v", err),
+							}
+						}
+					}
+				}
 				tuiMsg := packageInstallProgressMsg{
 					progress:    msg.Progress,
 					step:        msg.Step,

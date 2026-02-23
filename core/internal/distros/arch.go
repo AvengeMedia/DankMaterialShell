@@ -126,7 +126,7 @@ func (a *ArchDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (a *ArchDistribution) detectDMSGreeter() deps.Dependency {
-	return a.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", a.packageInstalled("greetd-dms-greeter-git"))
+	return a.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", a.packageInstalled("greetd-dms-greeter-git"))
 }
 
 func (a *ArchDistribution) packageInstalled(pkg string) bool {

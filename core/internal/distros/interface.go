@@ -55,6 +55,7 @@ const (
 	PhaseAURPackages
 	PhaseCursorTheme
 	PhaseConfiguration
+	PhaseGreeterSetup
 	PhaseComplete
 )
 
