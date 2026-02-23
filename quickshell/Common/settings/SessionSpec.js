@@ -77,7 +77,11 @@ var SPEC = {
 
     deviceMaxVolumes: { def: {} },
     hiddenOutputDeviceNames: { def: [] },
-    hiddenInputDeviceNames: { def: [] }
+    hiddenInputDeviceNames: { def: [] },
+
+    launcherLastMode: { def: "all" },
+    appDrawerLastMode: { def: "apps" },
+    niriOverviewLastMode: { def: "apps" }
 };
 
 function getValidKeys() {

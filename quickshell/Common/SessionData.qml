@@ -126,6 +126,10 @@ Singleton {
     property var hiddenOutputDeviceNames: []
     property var hiddenInputDeviceNames: []
 
+    property string launcherLastMode: "all"
+    property string appDrawerLastMode: "apps"
+    property string niriOverviewLastMode: "apps"
+
     Component.onCompleted: {
         if (!isGreeterMode) {
             loadSettings();
@@ -1097,6 +1101,21 @@ Singleton {
         const updated = Object.assign({}, deviceMaxVolumes);
         delete updated[nodeName];
         deviceMaxVolumes = updated;
+        saveSettings();
+    }
+
+    function setLauncherLastMode(mode) {
+        launcherLastMode = mode;
+        saveSettings();
+    }
+
+    function setAppDrawerLastMode(mode) {
+        appDrawerLastMode = mode;
+        saveSettings();
+    }
+
+    function setNiriOverviewLastMode(mode) {
+        niriOverviewLastMode = mode;
         saveSettings();
     }
 

@@ -102,7 +102,7 @@ Item {
             spotlightContent.searchField.text = query;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || "all";
+            var targetMode = mode || SessionData.launcherLastMode || "all";
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
@@ -223,6 +223,15 @@ Item {
             if (root.unloadContentOnClose)
                 launcherContentLoader.active = false;
             dialogClosed();
+        }
+    }
+
+    Connections {
+        target: spotlightContent?.controller ?? null
+        function onModeChanged(mode) {
+            if (spotlightContent.controller.autoSwitchedToFiles)
+                return;
+            SessionData.setLauncherLastMode(mode);
         }
     }
 
