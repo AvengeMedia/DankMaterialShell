@@ -85,22 +85,20 @@ Variants {
             }
 
             Component.onCompleted: {
+                if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
+                    blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+
                 if (!source) {
-                    isInitialized = true;
-                    updatesBindingTimer.start();
-                    return;
+                    root._renderSettling = false;
                 }
-                const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
-                setWallpaperImmediate(formattedSource);
                 isInitialized = true;
-                updatesBindingTimer.start();
             }
 
             property bool isInitialized: false
             property real transitionProgress: 0
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
-            property bool _renderSettling: false
+            property bool _renderSettling: true
             property bool useNextForEffect: false
 
             Connections {
@@ -117,15 +115,6 @@ Variants {
                 id: renderSettleTimer
                 interval: 100
                 onTriggered: root._renderSettling = false
-            }
-
-            Timer {
-                id: updatesBindingTimer
-                interval: 500
-                onTriggered: {
-                    if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
-                        blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
-                }
             }
 
             onSourceChanged: {
