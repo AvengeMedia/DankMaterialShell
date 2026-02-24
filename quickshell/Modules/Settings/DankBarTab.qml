@@ -92,7 +92,7 @@ Item {
             widgetOutlineColor: defaultBar.widgetOutlineColor || "primary",
             widgetOutlineOpacity: defaultBar.widgetOutlineOpacity ?? 1.0,
             widgetOutlineThickness: defaultBar.widgetOutlineThickness ?? 1,
-            widgetPadding: defaultBar.widgetPadding ?? 12,
+            widgetPadding: defaultBar.widgetPadding ?? 8,
             maximizeWidgetIcons: defaultBar.maximizeWidgetIcons ?? false,
             maximizeWidgetText: defaultBar.maximizeWidgetText ?? false,
             removeWidgetPadding: defaultBar.removeWidgetPadding ?? false,
@@ -837,11 +837,11 @@ Item {
                 SettingsSliderRow {
                     id: widgetPaddingSlider
                     text: I18n.tr("Padding")
-                    value: selectedBarConfig?.widgetPadding ?? 12
+                    value: selectedBarConfig?.widgetPadding ?? 8
                     minimum: 0
                     maximum: 32
                     unit: "px"
-                    defaultValue: 12
+                    defaultValue: 8
                     opacity: (selectedBarConfig?.removeWidgetPadding ?? false) ? 0.5 : 1.0
                     enabled: !(selectedBarConfig?.removeWidgetPadding ?? false)
                     onSliderValueChanged: newValue => {
