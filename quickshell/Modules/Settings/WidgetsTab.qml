@@ -24,6 +24,57 @@ Item {
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
 
+    function highlightWidget(widgetId) {
+        if (!widgetId) return;
+
+        let sections = [
+            { item: leftSection },
+            { item: centerSection },
+            { item: rightSection }
+        ];
+
+        for (let s of sections) {
+            let index = -1;
+            for (let i = 0; i < s.item.items.length; i++) {
+                let w = s.item.items[i];
+                if ((typeof w === 'string' ? w : w.id) === widgetId) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index !== -1) {
+                s.item.highlightWidgetIndex = index;
+                Qt.callLater(() => {
+                    let delegate = s.item.getDelegate(index);
+                    if (delegate) {
+                        let pos = delegate.mapToItem(flickable.contentItem, 0, 0);
+                        let targetY = Math.max(0, Math.min(pos.y - 100, flickable.contentHeight - flickable.height));
+                        flickable.contentY = targetY;
+                    }
+                });
+                return;
+            }
+        }
+    }
+
+    Connections {
+        target: PopoutService
+        function onPendingWidgetHighlightChanged() {
+            if (widgetsTab.visible && PopoutService.pendingWidgetHighlight) {
+                widgetsTab.highlightWidget(PopoutService.pendingWidgetHighlight);
+                PopoutService.pendingWidgetHighlight = "";
+            }
+        }
+    }
+
+    onVisibleChanged: {
+        if (visible && PopoutService.pendingWidgetHighlight) {
+            highlightWidget(PopoutService.pendingWidgetHighlight);
+            PopoutService.pendingWidgetHighlight = "";
+        }
+    }
+
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
 
     DankTooltipV2 {
@@ -402,6 +453,8 @@ Item {
             widgetObj.mountPath = "/";
         if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp")
             widgetObj.minimumWidth = true;
+        if (widgetId === "memUsage")
+            widgetObj.showInGb = false;
 
         var widgets = getWidgetsForSection(targetSection).slice();
         widgets.push(widgetObj);
@@ -425,7 +478,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -536,6 +589,18 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
+    function handleShowInGbChanged(sectionId, widgetIndex, enabled) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            setWidgetsForSection(sectionId, widgets);
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.showInGb = enabled;
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
     function handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -629,6 +694,8 @@ Item {
                     item.minimumWidth = widget.minimumWidth;
                 if (widget.showSwap !== undefined)
                     item.showSwap = widget.showSwap;
+                if (widget.showInGb !== undefined)
+                    item.showInGb = widget.showInGb;
                 if (widget.mediaSize !== undefined)
                     item.mediaSize = widget.mediaSize;
                 if (widget.clockCompactMode !== undefined)
@@ -710,6 +777,7 @@ Item {
     }
 
     DankFlickable {
+        id: flickable
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
@@ -925,6 +993,9 @@ Item {
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
                         }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
+                        }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
@@ -983,6 +1054,9 @@ Item {
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
                         }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
+                        }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
@@ -1040,6 +1114,9 @@ Item {
                         }
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
+                        }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
                         }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);

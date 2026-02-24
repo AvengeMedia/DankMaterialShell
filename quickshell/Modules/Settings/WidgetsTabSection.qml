@@ -13,6 +13,14 @@ Column {
     property string title: ""
     property string titleIcon: "widgets"
     property string sectionId: ""
+    property int highlightWidgetIndex: -1
+
+    function getDelegate(index) {
+        if (index >= 0 && index < itemsList.children.length - 1) { // -1 because repeaters might have an extra internal child or just being safe
+             return itemsList.children[index];
+        }
+        return null;
+    }
 
     DankTooltipV2 {
         id: sharedTooltip
@@ -30,6 +38,7 @@ Column {
     signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
+    signal showInGbChanged(string sectionId, int widgetIndex, bool enabled)
     signal overflowSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
 
     function cloneWidgetData(widget) {
@@ -37,7 +46,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -133,7 +142,26 @@ Column {
 
                 width: itemsList.width
                 height: 70
-                z: held ? 2 : 1
+                z: (held || highlightWidgetIndex === index) ? 2 : 1
+
+                Rectangle {
+                    id: highlightOverlay
+                    anchors.fill: parent
+                    anchors.margins: 2
+                    radius: Theme.cornerRadius
+                    color: Theme.primary
+                    opacity: 0
+                    z: 10
+
+                    SequentialAnimation on opacity {
+                        id: flashAnim
+                        running: root.highlightWidgetIndex === index
+                        NumberAnimation { to: 0.3; duration: 400; easing.type: Easing.OutCubic }
+                        PauseAnimation { duration: 500 }
+                        NumberAnimation { to: 0; duration: 1000; easing.type: Easing.InCubic }
+                        onFinished: root.highlightWidgetIndex = -1
+                    }
+                }
 
                 Rectangle {
                     id: itemBackground
@@ -354,23 +382,36 @@ Column {
                         }
 
                         DankActionButton {
-                            id: showSwapButton
-                            buttonSize: 28
+                            id: memMenuButton
                             visible: modelData.id === "memUsage"
-                            iconName: "swap_horiz"
-                            iconSize: 16
-                            iconColor: (modelData.showSwap !== undefined ? modelData.showSwap : false) ? Theme.primary : Theme.outline
+                            buttonSize: 32
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
                             onClicked: {
-                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
-                                root.showSwapChanged(root.sectionId, index, !currentEnabled);
-                            }
-                            onEntered: {
-                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
-                                const tooltipText = currentEnabled ? "Hide Swap" : "Show Swap";
-                                sharedTooltip.show(tooltipText, showSwapButton, 0, 0, "bottom");
-                            }
-                            onExited: {
-                                sharedTooltip.hide();
+                                memUsageContextMenu.widgetData = modelData;
+                                memUsageContextMenu.sectionId = root.sectionId;
+                                memUsageContextMenu.widgetIndex = index;
+
+                                var buttonPos = memMenuButton.mapToItem(root, 0, 0);
+                                var popupWidth = memUsageContextMenu.width;
+                                var popupHeight = memUsageContextMenu.height;
+
+                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                if (xPos < 0) {
+                                    xPos = buttonPos.x + memMenuButton.width + Theme.spacingS;
+                                }
+
+                                var yPos = buttonPos.y - popupHeight / 2 + memMenuButton.height / 2;
+                                if (yPos < 0) {
+                                    yPos = Theme.spacingS;
+                                } else if (yPos + popupHeight > root.height) {
+                                    yPos = root.height - popupHeight - Theme.spacingS;
+                                }
+
+                                memUsageContextMenu.x = xPos;
+                                memUsageContextMenu.y = yPos;
+                                memUsageContextMenu.open();
                             }
                         }
 
@@ -795,6 +836,142 @@ Column {
             ColorAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
+            }
+        }
+    }
+
+    Popup {
+        id: memUsageContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+
+        width: 200
+        height: 80
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: swapToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "swap_horiz"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Swap")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: swapToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: memUsageContextMenu.widgetData?.showSwap ?? false
+                        onToggled: {
+                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: swapToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            swapToggle.checked = !swapToggle.checked;
+                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, swapToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: gbToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "straighten"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show in GB")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: gbToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: memUsageContextMenu.widgetData?.showInGb ?? false
+                        onToggled: {
+                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: gbToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            gbToggle.checked = !gbToggle.checked;
+                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, gbToggle.checked);
+                        }
+                    }
+                }
             }
         }
     }
