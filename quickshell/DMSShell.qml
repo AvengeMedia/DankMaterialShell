@@ -142,6 +142,12 @@ Item {
                         fadeDpmsWindowLoader.item.cancelFade();
                     }
                 }
+
+                function onRequestMonitorOn() {
+                    if (!fadeDpmsWindowLoader.item)
+                        return;
+                    fadeDpmsWindowLoader.item.cancelFade();
+                }
             }
         }
     }
