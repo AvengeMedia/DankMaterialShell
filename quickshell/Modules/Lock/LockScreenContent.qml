@@ -222,7 +222,7 @@ Item {
 
                 property string fullTimeStr: {
                     const format = SettingsData.getEffectiveTimeFormat();
-                    return systemClock.date.toLocaleTimeString(Qt.locale(), format);
+                    return systemClock.date.toLocaleTimeString(I18n.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
                 property string hours: timeParts[0] || ""
@@ -333,9 +333,9 @@ Item {
             visible: SettingsData.lockScreenShowDate
             text: {
                 if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat);
+                    return systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat);
                 }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
+                return systemClock.date.toLocaleDateString(I18n.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"

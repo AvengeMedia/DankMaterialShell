@@ -415,7 +415,7 @@ Singleton {
         try {
             const date = new Date(isoString);
             const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-            return date.toLocaleTimeString(Qt.locale(), format);
+            return date.toLocaleTimeString(I18n.locale(), format);
         } catch (e) {
             return "--";
         }
@@ -444,7 +444,7 @@ Singleton {
 
         const date = new Date();
         date.setDate(date.getDate() + index);
-        const locale = Qt.locale();
+        const locale = I18n.locale();
         return locale.dayName(date.getDay(), Locale.ShortFormat);
     }
 

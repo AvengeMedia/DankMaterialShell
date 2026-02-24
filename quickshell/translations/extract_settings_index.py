@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import re
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -82,7 +82,15 @@ CATEGORY_KEYWORDS = {
     "Displays": ["monitor", "screen", "resolution"],
     "Desktop Widgets": ["conky", "desktop clock"],
     "Audio": ["sound", "volume", "speaker", "microphone", "headphones", "pipewire"],
-    "Window Rules": ["window", "rules", "matching", "floating", "fullscreen", "opacity"],
+    "Window Rules": [
+        "window",
+        "rules",
+        "matching",
+        "floating",
+        "fullscreen",
+        "opacity",
+    ],
+    "Locale": ["locale", "language", "country"],
 }
 
 TAB_INDEX_MAP = {
@@ -115,6 +123,7 @@ TAB_INDEX_MAP = {
     "DesktopWidgetsTab.qml": 27,
     "WindowRulesTab.qml": 28,
     "AudioTab.qml": 29,
+    "LocaleTab.qml": 30,
 }
 
 TAB_CATEGORY_MAP = {
@@ -147,6 +156,7 @@ TAB_CATEGORY_MAP = {
     27: "Desktop Widgets",
     28: "Window Rules",
     29: "Audio",
+    30: "Locale",
 }
 
 SEARCHABLE_COMPONENTS = [

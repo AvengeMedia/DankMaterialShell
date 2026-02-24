@@ -247,6 +247,12 @@ Rectangle {
                     "tabIndex": 29
                 },
                 {
+                    "id": "locale",
+                    "text": I18n.tr("Locale"),
+                    "icon": "language",
+                    "tabIndex": 30
+                },
+                {
                     "id": "clipboard",
                     "text": I18n.tr("Clipboard"),
                     "icon": "content_paste",

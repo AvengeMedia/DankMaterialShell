@@ -57,7 +57,7 @@ Item {
         try {
             const date = new Date(WeatherService.weather.rawSunrise);
             const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-            return date.toLocaleTimeString(Qt.locale(), format);
+            return date.toLocaleTimeString(I18n.locale(), format);
         } catch (e) {
             return WeatherService.weather.sunrise || "";
         }
@@ -69,7 +69,7 @@ Item {
         try {
             const date = new Date(WeatherService.weather.rawSunset);
             const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-            return date.toLocaleTimeString(Qt.locale(), format);
+            return date.toLocaleTimeString(I18n.locale(), format);
         } catch (e) {
             return WeatherService.weather.sunset || "";
         }

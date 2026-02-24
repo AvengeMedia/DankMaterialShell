@@ -128,7 +128,7 @@ DesktopPluginComponent {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: Theme.spacingXS
-                text: systemClock.date?.toLocaleDateString(Qt.locale(), "ddd, MMM d") ?? ""
+                text: systemClock.date?.toLocaleDateString(I18n.locale(), "ddd, MMM d") ?? ""
                 font.pixelSize: Theme.fontSizeSmall
                 font.weight: Font.Medium
                 color: Theme.surfaceText
@@ -150,7 +150,7 @@ DesktopPluginComponent {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: root.showDate ? -digitalRoot.dateFontSize * 0.8 : 0
-                text: systemClock.date?.toLocaleTimeString(Qt.locale(), root.showSeconds ? "hh:mm:ss" : "hh:mm") ?? ""
+                text: systemClock.date?.toLocaleTimeString(I18n.locale(), root.showSeconds ? "hh:mm:ss" : "hh:mm") ?? ""
                 font.pixelSize: digitalRoot.timeFontSize
                 font.weight: Font.Bold
                 font.family: "monospace"
@@ -163,7 +163,7 @@ DesktopPluginComponent {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: timeText.bottom
                 anchors.topMargin: Theme.spacingXS
-                text: systemClock.date?.toLocaleDateString(Qt.locale(), "ddd, MMM d") ?? ""
+                text: systemClock.date?.toLocaleDateString(I18n.locale(), "ddd, MMM d") ?? ""
                 font.pixelSize: digitalRoot.dateFontSize
                 color: Theme.surfaceText
             }

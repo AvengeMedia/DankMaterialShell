@@ -133,7 +133,7 @@ Item {
             const date = new Date(isoString);
             if (isNaN(date.getTime()))
                 return "";
-            return date.toLocaleTimeString(Qt.locale(), "HH:mm");
+            return date.toLocaleTimeString(I18n.locale(), "HH:mm");
         } catch (e) {
             return "";
         }

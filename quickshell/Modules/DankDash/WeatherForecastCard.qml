@@ -28,7 +28,7 @@ Rectangle {
         try {
             const date = new Date(root.forecastData.rawTime);
             const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-            return date.toLocaleTimeString(Qt.locale(), format);
+            return date.toLocaleTimeString(I18n.locale(), format);
         } catch (e) {
             return root.forecastData?.time ?? "--";
         }

@@ -218,7 +218,7 @@ Item {
 
                 property string fullTimeStr: {
                     const format = GreetdSettings.getEffectiveTimeFormat();
-                    return systemClock.date.toLocaleTimeString(Qt.locale(), format);
+                    return systemClock.date.toLocaleTimeString(I18n.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
                 property string hours: timeParts[0] || ""
@@ -328,9 +328,9 @@ Item {
             anchors.topMargin: 4
             text: {
                 if (GreetdSettings.lockDateFormat && GreetdSettings.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), GreetdSettings.lockDateFormat);
+                    return systemClock.date.toLocaleDateString(I18n.locale(), GreetdSettings.lockDateFormat);
                 }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
+                return systemClock.date.toLocaleDateString(I18n.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"

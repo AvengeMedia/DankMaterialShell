@@ -470,7 +470,22 @@ FocusScope {
 
             onActiveChanged: {
                 if (active && item)
-                    Qt.callLater(() => item.forceActiveFocus());
+                Qt.callLater(() => item.forceActiveFocus());
+            }
+        }
+
+        Loader {
+            id: localeLoader
+            anchors.fill: parent
+            active: root.currentIndex === 30
+            visible: active
+            focus: active
+
+            sourceComponent: LocaleTab {}
+
+            onActiveChanged: {
+                if (active && item)
+                Qt.callLater(() => item.forceActiveFocus());
             }
         }
     }

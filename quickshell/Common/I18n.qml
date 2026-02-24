@@ -21,6 +21,8 @@ Singleton {
 
     readonly property url translationsFolder: Qt.resolvedUrl("../translations/poexports")
 
+    readonly property alias folder: dir.folder
+    property var presentLocales: ({ "en": Qt.locale("en") })
     property string currentLocale: "en"
     property var translations: ({})
     property bool translationsLoaded: false
@@ -34,8 +36,10 @@ Singleton {
         showDirs: false
         showDotAndDotDot: false
 
-        onStatusChanged: if (status === FolderListModel.Ready)
-            root._pickTranslation()
+        onStatusChanged: if (status === FolderListModel.Ready) {
+            root._loadPresentLocales();
+            root._pickTranslation();
+        }
     }
 
     FileView {
@@ -59,18 +63,28 @@ Singleton {
         }
     }
 
-    function _pickTranslation() {
-        const present = new Set();
+    // for replacing Qt.locale()
+    function locale() {
+        return presentLocales[currentLocale];
+    }
+
+    function _loadPresentLocales() {
+        if (Object.keys(presentLocales).length > 1) {
+            return; // already loaded
+        }
         for (let i = 0; i < dir.count; i++) {
             const name = dir.get(i, "fileName"); // e.g. "zh_CN.json"
             if (name && name.endsWith(".json")) {
-                present.add(name.slice(0, -5));
+                const shortName = name.slice(0, -5);
+                presentLocales[shortName] = Qt.locale(shortName);
             }
         }
+    }
 
+    function _pickTranslation() {
         for (let i = 0; i < _candidates.length; i++) {
             const cand = _candidates[i];
-            if (present.has(cand)) {
+            if (presentLocales[cand] !== undefined) {
                 _useLocale(cand, dir.folder + "/" + cand + ".json");
                 return;
             }

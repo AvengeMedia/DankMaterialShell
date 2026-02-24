@@ -3884,6 +3884,27 @@
     "description": "Automatically lock the screen when DMS starts"
   },
   {
+    "section": "lockBeforeSuspend",
+    "label": "Lock before suspend",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "automatic",
+      "automatically",
+      "before",
+      "lock",
+      "login",
+      "password",
+      "prepares",
+      "screen",
+      "security",
+      "sleep",
+      "suspend",
+      "system"
+    ],
+    "description": "Automatically lock the screen when the system prepares to suspend"
+  },
+  {
     "section": "lockScreenNotificationMode",
     "label": "Notification Display",
     "tabIndex": 11,
@@ -5808,27 +5829,6 @@
     "description": "Gradually fade the screen before locking with a configurable grace period"
   },
   {
-    "section": "lockBeforeSuspend",
-    "label": "Lock before suspend",
-    "tabIndex": 21,
-    "category": "Power & Sleep",
-    "keywords": [
-      "automatically",
-      "before",
-      "energy",
-      "lock",
-      "power",
-      "prepares",
-      "screen",
-      "security",
-      "shutdown",
-      "sleep",
-      "suspend",
-      "system"
-    ],
-    "description": "Automatically lock the screen when the system prepares to suspend"
-  },
-  {
     "section": "fadeToLockGracePeriod",
     "label": "Lock fade grace period",
     "tabIndex": 21,
@@ -6395,5 +6395,33 @@
       "volume"
     ],
     "icon": "computer"
+  },
+  {
+    "section": "_tab_30",
+    "label": "Locale",
+    "tabIndex": 30,
+    "category": "Locale",
+    "keywords": [
+      "country",
+      "language",
+      "locale"
+    ],
+    "icon": "language"
+  },
+  {
+    "section": "locale",
+    "label": "Locale Settings",
+    "tabIndex": 30,
+    "category": "Locale",
+    "keywords": [
+      "change",
+      "country",
+      "interface",
+      "language",
+      "locale",
+      "settings"
+    ],
+    "icon": "language",
+    "description": "Change the locale used by the DMS interface."
   }
 ]

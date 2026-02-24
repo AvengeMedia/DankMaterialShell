@@ -15,7 +15,7 @@ Rectangle {
     signal closeDash
 
     function weekStartJs() {
-        return Qt.locale().firstDayOfWeek % 7;
+        return I18n.locale().firstDayOfWeek % 7;
     }
 
     function startOfWeek(dateObj) {
@@ -179,7 +179,7 @@ Rectangle {
             StyledText {
                 width: parent.width - 56
                 height: 28
-                text: calendarGrid.displayDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
+                text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -223,7 +223,7 @@ Rectangle {
             Repeater {
                 model: {
                     const days = [];
-                    const loc = Qt.locale();
+                    const loc = I18n.locale();
                     const qtFirst = loc.firstDayOfWeek;
                     for (let i = 0; i < 7; ++i) {
                         const qtDay = ((qtFirst - 1 + i) % 7) + 1;

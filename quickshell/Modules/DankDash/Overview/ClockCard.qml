@@ -99,7 +99,7 @@ Card {
         }
 
         StyledText {
-            text: systemClock?.date?.toLocaleDateString(Qt.locale(), "MMM dd")
+            text: systemClock?.date?.toLocaleDateString(I18n.locale(), "MMM dd")
             font.pixelSize: Theme.fontSizeSmall
             color: Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.7)
             anchors.horizontalCenter: parent.horizontalCenter

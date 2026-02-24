@@ -271,8 +271,8 @@ Item {
 
                 text: {
                     if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0)
-                        return systemClock.date?.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat) ?? "";
-                    return systemClock.date?.toLocaleDateString(Qt.locale(), "ddd, MMM d") ?? "";
+                        return systemClock.date?.toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat) ?? "";
+                    return systemClock.date?.toLocaleDateString(I18n.locale(), "ddd, MMM d") ?? "";
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 color: root.accentColor
@@ -324,8 +324,8 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: {
                         if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0)
-                            return systemClock.date?.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat) ?? "";
-                        return systemClock.date?.toLocaleDateString(Qt.locale(), "ddd, MMM d") ?? "";
+                            return systemClock.date?.toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat) ?? "";
+                        return systemClock.date?.toLocaleDateString(I18n.locale(), "ddd, MMM d") ?? "";
                     }
                     font.pixelSize: digitalRoot.smallSize
                     color: Theme.withAlpha(root.accentColor, 0.7)
@@ -528,7 +528,7 @@ Item {
                 StyledText {
                     visible: stackedRoot.hasDate
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: systemClock.date?.toLocaleDateString(Qt.locale(), "MMM dd") ?? ""
+                    text: systemClock.date?.toLocaleDateString(I18n.locale(), "MMM dd") ?? ""
                     font.pixelSize: stackedRoot.smallSize * 0.7
                     color: Theme.withAlpha(root.accentColor, 0.7)
                 }
