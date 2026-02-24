@@ -142,6 +142,12 @@ Item {
                         fadeDpmsWindowLoader.item.cancelFade();
                     }
                 }
+
+                function onRequestMonitorOn() {
+                    if (!fadeDpmsWindowLoader.item)
+                        return;
+                    fadeDpmsWindowLoader.item.cancelFade();
+                }
             }
         }
     }
@@ -337,6 +343,23 @@ Item {
 
             Component.onCompleted: {
                 PopoutService.wifiPasswordModal = wifiPasswordModalItem;
+            }
+        }
+    }
+
+    LazyLoader {
+        id: wifiQRCodeModalLoader
+        active: false
+
+        Component.onCompleted: {
+            PopoutService.wifiQRCodeModalLoader = wifiQRCodeModalLoader;
+        }
+
+        WifiQRCodeModal {
+            id: wifiQRCodeModalItem
+
+            Component.onCompleted: {
+                PopoutService.wifiQRCodeModal = wifiQRCodeModalItem;
             }
         }
     }

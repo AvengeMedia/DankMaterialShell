@@ -652,15 +652,13 @@ func checkI2CAvailability() checkResult {
 func checkImageFormatPlugins() []checkResult {
 	url := doctorDocsURL + "#optional-features"
 
-	pluginDir := findQtPluginDir()
-	if pluginDir == "" {
+	pluginDirs := findQtPluginDirs()
+	if len(pluginDirs) == 0 {
 		return []checkResult{
 			{catOptionalFeatures, "qt6-imageformats", statusInfo, "Cannot detect (plugin dir not found)", "WebP, TIFF, JP2 support", url},
 			{catOptionalFeatures, "kimageformats", statusInfo, "Cannot detect (plugin dir not found)", "AVIF, HEIF, JXL support", url},
 		}
 	}
-
-	imageFormatsDir := filepath.Join(pluginDir, "imageformats")
 
 	type pluginCheck struct {
 		name    string
@@ -695,9 +693,18 @@ func checkImageFormatPlugins() []checkResult {
 	var results []checkResult
 	for _, c := range checks {
 		var found []string
-		for _, p := range c.plugins {
-			if _, err := os.Stat(filepath.Join(imageFormatsDir, p.file)); err == nil {
-				found = append(found, p.format)
+		var foundDirs []string
+		for _, pluginDir := range pluginDirs {
+			imageFormatsDir := filepath.Join(pluginDir, "imageformats")
+			for _, p := range c.plugins {
+				if _, err := os.Stat(filepath.Join(imageFormatsDir, p.file)); err == nil {
+					if !slices.Contains(found, p.format) {
+						found = append(found, p.format)
+					}
+					if !slices.Contains(foundDirs, imageFormatsDir) {
+						foundDirs = append(foundDirs, imageFormatsDir)
+					}
+				}
 			}
 		}
 
@@ -708,7 +715,7 @@ func checkImageFormatPlugins() []checkResult {
 		default:
 			details := ""
 			if doctorVerbose {
-				details = fmt.Sprintf("Formats: %s (%s)", strings.Join(found, ", "), imageFormatsDir)
+				details = fmt.Sprintf("Formats: %s (%s)", strings.Join(found, ", "), strings.Join(foundDirs, ":"))
 			}
 			result = checkResult{catOptionalFeatures, c.name, statusOK, fmt.Sprintf("Installed (%d formats)", len(found)), details, url}
 		}
@@ -718,22 +725,28 @@ func checkImageFormatPlugins() []checkResult {
 	return results
 }
 
-func findQtPluginDir() string {
-	// Check QT_PLUGIN_PATH env var first (used by NixOS and custom setups)
+func findQtPluginDirs() []string {
+	var dirs []string
+
+	addDir := func(dir string) {
+		if dir != "" {
+			if _, err := os.Stat(filepath.Join(dir, "imageformats")); err == nil {
+				dirs = append(dirs, dir)
+			}
+		}
+	}
+
+	// Check all paths in QT_PLUGIN_PATH env var (used by NixOS and custom setups)
 	if envPath := os.Getenv("QT_PLUGIN_PATH"); envPath != "" {
 		for dir := range strings.SplitSeq(envPath, ":") {
-			if _, err := os.Stat(filepath.Join(dir, "imageformats")); err == nil {
-				return dir
-			}
+			addDir(dir)
 		}
 	}
 
 	// Try qtpaths
 	for _, cmd := range []string{"qtpaths6", "qtpaths"} {
 		if output, err := exec.Command(cmd, "-query", "QT_INSTALL_PLUGINS").Output(); err == nil {
-			if dir := strings.TrimSpace(string(output)); dir != "" {
-				return dir
-			}
+			addDir(strings.TrimSpace(string(output)))
 		}
 	}
 
@@ -744,12 +757,10 @@ func findQtPluginDir() string {
 		"/usr/lib/x86_64-linux-gnu/qt6/plugins",
 		"/usr/lib/aarch64-linux-gnu/qt6/plugins",
 	} {
-		if _, err := os.Stat(filepath.Join(dir, "imageformats")); err == nil {
-			return dir
-		}
+		addDir(dir)
 	}
 
-	return ""
+	return dirs
 }
 
 func detectNetworkBackend(stackResult *network.DetectResult) string {

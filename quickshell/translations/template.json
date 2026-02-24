@@ -5985,6 +5985,13 @@
     "comment": ""
   },
   {
+    "term": "Icon Scale",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Icon Size",
     "translation": "",
     "context": "",
@@ -7043,6 +7050,20 @@
   },
   {
     "term": "Maximize Detection",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Maximize Widget Icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Maximize Widget Text",
     "translation": "",
     "context": "",
     "reference": "",
@@ -8582,6 +8603,13 @@
     "comment": ""
   },
   {
+    "term": "Open in terminal",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Open search bar to find text",
     "translation": "",
     "context": "",
@@ -9730,6 +9758,13 @@
     "comment": ""
   },
   {
+    "term": "Remove Widget Padding",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remove gaps and border when windows are maximized",
     "translation": "",
     "context": "",
@@ -10101,6 +10136,13 @@
     "comment": ""
   },
   {
+    "term": "Save QR Code",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Save and switch between display configurations",
     "translation": "",
     "context": "",
@@ -10186,6 +10228,13 @@
   },
   {
     "term": "Scale DankBar font sizes independently",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Scale DankBar icon sizes independently",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12250,6 +12299,13 @@
     "comment": ""
   },
   {
+    "term": "Try a different search",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Turn off all displays immediately when the lock screen activates",
     "translation": "",
     "context": "",
@@ -13091,6 +13147,13 @@
   },
   {
     "term": "WiFi Device",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "WiFi QR code for ",
     "translation": "",
     "context": "",
     "reference": "",

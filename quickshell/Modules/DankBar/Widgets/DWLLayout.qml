@@ -57,14 +57,14 @@ BasePill {
 
                 DankIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness, undefined, layout.barConfig?.noBackground)
+                    size: Theme.barIconSize(layout.barThickness, undefined, layout.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 StyledText {
                     text: layout.currentLayoutSymbol
-                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale, layout.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -78,14 +78,14 @@ BasePill {
 
                 DankIcon {
                     name: layout.getLayoutIcon(layout.currentLayoutSymbol)
-                    size: Theme.barIconSize(layout.barThickness, -4, layout.barConfig?.noBackground)
+                    size: Theme.barIconSize(layout.barThickness, -4, layout.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 StyledText {
                     text: layout.currentLayoutSymbol
-                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(layout.barThickness, layout.barConfig?.fontScale, layout.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                 }

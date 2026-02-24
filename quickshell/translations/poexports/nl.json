@@ -105,10 +105,10 @@
     "2 minutes": "2 minuten"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 seconden"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 minuten"
   },
   "24-Hour Format": {
     "24-Hour Format": "24-uursnotatie"
@@ -117,7 +117,7 @@
     "24-hour format": "24-uursnotatie"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250 ms"
   },
   "270°": {
     "270°": "270°"
@@ -126,7 +126,7 @@
     "3 days": "3 dagen"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 minuten"
   },
   "3 seconds": {
     "3 seconds": "3 seconden"
@@ -141,7 +141,7 @@
     "3rd party": "Derden"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 seconden"
   },
   "5 minutes": {
     "5 minutes": "5 minuten"
@@ -150,13 +150,13 @@
     "5 seconds": "5 seconden"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500 ms"
   },
   "7 days": {
     "7 days": "7 dagen"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750 ms"
   },
   "8 seconds": {
     "8 seconds": "8 seconden"
@@ -171,7 +171,7 @@
     "A file with this name already exists. Do you want to overwrite it?": "Er bestaat al een bestand met deze naam. Wilt u het overschrijven?"
   },
   "AC Power": {
-    "AC Power": ""
+    "AC Power": "Netstroom"
   },
   "API": {
     "API": "API"
@@ -381,7 +381,7 @@
     "Apps with custom display name, icon, or launch options. Right-click an app and select 'Edit App' to customize.": "Apps met aangepaste weergavenaam, pictogram of startopties. Klik rechts op een app en selecteer 'App bewerken' om aan te passen."
   },
   "Apps with notification popups muted. Unmute or delete to remove.": {
-    "Apps with notification popups muted. Unmute or delete to remove.": ""
+    "Apps with notification popups muted. Unmute or delete to remove.": "Apps met gedempte meldingspop-ups. Dempen opheffen of verwijderen om te wissen."
   },
   "Arrange displays and configure resolution, refresh rate, and VRR": {
     "Arrange displays and configure resolution, refresh rate, and VRR": "Beeldschermen rangschikken en resolutie, verversingssnelheid en VRR configureren"
@@ -587,7 +587,7 @@
     "Bar Transparency": "Balktransparantie"
   },
   "Base duration for animations (drag to use Custom)": {
-    "Base duration for animations (drag to use Custom)": ""
+    "Base duration for animations (drag to use Custom)": "Basisduur voor animaties (sleep om Aangepast te gebruiken)"
   },
   "Battery": {
     "Battery": "Batterij"
@@ -770,7 +770,7 @@
     "Caps Lock Indicator": "Caps Lock-indicator"
   },
   "Caps Lock is on": {
-    "Caps Lock is on": ""
+    "Caps Lock is on": "Caps Lock staat aan"
   },
   "Center Section": {
     "Center Section": "Middensectie"
@@ -863,7 +863,7 @@
     "Clear History?": "Geschiedenis wissen?"
   },
   "Clear Sky": {
-    "Clear Sky": ""
+    "Clear Sky": "Heldere hemel"
   },
   "Clear all history when server starts": {
     "Clear all history when server starts": "Alle geschiedenis wissen wanneer server start"
@@ -1112,7 +1112,7 @@
     "Control Center Tile Color": "Tegelkleur bedieningspaneel"
   },
   "Control animation duration for notification popups and history": {
-    "Control animation duration for notification popups and history": ""
+    "Control animation duration for notification popups and history": "Animatieduur voor meldingspop-ups en geschiedenis beheren"
   },
   "Control currently playing media": {
     "Control currently playing media": "Huidige media bedienen"
@@ -1205,7 +1205,7 @@
     "Create rules to mute, ignore, hide from history, or override notification priority.": "Maak regels om meldingen te dempen, te negeren, uit de geschiedenis te verbergen of de prioriteit te overschrijven."
   },
   "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": {
-    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": ""
+    "Create rules to mute, ignore, hide from history, or override notification priority. Default only overrides priority; notifications still show normally.": "Regels maken om meldingen te dempen, negeren, verbergen in geschiedenis of prioriteit te overschrijven. Standaard wordt alleen de prioriteit overschreven; meldingen worden nog steeds normaal weergegeven."
   },
   "Creating...": {
     "Creating...": "Aanmaken..."
@@ -1418,7 +1418,7 @@
     "Description": "Beschrijving"
   },
   "Desktop": {
-    "Desktop": ""
+    "Desktop": "Bureaublad"
   },
   "Desktop Clock": {
     "Desktop Clock": "Bureaubladklok"
@@ -1592,7 +1592,7 @@
     "Docs": "Documentatie"
   },
   "Documents": {
-    "Documents": ""
+    "Documents": "Documenten"
   },
   "Domain (optional)": {
     "Domain (optional)": "Domein (optioneel)"
@@ -1607,7 +1607,7 @@
     "Door Open": "Deur open"
   },
   "Downloads": {
-    "Downloads": ""
+    "Downloads": "Downloads"
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Sleep om te rangschikken"
@@ -1622,7 +1622,7 @@
     "Driver": "Stuurprogramma"
   },
   "Drizzle": {
-    "Drizzle": ""
+    "Drizzle": "Motregen"
   },
   "Duplicate": {
     "Duplicate": "Dupliceren"
@@ -1631,7 +1631,7 @@
     "Duplicate Wallpaper with Blur": "Achtergrond dupliceren met vervaging"
   },
   "Duration": {
-    "Duration": ""
+    "Duration": "Duur"
   },
   "Dusk (Astronomical Twilight)": {
     "Dusk (Astronomical Twilight)": "Avondschemering (Astronomische schemering)"
@@ -2087,7 +2087,13 @@
     "Focused Window": "Actieve venster"
   },
   "Fog": {
-    "Fog": ""
+    "Fog": "Mist"
+  },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Monitorfocus volgen"
@@ -2150,10 +2156,10 @@
     "Format Legend": "Legenda voor notatie"
   },
   "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": {
-    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": ""
+    "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "VRAM/geheugen vrijmaken wanneer het startmenu gesloten is. Dit kan een lichte vertraging veroorzaken bij het heropenen."
   },
   "Freezing Drizzle": {
-    "Freezing Drizzle": ""
+    "Freezing Drizzle": "IJzel"
   },
   "Frequency": {
     "Frequency": "Frequentie"
@@ -2261,13 +2267,13 @@
     "Health": "Gezondheid"
   },
   "Heavy Rain": {
-    "Heavy Rain": ""
+    "Heavy Rain": "Zware regen"
   },
   "Heavy Snow": {
-    "Heavy Snow": ""
+    "Heavy Snow": "Zware sneeuwval"
   },
   "Heavy Snow Showers": {
-    "Heavy Snow Showers": ""
+    "Heavy Snow Showers": "Zware sneeuwbuien"
   },
   "Height": {
     "Height": "Hoogte"
@@ -2288,7 +2294,7 @@
     "Hidden": "Verborgen"
   },
   "Hidden (%1)": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Verborgen (%1)"
   },
   "Hidden Apps": {
     "Hidden Apps": "Verborgen apps"
@@ -2330,13 +2336,13 @@
     "Hide cursor when using touch input": "Cursor verbergen bij gebruik van aanraakinvoer"
   },
   "Hide device": {
-    "Hide device": ""
+    "Hide device": "Apparaat verbergen"
   },
   "Hide notification content until expanded": {
-    "Hide notification content until expanded": ""
+    "Hide notification content until expanded": "Meldingsinhoud verbergen tot uitgevouwen"
   },
   "Hide notification content until expanded; popups show collapsed by default": {
-    "Hide notification content until expanded; popups show collapsed by default": ""
+    "Hide notification content until expanded; popups show collapsed by default": "Meldingsinhoud verbergen tot uitgevouwen; pop-ups worden standaard ingeklapt weergegeven"
   },
   "Hide on Touch": {
     "Hide on Touch": "Verbergen bij aanraking"
@@ -2369,7 +2375,7 @@
     "Hold to confirm (%1s)": "Ingedrukt houden om te bevestigen (%1s)"
   },
   "Home": {
-    "Home": ""
+    "Home": "Persoonlijke map"
   },
   "Hot Corners": {
     "Hot Corners": "Hot Corners"
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "Pictogram"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Pictogramgrootte"
@@ -2819,13 +2828,13 @@
     "Light Mode": "Lichte modus"
   },
   "Light Rain": {
-    "Light Rain": ""
+    "Light Rain": "Lichte regen"
   },
   "Light Snow": {
-    "Light Snow": ""
+    "Light Snow": "Lichte sneeuwval"
   },
   "Light Snow Showers": {
-    "Light Snow Showers": ""
+    "Light Snow Showers": "Lichte sneeuwbuien"
   },
   "Linear": {
     "Linear": "Lineair"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "Maximalisatiedetectie"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Maximale grootte item"
   },
@@ -3173,13 +3188,13 @@
     "Moving to Paused": "Overschakelen naar gepauzeerd"
   },
   "Music": {
-    "Music": ""
+    "Music": "Muziek"
   },
   "Mute popups for %1": {
-    "Mute popups for %1": ""
+    "Mute popups for %1": "Pop-ups dempen voor %1"
   },
   "Muted Apps": {
-    "Muted Apps": ""
+    "Muted Apps": "Gedempte apps"
   },
   "Muted palette with subdued, calming tones.": {
     "Muted palette with subdued, calming tones.": "Gedempt palet met ingetogen, rustgevende tinten."
@@ -3332,7 +3347,7 @@
     "No apps have been launched yet.": "Er zijn nog geen apps gestart."
   },
   "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": {
-    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": ""
+    "No apps muted. Right-click a notification and choose \"Mute popups\" to add one here.": "Geen apps gedempt. Klik met de rechtermuisknop op een melding en kies \"Pop-ups dempen\" om er hier een toe te voegen."
   },
   "No battery": {
     "No battery": "Geen batterij"
@@ -3363,6 +3378,9 @@
   },
   "No files found": {
     "No files found": "Geen bestanden gevonden"
+  },
+  "No folders found": {
+    "No folders found": ""
   },
   "No hidden apps.": {
     "No hidden apps.": "Geen verborgen apps."
@@ -3556,6 +3574,9 @@
   "Open in Browser": {
     "Open in Browser": "Openen in browser"
   },
+  "Open in terminal": {
+    "Open in terminal": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "Zoekbalk openen om tekst te vinden"
   },
@@ -3593,7 +3614,7 @@
     "Outputs Include Missing": "Outputs-include ontbreekt"
   },
   "Overcast": {
-    "Overcast": ""
+    "Overcast": "Bewolkt"
   },
   "Overflow": {
     "Overflow": "Overloop"
@@ -3653,7 +3674,7 @@
     "Pairing...": "Koppelen..."
   },
   "Partly Cloudy": {
-    "Partly Cloudy": ""
+    "Partly Cloudy": "Half bewolkt"
   },
   "Passkey:": {
     "Passkey:": "Toegangscode:"
@@ -3763,7 +3784,7 @@
     "Unavailable": "Niet beschikbaar"
   },
   "Pictures": {
-    "Pictures": ""
+    "Pictures": "Afbeeldingen"
   },
   "Pin": {
     "Pin": "Vastmaken"
@@ -3835,7 +3856,7 @@
     "Popup Position": "Popup-positie"
   },
   "Popup Shadow": {
-    "Popup Shadow": ""
+    "Popup Shadow": "Pop-upschaduw"
   },
   "Popup Transparency": {
     "Popup Transparency": "Popup-transparantie"
@@ -3946,7 +3967,7 @@
     "Privacy Indicator": "Privacy-indicator"
   },
   "Privacy Mode": {
-    "Privacy Mode": ""
+    "Privacy Mode": "Privacy-modus"
   },
   "Private Key Password": {
     "Private Key Password": "Wachtwoord privésleutel"
@@ -3991,7 +4012,7 @@
     "Protocol": "Protocol"
   },
   "Quick Access": {
-    "Quick Access": ""
+    "Quick Access": "Snelle toegang"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "Snelle toegang tot app-starter"
@@ -4012,7 +4033,7 @@
     "Radius": "Straal"
   },
   "Rain": {
-    "Rain": ""
+    "Rain": "Regen"
   },
   "Rain Chance": {
     "Rain Chance": "Neerslagkans"
@@ -4052,6 +4073,9 @@
   },
   "Remove": {
     "Remove": "Verwijderen"
+  },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
   },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Tussenruimte en rand verwijderen wanneer vensters gemaximaliseerd zijn"
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Kladblok-bestand opslaan"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Opslaan en schakelen tussen beeldschermconfiguraties"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "DankBar-lettergroottes onafhankelijk schalen"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Alle lettergroottes in de shell schalen"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Wetenschap"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "Schermdelen"
@@ -4411,7 +4444,7 @@
     "Set key and action to save": "Stel toets en actie in om op te slaan"
   },
   "Set notification rules": {
-    "Set notification rules": ""
+    "Set notification rules": "Meldingsregels instellen"
   },
   "Setup": {
     "Setup": "Instellen"
@@ -4585,13 +4618,13 @@
     "Show darkened overlay behind modal dialogs": "Verduisterde overlay tonen achter modale vensters"
   },
   "Show device": {
-    "Show device": ""
+    "Show device": "Apparaat tonen"
   },
   "Show dock when floating windows don't overlap its area": {
     "Show dock when floating windows don't overlap its area": "Dock tonen wanneer zwevende vensters het gebied niet overlappen"
   },
   "Show drop shadow on notification popups": {
-    "Show drop shadow on notification popups": ""
+    "Show drop shadow on notification popups": "Slagschaduw tonen op meldingspop-ups"
   },
   "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": {
     "Show launcher overlay when typing in Niri overview. Disable to use another launcher.": "Starter-overlay tonen bij typen in Niri-overzicht. Schakel uit om een andere starter te gebruiken."
@@ -4714,7 +4747,7 @@
     "Snap": "Vastklikken"
   },
   "Snow": {
-    "Snow": ""
+    "Snow": "Sneeuw"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "Sommige plug-ins vereisen een nieuwere versie van DMS:"
@@ -4813,7 +4846,7 @@
     "Suspend system after": "Systeem in slaapstand zetten na"
   },
   "Suspend then Hibernate": {
-    "Suspend then Hibernate": ""
+    "Suspend then Hibernate": "Onderbreken dan Sluimerstand"
   },
   "Swap": {
     "Swap": "Swap"
@@ -4954,10 +4987,10 @@
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "Dit verwijdert dit opgeslagen klemborditem permanent. Deze actie kan niet ongedaan worden gemaakt."
   },
   "Thunderstorm": {
-    "Thunderstorm": ""
+    "Thunderstorm": "Onweer"
   },
   "Thunderstorm with Hail": {
-    "Thunderstorm with Hail": ""
+    "Thunderstorm with Hail": "Onweer met hagel"
   },
   "Tiled": {
     "Tiled": "Getegeld"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "Trigger: %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "Probeer een andere zoekopdracht"
   },
@@ -5143,13 +5179,13 @@
     "Unknown Title": "Onbekende titel"
   },
   "Unload on Close": {
-    "Unload on Close": ""
+    "Unload on Close": "Ontladen bij sluiten"
   },
   "Unmute": {
-    "Unmute": ""
+    "Unmute": "Dempen opheffen"
   },
   "Unmute popups for %1": {
-    "Unmute popups for %1": ""
+    "Unmute popups for %1": "Dempen van pop-ups opheffen voor %1"
   },
   "Unnamed Rule": {
     "Unnamed Rule": "Naamloze regel"
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Naamloos"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "Bijwerken"
@@ -5350,7 +5389,7 @@
     "Vibrant palette with playful saturation.": "Levendig palet met speelse verzadiging."
   },
   "Videos": {
-    "Videos": ""
+    "Videos": "Video's"
   },
   "View Mode": {
     "View Mode": "Weergavemodus"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "Wifi-apparaat"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "Wifi uitgeschakeld"
@@ -5622,7 +5664,7 @@
     "Thickness": "Dikte"
   },
   "brandon": {
-    "brandon": ""
+    "brandon": "brandon"
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "Thema's doorbladeren"
@@ -5653,7 +5695,7 @@
     "Active tile background and icon color": "Achtergrond- en pictogramkleur van actieve tegel"
   },
   "count of hidden audio devices": {
-    "Hidden (%1)": ""
+    "Hidden (%1)": "Verborgen (%1)"
   },
   "current theme label": {
     "Current Theme: %1": "Huidig thema: %1"
@@ -5668,7 +5710,7 @@
     "Click to select a custom theme JSON file": "Klik om een aangepast thema-JSON-bestand te selecteren"
   },
   "dark mode wallpaper color picker title": {
-    "Choose Dark Mode Color": ""
+    "Choose Dark Mode Color": "Kleur donkere modus kiezen"
   },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "Selecteer achtergrond"
@@ -5689,7 +5731,7 @@
     "days": "dagen"
   },
   "default monitor label suffix": {
-    "(Default)": ""
+    "(Default)": "(Standaard)"
   },
   "dgop not available": {
     "dgop not available": "dgop niet beschikbaar"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "afspraken"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "Onbekende GPU"
@@ -5957,7 +6002,7 @@
     "leave empty for default": "laat leeg voor standaard"
   },
   "light mode wallpaper color picker title": {
-    "Choose Light Mode Color": ""
+    "Choose Light Mode Color": "Kleur lichte modus kiezen"
   },
   "loading indicator": {
     "Loading...": "Laden..."
@@ -6019,7 +6064,7 @@
     "nav": "navigatie"
   },
   "neovim template description": {
-    "Requires lazy plugin manager": ""
+    "Requires lazy plugin manager": "Vereist lazy plugin manager"
   },
   "network status": {
     "Connected": "Verbonden",
@@ -6035,7 +6080,7 @@
     "No custom theme file": "Geen aangepast themabestand"
   },
   "no monitors available label": {
-    "No monitors": ""
+    "No monitors": "Geen beeldschermen"
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "Geen thema's geïnstalleerd. Blader door thema's om te installeren uit het register."
@@ -6085,7 +6130,7 @@
     "Enable History": "Geschiedenis inschakelen"
   },
   "notification privacy mode placeholder": {
-    "Message Content": ""
+    "Message Content": "Berichtinhoud"
   },
   "notification rule action option": {
     "Ignore Completely": "Volledig negeren",
@@ -6118,22 +6163,22 @@
     "official": "officieel"
   },
   "on Hyprland": {
-    "on Hyprland": ""
+    "on Hyprland": "op Hyprland"
   },
   "on MangoWC": {
-    "on MangoWC": ""
+    "on MangoWC": "op MangoWC"
   },
   "on Miracle WM": {
-    "on Miracle WM": ""
+    "on Miracle WM": "op Miracle WM"
   },
   "on Niri": {
-    "on Niri": ""
+    "on Niri": "op Niri"
   },
   "on Scroll": {
-    "on Scroll": ""
+    "on Scroll": "op Scroll"
   },
   "on Sway": {
-    "on Sway": ""
+    "on Sway": "op Sway"
   },
   "open": {
     "open": "openen"
@@ -6183,10 +6228,10 @@
     "Select Profile Image": "Selecteer profielafbeelding"
   },
   "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "U moet het volgende instellen:\nQT_QPA_PLATFORMTHEME=gtk3 OF\nQT_QPA_PLATFORMTHEME=qt6ct\nals omgevingsvariabelen, en daarna de shell herstarten.\n\nqt6ct vereist dat qt6ct-kde is geïnstalleerd."
   },
   "qt theme env error title": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "Ontbrekende omgevingsvariabelen"
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "Instellingen zijn alleen-lezen. Wijzigingen worden niet opgeslagen."
@@ -6246,10 +6291,10 @@
     "Load Average": "Gemiddelde belasting"
   },
   "theme auto mode tab": {
-    "Location": ""
+    "Location": "Locatie"
   },
   "theme auto mode tab | wallpaper cycling mode tab": {
-    "Time": ""
+    "Time": "Tijd"
   },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "Installeer kleurthema's uit het DMS-themaregister"
@@ -6270,7 +6315,7 @@
     "Search themes...": "Thema's zoeken..."
   },
   "this app": {
-    "this app": ""
+    "this app": "deze app"
   },
   "tile color option": {
     "Primary Container": "Primaire container",
@@ -6292,7 +6337,7 @@
     "Unknown": "Onbekend"
   },
   "up": {
-    "up": ""
+    "up": "actief"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "update dms voor NM-integratie."
@@ -6307,10 +6352,10 @@
     "Requires %1": "Vereist %1"
   },
   "wallpaper color picker title": {
-    "Choose Wallpaper Color": ""
+    "Choose Wallpaper Color": "Achtergrondkleur kiezen"
   },
   "wallpaper cycling mode tab": {
-    "Interval": ""
+    "Interval": "Interval"
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "Selecteer achtergrondmap"
@@ -6331,32 +6376,32 @@
     "Tile V": "Tegelen V"
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "1 uur",
+    "1 hour 30 minutes": "1 uur 30 minuten",
+    "1 minute": "1 minuut",
+    "10 seconds": "10 seconden",
+    "12 hours": "12 uur",
+    "15 minutes": "15 minuten",
+    "15 seconds": "15 seconden",
+    "2 hours": "2 uur",
+    "20 seconds": "20 seconden",
+    "25 seconds": "25 seconden",
+    "3 hours": "3 uur",
+    "30 minutes": "30 minuten",
+    "30 seconds": "30 seconden",
+    "35 seconds": "35 seconden",
+    "4 hours": "4 uur",
+    "40 seconds": "40 seconden",
+    "45 seconds": "45 seconden",
+    "5 minutes": "5 minuten",
+    "5 seconds": "5 seconden",
+    "50 seconds": "50 seconden",
+    "55 seconds": "55 seconden",
+    "6 hours": "6 uur",
+    "8 hours": "8 uur"
   },
   "wallpaper not set label": {
-    "Not set": ""
+    "Not set": "Niet ingesteld"
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "Verwerken achtergrond mislukt"
@@ -6434,6 +6479,6 @@
     "• yyyy - Year (2024)": "• yyyy - Jaar (2024)"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Nav • Spatie: Uitvouwen • Enter: Actie/Uitvouwen • E: Tekst"
   }
 }

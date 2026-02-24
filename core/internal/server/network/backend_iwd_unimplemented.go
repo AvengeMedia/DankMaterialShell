@@ -1,6 +1,9 @@
 package network
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func (b *IWDBackend) GetWiredConnections() ([]WiredConnection, error) {
 	return nil, fmt.Errorf("wired connections not supported by iwd")
@@ -111,4 +114,20 @@ func (b *IWDBackend) getWiFiDevicesLocked() []WiFiDevice {
 		IP:        b.state.WiFiIP,
 		Networks:  b.state.WiFiNetworks,
 	}}
+}
+
+func (b *IWDBackend) GetWiFiQRCodeContent(ssid string) (string, error) {
+	path := iwdConfigPath(ssid)
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("no saved iwd config for `%s`: %w", ssid, err)
+	}
+
+	passphrase, err := parseIWDPassphrase(string(data))
+	if err != nil {
+		return "", fmt.Errorf("failed to read passphrase for `%s`: %w", ssid, err)
+	}
+
+	return FormatWiFiQRString("WPA", ssid, passphrase), nil
 }

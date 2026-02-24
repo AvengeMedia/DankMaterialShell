@@ -72,7 +72,7 @@ BasePill {
                         return "system_update_alt";
                     return "check_circle";
                 }
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 color: {
                     if (SystemUpdateService.hasError)
                         return Theme.error;
@@ -106,8 +106,8 @@ BasePill {
                 color: Theme.error
                 anchors.right: parent.right
                 anchors.top: parent.top
-                anchors.rightMargin: (barConfig?.noBackground ?? false) ? 0 : 6
-                anchors.topMargin: (barConfig?.noBackground ?? false) ? 0 : 6
+                anchors.rightMargin: (barConfig?.removeWidgetPadding ?? false) ? 0 : 6
+                anchors.topMargin: (barConfig?.removeWidgetPadding ?? false) ? 0 : 6
                 visible: root.isVerticalOrientation && root.hasUpdates && !root.isChecking
             }
 
@@ -129,7 +129,7 @@ BasePill {
                             return "system_update_alt";
                         return "check_circle";
                     }
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (SystemUpdateService.hasError)
                             return Theme.error;
@@ -160,7 +160,7 @@ BasePill {
                     id: countText
                     anchors.verticalCenter: parent.verticalCenter
                     text: SystemUpdateService.updateCount.toString()
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     visible: root.hasUpdates && !root.isChecking
                 }

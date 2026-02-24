@@ -80,7 +80,7 @@
               inherit version;
               pname = "dms-shell";
               src = ./core;
-              vendorHash = "sha256-cVUJXgzYMRSM0od1xzDVkMTdxHu3OIQX2bQ8AJbGQ1Q=";
+              vendorHash = "sha256-dEk7IOd6aQwaxZruxQclN7TGMyb8EJOl6NBWRsoZ9HQ=";
 
               subPackages = [ "cmd/dms" ];
 
@@ -182,6 +182,7 @@
               with pkgs;
               [
                 go_1_25
+                go-mockery_2
                 gopls
                 delve
                 go-tools

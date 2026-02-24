@@ -102,7 +102,7 @@ Item {
             spotlightContent.searchField.text = query;
         }
         if (spotlightContent.controller) {
-            var targetMode = mode || "all";
+            var targetMode = mode || SessionData.launcherLastMode || "all";
             spotlightContent.controller.searchMode = targetMode;
             spotlightContent.controller.activePluginId = "";
             spotlightContent.controller.activePluginName = "";
@@ -230,6 +230,15 @@ Item {
         }
     }
 
+    Connections {
+        target: spotlightContent?.controller ?? null
+        function onModeChanged(mode) {
+            if (spotlightContent.controller.autoSwitchedToFiles)
+                return;
+            SessionData.setLauncherLastMode(mode);
+        }
+    }
+
     HyprlandFocusGrab {
         id: focusGrab
         windows: [launcherWindow]
@@ -288,7 +297,7 @@ Item {
 
     PanelWindow {
         id: launcherWindow
-        visible: root._windowEnabled && (!root.unloadContentOnClose || spotlightOpen || isClosing)
+        visible: root._windowEnabled && (spotlightOpen || isClosing)
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 

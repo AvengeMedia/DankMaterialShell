@@ -135,7 +135,7 @@ BasePill {
         }
     }
     readonly property int windowCount: _groupByApp ? (groupedWindows?.length || 0) : (sortedToplevels?.length || 0)
-    readonly property real iconCellSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) + 6
+    readonly property real iconCellSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale) + 6
 
     readonly property string focusedAppId: {
         if (!sortedToplevels || sortedToplevels.length === 0)
@@ -277,10 +277,10 @@ BasePill {
                         IconImage {
                             id: iconImg
                             anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)) / 2) : Theme.spacingXS
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)) / 2) : Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             source: {
                                 root._desktopEntriesUpdateTrigger;
                                 root._appIdSubstitutionsTrigger;
@@ -306,9 +306,9 @@ BasePill {
 
                         DankIcon {
                             anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)) / 2) : Theme.spacingXS
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)) / 2) : Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
-                            size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             name: "sports_esports"
                             color: Theme.widgetTextColor
                             visible: !iconImg.visible && Paths.isSteamApp(appId)
@@ -359,7 +359,7 @@ BasePill {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: !(widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode)
                             text: windowTitle
-                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
+                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                             color: Theme.widgetTextColor
                             elide: Text.ElideRight
                             maximumLineCount: 1
@@ -531,10 +531,10 @@ BasePill {
                         IconImage {
                             id: iconImg
                             anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)) / 2) : Theme.spacingXS
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)) / 2) : Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             source: {
                                 root._desktopEntriesUpdateTrigger;
                                 root._appIdSubstitutionsTrigger;
@@ -560,9 +560,9 @@ BasePill {
 
                         DankIcon {
                             anchors.left: parent.left
-                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)) / 2) : Theme.spacingXS
+                            anchors.leftMargin: (widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode) ? Math.round((parent.width - Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)) / 2) : Theme.spacingXS
                             anchors.verticalCenter: parent.verticalCenter
-                            size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             name: "sports_esports"
                             color: Theme.widgetTextColor
                             visible: !iconImg.visible && Paths.isSteamApp(appId)
@@ -613,7 +613,7 @@ BasePill {
                             anchors.verticalCenter: parent.verticalCenter
                             visible: !(widgetData?.runningAppsCompactMode !== undefined ? widgetData.runningAppsCompactMode : SettingsData.runningAppsCompactMode)
                             text: windowTitle
-                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
+                            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                             color: Theme.widgetTextColor
                             elide: Text.ElideRight
                             maximumLineCount: 1

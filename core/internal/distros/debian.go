@@ -88,7 +88,7 @@ func (d *DebianDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (d *DebianDistribution) detectDMSGreeter() deps.Dependency {
-	return d.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", d.packageInstalled("dms-greeter"))
+	return d.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", d.packageInstalled("dms-greeter"))
 }
 
 func (d *DebianDistribution) packageInstalled(pkg string) bool {

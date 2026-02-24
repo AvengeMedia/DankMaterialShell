@@ -770,7 +770,7 @@
     "Caps Lock Indicator": "نشانگر Caps Lock"
   },
   "Caps Lock is on": {
-    "Caps Lock is on": ""
+    "Caps Lock is on": "قفل حروف بزرگ روشن است"
   },
   "Center Section": {
     "Center Section": "بخش مرکزی"
@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": "مه"
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "فوکوس مانیتور را دنبال کن"
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "آیکون"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "اندازه آیکون"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "تشخیص بزرگ‌شدن پنجره"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "حداکثر اندازه مدخل"
   },
@@ -3194,7 +3209,7 @@
     "Named Workspace Icons": "آیکون محیط‌کارهای نام‌دار"
   },
   "Navigation": {
-    "Navigation": "مسیریابی"
+    "Navigation": "پیمایش"
   },
   "Network": {
     "Network": "شبکه"
@@ -3363,6 +3378,9 @@
   },
   "No files found": {
     "No files found": "هیچ فایلی یافت نشد"
+  },
+  "No folders found": {
+    "No folders found": ""
   },
   "No hidden apps.": {
     "No hidden apps.": "هیچ برنامه پنهانی موجود نیست."
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": "باز کردن در مرورگر"
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "باز‌کردن نوار جستجو برای یافتن متن"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "حذف"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "حذف فاصله‌ها و حاشیه هنگام بزرگ‌کردن پنجره‌ها"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "ذخیره فایل دفترچه یادداشت"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "ذخیره و جابه‌جایی بین پیکربندی‌های نمایشگر"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "اندازه فونت نوار دَنک را به صورت مستقل مقیاس کن"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "تمام اندازه‌های فونت در سراسر شِل مقیاس کن"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "علمی"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "اشتراک‌گذاری صفحه"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "راه‌انداز: %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "یک جستجوی دیگر را امتحان کنید"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "بدون عنوان"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "بروزرسانی"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "دستگاه وای‌فای"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "وای‌فای غیرفعال"
@@ -5765,6 +5807,9 @@
   "events": {
     "events": "رویداد‌ها"
   },
+  "ext": {
+    "ext": ""
+  },
   "fallback gpu name": {
     "Unknown GPU": "کارت گرافیک ناشناخته"
   },
@@ -6016,7 +6061,7 @@
     "ms": "ms"
   },
   "nav": {
-    "nav": "جهت"
+    "nav": "پیمایش"
   },
   "neovim template description": {
     "Requires lazy plugin manager": "به مدیریت افزونه lazy نیاز دارد"
@@ -6322,13 +6367,13 @@
     "Wallpaper Error": "خطای تصویر پس‌زمینه"
   },
   "wallpaper fill mode": {
-    "Fill": "پرکن",
-    "Fit": "جاشدن",
+    "Fill": "پُر",
+    "Fit": "متناسب",
     "Pad": "حاشیه‌دار",
     "Stretch": "کشیده",
-    "Tile": "کاشی",
-    "Tile H": "کاشی افقی",
-    "Tile V": "کاشی عمودی"
+    "Tile": "کاشی‌وار",
+    "Tile H": "کاشی‌وار افقی",
+    "Tile V": "کاشی‌وار عمودی"
   },
   "wallpaper interval": {
     "1 hour": "۱ ساعت",
@@ -6434,6 +6479,6 @@
     "• yyyy - Year (2024)": "• yyyy - سال (2024)"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: پیمایش • Space: گسترش • Enter: اقدام/گسترش • E: متن"
   }
 }

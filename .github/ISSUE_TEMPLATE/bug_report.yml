@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         ## DankMaterialShell Bug Report
-        Limit your report to one issue per submission unless closely related
+        Limit your report to one issue per submission unless similarly related
   - type: dropdown
     id: compositor
     attributes:
@@ -53,9 +53,9 @@ body:
     validations:
       required: true
   - type: dropdown
-    id: original_installation_method_different
+    id: original_installation_method
     attributes:
-      label: Was your original Installation method different?
+      label: Was this your original Installation method?
       options:
         - "Yes"
         - No (specify below)
@@ -73,7 +73,7 @@ body:
     id: dms_doctor
     attributes:
       label: dms doctor -vC
-      description: Output of `dms doctor -vC` command — paste between the lines below to keep it collapsed in the issue
+      description: Output of `dms doctor -vC` command — paste between the details tags below to keep it collapsed in the issue
       placeholder: Paste the output of `dms doctor -vC` here
       value: |
         <details>

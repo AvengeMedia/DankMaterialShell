@@ -17,7 +17,6 @@ import (
 	"github.com/sblinch/kdl-go/document"
 )
 
-// DetectDMSPath checks for DMS installation following XDG Base Directory specification
 func DetectDMSPath() (string, error) {
 	return config.LocateDMSConfig()
 }
@@ -37,7 +36,6 @@ func DetectGreeterGroup() string {
 	return "greeter"
 }
 
-// DetectCompositors checks which compositors are installed
 func DetectCompositors() []string {
 	var compositors []string
 
@@ -51,7 +49,6 @@ func DetectCompositors() []string {
 	return compositors
 }
 
-// PromptCompositorChoice asks user to choose between compositors
 func PromptCompositorChoice(compositors []string) (string, error) {
 	fmt.Println("\nMultiple compositors detected:")
 	for i, comp := range compositors {
@@ -292,11 +289,9 @@ func TryInstallGreeterPackage(logFunc func(string), sudoPassword string) bool {
 
 // CopyGreeterFiles installs the dms-greeter wrapper and sets up cache directory
 func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPassword string) error {
-	// Check if dms-greeter is already in PATH
 	if utils.CommandExists("dms-greeter") {
 		logFunc("✓ dms-greeter wrapper already installed")
 	} else {
-		// Install the wrapper script
 		assetsDir := filepath.Join(dmsPath, "Modules", "Greetd", "assets")
 		wrapperSrc := filepath.Join(assetsDir, "dms-greeter")
 
@@ -333,7 +328,6 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 		}
 	}
 
-	// Create cache directory with proper permissions
 	cacheDir := "/var/cache/dms-greeter"
 	if err := runSudoCmd(sudoPassword, "mkdir", "-p", cacheDir); err != nil {
 		return fmt.Errorf("failed to create cache directory: %w", err)
@@ -354,14 +348,90 @@ func CopyGreeterFiles(dmsPath, compositor string, logFunc func(string), sudoPass
 	return nil
 }
 
+// EnsureACLInstalled installs the acl package (setfacl/getfacl) if not already present
+func EnsureACLInstalled(logFunc func(string), sudoPassword string) error {
+	if utils.CommandExists("setfacl") {
+		return nil
+	}
+
+	logFunc("setfacl not found – installing acl package...")
+
+	osInfo, err := distros.GetOSInfo()
+	if err != nil {
+		return fmt.Errorf("failed to detect OS: %w", err)
+	}
+
+	config, exists := distros.Registry[osInfo.Distribution.ID]
+	if !exists {
+		return fmt.Errorf("unsupported distribution for automatic acl installation: %s", osInfo.Distribution.ID)
+	}
+
+	ctx := context.Background()
+	var installCmd *exec.Cmd
+
+	switch config.Family {
+	case distros.FamilyArch:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "pacman -S --needed --noconfirm acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "pacman", "-S", "--needed", "--noconfirm", "acl")
+		}
+
+	case distros.FamilyFedora:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "dnf install -y acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "dnf", "install", "-y", "acl")
+		}
+
+	case distros.FamilySUSE:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "zypper install -y acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "zypper", "install", "-y", "acl")
+		}
+
+	case distros.FamilyUbuntu, distros.FamilyDebian:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "apt-get install -y acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "apt-get", "install", "-y", "acl")
+		}
+
+	case distros.FamilyGentoo:
+		if sudoPassword != "" {
+			installCmd = distros.ExecSudoCommand(ctx, sudoPassword, "emerge --ask n sys-fs/acl")
+		} else {
+			installCmd = exec.CommandContext(ctx, "sudo", "emerge", "--ask", "n", "sys-fs/acl")
+		}
+
+	case distros.FamilyNix:
+		return fmt.Errorf("on NixOS, please add pkgs.acl to your configuration.nix")
+
+	default:
+		return fmt.Errorf("unsupported distribution family for automatic acl installation: %s", config.Family)
+	}
+
+	installCmd.Stdout = os.Stdout
+	installCmd.Stderr = os.Stderr
+	if err := installCmd.Run(); err != nil {
+		return fmt.Errorf("failed to install acl: %w", err)
+	}
+
+	logFunc("✓ acl package installed")
+	return nil
+}
+
 // SetupParentDirectoryACLs sets ACLs on parent directories to allow traversal
 func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
+	if err := EnsureACLInstalled(logFunc, sudoPassword); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: could not install acl package: %v", err))
+		logFunc("  ACL permissions will be skipped; theme sync may not work correctly.")
+		return nil
+	}
 	if !utils.CommandExists("setfacl") {
-		logFunc("⚠ Warning: setfacl command not found. ACL support may not be available on this filesystem.")
-		logFunc("  If theme sync doesn't work, you may need to install acl package:")
-		logFunc("  - Fedora/RHEL: sudo dnf install acl")
-		logFunc("  - Debian/Ubuntu: sudo apt-get install acl")
-		logFunc("  - Arch: sudo pacman -S acl")
+		// setfacl still not found after install attempt (e.g. unsupported filesystem)
+		logFunc("⚠ Warning: setfacl still not available after install attempt; skipping ACL setup.")
 		return nil
 	}
 
@@ -394,7 +464,6 @@ func SetupParentDirectoryACLs(logFunc func(string), sudoPassword string) error {
 			}
 		}
 
-		// Set ACL to allow greeter user read+execute permission (for session discovery)
 		if err := runSudoCmd(sudoPassword, "setfacl", "-m", fmt.Sprintf("u:%s:rx", owner), dir.path); err != nil {
 			logFunc(fmt.Sprintf("⚠ Warning: Failed to set ACL on %s: %v", dir.desc, err))
 			logFunc(fmt.Sprintf("  You may need to run manually: setfacl -m u:%s:x %s", owner, dir.path))
@@ -429,7 +498,6 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 	if err == nil && strings.Contains(string(groupsOutput), group) {
 		logFunc(fmt.Sprintf("✓ %s is already in %s group", currentUser, group))
 	} else {
-		// Add current user to greeter group for file access permissions
 		if err := runSudoCmd(sudoPassword, "usermod", "-aG", group, currentUser); err != nil {
 			return fmt.Errorf("failed to add %s to %s group: %w", currentUser, group, err)
 		}
@@ -469,7 +537,6 @@ func SetupDMSGroup(logFunc func(string), sudoPassword string) error {
 		logFunc(fmt.Sprintf("✓ Set group permissions for %s", dir.desc))
 	}
 
-	// Set up ACLs on parent directories to allow greeter user traversal
 	if err := SetupParentDirectoryACLs(logFunc, sudoPassword); err != nil {
 		return fmt.Errorf("failed to setup parent directory ACLs: %w", err)
 	}
@@ -917,14 +984,12 @@ user = "%s"
 		}
 	}
 
-	// Determine wrapper command path
+	// If dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	wrapperCmd := "dms-greeter"
 	if !utils.CommandExists("dms-greeter") {
 		wrapperCmd = "/usr/local/bin/dms-greeter"
 	}
 
-	// Build command based on compositor and dms path
-	// When dmsPath is empty (packaged greeter), omit -p; wrapper finds /usr/share/quickshell/dms-greeter
 	compositorLower := strings.ToLower(compositor)
 	var command string
 	if dmsPath == "" {
@@ -1067,4 +1132,141 @@ func runSudoCmd(sudoPassword string, command string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func checkSystemdEnabled(service string) (string, error) {
+	cmd := exec.Command("systemctl", "is-enabled", service)
+	output, _ := cmd.Output()
+	return strings.TrimSpace(string(output)), nil
+}
+
+func DisableConflictingDisplayManagers(sudoPassword string, logFunc func(string)) error {
+	conflictingDMs := []string{"gdm", "gdm3", "lightdm", "sddm", "lxdm", "xdm", "cosmic-greeter"}
+	for _, dm := range conflictingDMs {
+		state, err := checkSystemdEnabled(dm)
+		if err != nil || state == "" || state == "not-found" {
+			continue
+		}
+		switch state {
+		case "enabled", "enabled-runtime", "static", "indirect", "alias":
+			logFunc(fmt.Sprintf("Disabling conflicting display manager: %s", dm))
+			if err := runSudoCmd(sudoPassword, "systemctl", "disable", "--now", dm); err != nil {
+				logFunc(fmt.Sprintf("⚠ Warning: Failed to disable %s: %v", dm, err))
+			} else {
+				logFunc(fmt.Sprintf("✓ Disabled %s", dm))
+			}
+		}
+	}
+	return nil
+}
+
+// EnableGreetd unmasks and enables greetd, forcing it over any other DM.
+func EnableGreetd(sudoPassword string, logFunc func(string)) error {
+	state, err := checkSystemdEnabled("greetd")
+	if err != nil {
+		return fmt.Errorf("failed to check greetd state: %w", err)
+	}
+	if state == "not-found" {
+		return fmt.Errorf("greetd service not found; ensure greetd is installed")
+	}
+	if state == "masked" || state == "masked-runtime" {
+		logFunc("  Unmasking greetd...")
+		if err := runSudoCmd(sudoPassword, "systemctl", "unmask", "greetd"); err != nil {
+			return fmt.Errorf("failed to unmask greetd: %w", err)
+		}
+		logFunc("  ✓ Unmasked greetd")
+	}
+	logFunc("  Enabling greetd service (--force)...")
+	if err := runSudoCmd(sudoPassword, "systemctl", "enable", "--force", "greetd"); err != nil {
+		return fmt.Errorf("failed to enable greetd: %w", err)
+	}
+	logFunc("✓ greetd enabled")
+	return nil
+}
+
+func EnsureGraphicalTarget(sudoPassword string, logFunc func(string)) error {
+	cmd := exec.Command("systemctl", "get-default")
+	output, err := cmd.Output()
+	if err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: could not get default systemd target: %v", err))
+		return nil
+	}
+	current := strings.TrimSpace(string(output))
+	if current == "graphical.target" {
+		logFunc("✓ Default target is already graphical.target")
+		return nil
+	}
+	logFunc(fmt.Sprintf("  Setting default target to graphical.target (was: %s)...", current))
+	if err := runSudoCmd(sudoPassword, "systemctl", "set-default", "graphical.target"); err != nil {
+		return fmt.Errorf("failed to set graphical target: %w", err)
+	}
+	logFunc("✓ Default target set to graphical.target")
+	return nil
+}
+
+// AutoSetupGreeter performs the full non-interactive greeter setup
+func AutoSetupGreeter(compositor, sudoPassword string, logFunc func(string)) error {
+	if IsGreeterPackaged() && HasLegacyLocalGreeterWrapper() {
+		return fmt.Errorf("legacy manual wrapper detected at /usr/local/bin/dms-greeter; " +
+			"remove it before using packaged dms-greeter: sudo rm -f /usr/local/bin/dms-greeter")
+	}
+
+	logFunc("Ensuring greetd is installed...")
+	if err := EnsureGreetdInstalled(logFunc, sudoPassword); err != nil {
+		return fmt.Errorf("greetd install failed: %w", err)
+	}
+
+	dmsPath := ""
+	if !IsGreeterPackaged() {
+		detected, err := DetectDMSPath()
+		if err != nil {
+			return fmt.Errorf("DMS installation not found: %w", err)
+		}
+		dmsPath = detected
+		logFunc(fmt.Sprintf("✓ Found DMS at: %s", dmsPath))
+	} else {
+		logFunc("✓ Using packaged dms-greeter (/usr/share/quickshell/dms-greeter)")
+	}
+
+	logFunc("Setting up dms-greeter group and permissions...")
+	if err := SetupDMSGroup(logFunc, sudoPassword); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: group/permissions setup error: %v", err))
+	}
+
+	logFunc("Copying greeter files...")
+	if err := CopyGreeterFiles(dmsPath, compositor, logFunc, sudoPassword); err != nil {
+		return fmt.Errorf("failed to copy greeter files: %w", err)
+	}
+
+	logFunc("Configuring greetd...")
+	greeterPathForConfig := ""
+	if !IsGreeterPackaged() {
+		greeterPathForConfig = dmsPath
+	}
+	if err := ConfigureGreetd(greeterPathForConfig, compositor, logFunc, sudoPassword); err != nil {
+		return fmt.Errorf("failed to configure greetd: %w", err)
+	}
+
+	logFunc("Synchronizing DMS configurations...")
+	if err := SyncDMSConfigs(dmsPath, compositor, logFunc, sudoPassword); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: config sync error: %v", err))
+	}
+
+	logFunc("Checking for conflicting display managers...")
+	if err := DisableConflictingDisplayManagers(sudoPassword, logFunc); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: %v", err))
+	}
+
+	logFunc("Enabling greetd service...")
+	if err := EnableGreetd(sudoPassword, logFunc); err != nil {
+		return fmt.Errorf("failed to enable greetd: %w", err)
+	}
+
+	logFunc("Ensuring graphical.target as default...")
+	if err := EnsureGraphicalTarget(sudoPassword, logFunc); err != nil {
+		logFunc(fmt.Sprintf("⚠ Warning: %v", err))
+	}
+
+	logFunc("✓ DMS greeter setup complete")
+	return nil
 }

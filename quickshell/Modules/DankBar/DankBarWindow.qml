@@ -131,38 +131,55 @@ PanelWindow {
     readonly property real _wingR: Math.max(0, wingtipsRadius)
     readonly property color _surfaceContainer: Theme.surfaceContainer
     readonly property string _barId: barConfig?.id ?? "default"
-    readonly property var _liveBarConfig: SettingsData.barConfigs.find(c => c.id === _barId) || barConfig
-    readonly property real _backgroundAlpha: _liveBarConfig?.transparency ?? 1.0
+    property real _backgroundAlpha: barConfig?.transparency ?? 1.0
     readonly property color _bgColor: Theme.withAlpha(_surfaceContainer, _backgroundAlpha)
+
+    function _updateBackgroundAlpha() {
+        const live = SettingsData.barConfigs.find(c => c.id === _barId);
+        _backgroundAlpha = (live ?? barConfig)?.transparency ?? 1.0;
+    }
     readonly property real _dpr: CompositorService.getScreenScale(barWindow.screen)
 
     property string screenName: modelData.name
 
-    readonly property bool hasMaximizedToplevel: {
-        if (!(barConfig?.maximizeDetection ?? true))
-            return false;
-        if (!CompositorService.isHyprland && !CompositorService.isNiri)
-            return false;
+    property bool hasMaximizedToplevel: false
+    property bool shouldHideForWindows: false
+
+    function _updateHasMaximizedToplevel() {
+        if (!(barConfig?.maximizeDetection ?? true)) {
+            hasMaximizedToplevel = false;
+            return;
+        }
+        if (!CompositorService.isHyprland && !CompositorService.isNiri) {
+            hasMaximizedToplevel = false;
+            return;
+        }
 
         const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
         for (let i = 0; i < filtered.length; i++) {
-            if (filtered[i]?.maximized)
-                return true;
+            if (filtered[i]?.maximized) {
+                hasMaximizedToplevel = true;
+                return;
+            }
         }
-        return false;
+        hasMaximizedToplevel = false;
     }
 
-    readonly property bool shouldHideForWindows: {
-        if (!(barConfig?.showOnWindowsOpen ?? false))
-            return false;
-        if (!(barConfig?.autoHide ?? false))
-            return false;
-        if (!CompositorService.isNiri && !CompositorService.isHyprland)
-            return false;
+    function _updateShouldHideForWindows() {
+        if (!(barConfig?.showOnWindowsOpen ?? false)) {
+            shouldHideForWindows = false;
+            return;
+        }
+        if (!(barConfig?.autoHide ?? false)) {
+            shouldHideForWindows = false;
+            return;
+        }
+        if (!CompositorService.isNiri && !CompositorService.isHyprland) {
+            shouldHideForWindows = false;
+            return;
+        }
 
         if (CompositorService.isNiri) {
-            NiriService.windows;
-
             let currentWorkspaceId = null;
             for (let i = 0; i < NiriService.allWorkspaces.length; i++) {
                 const ws = NiriService.allWorkspaces[i];
@@ -172,8 +189,10 @@ PanelWindow {
                 }
             }
 
-            if (currentWorkspaceId === null)
-                return false;
+            if (currentWorkspaceId === null) {
+                shouldHideForWindows = false;
+                return;
+            }
 
             let hasTiled = false;
             let hasFloatingTouchingBar = false;
@@ -217,14 +236,12 @@ PanelWindow {
                 }
             }
 
-            if (hasTiled)
-                return true;
-
-            return hasFloatingTouchingBar;
+            shouldHideForWindows = hasTiled || hasFloatingTouchingBar;
+            return;
         }
 
         const filtered = CompositorService.filterCurrentWorkspace(CompositorService.sortedToplevels, screenName);
-        return filtered.length > 0;
+        shouldHideForWindows = filtered.length > 0;
     }
 
     property real effectiveSpacing: hasMaximizedToplevel ? 0 : (barConfig?.spacing ?? 4)
@@ -356,6 +373,9 @@ PanelWindow {
         }
 
         updateGpuTempConfig();
+        _updateBackgroundAlpha();
+        _updateHasMaximizedToplevel();
+        _updateShouldHideForWindows();
 
         inhibitorInitTimer.start();
     }
@@ -432,9 +452,35 @@ PanelWindow {
     Connections {
         function onBarConfigChanged() {
             barWindow.updateGpuTempConfig();
+            barWindow._updateBackgroundAlpha();
+            barWindow._updateHasMaximizedToplevel();
+            barWindow._updateShouldHideForWindows();
         }
 
         target: rootWindow
+    }
+
+    Connections {
+        target: SettingsData
+        function onBarConfigsChanged() {
+            barWindow._updateBackgroundAlpha();
+        }
+    }
+
+    Connections {
+        target: CompositorService
+        function onToplevelsChanged() {
+            barWindow._updateHasMaximizedToplevel();
+            barWindow._updateShouldHideForWindows();
+        }
+    }
+
+    Connections {
+        target: NiriService
+        function onAllWorkspacesChanged() {
+            barWindow._updateHasMaximizedToplevel();
+            barWindow._updateShouldHideForWindows();
+        }
     }
 
     Connections {

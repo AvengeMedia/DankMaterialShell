@@ -21,15 +21,15 @@ BasePill {
                 visible: SettingsData.launcherLogoMode === "apps"
                 anchors.centerIn: parent
                 name: "apps"
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 color: Theme.widgetIconColor
             }
 
             SystemLogo {
                 visible: SettingsData.launcherLogoMode === "os"
                 anchors.centerIn: parent
-                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
-                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 colorOverride: Theme.effectiveLogoColor
                 brightnessOverride: SettingsData.launcherLogoBrightness
                 contrastOverride: SettingsData.launcherLogoContrast
@@ -38,8 +38,8 @@ BasePill {
             IconImage {
                 visible: SettingsData.launcherLogoMode === "dank"
                 anchors.centerIn: parent
-                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
-                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 smooth: true
                 mipmap: true
                 asynchronous: true
@@ -57,8 +57,8 @@ BasePill {
             IconImage {
                 visible: SettingsData.launcherLogoMode === "compositor" && (CompositorService.isNiri || CompositorService.isHyprland || CompositorService.isDwl || CompositorService.isSway || CompositorService.isScroll || CompositorService.isMiracle || CompositorService.isLabwc)
                 anchors.centerIn: parent
-                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
-                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 smooth: true
                 asynchronous: true
                 source: {
@@ -96,8 +96,8 @@ BasePill {
             IconImage {
                 visible: SettingsData.launcherLogoMode === "custom" && SettingsData.launcherLogoCustomPath !== ""
                 anchors.centerIn: parent
-                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
-                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.noBackground)
+                width: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                height: Theme.barIconSize(root.barThickness, SettingsData.launcherLogoSizeOffset, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 smooth: true
                 asynchronous: true
                 source: SettingsData.launcherLogoCustomPath ? "file://" + SettingsData.launcherLogoCustomPath.replace("file://", "") : ""

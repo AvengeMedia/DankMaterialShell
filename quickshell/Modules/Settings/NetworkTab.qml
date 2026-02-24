@@ -1282,6 +1282,15 @@ Item {
                                                 }
 
                                                 DankActionButton {
+                                                    iconName: "qr_code"
+                                                    buttonSize: 28
+                                                    visible: modelData.secured && modelData.saved
+                                                    onClicked: {
+                                                        PopoutService.showWifiQRCodeModal(modelData.ssid);
+                                                    }
+                                                }
+
+                                                DankActionButton {
                                                     iconName: isPinned ? "push_pin" : "push_pin"
                                                     buttonSize: 28
                                                     iconColor: isPinned ? Theme.primary : Theme.surfaceVariantText

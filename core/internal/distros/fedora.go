@@ -197,7 +197,7 @@ func (f *FedoraDistribution) detectAccountsService() deps.Dependency {
 }
 
 func (f *FedoraDistribution) detectDMSGreeter() deps.Dependency {
-	return f.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", f.packageInstalled("dms-greeter"))
+	return f.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", f.packageInstalled("dms-greeter"))
 }
 
 func (f *FedoraDistribution) getPrerequisites() []string {

@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": ""
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": ""
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": ""
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "アイコンサイズ"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": ""
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": ""
   },
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "ファイルが見つかりませんでした"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": ""
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": ""
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "検索バーを開いてテキストを検索"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "削除"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": ""
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "メモ帳ファイルを保存"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": ""
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Dank Barのフォントサイズを個別に調整"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": ""
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "科学"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": ""
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": ""
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": ""
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "無題"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": ""
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": ""
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFiを無効化にしました"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "イベント"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": ""

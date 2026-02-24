@@ -102,7 +102,7 @@ func (o *OpenSUSEDistribution) packageInstalled(pkg string) bool {
 }
 
 func (o *OpenSUSEDistribution) detectDMSGreeter() deps.Dependency {
-	return o.detectPackage("dms-greeter", "DankMaterialShell greetd greeter", o.packageInstalled("dms-greeter"))
+	return o.detectOptionalPackage("dms-greeter", "DankMaterialShell greetd greeter", o.packageInstalled("dms-greeter"))
 }
 
 func (o *OpenSUSEDistribution) GetPackageMapping(wm deps.WindowManager) map[string]PackageMapping {

@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": ""
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": ""
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": ""
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Simge Boyutu"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "Algılamayı En Üst Düzeye Çıkar"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Maksimum Kayıt Boyutu"
   },
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "Dosya bulunamadı"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": ""
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": ""
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Metin bulmak için arama çubuğunu aç"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "Kaldır"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Pencereler ekranı kapladığında boşlukları ve kenarlıkları kaldır"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Not Defteri Dosyasını Kaydet"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": ""
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "DankBar yazı tipi boyutlarını bağımsız olarak ölçeklendir"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Kabuk genelinde tüm yazı tipi boyutlarını ölçeklendir"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Bilim"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": ""
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": ""
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": ""
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Başlıksız"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": ""
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "WiFi Aygıtı"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi devre dışı"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "etkinlikler"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": ""
