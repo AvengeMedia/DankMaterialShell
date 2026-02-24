@@ -29,7 +29,7 @@ BasePill {
     property real micAccumulator: 0
     property real volumeAccumulator: 0
     property real brightnessAccumulator: 0
-    readonly property real vIconSize: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+    readonly property real vIconSize: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
     property var _hRow: null
     property var _vCol: null
     property var _hAudio: null
@@ -394,7 +394,7 @@ BasePill {
                         id: audioPercentV
                         visible: root.showAudioPercent
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: audioIconV.bottom
@@ -420,7 +420,7 @@ BasePill {
                         id: micPercentV
                         visible: root.showMicPercent
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: micIconV.bottom
@@ -446,7 +446,7 @@ BasePill {
                         id: brightnessPercentV
                         visible: root.showBrightnessPercent
                         text: Math.round(getBrightness() * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: brightnessIconV.bottom
@@ -502,7 +502,7 @@ BasePill {
 
                 DankIcon {
                     name: "screen_record"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: NiriService.hasActiveCast ? Theme.primary : Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showScreenSharingIcon && NiriService.hasCasts
@@ -511,7 +511,7 @@ BasePill {
                 DankIcon {
                     id: networkIcon
                     name: root.getNetworkIconName()
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: root.getNetworkIconColor()
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showNetworkIcon && NetworkService.networkAvailable
@@ -520,7 +520,7 @@ BasePill {
                 DankIcon {
                     id: vpnIcon
                     name: "vpn_lock"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: NetworkService.vpnConnected ? Theme.primary : Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showVpnIcon && NetworkService.vpnAvailable && NetworkService.vpnConnected
@@ -529,7 +529,7 @@ BasePill {
                 DankIcon {
                     id: bluetoothIcon
                     name: "bluetooth"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: BluetoothService.connected ? Theme.primary : Theme.surfaceText
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showBluetoothIcon && BluetoothService.available && BluetoothService.enabled
@@ -545,7 +545,7 @@ BasePill {
                     DankIcon {
                         id: audioIcon
                         name: root.getVolumeIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetIconColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
@@ -556,7 +556,7 @@ BasePill {
                         id: audioPercent
                         visible: root.showAudioPercent
                         text: Math.round((AudioService.sink?.audio?.volume ?? 0) * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: audioIcon.right
@@ -574,7 +574,7 @@ BasePill {
                     DankIcon {
                         id: micIcon
                         name: root.getMicIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: root.getMicIconColor()
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
@@ -585,7 +585,7 @@ BasePill {
                         id: micPercent
                         visible: root.showMicPercent
                         text: Math.round((AudioService.source?.audio?.volume ?? 0) * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: micIcon.right
@@ -603,7 +603,7 @@ BasePill {
                     DankIcon {
                         id: brightnessIcon
                         name: root.getBrightnessIconName()
-                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                        size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetIconColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
@@ -614,7 +614,7 @@ BasePill {
                         id: brightnessPercent
                         visible: root.showBrightnessPercent
                         text: Math.round(getBrightness() * 100) + "%"
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: brightnessIcon.right
@@ -625,7 +625,7 @@ BasePill {
                 DankIcon {
                     id: batteryIcon
                     name: Theme.getBatteryIcon(BatteryService.batteryLevel, BatteryService.isCharging, BatteryService.batteryAvailable)
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: root.getBatteryIconColor()
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showBatteryIcon && BatteryService.batteryAvailable
@@ -634,7 +634,7 @@ BasePill {
                 DankIcon {
                     id: printerIcon
                     name: "print"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: Theme.primary
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.showPrinterIcon && CupsService.cupsAvailable && root.hasPrintJobs()
@@ -642,7 +642,7 @@ BasePill {
 
                 DankIcon {
                     name: "settings"
-                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: root.isActive ? Theme.primary : Theme.widgetIconColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: root.hasNoVisibleIcons()

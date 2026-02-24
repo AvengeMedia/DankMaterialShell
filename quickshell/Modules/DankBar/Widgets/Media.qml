@@ -284,7 +284,7 @@ BasePill {
 
                             anchors.verticalCenter: parent.verticalCenter
                             text: textContainer.displayText
-                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                            font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                             color: Theme.widgetTextColor
                             wrapMode: Text.NoWrap
                             x: needsScrolling ? -scrollOffset : 0

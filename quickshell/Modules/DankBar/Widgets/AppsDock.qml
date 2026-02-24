@@ -400,7 +400,7 @@ BasePill {
     Component.onCompleted: updateModel()
 
     visible: dockItems.length > 0
-    readonly property real iconCellSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) + 6
+    readonly property real iconCellSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale) + 6
 
     content: Component {
         Item {
@@ -597,7 +597,7 @@ BasePill {
                 readonly property bool enlargeEnabled: (widgetData?.appsDockEnlargeOnHover !== undefined ? widgetData.appsDockEnlargeOnHover : SettingsData.appsDockEnlargeOnHover)
                 readonly property real enlargeScale: enlargeEnabled && mouseArea.containsMouse ? (widgetData?.appsDockEnlargePercentage !== undefined ? widgetData.appsDockEnlargePercentage : SettingsData.appsDockEnlargePercentage) / 100.0 : 1.0
                 readonly property real baseIconSizeMultiplier: (widgetData?.appsDockIconSizePercentage !== undefined ? widgetData.appsDockIconSizePercentage : SettingsData.appsDockIconSizePercentage) / 100.0
-                readonly property real effectiveIconSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) * baseIconSizeMultiplier
+                readonly property real effectiveIconSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale) * baseIconSizeMultiplier
 
                 readonly property color activeOverlayColor: {
                     switch (SettingsData.appsDockActiveColorMode) {
@@ -795,7 +795,7 @@ BasePill {
                         anchors.rightMargin: Theme.spacingS
                         anchors.verticalCenter: parent.verticalCenter
                         text: appItem.windowTitle || appItem.appId
-                        font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
                         elide: Text.ElideRight
                         maximumLineCount: 1

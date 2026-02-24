@@ -42,7 +42,7 @@ BasePill {
 
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
-                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.noBackground)
+                    size: Theme.barIconSize(battery.barThickness, undefined, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -63,7 +63,7 @@ BasePill {
 
                 StyledText {
                     text: BatteryService.batteryLevel.toString()
-                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: BatteryService.batteryAvailable
@@ -78,7 +78,7 @@ BasePill {
 
                 DankIcon {
                     name: BatteryService.getBatteryIcon()
-                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.noBackground)
+                    size: Theme.barIconSize(battery.barThickness, -4, battery.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (!BatteryService.batteryAvailable) {
                             return Theme.widgetIconColor;
@@ -99,7 +99,7 @@ BasePill {
 
                 StyledText {
                     text: `${BatteryService.batteryLevel}%`
-                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(battery.barThickness, battery.barConfig?.fontScale, battery.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.verticalCenter: parent.verticalCenter
                     visible: BatteryService.batteryAvailable

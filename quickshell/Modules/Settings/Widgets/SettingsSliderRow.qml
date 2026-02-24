@@ -66,7 +66,7 @@ Item {
     property int defaultValue: -1
 
     signal sliderValueChanged(int newValue)
-
+    signal sliderDragFinished(int finalValue)
     width: parent?.width ?? 0
     height: headerRow.height + Theme.spacingXS + slider.height
 
@@ -128,6 +128,7 @@ Item {
                     onClicked: {
                         slider.value = root.defaultValue;
                         root.sliderValueChanged(root.defaultValue);
+                        root.sliderDragFinished(root.defaultValue);
                     }
                 }
             }
@@ -141,6 +142,7 @@ Item {
             wheelEnabled: false
             thumbOutlineColor: Theme.surfaceContainerHigh
             onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
+            onSliderDragFinished: finalValue => root.sliderDragFinished(finalValue)
         }
     }
 }

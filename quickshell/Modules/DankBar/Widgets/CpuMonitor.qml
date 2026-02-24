@@ -36,7 +36,7 @@ BasePill {
 
                 DankIcon {
                     name: "memory"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (DgopService.cpuUsage > 80) {
                             return Theme.tempDanger;
@@ -59,7 +59,7 @@ BasePill {
 
                         return DgopService.cpuUsage.toFixed(0);
                     }
-                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                    font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
@@ -74,7 +74,7 @@ BasePill {
                 DankIcon {
                     id: cpuIcon
                     name: "memory"
-                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                    size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                     color: {
                         if (DgopService.cpuUsage > 80) {
                             return Theme.tempDanger;
@@ -101,7 +101,7 @@ BasePill {
 
                     StyledTextMetrics {
                         id: cpuBaseline
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: "88%"
                     }
 
@@ -114,7 +114,7 @@ BasePill {
                             }
                             return v.toFixed(0) + "%";
                         }
-                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale)
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         color: Theme.widgetTextColor
 
                         anchors.fill: parent

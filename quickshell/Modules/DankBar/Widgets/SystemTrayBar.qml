@@ -137,7 +137,7 @@ BasePill {
         }
     }
 
-    readonly property real trayItemSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground) + 6
+    readonly property real trayItemSize: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale) + 6
 
     readonly property real minTooltipY: {
         if (!parentScreen || !isVerticalOrientation) {
@@ -277,8 +277,8 @@ BasePill {
                         IconImage {
                             id: iconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             source: delegateRoot.iconSource
                             asynchronous: true
                             smooth: true
@@ -405,7 +405,7 @@ BasePill {
                     DankIcon {
                         anchors.centerIn: parent
                         name: root.menuOpen ? "expand_less" : "expand_more"
-                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetTextColor
                     }
 
@@ -534,8 +534,8 @@ BasePill {
                         IconImage {
                             id: iconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             source: delegateRoot.iconSource
                             asynchronous: true
                             smooth: true
@@ -669,7 +669,7 @@ BasePill {
                                 return root.menuOpen ? "chevron_right" : "chevron_left";
                             }
                         }
-                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                        size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                         color: Theme.widgetTextColor
                     }
 
@@ -1029,8 +1029,8 @@ BasePill {
                         IconImage {
                             id: menuIconImg
                             anchors.centerIn: parent
-                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
-                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.noBackground)
+                            width: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
+                            height: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             source: parent.iconSource
                             asynchronous: true
                             smooth: true
