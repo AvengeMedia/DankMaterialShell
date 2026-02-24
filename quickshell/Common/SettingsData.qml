@@ -149,6 +149,7 @@ Singleton {
     property int mangoLayoutRadiusOverride: -1
     property int mangoLayoutBorderSize: -1
 
+    property string locale: ""
     property bool use24HourClock: true
     property bool showSeconds: false
     property bool padHours12Hour: false

@@ -8,7 +8,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property string _rawLocale: Qt.locale().name
+    readonly property string _rawLocale: SettingsData.locale === "" ? Qt.locale().name : SettingsData.locale
     readonly property string _lang: _rawLocale.split(/[_-]/)[0]
     readonly property var _candidates: {
         const fullUnderscore = _rawLocale;
@@ -99,6 +99,7 @@ Singleton {
         translationsLoaded = false;
         translations = ({});
         console.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
+        SettingsData.set("locale", currentLocale);
     }
 
     function _fallbackToEnglish() {
@@ -107,6 +108,7 @@ Singleton {
         translationsLoaded = false;
         translations = ({});
         console.warn("I18n: Falling back to built-in English strings");
+        SettingsData.set("locale", currentLocale);
     }
 
     function tr(term, context) {
