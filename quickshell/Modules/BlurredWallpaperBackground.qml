@@ -87,18 +87,46 @@ Variants {
             Component.onCompleted: {
                 if (!source) {
                     isInitialized = true;
+                    updatesBindingTimer.start();
                     return;
                 }
                 const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
                 setWallpaperImmediate(formattedSource);
                 isInitialized = true;
+                updatesBindingTimer.start();
             }
 
             property bool isInitialized: false
             property real transitionProgress: 0
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
+            property bool _renderSettling: false
             property bool useNextForEffect: false
+
+            Connections {
+                target: currentWallpaper
+                function onStatusChanged() {
+                    if (currentWallpaper.status === Image.Ready) {
+                        root._renderSettling = true;
+                        renderSettleTimer.restart();
+                    }
+                }
+            }
+
+            Timer {
+                id: renderSettleTimer
+                interval: 100
+                onTriggered: root._renderSettling = false
+            }
+
+            Timer {
+                id: updatesBindingTimer
+                interval: 500
+                onTriggered: {
+                    if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
+                        blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+                }
+            }
 
             onSourceChanged: {
                 if (!source || source.startsWith("#")) {
@@ -124,6 +152,8 @@ Variants {
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
                 root.effectActive = false;
+                root._renderSettling = true;
+                renderSettleTimer.restart();
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
             }
