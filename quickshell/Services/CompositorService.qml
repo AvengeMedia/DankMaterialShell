@@ -29,10 +29,36 @@ Singleton {
     readonly property string labwcPid: Quickshell.env("LABWC_PID")
     property bool useNiriSorting: isNiri && NiriService
 
+    property var randrScales: ({})
+    property bool randrReady: false
+    signal randrDataReady
+
     property var sortedToplevels: []
     property bool _sortScheduled: false
 
     signal toplevelsChanged
+
+    function fetchRandrData() {
+        Proc.runCommand("randr", ["dms", "randr", "--json"], (output, exitCode) => {
+            if (exitCode === 0 && output) {
+                try {
+                    const data = JSON.parse(output.trim());
+                    if (data.outputs && Array.isArray(data.outputs)) {
+                        const scales = {};
+                        for (const out of data.outputs) {
+                            if (out.name && out.scale > 0)
+                                scales[out.name] = out.scale;
+                        }
+                        randrScales = scales;
+                    }
+                } catch (e) {
+                    console.warn("CompositorService: failed to parse randr data:", e);
+                }
+            }
+            randrReady = true;
+            randrDataReady();
+        }, 0, 3000);
+    }
 
     function getScreenScale(screen) {
         if (!screen)
@@ -41,6 +67,10 @@ Singleton {
         if (Quickshell.env("QT_WAYLAND_FORCE_DPI") || Quickshell.env("QT_SCALE_FACTOR")) {
             return screen.devicePixelRatio || 1;
         }
+
+        const randrScale = randrScales[screen.name];
+        if (randrScale !== undefined && randrScale > 0)
+            return Math.round(randrScale * 20) / 20;
 
         if (WlrOutputService.wlrOutputAvailable && screen) {
             const wlrOutput = WlrOutputService.getOutput(screen.name);
@@ -137,6 +167,7 @@ Singleton {
     }
 
     Component.onCompleted: {
+        fetchRandrData();
         detectCompositor();
         scheduleSort();
         Qt.callLater(() => {

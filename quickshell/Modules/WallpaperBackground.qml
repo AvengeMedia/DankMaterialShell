@@ -83,9 +83,10 @@ Variants {
 
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
-            property bool _renderSettling: false
+            property bool _renderSettling: true
             property bool useNextForEffect: false
             property string pendingWallpaper: ""
+            property string _deferredSource: ""
 
             Connections {
                 target: currentWallpaper
@@ -97,19 +98,45 @@ Variants {
                 }
             }
 
+            function _recheckScreenScale() {
+                const newScale = CompositorService.getScreenScale(modelData);
+                if (newScale !== root.screenScale) {
+                    console.info("WallpaperBackground: screen scale corrected for", modelData.name + ":", root.screenScale, "->", newScale);
+                    root.screenScale = newScale;
+                }
+            }
+
+            Connections {
+                target: NiriService
+                function onDisplayScalesChanged() {
+                    root._recheckScreenScale();
+                }
+            }
+
+            Connections {
+                target: WlrOutputService
+                function onWlrOutputAvailableChanged() {
+                    root._recheckScreenScale();
+                }
+            }
+
+            Connections {
+                target: CompositorService
+                function onRandrDataReady() {
+                    if (root._deferredSource) {
+                        const src = root._deferredSource;
+                        root._deferredSource = "";
+                        root.setWallpaperImmediate(src);
+                    } else {
+                        root._recheckScreenScale();
+                    }
+                }
+            }
+
             Timer {
                 id: renderSettleTimer
                 interval: 100
                 onTriggered: root._renderSettling = false
-            }
-
-            Timer {
-                id: updatesBindingTimer
-                interval: 500
-                onTriggered: {
-                    if (typeof wallpaperWindow.updatesEnabled !== "undefined")
-                        wallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
-                }
             }
 
             function getFillMode(modeName) {
@@ -136,15 +163,13 @@ Variants {
             }
 
             Component.onCompleted: {
+                if (typeof wallpaperWindow.updatesEnabled !== "undefined")
+                    wallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+
                 if (!source) {
-                    isInitialized = true;
-                    updatesBindingTimer.start();
-                    return;
+                    root._renderSettling = false;
                 }
-                const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
-                setWallpaperImmediate(formattedSource);
                 isInitialized = true;
-                updatesBindingTimer.start();
             }
 
             onSourceChanged: {
@@ -156,8 +181,11 @@ Variants {
                 const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
 
                 if (!isInitialized || !currentWallpaper.source) {
+                    if (!CompositorService.randrReady) {
+                        _deferredSource = formattedSource;
+                        return;
+                    }
                     setWallpaperImmediate(formattedSource);
-                    isInitialized = true;
                     return;
                 }
                 if (CompositorService.isNiri && SessionData.isSwitchingMode) {
@@ -173,6 +201,7 @@ Variants {
                 root.effectActive = false;
                 root._renderSettling = true;
                 renderSettleTimer.restart();
+                root.screenScale = CompositorService.getScreenScale(modelData);
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
             }
@@ -201,6 +230,7 @@ Variants {
                     return;
                 if (!newPath || newPath.startsWith("#"))
                     return;
+                root.screenScale = CompositorService.getScreenScale(modelData);
                 if (root.transitioning || root.effectActive) {
                     root.pendingWallpaper = newPath;
                     return;
@@ -252,7 +282,7 @@ Variants {
             }
 
             readonly property int maxTextureSize: 8192
-            property real screenScale: CompositorService.getScreenScale(modelData)
+            property real screenScale: 1
             property int textureWidth: Math.min(Math.round(modelData.width * screenScale), maxTextureSize)
             property int textureHeight: Math.min(Math.round(modelData.height * screenScale), maxTextureSize)
 

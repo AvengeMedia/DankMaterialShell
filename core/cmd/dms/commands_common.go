@@ -525,5 +525,6 @@ func getCommonCommands() []*cobra.Command {
 		doctorCmd,
 		configCmd,
 		dlCmd,
+		randrCmd,
 	}
 }
