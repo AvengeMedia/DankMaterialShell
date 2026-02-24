@@ -575,7 +575,7 @@ Singleton {
             "maximizeWidgetIcons": false,
             "maximizeWidgetText": false,
             "removeWidgetPadding": false,
-            "widgetPadding": 12,
+            "widgetPadding": 8,
             "gothCornersEnabled": false,
             "gothCornerRadiusOverride": false,
             "gothCornerRadiusValue": 12,
