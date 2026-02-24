@@ -152,21 +152,35 @@ Item {
         }
     }
 
+    property string _barLayoutStateJson: {
+        const configs = SettingsData.barConfigs;
+        const mapped = configs.map(c => ({
+                    id: c.id,
+                    position: c.position,
+                    autoHide: c.autoHide,
+                    visible: c.visible
+                })).sort((a, b) => {
+            const aVertical = a.position === SettingsData.Position.Left || a.position === SettingsData.Position.Right;
+            const bVertical = b.position === SettingsData.Position.Left || b.position === SettingsData.Position.Right;
+            if (aVertical !== bVertical) {
+                return aVertical - bVertical;
+            }
+            return String(a.id).localeCompare(String(b.id));
+        });
+        return JSON.stringify(mapped);
+    }
+
+    on_BarLayoutStateJsonChanged: {
+        if (typeof dockRecreateDebounce !== "undefined") {
+            dockRecreateDebounce.restart();
+        }
+    }
+
     Repeater {
         id: dankBarRepeater
         model: ScriptModel {
             id: barRepeaterModel
-            values: {
-                const configs = SettingsData.barConfigs;
-                return configs.map(c => ({
-                            id: c.id,
-                            position: c.position
-                        })).sort((a, b) => {
-                    const aVertical = a.position === SettingsData.Position.Left || a.position === SettingsData.Position.Right;
-                    const bVertical = b.position === SettingsData.Position.Left || b.position === SettingsData.Position.Right;
-                    return aVertical - bVertical;
-                });
-            }
+            values: JSON.parse(root._barLayoutStateJson)
         }
 
         property var hyprlandOverviewLoaderRef: hyprlandOverviewLoader
@@ -211,13 +225,6 @@ Item {
         dockRecreateDebounce.start();
         // Force PolkitService singleton to initialize
         PolkitService.polkitAvailable;
-    }
-
-    Connections {
-        target: SettingsData
-        function onBarConfigsChanged() {
-            dockRecreateDebounce.restart();
-        }
     }
 
     Loader {
