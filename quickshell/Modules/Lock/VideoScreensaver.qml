@@ -36,7 +36,6 @@ Item {
         volume: 0
 
         onSourceChanged: {
-            console.log("VideoScreensaver: source changed to", source);
             if (source && root.active) {
                 play();
             }
@@ -52,10 +51,7 @@ Item {
     Timer {
         id: inputEnableTimer
         interval: 500
-        onTriggered: {
-            console.log("VideoScreensaver: input now enabled");
-            root.inputEnabled = true;
-        }
+        onTriggered: root.inputEnabled = true
     }
 
     Process {
@@ -69,7 +65,6 @@ Item {
         stdout: SplitParser {
             onRead: data => {
                 const path = data.trim();
-                console.log("VideoScreensaver: found video:", path);
                 if (path) {
                     videoPicker.result = path;
                     root.videoSource = "file://" + path;
@@ -78,9 +73,8 @@ Item {
         }
 
         onExited: exitCode => {
-            console.log("VideoScreensaver: videoPicker exited with code", exitCode, "result:", videoPicker.result);
             if (exitCode !== 0 || !videoPicker.result) {
-                console.warn("VideoScreensaver: no video found");
+                console.warn("VideoScreensaver: no video found in folder");
                 ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("No video found in folder"));
                 root.dismiss();
             }
@@ -88,7 +82,6 @@ Item {
     }
 
     function start() {
-        console.log("VideoScreensaver: start() called, enabled:", SettingsData.lockScreenVideoEnabled, "path:", SettingsData.lockScreenVideoPath, "cycling:", SettingsData.lockScreenVideoCycling);
         if (!SettingsData.lockScreenVideoEnabled || !SettingsData.lockScreenVideoPath)
             return;
         videoPicker.result = "";
@@ -108,14 +101,12 @@ Item {
         onExited: exitCode => {
             const isDir = exitCode === 0;
             const videoPath = SettingsData.lockScreenVideoPath;
-            console.log("VideoScreensaver: fileChecker exited, isDir:", isDir, "cycling:", SettingsData.lockScreenVideoCycling);
 
             if (isDir) {
                 videoPicker.folder = videoPath;
                 videoPicker.running = true;
             } else if (SettingsData.lockScreenVideoCycling) {
                 const parentFolder = videoPath.substring(0, videoPath.lastIndexOf('/'));
-                console.log("VideoScreensaver: resolved parent folder:", parentFolder);
                 videoPicker.folder = parentFolder;
                 videoPicker.running = true;
             } else {
@@ -127,7 +118,6 @@ Item {
     function dismiss() {
         if (!active)
             return;
-        console.log("VideoScreensaver: dismiss() called");
         videoPlayer.stop();
         inputEnabled = false;
         active = false;
@@ -144,7 +134,6 @@ Item {
 
         onPositionChanged: mouse => {
             if (!root.mouseInitialized) {
-                console.log("VideoScreensaver: mouse initialized at", mouse.x, mouse.y);
                 root.lastMousePos = Qt.point(mouse.x, mouse.y);
                 root.mouseInitialized = true;
                 return;
@@ -152,26 +141,12 @@ Item {
             var dx = Math.abs(mouse.x - root.lastMousePos.x);
             var dy = Math.abs(mouse.y - root.lastMousePos.y);
             if (dx > 5 || dy > 5) {
-                console.log("VideoScreensaver: mouse moved by", dx, dy);
                 root.dismiss();
             }
         }
-        onClicked: {
-            console.log("VideoScreensaver: mouse clicked");
-            root.dismiss();
-        }
-        onPressed: {
-            console.log("VideoScreensaver: mouse pressed");
-            root.dismiss();
-        }
-        onWheel: {
-            console.log("VideoScreensaver: mouse wheel");
-            root.dismiss();
-        }
-    }
-
-    onActiveChanged: {
-        console.log("VideoScreensaver: active changed to", active);
+        onClicked: root.dismiss()
+        onPressed: root.dismiss()
+        onWheel: root.dismiss()
     }
 
     Connections {
@@ -179,14 +154,12 @@ Item {
 
         function onLockRequested() {
             if (SettingsData.lockScreenVideoEnabled && !root.active) {
-                console.log("VideoScreensaver: idle timeout while locked, restarting");
                 root.start();
             }
         }
 
         function onFadeToLockRequested() {
             if (SettingsData.lockScreenVideoEnabled && !root.active) {
-                console.log("VideoScreensaver: fade-to-lock while locked, restarting");
                 IdleService.cancelFadeToLock();
                 root.start();
             }

@@ -16,16 +16,10 @@ FocusScope {
     signal unlockRequested
 
     Keys.onPressed: event => {
-        console.log("LockSurface: Keys.onPressed, video active:", videoScreensaver.active, "inputEnabled:", videoScreensaver.inputEnabled);
         if (videoScreensaver.active && videoScreensaver.inputEnabled) {
-            console.log("LockSurface: dismissing video screensaver");
             videoScreensaver.dismiss();
             event.accepted = true;
         }
-    }
-
-    onActiveFocusChanged: {
-        console.log("LockSurface: activeFocus changed to", activeFocus);
     }
 
     Rectangle {
