@@ -24,57 +24,6 @@ Item {
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
 
-    function highlightWidget(widgetId) {
-        if (!widgetId) return;
-
-        let sections = [
-            { item: leftSection },
-            { item: centerSection },
-            { item: rightSection }
-        ];
-
-        for (let s of sections) {
-            let index = -1;
-            for (let i = 0; i < s.item.items.length; i++) {
-                let w = s.item.items[i];
-                if ((typeof w === 'string' ? w : w.id) === widgetId) {
-                    index = i;
-                    break;
-                }
-            }
-
-            if (index !== -1) {
-                s.item.highlightWidgetIndex = index;
-                Qt.callLater(() => {
-                    let delegate = s.item.getDelegate(index);
-                    if (delegate) {
-                        let pos = delegate.mapToItem(flickable.contentItem, 0, 0);
-                        let targetY = Math.max(0, Math.min(pos.y - 100, flickable.contentHeight - flickable.height));
-                        flickable.contentY = targetY;
-                    }
-                });
-                return;
-            }
-        }
-    }
-
-    Connections {
-        target: PopoutService
-        function onPendingWidgetHighlightChanged() {
-            if (widgetsTab.visible && PopoutService.pendingWidgetHighlight) {
-                widgetsTab.highlightWidget(PopoutService.pendingWidgetHighlight);
-                PopoutService.pendingWidgetHighlight = "";
-            }
-        }
-    }
-
-    onVisibleChanged: {
-        if (visible && PopoutService.pendingWidgetHighlight) {
-            highlightWidget(PopoutService.pendingWidgetHighlight);
-            PopoutService.pendingWidgetHighlight = "";
-        }
-    }
-
     property bool hasMultipleBars: SettingsData.barConfigs.length > 1
 
     DankTooltipV2 {
