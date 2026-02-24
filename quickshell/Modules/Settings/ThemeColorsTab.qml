@@ -386,12 +386,22 @@ Item {
                                 radius: Theme.cornerRadius
                                 color: Theme.surfaceVariant
 
-                                CachingImage {
+                                Image {
                                     anchors.fill: parent
                                     anchors.margins: 1
-                                    imagePath: (Theme.wallpaperPath && !Theme.wallpaperPath.startsWith("#")) ? Theme.wallpaperPath : ""
+                                    source: {
+                                        var wp = Theme.wallpaperPath;
+                                        if (!wp || wp === "" || wp.startsWith("#"))
+                                            return "";
+                                        if (wp.startsWith("file://"))
+                                            wp = wp.substring(7);
+                                        return "file://" + wp.split('/').map(s => encodeURIComponent(s)).join('/');
+                                    }
                                     fillMode: Image.PreserveAspectCrop
                                     visible: Theme.wallpaperPath && !Theme.wallpaperPath.startsWith("#")
+                                    sourceSize.width: 120
+                                    sourceSize.height: 120
+                                    asynchronous: true
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
                                         maskEnabled: true
