@@ -1,7 +1,9 @@
 package matugen
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -18,6 +20,8 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/utils"
 	"github.com/lucasb-eyer/go-colorful"
 )
+
+var ErrNoChanges = errors.New("no color changes")
 
 type ColorMode string
 
@@ -160,38 +164,44 @@ func Run(opts Options) error {
 
 	log.Infof("Building theme: %s %s (%s)", opts.Kind, opts.Value, opts.Mode)
 
-	buildErr := buildOnce(&opts)
+	changed, buildErr := buildOnce(&opts)
+	if buildErr != nil {
+		return buildErr
+	}
+
+	if !changed {
+		log.Info("No color changes detected, skipping refresh")
+		return ErrNoChanges
+	}
 
 	if opts.SyncModeWithPortal {
 		syncColorScheme(opts.Mode)
-	}
-
-	if buildErr != nil {
-		return buildErr
 	}
 
 	log.Info("Done")
 	return nil
 }
 
-func buildOnce(opts *Options) error {
+func buildOnce(opts *Options) (bool, error) {
 	cfgFile, err := os.CreateTemp("", "matugen-config-*.toml")
 	if err != nil {
-		return fmt.Errorf("failed to create temp config: %w", err)
+		return false, fmt.Errorf("failed to create temp config: %w", err)
 	}
 	defer os.Remove(cfgFile.Name())
 	defer cfgFile.Close()
 
 	tmpDir, err := os.MkdirTemp("", "matugen-templates-*")
 	if err != nil {
-		return fmt.Errorf("failed to create temp dir: %w", err)
+		return false, fmt.Errorf("failed to create temp dir: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
 	if err := buildMergedConfig(opts, cfgFile, tmpDir); err != nil {
-		return fmt.Errorf("failed to build config: %w", err)
+		return false, fmt.Errorf("failed to build config: %w", err)
 	}
 	cfgFile.Close()
+
+	oldColors, _ := os.ReadFile(opts.ColorsOutput())
 
 	var primaryDark, primaryLight, surface string
 	var dank16JSON string
@@ -204,7 +214,7 @@ func buildOnce(opts *Options) error {
 		surface = extractNestedColor(opts.StockColors, "surface", "dark")
 
 		if primaryDark == "" {
-			return fmt.Errorf("failed to extract primary dark from stock colors")
+			return false, fmt.Errorf("failed to extract primary dark from stock colors")
 		}
 		if primaryLight == "" {
 			primaryLight = primaryDark
@@ -218,14 +228,14 @@ func buildOnce(opts *Options) error {
 		args := []string{"color", "hex", primaryDark, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name()}
 		args = append(args, importArgs...)
 		if err := runMatugen(args); err != nil {
-			return err
+			return false, err
 		}
 	} else {
 		log.Infof("Using dynamic theme from %s: %s", opts.Kind, opts.Value)
 
 		matJSON, err := runMatugenDryRun(opts)
 		if err != nil {
-			return fmt.Errorf("matugen dry-run failed: %w", err)
+			return false, fmt.Errorf("matugen dry-run failed: %w", err)
 		}
 
 		primaryDark = extractMatugenColor(matJSON, "primary", "dark")
@@ -233,7 +243,7 @@ func buildOnce(opts *Options) error {
 		surface = extractMatugenColor(matJSON, "surface", "dark")
 
 		if primaryDark == "" {
-			return fmt.Errorf("failed to extract primary color")
+			return false, fmt.Errorf("failed to extract primary color")
 		}
 		if primaryLight == "" {
 			primaryLight = primaryDark
@@ -254,8 +264,13 @@ func buildOnce(opts *Options) error {
 		args = append(args, "-m", string(opts.Mode), "-t", opts.MatugenType, "-c", cfgFile.Name())
 		args = append(args, importArgs...)
 		if err := runMatugen(args); err != nil {
-			return err
+			return false, err
 		}
+	}
+
+	newColors, _ := os.ReadFile(opts.ColorsOutput())
+	if bytes.Equal(oldColors, newColors) && len(oldColors) > 0 {
+		return false, nil
 	}
 
 	if isDMSGTKActive(opts.ConfigDir) {
@@ -275,7 +290,7 @@ func buildOnce(opts *Options) error {
 
 	signalTerminals(opts)
 
-	return nil
+	return true, nil
 }
 
 func buildMergedConfig(opts *Options, cfgFile *os.File, tmpDir string) error {

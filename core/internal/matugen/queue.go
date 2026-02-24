@@ -2,6 +2,7 @@ package matugen
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -93,10 +94,13 @@ func (q *Queue) runWorker() {
 		err := Run(job.Options)
 
 		var result Result
-		if err != nil {
-			result = Result{Success: false, Error: err}
-		} else {
+		switch {
+		case err == nil:
 			result = Result{Success: true}
+		case errors.Is(err, ErrNoChanges):
+			result = Result{Success: true}
+		default:
+			result = Result{Success: false, Error: err}
 		}
 
 		q.finishJob(result)
