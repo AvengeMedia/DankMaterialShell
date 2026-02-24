@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import QtCore
+import qs.Services
 
 Singleton {
     id: root
@@ -83,7 +84,12 @@ Singleton {
         if (desktopEntry && desktopEntry.icon) {
             return Quickshell.iconPath(desktopEntry.icon, true);
         }
-        return Quickshell.iconPath(appId, true);
+
+        const icon = Quickshell.iconPath(appId, true);
+        if (icon && icon !== "")
+            return icon;
+
+        return DesktopService.resolveIconPath(appId);
     }
 
     function getAppName(appId: string, desktopEntry: var): string {

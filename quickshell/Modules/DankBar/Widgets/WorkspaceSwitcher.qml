@@ -290,6 +290,7 @@ Item {
                 const moddedId = Paths.moddedAppId(keyBase);
                 const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
                 const icon = Paths.getAppIcon(keyBase, desktopEntry);
+                const appName = Paths.getAppName(keyBase, desktopEntry);
                 byApp[key] = {
                     "type": "icon",
                     "icon": icon,
@@ -298,7 +299,7 @@ Item {
                     "active": !!((w.activated || w.is_focused) || (CompositorService.isNiri && w.is_focused)),
                     "count": 1,
                     "windowId": w.address || w.id,
-                    "fallbackText": w.appId || w.class || w.title || ""
+                    "fallbackText": appName || ""
                 };
             } else {
                 byApp[key].count++;
@@ -1473,9 +1474,44 @@ Item {
                                             IconImage {
                                                 id: rowAppIcon
                                                 anchors.fill: parent
-                                                source: modelData.icon
+                                                source: modelData.icon || ""
                                                 opacity: modelData.active ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && rowAppIcon.status !== Image.Ready
+                                                color: Theme.surfaceContainer
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: Theme.primarySelected
+                                                opacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+
+                                                StyledText {
+                                                    anchors.centerIn: parent
+                                                    text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
+                                                    font.pixelSize: parent.width * 0.45
+                                                    color: Theme.primary
+                                                    font.weight: Font.Bold
+                                                }
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: !modelData.isQuickshell && modelData.isSteamApp && rowSteamIcon.status !== Image.Ready
+                                                color: Theme.surfaceContainer
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: Theme.primarySelected
+                                                opacity: (modelData.active || isActive) ? 1.0 : rowAppMouseArea.containsMouse ? 0.8 : 0.6
+
+                                                DankIcon {
+                                                    anchors.centerIn: parent
+                                                    size: parent.width * 0.7
+                                                    name: "sports_esports"
+                                                    color: Theme.primary
+                                                }
                                             }
 
                                             IconImage {
@@ -1592,9 +1628,44 @@ Item {
                                             IconImage {
                                                 id: colAppIcon
                                                 anchors.fill: parent
-                                                source: modelData.icon
+                                                source: modelData.icon || ""
                                                 opacity: modelData.active ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
-                                                visible: !modelData.isQuickshell && !modelData.isSteamApp
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && status === Image.Ready
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: !modelData.isQuickshell && !modelData.isSteamApp && colAppIcon.status !== Image.Ready
+                                                color: Theme.surfaceContainer
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: Theme.primarySelected
+                                                opacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+
+                                                StyledText {
+                                                    anchors.centerIn: parent
+                                                    text: (modelData.fallbackText || "?").charAt(0).toUpperCase()
+                                                    font.pixelSize: parent.width * 0.45
+                                                    color: Theme.primary
+                                                    font.weight: Font.Bold
+                                                }
+                                            }
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                visible: !modelData.isQuickshell && modelData.isSteamApp && colSteamIcon.status !== Image.Ready
+                                                color: Theme.surfaceContainer
+                                                radius: Theme.cornerRadius * (root.appIconSize / 40)
+                                                border.width: 1
+                                                border.color: Theme.primarySelected
+                                                opacity: (modelData.active || isActive) ? 1.0 : colAppMouseArea.containsMouse ? 0.8 : 0.6
+
+                                                DankIcon {
+                                                    anchors.centerIn: parent
+                                                    size: parent.width * 0.7
+                                                    name: "sports_esports"
+                                                    color: Theme.primary
+                                                }
                                             }
 
                                             IconImage {
