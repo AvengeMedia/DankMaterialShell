@@ -320,6 +320,9 @@ var SPEC = {
     lockScreenActiveMonitor: { def: "all" },
     lockScreenInactiveColor: { def: "#000000" },
     lockScreenNotificationMode: { def: 0 },
+    lockScreenVideoEnabled: { def: false },
+    lockScreenVideoPath: { def: "" },
+    lockScreenVideoCycling: { def: false },
     hideBrightnessSlider: { def: false },
 
     notificationTimeoutLow: { def: 5000 },

@@ -497,6 +497,9 @@ Singleton {
     property string lockScreenActiveMonitor: "all"
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0
+    property bool lockScreenVideoEnabled: false
+    property string lockScreenVideoPath: ""
+    property bool lockScreenVideoCycling: false
     property bool hideBrightnessSlider: false
 
     property int notificationTimeoutLow: 5000
