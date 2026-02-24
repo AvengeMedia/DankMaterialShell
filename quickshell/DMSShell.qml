@@ -162,7 +162,10 @@ Item {
                 })).sort((a, b) => {
             const aVertical = a.position === SettingsData.Position.Left || a.position === SettingsData.Position.Right;
             const bVertical = b.position === SettingsData.Position.Left || b.position === SettingsData.Position.Right;
-            return aVertical - bVertical;
+            if (aVertical !== bVertical) {
+                return aVertical - bVertical;
+            }
+            return String(a.id).localeCompare(String(b.id));
         });
         return JSON.stringify(mapped);
     }
