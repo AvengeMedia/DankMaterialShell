@@ -10,8 +10,9 @@ Rectangle {
     property string fallbackIcon: "notifications"
     property string fallbackText: ""
     property bool hasImage: imageSource !== ""
+    readonly property bool shouldProbe: imageSource !== "" && !imageSource.startsWith("image://")
     // Probe with AnimatedImage first; once loaded, check frameCount to decide.
-    readonly property bool isAnimated: probe.status === Image.Ready && probe.frameCount > 1
+    readonly property bool isAnimated: shouldProbe && probe.status === Image.Ready && probe.frameCount > 1
     readonly property var activeImage: isAnimated ? probe : staticImage
     property int imageStatus: activeImage.status
 
@@ -44,7 +45,7 @@ Rectangle {
         mipmap: true
         cache: true
         visible: false
-        source: root.imageSource
+        source: root.shouldProbe ? root.imageSource : ""
     }
 
     // Static fallback: used once probe confirms the image is not animated.
@@ -58,13 +59,15 @@ Rectangle {
         mipmap: true
         cache: true
         visible: false
-        source: ""
+        source: !root.shouldProbe ? root.imageSource : ""
     }
 
     // Once the probe loads, if not animated, hand off to Image and unload probe.
     Connections {
         target: probe
         function onStatusChanged() {
+            if (!root.shouldProbe)
+                return;
             switch (probe.status) {
             case Image.Ready:
                 if (probe.frameCount <= 1) {
@@ -82,8 +85,13 @@ Rectangle {
 
     // If imageSource changes, reset: re-probe with AnimatedImage.
     onImageSourceChanged: {
-        staticImage.source = "";
-        probe.source = root.imageSource;
+        if (root.shouldProbe) {
+            staticImage.source = "";
+            probe.source = root.imageSource;
+        } else {
+            probe.source = "";
+            staticImage.source = root.imageSource;
+        }
     }
 
     MultiEffect {
