@@ -584,8 +584,7 @@ BasePill {
 
                 property string tooltipText: {
                     root._desktopEntriesUpdateTrigger;
-                    const moddedId = Paths.moddedAppId(appId);
-                    const desktopEntry = moddedId ? DesktopEntries.heuristicLookup(moddedId) : null;
+                    const desktopEntry = appId ? DesktopEntries.heuristicLookup(appId) : null;
                     const appName = appId ? Paths.getAppName(appId, desktopEntry) : "Unknown";
 
                     if (modelData.type === "grouped" && windowCount > 1) {
@@ -690,9 +689,8 @@ BasePill {
                             if (!appItem.appId)
                                 return "";
                             if (modelData.isCoreApp)
-                                return ""; // Explicitly skip if core app to avoid flickering or wrong look ups
-                            const moddedId = Paths.moddedAppId(appItem.appId);
-                            const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
+                                return "";
+                            const desktopEntry = DesktopEntries.heuristicLookup(appItem.appId);
                             return Paths.getAppIcon(appItem.appId, desktopEntry);
                         }
                         smooth: true
@@ -749,8 +747,7 @@ BasePill {
                             root._desktopEntriesUpdateTrigger;
                             if (!appItem.appId)
                                 return "?";
-                            const moddedId = Paths.moddedAppId(appItem.appId);
-                            const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
+                            const desktopEntry = DesktopEntries.heuristicLookup(appItem.appId);
                             const appName = Paths.getAppName(appItem.appId, desktopEntry);
                             return appName.charAt(0).toUpperCase();
                         }

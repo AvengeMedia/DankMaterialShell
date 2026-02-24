@@ -282,15 +282,15 @@ Item {
             }
 
             const keyBase = (w.app_id || w.appId || w.class || w.windowClass || "unknown");
-            const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${keyBase}_${i}` : keyBase;
+            const moddedId = Paths.moddedAppId(keyBase);
+            const key = isActiveWs || !SettingsData.groupWorkspaceApps ? `${moddedId}_${i}` : moddedId;
 
             if (!byApp[key]) {
                 const isQuickshell = keyBase === "org.quickshell";
-                const isSteamApp = Paths.isSteamApp(keyBase);
-                const moddedId = Paths.moddedAppId(keyBase);
+                const isSteamApp = Paths.isSteamApp(moddedId);
                 const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
-                const icon = Paths.getAppIcon(keyBase, desktopEntry);
-                const appName = Paths.getAppName(keyBase, desktopEntry);
+                const icon = Paths.getAppIcon(moddedId, desktopEntry);
+                const appName = Paths.getAppName(moddedId, desktopEntry);
                 byApp[key] = {
                     "type": "icon",
                     "icon": icon,
