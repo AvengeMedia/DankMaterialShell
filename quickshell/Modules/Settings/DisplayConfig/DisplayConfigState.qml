@@ -231,13 +231,16 @@ Singleton {
         const compositor = CompositorService.compositor;
         const profilesDir = getProfilesDir();
         const profileFile = profilesDir + "/" + profileId + getProfileExtension();
+        const isActive = SettingsData.getActiveDisplayProfile(compositor) === profileId;
 
         profilesLoading = true;
         Proc.runCommand("delete-profile", ["rm", "-f", profileFile], (output, exitCode) => {
             profilesLoading = false;
             SettingsData.removeDisplayProfile(compositor, profileId);
-            if (SettingsData.getActiveDisplayProfile(compositor) === profileId)
+            if (isActive) {
                 SettingsData.setActiveDisplayProfile(compositor, "");
+                backendWriteOutputsConfig(allOutputs);
+            }
             const updated = JSON.parse(JSON.stringify(validatedProfiles));
             delete updated[profileId];
             validatedProfiles = updated;
