@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
@@ -95,7 +97,11 @@ func buildMatugenOptions(cmd *cobra.Command) matugen.Options {
 
 func runMatugenGenerate(cmd *cobra.Command, args []string) {
 	opts := buildMatugenOptions(cmd)
-	if err := matugen.Run(opts); err != nil {
+	err := matugen.Run(opts)
+	switch {
+	case errors.Is(err, matugen.ErrNoChanges):
+		os.Exit(2)
+	case err != nil:
 		log.Fatalf("Theme generation failed: %v", err)
 	}
 }
@@ -129,7 +135,11 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 	if !wait {
 		if err := sendServerRequestFireAndForget(request); err != nil {
 			log.Info("Server unavailable, running synchronously")
-			if err := matugen.Run(opts); err != nil {
+			err := matugen.Run(opts)
+			switch {
+			case errors.Is(err, matugen.ErrNoChanges):
+				os.Exit(2)
+			case err != nil:
 				log.Fatalf("Theme generation failed: %v", err)
 			}
 			return
@@ -146,11 +156,15 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 		resp, ok := tryServerRequest(request)
 		if !ok {
 			log.Info("Server unavailable, running synchronously")
-			if err := matugen.Run(opts); err != nil {
+			err := matugen.Run(opts)
+			switch {
+			case errors.Is(err, matugen.ErrNoChanges):
+				resultCh <- matugen.ErrNoChanges
+			case err != nil:
 				resultCh <- err
-				return
+			default:
+				resultCh <- nil
 			}
-			resultCh <- nil
 			return
 		}
 		if resp.Error != "" {
@@ -162,7 +176,10 @@ func runMatugenQueue(cmd *cobra.Command, args []string) {
 
 	select {
 	case err := <-resultCh:
-		if err != nil {
+		switch {
+		case errors.Is(err, matugen.ErrNoChanges):
+			os.Exit(2)
+		case err != nil:
 			log.Fatalf("Theme generation failed: %v", err)
 		}
 		fmt.Println("Theme generation completed")

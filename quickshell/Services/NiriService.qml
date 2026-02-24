@@ -66,7 +66,7 @@ Singleton {
 
     Timer {
         id: suppressResetTimer
-        interval: 2000
+        interval: 5000
         onTriggered: root.matugenSuppression = false
     }
 
