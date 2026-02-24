@@ -107,6 +107,22 @@ Item {
         flickable.contentY = 0;
     }
 
+    function _scrollToExpandedItem() {
+        for (let i = 0; i < bindsRepeater.count; i++) {
+            const item = bindsRepeater.itemAt(i);
+            if (item && item.modelData.action === expandedKey) {
+                const itemY = item.mapToItem(flickable.contentItem, 0, 0).y;
+                const itemH = item.height;
+                const viewH = flickable.height;
+                if (itemY >= flickable.contentY && itemY + itemH <= flickable.contentY + viewH)
+                    return;
+                flickable.contentY = Math.max(0, Math.min(itemY - viewH / 4, flickable.contentHeight - viewH));
+                return;
+            }
+        }
+        flickable.contentY = _savedScrollY;
+    }
+
     Timer {
         id: searchDebounce
         interval: 150
@@ -122,8 +138,12 @@ Item {
             keybindsTab._updateCategories();
             keybindsTab._updateFiltered();
             keybindsTab._preserveScroll = false;
-            if (wasPreserving)
-                Qt.callLater(() => flickable.contentY = savedY);
+            if (wasPreserving) {
+                if (keybindsTab.expandedKey)
+                    Qt.callLater(keybindsTab._scrollToExpandedItem);
+                else
+                    Qt.callLater(() => flickable.contentY = savedY);
+            }
         }
         function onBindSaved(key) {
             keybindsTab._savedScrollY = flickable.contentY;
@@ -569,6 +589,7 @@ Item {
                 spacing: Theme.spacingXS
 
                 Repeater {
+                    id: bindsRepeater
                     model: ScriptModel {
                         values: keybindsTab._filteredBinds
                         objectProp: "action"
