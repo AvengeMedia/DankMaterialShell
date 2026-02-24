@@ -92,7 +92,12 @@ Item {
             widgetOutlineColor: defaultBar.widgetOutlineColor || "primary",
             widgetOutlineOpacity: defaultBar.widgetOutlineOpacity ?? 1.0,
             widgetOutlineThickness: defaultBar.widgetOutlineThickness ?? 1,
+            widgetPadding: defaultBar.widgetPadding ?? 12,
+            maximizeWidgetIcons: defaultBar.maximizeWidgetIcons ?? false,
+            maximizeWidgetText: defaultBar.maximizeWidgetText ?? false,
+            removeWidgetPadding: defaultBar.removeWidgetPadding ?? false,
             fontScale: defaultBar.fontScale ?? 1.0,
+            iconScale: defaultBar.iconScale ?? 1.0,
             autoHide: defaultBar.autoHide ?? false,
             autoHideDelay: defaultBar.autoHideDelay ?? 250,
             showOnWindowsOpen: defaultBar.showOnWindowsOpen ?? false,
@@ -589,7 +594,6 @@ Item {
                             SettingsData.updateBarConfig(selectedBarId, {
                                 autoHideDelay: newValue
                             });
-                            notifyHorizontalBarChange();
                         }
 
                         Binding {
@@ -609,7 +613,6 @@ Item {
                             SettingsData.updateBarConfig(selectedBarId, {
                                 showOnWindowsOpen: toggled
                             });
-                            notifyHorizontalBarChange();
                         }
                     }
                 }
@@ -663,7 +666,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             openOnOverview: toggled
                         });
-                        notifyHorizontalBarChange();
                     }
                 }
             }
@@ -780,7 +782,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             spacing: finalValue
                         });
-                        notifyHorizontalBarChange();
                     }
 
                     Binding {
@@ -802,7 +803,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             bottomGap: finalValue
                         });
-                        notifyHorizontalBarChange();
                     }
 
                     Binding {
@@ -824,7 +824,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             innerPadding: finalValue
                         });
-                        notifyHorizontalBarChange();
                     }
 
                     Binding {
@@ -873,7 +872,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             popupGapsAuto: checked
                         });
-                        notifyHorizontalBarChange();
                     }
                 }
 
@@ -902,7 +900,6 @@ Item {
                             SettingsData.updateBarConfig(selectedBarId, {
                                 popupGapsManual: finalValue
                             });
-                            notifyHorizontalBarChange();
                         }
 
                         Binding {
@@ -1343,7 +1340,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             transparency: finalValue / 100
                         });
-                        notifyHorizontalBarChange();
                     }
 
                     Binding {
@@ -1366,7 +1362,6 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             widgetTransparency: finalValue / 100
                         });
-                        notifyHorizontalBarChange();
                     }
 
                     Binding {
@@ -1393,7 +1388,6 @@ Item {
                     SettingsData.updateBarConfig(selectedBarId, {
                         fontScale: finalValue / 100
                     });
-                    notifyHorizontalBarChange();
                 }
 
                 Binding {
@@ -1419,7 +1413,6 @@ Item {
                     SettingsData.updateBarConfig(selectedBarId, {
                         iconScale: finalValue / 100
                     });
-                    notifyHorizontalBarChange();
                 }
 
                 Binding {
