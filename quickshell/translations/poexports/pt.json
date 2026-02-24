@@ -770,7 +770,7 @@
     "Caps Lock Indicator": "Indicador de Caps Lock"
   },
   "Caps Lock is on": {
-    "Caps Lock is on": ""
+    "Caps Lock is on": "Caps Lock está ligado"
   },
   "Center Section": {
     "Center Section": "Seção Central"
@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": "Neblina"
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Seguir Foco do Monitor"
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "Ícone"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Tamanho do Ícone"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "Detecção de Maximizado"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Tamanho Máximo de Entrada"
   },
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "Nenhum arquivo encontrado"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": "Sem aplicativos ocultos."
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": "Abrir no Navegador"
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Abrir barra de pesquisa e encontrar texto"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "Remover"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Remover espaçámentos e borda quando janelas estão maximizadas"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Salvar Arquivo do Bloco de Notas"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Salvar e alternar entre configurações de exibição"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Ajustar tamanho da fonte da DankBar de forma independente"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Ajuste todos os tamanhos de fonte em todo o shell"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Ciência"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "Compartilhamento de Tela"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "Gatilho: %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "Tente uma pesquisa diferente"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Sem título"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "Atualizar"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "Dispositivo WiFi"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi desativado"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "eventos"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "GPU Desconhecida"
@@ -6434,6 +6479,6 @@
     "• yyyy - Year (2024)": "yyyy - Ano (2024)"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Navegar • Espaço: Expandir • Enter: Ação/Expandir • E: Texto"
   }
 }

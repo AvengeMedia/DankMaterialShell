@@ -5355,6 +5355,20 @@
     "comment": ""
   },
   {
+    "term": "Folder",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Folders",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Follow Monitor Focus",
     "translation": "",
     "context": "",
@@ -6210,6 +6224,13 @@
   },
   {
     "term": "Icon",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Icon Scale",
     "translation": "",
     "context": "",
     "reference": "",
@@ -7301,6 +7322,20 @@
     "comment": ""
   },
   {
+    "term": "Maximize Widget Icons",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Maximize Widget Text",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Maximum Entry Size",
     "translation": "",
     "context": "",
@@ -8274,6 +8309,13 @@
     "comment": ""
   },
   {
+    "term": "No folders found",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "No hidden apps.",
     "translation": "",
     "context": "",
@@ -8870,6 +8912,13 @@
   },
   {
     "term": "Open in Browser",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Open in terminal",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10143,6 +10192,13 @@
     "comment": ""
   },
   {
+    "term": "Remove Widget Padding",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remove gaps and border when windows are maximized",
     "translation": "",
     "context": "",
@@ -10542,6 +10598,13 @@
     "comment": ""
   },
   {
+    "term": "Save QR Code",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Save and switch between display configurations",
     "translation": "",
     "context": "",
@@ -10633,6 +10696,13 @@
     "comment": ""
   },
   {
+    "term": "Scale DankBar icon sizes independently",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Scale all font sizes throughout the shell",
     "translation": "",
     "context": "",
@@ -10662,6 +10732,13 @@
   },
   {
     "term": "Science",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Score",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12901,6 +12978,13 @@
     "comment": ""
   },
   {
+    "term": "Trust",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Try a different search",
     "translation": "",
     "context": "",
@@ -13168,6 +13252,13 @@
   },
   {
     "term": "Untitled",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Untrust",
     "translation": "",
     "context": "",
     "reference": "",
@@ -13811,6 +13902,13 @@
     "comment": ""
   },
   {
+    "term": "WiFi QR code for ",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "WiFi disabled",
     "translation": "",
     "context": "",
@@ -14267,6 +14365,13 @@
   },
   {
     "term": "events",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "ext",
     "translation": "",
     "context": "",
     "reference": "",

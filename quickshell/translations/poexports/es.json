@@ -21,7 +21,7 @@
     "%1 custom animation duration": ""
   },
   "%1 days ago": {
-    "%1 days ago": ""
+    "%1 days ago": "hace %1 días"
   },
   "%1 disconnected": {
     "%1 disconnected": ""
@@ -45,7 +45,7 @@
     "%1 job(s)": "%1 trabajo(s)"
   },
   "%1 notifications": {
-    "%1 notifications": ""
+    "%1 notifications": "%1 notificaciones"
   },
   "%1 printer(s)": {
     "%1 printer(s)": "%1 impresora(s)"
@@ -57,13 +57,13 @@
     "%1 widgets": "%1 widgets"
   },
   "%1m ago": {
-    "%1m ago": ""
+    "%1m ago": "hace %1m"
   },
   "(Unnamed)": {
     "(Unnamed)": "(Sin nombre)"
   },
   "+ %1 more": {
-    "+ %1 more": ""
+    "+ %1 more": "+ %1 más"
   },
   "0 = square corners": {
     "0 = square corners": "0 = esquinas cuadradas"
@@ -78,7 +78,7 @@
     "1 minute": "1 minuto"
   },
   "1 notification": {
-    "1 notification": ""
+    "1 notification": "1 notificación"
   },
   "1 second": {
     "1 second": "1 segundo"
@@ -183,7 +183,7 @@
     "About": "Información"
   },
   "Accent Color": {
-    "Accent Color": ""
+    "Accent Color": "Color de acento"
   },
   "Accept Jobs": {
     "Accept Jobs": "Aceptar trabajos"
@@ -560,7 +560,7 @@
     "Available Screens (%1)": "Pantallas disponibles (%1)"
   },
   "Available in Detailed and Forecast view modes": {
-    "Available in Detailed and Forecast view modes": ""
+    "Available in Detailed and Forecast view modes": "Disponible en modo detallado y pronóstico"
   },
   "BSSID": {
     "BSSID": "BSSID"
@@ -659,7 +659,7 @@
     "Border Opacity": "Opacidad del borde"
   },
   "Border Size": {
-    "Border Size": ""
+    "Border Size": "Grosor del borde"
   },
   "Border Thickness": {
     "Border Thickness": "Grosor del borde"
@@ -812,7 +812,7 @@
     "Choose colors from palette": "Escoje colores de la paleta"
   },
   "Choose how the weather widget is displayed": {
-    "Choose how the weather widget is displayed": ""
+    "Choose how the weather widget is displayed": "Elige cómo se muestra el widget del tiempo"
   },
   "Choose icon": {
     "Choose icon": "Elegir icono"
@@ -1010,7 +1010,7 @@
     "Communication": "Comunicación"
   },
   "Compact": {
-    "Compact": ""
+    "Compact": "Compacto"
   },
   "Compact Mode": {
     "Compact Mode": "Modo compacto"
@@ -1253,7 +1253,7 @@
     "Custom": "Personal"
   },
   "Custom Color": {
-    "Custom Color": ""
+    "Custom Color": "Color personalizado"
   },
   "Custom Duration": {
     "Custom Duration": "Duracion personalizada"
@@ -1439,7 +1439,7 @@
     "Desktop Clock": "Reloj de escritorio"
   },
   "Detailed": {
-    "Detailed": ""
+    "Detailed": "Detallado"
   },
   "Development": {
     "Development": "Desarrollo"
@@ -1541,7 +1541,7 @@
     "Display currently focused application title": "Mostrar título de la aplicación enfocada"
   },
   "Display hourly weather predictions": {
-    "Display hourly weather predictions": ""
+    "Display hourly weather predictions": "Mostrar pronósticos por hora"
   },
   "Display only workspaces that contain windows": {
     "Display only workspaces that contain windows": "Mostrar solo los espacios que contengan ventanas"
@@ -1826,7 +1826,7 @@
     "Fade to lock screen": "Bloquear con transición suave"
   },
   "Fade to monitor off": {
-    "Fade to monitor off": ""
+    "Fade to monitor off": "Fundido antes de apagar monitor"
   },
   "Failed to activate configuration": {
     "Failed to activate configuration": "Error al activar la configuración"
@@ -2006,7 +2006,7 @@
     "Failed to write temp file for validation": "Fallo al escribir archivo temporal para la validacion"
   },
   "Feels": {
-    "Feels": ""
+    "Feels": "Sensación"
   },
   "Feels Like": {
     "Feels Like": "Temperatura"
@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": ""
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": ""
   },
@@ -2123,7 +2129,7 @@
     "Force terminal applications to always use dark color schemes": "Forzar que las aplicaciones de terminal usen esquemas de colores oscuros"
   },
   "Forecast": {
-    "Forecast": ""
+    "Forecast": "Pronóstico"
   },
   "Forecast Days": {
     "Forecast Days": ""
@@ -2207,7 +2213,7 @@
     "Gradually fade the screen before locking with a configurable grace period": "Desvanecer gradualmente la pantalla antes de bloquear, con una duración configurable"
   },
   "Gradually fade the screen before turning off monitors with a configurable grace period": {
-    "Gradually fade the screen before turning off monitors with a configurable grace period": ""
+    "Gradually fade the screen before turning off monitors with a configurable grace period": "La pantalla se funde a negro antes de apagar el monitor, tras un intervalo configurable"
   },
   "Graph Time Range": {
     "Graph Time Range": "Gráfico Intervalo de tiempo"
@@ -2396,7 +2402,7 @@
     "Humidity": "Humedad"
   },
   "Hyprland Layout Overrides": {
-    "Hyprland Layout Overrides": ""
+    "Hyprland Layout Overrides": "Sobreescribir opciones de Hyprland"
   },
   "Hyprland Options": {
     "Hyprland Options": ""
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": ""
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Tamaño de icono"
@@ -2894,7 +2903,7 @@
     "Lock before suspend": "Bloquear pantalla antes de suspender"
   },
   "Lock fade grace period": {
-    "Lock fade grace period": ""
+    "Lock fade grace period": "Intervalo de fundido antes de bloquear la pantalla"
   },
   "Locked": {
     "Locked": ""
@@ -2933,7 +2942,7 @@
     "Management": "Gestión"
   },
   "MangoWC Layout Overrides": {
-    "MangoWC Layout Overrides": ""
+    "MangoWC Layout Overrides": "Sobreescribir opciones de MangoWC"
   },
   "Manual Coordinates": {
     "Manual Coordinates": "Coordenadas manuales"
@@ -3012,6 +3021,12 @@
   },
   "Maximize Detection": {
     "Maximize Detection": "Maximizar la detección"
+  },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
   },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Tamaño máximo de entrada"
@@ -3140,7 +3155,7 @@
     "Monitor Configuration": "Configuracion del monitor"
   },
   "Monitor fade grace period": {
-    "Monitor fade grace period": ""
+    "Monitor fade grace period": "Intervalo de fundido antes de apagar el monitor"
   },
   "Monitor whose wallpaper drives dynamic theming colors": {
     "Monitor whose wallpaper drives dynamic theming colors": "Seleccionar monitor que define los colores dinámicos"
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "Archivos no encontrados"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": ""
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": ""
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Abrir barra de búsqueda para encontrar texto"
@@ -3883,7 +3904,7 @@
     "Power source": "Fuente de energia"
   },
   "Precip": {
-    "Precip": ""
+    "Precip": "Precipitaciones"
   },
   "Precipitation": {
     "Precipitation": ""
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "Remover"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Eliminar espacios y bordes cuando las ventanas estan maximizadas"
   },
@@ -4150,10 +4174,10 @@
     "Rounded corners for windows": "Esquinas redondeadas para ventanas"
   },
   "Rounded corners for windows (border_radius)": {
-    "Rounded corners for windows (border_radius)": ""
+    "Rounded corners for windows (border_radius)": "Esquinas de ventana redondeadas (border_radius)"
   },
   "Rounded corners for windows (decoration.rounding)": {
-    "Rounded corners for windows (decoration.rounding)": ""
+    "Rounded corners for windows (decoration.rounding)": "Esquinas de ventana redondeadas (decoration.rounding)"
   },
   "Rule": {
     "Rule": ""
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Guardar archivo"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": ""
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Escalar fuentes de la barra independientemente"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Escala todos los tamaños de fuente en todo el shell"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Ciencia"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": ""
@@ -4471,10 +4504,10 @@
     "Show Dock": "Mostrar dock"
   },
   "Show Feels Like Temperature": {
-    "Show Feels Like Temperature": ""
+    "Show Feels Like Temperature": "Mostrar sensación térmica"
   },
   "Show Forecast": {
-    "Show Forecast": ""
+    "Show Forecast": "Mostrar pronóstico"
   },
   "Show GPU Temperature": {
     "Show GPU Temperature": "Mostrar temperatura de la GPU"
@@ -4489,10 +4522,10 @@
     "Show Hour Numbers": "Mostrar números de horas"
   },
   "Show Hourly Forecast": {
-    "Show Hourly Forecast": ""
+    "Show Hourly Forecast": "Mostrar pronóstico por hora"
   },
   "Show Humidity": {
-    "Show Humidity": ""
+    "Show Humidity": "Mostrar humedad"
   },
   "Show Launcher Button": {
     "Show Launcher Button": ""
@@ -4501,7 +4534,7 @@
     "Show Line Numbers": "Mostrar números de líneas"
   },
   "Show Location": {
-    "Show Location": ""
+    "Show Location": "Mostrar ubicación"
   },
   "Show Lock": {
     "Show Lock": "Mostrar Bloquear"
@@ -4534,10 +4567,10 @@
     "Show Power Off": "Mostrar Apagar"
   },
   "Show Precipitation Probability": {
-    "Show Precipitation Probability": ""
+    "Show Precipitation Probability": "Mostrar probabilidad de precipitaciones"
   },
   "Show Pressure": {
-    "Show Pressure": ""
+    "Show Pressure": "Mostrar presión"
   },
   "Show Reboot": {
     "Show Reboot": "Mostrar Reiniciar"
@@ -4552,7 +4585,7 @@
     "Show Seconds": "Mostrar segundos"
   },
   "Show Sunrise/Sunset": {
-    "Show Sunrise/Sunset": ""
+    "Show Sunrise/Sunset": "Mostrar amanecer/anochecer"
   },
   "Show Suspend": {
     "Show Suspend": "Mostrar Suspender"
@@ -4561,13 +4594,13 @@
     "Show Top Processes": "Mostrar procesos principales"
   },
   "Show Weather Condition": {
-    "Show Weather Condition": ""
+    "Show Weather Condition": "Mostrar estado del tiempo"
   },
   "Show Welcome": {
-    "Show Welcome": ""
+    "Show Welcome": "Mostrar bienvenida"
   },
   "Show Wind Speed": {
-    "Show Wind Speed": ""
+    "Show Wind Speed": "Mostrar velocidad del viento"
   },
   "Show Workspace Apps": {
     "Show Workspace Apps": "Mostrar aplicaciones en el espacio de trabajo"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": ""
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": ""
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Sin titulo"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": ""
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "Dispositivo Wi-Fi"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "Wi‑Fi desactivado"
@@ -5765,6 +5807,9 @@
   "events": {
     "events": "eventos"
   },
+  "ext": {
+    "ext": ""
+  },
   "fallback gpu name": {
     "Unknown GPU": ""
   },
@@ -5781,28 +5826,28 @@
     "GPU Monitoring": ""
   },
   "greeter back button": {
-    "Back": ""
+    "Back": "Atrás"
   },
   "greeter completion page subtitle": {
-    "DankMaterialShell is ready to use": ""
+    "DankMaterialShell is ready to use": "DankMaterialShell está listo para utilizarse"
   },
   "greeter completion page title": {
     "You're All Set!": ""
   },
   "greeter configure keybinds link": {
-    "Configure Keybinds": ""
+    "Configure Keybinds": "Configurar atajos de teclado"
   },
   "greeter dankbar description": {
     "Widgets, layout, style": ""
   },
   "greeter displays description": {
-    "Resolution, position, scale": ""
+    "Resolution, position, scale": "Resolución, posición, escala"
   },
   "greeter dock description": {
-    "Position, pinned apps": ""
+    "Position, pinned apps": "Posición de las aplicaciones fijadas"
   },
   "greeter doctor page button": {
-    "Run Again": ""
+    "Run Again": "Ejecutar de nuevo"
   },
   "greeter doctor page empty state": {
     "No checks passed": "",
@@ -5811,46 +5856,46 @@
     "No warnings": ""
   },
   "greeter doctor page error count": {
-    "%1 issue(s) found": ""
+    "%1 issue(s) found": "detectado(s) %1 problema(s)"
   },
   "greeter doctor page loading text": {
-    "Analyzing configuration...": ""
+    "Analyzing configuration...": "Analizando la configuración..."
   },
   "greeter doctor page status card": {
-    "Errors": "",
-    "Info": "",
+    "Errors": "Errores",
+    "Info": "Información",
     "OK": "",
     "Warnings": ""
   },
   "greeter doctor page success": {
-    "All checks passed": ""
+    "All checks passed": "Todas las comprobaciones fueron exitosas"
   },
   "greeter doctor page title": {
     "System Check": ""
   },
   "greeter documentation link": {
-    "Docs": ""
+    "Docs": "Documentación"
   },
   "greeter explore section header": {
-    "Explore": ""
+    "Explore": "Explorar"
   },
   "greeter feature card description": {
     "Background app icons": "",
-    "Colors from wallpaper": "",
-    "Community themes": "",
-    "Extensible architecture": "",
-    "GTK, Qt, IDEs, more": "",
-    "Modular widget bar": "",
+    "Colors from wallpaper": "Colores del fondo de pantalla",
+    "Community themes": "Temas de la comunidad",
+    "Extensible architecture": "Arquitectura extensible",
+    "GTK, Qt, IDEs, more": "GTK, Qt, IDE y más",
+    "Modular widget bar": "Barra de widgets modular",
     "Night mode & gamma": "",
     "Per-screen config": "",
-    "Quick system toggles": "",
+    "Quick system toggles": "Configuración rápida del sistema",
     "Security & privacy": ""
   },
   "greeter feature card title": {
     "App Theming": "",
-    "Control Center": "",
-    "Display Control": "",
-    "Dynamic Theming": "",
+    "Control Center": "Centro de control",
+    "Display Control": "Control del monitor",
+    "Dynamic Theming": "Temas dinámicos",
     "Multi-Monitor": "",
     "System Tray": "",
     "Theme Registry": ""
@@ -5859,22 +5904,22 @@
     "Plugins": ""
   },
   "greeter feature card title | greeter settings link": {
-    "DankBar": ""
+    "DankBar": "DankBar"
   },
   "greeter feature card title | lock screen notifications settings card": {
     "Lock Screen": ""
   },
   "greeter finish button": {
-    "Finish": ""
+    "Finish": "Terminar"
   },
   "greeter first page button": {
-    "Get Started": ""
+    "Get Started": "Comenzar"
   },
   "greeter keybinds niri description": {
     "niri shortcuts config": ""
   },
   "greeter keybinds section header": {
-    "DMS Shortcuts": ""
+    "DMS Shortcuts": "Atajos de DMS"
   },
   "greeter modal window title": {
     "Welcome": ""
@@ -5886,39 +5931,39 @@
     "No DMS shortcuts configured": ""
   },
   "greeter notifications description": {
-    "Popup behavior, position": ""
+    "Popup behavior, position": "Comportamiento y posición de las notificaciones emergentes"
   },
   "greeter settings link": {
-    "Displays": "",
-    "Dock": "",
-    "Keybinds": "",
+    "Displays": "Monitores",
+    "Dock": "Dock",
+    "Keybinds": "Atajos de teclado",
     "Notifications": "",
     "Theme & Colors": "",
     "Wallpaper": ""
   },
   "greeter settings section header": {
-    "Configure": ""
+    "Configure": "Configurar"
   },
   "greeter skip button": {
-    "Skip": ""
+    "Skip": "Pasar"
   },
   "greeter skip button tooltip": {
     "Skip setup": ""
   },
   "greeter theme description": {
-    "Dynamic colors, presets": ""
+    "Dynamic colors, presets": "Colores y esquemas dinámicos"
   },
   "greeter themes link": {
     "Themes": ""
   },
   "greeter wallpaper description": {
-    "Background image": ""
+    "Background image": "Imagen de fondo"
   },
   "greeter welcome page section header": {
-    "Features": ""
+    "Features": "Funciones"
   },
   "greeter welcome page tagline": {
-    "A modern desktop shell for Wayland compositors": ""
+    "A modern desktop shell for Wayland compositors": "Un shell de escritorio moderno para compositores Wayland"
   },
   "greeter welcome page title": {
     "Welcome to DankMaterialShell": ""
@@ -5963,20 +6008,20 @@
     "Loading...": "Cargando..."
   },
   "lock screen notification mode option": {
-    "App Names": "",
-    "Count Only": "",
-    "Disabled": "",
-    "Full Content": ""
+    "App Names": "Nombre de la aplicación",
+    "Count Only": "Solo la cantidad",
+    "Disabled": "Desactivado",
+    "Full Content": "Contenido completo"
   },
   "lock screen notification mode option | notification rule match field option": {
     "App Names": ""
   },
   "lock screen notification privacy setting": {
-    "Control what notification information is shown on the lock screen": "",
+    "Control what notification information is shown on the lock screen": "Controla cuánta información de las notificaciones se muestra en la pantalla de bloqueo",
     "Notification Display": ""
   },
   "lock screen notifications settings card": {
-    "Lock Screen": ""
+    "Lock Screen": "Pantalla de bloqueo"
   },
   "loginctl not available - lock integration requires DMS socket connection": {
     "loginctl not available - lock integration requires DMS socket connection": "loginctl no disponible - integración requiere conexión al socket DMS"
@@ -6044,45 +6089,45 @@
     "No wallpaper selected": "No hay papel pintado seleccionado"
   },
   "notification center tab": {
-    "Current": "",
-    "History": ""
+    "Current": "Actuales",
+    "History": "Historial"
   },
   "notification history filter": {
-    "All": "",
-    "Last hour": "",
-    "Today": "",
-    "Yesterday": ""
+    "All": "Todas",
+    "Last hour": "Última hora",
+    "Today": "Hoy",
+    "Yesterday": "Ayer"
   },
   "notification history filter for content older than other filters": {
-    "Older": ""
+    "Older": "Más antiguas"
   },
   "notification history filter | notification history retention option": {
-    "30 days": "",
-    "7 days": ""
+    "30 days": "30 días",
+    "7 days": "7 días"
   },
   "notification history limit": {
-    "Maximum number of notifications to keep": ""
+    "Maximum number of notifications to keep": "Número máximo de notificaciones que se conservarán"
   },
   "notification history retention option": {
-    "1 day": "",
-    "14 days": "",
-    "3 days": "",
-    "Forever": ""
+    "1 day": "1 día",
+    "14 days": "14 días",
+    "3 days": "3 días",
+    "Forever": "Siempre"
   },
   "notification history retention settings label": {
-    "History Retention": ""
+    "History Retention": "Preservación del historial"
   },
   "notification history setting": {
-    "Auto-delete notifications older than this": "",
-    "Save critical priority notifications to history": "",
-    "Save low priority notifications to history": "",
-    "Save normal priority notifications to history": ""
+    "Auto-delete notifications older than this": "Eliminar automáticamente las notificaciones más antiguas",
+    "Save critical priority notifications to history": "Guardar en el historial las notificaciones de prioridad crítica",
+    "Save low priority notifications to history": "Guardar en el historial las notificaciones de prioridad baja",
+    "Save normal priority notifications to history": "Guardar en el historial las notificaciones de prioridad normal"
   },
   "notification history toggle description": {
-    "Save dismissed notifications to history": ""
+    "Save dismissed notifications to history": "Guardar en el historial las notificaciones ignoradas"
   },
   "notification history toggle label": {
-    "Enable History": ""
+    "Enable History": "Activar historial"
   },
   "notification privacy mode placeholder": {
     "Message Content": ""
@@ -6112,7 +6157,7 @@
     "Normal Priority": ""
   },
   "now": {
-    "now": ""
+    "now": "ahora"
   },
   "official": {
     "official": "oficial"
@@ -6392,7 +6437,7 @@
     "wtype not available - install wtype for paste support": "wtype no disponible - instala wtype para soporte de pegado"
   },
   "yesterday": {
-    "yesterday": ""
+    "yesterday": "ayer"
   },
   "• Install only from trusted sources": {
     "• Install only from trusted sources": "• Instalar solo desde fuentes confiables"

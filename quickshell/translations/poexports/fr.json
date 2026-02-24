@@ -105,10 +105,10 @@
     "2 minutes": "2 minutes"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 secondes"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 minutes"
   },
   "24-Hour Format": {
     "24-Hour Format": "Format 24 Heures"
@@ -117,7 +117,7 @@
     "24-hour format": "Format 24 heures"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250ms"
   },
   "270°": {
     "270°": "270°"
@@ -126,7 +126,7 @@
     "3 days": "3 jours"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 minutes"
   },
   "3 seconds": {
     "3 seconds": "3 secondes"
@@ -141,7 +141,7 @@
     "3rd party": "tiers"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 secondes"
   },
   "5 minutes": {
     "5 minutes": "5 minutes"
@@ -150,13 +150,13 @@
     "5 seconds": "5 secondes"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500ms"
   },
   "7 days": {
     "7 days": "7 jours"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750ms"
   },
   "8 seconds": {
     "8 seconds": "8 secondes"
@@ -770,7 +770,7 @@
     "Caps Lock Indicator": "Indicateur Verr. Maj."
   },
   "Caps Lock is on": {
-    "Caps Lock is on": ""
+    "Caps Lock is on": "Verr Maj est activé"
   },
   "Center Section": {
     "Center Section": "Partie centrale"
@@ -1418,7 +1418,7 @@
     "Description": "Description"
   },
   "Desktop": {
-    "Desktop": ""
+    "Desktop": "Bureau"
   },
   "Desktop Clock": {
     "Desktop Clock": "Horloge du bureau"
@@ -1592,7 +1592,7 @@
     "Docs": "Documentation"
   },
   "Documents": {
-    "Documents": ""
+    "Documents": "Documents"
   },
   "Domain (optional)": {
     "Domain (optional)": "Domaine (optionnel)"
@@ -1607,7 +1607,7 @@
     "Door Open": "Porte ouverte"
   },
   "Downloads": {
-    "Downloads": ""
+    "Downloads": "Téléchargements"
   },
   "Drag to Reorder": {
     "Drag to Reorder": "Glisser pour réorganiser"
@@ -2087,7 +2087,13 @@
     "Focused Window": "Fenêtre active"
   },
   "Fog": {
-    "Fog": ""
+    "Fog": "Brouillard"
+  },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Suivre le focus de l’écran"
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "Icône"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Taille d'icônes"
@@ -2819,10 +2828,10 @@
     "Light Mode": "Mode Clair"
   },
   "Light Rain": {
-    "Light Rain": ""
+    "Light Rain": "Pluie légère"
   },
   "Light Snow": {
-    "Light Snow": ""
+    "Light Snow": "Neige légère"
   },
   "Light Snow Showers": {
     "Light Snow Showers": ""
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "Détection de maximisation"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Taille maximale d’entrée"
   },
@@ -3173,7 +3188,7 @@
     "Moving to Paused": "Mise en pause en cours"
   },
   "Music": {
-    "Music": ""
+    "Music": "Musique"
   },
   "Mute popups for %1": {
     "Mute popups for %1": "Popup en sourdine pour %1"
@@ -3363,6 +3378,9 @@
   },
   "No files found": {
     "No files found": "Aucun fichier trouvé"
+  },
+  "No folders found": {
+    "No folders found": ""
   },
   "No hidden apps.": {
     "No hidden apps.": "Aucune appli masquée."
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": "Ouvrir dans le navigateur"
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Ouvrir la barre de recherche pour trouver du texte"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "Supprimer"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Supprimer les marges et bordures lorsque les fenêtres sont maximisées"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Enregistrer le fichier"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Enregistrer et basculer entre les configurations d’affichage"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Échelle des polices de la barre indépendamment"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Échelle de toutes les polices dans le shell"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Science"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "Partage d'écran"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "Déclencheur : %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "Essayez une recherche différente"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Sans titre"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "Mettre à jour"
@@ -5350,7 +5389,7 @@
     "Vibrant palette with playful saturation.": "Palette vibrante avec saturation ludique."
   },
   "Videos": {
-    "Videos": ""
+    "Videos": "Vidéos"
   },
   "View Mode": {
     "View Mode": "Mode d’affichage"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "Appareil Wi-Fi"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "Wi-Fi désactivé"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "événements"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "GPU inconnu"
@@ -6118,22 +6163,22 @@
     "official": "officiel"
   },
   "on Hyprland": {
-    "on Hyprland": ""
+    "on Hyprland": "sur Hyprland"
   },
   "on MangoWC": {
-    "on MangoWC": ""
+    "on MangoWC": "sur MangoWC"
   },
   "on Miracle WM": {
-    "on Miracle WM": ""
+    "on Miracle WM": "sur Miracle WM"
   },
   "on Niri": {
-    "on Niri": ""
+    "on Niri": "sur Niri"
   },
   "on Scroll": {
-    "on Scroll": ""
+    "on Scroll": "sur Scroll"
   },
   "on Sway": {
-    "on Sway": ""
+    "on Sway": "sur Sway"
   },
   "open": {
     "open": "ouvrir"
@@ -6186,7 +6231,7 @@
     "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
   },
   "qt theme env error title": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "Variables d'environnement manquantes"
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "Les paramètres sont en lecture seule. Les modifications ne seront pas conservées."
@@ -6246,7 +6291,7 @@
     "Load Average": "Charge moyenne"
   },
   "theme auto mode tab": {
-    "Location": ""
+    "Location": "Localisation"
   },
   "theme auto mode tab | wallpaper cycling mode tab": {
     "Time": ""
@@ -6292,7 +6337,7 @@
     "Unknown": "Inconnu"
   },
   "up": {
-    "up": ""
+    "up": "allumé"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "Mettre à jour DMS pour l'intégration NM."
@@ -6331,29 +6376,29 @@
     "Tile V": "Tuile V"
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "1 heure",
+    "1 hour 30 minutes": "1 heure et 30 minutes",
+    "1 minute": "1 minute",
+    "10 seconds": "10 secondes",
+    "12 hours": "12 heures",
+    "15 minutes": "15 minutes",
+    "15 seconds": "15 secondes",
+    "2 hours": "2 heures",
+    "20 seconds": "20 secondes",
+    "25 seconds": "25 secondes",
+    "3 hours": "3 heures",
+    "30 minutes": "30 minutes",
+    "30 seconds": "30 secondes",
+    "35 seconds": "35 secondes",
+    "4 hours": "4 heures",
+    "40 seconds": "40 secondes",
+    "45 seconds": "45 secondes",
+    "5 minutes": "5 minutes",
+    "5 seconds": "5 secondes",
+    "50 seconds": "50 secondes",
+    "55 seconds": "55 secondes",
+    "6 hours": "6 heures",
+    "8 hours": "8 heures"
   },
   "wallpaper not set label": {
     "Not set": ""
@@ -6434,6 +6479,6 @@
     "• yyyy - Year (2024)": "• yyyy - Année (2024)"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: Nav • Espace: Étendre • Entrée: Action/Étendre • E: Texte"
   }
 }

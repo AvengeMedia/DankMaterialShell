@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": ""
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "跟隨螢幕焦點"
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "圖示"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "圖示大小"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "最大化偵測"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "單一項目最大大小"
   },
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "沒有找到"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": "沒有隱藏的應用程式。"
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": "在瀏覽器中開啟"
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "打開搜尋欄尋找文本"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "刪除"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "視窗最大化時移除間距與邊框"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "儲存記事本"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "儲存並切換顯示設定"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "獨立縮放 DankBar 字體大小"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "縮放整個 Shell 中的所有字體大小"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "科學"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "螢幕分享"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "觸發條件：%1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "嘗試不同的搜尋"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "無標題"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "更新"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "WiFi 裝置"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "關閉 WiFi"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "活動"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "未知 GPU"

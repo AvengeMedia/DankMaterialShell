@@ -105,10 +105,10 @@
     "2 minutes": "2 דקות"
   },
   "2 seconds": {
-    "2 seconds": ""
+    "2 seconds": "2 שניות"
   },
   "20 minutes": {
-    "20 minutes": ""
+    "20 minutes": "20 דקות"
   },
   "24-Hour Format": {
     "24-Hour Format": "תבנית 24 שעות"
@@ -117,7 +117,7 @@
     "24-hour format": "תבנית 24 שעות"
   },
   "250 ms": {
-    "250 ms": ""
+    "250 ms": "250 ms"
   },
   "270°": {
     "270°": "270°"
@@ -126,7 +126,7 @@
     "3 days": "3 ימים"
   },
   "3 minutes": {
-    "3 minutes": ""
+    "3 minutes": "3 דקות"
   },
   "3 seconds": {
     "3 seconds": "3 שניות"
@@ -141,7 +141,7 @@
     "3rd party": "צד שלישי"
   },
   "4 seconds": {
-    "4 seconds": ""
+    "4 seconds": "4 שניות"
   },
   "5 minutes": {
     "5 minutes": "5 דקות"
@@ -150,13 +150,13 @@
     "5 seconds": "5 שניות"
   },
   "500 ms": {
-    "500 ms": ""
+    "500 ms": "500 מילישניות"
   },
   "7 days": {
     "7 days": "7 ימים"
   },
   "750 ms": {
-    "750 ms": ""
+    "750 ms": "750 מילישניות"
   },
   "8 seconds": {
     "8 seconds": "8 שניות"
@@ -171,7 +171,7 @@
     "A file with this name already exists. Do you want to overwrite it?": "קיים כבר קובץ עם השם זה. האם ברצונך לדרוס אותו?"
   },
   "AC Power": {
-    "AC Power": ""
+    "AC Power": "חשמל AC"
   },
   "API": {
     "API": "API"
@@ -770,7 +770,7 @@
     "Caps Lock Indicator": "מחוון Caps Lock"
   },
   "Caps Lock is on": {
-    "Caps Lock is on": ""
+    "Caps Lock is on": "Caps Lock פעיל"
   },
   "Center Section": {
     "Center Section": "קטע אמצעי"
@@ -863,7 +863,7 @@
     "Clear History?": "לנקות את ההיסטוריה?"
   },
   "Clear Sky": {
-    "Clear Sky": ""
+    "Clear Sky": "שמיים בהירים"
   },
   "Clear all history when server starts": {
     "Clear all history when server starts": "נקה/י את כל ההיסטוריה כאשר השרת מופעל"
@@ -1418,7 +1418,7 @@
     "Description": "תיאור"
   },
   "Desktop": {
-    "Desktop": ""
+    "Desktop": "שולחן העבודה"
   },
   "Desktop Clock": {
     "Desktop Clock": "שעון לשולחן העבודה"
@@ -1592,7 +1592,7 @@
     "Docs": "דוקיומנטציה"
   },
   "Documents": {
-    "Documents": ""
+    "Documents": "מסמכים"
   },
   "Domain (optional)": {
     "Domain (optional)": "דומיין (לא חובה)"
@@ -1607,7 +1607,7 @@
     "Door Open": "דלת פתוחה"
   },
   "Downloads": {
-    "Downloads": ""
+    "Downloads": "הורדות"
   },
   "Drag to Reorder": {
     "Drag to Reorder": "גרור/גררי לסידור מחדש"
@@ -1622,7 +1622,7 @@
     "Driver": "מנהל התקן"
   },
   "Drizzle": {
-    "Drizzle": ""
+    "Drizzle": "טפטוף"
   },
   "Duplicate": {
     "Duplicate": "שכפל/י"
@@ -2087,7 +2087,13 @@
     "Focused Window": "חלון ממוקד"
   },
   "Fog": {
-    "Fog": ""
+    "Fog": "ערפל"
+  },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
   },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "מעקב אחרי המסך הממוקד"
@@ -2153,7 +2159,7 @@
     "Free VRAM/memory when the launcher is closed. May cause a slight delay when reopening.": "שחרר/י VRAM/זיכרון כאשר המשגר נסגר. עלול לגרום לעיכוב קל בפתיחה מחדש."
   },
   "Freezing Drizzle": {
-    "Freezing Drizzle": ""
+    "Freezing Drizzle": "טפטוף קפוא"
   },
   "Frequency": {
     "Frequency": "תדירות"
@@ -2261,13 +2267,13 @@
     "Health": "בריאות"
   },
   "Heavy Rain": {
-    "Heavy Rain": ""
+    "Heavy Rain": "גשם כבד"
   },
   "Heavy Snow": {
-    "Heavy Snow": ""
+    "Heavy Snow": "שלג כבד"
   },
   "Heavy Snow Showers": {
-    "Heavy Snow Showers": ""
+    "Heavy Snow Showers": "מקלחות שלג כבדות"
   },
   "Height": {
     "Height": "גובה"
@@ -2369,7 +2375,7 @@
     "Hold to confirm (%1s)": "החזק/י לחוץ כדי לאשר (%1 שניות)"
   },
   "Home": {
-    "Home": ""
+    "Home": "בית"
   },
   "Hot Corners": {
     "Hot Corners": "פינות חמות"
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "סמל"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "גודל סמל"
@@ -2819,13 +2828,13 @@
     "Light Mode": "מצב בהיר"
   },
   "Light Rain": {
-    "Light Rain": ""
+    "Light Rain": "גשם קל"
   },
   "Light Snow": {
-    "Light Snow": ""
+    "Light Snow": "שלג קל"
   },
   "Light Snow Showers": {
-    "Light Snow Showers": ""
+    "Light Snow Showers": "מקלחות שלג קלות"
   },
   "Linear": {
     "Linear": "ליניארי"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "זיהוי הגדלה של החלון"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "גודל רשומה מקסימלי"
   },
@@ -3173,7 +3188,7 @@
     "Moving to Paused": "עובר להשהיה"
   },
   "Music": {
-    "Music": ""
+    "Music": "מוסיקה"
   },
   "Mute popups for %1": {
     "Mute popups for %1": "השתק/י חלונות קופצים עבור %1"
@@ -3363,6 +3378,9 @@
   },
   "No files found": {
     "No files found": "לא נמצאו קבצים"
+  },
+  "No folders found": {
+    "No folders found": ""
   },
   "No hidden apps.": {
     "No hidden apps.": "אין אפליקציות מוסתרות."
@@ -3556,6 +3574,9 @@
   "Open in Browser": {
     "Open in Browser": "פתח/י בדפדפן"
   },
+  "Open in terminal": {
+    "Open in terminal": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "פתח/י שורת חיפוש כדי למצוא טקסט"
   },
@@ -3593,7 +3614,7 @@
     "Outputs Include Missing": "קובץ includes של פלטי תצוגה חסר"
   },
   "Overcast": {
-    "Overcast": ""
+    "Overcast": "מעונן"
   },
   "Overflow": {
     "Overflow": "גלישה"
@@ -3653,7 +3674,7 @@
     "Pairing...": "מתאים..."
   },
   "Partly Cloudy": {
-    "Partly Cloudy": ""
+    "Partly Cloudy": "מעונן חלקית"
   },
   "Passkey:": {
     "Passkey:": "מפתח גישה:"
@@ -3763,7 +3784,7 @@
     "Unavailable": "לא זמין"
   },
   "Pictures": {
-    "Pictures": ""
+    "Pictures": "תמונות"
   },
   "Pin": {
     "Pin": "הצמד/י"
@@ -3991,7 +4012,7 @@
     "Protocol": "פרוטוקול"
   },
   "Quick Access": {
-    "Quick Access": ""
+    "Quick Access": "גישה מהירה"
   },
   "Quick access to application launcher": {
     "Quick access to application launcher": "גישה מהירה למשגר האפליקציות"
@@ -4012,7 +4033,7 @@
     "Radius": "רדיוס"
   },
   "Rain": {
-    "Rain": ""
+    "Rain": "גשם"
   },
   "Rain Chance": {
     "Rain Chance": "סיכוי לגשם"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "הסר/י"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "הסר/י רווחים ומסגרת כאשר חלונות ממוקסמים"
   },
@@ -4081,7 +4105,7 @@
     "Requires DMS %1": "DMS %1 נדרש"
   },
   "Requires DWL compositor": {
-    "Requires DWL compositor": "דורש קומפוזיטור DWL"
+    "Requires DWL compositor": "קומפוזיטור DWL נדרש"
   },
   "Requires night mode support": {
     "Requires night mode support": "תמיכה במצב לילה נדרשת"
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "שמור/י פתק כקובץ"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "שמור/שמרי והחלף/החליפי בין תצורות תצוגה"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "שנה/י את גודל הגופנים של DankBar באופן עצמאי"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "שנה/י קנה מידה של כל גדלי הגופנים בכל המעטפת"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "מדע"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "שיתוף מסך"
@@ -4510,7 +4543,7 @@
     "Show Log Out": "הצג/י התנתקות"
   },
   "Show Material Design ripple animations on interactive elements": {
-    "Show Material Design ripple animations on interactive elements": "הצג/י אנימציות של אדוות Material Design על רכיבים אינטראקטיביים"
+    "Show Material Design ripple animations on interactive elements": "הצג/י אנימציות של אדוות בעיצוב Material על גבי רכיבים אינטראקטיביים"
   },
   "Show Memory": {
     "Show Memory": "הצג/י זיכרון"
@@ -4714,7 +4747,7 @@
     "Snap": "הצמד/י"
   },
   "Snow": {
-    "Snow": ""
+    "Snow": "שלג"
   },
   "Some plugins require a newer version of DMS:": {
     "Some plugins require a newer version of DMS:": "תוספים מסוימים דורשים גרסה חדשה יותר של DMS:"
@@ -4813,7 +4846,7 @@
     "Suspend system after": "העבר/י את המערכת למצב השהיה לאחר"
   },
   "Suspend then Hibernate": {
-    "Suspend then Hibernate": ""
+    "Suspend then Hibernate": "השהיה ואחריה שינה עמוקה"
   },
   "Swap": {
     "Swap": "זיכרון החלפה (Swap)"
@@ -4930,7 +4963,7 @@
     "Third-Party Plugin Warning": "אזהרת תוסף צד שלישי"
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": {
-    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "תוספי צד שלישי נוצרו על ידי הקהילה ואינם נתמכים רשמית על ידי DankMaterialShell.\n\nתוספים אלה עלולים להוות סיכוני אבטחה ופרטיות - התקן/י על אחריותך."
+    "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\n\nThese plugins may pose security and privacy risks - install at your own risk.": "תוספי צד שלישי נוצרו על ידי הקהילה ואינם נתמכים רשמית על ידי DankMaterialShell.\n\nתוספים אלה עלולים להוות סיכוני אבטחה ופרטיות - התקן/י על אחריותך בלבד."
   },
   "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": {
     "Third-party plugins are created by the community and are not officially supported by DankMaterialShell.\\n\\nThese plugins may pose security and privacy risks - install at your own risk.": "תוספי צד שלישי נוצרים על ידי הקהילה ואינם נתמכים רשמית על ידי DankMaterialShell.\\n\\nתוספים אלה עלולים להוות סיכון אבטחה ופרטיות – התקן/י אותם על אחריותך בלבד."
@@ -4954,10 +4987,10 @@
     "This will permanently remove this saved clipboard item. This action cannot be undone.": "זה יסיר לצמיתות את פריט לוח ההעתקה השמור הזה. לא ניתן לבטל פעולה זו."
   },
   "Thunderstorm": {
-    "Thunderstorm": ""
+    "Thunderstorm": "סערת ברקים"
   },
   "Thunderstorm with Hail": {
-    "Thunderstorm with Hail": ""
+    "Thunderstorm with Hail": "סערת ברקים עם ברד"
   },
   "Tiled": {
     "Tiled": "באריחים"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "מפעיל: %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "נסה/י חיפוש אחר"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "ללא כותרת"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "עדכן/י"
@@ -5350,7 +5389,7 @@
     "Vibrant palette with playful saturation.": "פלטת צבעים עשירה עם רוויה משחקית."
   },
   "Videos": {
-    "Videos": ""
+    "Videos": "סרטונים"
   },
   "View Mode": {
     "View Mode": "מצב תצוגה"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "התקן WiFi"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi מושבת"
@@ -5622,7 +5664,7 @@
     "Thickness": "עובי"
   },
   "brandon": {
-    "brandon": ""
+    "brandon": "brandon"
   },
   "browse themes button | theme browser header | theme browser window title": {
     "Browse Themes": "עיין/י בערכות נושא"
@@ -5668,7 +5710,7 @@
     "Click to select a custom theme JSON file": "לחץ/י כדי לבחור קובץ JSON של ערכת נושא מותאמת אישית"
   },
   "dark mode wallpaper color picker title": {
-    "Choose Dark Mode Color": ""
+    "Choose Dark Mode Color": "בחר/י צבע למצב כהה"
   },
   "dark mode wallpaper file browser title | light mode wallpaper file browser title | wallpaper file browser title": {
     "Select Wallpaper": "בחר/י רקע"
@@ -5683,13 +5725,13 @@
     "Month Date": "חודש תאריך",
     "Numeric (D/M)": "מספרי (D/M)",
     "Numeric (M/D)": "מספרי (M/D)",
-    "System Default": "ברירת מחדל מערכת"
+    "System Default": "ברירת מחדל של המערכת"
   },
   "days": {
     "days": "ימים"
   },
   "default monitor label suffix": {
-    "(Default)": ""
+    "(Default)": "(ברירת מחדל)"
   },
   "dgop not available": {
     "dgop not available": "dgop אינו זמין"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "אירועים"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "GPU לא ידוע"
@@ -5957,7 +6002,7 @@
     "leave empty for default": "השאר/י ריק לברירת מחדל"
   },
   "light mode wallpaper color picker title": {
-    "Choose Light Mode Color": ""
+    "Choose Light Mode Color": "בחר/י צבע למצב בהיר"
   },
   "loading indicator": {
     "Loading...": "טוען..."
@@ -6019,7 +6064,7 @@
     "nav": "ניווט"
   },
   "neovim template description": {
-    "Requires lazy plugin manager": ""
+    "Requires lazy plugin manager": "מנהל התוספים 'lazy' נדרש"
   },
   "network status": {
     "Connected": "מחובר",
@@ -6035,7 +6080,7 @@
     "No custom theme file": "אין קובץ ערכת נושא מותאמת אישית"
   },
   "no monitors available label": {
-    "No monitors": ""
+    "No monitors": "אין מסכים"
   },
   "no registry themes installed hint": {
     "No themes installed. Browse themes to install from the registry.": "אין ערכות נושא מותקנות. עיין/י בערכות נושא להתקנה מהמאגר."
@@ -6118,22 +6163,22 @@
     "official": "רשמי"
   },
   "on Hyprland": {
-    "on Hyprland": ""
+    "on Hyprland": "על Hyprland"
   },
   "on MangoWC": {
-    "on MangoWC": ""
+    "on MangoWC": "על MangoWC"
   },
   "on Miracle WM": {
-    "on Miracle WM": ""
+    "on Miracle WM": "על Miracle WM"
   },
   "on Niri": {
-    "on Niri": ""
+    "on Niri": "על Niri"
   },
   "on Scroll": {
-    "on Scroll": ""
+    "on Scroll": "על Scroll"
   },
   "on Sway": {
-    "on Sway": ""
+    "on Sway": "על Sway"
   },
   "open": {
     "open": "פתח/י"
@@ -6183,10 +6228,10 @@
     "Select Profile Image": "בחר/י תמונת פרופיל"
   },
   "qt theme env error body": {
-    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": ""
+    "You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.": "עליך להגדיר את אחד מהמשתנים הבאים:\nQT_QPA_PLATFORMTHEME=gtk3 או\nQT_QPA_PLATFORMTHEME=qt6ct\nכמשתני סביבה ולאחר מכן להפעיל מחדש את DMS.\n\n* qt6ct דורש התקנה של qt6ct-kde."
   },
   "qt theme env error title": {
-    "Missing Environment Variables": ""
+    "Missing Environment Variables": "משתני סביבה חסרים"
   },
   "read-only settings warning for NixOS home-manager users": {
     "Settings are read-only. Changes will not persist.": "ההגדרות הן לקריאה בלבד. שינויים לא יישמרו."
@@ -6246,10 +6291,10 @@
     "Load Average": "עומס ממוצע"
   },
   "theme auto mode tab": {
-    "Location": ""
+    "Location": "מיקום"
   },
   "theme auto mode tab | wallpaper cycling mode tab": {
-    "Time": ""
+    "Time": "זמן"
   },
   "theme browser description": {
     "Install color themes from the DMS theme registry": "התקן/י ערכות צבעים ממאגר ערכות הנושא של DMS"
@@ -6292,7 +6337,7 @@
     "Unknown": "לא ידוע"
   },
   "up": {
-    "up": ""
+    "up": "פועל"
   },
   "update dms for NM integration.": {
     "update dms for NM integration.": "עדכן/י את DMS כדי לאפשר אינטגרציה עם NM."
@@ -6307,10 +6352,10 @@
     "Requires %1": "גרסה %1 נדרשת"
   },
   "wallpaper color picker title": {
-    "Choose Wallpaper Color": ""
+    "Choose Wallpaper Color": "בחר/י צבע לרקע"
   },
   "wallpaper cycling mode tab": {
-    "Interval": ""
+    "Interval": "מרווח זמן"
   },
   "wallpaper directory file browser title": {
     "Select Wallpaper Directory": "בחר/י תיקיית רקעים"
@@ -6331,32 +6376,32 @@
     "Tile V": "אריח אנכי"
   },
   "wallpaper interval": {
-    "1 hour": "",
-    "1 hour 30 minutes": "",
-    "1 minute": "",
-    "10 seconds": "",
-    "12 hours": "",
-    "15 minutes": "",
-    "15 seconds": "",
-    "2 hours": "",
-    "20 seconds": "",
-    "25 seconds": "",
-    "3 hours": "",
-    "30 minutes": "",
-    "30 seconds": "",
-    "35 seconds": "",
-    "4 hours": "",
-    "40 seconds": "",
-    "45 seconds": "",
-    "5 minutes": "",
-    "5 seconds": "",
-    "50 seconds": "",
-    "55 seconds": "",
-    "6 hours": "",
-    "8 hours": ""
+    "1 hour": "שעה אחת",
+    "1 hour 30 minutes": "שעה וחצי (ו30 דקות)",
+    "1 minute": "דקה אחת",
+    "10 seconds": "10 שניות",
+    "12 hours": "12 שעות",
+    "15 minutes": "15 דקות",
+    "15 seconds": "15 שניות",
+    "2 hours": "2 שעות",
+    "20 seconds": "20 שניות",
+    "25 seconds": "25 שניות",
+    "3 hours": "3 שעות",
+    "30 minutes": "30 דקות",
+    "30 seconds": "30 שניות",
+    "35 seconds": "35 שניות",
+    "4 hours": "4 שעות",
+    "40 seconds": "40 שניות",
+    "45 seconds": "45 שניות",
+    "5 minutes": "5 דקות",
+    "5 seconds": "5 שניות",
+    "50 seconds": "50 שניות",
+    "55 seconds": "55 שניות",
+    "6 hours": "6 שעות",
+    "8 hours": "8 שעות"
   },
   "wallpaper not set label": {
-    "Not set": ""
+    "Not set": "לא מוגדר"
   },
   "wallpaper processing error": {
     "Wallpaper processing failed": "עיבוד תמונת הרקע נכשל"
@@ -6434,6 +6479,6 @@
     "• yyyy - Year (2024)": "• yyyy - שנה (2024)"
   },
   "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": {
-    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": ""
+    "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text": "↑/↓: ניווט • Space: הרחב • Enter: פעולה/הרחבה • E: טקסט"
   }
 }
