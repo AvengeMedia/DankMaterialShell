@@ -912,6 +912,56 @@ Item {
                 }
             }
 
+            SettingsSliderCard {
+                id: fontScaleSliderCard
+                iconName: "text_fields"
+                title: I18n.tr("Font Scale")
+                description: I18n.tr("Scale DankBar font sizes independently")
+                visible: selectedBarConfig?.enabled
+                minimum: 50
+                maximum: 200
+                value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
+                unit: "%"
+                defaultValue: 100
+                onSliderDragFinished: finalValue => {
+                    SettingsData.updateBarConfig(selectedBarId, {
+                        fontScale: finalValue / 100
+                    });
+                }
+
+                Binding {
+                    target: fontScaleSliderCard
+                    property: "value"
+                    value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
+                    restoreMode: Binding.RestoreBinding
+                }
+            }
+
+            SettingsSliderCard {
+                id: iconScaleSliderCard
+                iconName: "interests"
+                title: I18n.tr("Icon Scale")
+                description: I18n.tr("Scale DankBar icon sizes independently")
+                visible: selectedBarConfig?.enabled
+                minimum: 50
+                maximum: 200
+                value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
+                unit: "%"
+                defaultValue: 100
+                onSliderDragFinished: finalValue => {
+                    SettingsData.updateBarConfig(selectedBarId, {
+                        iconScale: finalValue / 100
+                    });
+                }
+
+                Binding {
+                    target: iconScaleSliderCard
+                    property: "value"
+                    value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
+                    restoreMode: Binding.RestoreBinding
+                }
+            }
+
             SettingsCard {
                 iconName: "opacity"
                 title: I18n.tr("Transparency")
@@ -960,56 +1010,6 @@ Item {
                         value: (selectedBarConfig?.widgetTransparency ?? 1.0) * 100
                         restoreMode: Binding.RestoreBinding
                     }
-                }
-            }
-
-            SettingsSliderCard {
-                id: fontScaleSliderCard
-                iconName: "text_fields"
-                title: I18n.tr("Font Scale")
-                description: I18n.tr("Scale DankBar font sizes independently")
-                visible: selectedBarConfig?.enabled
-                minimum: 50
-                maximum: 200
-                value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
-                unit: "%"
-                defaultValue: 100
-                onSliderDragFinished: finalValue => {
-                    SettingsData.updateBarConfig(selectedBarId, {
-                        fontScale: finalValue / 100
-                    });
-                }
-
-                Binding {
-                    target: fontScaleSliderCard
-                    property: "value"
-                    value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
-                    restoreMode: Binding.RestoreBinding
-                }
-            }
-
-            SettingsSliderCard {
-                id: iconScaleSliderCard
-                iconName: "interests"
-                title: I18n.tr("Icon Scale")
-                description: I18n.tr("Scale DankBar icon sizes independently")
-                visible: selectedBarConfig?.enabled
-                minimum: 50
-                maximum: 200
-                value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
-                unit: "%"
-                defaultValue: 100
-                onSliderDragFinished: finalValue => {
-                    SettingsData.updateBarConfig(selectedBarId, {
-                        iconScale: finalValue / 100
-                    });
-                }
-
-                Binding {
-                    target: iconScaleSliderCard
-                    property: "value"
-                    value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
-                    restoreMode: Binding.RestoreBinding
                 }
             }
 
