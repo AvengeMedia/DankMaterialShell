@@ -28,7 +28,33 @@ Item {
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
 
+    Timer {
+        id: horizontalBarChangeDebounce
+        interval: 500
+        repeat: false
+        onTriggered: {
+            const verticalBars = SettingsData.barConfigs.filter(cfg => {
+                const pos = cfg.position ?? SettingsData.Position.Top;
+                return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
+            });
+
+            verticalBars.forEach(bar => {
+                if (!bar.enabled)
+                    return;
+                SettingsData.updateBarConfig(bar.id, {
+                    enabled: false
+                });
+                Qt.callLater(() => SettingsData.updateBarConfig(bar.id, {
+                        enabled: true
+                    }));
+            });
+        }
+    }
+
     function notifyHorizontalBarChange() {
+        if (selectedBarIsVertical)
+            return;
+        horizontalBarChangeDebounce.restart();
     }
 
     function createNewBar() {
@@ -811,8 +837,7 @@ Item {
 
                 SettingsSliderRow {
                     id: widgetPaddingSlider
-                    text: I18n.tr("Widget Padding Base")
-                    description: I18n.tr("Material 3 Expressive padding")
+                    text: I18n.tr("Padding")
                     value: selectedBarConfig?.widgetPadding ?? 12
                     minimum: 0
                     maximum: 32
