@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
 )
@@ -187,6 +188,29 @@ func (m *Manager) Close() {
 	})
 }
 
+func (m *Manager) WatchLoginctl(lm *loginctl.Manager) {
+	ch := lm.Subscribe("thememode")
+	m.wg.Add(1)
+	go func() {
+		defer m.wg.Done()
+		defer lm.Unsubscribe("thememode")
+		for {
+			select {
+			case <-m.stopChan:
+				return
+			case state, ok := <-ch:
+				if !ok {
+					return
+				}
+				if state.PreparingForSleep {
+					continue
+				}
+				m.TriggerUpdate()
+			}
+		}
+	}()
+}
+
 func (m *Manager) schedulerLoop() {
 	defer m.wg.Done()
 
@@ -327,10 +351,12 @@ func statesEqual(a, b *State) bool {
 }
 
 func (m *Manager) computeSchedule(now time.Time, config Config) (bool, time.Time) {
-	if config.Mode == "location" {
+	switch config.Mode {
+	case "location":
 		return m.computeLocationSchedule(now, config)
+	default:
+		return computeTimeSchedule(now, config)
 	}
-	return computeTimeSchedule(now, config)
 }
 
 func computeTimeSchedule(now time.Time, config Config) (bool, time.Time) {
@@ -381,10 +407,10 @@ func (m *Manager) computeLocationSchedule(now time.Time, config Config) (bool, t
 	}
 
 	times, cond := wayland.CalculateSunTimesWithTwilight(*lat, *lon, now, config.ElevationTwilight, config.ElevationDaylight)
-	if cond != wayland.SunNormal {
-		if cond == wayland.SunMidnightSun {
-			return true, startOfNextDay(now)
-		}
+	switch cond {
+	case wayland.SunMidnightSun:
+		return true, startOfNextDay(now)
+	case wayland.SunPolarNight:
 		return false, startOfNextDay(now)
 	}
 
@@ -397,10 +423,10 @@ func (m *Manager) computeLocationSchedule(now time.Time, config Config) (bool, t
 
 	nextDay := startOfNextDay(now)
 	nextTimes, nextCond := wayland.CalculateSunTimesWithTwilight(*lat, *lon, nextDay, config.ElevationTwilight, config.ElevationDaylight)
-	if nextCond != wayland.SunNormal {
-		if nextCond == wayland.SunMidnightSun {
-			return true, startOfNextDay(nextDay)
-		}
+	switch nextCond {
+	case wayland.SunMidnightSun:
+		return true, startOfNextDay(nextDay)
+	case wayland.SunPolarNight:
 		return false, startOfNextDay(nextDay)
 	}
 
@@ -413,13 +439,7 @@ func startOfNextDay(t time.Time) time.Time {
 }
 
 func validateHourMinute(hour, minute int) bool {
-	if hour < 0 || hour > 23 {
-		return false
-	}
-	if minute < 0 || minute > 59 {
-		return false
-	}
-	return true
+	return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59
 }
 
 func (m *Manager) ValidateSchedule(startHour, startMinute, endHour, endMinute int) error {

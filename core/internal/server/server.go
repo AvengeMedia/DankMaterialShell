@@ -1599,6 +1599,13 @@ func Start(printDocs bool) error {
 		log.Warnf("Theme mode manager unavailable: %v", err)
 	} else {
 		notifyCapabilityChange()
+		go func() {
+			<-loginctlReady
+			if loginctlManager == nil {
+				return
+			}
+			themeModeManager.WatchLoginctl(loginctlManager)
+		}()
 	}
 
 	fatalErrChan := make(chan error, 1)
