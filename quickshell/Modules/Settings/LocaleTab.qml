@@ -42,6 +42,7 @@ Item {
                     text: I18n.tr("Current Locale")
                     description: I18n.tr("Change the locale used by the DMS interface.")
                     options: Object.keys(I18n.presentLocales).map(root.capitalizeNativeLanguageName)
+                    enableFuzzySearch: true
 
                     Component.onCompleted: {
                         currentValue = root.capitalizeNativeLanguageName(SettingsData.locale);
