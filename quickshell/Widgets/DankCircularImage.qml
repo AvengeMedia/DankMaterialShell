@@ -65,11 +65,17 @@ Rectangle {
     Connections {
         target: probe
         function onStatusChanged() {
-            if (probe.status !== Image.Ready)
-                return;
-            if (probe.frameCount <= 1) {
+            switch (probe.status) {
+            case Image.Ready:
+                if (probe.frameCount <= 1) {
+                    staticImage.source = root.imageSource;
+                    probe.source = "";
+                }
+                break;
+            case Image.Error:
                 staticImage.source = root.imageSource;
                 probe.source = "";
+                break;
             }
         }
     }
