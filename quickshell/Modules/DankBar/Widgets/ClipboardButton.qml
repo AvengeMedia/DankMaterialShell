@@ -87,7 +87,7 @@ BasePill {
                 id: icon
                 anchors.centerIn: parent
                 name: "content_paste"
-                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.noBackground)
+                size: Theme.barIconSize(root.barThickness, -4, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                 color: Theme.widgetIconColor
             }
         }

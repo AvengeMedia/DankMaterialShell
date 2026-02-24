@@ -23,7 +23,7 @@ StyledRect {
     property int defaultValue: -1
 
     signal sliderValueChanged(int newValue)
-
+    signal sliderDragFinished(int finalValue)
     width: parent?.width ?? 0
     height: Theme.spacingL * 2 + contentColumn.height
     radius: Theme.cornerRadius
@@ -89,6 +89,7 @@ StyledRect {
                 onClicked: {
                     slider.value = root.defaultValue;
                     root.sliderValueChanged(root.defaultValue);
+                    root.sliderDragFinished(root.defaultValue);
                 }
             }
         }
@@ -101,6 +102,7 @@ StyledRect {
             wheelEnabled: false
             thumbOutlineColor: Theme.surfaceContainerHigh
             onSliderValueChanged: newValue => root.sliderValueChanged(newValue)
+            onSliderDragFinished: finalValue => root.sliderDragFinished(finalValue)
         }
     }
 }

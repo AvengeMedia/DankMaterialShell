@@ -1169,21 +1169,23 @@ Singleton {
         return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) < 0.5;
     }
 
-    function barIconSize(barThickness, offset, noBackground) {
+    function barIconSize(barThickness, offset, maximizeIcon, iconScale) {
         const defaultOffset = offset !== undefined ? offset : -6;
-        const size = (noBackground ?? false) ? iconSizeLarge : iconSize;
+        const size = (maximizeIcon ?? false) ? iconSizeLarge : iconSize;
+        const s = iconScale !== undefined ? iconScale : 1.0;
 
-        return Math.round((barThickness / 48) * (size + defaultOffset));
+        return Math.round((barThickness / 48) * (size + defaultOffset) * s);
     }
 
-    function barTextSize(barThickness, fontScale) {
+    function barTextSize(barThickness, fontScale, maximizeText) {
         const scale = barThickness / 48;
         const dankBarScale = fontScale !== undefined ? fontScale : 1.0;
+        const maxScale = (maximizeText ?? false) ? 1.5 : 1.0;
         if (scale <= 0.75)
-            return Math.round(fontSizeSmall * 0.9 * dankBarScale);
+            return Math.round(fontSizeSmall * 0.9 * dankBarScale * maxScale);
         if (scale >= 1.25)
-            return Math.round(fontSizeMedium * dankBarScale);
-        return Math.round(fontSizeSmall * dankBarScale);
+            return Math.round(fontSizeMedium * dankBarScale * maxScale);
+        return Math.round(fontSizeSmall * dankBarScale * maxScale);
     }
 
     function getBatteryIcon(level, isCharging, batteryAvailable) {

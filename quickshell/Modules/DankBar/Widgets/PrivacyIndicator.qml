@@ -184,7 +184,7 @@ BasePill {
             id: tooltipText
             anchors.centerIn: parent
             text: PrivacyService.getPrivacySummary()
-            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale)
+            font.pixelSize: Theme.barTextSize(barThickness, barConfig?.fontScale, barConfig?.maximizeWidgetText)
             color: Theme.widgetTextColor
         }
 
