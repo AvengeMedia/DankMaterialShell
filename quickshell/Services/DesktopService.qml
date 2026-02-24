@@ -85,6 +85,7 @@ Singleton {
             }
         }
 
+        return "";
         })();
 
         _cache[moddedAppId] = result;
