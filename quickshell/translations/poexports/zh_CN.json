@@ -24,10 +24,10 @@
     "%1 days ago": "%1天之前"
   },
   "%1 disconnected": {
-    "%1 disconnected": ""
+    "%1 disconnected": "%1已断开连接"
   },
   "%1 disconnected (hidden)": {
-    "%1 disconnected (hidden)": ""
+    "%1 disconnected (hidden)": "%1已断开连接（隐藏）"
   },
   "%1 display(s)": {
     "%1 display(s)": "%1 显示"
@@ -36,7 +36,7 @@
     "%1 exists but is not included in config. Custom keybinds will not work until this is fixed.": "%1存在但并未被包含至配置文件。在此问题修复前，自定义快捷键绑定将不会生效。"
   },
   "%1 exists but is not included. Window rules won't apply.": {
-    "%1 exists but is not included. Window rules won't apply.": ""
+    "%1 exists but is not included. Window rules won't apply.": "%1已存在但未被包含。窗口规则将不会生效。"
   },
   "%1 is now included in config": {
     "%1 is now included in config": "%1现在已被包含至配置文件"
@@ -246,7 +246,7 @@
     "Add Printer": "添加打印机"
   },
   "Add Title": {
-    "Add Title": ""
+    "Add Title": "添加标题"
   },
   "Add Widget": {
     "Add Widget": "添加部件"
@@ -339,7 +339,7 @@
     "App ID Substitutions": "应用ID替换"
   },
   "App ID regex (e.g. ^firefox$)": {
-    "App ID regex (e.g. ^firefox$)": ""
+    "App ID regex (e.g. ^firefox$)": "应用ID正则（比如^firefox$）"
   },
   "App Launcher": {
     "App Launcher": "启动器"
@@ -617,10 +617,10 @@
     "Bit Depth": "位深"
   },
   "Block Out": {
-    "Block Out": ""
+    "Block Out": "封锁"
   },
   "Block Out From": {
-    "Block Out From": ""
+    "Block Out From": "从此处封锁"
   },
   "Block notifications": {
     "Block notifications": "屏蔽通知"
@@ -665,7 +665,7 @@
     "Border Thickness": "边框厚度"
   },
   "Border with BG": {
-    "Border with BG": ""
+    "Border with BG": "带BG的边框"
   },
   "Bottom": {
     "Bottom": "底部"
@@ -845,7 +845,7 @@
     "Cipher": "密码"
   },
   "Class regex (e.g. ^firefox$)": {
-    "Class regex (e.g. ^firefox$)": ""
+    "Class regex (e.g. ^firefox$)": "窗口类型正则（比如^firefox$）"
   },
   "Clear": {
     "Clear": "清除"
@@ -875,7 +875,7 @@
     "Click 'Setup' to create %1 and add include to config.": "点击设置以创建%1并将其包含至配置文件。"
   },
   "Click 'Setup' to create %1 and add include to your compositor config.": {
-    "Click 'Setup' to create %1 and add include to your compositor config.": ""
+    "Click 'Setup' to create %1 and add include to your compositor config.": "点击设置以创建%1并添加包含文件至合成器配置文件。"
   },
   "Click 'Setup' to create cursor config and add include to your compositor config.": {
     "Click 'Setup' to create cursor config and add include to your compositor config.": "点击设置以创建光标配置，并导入至合成器配置文件。"
@@ -905,10 +905,10 @@
     "Click to capture": "点击以捕获"
   },
   "Clip": {
-    "Clip": ""
+    "Clip": "裁剪"
   },
   "Clip to Geometry": {
-    "Clip to Geometry": ""
+    "Clip to Geometry": "裁剪至几何形"
   },
   "Clipboard": {
     "Clipboard": "剪切板"
@@ -995,10 +995,10 @@
     "Column": "列"
   },
   "Column Display": {
-    "Column Display": ""
+    "Column Display": "列式显示"
   },
   "Column Width": {
-    "Column Width": ""
+    "Column Width": "列宽"
   },
   "Command": {
     "Command": "命令"
@@ -1025,7 +1025,7 @@
     "Compositor Settings": "合成器设置"
   },
   "Compositor not supported": {
-    "Compositor not supported": ""
+    "Compositor not supported": "合成器不支持"
   },
   "Config Format": {
     "Config Format": "配置格式"
@@ -1052,7 +1052,7 @@
     "Configure icons for named workspaces. Icons take priority over numbers when both are enabled.": "为已命名工作区配置图标。当数字和图标同时启用时，图标优先生效。"
   },
   "Configure match criteria and actions": {
-    "Configure match criteria and actions": ""
+    "Configure match criteria and actions": "配置文件匹配条件与动作"
   },
   "Configure which displays show \"%1": {
     "Configure which displays show \"%1\"": ""
@@ -1100,7 +1100,7 @@
     "Connecting...": "连接中..."
   },
   "Content copied": {
-    "Content copied": ""
+    "Content copied": "内容已复制"
   },
   "Contrast": {
     "Contrast": "对比度"
@@ -1148,7 +1148,7 @@
     "Copy": "复制"
   },
   "Copy Content": {
-    "Copy Content": ""
+    "Copy Content": "复制内容"
   },
   "Copy Full Command": {
     "Copy Full Command": "复制完整命令"
@@ -1187,7 +1187,7 @@
     "Cover Open": "打印机盖已打开"
   },
   "Create": {
-    "Create": ""
+    "Create": "创建"
   },
   "Create Dir": {
     "Create Dir": "创建目录"
@@ -1196,10 +1196,10 @@
     "Create Printer": "创建打印机"
   },
   "Create Window Rule": {
-    "Create Window Rule": ""
+    "Create Window Rule": "创建窗口规则"
   },
   "Create rule for:": {
-    "Create rule for:": ""
+    "Create rule for:": "为此创建规则："
   },
   "Create rules to mute, ignore, hide from history, or override notification priority.": {
     "Create rules to mute, ignore, hide from history, or override notification priority.": ""
@@ -1382,7 +1382,7 @@
     "Defaults": "复位"
   },
   "Define rules for window behavior. Saves to %1": {
-    "Define rules for window behavior. Saves to %1": ""
+    "Define rules for window behavior. Saves to %1": "定义窗口行为规则。保存至%1"
   },
   "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": {
     "Del: Clear • Shift+Del: Clear All • 1-9: Actions • F10: Help • Esc: Close": "Del: 清除 • Shift+Del: 清空 • 1-9: 操作 • F10: 帮助 • Esc: 关闭"
@@ -1505,7 +1505,7 @@
     "Dismiss": "忽略"
   },
   "Display": {
-    "Display": ""
+    "Display": "显示"
   },
   "Display Assignment": {
     "Display Assignment": "显示布局"
@@ -1514,7 +1514,7 @@
     "Display Name Format": "显示名称格式"
   },
   "Display Profiles": {
-    "Display Profiles": ""
+    "Display Profiles": "显示档案"
   },
   "Display Settings": {
     "Display Settings": "显示设置"
@@ -1562,7 +1562,7 @@
     "Displays": "显示"
   },
   "Displays count when overflow is active": {
-    "Displays count when overflow is active": ""
+    "Displays count when overflow is active": "当溢出激活时显示计数"
   },
   "Displays the active keyboard layout and allows switching": {
     "Displays the active keyboard layout and allows switching": "显示当前键盘布局并支持切换"
@@ -1643,7 +1643,7 @@
     "Dusk (Nautical Twilight)": "黄昏（航海暮光）"
   },
   "Dynamic Properties": {
-    "Dynamic Properties": ""
+    "Dynamic Properties": "动态属性"
   },
   "Edge Spacing": {
     "Edge Spacing": "边缘间距"
@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": ""
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "遵守显示器聚焦"
   },
@@ -2413,6 +2419,9 @@
   "Icon": {
     "Icon": "图标"
   },
+  "Icon Scale": {
+    "Icon Scale": ""
+  },
   "Icon Size": {
     "Icon Size": "图标大小"
   },
@@ -2551,7 +2560,7 @@
     "Clipboard sent": "已发送剪切板"
   },
   "KDE Connect clipboard action | Phone Connect clipboard action": {
-    "Clipboard sent": ""
+    "Clipboard sent": "剪切板已发送"
   },
   "KDE Connect clipboard tooltip": {
     "Send Clipboard": "发送剪切板"
@@ -2597,7 +2606,7 @@
     "No devices": "无设备"
   },
   "KDE Connect no devices status | bluetooth status": {
-    "No devices": ""
+    "No devices": "无设备"
   },
   "KDE Connect not paired status": {
     "Not paired": "未配对"
@@ -2704,7 +2713,7 @@
     "Unavailable": "不可用"
   },
   "KDE Connect unknown device status | battery status | power profile option | unknown author | widget status": {
-    "Unknown": ""
+    "Unknown": "未知"
   },
   "KDE Connect unknown device status | unknown author": {
     "Unknown": "未知"
@@ -2713,7 +2722,7 @@
     "Device unpaired": "设备已取消配对"
   },
   "KDE Connect unpair action | Phone Connect unpair action": {
-    "Device unpaired": ""
+    "Device unpaired": "设备已取消配对"
   },
   "KDE Connect unpair tooltip": {
     "Unpair": "取消配对"
@@ -3012,6 +3021,12 @@
   },
   "Maximize Detection": {
     "Maximize Detection": "最大化检测"
+  },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
   },
   "Maximum Entry Size": {
     "Maximum Entry Size": "最大尺寸"
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "未找到文件"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": "无已隐藏应用。"
   },
@@ -3556,6 +3574,9 @@
   "Open in Browser": {
     "Open in Browser": "在浏览器中打开"
   },
+  "Open in terminal": {
+    "Open in terminal": ""
+  },
   "Open search bar to find text": {
     "Open search bar to find text": "打开搜索栏以查找文本"
   },
@@ -3732,7 +3753,7 @@
     "No devices": ""
   },
   "Phone Connect pairing action": {
-    "Device paired": "",
+    "Device paired": "设备已配对",
     "Pairing request sent": ""
   },
   "Phone Connect pairing request notification": {
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "移除"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "当窗口最大化时移除间距和边框"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "保存便签"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": ""
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "独立调整 Dank Bar 字体缩放"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "缩放整个 shell 中的所有字体大小"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "科学"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "屏幕共享"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "触发器：%1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "尝试不同的搜索"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "无标题"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": ""
@@ -5431,6 +5470,9 @@
   "WiFi Device": {
     "WiFi Device": "WiFi 设备"
   },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
+  },
   "WiFi disabled": {
     "WiFi disabled": "Wi-Fi 已停用"
   },
@@ -5583,10 +5625,10 @@
     "apps": "应用程序"
   },
   "audio status": {
-    "Muted": "",
-    "No input device": "",
-    "No output device": "",
-    "Select device": ""
+    "Muted": "已静音",
+    "No input device": "无输入设备",
+    "No output device": "无输出设备",
+    "Select device": "选择设备"
   },
   "author attribution": {
     "by %1": "%1"
@@ -5598,19 +5640,19 @@
     "Charging": "充电",
     "Discharging": "放电",
     "Empty": "空白",
-    "Fully Charged": "",
-    "No Battery": "",
-    "Pending Charge": "",
-    "Pending Discharge": "",
-    "Plugged In": ""
+    "Fully Charged": "已充满",
+    "No Battery": "无电池",
+    "Pending Charge": "待充电",
+    "Pending Discharge": "待放电",
+    "Plugged In": "已接入"
   },
   "bluetooth status": {
     "Bluetooth": "蓝牙",
     "Connected Device": "已连接的设备",
-    "Enabled": "",
-    "No adapter": "",
-    "No adapters": "",
-    "Off": ""
+    "Enabled": "启用",
+    "No adapter": "无适配器",
+    "No adapters": "无适配器",
+    "Off": "关"
   },
   "bluetooth status | lock screen notification mode option": {
     "Disabled": "禁用"
@@ -5641,13 +5683,13 @@
     "Soothing pastel theme based on Catppuccin": "基于Catppuccin的舒缓且柔和的主题"
   },
   "color option | primary color | tile color option": {
-    "Primary": ""
+    "Primary": "首选"
   },
   "color option | secondary color | tile color option": {
-    "Secondary": ""
+    "Secondary": "次选"
   },
   "color option | shadow color option": {
-    "Surface": ""
+    "Surface": "表面"
   },
   "control center tile color setting description": {
     "Active tile background and icon color": "激活平铺背景与图标颜色"
@@ -5677,13 +5719,13 @@
     "Custom...": "自定义...",
     "Day Date": "日 日期",
     "Day Month Date": "日 月份 日期",
-    "Full Day & Month": "",
-    "Full with Year": "",
-    "ISO Date": "",
-    "Month Date": "",
-    "Numeric (D/M)": "",
-    "Numeric (M/D)": "",
-    "System Default": ""
+    "Full Day & Month": "日期与月份全写",
+    "Full with Year": "年份全写",
+    "ISO Date": "ISO日期",
+    "Month Date": "月份日期",
+    "Numeric (D/M)": "数字（D/M）",
+    "Numeric (M/D)": "数字（M/D）",
+    "System Default": "系统默认"
   },
   "days": {
     "days": "天"
@@ -5721,13 +5763,13 @@
   },
   "dock indicator style option": {
     "Circle": "圆形",
-    "Line": ""
+    "Line": "线条"
   },
   "dock position option": {
     "Bottom": "底部",
-    "Left": "",
-    "Right": "",
-    "Top": ""
+    "Left": "左侧",
+    "Right": "右侧",
+    "Top": "顶部"
   },
   "dynamic colors description": {
     "Dynamic colors from wallpaper": "自壁纸选取动态色"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "事件"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "未知的GPU"
@@ -5983,14 +6028,14 @@
   },
   "matugen color scheme option": {
     "Content": "内容",
-    "Expressive": "",
-    "Fidelity": "",
-    "Fruit Salad": "",
-    "Monochrome": "",
-    "Neutral": "",
-    "Rainbow": "",
-    "Tonal Spot": "",
-    "Vibrant": ""
+    "Expressive": "具有表现力的",
+    "Fidelity": "保真",
+    "Fruit Salad": "水果沙拉",
+    "Monochrome": "单色",
+    "Neutral": "中性",
+    "Rainbow": "彩虹",
+    "Tonal Spot": "音色斑点",
+    "Vibrant": "鲜艳"
   },
   "matugen error": {
     "matugen not found - install matugen package for dynamic theming": "未找到matugen - 请为动态主题安装matugen包"
@@ -6004,7 +6049,7 @@
   "media scroll wheel option": {
     "Change Song": "切换歌曲",
     "Change Volume": "切换音量",
-    "Nothing": ""
+    "Nothing": "无"
   },
   "minutes": {
     "minutes": "分钟"
@@ -6024,12 +6069,12 @@
   "network status": {
     "Connected": "",
     "Disabling WiFi...": "正在禁用WiFi...",
-    "Enabling WiFi...": "",
-    "Ethernet": "",
-    "Not connected": "",
-    "Please wait...": "",
-    "Select network": "",
-    "WiFi off": ""
+    "Enabling WiFi...": "正在启用WiFi...",
+    "Ethernet": "以太网",
+    "Not connected": "未连接",
+    "Please wait...": "请稍候...",
+    "Select network": "选择网络",
+    "WiFi off": "WiFi关闭"
   },
   "no custom theme file status": {
     "No custom theme file": "缺失自定义主题文件"
@@ -6159,13 +6204,13 @@
   "power profile description": {
     "Balance power and performance": "平衡与性能电源模式",
     "Custom power profile": "自定义电源配置",
-    "Extend battery life": "",
-    "Prioritize performance": ""
+    "Extend battery life": "延长电池寿命",
+    "Prioritize performance": "优先考虑性能"
   },
   "power profile option": {
     "Balanced": "平衡",
-    "Performance": "",
-    "Power Saver": ""
+    "Performance": "性能",
+    "Power Saver": "省电"
   },
   "primary color": {
     "Primary": "首选"
@@ -6198,11 +6243,11 @@
     "Bottom Center": "底部中间",
     "Bottom Left": "底部左侧",
     "Bottom Right": "底部右侧",
-    "Left Center": "",
-    "Right Center": "",
-    "Top Center": "",
-    "Top Left": "",
-    "Top Right": ""
+    "Left Center": "左侧中部",
+    "Right Center": "右侧中部",
+    "Top Center": "顶部中间",
+    "Top Left": "顶部左侧",
+    "Top Right": "顶部右侧"
   },
   "secondary color": {
     "Secondary": "次选"
@@ -6258,7 +6303,7 @@
     "Auto": "自动",
     "Browse": "浏览",
     "Custom": "自定义",
-    "Generic": ""
+    "Generic": "通用"
   },
   "theme installation confirmation": {
     "Install theme '%1' from the DMS registry?": "要从DMS注册表安装主题%1吗？"
@@ -6273,8 +6318,8 @@
     "this app": ""
   },
   "tile color option": {
-    "Primary Container": "",
-    "Surface Variant": ""
+    "Primary Container": "首选容器",
+    "Surface Variant": "表面变体"
   },
   "uninstall action button": {
     "Uninstall": "卸载"
@@ -6322,13 +6367,13 @@
     "Wallpaper Error": "壁纸错误"
   },
   "wallpaper fill mode": {
-    "Fill": "",
-    "Fit": "",
-    "Pad": "",
-    "Stretch": "",
-    "Tile": "",
-    "Tile H": "",
-    "Tile V": ""
+    "Fill": "填充",
+    "Fit": "适合",
+    "Pad": "覆盖",
+    "Stretch": "拉伸",
+    "Tile": "平铺",
+    "Tile H": "水平平铺",
+    "Tile V": "垂直平铺"
   },
   "wallpaper interval": {
     "1 hour": "",
@@ -6372,14 +6417,14 @@
   },
   "wallpaper transition option": {
     "Disc": "Disc",
-    "Fade": "",
-    "Iris Bloom": "",
-    "None": "",
-    "Pixelate": "",
-    "Portal": "",
-    "Random": "",
-    "Stripes": "",
-    "Wipe": ""
+    "Fade": "淡入淡出",
+    "Iris Bloom": "光圈绽放",
+    "None": "无",
+    "Pixelate": "像素化",
+    "Portal": "门户",
+    "Random": "随机",
+    "Stripes": "条纹",
+    "Wipe": "擦除"
   },
   "weather feels like temperature": {
     "Feels Like %1°": "体感 %1°"

@@ -2089,6 +2089,12 @@
   "Fog": {
     "Fog": "Nebbia"
   },
+  "Folder": {
+    "Folder": ""
+  },
+  "Folders": {
+    "Folders": ""
+  },
   "Follow Monitor Focus": {
     "Follow Monitor Focus": "Segui lo Schermo Attivo"
   },
@@ -2412,6 +2418,9 @@
   },
   "Icon": {
     "Icon": "Icona"
+  },
+  "Icon Scale": {
+    "Icon Scale": ""
   },
   "Icon Size": {
     "Icon Size": "Dimensione Icona"
@@ -3013,6 +3022,12 @@
   "Maximize Detection": {
     "Maximize Detection": "Rilevamento Finestra Massimizzata"
   },
+  "Maximize Widget Icons": {
+    "Maximize Widget Icons": ""
+  },
+  "Maximize Widget Text": {
+    "Maximize Widget Text": ""
+  },
   "Maximum Entry Size": {
     "Maximum Entry Size": "Dimensione Massima della Voce"
   },
@@ -3364,6 +3379,9 @@
   "No files found": {
     "No files found": "Nessun file trovato"
   },
+  "No folders found": {
+    "No folders found": ""
+  },
   "No hidden apps.": {
     "No hidden apps.": "Nessuna app nascosta."
   },
@@ -3555,6 +3573,9 @@
   },
   "Open in Browser": {
     "Open in Browser": "Apri nel Browser"
+  },
+  "Open in terminal": {
+    "Open in terminal": ""
   },
   "Open search bar to find text": {
     "Open search bar to find text": "Apri barra di ricerca per cercare testo"
@@ -4053,6 +4074,9 @@
   "Remove": {
     "Remove": "Rimuovi"
   },
+  "Remove Widget Padding": {
+    "Remove Widget Padding": ""
+  },
   "Remove gaps and border when windows are maximized": {
     "Remove gaps and border when windows are maximized": "Rimuovi spazi e bordo quando le finestre sono massimizzate"
   },
@@ -4203,6 +4227,9 @@
   "Save Notepad File": {
     "Save Notepad File": "Salva File Blocco Note"
   },
+  "Save QR Code": {
+    "Save QR Code": ""
+  },
   "Save and switch between display configurations": {
     "Save and switch between display configurations": "Salva e passa tra le configurazioni dello schermo"
   },
@@ -4230,6 +4257,9 @@
   "Scale DankBar font sizes independently": {
     "Scale DankBar font sizes independently": "Scala le dimensioni dei font della DankBar in modo indipendente"
   },
+  "Scale DankBar icon sizes independently": {
+    "Scale DankBar icon sizes independently": ""
+  },
   "Scale all font sizes throughout the shell": {
     "Scale all font sizes throughout the shell": "Ridimensiona tutte le dimensioni dei caratteri nell'intera shell"
   },
@@ -4244,6 +4274,9 @@
   },
   "Science": {
     "Science": "Scienza"
+  },
+  "Score": {
+    "Score": ""
   },
   "Screen Sharing": {
     "Screen Sharing": "Condivisione dello Schermo"
@@ -5076,6 +5109,9 @@
   "Trigger: %1": {
     "Trigger: %1": "Attivatore: %1"
   },
+  "Trust": {
+    "Trust": ""
+  },
   "Try a different search": {
     "Try a different search": "Prova una ricerca diversa"
   },
@@ -5171,6 +5207,9 @@
   },
   "Untitled": {
     "Untitled": "Senza Titolo"
+  },
+  "Untrust": {
+    "Untrust": ""
   },
   "Update": {
     "Update": "Aggiorna"
@@ -5430,6 +5469,9 @@
   },
   "WiFi Device": {
     "WiFi Device": "Dispositivo WiFi"
+  },
+  "WiFi QR code for ": {
+    "WiFi QR code for ": ""
   },
   "WiFi disabled": {
     "WiFi disabled": "WiFi disattivato"
@@ -5764,6 +5806,9 @@
   },
   "events": {
     "events": "eventi"
+  },
+  "ext": {
+    "ext": ""
   },
   "fallback gpu name": {
     "Unknown GPU": "GPU Sconosciuta"
