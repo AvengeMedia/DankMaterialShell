@@ -21,73 +21,82 @@ Item {
     property alias centerWidgetsModel: centerWidgetsModel
     property alias rightWidgetsModel: rightWidgetsModel
 
+    property string _leftWidgetsJson: {
+        root.barConfig;
+        const leftWidgets = root.barConfig?.leftWidgets || [];
+        const mapped = leftWidgets.map((w, index) => {
+            if (typeof w === "string") {
+                return {
+                    widgetId: w,
+                    id: w + "_" + index,
+                    enabled: true
+                };
+            } else {
+                const obj = Object.assign({}, w);
+                obj.widgetId = w.id || w.widgetId;
+                obj.id = (w.id || w.widgetId) + "_" + index;
+                obj.enabled = w.enabled !== false;
+                return obj;
+            }
+        });
+        return JSON.stringify(mapped);
+    }
+
+    property string _centerWidgetsJson: {
+        root.barConfig;
+        const centerWidgets = root.barConfig?.centerWidgets || [];
+        const mapped = centerWidgets.map((w, index) => {
+            if (typeof w === "string") {
+                return {
+                    widgetId: w,
+                    id: w + "_" + index,
+                    enabled: true
+                };
+            } else {
+                const obj = Object.assign({}, w);
+                obj.widgetId = w.id || w.widgetId;
+                obj.id = (w.id || w.widgetId) + "_" + index;
+                obj.enabled = w.enabled !== false;
+                return obj;
+            }
+        });
+        return JSON.stringify(mapped);
+    }
+
+    property string _rightWidgetsJson: {
+        root.barConfig;
+        const rightWidgets = root.barConfig?.rightWidgets || [];
+        const mapped = rightWidgets.map((w, index) => {
+            if (typeof w === "string") {
+                return {
+                    widgetId: w,
+                    id: w + "_" + index,
+                    enabled: true
+                };
+            } else {
+                const obj = Object.assign({}, w);
+                obj.widgetId = w.id || w.widgetId;
+                obj.id = (w.id || w.widgetId) + "_" + index;
+                obj.enabled = w.enabled !== false;
+                return obj;
+            }
+        });
+        return JSON.stringify(mapped);
+    }
+
     ScriptModel {
         id: leftWidgetsModel
-        values: {
-            root.barConfig;
-            const leftWidgets = root.barConfig?.leftWidgets || [];
-            return leftWidgets.map((w, index) => {
-                if (typeof w === "string") {
-                    return {
-                        widgetId: w,
-                        id: w + "_" + index,
-                        enabled: true
-                    };
-                } else {
-                    const obj = Object.assign({}, w);
-                    obj.widgetId = w.id || w.widgetId;
-                    obj.id = (w.id || w.widgetId) + "_" + index;
-                    obj.enabled = w.enabled !== false;
-                    return obj;
-                }
-            });
-        }
+        values: JSON.parse(root._leftWidgetsJson)
     }
 
     ScriptModel {
         id: centerWidgetsModel
-        values: {
-            root.barConfig;
-            const centerWidgets = root.barConfig?.centerWidgets || [];
-            return centerWidgets.map((w, index) => {
-                if (typeof w === "string") {
-                    return {
-                        widgetId: w,
-                        id: w + "_" + index,
-                        enabled: true
-                    };
-                } else {
-                    const obj = Object.assign({}, w);
-                    obj.widgetId = w.id || w.widgetId;
-                    obj.id = (w.id || w.widgetId) + "_" + index;
-                    obj.enabled = w.enabled !== false;
-                    return obj;
-                }
-            });
-        }
+        values: JSON.parse(root._centerWidgetsJson)
     }
 
     ScriptModel {
         id: rightWidgetsModel
-        values: {
-            root.barConfig;
-            const rightWidgets = root.barConfig?.rightWidgets || [];
-            return rightWidgets.map((w, index) => {
-                if (typeof w === "string") {
-                    return {
-                        widgetId: w,
-                        id: w + "_" + index,
-                        enabled: true
-                    };
-                } else {
-                    const obj = Object.assign({}, w);
-                    obj.widgetId = w.id || w.widgetId;
-                    obj.id = (w.id || w.widgetId) + "_" + index;
-                    obj.enabled = w.enabled !== false;
-                    return obj;
-                }
-            });
-        }
+        values: JSON.parse(root._rightWidgetsJson)
     }
 
     function triggerControlCenterOnFocusedScreen() {
