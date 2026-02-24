@@ -9,9 +9,6 @@ BasePill {
     id: root
 
     property bool isActive: false
-    property var popoutTarget: null
-    property var parentScreen: null
-    property Item windowRoot: (Window.window ? Window.window.contentItem : null)
     property bool isAutoHideBar: false
 
     signal clipboardClicked
