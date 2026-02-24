@@ -271,6 +271,7 @@ Item {
         sourceComponent: Component {
             DankDashPopout {
                 id: dankDashPopout
+                onPopoutClosed: PopoutService.unloadDankDash()
             }
         }
     }
@@ -290,8 +291,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.notificationCenterLoader = notificationCenterLoader;
+        }
+
         NotificationCenterPopout {
             id: notificationCenter
+            onPopoutClosed: PopoutService.unloadNotificationCenter()
 
             Component.onCompleted: {
                 PopoutService.notificationCenterPopout = notificationCenter;
@@ -315,10 +321,15 @@ Item {
         property var modalRef: colorPickerModal
         property LazyLoader powerModalLoaderRef: powerMenuModalLoader
 
+        Component.onCompleted: {
+            PopoutService.controlCenterLoader = controlCenterLoader;
+        }
+
         ControlCenterPopout {
             id: controlCenterPopout
             colorPickerModal: controlCenterLoader.modalRef
             powerMenuModalLoader: controlCenterLoader.powerModalLoaderRef
+            onPopoutClosed: PopoutService.unloadControlCenter()
 
             onLockRequested: {
                 lock.activate();
@@ -443,8 +454,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.batteryPopoutLoader = batteryPopoutLoader;
+        }
+
         BatteryPopout {
             id: batteryPopout
+            onPopoutClosed: PopoutService.unloadBattery()
 
             Component.onCompleted: {
                 PopoutService.batteryPopout = batteryPopout;
@@ -457,8 +473,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.layoutPopoutLoader = layoutPopoutLoader;
+        }
+
         DWLLayoutPopout {
             id: layoutPopout
+            onPopoutClosed: PopoutService.unloadLayoutPopout()
 
             Component.onCompleted: {
                 PopoutService.layoutPopout = layoutPopout;
@@ -471,8 +492,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.vpnPopoutLoader = vpnPopoutLoader;
+        }
+
         VpnPopout {
             id: vpnPopout
+            onPopoutClosed: PopoutService.unloadVpn()
 
             Component.onCompleted: {
                 PopoutService.vpnPopout = vpnPopout;
@@ -485,8 +511,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.processListPopoutLoader = processListPopoutLoader;
+        }
+
         ProcessListPopout {
             id: processListPopout
+            onPopoutClosed: PopoutService.unloadProcessListPopout()
 
             Component.onCompleted: {
                 PopoutService.processListPopout = processListPopout;
@@ -529,8 +560,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.appDrawerLoader = appDrawerLoader;
+        }
+
         AppDrawerPopout {
             id: appDrawerPopout
+            onPopoutClosed: PopoutService.unloadAppDrawer()
 
             Component.onCompleted: {
                 PopoutService.appDrawerPopout = appDrawerPopout;
@@ -562,8 +598,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.clipboardHistoryPopoutLoader = clipboardHistoryPopoutLoader;
+        }
+
         ClipboardHistoryPopout {
             id: clipboardHistoryPopout
+            onPopoutClosed: PopoutService.unloadClipboardHistoryPopout()
 
             Component.onCompleted: {
                 PopoutService.clipboardHistoryPopout = clipboardHistoryPopout;
@@ -738,8 +779,13 @@ Item {
 
         active: false
 
+        Component.onCompleted: {
+            PopoutService.systemUpdateLoader = systemUpdateLoader;
+        }
+
         SystemUpdatePopout {
             id: systemUpdatePopout
+            onPopoutClosed: PopoutService.unloadSystemUpdate()
 
             Component.onCompleted: {
                 PopoutService.systemUpdatePopout = systemUpdatePopout;
