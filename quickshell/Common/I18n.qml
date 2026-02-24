@@ -23,7 +23,6 @@ Singleton {
 
     readonly property alias folder: dir.folder
     property var presentLocales: ({ "en": Qt.locale("en") })
-    property string currentLocale: "en"
     property var translations: ({})
     property bool translationsLoaded: false
 
@@ -50,22 +49,22 @@ Singleton {
             try {
                 root.translations = JSON.parse(text());
                 root.translationsLoaded = true;
-                console.info(`I18n: Loaded translations for '${root.currentLocale}' ` + `(${Object.keys(root.translations).length} contexts)`);
+                console.info(`I18n: Loaded translations for '${SettingsData.locale}' (${Object.keys(root.translations).length} contexts)`);
             } catch (e) {
-                console.warn(`I18n: Error parsing '${root.currentLocale}':`, e, "- falling back to English");
+                console.warn(`I18n: Error parsing '${SettingsData.locale}':`, e, "- falling back to English");
                 root._fallbackToEnglish();
             }
         }
 
         onLoadFailed: error => {
-            console.warn(`I18n: Failed to load '${root.currentLocale}' (${error}), ` + "falling back to English");
+            console.warn(`I18n: Failed to load '${SettingsData.locale}' (${error}), ` + "falling back to English");
             root._fallbackToEnglish();
         }
     }
 
     // for replacing Qt.locale()
     function locale() {
-        return presentLocales[currentLocale];
+        return presentLocales[SettingsData.locale] ?? presentLocales["en"];
     }
 
     function _loadPresentLocales() {
@@ -85,7 +84,7 @@ Singleton {
         for (let i = 0; i < _candidates.length; i++) {
             const cand = _candidates[i];
             if (presentLocales[cand] !== undefined) {
-                _useLocale(cand, dir.folder + "/" + cand + ".json");
+                SettingsData.set("locale", cand);
                 return;
             }
         }
@@ -93,22 +92,18 @@ Singleton {
         _fallbackToEnglish();
     }
 
-    function _useLocale(localeTag, fileUrl) {
-        currentLocale = localeTag;
+    function useLocale(localeTag, fileUrl) {
         _selectedPath = fileUrl;
         translationsLoaded = false;
         translations = ({});
         console.info(`I18n: Using locale '${localeTag}' from ${fileUrl}`);
-        SettingsData.set("locale", currentLocale);
     }
 
     function _fallbackToEnglish() {
-        currentLocale = "en";
         _selectedPath = "";
         translationsLoaded = false;
         translations = ({});
         console.warn("I18n: Falling back to built-in English strings");
-        SettingsData.set("locale", currentLocale);
     }
 
     function tr(term, context) {

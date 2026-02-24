@@ -1124,13 +1124,18 @@ Singleton {
         Quickshell.execDetached(["sh", "-lc", script]);
     }
 
+    function updateLocale() {
+        I18n.useLocale(locale, locale.startsWith("en") ? "" : I18n.folder + "/" + locale + ".json");
+    }
+
     readonly property var _hooks: ({
             "applyStoredTheme": applyStoredTheme,
             "regenSystemThemes": regenSystemThemes,
             "updateCompositorLayout": updateCompositorLayout,
             "applyStoredIconTheme": applyStoredIconTheme,
             "updateBarConfigs": updateBarConfigs,
-            "updateCompositorCursor": updateCompositorCursor
+            "updateCompositorCursor": updateCompositorCursor,
+            "updateLocale": updateLocale,
         })
 
     function set(key, value) {
@@ -2634,6 +2639,7 @@ Singleton {
                 _hasLoaded = true;
                 applyStoredTheme();
                 updateCompositorCursor();
+                updateLocale();
             } catch (e) {
                 _parseError = true;
                 const msg = e.message;

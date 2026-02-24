@@ -44,13 +44,13 @@ Item {
                     options: Object.keys(I18n.presentLocales).map(root.capitalizeNativeLanguageName)
 
                     Component.onCompleted: {
-                        currentValue = root.capitalizeNativeLanguageName(I18n.currentLocale);
+                        currentValue = root.capitalizeNativeLanguageName(SettingsData.locale);
                     }
 
                     onValueChanged: value => {
                         for (let code of Object.keys(I18n.presentLocales)) {
                             if (root.capitalizeNativeLanguageName(code) === value) {
-                                I18n._useLocale(code, I18n.folder + "/" + code + ".json");
+                                SettingsData.set("locale", code);
                                 return;
                             }
                         }
