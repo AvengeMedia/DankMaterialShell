@@ -236,7 +236,14 @@ Item {
 
         parent: Overlay.overlay
         width: root.popupWidth === -1 ? undefined : (root.popupWidth > 0 ? root.popupWidth : (dropdown.width + root.popupWidthOffset))
-        height: Math.min(root.maxPopupHeight, (root.enableFuzzySearch ? 54 : 0) + Math.min(filteredOptions.length, 10) * 36 + 16)
+        height: {
+            let h = root.enableFuzzySearch ? 54 : 0;
+            if (root.options.length === 0 && root.emptyText !== "")
+                h += 32;
+            else
+                h += Math.min(filteredOptions.length, 10) * 36;
+            return Math.min(root.maxPopupHeight, h + 16);
+        }
         padding: 0
         modal: true
         dim: false
