@@ -35,7 +35,7 @@ Item {
                 iconName: "language"
 
                 SettingsDropdownRow {
-                    id: maxHistoryDropdown
+                    id: localeDropdown
                     tab: "locale"
                     tags: ["locale", "language", "country"]
                     settingKey: "locale"
