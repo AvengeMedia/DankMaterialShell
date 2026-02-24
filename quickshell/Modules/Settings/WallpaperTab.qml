@@ -401,19 +401,25 @@ Item {
                                 radius: Theme.cornerRadius
                                 color: Theme.surfaceVariant
 
-                                CachingImage {
+                                Image {
                                     anchors.fill: parent
                                     anchors.margins: 1
-                                    imagePath: {
-                                        var lightWallpaper = SessionData.wallpaperPathLight;
-                                        return (lightWallpaper !== "" && !lightWallpaper.startsWith("#")) ? lightWallpaper : "";
+                                    source: {
+                                        var wp = SessionData.wallpaperPathLight;
+                                        if (wp === "" || wp.startsWith("#"))
+                                            return "";
+                                        if (wp.startsWith("file://"))
+                                            wp = wp.substring(7);
+                                        return "file://" + wp.split('/').map(s => encodeURIComponent(s)).join('/');
                                     }
                                     fillMode: Image.PreserveAspectCrop
                                     visible: {
                                         var lightWallpaper = SessionData.wallpaperPathLight;
                                         return lightWallpaper !== "" && !lightWallpaper.startsWith("#");
                                     }
-                                    maxCacheSize: 160
+                                    sourceSize.width: 160
+                                    sourceSize.height: 160
+                                    asynchronous: true
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
                                         maskEnabled: true
@@ -585,19 +591,25 @@ Item {
                                 radius: Theme.cornerRadius
                                 color: Theme.surfaceVariant
 
-                                CachingImage {
+                                Image {
                                     anchors.fill: parent
                                     anchors.margins: 1
-                                    imagePath: {
-                                        var darkWallpaper = SessionData.wallpaperPathDark;
-                                        return (darkWallpaper !== "" && !darkWallpaper.startsWith("#")) ? darkWallpaper : "";
+                                    source: {
+                                        var wp = SessionData.wallpaperPathDark;
+                                        if (wp === "" || wp.startsWith("#"))
+                                            return "";
+                                        if (wp.startsWith("file://"))
+                                            wp = wp.substring(7);
+                                        return "file://" + wp.split('/').map(s => encodeURIComponent(s)).join('/');
                                     }
                                     fillMode: Image.PreserveAspectCrop
                                     visible: {
                                         var darkWallpaper = SessionData.wallpaperPathDark;
                                         return darkWallpaper !== "" && !darkWallpaper.startsWith("#");
                                     }
-                                    maxCacheSize: 160
+                                    sourceSize.width: 160
+                                    sourceSize.height: 160
+                                    asynchronous: true
                                     layer.enabled: true
                                     layer.effect: MultiEffect {
                                         maskEnabled: true
