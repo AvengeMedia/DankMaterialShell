@@ -13,14 +13,6 @@ Column {
     property string title: ""
     property string titleIcon: "widgets"
     property string sectionId: ""
-    property int highlightWidgetIndex: -1
-
-    function getDelegate(index) {
-        if (index >= 0 && index < itemsList.children.length - 1) { // -1 because repeaters might have an extra internal child or just being safe
-             return itemsList.children[index];
-        }
-        return null;
-    }
 
     DankTooltipV2 {
         id: sharedTooltip
@@ -77,51 +69,6 @@ Column {
             Layout.alignment: Qt.AlignVCenter
         }
 
-        Item {
-            height: 1
-            Layout.fillWidth: true
-        }
-
-        RowLayout {
-            spacing: Theme.spacingXS
-            Layout.alignment: Qt.AlignVCenter
-            visible: root.sectionId === "center"
-
-            DankActionButton {
-                id: indexCenterButton
-                buttonSize: 28
-                iconName: "format_list_numbered"
-                iconSize: 16
-                iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
-                onClicked: {
-                    console.log("Centering mode changed to: index");
-                    SettingsData.set("centeringMode", "index");
-                }
-                onEntered: {
-                    sharedTooltip.show("Index Centering", indexCenterButton, 0, 0, "bottom");
-                }
-                onExited: {
-                    sharedTooltip.hide();
-                }
-            }
-
-            DankActionButton {
-                id: geometricCenterButton
-                buttonSize: 28
-                iconName: "center_focus_weak"
-                iconSize: 16
-                iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
-                onClicked: {
-                    console.log("Centering mode changed to: geometric");
-                    SettingsData.set("centeringMode", "geometric");
-                }
-                onEntered: {
-                    sharedTooltip.show("Geometric Centering", geometricCenterButton, 0, 0, "bottom");
-                }
-                onExited: {
-                    sharedTooltip.hide();
-                }
-            }
         }
     }
 
@@ -142,26 +89,8 @@ Column {
 
                 width: itemsList.width
                 height: 70
-                z: (held || highlightWidgetIndex === index) ? 2 : 1
+                z: held ? 2 : 1
 
-                Rectangle {
-                    id: highlightOverlay
-                    anchors.fill: parent
-                    anchors.margins: 2
-                    radius: Theme.cornerRadius
-                    color: Theme.primary
-                    opacity: 0
-                    z: 10
-
-                    SequentialAnimation on opacity {
-                        id: flashAnim
-                        running: root.highlightWidgetIndex === index
-                        NumberAnimation { to: 0.3; duration: 400; easing.type: Easing.OutCubic }
-                        PauseAnimation { duration: 500 }
-                        NumberAnimation { to: 0; duration: 1000; easing.type: Easing.InCubic }
-                        onFinished: root.highlightWidgetIndex = -1
-                    }
-                }
 
                 Rectangle {
                     id: itemBackground

@@ -726,7 +726,6 @@ Item {
     }
 
     DankFlickable {
-        id: flickable
         anchors.fill: parent
         clip: true
         contentHeight: mainColumn.height + Theme.spacingXL
