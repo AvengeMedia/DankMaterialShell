@@ -402,6 +402,8 @@ Item {
             widgetObj.mountPath = "/";
         if (widgetId === "cpuUsage" || widgetId === "memUsage" || widgetId === "cpuTemp" || widgetId === "gpuTemp")
             widgetObj.minimumWidth = true;
+        if (widgetId === "memUsage")
+            widgetObj.showInGb = false;
 
         var widgets = getWidgetsForSection(targetSection).slice();
         widgets.push(widgetObj);
@@ -425,7 +427,7 @@ Item {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -536,6 +538,18 @@ Item {
         setWidgetsForSection(sectionId, widgets);
     }
 
+    function handleShowInGbChanged(sectionId, widgetIndex, enabled) {
+        var widgets = getWidgetsForSection(sectionId).slice();
+        if (widgetIndex < 0 || widgetIndex >= widgets.length) {
+            setWidgetsForSection(sectionId, widgets);
+            return;
+        }
+        var newWidget = cloneWidgetData(widgets[widgetIndex]);
+        newWidget.showInGb = enabled;
+        widgets[widgetIndex] = newWidget;
+        setWidgetsForSection(sectionId, widgets);
+    }
+
     function handleOverflowSettingChanged(sectionId, widgetIndex, settingName, value) {
         var widgets = getWidgetsForSection(sectionId).slice();
         if (widgetIndex < 0 || widgetIndex >= widgets.length) {
@@ -629,6 +643,8 @@ Item {
                     item.minimumWidth = widget.minimumWidth;
                 if (widget.showSwap !== undefined)
                     item.showSwap = widget.showSwap;
+                if (widget.showInGb !== undefined)
+                    item.showInGb = widget.showInGb;
                 if (widget.mediaSize !== undefined)
                     item.mediaSize = widget.mediaSize;
                 if (widget.clockCompactMode !== undefined)
@@ -925,6 +941,9 @@ Item {
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
                         }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
+                        }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
@@ -983,6 +1002,9 @@ Item {
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
                         }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
+                        }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
                         }
@@ -1040,6 +1062,9 @@ Item {
                         }
                         onShowSwapChanged: (sectionId, index, enabled) => {
                             widgetsTab.handleShowSwapChanged(sectionId, index, enabled);
+                        }
+                        onShowInGbChanged: (sectionId, index, enabled) => {
+                            widgetsTab.handleShowInGbChanged(sectionId, index, enabled);
                         }
                         onCompactModeChanged: (widgetId, value) => {
                             widgetsTab.handleCompactModeChanged(sectionId, widgetId, value);
