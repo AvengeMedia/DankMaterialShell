@@ -18,9 +18,43 @@ BasePill {
     readonly property real contentWidth: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
     readonly property real contentHeight: hasActivePrivacy ? (activeCount * 18 + (activeCount - 1) * Theme.spacingXS) : 0
 
-    visible: hasActivePrivacy
     opacity: hasActivePrivacy ? 1 : 0
-    enabled: hasActivePrivacy
+
+    states: [
+        State {
+            name: "hidden_horizontal"
+            when: !hasActivePrivacy && !isVerticalOrientation
+            PropertyChanges {
+                target: root
+                width: 0
+            }
+        },
+        State {
+            name: "hidden_vertical"
+            when: !hasActivePrivacy && isVerticalOrientation
+            PropertyChanges {
+                target: root
+                height: 0
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            NumberAnimation {
+                properties: "width,height"
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+    ]
+
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
 
     content: Component {
         Item {
@@ -35,7 +69,7 @@ BasePill {
                 Item {
                     width: 18
                     height: 18
-                    visible: PrivacyService.microphoneActive
+                    visible: root.showMicIcon || PrivacyService.microphoneActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     DankIcon {
@@ -47,8 +81,8 @@ BasePill {
                             return "mic";
                         }
                         size: Theme.iconSizeSmall
-                        color: Theme.error
-                        filled: true
+                        color: PrivacyService.microphoneActive ? Theme.error : Theme.surfaceText
+                        filled: PrivacyService.microphoneActive
                         anchors.centerIn: parent
                     }
                 }
@@ -56,14 +90,14 @@ BasePill {
                 Item {
                     width: 18
                     height: 18
-                    visible: PrivacyService.cameraActive
+                    visible: root.showCameraIcon || PrivacyService.cameraActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     DankIcon {
                         name: "camera_video"
                         size: Theme.iconSizeSmall
-                        color: Theme.widgetTextColor
-                        filled: true
+                        color: PrivacyService.cameraActive ? Theme.error : Theme.surfaceText
+                        filled: PrivacyService.cameraActive
                         anchors.centerIn: parent
                     }
 
@@ -76,20 +110,21 @@ BasePill {
                         anchors.top: parent.top
                         anchors.rightMargin: -2
                         anchors.topMargin: -1
+                        visible: PrivacyService.cameraActive
                     }
                 }
 
                 Item {
                     width: 18
                     height: 18
-                    visible: PrivacyService.screensharingActive
+                    visible: root.showScreenSharingIcon || PrivacyService.screensharingActive
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     DankIcon {
                         name: "screen_share"
                         size: Theme.iconSizeSmall
-                        color: Theme.warning
-                        filled: true
+                        color: PrivacyService.screensharingActive ? Theme.warning : Theme.surfaceText
+                        filled: PrivacyService.screensharingActive
                         anchors.centerIn: parent
                     }
                 }
@@ -116,7 +151,7 @@ BasePill {
                         }
                         size: Theme.iconSizeSmall
                         color: PrivacyService.microphoneActive ? Theme.error : Theme.surfaceText
-                        filled: true
+                        filled: PrivacyService.microphoneActive
                         anchors.centerIn: parent
                     }
                 }
@@ -131,7 +166,7 @@ BasePill {
                         name: "camera_video"
                         size: Theme.iconSizeSmall
                         color: PrivacyService.cameraActive ? Theme.error : Theme.surfaceText
-                        filled: true
+                        filled: PrivacyService.cameraActive
                         anchors.centerIn: parent
                     }
 
@@ -158,7 +193,7 @@ BasePill {
                         name: "screen_share"
                         size: Theme.iconSizeSmall
                         color: PrivacyService.screensharingActive ? Theme.warning : Theme.surfaceText
-                        filled: true
+                        filled: PrivacyService.screensharingActive
                         anchors.centerIn: parent
                     }
                 }
@@ -207,24 +242,6 @@ BasePill {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
-        }
-    }
-
-    Behavior on width {
-        enabled: hasActivePrivacy && visible && !isVerticalOrientation
-
-        NumberAnimation {
-            duration: Theme.mediumDuration
-            easing.type: Theme.emphasizedEasing
-        }
-    }
-
-    Behavior on height {
-        enabled: hasActivePrivacy && visible && isVerticalOrientation
-
-        NumberAnimation {
-            duration: Theme.mediumDuration
-            easing.type: Theme.emphasizedEasing
         }
     }
 }

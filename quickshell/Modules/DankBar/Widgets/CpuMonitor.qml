@@ -93,7 +93,7 @@ BasePill {
                     id: textBox
                     anchors.verticalCenter: parent.verticalCenter
 
-                    implicitWidth: root.minimumWidth ? Math.max(cpuBaseline.width, cpuText.paintedWidth) : cpuText.paintedWidth
+                    implicitWidth: root.minimumWidth ? Math.max(cpuBaseline.width, cpuCurrent.width) : cpuCurrent.width
                     implicitHeight: cpuText.implicitHeight
 
                     width: implicitWidth
@@ -103,6 +103,12 @@ BasePill {
                         id: cpuBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                         text: "88%"
+                    }
+
+                    StyledTextMetrics {
+                        id: cpuCurrent
+                        font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
+                        text: cpuText.text
                     }
 
                     StyledText {

@@ -85,12 +85,12 @@ Variants {
             }
 
             Component.onCompleted: {
+                if (typeof blurWallpaperWindow.updatesEnabled !== "undefined")
+                    blurWallpaperWindow.updatesEnabled = Qt.binding(() => root.effectActive || root._renderSettling || currentWallpaper.status === Image.Loading || nextWallpaper.status === Image.Loading);
+
                 if (!source) {
-                    isInitialized = true;
-                    return;
+                    root._renderSettling = false;
                 }
-                const formattedSource = source.startsWith("file://") ? source : encodeFileUrl(source);
-                setWallpaperImmediate(formattedSource);
                 isInitialized = true;
             }
 
@@ -98,7 +98,24 @@ Variants {
             property real transitionProgress: 0
             readonly property bool transitioning: transitionAnimation.running
             property bool effectActive: false
+            property bool _renderSettling: true
             property bool useNextForEffect: false
+
+            Connections {
+                target: currentWallpaper
+                function onStatusChanged() {
+                    if (currentWallpaper.status === Image.Ready) {
+                        root._renderSettling = true;
+                        renderSettleTimer.restart();
+                    }
+                }
+            }
+
+            Timer {
+                id: renderSettleTimer
+                interval: 100
+                onTriggered: root._renderSettling = false
+            }
 
             onSourceChanged: {
                 if (!source || source.startsWith("#")) {
@@ -124,6 +141,8 @@ Variants {
                 transitionAnimation.stop();
                 root.transitionProgress = 0.0;
                 root.effectActive = false;
+                root._renderSettling = true;
+                renderSettleTimer.restart();
                 currentWallpaper.source = newSource;
                 nextWallpaper.source = "";
             }

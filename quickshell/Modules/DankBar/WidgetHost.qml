@@ -29,11 +29,20 @@ Loader {
 
     readonly property bool orientationMatches: (axis?.isVertical ?? false) === isInColumn
 
+    readonly property bool widgetEnabled: widgetData?.enabled !== false
+
     active: orientationMatches && getWidgetVisible(widgetId, DgopService.dgopAvailable) && (widgetId !== "music" || MprisController.activePlayer !== null)
     sourceComponent: getWidgetComponent(widgetId, components)
-    opacity: getWidgetEnabled(widgetData?.enabled) ? 1 : 0
 
     signal contentItemReady(var item)
+
+    Binding {
+        target: root.item
+        when: root.item && !root.widgetEnabled
+        property: "visible"
+        value: false
+        restoreMode: Binding.RestoreBinding
+    }
 
     Binding {
         target: root.item
@@ -268,9 +277,5 @@ Loader {
         };
 
         return widgetVisibility[widgetId] ?? true;
-    }
-
-    function getWidgetEnabled(enabled) {
-        return enabled !== false;
     }
 }

@@ -30,6 +30,8 @@ Column {
     signal privacySettingChanged(string sectionId, int widgetIndex, string settingName, bool value)
     signal minimumWidthChanged(string sectionId, int widgetIndex, bool enabled)
     signal showSwapChanged(string sectionId, int widgetIndex, bool enabled)
+    signal showInGbChanged(string sectionId, int widgetIndex, bool enabled)
+    signal diskUsageModeChanged(string sectionId, int widgetIndex, int mode)
     signal overflowSettingChanged(string sectionId, int widgetIndex, string settingName, var value)
 
     function cloneWidgetData(widget) {
@@ -37,7 +39,7 @@ Column {
             "id": widget.id,
             "enabled": widget.enabled
         };
-        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "minimumWidth", "showSwap", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
+        var keys = ["size", "selectedGpuIndex", "pciId", "mountPath", "diskUsageMode", "minimumWidth", "showSwap", "showInGb", "mediaSize", "clockCompactMode", "focusedWindowCompactMode", "runningAppsCompactMode", "keyboardLayoutNameCompactMode", "runningAppsGroupByApp", "runningAppsCurrentWorkspace", "runningAppsCurrentMonitor", "showNetworkIcon", "showBluetoothIcon", "showAudioIcon", "showAudioPercent", "showVpnIcon", "showBrightnessIcon", "showBrightnessPercent", "showMicIcon", "showMicPercent", "showBatteryIcon", "showPrinterIcon", "showScreenSharingIcon", "barMaxVisibleApps", "barMaxVisibleRunningApps", "barShowOverflowBadge"];
         for (var i = 0; i < keys.length; i++) {
             if (widget[keys[i]] !== undefined)
                 result[keys[i]] = widget[keys[i]];
@@ -67,53 +69,6 @@ Column {
             color: Theme.surfaceText
             Layout.alignment: Qt.AlignVCenter
         }
-
-        Item {
-            height: 1
-            Layout.fillWidth: true
-        }
-
-        RowLayout {
-            spacing: Theme.spacingXS
-            Layout.alignment: Qt.AlignVCenter
-            visible: root.sectionId === "center"
-
-            DankActionButton {
-                id: indexCenterButton
-                buttonSize: 28
-                iconName: "format_list_numbered"
-                iconSize: 16
-                iconColor: SettingsData.centeringMode === "index" ? Theme.primary : Theme.outline
-                onClicked: {
-                    console.log("Centering mode changed to: index");
-                    SettingsData.set("centeringMode", "index");
-                }
-                onEntered: {
-                    sharedTooltip.show("Index Centering", indexCenterButton, 0, 0, "bottom");
-                }
-                onExited: {
-                    sharedTooltip.hide();
-                }
-            }
-
-            DankActionButton {
-                id: geometricCenterButton
-                buttonSize: 28
-                iconName: "center_focus_weak"
-                iconSize: 16
-                iconColor: SettingsData.centeringMode === "geometric" ? Theme.primary : Theme.outline
-                onClicked: {
-                    console.log("Centering mode changed to: geometric");
-                    SettingsData.set("centeringMode", "geometric");
-                }
-                onEntered: {
-                    sharedTooltip.show("Geometric Centering", geometricCenterButton, 0, 0, "bottom");
-                }
-                onExited: {
-                    sharedTooltip.hide();
-                }
-            }
-        }
     }
 
     Column {
@@ -134,6 +89,7 @@ Column {
                 width: itemsList.width
                 height: 70
                 z: held ? 2 : 1
+
 
                 Rectangle {
                     id: itemBackground
@@ -275,6 +231,34 @@ Column {
                             }
                         }
 
+                        DankActionButton {
+                            id: diskMenuButton
+                            visible: modelData.id === "diskUsage"
+                            buttonSize: 32
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
+                            onClicked: {
+                                diskUsageContextMenu.widgetData = modelData;
+                                diskUsageContextMenu.sectionId = root.sectionId;
+                                diskUsageContextMenu.widgetIndex = index;
+
+                                var buttonPos = diskMenuButton.mapToItem(root, 0, 0);
+                                var xPos = buttonPos.x - diskUsageContextMenu.width - Theme.spacingS;
+                                if (xPos < 0)
+                                    xPos = buttonPos.x + diskMenuButton.width + Theme.spacingS;
+                                var yPos = buttonPos.y - diskUsageContextMenu.height / 2 + diskMenuButton.height / 2;
+                                if (yPos < 0)
+                                    yPos = Theme.spacingS;
+                                else if (yPos + diskUsageContextMenu.height > root.height)
+                                    yPos = root.height - diskUsageContextMenu.height - Theme.spacingS;
+
+                                diskUsageContextMenu.x = xPos;
+                                diskUsageContextMenu.y = yPos;
+                                diskUsageContextMenu.open();
+                            }
+                        }
+
                         Item {
                             width: 32
                             height: 32
@@ -354,23 +338,36 @@ Column {
                         }
 
                         DankActionButton {
-                            id: showSwapButton
-                            buttonSize: 28
+                            id: memMenuButton
                             visible: modelData.id === "memUsage"
-                            iconName: "swap_horiz"
-                            iconSize: 16
-                            iconColor: (modelData.showSwap !== undefined ? modelData.showSwap : false) ? Theme.primary : Theme.outline
+                            buttonSize: 32
+                            iconName: "more_vert"
+                            iconSize: 18
+                            iconColor: Theme.outline
                             onClicked: {
-                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
-                                root.showSwapChanged(root.sectionId, index, !currentEnabled);
-                            }
-                            onEntered: {
-                                var currentEnabled = modelData.showSwap !== undefined ? modelData.showSwap : false;
-                                const tooltipText = currentEnabled ? "Hide Swap" : "Show Swap";
-                                sharedTooltip.show(tooltipText, showSwapButton, 0, 0, "bottom");
-                            }
-                            onExited: {
-                                sharedTooltip.hide();
+                                memUsageContextMenu.widgetData = modelData;
+                                memUsageContextMenu.sectionId = root.sectionId;
+                                memUsageContextMenu.widgetIndex = index;
+
+                                var buttonPos = memMenuButton.mapToItem(root, 0, 0);
+                                var popupWidth = memUsageContextMenu.width;
+                                var popupHeight = memUsageContextMenu.height;
+
+                                var xPos = buttonPos.x - popupWidth - Theme.spacingS;
+                                if (xPos < 0) {
+                                    xPos = buttonPos.x + memMenuButton.width + Theme.spacingS;
+                                }
+
+                                var yPos = buttonPos.y - popupHeight / 2 + memMenuButton.height / 2;
+                                if (yPos < 0) {
+                                    yPos = Theme.spacingS;
+                                } else if (yPos + popupHeight > root.height) {
+                                    yPos = root.height - popupHeight - Theme.spacingS;
+                                }
+
+                                memUsageContextMenu.x = xPos;
+                                memUsageContextMenu.y = yPos;
+                                memUsageContextMenu.open();
                             }
                         }
 
@@ -795,6 +792,257 @@ Column {
             ColorAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
+            }
+        }
+    }
+
+    Popup {
+        id: memUsageContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+
+        width: 200
+        height: 80
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: swapToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "swap_horiz"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show Swap")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: swapToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: memUsageContextMenu.widgetData?.showSwap ?? false
+                        onToggled: {
+                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: swapToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            swapToggle.checked = !swapToggle.checked;
+                            root.showSwapChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, swapToggle.checked);
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: gbToggleArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingS
+
+                        DankIcon {
+                            name: "straighten"
+                            size: 16
+                            color: Theme.surfaceText
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        StyledText {
+                            text: I18n.tr("Show in GB")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.surfaceText
+                            font.weight: Font.Normal
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    DankToggle {
+                        id: gbToggle
+                        anchors.right: parent.right
+                        anchors.rightMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 40
+                        height: 20
+                        checked: memUsageContextMenu.widgetData?.showInGb ?? false
+                        onToggled: {
+                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, toggled);
+                        }
+                    }
+
+                    MouseArea {
+                        id: gbToggleArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPressed: {
+                            gbToggle.checked = !gbToggle.checked;
+                            root.showInGbChanged(memUsageContextMenu.sectionId, memUsageContextMenu.widgetIndex, gbToggle.checked);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Popup {
+        id: diskUsageContextMenu
+
+        property var widgetData: null
+        property string sectionId: ""
+        property int widgetIndex: -1
+        readonly property var currentWidgetData: (widgetIndex >= 0 && widgetIndex < root.items.length) ? root.items[widgetIndex] : widgetData
+
+        width: 240
+        height: diskMenuColumn.implicitHeight + Theme.spacingS * 2
+        padding: 0
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        background: Rectangle {
+            color: Theme.surfaceContainer
+            radius: Theme.cornerRadius
+            border.color: Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.08)
+            border.width: 0
+        }
+
+        contentItem: Item {
+            Column {
+                id: diskMenuColumn
+                anchors.fill: parent
+                anchors.margins: Theme.spacingS
+                spacing: 2
+
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    radius: Theme.cornerRadius
+                    color: "transparent"
+
+                    StyledText {
+                        anchors.left: parent.left
+                        anchors.leftMargin: Theme.spacingS
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: I18n.tr("Disk Usage Display")
+                        font.pixelSize: Theme.fontSizeSmall
+                        font.weight: Font.Medium
+                        color: Theme.surfaceText
+                    }
+                }
+
+                Repeater {
+                    model: [
+                        { label: I18n.tr("Percentage"), mode: 0, icon: "percent" },
+                        { label: I18n.tr("Total"), mode: 1, icon: "storage" },
+                        { label: I18n.tr("Remaining"), mode: 2, icon: "hourglass_empty" },
+                        { label: I18n.tr("Remaining / Total"), mode: 3, icon: "pie_chart" }
+                    ]
+
+                    delegate: Rectangle {
+                        required property var modelData
+                        required property int index
+
+                        width: diskMenuColumn.width
+                        height: 32
+                        radius: Theme.cornerRadius
+                        color: diskOptionArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : "transparent"
+
+                        function isSelected() {
+                            return (diskUsageContextMenu.currentWidgetData?.diskUsageMode ?? 0) === modelData.mode;
+                        }
+
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.spacingS
+
+                            DankIcon {
+                                name: modelData.icon
+                                size: 16
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            StyledText {
+                                text: modelData.label
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: isSelected() ? Theme.primary : Theme.surfaceText
+                                font.weight: isSelected() ? Font.Medium : Font.Normal
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        DankIcon {
+                            anchors.right: parent.right
+                            anchors.rightMargin: Theme.spacingS
+                            anchors.verticalCenter: parent.verticalCenter
+                            name: "check"
+                            size: 16
+                            color: Theme.primary
+                            visible: isSelected()
+                        }
+
+                        MouseArea {
+                            id: diskOptionArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.diskUsageModeChanged(diskUsageContextMenu.sectionId, diskUsageContextMenu.widgetIndex, modelData.mode);
+                                diskUsageContextMenu.close();
+                            }
+                        }
+                    }
+                }
             }
         }
     }

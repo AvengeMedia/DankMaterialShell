@@ -9,6 +9,7 @@ BasePill {
 
     property var widgetData: null
     property string mountPath: (widgetData && widgetData.mountPath !== undefined) ? widgetData.mountPath : "/"
+    property int diskUsageMode: (widgetData && widgetData.diskUsageMode !== undefined) ? widgetData.diskUsageMode : 0
     property bool isHovered: mouseArea.containsMouse
     property bool isAutoHideBar: false
 
@@ -130,7 +131,13 @@ BasePill {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
                             return "--";
                         }
-                        return root.diskUsagePercent.toFixed(0);
+                        if (!root.selectedMount) return "--";
+                        switch (root.diskUsageMode) {
+                            case 1: return root.selectedMount.size || "--";
+                            case 2: return root.selectedMount.avail || "--";
+                            case 3: return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
+                            default: return root.diskUsagePercent.toFixed(0);
+                        }
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
@@ -178,7 +185,13 @@ BasePill {
                         if (root.diskUsagePercent === undefined || root.diskUsagePercent === null || root.diskUsagePercent === 0) {
                             return "--%";
                         }
-                        return root.diskUsagePercent.toFixed(0) + "%";
+                        if (!root.selectedMount) return "--%";
+                        switch (root.diskUsageMode) {
+                            case 1: return root.selectedMount.size || "--";
+                            case 2: return root.selectedMount.avail || "--";
+                            case 3: return (root.selectedMount.avail || "--") + " / " + (root.selectedMount.size || "--");
+                            default: return root.diskUsagePercent.toFixed(0) + "%";
+                        }
                     }
                     font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
                     color: Theme.widgetTextColor
@@ -189,7 +202,14 @@ BasePill {
                     StyledTextMetrics {
                         id: diskBaseline
                         font.pixelSize: Theme.barTextSize(root.barThickness, root.barConfig?.fontScale, root.barConfig?.maximizeWidgetText)
-                        text: "100%"
+                        text: {
+                            switch (root.diskUsageMode) {
+                                case 3: return "888.8G / 888.8G";
+                                case 1:
+                                case 2: return "888.8G";
+                                default: return "100%";
+                            }
+                        }
                     }
 
                     width: Math.max(diskBaseline.width, paintedWidth)

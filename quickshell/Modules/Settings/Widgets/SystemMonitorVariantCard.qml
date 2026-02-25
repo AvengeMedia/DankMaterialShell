@@ -216,6 +216,15 @@ Rectangle {
                 onToggled: checked => root.updateConfig("showMemoryGraph", checked)
             }
 
+            DankToggle {
+                width: parent.width - Theme.spacingM * 2
+                x: Theme.spacingM
+                text: I18n.tr("Show Memory in GB")
+                visible: root.cfg.showMemory
+                checked: root.cfg.showInGb ?? false
+                onToggled: checked => root.updateConfig("showInGb", checked)
+            }
+
             SettingsDivider {}
 
             DankToggle {

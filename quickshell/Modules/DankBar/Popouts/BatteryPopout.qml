@@ -167,9 +167,22 @@ DankPopout {
                     }
 
                     Column {
+                        id: headerInfoColumn
                         spacing: Theme.spacingXS
                         anchors.verticalCenter: parent.verticalCenter
                         width: parent.width - Theme.iconSizeLarge - 32 - Theme.spacingM * 2
+                        readonly property string timeInfoText: {
+                            if (!BatteryService.batteryAvailable)
+                                return "Power profile management available";
+                            const time = BatteryService.formatTimeRemaining();
+                            if (time !== "Unknown") {
+                                return BatteryService.isCharging ? `Time until full: ${time}` : `Time remaining: ${time}`;
+                            }
+                            return "";
+                        }
+                        readonly property bool showPowerRate: BatteryService.batteryAvailable && Math.abs(BatteryService.changeRate) > 0.05
+                        readonly property bool isOnAC: BatteryService.batteryAvailable && (BatteryService.isCharging || BatteryService.isPluggedIn)
+                        readonly property bool isDischarging: BatteryService.batteryAvailable && !BatteryService.isCharging && !BatteryService.isPluggedIn
 
                         Row {
                             spacing: Theme.spacingS
@@ -207,21 +220,35 @@ DankPopout {
                             }
                         }
 
-                        StyledText {
-                            text: {
-                                if (!BatteryService.batteryAvailable)
-                                    return "Power profile management available";
-                                const time = BatteryService.formatTimeRemaining();
-                                if (time !== "Unknown") {
-                                    return BatteryService.isCharging ? `Time until full: ${time}` : `Time remaining: ${time}`;
-                                }
-                                return "";
-                            }
-                            font.pixelSize: Theme.fontSizeSmall
-                            color: Theme.surfaceTextMedium
-                            visible: text.length > 0
-                            elide: Text.ElideRight
+                        Row {
                             width: parent.width
+                            spacing: Theme.spacingS
+                            visible: headerInfoColumn.timeInfoText.length > 0
+
+                            StyledText {
+                                id: powerRateText
+                                text: `${headerInfoColumn.isOnAC ? "+" : (headerInfoColumn.isDischarging ? "-" : "")}${Math.abs(BatteryService.changeRate).toFixed(1)}W`
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: {
+                                    if (headerInfoColumn.isOnAC) {
+                                        return Theme.primary;
+                                    }
+                                    if (headerInfoColumn.isDischarging) {
+                                        return Theme.warning;
+                                    }
+                                    return Theme.surfaceTextMedium;
+                                }
+                                font.weight: Font.Medium
+                                visible: headerInfoColumn.showPowerRate
+                            }
+
+                            StyledText {
+                                text: headerInfoColumn.timeInfoText
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.surfaceTextMedium
+                                elide: Text.ElideRight
+                                width: parent.width - (powerRateText.visible ? (powerRateText.implicitWidth + parent.spacing) : 0)
+                            }
                         }
                     }
 

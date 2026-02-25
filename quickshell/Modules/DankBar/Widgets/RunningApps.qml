@@ -241,14 +241,17 @@ BasePill {
                     property var toplevelData: isGrouped ? (modelData.windows.length > 0 ? modelData.windows[0].toplevel : null) : modelData
                     property bool isFocused: isGrouped ? (root.focusedAppId === appId) : (toplevelData ? toplevelData.activated : false)
                     property string appId: isGrouped ? modelData.appId : (modelData.appId || "")
+                    readonly property string effectiveAppId: {
+                        root._appIdSubstitutionsTrigger;
+                        return Paths.moddedAppId(appId);
+                    }
                     property string windowTitle: toplevelData ? (toplevelData.title || "(Unnamed)") : "(Unnamed)"
                     property var toplevelObject: toplevelData
                     property int windowCount: isGrouped ? modelData.windows.length : 1
                     property string tooltipText: {
                         root._desktopEntriesUpdateTrigger;
-                        const moddedId = Paths.moddedAppId(appId);
-                        const desktopEntry = moddedId ? DesktopEntries.heuristicLookup(moddedId) : null;
-                        const appName = appId ? Paths.getAppName(appId, desktopEntry) : "Unknown";
+                        const desktopEntry = effectiveAppId ? DesktopEntries.heuristicLookup(effectiveAppId) : null;
+                        const appName = effectiveAppId ? Paths.getAppName(effectiveAppId, desktopEntry) : "Unknown";
 
                         if (isGrouped && windowCount > 1) {
                             return appName + " (" + windowCount + " windows)";
@@ -284,11 +287,10 @@ BasePill {
                             source: {
                                 root._desktopEntriesUpdateTrigger;
                                 root._appIdSubstitutionsTrigger;
-                                if (!appId)
+                                if (!effectiveAppId)
                                     return "";
-                                const moddedId = Paths.moddedAppId(appId);
-                                const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
-                                return Paths.getAppIcon(appId, desktopEntry);
+                                const desktopEntry = DesktopEntries.heuristicLookup(effectiveAppId);
+                                return Paths.getAppIcon(effectiveAppId, desktopEntry);
                             }
                             smooth: true
                             mipmap: true
@@ -311,20 +313,18 @@ BasePill {
                             size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             name: "sports_esports"
                             color: Theme.widgetTextColor
-                            visible: !iconImg.visible && Paths.isSteamApp(appId)
+                            visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
                         }
 
                         Text {
                             anchors.centerIn: parent
-                            visible: !iconImg.visible && !Paths.isSteamApp(appId)
+                            visible: !iconImg.visible && !Paths.isSteamApp(effectiveAppId)
                             text: {
                                 root._desktopEntriesUpdateTrigger;
-                                if (!appId)
+                                if (!effectiveAppId)
                                     return "?";
-
-                                const moddedId = Paths.moddedAppId(appId);
-                                const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
-                                const appName = Paths.getAppName(appId, desktopEntry);
+                                const desktopEntry = DesktopEntries.heuristicLookup(effectiveAppId);
+                                const appName = Paths.getAppName(effectiveAppId, desktopEntry);
                                 return appName.charAt(0).toUpperCase();
                             }
                             font.pixelSize: 10
@@ -496,14 +496,17 @@ BasePill {
                     property var toplevelData: isGrouped ? (modelData.windows.length > 0 ? modelData.windows[0].toplevel : null) : modelData
                     property bool isFocused: isGrouped ? (root.focusedAppId === appId) : (toplevelData ? toplevelData.activated : false)
                     property string appId: isGrouped ? modelData.appId : (modelData.appId || "")
+                    readonly property string effectiveAppId: {
+                        root._appIdSubstitutionsTrigger;
+                        return Paths.moddedAppId(appId);
+                    }
                     property string windowTitle: toplevelData ? (toplevelData.title || "(Unnamed)") : "(Unnamed)"
                     property var toplevelObject: toplevelData
                     property int windowCount: isGrouped ? modelData.windows.length : 1
                     property string tooltipText: {
                         root._desktopEntriesUpdateTrigger;
-                        const moddedId = Paths.moddedAppId(appId);
-                        const desktopEntry = moddedId ? DesktopEntries.heuristicLookup(moddedId) : null;
-                        const appName = appId ? Paths.getAppName(appId, desktopEntry) : "Unknown";
+                        const desktopEntry = effectiveAppId ? DesktopEntries.heuristicLookup(effectiveAppId) : null;
+                        const appName = effectiveAppId ? Paths.getAppName(effectiveAppId, desktopEntry) : "Unknown";
 
                         if (isGrouped && windowCount > 1) {
                             return appName + " (" + windowCount + " windows)";
@@ -538,11 +541,10 @@ BasePill {
                             source: {
                                 root._desktopEntriesUpdateTrigger;
                                 root._appIdSubstitutionsTrigger;
-                                if (!appId)
+                                if (!effectiveAppId)
                                     return "";
-                                const moddedId = Paths.moddedAppId(appId);
-                                const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
-                                return Paths.getAppIcon(appId, desktopEntry);
+                                const desktopEntry = DesktopEntries.heuristicLookup(effectiveAppId);
+                                return Paths.getAppIcon(effectiveAppId, desktopEntry);
                             }
                             smooth: true
                             mipmap: true
@@ -565,20 +567,18 @@ BasePill {
                             size: Theme.barIconSize(root.barThickness, undefined, root.barConfig?.maximizeWidgetIcons, root.barConfig?.iconScale)
                             name: "sports_esports"
                             color: Theme.widgetTextColor
-                            visible: !iconImg.visible && Paths.isSteamApp(appId)
+                            visible: !iconImg.visible && Paths.isSteamApp(effectiveAppId)
                         }
 
                         Text {
                             anchors.centerIn: parent
-                            visible: !iconImg.visible && !Paths.isSteamApp(appId)
+                            visible: !iconImg.visible && !Paths.isSteamApp(effectiveAppId)
                             text: {
                                 root._desktopEntriesUpdateTrigger;
-                                if (!appId)
+                                if (!effectiveAppId)
                                     return "?";
-
-                                const moddedId = Paths.moddedAppId(appId);
-                                const desktopEntry = DesktopEntries.heuristicLookup(moddedId);
-                                const appName = Paths.getAppName(appId, desktopEntry);
+                                const desktopEntry = DesktopEntries.heuristicLookup(effectiveAppId);
+                                const appName = Paths.getAppName(effectiveAppId, desktopEntry);
                                 return appName.charAt(0).toUpperCase();
                             }
                             font.pixelSize: 10

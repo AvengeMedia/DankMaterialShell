@@ -158,7 +158,10 @@ Singleton {
                     continue;
                 const urg = typeof item.urgency === "number" ? item.urgency : 1;
                 const body = item.body || "";
-                const htmlBody = item.htmlBody || _resolveHtmlBody(body);
+                let htmlBody = item.htmlBody || _resolveHtmlBody(body);
+                if (htmlBody) {
+                    htmlBody = htmlBody.replace(/<img\b[^>]*>/gi, "");
+                }
                 loaded.push({
                     id: item.id || "",
                     summary: item.summary || "",
@@ -720,8 +723,8 @@ Singleton {
         }
 
         required property Notification notification
-        readonly property string summary: notification?.summary ?? ""
-        readonly property string body: notification?.body ?? ""
+        readonly property string summary: (notification?.summary ?? "").replace(/<img\b[^>]*>/gi, "")
+        readonly property string body: (notification?.body ?? "").replace(/<img\b[^>]*>/gi, "")
         readonly property string htmlBody: root._resolveHtmlBody(body)
         readonly property string appIcon: notification?.appIcon ?? ""
         readonly property string appName: {
@@ -978,22 +981,34 @@ Singleton {
     function _resolveHtmlBody(body) {
         if (!body)
             return "";
-        if (/<\/?[a-z][\s\S]*>/i.test(body))
-            return body;
 
-        // Decode percent-encoded URLs (e.g. https%3A%2F%2F → https://)
-        body = body.replace(/\bhttps?%3A%2F%2F[^\s]+/gi, match => {
-            try { return decodeURIComponent(match); }
-            catch (e) { return match; }
-        });
+        let result = body;
 
-        if (/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(body)) {
-            const decoded = _decodeEntities(body);
-            if (/<\/?[a-z][\s\S]*>/i.test(decoded))
-                return decoded;
-            return Markdown2Html.markdownToHtml(decoded);
+        if (/<\/?[a-z][\s\S]*>/i.test(body)) {
+            result = body;
+        } else {
+            // Decode percent-encoded URLs (e.g. https%3A%2F%2F → https://)
+            let processed = body.replace(/\bhttps?%3A%2F%2F[^\s]+/gi, match => {
+                try {
+                    return decodeURIComponent(match);
+                } catch (e) {
+                    return match;
+                }
+            });
+
+            if (/&(#\d+|#x[0-9a-fA-F]+|[a-zA-Z][a-zA-Z0-9]+);/.test(processed)) {
+                const decoded = _decodeEntities(processed);
+                if (/<\/?[a-z][\s\S]*>/i.test(decoded))
+                    result = decoded;
+                else
+                    result = Markdown2Html.markdownToHtml(decoded);
+            } else {
+                result = Markdown2Html.markdownToHtml(processed);
+            }
         }
-        return Markdown2Html.markdownToHtml(body);
+
+        // Strip out image tags to prevent IP tracking
+        return result.replace(/<img\b[^>]*>/gi, "");
     }
 
     function getGroupKey(wrapper) {
