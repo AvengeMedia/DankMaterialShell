@@ -909,6 +909,9 @@ Singleton {
         case "dwl":
             DwlService.generateOutputsConfig(outputsData);
             break;
+        default:
+            WlrOutputService.applyOutputsConfig(outputsData, outputs);
+            break;
         }
     }
 
