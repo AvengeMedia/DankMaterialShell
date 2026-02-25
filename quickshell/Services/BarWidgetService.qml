@@ -18,6 +18,8 @@ Singleton {
     function registerWidget(widgetId, screenName, widgetRef) {
         if (!widgetId || !screenName || !widgetRef)
             return;
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
+            widgetRegistry = ({});
 
         if (!widgetRegistry[widgetId])
             widgetRegistry[widgetId] = {};
@@ -28,6 +30,8 @@ Singleton {
 
     function unregisterWidget(widgetId, screenName) {
         if (!widgetId || !screenName)
+            return;
+        if (typeof widgetRegistry !== "object" || widgetRegistry === null)
             return;
         if (!widgetRegistry[widgetId])
             return;

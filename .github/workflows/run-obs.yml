@@ -9,8 +9,8 @@ on:
         type: choice
         options:
           - dms
-          - dms-git
           - dms-greeter
+          - dms-git
           - all
         default: "dms"
       rebuild_release:
@@ -119,9 +119,8 @@ jobs:
               echo "🔄 Manual rebuild requested: $PKG (db$REBUILD)"
 
             elif [[ "$PKG" == "all" ]]; then
-              # Check each package and build list of those needing updates
+              # Check each stable package and build list of those needing updates
               PACKAGES_TO_UPDATE=()
-              check_dms_git && PACKAGES_TO_UPDATE+=("dms-git")
               if check_dms_stable; then
                 PACKAGES_TO_UPDATE+=("dms")
                 if [[ -n "$LATEST_TAG" ]]; then
@@ -140,7 +139,7 @@ jobs:
               else
                 echo "packages=" >> $GITHUB_OUTPUT
                 echo "has_updates=false" >> $GITHUB_OUTPUT
-                echo "✓ All packages up to date"
+                echo "✓ Both packages up to date"
               fi
 
             elif [[ "$PKG" == "dms-git" ]]; then
@@ -245,7 +244,7 @@ jobs:
           fi
 
       - name: Update dms-git spec version
-        if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
+        if: contains(steps.packages.outputs.packages, 'dms-git')
         run: |
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
@@ -266,7 +265,7 @@ jobs:
           } > distro/opensuse/dms-git.spec
 
       - name: Update Debian dms-git changelog version
-        if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
+        if: contains(steps.packages.outputs.packages, 'dms-git')
         run: |
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
@@ -389,7 +388,7 @@ jobs:
           UPLOADED_PACKAGES=()
           SKIPPED_PACKAGES=()
 
-          # PACKAGES can be space-separated list (e.g., "dms-git dms" from "all" check)
+          # PACKAGES can be space-separated list (e.g., "dms dms-greeter" from "all" check)
           # Loop through each package and upload
           for PKG in $PACKAGES; do
             echo ""

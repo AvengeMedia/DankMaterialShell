@@ -4,9 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package to upload (dms, dms-git, dms-greeter, or all)"
-        required: false
-        default: "dms-git"
+        description: "Package to upload"
+        required: true
+        type: choice
+        options:
+          - dms
+          - dms-greeter
+          - dms-git
+          - all
+        default: "dms"
       rebuild_release:
         description: "Release number for rebuilds (e.g., 2, 3, 4 for ppa2, ppa3, ppa4)"
         required: false
@@ -139,7 +145,7 @@ jobs:
             fi
           else
             # Fallback
-            echo "packages=dms-git" >> $GITHUB_OUTPUT
+            echo "packages=dms" >> $GITHUB_OUTPUT
             echo "has_updates=true" >> $GITHUB_OUTPUT
           fi
 
@@ -209,7 +215,7 @@ jobs:
             echo "✓ Using rebuild release number: ppa$REBUILD_RELEASE"
           fi
 
-          # PACKAGES can be space-separated list (e.g., "dms-git dms" from "all" check)
+          # PACKAGES can be space-separated list (e.g., "dms-git dms dms-greeter" from "all" check)
           # Loop through each package and upload
           for PKG in $PACKAGES; do
             # Map package to PPA name

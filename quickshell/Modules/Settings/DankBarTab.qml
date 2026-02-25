@@ -51,9 +51,34 @@ Item {
         }
     }
 
+    function _isBarActive(c) {
+        if (!c.enabled) return false;
+        const prefs = c.screenPreferences || ["all"];
+        if (prefs.length > 0) return true;
+        return (c.showOnLastDisplay ?? true) && Quickshell.screens.length === 1;
+    }
+
     function notifyHorizontalBarChange() {
-        if (selectedBarIsVertical)
+        const configs = SettingsData.barConfigs;
+        if (configs.length < 2)
             return;
+
+        const hasHorizontal = configs.some(c => {
+            if (!_isBarActive(c)) return false;
+            const p = c.position ?? SettingsData.Position.Top;
+            return p === SettingsData.Position.Top || p === SettingsData.Position.Bottom;
+        });
+        if (!hasHorizontal)
+            return;
+
+        const hasVertical = configs.some(c => {
+            if (!_isBarActive(c)) return false;
+            const p = c.position ?? SettingsData.Position.Top;
+            return p === SettingsData.Position.Left || p === SettingsData.Position.Right;
+        });
+        if (!hasVertical)
+            return;
+
         horizontalBarChangeDebounce.restart();
     }
 
@@ -147,6 +172,7 @@ Item {
         SettingsData.updateBarConfig(barId, {
             screenPreferences: prefs
         });
+        notifyHorizontalBarChange();
     }
 
     function getBarShowOnLastDisplay(barId) {
@@ -158,6 +184,8 @@ Item {
         SettingsData.updateBarConfig(barId, {
             showOnLastDisplay: value
         });
+        if (Quickshell.screens.length === 1)
+            notifyHorizontalBarChange();
     }
 
     DankFlickable {
@@ -539,13 +567,10 @@ Item {
                                 newPos = SettingsData.Position.Right;
                                 break;
                             }
-                            const wasVertical = selectedBarIsVertical;
                             SettingsData.updateBarConfig(selectedBarId, {
                                 position: newPos
                             });
-                            const isVertical = newPos === SettingsData.Position.Left || newPos === SettingsData.Position.Right;
-                            if (wasVertical !== isVertical || !isVertical)
-                                notifyHorizontalBarChange();
+                            notifyHorizontalBarChange();
                         }
                     }
                 }
@@ -923,9 +948,9 @@ Item {
                 value: Math.round((selectedBarConfig?.fontScale ?? 1.0) * 100)
                 unit: "%"
                 defaultValue: 100
-                onSliderDragFinished: finalValue => {
+                onSliderValueChanged: newValue => {
                     SettingsData.updateBarConfig(selectedBarId, {
-                        fontScale: finalValue / 100
+                        fontScale: newValue / 100
                     });
                 }
 
@@ -948,9 +973,9 @@ Item {
                 value: Math.round((selectedBarConfig?.iconScale ?? 1.0) * 100)
                 unit: "%"
                 defaultValue: 100
-                onSliderDragFinished: finalValue => {
+                onSliderValueChanged: newValue => {
                     SettingsData.updateBarConfig(selectedBarId, {
-                        iconScale: finalValue / 100
+                        iconScale: newValue / 100
                     });
                 }
 

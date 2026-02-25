@@ -419,6 +419,9 @@ if [[ "$UPLOAD_OPENSUSE" == true ]] && [[ -f "distro/opensuse/$PACKAGE.spec" ]];
         sed -i "s/VERSION_PLACEHOLDER/${DMS_GREETER_BASE_VERSION}/g" "$WORK_DIR/$PACKAGE.spec"
         sed -i "s/RELEASE_PLACEHOLDER/${DMS_GREETER_RELEASE}/g" "$WORK_DIR/$PACKAGE.spec"
         sed -i "s/CHANGELOG_DATE_PLACEHOLDER/${CHANGELOG_DATE}/g" "$WORK_DIR/$PACKAGE.spec"
+        # Explicitly set Version:/Release: in case the spec uses %{version} macro
+        sed -i "s/^Version:.*/Version:        ${DMS_GREETER_BASE_VERSION}/" "$WORK_DIR/$PACKAGE.spec"
+        sed -i "s/^Release:.*/Release:        ${DMS_GREETER_RELEASE}%{?dist}/" "$WORK_DIR/$PACKAGE.spec"
     fi
 
     if [[ -f "$WORK_DIR/.osc/$PACKAGE.spec" ]]; then
@@ -813,6 +816,9 @@ if [[ "$UPLOAD_DEBIAN" == true ]] && [[ -d "distro/debian/$PACKAGE/debian" ]]; t
                 sed -i "s/VERSION_PLACEHOLDER/${DMS_GREETER_BASE_VERSION}/g" "$WORK_DIR/$PACKAGE.spec"
                 sed -i "s/RELEASE_PLACEHOLDER/${DMS_GREETER_RELEASE}/g" "$WORK_DIR/$PACKAGE.spec"
                 sed -i "s/CHANGELOG_DATE_PLACEHOLDER/${CHANGELOG_DATE}/g" "$WORK_DIR/$PACKAGE.spec"
+                # Explicitly set Version:/Release: in case the spec uses %{version} macro
+                sed -i "s/^Version:.*/Version:        ${DMS_GREETER_BASE_VERSION}/" "$WORK_DIR/$PACKAGE.spec"
+                sed -i "s/^Release:.*/Release:        ${DMS_GREETER_RELEASE}%{?dist}/" "$WORK_DIR/$PACKAGE.spec"
             fi
         fi
 

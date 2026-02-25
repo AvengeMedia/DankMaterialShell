@@ -1,6 +1,5 @@
-dms-greeter (1.4.2db8) unstable; urgency=medium
+dms-greeter (1.4.3db1) unstable; urgency=medium
 
-  * Initial Debian OBS package
-  * Port from Ubuntu/Fedora packaging
+  * Update to v1.4.3 stable release
 
- -- Avenge Media <AvengeMedia.US@gmail.com>  Sat, 21 Feb 2026 00:00:00 +0000
+ -- Avenge Media <AvengeMedia.US@gmail.com>  Tue, 25 Feb 2026 02:40:00 +0000
