@@ -41,6 +41,12 @@ BasePill {
         return `${id}::${tooltipTitle}`;
     }
 
+    // ! TODO - replace with either native dbus client (like plugins use) or just a DMS cli or something
+    function callContextMenuFallback(trayItemId, globalX, globalY) {
+        const script = ['ITEMS=$(dbus-send --session --print-reply --dest=org.kde.StatusNotifierWatcher /StatusNotifierWatcher org.freedesktop.DBus.Properties.Get string:org.kde.StatusNotifierWatcher string:RegisteredStatusNotifierItems 2>/dev/null)', 'while IFS= read -r line; do', '  line="${line#*\\\"}"', '  line="${line%\\\"*}"', '  [ -z "$line" ] && continue', '  BUS="${line%%/*}"', '  OBJ="/${line#*/}"', '  ID=$(dbus-send --session --print-reply --dest="$BUS" "$OBJ" org.freedesktop.DBus.Properties.Get string:org.kde.StatusNotifierItem string:Id 2>/dev/null | grep -oP "(?<=\\\")(.*?)(?=\\\")" | tail -1)', '  if [ "$ID" = "$1" ]; then', '    dbus-send --session --type=method_call --dest="$BUS" "$OBJ" org.kde.StatusNotifierItem.ContextMenu int32:"$2" int32:"$3"', '    exit 0', '  fi', 'done <<< "$ITEMS"',].join("\n");
+        Quickshell.execDetached(["bash", "-c", script, "_", trayItemId, String(globalX), String(globalY)]);
+    }
+
     property int _trayOrderTrigger: 0
 
     Connections {
@@ -380,8 +386,11 @@ BasePill {
                                 return;
                             if (mouse.button !== Qt.RightButton)
                                 return;
-                            if (!delegateRoot.trayItem?.hasMenu)
+                            if (!delegateRoot.trayItem?.hasMenu) {
+                                const gp = trayItemArea.mapToGlobal(mouse.x, mouse.y);
+                                root.callContextMenuFallback(delegateRoot.trayItem.id, Math.round(gp.x), Math.round(gp.y));
                                 return;
+                            }
                             root.menuOpen = false;
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                         }
@@ -637,8 +646,11 @@ BasePill {
                                 return;
                             if (mouse.button !== Qt.RightButton)
                                 return;
-                            if (!delegateRoot.trayItem?.hasMenu)
+                            if (!delegateRoot.trayItem?.hasMenu) {
+                                const gp = trayItemArea.mapToGlobal(mouse.x, mouse.y);
+                                root.callContextMenuFallback(delegateRoot.trayItem.id, Math.round(gp.x), Math.round(gp.y));
                                 return;
+                            }
                             root.menuOpen = false;
                             root.showForTrayItem(delegateRoot.trayItem, visualContent, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                         }
@@ -1065,9 +1077,11 @@ BasePill {
                                     root.menuOpen = false;
                                     return;
                                 }
-
-                                if (!trayItem.hasMenu)
+                                if (!trayItem.hasMenu) {
+                                    const gp = itemArea.mapToGlobal(mouse.x, mouse.y);
+                                    root.callContextMenuFallback(trayItem.id, Math.round(gp.x), Math.round(gp.y));
                                     return;
+                                }
                                 root.showForTrayItem(trayItem, menuContainer, parentScreen, root.isAtBottom, root.isVerticalOrientation, root.axis);
                             }
                         }
