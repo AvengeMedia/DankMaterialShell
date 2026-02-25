@@ -24,17 +24,20 @@ Rectangle {
     property real holdProgress: 0
     property bool showHoldHint: false
 
-    property bool useGreeterPowerSettings: false
-    property bool greeterPowerActionConfirm: true
-    property real greeterPowerActionHoldDuration: 0.5
+    property var powerActionConfirmOverride: undefined
+    property var powerActionHoldDurationOverride: undefined
+    property var powerMenuActionsOverride: undefined
+    property var powerMenuDefaultActionOverride: undefined
+    property var powerMenuGridLayoutOverride: undefined
+    property var requiredActions: []
 
-    readonly property bool needsConfirmation: useGreeterPowerSettings ? greeterPowerActionConfirm : (typeof SettingsData !== "undefined" && SettingsData.powerActionConfirm)
-    readonly property int holdDurationMs: useGreeterPowerSettings ? (greeterPowerActionHoldDuration * 1000) : ((typeof SettingsData !== "undefined" ? SettingsData.powerActionHoldDuration : 0.5) * 1000)
+    readonly property bool needsConfirmation: powerActionConfirmOverride !== undefined ? powerActionConfirmOverride : SettingsData.powerActionConfirm
+    readonly property int holdDurationMs: (powerActionHoldDurationOverride !== undefined ? powerActionHoldDurationOverride : SettingsData.powerActionHoldDuration) * 1000
 
     signal closed
 
     function updateVisibleActions() {
-        const allActions = (typeof SettingsData !== "undefined" && SettingsData.powerMenuActions) ? SettingsData.powerMenuActions : ["logout", "suspend", "hibernate", "reboot", "poweroff"];
+        const allActions = powerMenuActionsOverride !== undefined ? powerMenuActionsOverride : ((typeof SettingsData !== "undefined" && SettingsData.powerMenuActions) ? SettingsData.powerMenuActions : ["logout", "suspend", "hibernate", "reboot", "poweroff"]);
         const hibernateSupported = (typeof SessionService !== "undefined" && SessionService.hibernateSupported) || false;
         let filtered = allActions.filter(action => {
             if (action === "hibernate" && !hibernateSupported)
@@ -48,9 +51,14 @@ Rectangle {
             return true;
         });
 
+        for (const action of requiredActions) {
+            if (!filtered.includes(action))
+                filtered.push(action);
+        }
+
         visibleActions = filtered;
 
-        useGridLayout = (typeof SettingsData !== "undefined" && SettingsData.powerMenuGridLayout !== undefined) ? SettingsData.powerMenuGridLayout : false;
+        useGridLayout = powerMenuGridLayoutOverride !== undefined ? powerMenuGridLayoutOverride : ((typeof SettingsData !== "undefined" && SettingsData.powerMenuGridLayout !== undefined) ? SettingsData.powerMenuGridLayout : false);
         if (!useGridLayout)
             return;
         const count = visibleActions.length;
@@ -77,7 +85,7 @@ Rectangle {
     }
 
     function getDefaultActionIndex() {
-        const defaultAction = (typeof SettingsData !== "undefined" && SettingsData.powerMenuDefaultAction) ? SettingsData.powerMenuDefaultAction : "suspend";
+        const defaultAction = powerMenuDefaultActionOverride !== undefined ? powerMenuDefaultActionOverride : ((typeof SettingsData !== "undefined" && SettingsData.powerMenuDefaultAction) ? SettingsData.powerMenuDefaultAction : "suspend");
         const index = visibleActions.indexOf(defaultAction);
         return index >= 0 ? index : 0;
     }

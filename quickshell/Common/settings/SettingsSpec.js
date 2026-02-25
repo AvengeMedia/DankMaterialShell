@@ -350,7 +350,6 @@ var SPEC = {
     osdAudioOutputEnabled: { def: true },
 
     powerActionConfirm: { def: true },
-    powerActionConfirmGreeter: { def: true },
     powerActionHoldDuration: { def: 0.5 },
     powerMenuActions: { def: ["reboot", "logout", "poweroff", "lock", "suspend", "restart"] },
     powerMenuDefaultAction: { def: "logout" },

@@ -527,7 +527,6 @@ Singleton {
     property bool osdAudioOutputEnabled: true
 
     property bool powerActionConfirm: true
-    property bool powerActionConfirmGreeter: true
     property real powerActionHoldDuration: 0.5
     property var powerMenuActions: ["reboot", "logout", "poweroff", "lock", "suspend", "restart"]
     property string powerMenuDefaultAction: "logout"
