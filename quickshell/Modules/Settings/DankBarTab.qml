@@ -28,6 +28,35 @@ Item {
         return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
     }
 
+    Timer {
+        id: horizontalBarChangeDebounce
+        interval: 500
+        repeat: false
+        onTriggered: {
+            const verticalBars = SettingsData.barConfigs.filter(cfg => {
+                const pos = cfg.position ?? SettingsData.Position.Top;
+                return pos === SettingsData.Position.Left || pos === SettingsData.Position.Right;
+            });
+
+            verticalBars.forEach(bar => {
+                if (!bar.enabled)
+                    return;
+                SettingsData.updateBarConfig(bar.id, {
+                    enabled: false
+                });
+                Qt.callLater(() => SettingsData.updateBarConfig(bar.id, {
+                        enabled: true
+                    }));
+            });
+        }
+    }
+
+    function notifyHorizontalBarChange() {
+        if (selectedBarIsVertical)
+            return;
+        horizontalBarChangeDebounce.restart();
+    }
+
     function createNewBar() {
         if (SettingsData.barConfigs.length >= 4)
             return;
@@ -514,6 +543,9 @@ Item {
                             SettingsData.updateBarConfig(selectedBarId, {
                                 position: newPos
                             });
+                            const isVertical = newPos === SettingsData.Position.Left || newPos === SettingsData.Position.Right;
+                            if (wasVertical !== isVertical || !isVertical)
+                                notifyHorizontalBarChange();
                         }
                     }
                 }
@@ -532,6 +564,7 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             autoHide: toggled
                         });
+                        notifyHorizontalBarChange();
                     }
                 }
 
@@ -598,6 +631,7 @@ Item {
                         SettingsData.updateBarConfig(selectedBarId, {
                             visible: toggled
                         });
+                        notifyHorizontalBarChange();
                     }
                 }
 
