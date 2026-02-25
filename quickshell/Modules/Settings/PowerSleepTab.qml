@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Io
 import qs.Common
 import qs.Services
 import qs.Widgets
@@ -6,6 +7,17 @@ import qs.Modules.Settings.Widgets
 
 Item {
     id: root
+
+    property bool greeterInstalled: false
+
+    Process {
+        id: greeterCheck
+        command: ["sh", "-c", "command -v dms-greeter 2>/dev/null || [ -f /usr/share/quickshell/dms-greeter/shell.qml ]"]
+        running: false
+        onExited: exitCode => root.greeterInstalled = exitCode === 0
+    }
+
+    Component.onCompleted: greeterCheck.running = true
 
     readonly property var timeoutOptions: [I18n.tr("Never"), I18n.tr("1 minute"), I18n.tr("2 minutes"), I18n.tr("3 minutes"), I18n.tr("5 minutes"), I18n.tr("10 minutes"), I18n.tr("15 minutes"), I18n.tr("20 minutes"), I18n.tr("30 minutes"), I18n.tr("1 hour"), I18n.tr("1 hour 30 minutes"), I18n.tr("2 hours"), I18n.tr("3 hours")]
     readonly property var timeoutValues: [0, 60, 120, 180, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 10800]
@@ -475,6 +487,16 @@ Item {
                     onToggled: checked => SettingsData.set("powerActionConfirm", checked)
                 }
 
+                SettingsToggleRow {
+                    settingKey: "powerActionConfirmGreeter"
+                    tags: ["power", "confirm", "hold", "greeter", "login", "screen"]
+                    text: I18n.tr("Hold to Confirm Power Actions on the Login Screen")
+                    description: I18n.tr("Require holding to confirm power off, restart, suspend and hibernate on the DMS Greeter login screen")
+                    checked: SettingsData.powerActionConfirmGreeter
+                    visible: root.greeterInstalled
+                    onToggled: checked => SettingsData.set("powerActionConfirmGreeter", checked)
+                }
+
                 SettingsDropdownRow {
                     id: holdDurationDropdown
                     settingKey: "powerActionHoldDuration"
@@ -484,7 +506,7 @@ Item {
 
                     text: I18n.tr("Hold Duration")
                     options: durationOptions
-                    visible: SettingsData.powerActionConfirm
+                    visible: SettingsData.powerActionConfirm || SettingsData.powerActionConfirmGreeter
 
                     Component.onCompleted: {
                         const currentDuration = SettingsData.powerActionHoldDuration;

@@ -5777,6 +5777,26 @@
     "description": "Require holding button/key to confirm power off, restart, suspend, hibernate and logout"
   },
   {
+    "section": "powerActionConfirmGreeter",
+    "label": "Hold to confirm on login screen",
+    "tabIndex": 21,
+    "category": "Power & Sleep",
+    "keywords": [
+      "confirm",
+      "greeter",
+      "hold",
+      "holding",
+      "login",
+      "power",
+      "reboot",
+      "restart",
+      "screen",
+      "shutdown",
+      "suspend"
+    ],
+    "description": "Require holding to confirm power off, restart, suspend and hibernate on the greetd login screen"
+  },
+  {
     "section": "idleSettings",
     "label": "Idle Settings",
     "tabIndex": 21,
