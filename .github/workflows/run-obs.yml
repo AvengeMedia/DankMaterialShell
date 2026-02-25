@@ -9,9 +9,8 @@ on:
         type: choice
         options:
           - dms
-          - dms-git
           - dms-greeter
-          - all
+          - both
         default: "dms"
       rebuild_release:
         description: "Release number for rebuilds (e.g., 2, 3, 4 to increment spec Release)"
@@ -118,10 +117,9 @@ jobs:
               echo "has_updates=true" >> $GITHUB_OUTPUT
               echo "🔄 Manual rebuild requested: $PKG (db$REBUILD)"
 
-            elif [[ "$PKG" == "all" ]]; then
-              # Check each package and build list of those needing updates
+            elif [[ "$PKG" == "both" ]]; then
+              # Check each stable package and build list of those needing updates
               PACKAGES_TO_UPDATE=()
-              check_dms_git && PACKAGES_TO_UPDATE+=("dms-git")
               if check_dms_stable; then
                 PACKAGES_TO_UPDATE+=("dms")
                 if [[ -n "$LATEST_TAG" ]]; then
@@ -140,7 +138,7 @@ jobs:
               else
                 echo "packages=" >> $GITHUB_OUTPUT
                 echo "has_updates=false" >> $GITHUB_OUTPUT
-                echo "✓ All packages up to date"
+                echo "✓ Both packages up to date"
               fi
 
             elif [[ "$PKG" == "dms-git" ]]; then
@@ -218,7 +216,7 @@ jobs:
 
             # Determine version for dms stable and dms-greeter using the API
             # GITHUB_REF is unreliable when "Use workflow from" a tag; API works from any ref
-            if [[ "${{ github.event.inputs.package }}" == "dms" ]] || [[ "${{ github.event.inputs.package }}" == "dms-greeter" ]] || [[ "${{ github.event.inputs.package }}" == "all" ]]; then
+            if [[ "${{ github.event.inputs.package }}" == "dms" ]] || [[ "${{ github.event.inputs.package }}" == "dms-greeter" ]] || [[ "${{ github.event.inputs.package }}" == "both" ]]; then
               LATEST_TAG=$(curl -s https://api.github.com/repos/AvengeMedia/DankMaterialShell/releases/latest | grep '"tag_name"' | sed 's/.*"tag_name": "\([^"]*\)".*/\1/' || echo "")
               if [[ -n "$LATEST_TAG" ]]; then
                 echo "version=$LATEST_TAG" >> $GITHUB_OUTPUT
@@ -229,10 +227,10 @@ jobs:
               fi
             fi
 
-            # Use filtered packages from check-updates when package="all" and no rebuild/tag specified
-            if [[ "${{ github.event.inputs.package }}" == "all" ]] && [[ -z "${{ github.event.inputs.rebuild_release }}" ]] && [[ ! "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+            # Use filtered packages from check-updates when package="both" and no rebuild/tag specified
+            if [[ "${{ github.event.inputs.package }}" == "both" ]] && [[ -z "${{ github.event.inputs.rebuild_release }}" ]] && [[ ! "${{ github.ref }}" =~ ^refs/tags/ ]]; then
               echo "packages=${{ needs.check-updates.outputs.packages }}" >> $GITHUB_OUTPUT
-              echo "Manual trigger: all (filtered to: ${{ needs.check-updates.outputs.packages }})"
+              echo "Manual trigger: both (filtered to: ${{ needs.check-updates.outputs.packages }})"
             else
               echo "packages=${{ github.event.inputs.package }}" >> $GITHUB_OUTPUT
               echo "Manual trigger: ${{ github.event.inputs.package }}"
@@ -245,7 +243,7 @@ jobs:
           fi
 
       - name: Update dms-git spec version
-        if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
+        if: contains(steps.packages.outputs.packages, 'dms-git')
         run: |
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
@@ -266,7 +264,7 @@ jobs:
           } > distro/opensuse/dms-git.spec
 
       - name: Update Debian dms-git changelog version
-        if: contains(steps.packages.outputs.packages, 'dms-git') || steps.packages.outputs.packages == 'all'
+        if: contains(steps.packages.outputs.packages, 'dms-git')
         run: |
           COMMIT_HASH=$(git rev-parse --short=8 HEAD)
           COMMIT_COUNT=$(git rev-list --count HEAD)
@@ -389,7 +387,7 @@ jobs:
           UPLOADED_PACKAGES=()
           SKIPPED_PACKAGES=()
 
-          # PACKAGES can be space-separated list (e.g., "dms-git dms" from "all" check)
+          # PACKAGES can be space-separated list (e.g., "dms dms-greeter" from "both" check)
           # Loop through each package and upload
           for PKG in $PACKAGES; do
             echo ""

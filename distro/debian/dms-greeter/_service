@@ -3,7 +3,7 @@
   <service name="download_url">
     <param name="protocol">https</param>
     <param name="host">github.com</param>
-    <param name="path">/AvengeMedia/DankMaterialShell/releases/download/v1.4.2/dms-qml.tar.gz</param>
+    <param name="path">/AvengeMedia/DankMaterialShell/releases/download/v1.4.3/dms-qml.tar.gz</param>
     <param name="filename">dms-qml.tar.gz</param>
   </service>
 </services>
