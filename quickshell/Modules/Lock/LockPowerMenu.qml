@@ -24,8 +24,12 @@ Rectangle {
     property real holdProgress: 0
     property bool showHoldHint: false
 
-    readonly property bool needsConfirmation: SettingsData.powerActionConfirm
-    readonly property int holdDurationMs: SettingsData.powerActionHoldDuration * 1000
+    property bool useGreeterPowerSettings: false
+    property bool greeterPowerActionConfirm: true
+    property real greeterPowerActionHoldDuration: 0.5
+
+    readonly property bool needsConfirmation: useGreeterPowerSettings ? greeterPowerActionConfirm : (typeof SettingsData !== "undefined" && SettingsData.powerActionConfirm)
+    readonly property int holdDurationMs: useGreeterPowerSettings ? (greeterPowerActionHoldDuration * 1000) : ((typeof SettingsData !== "undefined" ? SettingsData.powerActionHoldDuration : 0.5) * 1000)
 
     signal closed
 
@@ -780,8 +784,9 @@ Rectangle {
                     }
 
                     StyledText {
-                        readonly property real totalMs: SettingsData.powerActionHoldDuration * 1000
+                        readonly property real totalMs: root.holdDurationMs
                         readonly property int remainingMs: Math.ceil(totalMs * (1 - root.holdProgress))
+                        readonly property real durationSec: root.holdDurationMs / 1000
                         text: {
                             if (root.showHoldHint)
                                 return I18n.tr("Hold longer to confirm");
@@ -792,7 +797,7 @@ Rectangle {
                             }
                             if (totalMs < 1000)
                                 return I18n.tr("Hold to confirm (%1 ms)").arg(totalMs);
-                            return I18n.tr("Hold to confirm (%1s)").arg(SettingsData.powerActionHoldDuration);
+                            return I18n.tr("Hold to confirm (%1s)").arg(durationSec);
                         }
                         font.pixelSize: Theme.fontSizeSmall
                         color: root.showHoldHint ? Theme.warning : Qt.rgba(Theme.surfaceText.r, Theme.surfaceText.g, Theme.surfaceText.b, 0.6)
