@@ -41,8 +41,11 @@ Singleton {
     property string lockDateFormat: ""
     property bool lockScreenShowPowerActions: true
     property bool lockScreenShowProfileImage: true
-    property bool powerActionConfirmGreeter: true
+    property bool powerActionConfirm: true
     property real powerActionHoldDuration: 0.5
+    property var powerMenuActions: ["reboot", "logout", "poweroff", "lock", "suspend", "restart"]
+    property string powerMenuDefaultAction: "logout"
+    property bool powerMenuGridLayout: false
     property var screenPreferences: ({})
     property int animationSpeed: 2
     property string wallpaperFillMode: "Fill"
@@ -77,8 +80,11 @@ Singleton {
                 lockDateFormat = settings.lockDateFormat !== undefined ? settings.lockDateFormat : "";
                 lockScreenShowPowerActions = settings.lockScreenShowPowerActions !== undefined ? settings.lockScreenShowPowerActions : true;
                 lockScreenShowProfileImage = settings.lockScreenShowProfileImage !== undefined ? settings.lockScreenShowProfileImage : true;
-                powerActionConfirmGreeter = settings.powerActionConfirmGreeter !== undefined ? settings.powerActionConfirmGreeter : true;
+                powerActionConfirm = settings.powerActionConfirm !== undefined ? settings.powerActionConfirm : true;
                 powerActionHoldDuration = settings.powerActionHoldDuration !== undefined ? settings.powerActionHoldDuration : 0.5;
+                powerMenuActions = settings.powerMenuActions !== undefined ? settings.powerMenuActions : ["reboot", "logout", "poweroff", "lock", "suspend", "restart"];
+                powerMenuDefaultAction = settings.powerMenuDefaultAction !== undefined ? settings.powerMenuDefaultAction : "logout";
+                powerMenuGridLayout = settings.powerMenuGridLayout !== undefined ? settings.powerMenuGridLayout : false;
                 screenPreferences = settings.screenPreferences !== undefined ? settings.screenPreferences : ({});
                 animationSpeed = settings.animationSpeed !== undefined ? settings.animationSpeed : 2;
                 wallpaperFillMode = settings.wallpaperFillMode !== undefined ? settings.wallpaperFillMode : "Fill";
