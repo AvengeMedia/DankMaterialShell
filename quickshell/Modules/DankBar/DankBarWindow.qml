@@ -624,7 +624,7 @@ PanelWindow {
     Item {
         id: topBarCore
         anchors.fill: parent
-        layer.enabled: true
+        layer.enabled: false
 
         property bool autoHide: barConfig?.autoHide ?? false
         property bool revealSticky: false
