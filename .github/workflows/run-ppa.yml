@@ -10,7 +10,8 @@ on:
         options:
           - dms
           - dms-greeter
-          - both
+          - dms-git
+          - all
         default: "dms"
       rebuild_release:
         description: "Release number for rebuilds (e.g., 2, 3, 4 for ppa2, ppa3, ppa4)"
@@ -92,9 +93,10 @@ jobs:
               echo "has_updates=true" >> $GITHUB_OUTPUT
               echo "🔄 Manual rebuild requested: $PKG (ppa$REBUILD)"
 
-            elif [[ "$PKG" == "both" ]]; then
+            elif [[ "$PKG" == "all" ]]; then
               # Check each package and build list of those needing updates
               PACKAGES_TO_UPDATE=()
+              check_dms_git && PACKAGES_TO_UPDATE+=("dms-git")
               check_stable_package "dms" "dms" && PACKAGES_TO_UPDATE+=("dms")
               check_stable_package "dms-greeter" "danklinux" && PACKAGES_TO_UPDATE+=("dms-greeter")
 
@@ -106,6 +108,15 @@ jobs:
                 echo "packages=" >> $GITHUB_OUTPUT
                 echo "has_updates=false" >> $GITHUB_OUTPUT
                 echo "✓ All packages up to date"
+              fi
+
+            elif [[ "$PKG" == "dms-git" ]]; then
+              if check_dms_git; then
+                echo "packages=$PKG" >> $GITHUB_OUTPUT
+                echo "has_updates=true" >> $GITHUB_OUTPUT
+              else
+                echo "packages=" >> $GITHUB_OUTPUT
+                echo "has_updates=false" >> $GITHUB_OUTPUT
               fi
 
             elif [[ "$PKG" == "dms" ]]; then
@@ -204,7 +215,7 @@ jobs:
             echo "✓ Using rebuild release number: ppa$REBUILD_RELEASE"
           fi
 
-          # PACKAGES can be space-separated list (e.g., "dms-git dms" from "all" check)
+          # PACKAGES can be space-separated list (e.g., "dms-git dms dms-greeter" from "all" check)
           # Loop through each package and upload
           for PKG in $PACKAGES; do
             # Map package to PPA name
