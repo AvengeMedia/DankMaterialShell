@@ -351,6 +351,7 @@ Item {
         Loader {
             id: contentLoader
             anchors.fill: parent
+            active: root.widgetEnabled && root.activeComponent !== null
             sourceComponent: root.activeComponent
 
             function reloadComponent() {
