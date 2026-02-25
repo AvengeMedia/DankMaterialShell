@@ -68,8 +68,6 @@ Column {
             color: Theme.surfaceText
             Layout.alignment: Qt.AlignVCenter
         }
-
-        }
     }
 
     Column {
