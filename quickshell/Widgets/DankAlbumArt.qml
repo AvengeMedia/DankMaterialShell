@@ -7,7 +7,7 @@ import qs.Services
 Item {
     id: root
 
-    property MprisPlayer activePlayer
+    property var activePlayer
     property string artUrl: (activePlayer?.trackArtUrl) || ""
     property string lastValidArtUrl: ""
     property alias albumArtStatus: albumArt.imageStatus
@@ -22,7 +22,7 @@ Item {
     }
 
     Loader {
-        active: activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
+        active: activePlayer?.playbackState === CustomMediaSource.statePlaying && showAnimation
         sourceComponent: Component {
             Ref {
                 service: CavaService
@@ -35,7 +35,7 @@ Item {
         width: parent.width * 1.1
         height: parent.height * 1.1
         anchors.centerIn: parent
-        visible: CavaService.cavaAvailable && activePlayer?.playbackState === MprisPlaybackState.Playing && showAnimation
+        visible: CavaService.cavaAvailable && activePlayer?.playbackState === CustomMediaSource.statePlaying && showAnimation
         asynchronous: false
         antialiasing: true
         preferredRendererType: Shape.CurveRenderer

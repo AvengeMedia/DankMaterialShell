@@ -6,9 +6,9 @@ import qs.Services
 Item {
     id: root
 
-    readonly property MprisPlayer activePlayer: MprisController.activePlayer
+    readonly property var activePlayer: MprisController.currentPlayer
     readonly property bool hasActiveMedia: activePlayer !== null
-    readonly property bool isPlaying: hasActiveMedia && activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
+    readonly property bool isPlaying: MprisController.currentIsPlaying
 
     width: 20
     height: Theme.iconSize

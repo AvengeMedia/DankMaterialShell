@@ -7,7 +7,7 @@ import qs.Widgets
 Item {
     id: root
 
-    property MprisPlayer activePlayer
+    property var activePlayer
     property real value: {
         if (!activePlayer || activePlayer.length <= 0) return 0
         const pos = (activePlayer.position || 0) % Math.max(1, activePlayer.length)
@@ -29,7 +29,7 @@ Item {
 
             M3WaveProgress {
                 value: root.value
-                isPlaying: activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
+                isPlaying: MprisController.currentIsPlaying
 
                 MouseArea {
                     anchors.fill: parent

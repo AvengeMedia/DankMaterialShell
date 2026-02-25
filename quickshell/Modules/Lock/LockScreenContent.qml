@@ -1176,12 +1176,12 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: MprisController.activePlayer && SettingsData.lockScreenShowMediaPlayer
+                visible: MprisController.currentPlayer && SettingsData.lockScreenShowMediaPlayer
             }
 
             Row {
                 spacing: Theme.spacingS
-                visible: MprisController.activePlayer && SettingsData.lockScreenShowMediaPlayer
+                visible: MprisController.currentPlayer && SettingsData.lockScreenShowMediaPlayer
                 anchors.verticalCenter: parent.verticalCenter
 
                 Item {
@@ -1190,7 +1190,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     Loader {
-                        active: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing
+                        active: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying
 
                         sourceComponent: Component {
                             Ref {
@@ -1200,7 +1200,7 @@ Item {
                     }
 
                     Timer {
-                        running: !CavaService.cavaAvailable && MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing
+                        running: !CavaService.cavaAvailable && MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying
                         interval: 256
                         repeat: true
                         onTriggered: {
@@ -1219,7 +1219,7 @@ Item {
 
                                 width: 2
                                 height: {
-                                    if (MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing && CavaService.values.length > index) {
+                                    if (MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying && CavaService.values.length > index) {
                                         const rawLevel = CavaService.values[index] || 0;
                                         const scaledLevel = Math.sqrt(Math.min(Math.max(rawLevel, 0), 100) / 100) * 100;
                                         const maxHeight = Theme.iconSize - 2;
@@ -1246,7 +1246,7 @@ Item {
 
                 StyledText {
                     text: {
-                        const player = MprisController.activePlayer;
+                        const player = MprisController.currentPlayer;
                         if (!player?.trackTitle)
                             return "";
                         const title = player.trackTitle;
@@ -1273,8 +1273,8 @@ Item {
                         radius: 10
                         anchors.verticalCenter: parent.verticalCenter
                         color: prevArea.containsMouse ? Qt.rgba(255, 255, 255, 0.2) : "transparent"
-                        visible: MprisController.activePlayer
-                        opacity: (MprisController.activePlayer?.canGoPrevious ?? false) ? 1 : 0.3
+                        visible: MprisController.currentPlayer
+                        opacity: (MprisController.currentPlayer?.canGoPrevious ?? false) ? 1 : 0.3
 
                         DankIcon {
                             anchors.centerIn: parent
@@ -1286,10 +1286,10 @@ Item {
                         MouseArea {
                             id: prevArea
                             anchors.fill: parent
-                            enabled: MprisController.activePlayer?.canGoPrevious ?? false
+                            enabled: MprisController.currentPlayer?.canGoPrevious ?? false
                             hoverEnabled: enabled
                             cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.previous()
+                            onClicked: MprisController.currentPlayer?.previous()
                         }
                     }
 
@@ -1298,22 +1298,22 @@ Item {
                         height: 24
                         radius: 12
                         anchors.verticalCenter: parent.verticalCenter
-                        color: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? Qt.rgba(255, 255, 255, 0.9) : Qt.rgba(255, 255, 255, 0.2)
-                        visible: MprisController.activePlayer
+                        color: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? Qt.rgba(255, 255, 255, 0.9) : Qt.rgba(255, 255, 255, 0.2)
+                        visible: MprisController.currentPlayer
 
                         DankIcon {
                             anchors.centerIn: parent
-                            name: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? "pause" : "play_arrow"
+                            name: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? "pause" : "play_arrow"
                             size: 14
-                            color: MprisController.activePlayer?.playbackState === MprisPlaybackState.Playing ? "black" : "white"
+                            color: MprisController.currentPlayer?.playbackState === CustomMediaSource.statePlaying ? "black" : "white"
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            enabled: MprisController.activePlayer
+                            enabled: MprisController.currentPlayer
                             hoverEnabled: enabled
                             cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.togglePlaying()
+                            onClicked: MprisController.currentPlayer?.togglePlaying()
                         }
                     }
 
@@ -1323,8 +1323,8 @@ Item {
                         radius: 10
                         anchors.verticalCenter: parent.verticalCenter
                         color: nextArea.containsMouse ? Qt.rgba(255, 255, 255, 0.2) : "transparent"
-                        visible: MprisController.activePlayer
-                        opacity: (MprisController.activePlayer?.canGoNext ?? false) ? 1 : 0.3
+                        visible: MprisController.currentPlayer
+                        opacity: (MprisController.currentPlayer?.canGoNext ?? false) ? 1 : 0.3
 
                         DankIcon {
                             anchors.centerIn: parent
@@ -1336,10 +1336,10 @@ Item {
                         MouseArea {
                             id: nextArea
                             anchors.fill: parent
-                            enabled: MprisController.activePlayer?.canGoNext ?? false
+                            enabled: MprisController.currentPlayer?.canGoNext ?? false
                             hoverEnabled: enabled
                             cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                            onClicked: MprisController.activePlayer?.next()
+                            onClicked: MprisController.currentPlayer?.next()
                         }
                     }
                 }
@@ -1350,7 +1350,7 @@ Item {
                 height: 24
                 color: Qt.rgba(255, 255, 255, 0.2)
                 anchors.verticalCenter: parent.verticalCenter
-                visible: MprisController.activePlayer && SettingsData.lockScreenShowMediaPlayer && WeatherService.weather.available
+                visible: MprisController.currentPlayer && SettingsData.lockScreenShowMediaPlayer && WeatherService.weather.available
             }
 
             Row {

@@ -14,6 +14,7 @@ Item {
     property int dropdownType: 0
     property var activePlayer: null
     property var allPlayers: []
+    property bool activeIsCustom: false  // True if activePlayer is CustomMediaSource
     property point anchorPos: Qt.point(0, 0)
     property bool isRightEdge: false
 
@@ -414,12 +415,19 @@ Item {
                             required property var modelData
                             required property int index
 
+                            readonly property bool isActive: {
+                                if (modelData?.isCustom) {
+                                    return activeIsCustom
+                                }
+                                return modelData?.player === activePlayer
+                            }
+
                             width: parent.width
                             height: 48
                             radius: Theme.cornerRadius
                             color: playerMouseArea.containsMouse ? Qt.rgba(Theme.primary.r, Theme.primary.g, Theme.primary.b, 0.12) : Theme.withAlpha(Theme.surfaceContainerHigh, Theme.popupTransparency)
-                            border.color: modelData === activePlayer ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
-                            border.width: modelData === activePlayer ? 2 : 1
+                            border.color: isActive ? Theme.primary : Qt.rgba(Theme.outline.r, Theme.outline.g, Theme.outline.b, 0.2)
+                            border.width: isActive ? 2 : 1
 
                             Row {
                                 anchors.left: parent.left
@@ -429,9 +437,9 @@ Item {
                                 width: parent.width - Theme.spacingM * 2
 
                                 DankIcon {
-                                    name: "music_note"
+                                    name: modelData?.isCustom ? "queue_music" : "music_note"
                                     size: 20
-                                    color: modelData === activePlayer ? Theme.primary : Theme.surfaceText
+                                    color: isActive ? Theme.primary : Theme.surfaceText
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
 
@@ -443,28 +451,18 @@ Item {
                                         text: {
                                             if (!modelData)
                                                 return "Unknown Player";
-                                            const identity = modelData.identity || "Unknown Player";
-                                            const trackTitle = modelData.trackTitle || "";
-                                            return trackTitle.length > 0 ? identity + " - " + trackTitle : identity;
+                                            return modelData.identity || "Unknown Player";
                                         }
                                         font.pixelSize: Theme.fontSizeMedium
                                         color: Theme.surfaceText
-                                        font.weight: modelData === activePlayer ? Font.Medium : Font.Normal
+                                        font.weight: isActive ? Font.Medium : Font.Normal
                                         elide: Text.ElideRight
                                         wrapMode: Text.NoWrap
                                         width: parent.width
                                     }
 
                                     StyledText {
-                                        text: {
-                                            if (!modelData)
-                                                return "";
-                                            const artist = modelData.trackArtist || "";
-                                            const isActive = modelData === activePlayer;
-                                            if (artist.length > 0)
-                                                return artist + (isActive ? " (Active)" : "");
-                                            return isActive ? "Active" : "Available";
-                                        }
+                                        text: isActive ? "Active" : "Available"
                                         font.pixelSize: Theme.fontSizeSmall
                                         color: Theme.surfaceVariantText
                                         elide: Text.ElideRight
