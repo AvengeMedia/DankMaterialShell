@@ -289,7 +289,7 @@ Item {
         visible: false
         color: "transparent"
         Component.onCompleted: {
-            if (typeof updatesEnabled !== "undefined")
+            if (typeof updatesEnabled !== "undefined" && !root.overlayContent)
                 updatesEnabled = false;
         }
 
