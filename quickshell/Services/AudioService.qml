@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Pipewire
 import qs.Common
+import qs.Services
 
 Singleton {
     id: root
@@ -14,7 +15,7 @@ Singleton {
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNode source: Pipewire.defaultAudioSource
 
-    property bool soundsAvailable: false
+    readonly property bool soundsAvailable: MultimediaService.available
     property bool gsettingsAvailable: false
     property var availableSoundThemes: []
     property string currentSoundTheme: ""
@@ -309,24 +310,6 @@ EOFCONFIG
             if (SessionData.suppressOSD)
                 return;
             root.playVolumeChangeSoundIfEnabled();
-        }
-    }
-
-    function detectSoundsAvailability() {
-        try {
-            const testObj = Qt.createQmlObject(`
-                import QtQuick
-                import QtMultimedia
-                Item {}
-            `, root, "AudioService.TestComponent");
-            if (testObj) {
-                testObj.destroy();
-            }
-            soundsAvailable = true;
-            return true;
-        } catch (e) {
-            soundsAvailable = false;
-            return false;
         }
     }
 
@@ -1028,10 +1011,7 @@ EOFCONFIG
     }
 
     Component.onCompleted: {
-        if (!detectSoundsAvailability()) {
-            console.warn("AudioService: QtMultimedia not available - sound effects disabled");
-        } else {
-            console.info("AudioService: Sound effects enabled");
+        if (soundsAvailable) {
             checkGsettings();
             Qt.callLater(createSoundPlayers);
         }
