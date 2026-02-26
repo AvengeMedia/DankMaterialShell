@@ -333,9 +333,9 @@ Item {
             visible: SettingsData.lockScreenShowDate
             text: {
                 if (SettingsData.lockDateFormat && SettingsData.lockDateFormat.length > 0) {
-                    return systemClock.date.toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat);
+                    return systemClock.date.toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat);
                 }
-                return systemClock.date.toLocaleDateString(Qt.locale(), Locale.LongFormat);
+                return systemClock.date.toLocaleDateString(I18n.locale(), Locale.LongFormat);
             }
             font.pixelSize: Theme.fontSizeXLarge
             color: "white"

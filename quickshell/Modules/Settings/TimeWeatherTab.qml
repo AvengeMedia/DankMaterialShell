@@ -74,7 +74,7 @@ Item {
                     tags: ["date", "format", "topbar"]
                     settingKey: "clockDateFormat"
                     text: I18n.tr("Top Bar Format")
-                    description: "Preview: " + (SettingsData.clockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(Qt.locale(), "ddd d"))
+                    description: "Preview: " + (SettingsData.clockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat) : new Date().toLocaleDateString(I18n.locale(), "ddd d"))
                     options: [I18n.tr("System Default", "date format option"), I18n.tr("Day Date", "date format option"), I18n.tr("Day Month Date", "date format option"), I18n.tr("Month Date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with Year", "date format option"), I18n.tr("ISO Date", "date format option"), I18n.tr("Full Day & Month", "date format option"), I18n.tr("Custom...", "date format option")]
                     currentValue: {
                         if (!SettingsData.clockDateFormat || SettingsData.clockDateFormat.length === 0)
@@ -161,7 +161,7 @@ Item {
                     tags: ["date", "format", "lock", "screen"]
                     settingKey: "lockDateFormat"
                     text: I18n.tr("Lock Screen Format")
-                    description: "Preview: " + (SettingsData.lockDateFormat ? new Date().toLocaleDateString(Qt.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(Qt.locale(), Locale.LongFormat))
+                    description: "Preview: " + (SettingsData.lockDateFormat ? new Date().toLocaleDateString(I18n.locale(), SettingsData.lockDateFormat) : new Date().toLocaleDateString(I18n.locale(), Locale.LongFormat))
                     options: [I18n.tr("System Default", "date format option"), I18n.tr("Day Date", "date format option"), I18n.tr("Day Month Date", "date format option"), I18n.tr("Month Date", "date format option"), I18n.tr("Numeric (M/D)", "date format option"), I18n.tr("Numeric (D/M)", "date format option"), I18n.tr("Full with Year", "date format option"), I18n.tr("ISO Date", "date format option"), I18n.tr("Full Day & Month", "date format option"), I18n.tr("Custom...", "date format option")]
                     currentValue: {
                         if (!SettingsData.lockDateFormat || SettingsData.lockDateFormat.length === 0)

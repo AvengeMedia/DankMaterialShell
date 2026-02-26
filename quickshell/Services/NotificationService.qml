@@ -252,7 +252,7 @@ Singleton {
         if (daysDiff === 0)
             return timeStr;
         try {
-            const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
+            const localeName = (typeof I18n !== "undefined" && I18n.locale) ? I18n.locale().name : "en-US";
             const weekday = date.toLocaleDateString(localeName, {
                 weekday: "long"
             });
@@ -695,7 +695,7 @@ Singleton {
             }
 
             try {
-                const localeName = (typeof Qt !== "undefined" && Qt.locale) ? Qt.locale().name : "en-US";
+                const localeName = (typeof I18n !== "undefined" && I18n.locale) ? I18n.locale().name : "en-US";
                 const weekday = time.toLocaleDateString(localeName, {
                     weekday: "long"
                 });

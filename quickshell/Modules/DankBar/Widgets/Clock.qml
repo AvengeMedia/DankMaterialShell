@@ -129,7 +129,7 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale();
+                            const locale = I18n.locale();
                             const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
                             const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
                             const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0');
@@ -144,7 +144,7 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale();
+                            const locale = I18n.locale();
                             const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
                             const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
                             const value = dayFirst ? String(systemClock?.date?.getDate()).padStart(2, '0') : String(systemClock?.date?.getMonth() + 1).padStart(2, '0');
@@ -165,7 +165,7 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale();
+                            const locale = I18n.locale();
                             const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
                             const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
                             const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0');
@@ -180,7 +180,7 @@ BasePill {
 
                     StyledText {
                         text: {
-                            const locale = Qt.locale();
+                            const locale = I18n.locale();
                             const dateFormatShort = locale.dateFormat(Locale.ShortFormat);
                             const dayFirst = dateFormatShort.indexOf('d') < dateFormatShort.indexOf('M');
                             const value = dayFirst ? String(systemClock?.date?.getMonth() + 1).padStart(2, '0') : String(systemClock?.date?.getDate()).padStart(2, '0');
@@ -311,9 +311,9 @@ BasePill {
                     id: dateText
                     text: {
                         if (SettingsData.clockDateFormat && SettingsData.clockDateFormat.length > 0) {
-                            return systemClock?.date?.toLocaleDateString(Qt.locale(), SettingsData.clockDateFormat);
+                            return systemClock?.date?.toLocaleDateString(I18n.locale(), SettingsData.clockDateFormat);
                         }
-                        return systemClock?.date?.toLocaleDateString(Qt.locale(), "ddd d");
+                        return systemClock?.date?.toLocaleDateString(I18n.locale(), "ddd d");
                     }
                     font.pixelSize: clockRow.fontSize
                     color: Theme.widgetTextColor

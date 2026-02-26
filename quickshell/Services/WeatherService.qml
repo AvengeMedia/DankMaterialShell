@@ -444,7 +444,7 @@ Singleton {
 
         const date = new Date();
         date.setDate(date.getDate() + index);
-        const locale = Qt.locale();
+        const locale = I18n.locale();
         return locale.dayName(date.getDay(), Locale.ShortFormat);
     }
 

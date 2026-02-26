@@ -179,7 +179,7 @@ Rectangle {
             StyledText {
                 width: parent.width - 56
                 height: 28
-                text: calendarGrid.displayDate.toLocaleDateString(Qt.locale(), "MMMM yyyy")
+                text: calendarGrid.displayDate.toLocaleDateString(I18n.locale(), "MMMM yyyy")
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.surfaceText
                 font.weight: Font.Medium
@@ -223,11 +223,10 @@ Rectangle {
             Repeater {
                 model: {
                     const days = [];
-                    const loc = Qt.locale();
-                    const qtFirst = loc.firstDayOfWeek;
+                    const qtFirst = Qt.locale().firstDayOfWeek;
                     for (let i = 0; i < 7; ++i) {
                         const qtDay = ((qtFirst - 1 + i) % 7) + 1;
-                        days.push(loc.dayName(qtDay, Locale.ShortFormat));
+                        days.push(I18n.locale().dayName(qtDay, Locale.ShortFormat));
                     }
                     return days;
                 }

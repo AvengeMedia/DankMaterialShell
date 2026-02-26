@@ -2044,6 +2044,13 @@
     "comment": ""
   },
   {
+    "term": "Change the locale used by the DMS interface.",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Channel",
     "translation": "",
     "context": "",
@@ -3115,6 +3122,13 @@
     "comment": ""
   },
   {
+    "term": "Current Locale",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Current Monitor",
     "translation": "",
     "context": "Running apps filter: only show apps from the same monitor",
@@ -3844,6 +3858,13 @@
   },
   {
     "term": "Disk Usage",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Disk Usage Display",
     "translation": "",
     "context": "",
     "reference": "",
@@ -6931,6 +6952,20 @@
   },
   {
     "term": "Local",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Locale",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Locale Settings",
     "translation": "",
     "context": "",
     "reference": "",
@@ -10185,6 +10220,20 @@
     "comment": ""
   },
   {
+    "term": "Remaining",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Remaining / Total",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Remove",
     "translation": "",
     "context": "",
@@ -11550,6 +11599,13 @@
     "comment": ""
   },
   {
+    "term": "Show Memory in GB",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show Network",
     "translation": "",
     "context": "",
@@ -11662,6 +11718,13 @@
     "comment": ""
   },
   {
+    "term": "Show Swap",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Show System Date",
     "translation": "",
     "context": "Enable system date display on the lock screen window",
@@ -11761,6 +11824,13 @@
   },
   {
     "term": "Show drop shadow on notification popups",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Show in GB",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12909,6 +12979,13 @@
   },
   {
     "term": "Top Section",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Total",
     "translation": "",
     "context": "",
     "reference": "",

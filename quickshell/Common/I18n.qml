@@ -8,7 +8,7 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property string _rawLocale: Qt.locale().name
+    readonly property string _rawLocale: SettingsData.locale === "" ? Qt.locale().name : SettingsData.locale
     readonly property string _lang: _rawLocale.split(/[_-]/)[0]
     readonly property var _candidates: {
         const fullUnderscore = _rawLocale;
@@ -21,7 +21,8 @@ Singleton {
 
     readonly property url translationsFolder: Qt.resolvedUrl("../translations/poexports")
 
-    property string currentLocale: "en"
+    readonly property alias folder: dir.folder
+    property var presentLocales: ({ "en": Qt.locale("en") })
     property var translations: ({})
     property bool translationsLoaded: false
 
@@ -34,8 +35,10 @@ Singleton {
         showDirs: false
         showDotAndDotDot: false
 
-        onStatusChanged: if (status === FolderListModel.Ready)
-            root._pickTranslation()
+        onStatusChanged: if (status === FolderListModel.Ready) {
+            root._loadPresentLocales();
+            root._pickTranslation();
+        }
     }
 
     FileView {
@@ -46,32 +49,42 @@ Singleton {
             try {
                 root.translations = JSON.parse(text());
                 root.translationsLoaded = true;
-                console.info(`I18n: Loaded translations for '${root.currentLocale}' ` + `(${Object.keys(root.translations).length} contexts)`);
+                console.info(`I18n: Loaded translations for '${SettingsData.locale}' (${Object.keys(root.translations).length} contexts)`);
             } catch (e) {
-                console.warn(`I18n: Error parsing '${root.currentLocale}':`, e, "- falling back to English");
+                console.warn(`I18n: Error parsing '${SettingsData.locale}':`, e, "- falling back to English");
                 root._fallbackToEnglish();
             }
         }
 
         onLoadFailed: error => {
-            console.warn(`I18n: Failed to load '${root.currentLocale}' (${error}), ` + "falling back to English");
+            console.warn(`I18n: Failed to load '${SettingsData.locale}' (${error}), ` + "falling back to English");
             root._fallbackToEnglish();
         }
     }
 
-    function _pickTranslation() {
-        const present = new Set();
+    // for replacing Qt.locale()
+    function locale() {
+        return presentLocales[SettingsData.locale] ?? presentLocales["en"];
+    }
+
+    function _loadPresentLocales() {
+        if (Object.keys(presentLocales).length > 1) {
+            return; // already loaded
+        }
         for (let i = 0; i < dir.count; i++) {
             const name = dir.get(i, "fileName"); // e.g. "zh_CN.json"
             if (name && name.endsWith(".json")) {
-                present.add(name.slice(0, -5));
+                const shortName = name.slice(0, -5);
+                presentLocales[shortName] = Qt.locale(shortName);
             }
         }
+    }
 
+    function _pickTranslation() {
         for (let i = 0; i < _candidates.length; i++) {
             const cand = _candidates[i];
-            if (present.has(cand)) {
-                _useLocale(cand, dir.folder + "/" + cand + ".json");
+            if (presentLocales[cand] !== undefined) {
+                SettingsData.set("locale", cand);
                 return;
             }
         }
@@ -79,8 +92,7 @@ Singleton {
         _fallbackToEnglish();
     }
 
-    function _useLocale(localeTag, fileUrl) {
-        currentLocale = localeTag;
+    function useLocale(localeTag, fileUrl) {
         _selectedPath = fileUrl;
         translationsLoaded = false;
         translations = ({});
@@ -88,7 +100,6 @@ Singleton {
     }
 
     function _fallbackToEnglish() {
-        currentLocale = "en";
         _selectedPath = "";
         translationsLoaded = false;
         translations = ({});
