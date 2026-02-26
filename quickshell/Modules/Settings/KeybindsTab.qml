@@ -344,7 +344,11 @@ Item {
                                         return I18n.tr("%1 exists but is not included in config. Custom keybinds will not work until this is fixed.").arg(bindsFile);
                                     if (warningBox.showWarning) {
                                         const count = warningBox.status.overriddenBy;
-                                        return I18n.tr("%1 DMS bind(s) may be overridden by config binds that come after the include.").arg(count);
+                                        return I18n.ntr(
+                                            "%1 DMS bind may be overridden by config binds that come after the include.",
+                                            "%1 DMS binds may be overridden by config binds that come after the include.",
+                                            count
+                                        ).arg(count);
                                     }
                                     return "";
                                 }

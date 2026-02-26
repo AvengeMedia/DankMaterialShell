@@ -305,7 +305,9 @@ Item {
                                                 const prefs = cfg?.screenPreferences || ["all"];
                                                 if (prefs.includes("all") || (typeof prefs[0] === "string" && prefs[0] === "all"))
                                                     return I18n.tr("All displays");
-                                                return I18n.tr("%1 display(s)").replace("%1", prefs.length);
+                                                return prefs.length === 1
+                                                    ? I18n.tr("%1 display").arg(prefs.length)
+                                                    : I18n.tr("%1 displays").arg(prefs.length);
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText

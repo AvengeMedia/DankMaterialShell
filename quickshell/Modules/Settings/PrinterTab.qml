@@ -548,7 +548,7 @@ Item {
                                     const count = CupsService.printerNames.length;
                                     if (count === 0)
                                         return I18n.tr("No printers configured");
-                                    return I18n.tr("%1 printer(s)").arg(count);
+                                    return I18n.ntr("%1 printer", "%1 printers", count).arg(count);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
@@ -698,7 +698,7 @@ Item {
                                                     }
 
                                                     StyledText {
-                                                        text: I18n.tr("%1 job(s)").arg(printerData?.jobs?.length ?? 0)
+                                                        text: I18n.ntr("%1 job", "%1 jobs", printerData?.jobs?.length ?? 0).arg(printerData?.jobs?.length ?? 0)
                                                         font.pixelSize: Theme.fontSizeSmall
                                                         color: Theme.surfaceVariantText
                                                         visible: (printerData?.jobs?.length ?? 0) > 0
@@ -1245,7 +1245,7 @@ Item {
                             }
 
                             StyledText {
-                                text: I18n.tr("%1 class(es)").arg(CupsService.printerClasses.length)
+                                text: I18n.ntr("%1 class", "%1 classes", CupsService.printerClasses.length).arg(CupsService.printerClasses.length)
                                 font.pixelSize: Theme.fontSizeSmall
                                 color: Theme.surfaceVariantText
                                 width: parent.width
@@ -1310,7 +1310,7 @@ Item {
                                         }
 
                                         StyledText {
-                                            text: I18n.tr("%1 printer(s)").arg(modelData.members?.length ?? 0)
+                                            text: I18n.ntr("%1 printer", "%1 printers", modelData.members?.length ?? 0).arg(modelData.members?.length ?? 0)
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceVariantText
                                         }

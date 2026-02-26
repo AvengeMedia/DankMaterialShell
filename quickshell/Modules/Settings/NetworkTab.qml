@@ -340,7 +340,9 @@ Item {
                                     if (devices.length === 0)
                                         return I18n.tr("No adapters");
                                     if (connected === 0)
-                                        return I18n.tr("%1 adapter(s), none connected").arg(devices.length);
+                                        return devices.length === 1
+                                            ? I18n.tr("%1 adapter, none connected").arg(devices.length)
+                                            : I18n.tr("%1 adapters, none connected").arg(devices.length);
                                     return I18n.tr("%1 connected").arg(connected);
                                 }
                                 font.pixelSize: Theme.fontSizeSmall

@@ -34,51 +34,51 @@ Rectangle {
 
     readonly property var timeoutOptions: [
         {
-            "text": "Never",
+            "text": I18n.tr("Never"),
             "value": 0
         },
         {
-            "text": "1 second",
+            "text": I18n.tr("1 second"),
             "value": 1000
         },
         {
-            "text": "3 seconds",
+            "text": I18n.tr("3 seconds"),
             "value": 3000
         },
         {
-            "text": "5 seconds",
+            "text": I18n.tr("5 seconds"),
             "value": 5000
         },
         {
-            "text": "8 seconds",
+            "text": I18n.tr("8 seconds"),
             "value": 8000
         },
         {
-            "text": "10 seconds",
+            "text": I18n.tr("10 seconds"),
             "value": 10000
         },
         {
-            "text": "15 seconds",
+            "text": I18n.tr("15 seconds"),
             "value": 15000
         },
         {
-            "text": "30 seconds",
+            "text": I18n.tr("30 seconds"),
             "value": 30000
         },
         {
-            "text": "1 minute",
+            "text": I18n.tr("1 minute"),
             "value": 60000
         },
         {
-            "text": "2 minutes",
+            "text": I18n.tr("2 minutes"),
             "value": 120000
         },
         {
-            "text": "5 minutes",
+            "text": I18n.tr("5 minutes"),
             "value": 300000
         },
         {
-            "text": "10 minutes",
+            "text": I18n.tr("10 minutes"),
             "value": 600000
         }
     ]
