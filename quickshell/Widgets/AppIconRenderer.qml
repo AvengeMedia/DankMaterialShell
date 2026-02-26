@@ -98,7 +98,7 @@ Item {
         sourceComponent: IconImage {
             anchors.fill: parent
             source: root.iconPath
-            backer.sourceSize: Qt.size(root.iconSize, root.iconSize)
+            backer.sourceSize: Qt.size(root.iconSize * 2, root.iconSize * 2)
             mipmap: true
             asynchronous: true
             visible: status === Image.Ready

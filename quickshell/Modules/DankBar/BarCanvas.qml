@@ -121,7 +121,7 @@ Item {
     Loader {
         id: shadowLoader
         anchors.fill: parent
-        active: root.shadowEnabled && mainPathCorrectShape
+        active: root.shadowEnabled && mainPathCorrectShape && Theme.elevationEnabled
         asynchronous: false
         sourceComponent: Item {
             anchors.fill: parent

@@ -263,10 +263,10 @@ Item {
 
             layer.enabled: true
             layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowBlur: 0.4
-                shadowColor: Theme.shadowStrong
-                shadowVerticalOffset: 4
+                shadowEnabled: Theme.elevationEnabled
+                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
+                shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
             }
 
             Column {

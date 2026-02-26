@@ -313,12 +313,10 @@ PanelWindow {
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        readonly property real radiusForShadow: Theme.cornerRadius
-        property real shadowBlurPx: SettingsData.notificationPopupShadowEnabled ? ((2 + radiusForShadow * 0.2) * (cardHoverHandler.hovered ? 1.2 : 1)) : 0
-        property real shadowSpreadPx: SettingsData.notificationPopupShadowEnabled ? (radiusForShadow * (cardHoverHandler.hovered ? 0.06 : 0)) : 0
-        property real shadowBaseAlpha: 0.35
-        readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-        readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
+        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
+        readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
+        property real shadowBlurPx: shadowsAllowed ? (elevLevel && elevLevel.blurPx !== undefined ? elevLevel.blurPx : 12) : 0
+        property real shadowOffsetY: shadowsAllowed ? (elevLevel && elevLevel.offsetY !== undefined ? elevLevel.offsetY : 6) : 0
 
         Behavior on shadowBlurPx {
             NumberAnimation {
@@ -327,7 +325,7 @@ PanelWindow {
             }
         }
 
-        Behavior on shadowSpreadPx {
+        Behavior on shadowOffsetY {
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
@@ -348,15 +346,14 @@ PanelWindow {
             layer.effect: MultiEffect {
                 id: shadowFx
                 autoPaddingEnabled: true
-                shadowEnabled: SettingsData.notificationPopupShadowEnabled
+                shadowEnabled: content.shadowsAllowed
                 blurEnabled: false
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
-                shadowScale: 1 + (2 * content.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: {
-                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                    return Theme.withAlpha(baseColor, content.effectiveShadowAlpha);
-                }
+                shadowScale: 1
+                shadowHorizontalOffset: 0
+                shadowVerticalOffset: content.shadowOffsetY
+                shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
             }
 
             Rectangle {

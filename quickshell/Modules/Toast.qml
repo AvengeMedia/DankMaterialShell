@@ -407,12 +407,12 @@ PanelWindow {
         }
 
         layer.effect: MultiEffect {
-            shadowEnabled: true
+            shadowEnabled: Theme.elevationEnabled
             shadowHorizontalOffset: 0
-            shadowVerticalOffset: 4
-            shadowBlur: 0.8
-            shadowColor: Qt.rgba(0, 0, 0, 0.3)
-            shadowOpacity: 0.3
+            shadowVerticalOffset: Theme.elevationLevel3 && Theme.elevationLevel3.offsetY !== undefined ? Theme.elevationLevel3.offsetY : 6
+            shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined ? Theme.elevationLevel3.blurPx : 12) / Theme.elevationBlurMax)) : 0
+            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
+            shadowOpacity: Theme.elevationLevel3 && Theme.elevationLevel3.alpha !== undefined ? Theme.elevationLevel3.alpha : 0.3
         }
 
         Behavior on opacity {

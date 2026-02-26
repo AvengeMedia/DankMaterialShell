@@ -2401,6 +2401,23 @@
     "description": "0 = square corners"
   },
   {
+    "section": "m3ElevationEnabled",
+    "label": "M3 Elevation & Shadows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "elevation",
+      "lift",
+      "material",
+      "m3",
+      "shadow",
+      "shadows",
+      "theme"
+    ],
+    "description": "Material Design 3 shadows and elevation on modals, popouts, and dialogs"
+  },
+  {
     "section": "cursorSize",
     "label": "Cursor Size",
     "tabIndex": 10,

@@ -241,14 +241,14 @@ Item {
                             color: Theme.primary
                             anchors.verticalCenter: parent.verticalCenter
 
-                            layer.enabled: true
+                            layer.enabled: Theme.elevationEnabled
                             layer.effect: MultiEffect {
-                                shadowEnabled: true
+                                shadowEnabled: Theme.elevationEnabled
                                 shadowHorizontalOffset: 0
-                                shadowVerticalOffset: 4
-                                shadowBlur: 0.8
-                                shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                                shadowOpacity: 0.2
+                                shadowVerticalOffset: Theme.elevationLevel1 && Theme.elevationLevel1.offsetY !== undefined ? Theme.elevationLevel1.offsetY : 1
+                                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
+                                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+                                shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
                             }
                         }
 

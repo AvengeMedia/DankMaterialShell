@@ -673,6 +673,19 @@ Singleton {
     property color shadowMedium: Qt.rgba(0, 0, 0, 0.08)
     property color shadowStrong: Qt.rgba(0, 0, 0, 0.3)
 
+    readonly property bool elevationEnabled: typeof SettingsData !== "undefined" && (SettingsData.m3ElevationEnabled ?? true)
+    readonly property real elevationBlurMax: 64
+    readonly property var elevationLevel1: ({ blurPx: 4, offsetY: 1, spreadPx: 0, alpha: 0.2 })
+    readonly property var elevationLevel2: ({ blurPx: 8, offsetY: 4, spreadPx: 0, alpha: 0.25 })
+    readonly property var elevationLevel3: ({ blurPx: 12, offsetY: 6, spreadPx: 0, alpha: 0.3 })
+    readonly property var elevationLevel4: ({ blurPx: 16, offsetY: 8, spreadPx: 0, alpha: 0.3 })
+    readonly property var elevationLevel5: ({ blurPx: 20, offsetY: 10, spreadPx: 0, alpha: 0.3 })
+    function elevationShadowColor(level) {
+        const alpha = (level && level.alpha !== undefined) ? level.alpha : 0.3;
+        const baseColor = isLightMode ? Qt.rgba(0, 0, 0, 1) : surfaceContainerHighest;
+        return Theme.withAlpha(baseColor, alpha * (typeof SettingsData !== "undefined" ? SettingsData.popupTransparency : 1));
+    }
+
     readonly property var animationDurations: [
         {
             "shorter": 0,

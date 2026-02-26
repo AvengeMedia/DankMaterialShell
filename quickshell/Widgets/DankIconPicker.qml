@@ -135,13 +135,14 @@ Rectangle {
             color: Theme.surface
             radius: Theme.cornerRadius
 
-            layer.enabled: true
+            layer.enabled: Theme.elevationEnabled
             layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowColor: Theme.shadowStrong
-                shadowBlur: 0.8
+                shadowEnabled: Theme.elevationEnabled
+                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
+                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
                 shadowHorizontalOffset: 0
-                shadowVerticalOffset: 4
+                shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+                shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             }
 
             Rectangle {

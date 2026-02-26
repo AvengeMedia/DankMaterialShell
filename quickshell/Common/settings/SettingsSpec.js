@@ -46,6 +46,7 @@ var SPEC = {
     modalAnimationSpeed: { def: 1 },
     modalCustomAnimationDuration: { def: 150 },
     enableRippleEffects: { def: true },
+    m3ElevationEnabled: { def: true },
     wallpaperFillMode: { def: "Fill" },
     blurredWallpaperLayer: { def: false },
     blurWallpaperOnOverview: { def: false },

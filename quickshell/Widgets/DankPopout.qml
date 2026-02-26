@@ -493,14 +493,15 @@ Item {
                 x: contentWrapper.x
                 y: contentWrapper.y
 
-                property real shadowBlurPx: 10
-                property real shadowSpreadPx: 0
-                property real shadowBaseAlpha: 0.60
+                readonly property var elev: Theme.elevationLevel3
+                property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 12
+                property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
+                property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.3
                 readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
                 readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
-                readonly property int blurMax: 64
+                readonly property int blurMax: Theme.elevationBlurMax
 
-                layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
                 layer.smooth: false
 
                 layer.effect: MultiEffect {
@@ -511,10 +512,8 @@ Item {
                     maskEnabled: false
                     shadowBlur: Math.max(0, Math.min(1, shadowSource.shadowBlurPx / shadowSource.blurMax))
                     shadowScale: 1 + (2 * shadowSource.shadowSpreadPx) / Math.max(1, Math.min(shadowSource.width, shadowSource.height))
-                    shadowColor: {
-                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                        return Theme.withAlpha(baseColor, shadowSource.effectiveShadowAlpha);
-                    }
+                    shadowVerticalOffset: parent.elev && parent.elev.offsetY !== undefined ? parent.elev.offsetY : 6
+                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                 }
             }
 

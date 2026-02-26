@@ -940,9 +940,10 @@ BasePill {
                     }
                 })(), overflowMenu.dpr)
 
-            property real shadowBlurPx: 10
-            property real shadowSpreadPx: 0
-            property real shadowBaseAlpha: 0.60
+            readonly property var elev: Theme.elevationLevel2
+            property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 8
+            property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
+            property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.25
             readonly property real popupSurfaceAlpha: Theme.popupTransparency
             readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
 
@@ -966,7 +967,7 @@ BasePill {
             Item {
                 id: bgShadowLayer
                 anchors.fill: parent
-                layer.enabled: true
+                layer.enabled: Theme.elevationEnabled
                 layer.smooth: true
                 layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -1412,9 +1413,10 @@ BasePill {
                             }
                         })(), menuWindow.dpr)
 
-                    property real shadowBlurPx: 10
-                    property real shadowSpreadPx: 0
-                    property real shadowBaseAlpha: 0.60
+                    readonly property var elev: Theme.elevationLevel2
+                    property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 8
+                    property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
+                    property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.25
                     readonly property real popupSurfaceAlpha: Theme.popupTransparency
                     readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
 
@@ -1438,7 +1440,7 @@ BasePill {
                     Item {
                         id: menuBgShadowLayer
                         anchors.fill: parent
-                        layer.enabled: true
+                        layer.enabled: Theme.elevationEnabled
                         layer.smooth: true
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically

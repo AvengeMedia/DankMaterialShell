@@ -1592,6 +1592,16 @@ Item {
                     defaultValue: 12
                     onSliderValueChanged: newValue => SettingsData.setCornerRadius(newValue)
                 }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "lift", "m3", "material"]
+                    settingKey: "m3ElevationEnabled"
+                    text: I18n.tr("M3 Elevation & Shadows")
+                    description: I18n.tr("Material Design 3 shadows and elevation on modals, popouts, and dialogs")
+                    checked: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
+                }
             }
 
             SettingsCard {

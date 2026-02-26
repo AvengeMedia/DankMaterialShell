@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -374,6 +375,31 @@ Item {
                             duration: animationDuration
                             easing.type: Easing.BezierSpline
                             easing.bezierCurve: root.shouldBeVisible ? root.animationEnterCurve : root.animationExitCurve
+                        }
+                    }
+
+                    readonly property var elev: Theme.elevationLevel3
+                    readonly property real shadowBlurNorm: Math.max(0, Math.min(1, (elev && elev.blurPx !== undefined ? elev.blurPx : 12) / Theme.elevationBlurMax))
+
+                    Rectangle {
+                        id: modalShadowShape
+                        anchors.fill: parent
+                        radius: root.cornerRadius
+                        color: "black"
+                        visible: false
+                        layer.enabled: root.enableShadow && Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                        layer.smooth: false
+
+                        layer.effect: MultiEffect {
+                            autoPaddingEnabled: true
+                            shadowEnabled: true
+                            blurEnabled: false
+                            maskEnabled: false
+                            shadowBlur: modalShadowShape.parent.shadowBlurNorm
+                            shadowScale: 1
+                            shadowVerticalOffset: modalShadowShape.parent.elev && modalShadowShape.parent.elev.offsetY !== undefined ? modalShadowShape.parent.elev.offsetY : 6
+                            shadowHorizontalOffset: 0
+                            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                         }
                     }
 

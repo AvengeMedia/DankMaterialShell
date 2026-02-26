@@ -148,14 +148,14 @@ Item {
         radius: Theme.cornerRadius
         color: Theme.surfaceContainer
 
-        layer.enabled: true
+        layer.enabled: Theme.elevationEnabled
         layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowBlur: 0.5
+            shadowEnabled: Theme.elevationEnabled
+            shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
             shadowHorizontalOffset: 0
-            shadowVerticalOffset: 4
-            shadowColor: Theme.shadowStrong
-            shadowOpacity: 1
+            shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
+            shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
             blurMax: 32
         }
 

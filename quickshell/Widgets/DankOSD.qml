@@ -257,9 +257,10 @@ PanelWindow {
         scale: shouldBeVisible ? 1 : 0.9
 
         property bool childHovered: false
-        property real shadowBlurPx: 10
-        property real shadowSpreadPx: 0
-        property real shadowBaseAlpha: 0.60
+        readonly property var elev: Theme.elevationLevel3
+        property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 12
+        property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
+        property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.3
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
         readonly property real effectiveShadowAlpha: shouldBeVisible ? Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha)) : 0
 
@@ -277,12 +278,12 @@ PanelWindow {
             id: bgShadowLayer
             anchors.fill: parent
             visible: osdContainer.popupSurfaceAlpha >= 0.95
-            layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+            layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.smooth: false
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            readonly property int blurMax: 64
+            readonly property int blurMax: Theme.elevationBlurMax
 
             layer.effect: MultiEffect {
                 id: shadowFx
