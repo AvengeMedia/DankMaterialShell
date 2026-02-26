@@ -185,11 +185,21 @@ Item {
                 title: I18n.tr("Video Screensaver")
                 settingKey: "videoScreensaver"
 
+                StyledText {
+                    visible: !MultimediaService.available
+                    text: I18n.tr("QtMultimedia is not available - video screensaver requires qt multimedia services")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.warning
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                }
+
                 SettingsToggleRow {
                     settingKey: "lockScreenVideoEnabled"
                     tags: ["lock", "screen", "video", "screensaver", "animation", "movie"]
                     text: I18n.tr("Enable Video Screensaver")
                     description: I18n.tr("Play a video when the screen locks.")
+                    enabled: MultimediaService.available
                     checked: SettingsData.lockScreenVideoEnabled
                     onToggled: checked => SettingsData.set("lockScreenVideoEnabled", checked)
                 }
@@ -197,7 +207,7 @@ Item {
                 Column {
                     width: parent.width
                     spacing: Theme.spacingXS
-                    visible: SettingsData.lockScreenVideoEnabled
+                    visible: SettingsData.lockScreenVideoEnabled && MultimediaService.available
 
                     StyledText {
                         text: I18n.tr("Video Path")
@@ -243,7 +253,8 @@ Item {
                     tags: ["lock", "screen", "video", "screensaver", "cycling", "random", "shuffle"]
                     text: I18n.tr("Automatic Cycling")
                     description: I18n.tr("Pick a different random video each time from the same folder")
-                    visible: SettingsData.lockScreenVideoEnabled
+                    visible: SettingsData.lockScreenVideoEnabled && MultimediaService.available
+                    enabled: MultimediaService.available
                     checked: SettingsData.lockScreenVideoCycling
                     onToggled: checked => SettingsData.set("lockScreenVideoCycling", checked)
                 }

@@ -1,7 +1,6 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
-import QtMultimedia
 import Quickshell.Io
 import qs.Common
 import qs.Services
@@ -15,6 +14,7 @@ Item {
     property bool inputEnabled: false
     property point lastMousePos: Qt.point(-1, -1)
     property bool mouseInitialized: false
+    property var videoPlayer: null
 
     signal dismissed
 
@@ -22,30 +22,10 @@ Item {
     z: 1000
 
     Rectangle {
+        id: background
         anchors.fill: parent
         color: "black"
         visible: root.active
-    }
-
-    Video {
-        id: videoPlayer
-        anchors.fill: parent
-        source: root.videoSource
-        fillMode: VideoOutput.PreserveAspectCrop
-        loops: MediaPlayer.Infinite
-        volume: 0
-
-        onSourceChanged: {
-            if (source && root.active) {
-                play();
-            }
-        }
-
-        onErrorOccurred: (error, errorString) => {
-            console.warn("VideoScreensaver: playback error:", errorString);
-            ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("Playback error: ") + errorString);
-            root.dismiss();
-        }
     }
 
     Timer {
@@ -59,7 +39,6 @@ Item {
         property string result: ""
         property string folder: ""
 
-        // random picker
         command: ["sh", "-c", "find '" + folder + "' -maxdepth 1 -type f \\( " + "-iname '*.mp4' -o -iname '*.mkv' -o -iname '*.webm' -o " + "-iname '*.mov' -o -iname '*.avi' -o -iname '*.m4v' " + "\\) 2>/dev/null | shuf -n1"]
 
         stdout: SplitParser {
@@ -79,19 +58,6 @@ Item {
                 root.dismiss();
             }
         }
-    }
-
-    function start() {
-        if (!SettingsData.lockScreenVideoEnabled || !SettingsData.lockScreenVideoPath)
-            return;
-        videoPicker.result = "";
-        videoPicker.folder = "";
-        inputEnabled = false;
-        mouseInitialized = false;
-        lastMousePos = Qt.point(-1, -1);
-        active = true;
-        inputEnableTimer.start();
-        fileChecker.running = true;
     }
 
     Process {
@@ -115,14 +81,80 @@ Item {
         }
     }
 
+    function createVideoPlayer() {
+        if (videoPlayer)
+            return true;
+
+        try {
+            videoPlayer = Qt.createQmlObject(`
+                import QtQuick
+                import QtMultimedia
+                Video {
+                    anchors.fill: parent
+                    fillMode: VideoOutput.PreserveAspectCrop
+                    loops: MediaPlayer.Infinite
+                    volume: 0
+                }
+            `, background, "VideoScreensaver.VideoPlayer");
+
+            videoPlayer.errorOccurred.connect((error, errorString) => {
+                console.warn("VideoScreensaver: playback error:", errorString);
+                ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("Playback error: ") + errorString);
+                root.dismiss();
+            });
+
+            return true;
+        } catch (e) {
+            console.warn("VideoScreensaver: Failed to create video player:", e);
+            return false;
+        }
+    }
+
+    function destroyVideoPlayer() {
+        if (videoPlayer) {
+            videoPlayer.stop();
+            videoPlayer.destroy();
+            videoPlayer = null;
+        }
+    }
+
+    function start() {
+        if (!SettingsData.lockScreenVideoEnabled || !SettingsData.lockScreenVideoPath)
+            return;
+
+        if (!MultimediaService.available) {
+            ToastService.showError(I18n.tr("Video Screensaver"), I18n.tr("QtMultimedia is not available"));
+            return;
+        }
+
+        if (!createVideoPlayer())
+            return;
+
+        videoPicker.result = "";
+        videoPicker.folder = "";
+        inputEnabled = false;
+        mouseInitialized = false;
+        lastMousePos = Qt.point(-1, -1);
+        active = true;
+        inputEnableTimer.start();
+        fileChecker.running = true;
+    }
+
     function dismiss() {
         if (!active)
             return;
-        videoPlayer.stop();
+        destroyVideoPlayer();
         inputEnabled = false;
         active = false;
         videoSource = "";
         dismissed();
+    }
+
+    onVideoSourceChanged: {
+        if (videoSource && active && videoPlayer) {
+            videoPlayer.source = videoSource;
+            videoPlayer.play();
+        }
     }
 
     MouseArea {
