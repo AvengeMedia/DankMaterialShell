@@ -32,7 +32,6 @@ var SPEC = {
     mangoLayoutRadiusOverride: { def: -1, onChange: "updateCompositorLayout" },
     mangoLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
 
-    locale: { def: "", onChange: "updateLocale" },
     use24HourClock: { def: true },
     showSeconds: { def: false },
     padHours12Hour: { def: false },

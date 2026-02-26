@@ -21,7 +21,9 @@ Singleton {
     property bool _isReadOnly: false
     property bool _hasUnsavedChanges: false
     property var _loadedSessionSnapshot: null
-    readonly property var _hooks: ({})
+    readonly property var _hooks: ({
+        "updateLocale": updateLocale
+    })
     readonly property string _stateUrl: StandardPaths.writableLocation(StandardPaths.GenericStateLocation)
     readonly property string _stateDir: Paths.strip(_stateUrl)
 
@@ -125,6 +127,8 @@ Singleton {
     property var deviceMaxVolumes: ({})
     property var hiddenOutputDeviceNames: []
     property var hiddenInputDeviceNames: []
+
+    property string locale: ""
 
     property string launcherLastMode: "all"
     property string appDrawerLastMode: "apps"
@@ -1102,6 +1106,14 @@ Singleton {
         delete updated[nodeName];
         deviceMaxVolumes = updated;
         saveSettings();
+    }
+
+    function updateLocale() {
+        if (!locale) {
+            I18n._pickTranslation();
+            return;
+        }
+        I18n.useLocale(locale, locale.startsWith("en") ? "" : I18n.folder + "/" + locale + ".json");
     }
 
     function setLauncherLastMode(mode) {

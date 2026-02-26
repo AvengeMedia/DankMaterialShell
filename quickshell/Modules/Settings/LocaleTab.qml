@@ -5,7 +5,9 @@ import qs.Widgets
 import qs.Modules.Settings.Widgets
 
 Item {
-    id: root
+    id: localeTab
+
+    readonly property string _systemDefaultLabel: I18n.tr("System Default")
 
     function capitalizeNativeLanguageName(localeCode) {
         if (I18n.presentLocales[localeCode] == undefined) {
@@ -13,6 +15,11 @@ Item {
         }
         const nativeName = I18n.presentLocales[localeCode].nativeLanguageName;
         return nativeName[0].toUpperCase() + nativeName.slice(1);
+    }
+
+    function _displayValue() {
+        if (!SessionData.locale) return _systemDefaultLabel;
+        return capitalizeNativeLanguageName(SessionData.locale);
     }
 
     DankFlickable {
@@ -41,17 +48,21 @@ Item {
                     settingKey: "locale"
                     text: I18n.tr("Current Locale")
                     description: I18n.tr("Change the locale used by the DMS interface.")
-                    options: Object.keys(I18n.presentLocales).map(root.capitalizeNativeLanguageName)
+                    options: [localeTab._systemDefaultLabel].concat(Object.keys(I18n.presentLocales).map(localeTab.capitalizeNativeLanguageName))
                     enableFuzzySearch: true
 
                     Component.onCompleted: {
-                        currentValue = root.capitalizeNativeLanguageName(SettingsData.locale);
+                        currentValue = localeTab._displayValue();
                     }
 
                     onValueChanged: value => {
+                        if (value === localeTab._systemDefaultLabel) {
+                            SessionData.set("locale", "");
+                            return;
+                        }
                         for (let code of Object.keys(I18n.presentLocales)) {
-                            if (root.capitalizeNativeLanguageName(code) === value) {
-                                SettingsData.set("locale", code);
+                            if (localeTab.capitalizeNativeLanguageName(code) === value) {
+                                SessionData.set("locale", code);
                                 return;
                             }
                         }

@@ -79,6 +79,8 @@ var SPEC = {
     hiddenOutputDeviceNames: { def: [] },
     hiddenInputDeviceNames: { def: [] },
 
+    locale: { def: "", onChange: "updateLocale" },
+
     launcherLastMode: { def: "all" },
     appDrawerLastMode: { def: "apps" },
     niriOverviewLastMode: { def: "apps" }

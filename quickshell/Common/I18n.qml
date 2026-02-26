@@ -8,7 +8,9 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    readonly property string _rawLocale: SettingsData.locale === "" ? Qt.locale().name : SettingsData.locale
+    property string _resolvedLocale: "en"
+
+    readonly property string _rawLocale: SessionData.locale === "" ? Qt.locale().name : SessionData.locale
     readonly property string _lang: _rawLocale.split(/[_-]/)[0]
     readonly property var _candidates: {
         const fullUnderscore = _rawLocale;
@@ -49,22 +51,21 @@ Singleton {
             try {
                 root.translations = JSON.parse(text());
                 root.translationsLoaded = true;
-                console.info(`I18n: Loaded translations for '${SettingsData.locale}' (${Object.keys(root.translations).length} contexts)`);
+                console.info(`I18n: Loaded translations for '${root._resolvedLocale}' (${Object.keys(root.translations).length} contexts)`);
             } catch (e) {
-                console.warn(`I18n: Error parsing '${SettingsData.locale}':`, e, "- falling back to English");
+                console.warn(`I18n: Error parsing '${root._resolvedLocale}':`, e, "- falling back to English");
                 root._fallbackToEnglish();
             }
         }
 
         onLoadFailed: error => {
-            console.warn(`I18n: Failed to load '${SettingsData.locale}' (${error}), ` + "falling back to English");
+            console.warn(`I18n: Failed to load '${root._resolvedLocale}' (${error}), ` + "falling back to English");
             root._fallbackToEnglish();
         }
     }
 
-    // for replacing Qt.locale()
     function locale() {
-        return presentLocales[SettingsData.locale] ?? presentLocales["en"];
+        return presentLocales[_resolvedLocale] ?? presentLocales["en"];
     }
 
     function _loadPresentLocales() {
@@ -83,16 +84,18 @@ Singleton {
     function _pickTranslation() {
         for (let i = 0; i < _candidates.length; i++) {
             const cand = _candidates[i];
-            if (presentLocales[cand] !== undefined) {
-                SettingsData.set("locale", cand);
-                return;
-            }
+            if (presentLocales[cand] === undefined) continue;
+            _resolvedLocale = cand;
+            useLocale(cand, cand.startsWith("en") ? "" : translationsFolder + "/" + cand + ".json");
+            return;
         }
 
+        _resolvedLocale = "en";
         _fallbackToEnglish();
     }
 
     function useLocale(localeTag, fileUrl) {
+        _resolvedLocale = localeTag || "en";
         _selectedPath = fileUrl;
         translationsLoaded = false;
         translations = ({});
