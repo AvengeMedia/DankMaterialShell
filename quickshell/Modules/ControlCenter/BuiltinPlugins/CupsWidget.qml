@@ -288,7 +288,7 @@ PluginComponent {
                                         StyledText {
                                             text: {
                                                 var date = new Date(modelData.timeCreated);
-                                                return date.toLocaleString(I18n.locale(), Locale.ShortFormat);
+                                                return date.toLocaleString(Qt.locale(), Locale.ShortFormat);
                                             }
                                             font.pixelSize: Theme.fontSizeSmall
                                             color: Theme.surfaceTextMedium

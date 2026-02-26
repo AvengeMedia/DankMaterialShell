@@ -15,7 +15,7 @@ Rectangle {
     signal closeDash
 
     function weekStartJs() {
-        return I18n.locale().firstDayOfWeek % 7;
+        return Qt.locale().firstDayOfWeek % 7;
     }
 
     function startOfWeek(dateObj) {
@@ -223,11 +223,10 @@ Rectangle {
             Repeater {
                 model: {
                     const days = [];
-                    const loc = I18n.locale();
-                    const qtFirst = loc.firstDayOfWeek;
+                    const qtFirst = Qt.locale().firstDayOfWeek;
                     for (let i = 0; i < 7; ++i) {
                         const qtDay = ((qtFirst - 1 + i) % 7) + 1;
-                        days.push(loc.dayName(qtDay, Locale.ShortFormat));
+                        days.push(I18n.locale().dayName(qtDay, Locale.ShortFormat));
                     }
                     return days;
                 }

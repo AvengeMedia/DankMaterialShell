@@ -222,7 +222,7 @@ Item {
 
                 property string fullTimeStr: {
                     const format = SettingsData.getEffectiveTimeFormat();
-                    return systemClock.date.toLocaleTimeString(I18n.locale(), format);
+                    return systemClock.date.toLocaleTimeString(Qt.locale(), format);
                 }
                 property var timeParts: fullTimeStr.split(':')
                 property string hours: timeParts[0] || ""

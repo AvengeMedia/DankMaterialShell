@@ -1108,7 +1108,7 @@ Item {
                                                                         text: {
                                                                             const size = Math.round((modelData.size || 0) / 1024);
                                                                             const date = new Date(modelData.timeCreated);
-                                                                            return size + " KB • " + date.toLocaleString(I18n.locale(), Locale.ShortFormat);
+                                                                            return size + " KB • " + date.toLocaleString(Qt.locale(), Locale.ShortFormat);
                                                                         }
                                                                         font.pixelSize: Theme.fontSizeSmall - 1
                                                                         color: Theme.surfaceVariantText

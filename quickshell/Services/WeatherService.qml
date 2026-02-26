@@ -415,7 +415,7 @@ Singleton {
         try {
             const date = new Date(isoString);
             const format = SettingsData.use24HourClock ? "HH:mm" : "h:mm AP";
-            return date.toLocaleTimeString(I18n.locale(), format);
+            return date.toLocaleTimeString(Qt.locale(), format);
         } catch (e) {
             return "--";
         }
