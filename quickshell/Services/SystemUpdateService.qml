@@ -259,7 +259,7 @@ Singleton {
         const terminal = Quickshell.env("TERMINAL") || "xterm";
 
         if (SettingsData.updaterUseCustomCommand && SettingsData.updaterCustomCommand.length > 0) {
-            const updateCommand = `${SettingsData.updaterCustomCommand} && echo "Updates complete! Press Enter to close..." && read`;
+            const updateCommand = `${SettingsData.updaterCustomCommand} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
             const termClass = SettingsData.updaterTerminalAdditionalParams;
 
             var finalCommand = [terminal];
@@ -274,7 +274,7 @@ Singleton {
         } else {
             const params = packageManagerParams[pkgManager].upgradeSettings.params.join(" ");
             const sudo = packageManagerParams[pkgManager].upgradeSettings.requiresSudo ? "sudo" : "";
-            const updateCommand = `${sudo} ${pkgManager} ${params} && echo "Updates complete! Press Enter to close..." && read`;
+            const updateCommand = `${sudo} ${pkgManager} ${params} && echo -n "Updates complete! " ; echo "Press Enter to close..." && read`;
 
             updater.command = [terminal, "-e", "sh", "-c", updateCommand];
         }
