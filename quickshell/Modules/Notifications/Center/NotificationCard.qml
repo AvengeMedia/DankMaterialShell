@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
@@ -98,6 +99,20 @@ Rectangle {
         return 1;
     }
     clip: true
+
+    layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    layer.smooth: false
+    layer.effect: MultiEffect {
+        autoPaddingEnabled: true
+        shadowEnabled: Theme.elevationEnabled
+        blurEnabled: false
+        maskEnabled: false
+        shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel1.blurPx / Theme.elevationBlurMax))
+        shadowScale: 1
+        shadowVerticalOffset: Theme.elevationLevel1.offsetY
+        shadowHorizontalOffset: 0
+        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+    }
 
     HoverHandler {
         id: cardHoverHandler

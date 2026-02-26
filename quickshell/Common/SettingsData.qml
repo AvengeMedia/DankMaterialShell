@@ -167,6 +167,10 @@ Singleton {
     onEnableRippleEffectsChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
+    property bool modalElevationEnabled: true
+    onModalElevationEnabledChanged: saveSettings()
+    property bool popoutElevationEnabled: true
+    onPopoutElevationEnabledChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false

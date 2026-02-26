@@ -278,7 +278,7 @@ PanelWindow {
             id: bgShadowLayer
             anchors.fill: parent
             visible: osdContainer.popupSurfaceAlpha >= 0.95
-            layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+            layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.smooth: false
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
@@ -293,10 +293,7 @@ PanelWindow {
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: {
-                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                    return Theme.withAlpha(baseColor, osdContainer.effectiveShadowAlpha);
-                }
+                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
             }
 
             Rectangle {
@@ -305,6 +302,13 @@ PanelWindow {
                 color: Theme.surfaceContainer
                 border.color: Theme.outlineMedium
                 border.width: 1
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: Theme.cornerRadius
+                color: Theme.surfaceTint
+                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
             }
         }
 

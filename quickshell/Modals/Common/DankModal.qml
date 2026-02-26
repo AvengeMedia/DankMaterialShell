@@ -35,7 +35,7 @@ Item {
     property color borderColor: Theme.outlineMedium
     property real borderWidth: 1
     property real cornerRadius: Theme.cornerRadius
-    property bool enableShadow: false
+    property bool enableShadow: true
     property alias modalFocusScope: focusScope
     property bool shouldBeVisible: false
     property bool shouldHaveFocus: shouldBeVisible
@@ -143,7 +143,7 @@ Item {
         }
     }
 
-    readonly property real shadowBuffer: 5
+    readonly property real shadowBuffer: 24
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
@@ -381,13 +381,10 @@ Item {
                     readonly property var elev: Theme.elevationLevel3
                     readonly property real shadowBlurNorm: Math.max(0, Math.min(1, (elev && elev.blurPx !== undefined ? elev.blurPx : 12) / Theme.elevationBlurMax))
 
-                    Rectangle {
-                        id: modalShadowShape
+                    Item {
+                        id: modalShadowLayer
                         anchors.fill: parent
-                        radius: root.cornerRadius
-                        color: "black"
-                        visible: false
-                        layer.enabled: root.enableShadow && Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                        layer.enabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                         layer.smooth: false
 
                         layer.effect: MultiEffect {
@@ -395,20 +392,27 @@ Item {
                             shadowEnabled: true
                             blurEnabled: false
                             maskEnabled: false
-                            shadowBlur: modalShadowShape.parent.shadowBlurNorm
+                            shadowBlur: animatedContent.shadowBlurNorm
                             shadowScale: 1
-                            shadowVerticalOffset: modalShadowShape.parent.elev && modalShadowShape.parent.elev.offsetY !== undefined ? modalShadowShape.parent.elev.offsetY : 6
+                            shadowVerticalOffset: animatedContent.elev && animatedContent.elev.offsetY !== undefined ? animatedContent.elev.offsetY : 6
                             shadowHorizontalOffset: 0
                             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: root.cornerRadius
+                            color: root.backgroundColor
+                            border.color: root.borderColor
+                            border.width: root.borderWidth
                         }
                     }
 
                     Rectangle {
                         anchors.fill: parent
-                        color: root.backgroundColor
-                        border.color: root.borderColor
-                        border.width: root.borderWidth
                         radius: root.cornerRadius
+                        color: Theme.surfaceTint
+                        opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
                     }
 
                     FocusScope {

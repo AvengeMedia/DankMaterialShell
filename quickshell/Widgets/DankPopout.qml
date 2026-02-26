@@ -197,7 +197,7 @@ Item {
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
 
-    readonly property real shadowBuffer: 5
+    readonly property real shadowBuffer: 24
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
 
@@ -487,7 +487,6 @@ Item {
                 height: parent.height
                 radius: Theme.cornerRadius
                 color: "black"
-                visible: false
                 opacity: contentWrapper.opacity
                 scale: contentWrapper.scale
                 x: contentWrapper.x
@@ -501,7 +500,7 @@ Item {
                 readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
                 readonly property int blurMax: Theme.elevationBlurMax
 
-                layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
+                layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
                 layer.smooth: false
 
                 layer.effect: MultiEffect {
@@ -546,6 +545,13 @@ Item {
                     color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                     border.color: Theme.outlineMedium
                     border.width: 1
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: Theme.cornerRadius
+                    color: Theme.surfaceTint
+                    opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
                 }
 
                 Loader {

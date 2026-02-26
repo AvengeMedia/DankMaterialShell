@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
@@ -390,12 +391,37 @@ Item {
                 }
             }
 
+            Item {
+                id: launcherShadowLayer
+                anchors.fill: parent
+                layer.enabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+                layer.smooth: false
+                layer.effect: MultiEffect {
+                    autoPaddingEnabled: true
+                    shadowEnabled: true
+                    blurEnabled: false
+                    maskEnabled: false
+                    shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel3.blurPx / Theme.elevationBlurMax))
+                    shadowScale: 1
+                    shadowVerticalOffset: Theme.elevationLevel3.offsetY
+                    shadowHorizontalOffset: 0
+                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    color: root.backgroundColor
+                    border.color: root.borderColor
+                    border.width: root.borderWidth
+                    radius: root.cornerRadius
+                }
+            }
+
             Rectangle {
                 anchors.fill: parent
-                color: root.backgroundColor
-                border.color: root.borderColor
-                border.width: root.borderWidth
                 radius: root.cornerRadius
+                color: Theme.surfaceTint
+                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
             }
 
             MouseArea {

@@ -814,12 +814,11 @@ Item {
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
-                        shadowEnabled: true
+                        shadowEnabled: Theme.elevationEnabled
                         shadowHorizontalOffset: 0
                         shadowVerticalOffset: 4
                         shadowBlur: 0.8
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        shadowOpacity: 0.2
+                        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                     }
                 }
 
@@ -836,12 +835,11 @@ Item {
 
                     layer.enabled: true
                     layer.effect: MultiEffect {
-                        shadowEnabled: true
+                        shadowEnabled: Theme.elevationEnabled
                         shadowHorizontalOffset: 0
                         shadowVerticalOffset: 4
                         shadowBlur: 0.8
-                        shadowColor: Qt.rgba(0, 0, 0, 0.2)
-                        shadowOpacity: 0.2
+                        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                     }
                 }
             }

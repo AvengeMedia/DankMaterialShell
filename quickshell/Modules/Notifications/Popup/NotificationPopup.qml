@@ -341,7 +341,7 @@ PanelWindow {
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            readonly property int blurMax: 64
+            readonly property int blurMax: Theme.elevationBlurMax
 
             layer.effect: MultiEffect {
                 id: shadowFx
@@ -390,6 +390,13 @@ PanelWindow {
                         color: "transparent"
                     }
                 }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                radius: shadowShapeSource.radius
+                color: Theme.surfaceTint
+                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(content.elevLevel) : 0
             }
         }
 

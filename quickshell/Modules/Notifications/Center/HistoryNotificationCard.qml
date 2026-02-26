@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Services
@@ -31,6 +32,20 @@ Rectangle {
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
     clip: true
+
+    layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    layer.smooth: false
+    layer.effect: MultiEffect {
+        autoPaddingEnabled: true
+        shadowEnabled: Theme.elevationEnabled
+        blurEnabled: false
+        maskEnabled: false
+        shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel1.blurPx / Theme.elevationBlurMax))
+        shadowScale: 1
+        shadowVerticalOffset: Theme.elevationLevel1.offsetY
+        shadowHorizontalOffset: 0
+        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+    }
 
     color: {
         if (isSelected && keyboardNavigationActive)

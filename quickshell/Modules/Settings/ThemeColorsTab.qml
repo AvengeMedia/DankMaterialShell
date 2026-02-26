@@ -1602,6 +1602,28 @@ Item {
                     checked: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
                 }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "modal", "dialog", "m3"]
+                    settingKey: "modalElevationEnabled"
+                    text: I18n.tr("Modal Shadows")
+                    description: I18n.tr("Shadow elevation on modals and dialogs")
+                    checked: SettingsData.modalElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("modalElevationEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "popout", "popup", "osd", "dropdown", "m3"]
+                    settingKey: "popoutElevationEnabled"
+                    text: I18n.tr("Popout Shadows")
+                    description: I18n.tr("Shadow elevation on popouts, OSDs, and dropdowns")
+                    checked: SettingsData.popoutElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("popoutElevationEnabled", checked)
+                }
             }
 
             SettingsCard {
