@@ -3772,6 +3772,48 @@
     "description": "Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)"
   },
   {
+    "section": "enableU2f",
+    "label": "Enable security key authentication",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "authentication",
+      "enable",
+      "fido",
+      "hardware",
+      "key",
+      "lock",
+      "lockscreen",
+      "login",
+      "password",
+      "screen",
+      "security",
+      "u2f",
+      "yubikey"
+    ],
+    "description": "Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)"
+  },
+  {
+    "section": "u2fMode",
+    "label": "Security key mode",
+    "tabIndex": 11,
+    "category": "Lock Screen",
+    "keywords": [
+      "alternative",
+      "authentication",
+      "factor",
+      "key",
+      "lock",
+      "lockscreen",
+      "mode",
+      "second",
+      "security",
+      "u2f",
+      "yubikey"
+    ],
+    "description": "Alternative lets the key unlock on its own. Second factor requires password or fingerprint first, then the key."
+  },
+  {
     "section": "loginctlLockIntegration",
     "label": "Enable loginctl lock integration",
     "tabIndex": 11,

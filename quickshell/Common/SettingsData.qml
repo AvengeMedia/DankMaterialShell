@@ -494,6 +494,9 @@ Singleton {
     property bool enableFprint: false
     property int maxFprintTries: 15
     property bool fprintdAvailable: false
+    property bool enableU2f: false
+    property string u2fMode: "or"
+    property bool u2fAvailable: false
     property string lockScreenActiveMonitor: "all"
     property string lockScreenInactiveColor: "#000000"
     property int lockScreenNotificationMode: 0
@@ -982,6 +985,7 @@ Singleton {
             loadSettings();
             initializeListModels();
             Processes.detectFprintd();
+            Processes.detectU2f();
             Processes.checkPluginSettings();
         }
     }
