@@ -251,7 +251,7 @@ Scope {
     Process {
         id: u2fAvailProc
 
-        command: ["sh", "-c", "(test -f /usr/lib/security/pam_u2f.so || test -f /usr/lib64/security/pam_u2f.so) && test -f \"$HOME/.config/Yubico/u2f_keys\""]
+        command: ["sh", "-c", "(test -f /usr/lib/security/pam_u2f.so || test -f /usr/lib64/security/pam_u2f.so) && (test -f /etc/pam.d/dankshell-u2f || test -f \"$HOME/.config/Yubico/u2f_keys\")"]
         onExited: code => {
             u2f.available = code === 0;
             u2f.checkAvail();
