@@ -765,6 +765,11 @@ Item {
                             }
 
                             if (event.key === Qt.Key_Escape) {
+                                if (pam.u2fPending) {
+                                    pam.cancelU2fPending();
+                                    event.accepted = true;
+                                    return;
+                                }
                                 clear();
                             }
 

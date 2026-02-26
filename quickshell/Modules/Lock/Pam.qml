@@ -33,6 +33,7 @@ Scope {
             u2f.abort();
             errorRetry.running = false;
             u2fErrorRetry.running = false;
+            u2fPendingTimeout.running = false;
             u2fPending = false;
             u2fState = "";
             unlockRequested();
@@ -45,6 +46,17 @@ Scope {
         } else {
             completeUnlock();
         }
+    }
+
+    function cancelU2fPending(): void {
+        if (!u2fPending)
+            return;
+        u2f.abort();
+        u2fErrorRetry.running = false;
+        u2fPendingTimeout.running = false;
+        u2fPending = false;
+        u2fState = "";
+        fprint.checkAvail();
     }
 
     FileView {
@@ -182,6 +194,7 @@ Scope {
             abort();
             root.u2fPending = true;
             root.u2fState = "";
+            u2fPendingTimeout.restart();
             start();
         }
 
@@ -260,6 +273,13 @@ Scope {
     }
 
     Timer {
+        id: u2fPendingTimeout
+
+        interval: 30000
+        onTriggered: root.cancelU2fPending()
+    }
+
+    Timer {
         id: stateReset
 
         interval: 4000
@@ -295,6 +315,7 @@ Scope {
             u2f.abort();
             errorRetry.running = false;
             u2fErrorRetry.running = false;
+            u2fPendingTimeout.running = false;
             root.u2fPending = false;
             root.u2fState = "";
             root.unlockInProgress = false;
@@ -316,6 +337,7 @@ Scope {
             if (root.lockSecured) {
                 u2f.abort();
                 u2fErrorRetry.running = false;
+                u2fPendingTimeout.running = false;
                 root.u2fPending = false;
                 root.u2fState = "";
                 u2f.checkAvail();
