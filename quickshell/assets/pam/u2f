@@ -1,0 +1,3 @@
+#%PAM-1.0
+
+auth    required    pam_u2f.so  cue nouserok timeout=10

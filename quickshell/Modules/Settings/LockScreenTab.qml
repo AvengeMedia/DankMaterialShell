@@ -172,10 +172,38 @@ Item {
                     settingKey: "enableFprint"
                     tags: ["lock", "screen", "fingerprint", "authentication", "biometric", "fprint"]
                     text: I18n.tr("Enable fingerprint authentication")
-                    description: I18n.tr("Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)")
+                    description: SettingsData.fprintdAvailable ? I18n.tr("Use fingerprint reader for lock screen authentication (requires enrolled fingerprints)") : I18n.tr("Not enrolled", "fingerprint not detected status")
+                    descriptionColor: SettingsData.fprintdAvailable ? Theme.surfaceVariantText : Theme.warning
                     checked: SettingsData.enableFprint
-                    visible: SettingsData.fprintdAvailable
+                    enabled: SettingsData.fprintdAvailable
                     onToggled: checked => SettingsData.set("enableFprint", checked)
+                }
+
+                SettingsToggleRow {
+                    settingKey: "enableU2f"
+                    tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "fido", "authentication", "hardware"]
+                    text: I18n.tr("Enable security key authentication", "Enable FIDO2/U2F hardware security key for lock screen")
+                    description: SettingsData.u2fAvailable ? I18n.tr("Use a FIDO2/U2F security key (e.g. YubiKey) for lock screen authentication (requires enrolled keys)", "lock screen U2F security key setting") : I18n.tr("Not enrolled", "security key not detected status")
+                    descriptionColor: SettingsData.u2fAvailable ? Theme.surfaceVariantText : Theme.warning
+                    checked: SettingsData.enableU2f
+                    enabled: SettingsData.u2fAvailable
+                    onToggled: checked => SettingsData.set("enableU2f", checked)
+                }
+
+                SettingsDropdownRow {
+                    settingKey: "u2fMode"
+                    tags: ["lock", "screen", "u2f", "yubikey", "security", "key", "mode", "factor", "second"]
+                    text: I18n.tr("Security key mode", "lock screen U2F security key mode setting")
+                    description: I18n.tr("'Alternative' lets the key unlock on its own. 'Second factor' requires password or fingerprint first, then the key.", "lock screen U2F security key mode setting")
+                    visible: SettingsData.u2fAvailable && SettingsData.enableU2f
+                    options: [I18n.tr("Alternative (OR)", "U2F mode option: key works as standalone unlock method"), I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint")]
+                    currentValue: SettingsData.u2fMode === "and" ? I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint") : I18n.tr("Alternative (OR)", "U2F mode option: key works as standalone unlock method")
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Second Factor (AND)", "U2F mode option: key required after password or fingerprint"))
+                            SettingsData.set("u2fMode", "and");
+                        else
+                            SettingsData.set("u2fMode", "or");
+                    }
                 }
             }
 

@@ -9,6 +9,9 @@ function parse(root, jsonObj) {
 
     for (var k in SPEC) {
         if (k === "pluginSettings") continue;
+        // Runtime-only keys are never in the JSON; resetting them here
+        // would wipe values set by detection processes on every reload.
+        if (SPEC[k].persist === false) continue;
         if (!(k in jsonObj)) {
             root[k] = SPEC[k].def;
         }

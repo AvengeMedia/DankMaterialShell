@@ -18,6 +18,10 @@ Singleton {
         fprintdDetectionProcess.running = true;
     }
 
+    function detectU2f() {
+        u2fDetectionProcess.running = true;
+    }
+
     function checkPluginSettings() {
         pluginSettingsCheckProcess.running = true;
     }
@@ -54,6 +58,16 @@ Singleton {
             if (!settingsRoot)
                 return;
             settingsRoot.fprintdAvailable = (exitCode === 0);
+        }
+    }
+
+    property var u2fDetectionProcess: Process {
+        command: ["sh", "-c", "(test -f /usr/lib/security/pam_u2f.so || test -f /usr/lib64/security/pam_u2f.so) && (test -f /etc/pam.d/dankshell-u2f || test -f \"$HOME/.config/Yubico/u2f_keys\")"]
+        running: false
+        onExited: function (exitCode) {
+            if (!settingsRoot)
+                return;
+            settingsRoot.u2fAvailable = (exitCode === 0);
         }
     }
 

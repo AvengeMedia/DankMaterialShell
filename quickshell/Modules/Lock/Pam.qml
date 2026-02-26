@@ -14,13 +14,50 @@ Scope {
 
     readonly property alias passwd: passwd
     readonly property alias fprint: fprint
+    readonly property alias u2f: u2f
     property string lockMessage
     property string state
     property string fprintState
+    property string u2fState
+    property bool u2fPending: false
     property string buffer
 
     signal flashMsg
     signal unlockRequested
+
+    function completeUnlock(): void {
+        if (!unlockInProgress) {
+            unlockInProgress = true;
+            passwd.abort();
+            fprint.abort();
+            u2f.abort();
+            errorRetry.running = false;
+            u2fErrorRetry.running = false;
+            u2fPendingTimeout.running = false;
+            u2fPending = false;
+            u2fState = "";
+            unlockRequested();
+        }
+    }
+
+    function proceedAfterPrimaryAuth(): void {
+        if (SettingsData.enableU2f && SettingsData.u2fMode === "and" && u2f.available) {
+            u2f.startForSecondFactor();
+        } else {
+            completeUnlock();
+        }
+    }
+
+    function cancelU2fPending(): void {
+        if (!u2fPending)
+            return;
+        u2f.abort();
+        u2fErrorRetry.running = false;
+        u2fPendingTimeout.running = false;
+        u2fPending = false;
+        u2fState = "";
+        fprint.checkAvail();
+    }
 
     FileView {
         id: dankshellConfigWatcher
@@ -30,9 +67,9 @@ Scope {
     }
 
     FileView {
-        id: loginConfigWatcher
+        id: u2fConfigWatcher
 
-        path: "/etc/pam.d/login"
+        path: "/etc/pam.d/dankshell-u2f"
         printErrors: false
     }
 
@@ -40,7 +77,7 @@ Scope {
         id: passwd
 
         config: dankshellConfigWatcher.loaded ? "dankshell" : "login"
-        configDirectory: dankshellConfigWatcher.loaded || loginConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+        configDirectory: dankshellConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
 
         onMessageChanged: {
             if (message.startsWith("The account is locked"))
@@ -59,9 +96,8 @@ Scope {
         onCompleted: res => {
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
-                    root.unlockInProgress = true;
                     fprint.abort();
-                    root.unlockRequested();
+                    root.proceedAfterPrimaryAuth();
                 }
                 return;
             }
@@ -105,9 +141,8 @@ Scope {
 
             if (res === PamResult.Success) {
                 if (!root.unlockInProgress) {
-                    root.unlockInProgress = true;
                     passwd.abort();
-                    root.unlockRequested();
+                    root.proceedAfterPrimaryAuth();
                 }
                 return;
             }
@@ -135,6 +170,74 @@ Scope {
         }
     }
 
+    PamContext {
+        id: u2f
+
+        property bool available
+
+        function checkAvail(): void {
+            if (!available || !SettingsData.enableU2f || !root.lockSecured) {
+                abort();
+                return;
+            }
+
+            if (SettingsData.u2fMode === "or") {
+                start();
+            }
+        }
+
+        function startForSecondFactor(): void {
+            if (!available || !SettingsData.enableU2f) {
+                root.completeUnlock();
+                return;
+            }
+            abort();
+            root.u2fPending = true;
+            root.u2fState = "";
+            u2fPendingTimeout.restart();
+            start();
+        }
+
+        config: u2fConfigWatcher.loaded ? "dankshell-u2f" : "u2f"
+        configDirectory: u2fConfigWatcher.loaded ? "/etc/pam.d" : Quickshell.shellDir + "/assets/pam"
+
+        onMessageChanged: {
+            if (message.toLowerCase().includes("touch"))
+                root.u2fState = "waiting";
+        }
+
+        onCompleted: res => {
+            if (!available || root.unlockInProgress)
+                return;
+
+            if (res === PamResult.Success) {
+                root.completeUnlock();
+                return;
+            }
+
+            if (res === PamResult.Error || res === PamResult.MaxTries || res === PamResult.Failed) {
+                abort();
+
+                if (root.u2fPending) {
+                    if (root.u2fState === "waiting") {
+                        // AND mode: device was found but auth failed → back to password
+                        root.u2fPending = false;
+                        root.u2fState = "";
+                        fprint.checkAvail();
+                    } else {
+                        // AND mode: no device found → keep pending, show "Insert...", retry
+                        root.u2fState = "insert";
+                        u2fErrorRetry.restart();
+                    }
+                } else {
+                    // OR mode: prompt to insert key, silently retry
+                    root.u2fState = "insert";
+                    u2fErrorRetry.restart();
+                }
+            }
+        }
+    }
+
     Process {
         id: availProc
 
@@ -145,11 +248,35 @@ Scope {
         }
     }
 
+    Process {
+        id: u2fAvailProc
+
+        command: ["sh", "-c", "(test -f /usr/lib/security/pam_u2f.so || test -f /usr/lib64/security/pam_u2f.so) && (test -f /etc/pam.d/dankshell-u2f || test -f \"$HOME/.config/Yubico/u2f_keys\")"]
+        onExited: code => {
+            u2f.available = code === 0;
+            u2f.checkAvail();
+        }
+    }
+
     Timer {
         id: errorRetry
 
         interval: 800
         onTriggered: fprint.start()
+    }
+
+    Timer {
+        id: u2fErrorRetry
+
+        interval: 800
+        onTriggered: u2f.start()
+    }
+
+    Timer {
+        id: u2fPendingTimeout
+
+        interval: 30000
+        onTriggered: root.cancelU2fPending()
     }
 
     Timer {
@@ -175,13 +302,22 @@ Scope {
     onLockSecuredChanged: {
         if (lockSecured) {
             availProc.running = true;
+            u2fAvailProc.running = true;
             root.state = "";
             root.fprintState = "";
+            root.u2fState = "";
+            root.u2fPending = false;
             root.lockMessage = "";
             root.unlockInProgress = false;
         } else {
             fprint.abort();
             passwd.abort();
+            u2f.abort();
+            errorRetry.running = false;
+            u2fErrorRetry.running = false;
+            u2fPendingTimeout.running = false;
+            root.u2fPending = false;
+            root.u2fState = "";
             root.unlockInProgress = false;
         }
     }
@@ -191,6 +327,21 @@ Scope {
 
         function onEnableFprintChanged(): void {
             fprint.checkAvail();
+        }
+
+        function onEnableU2fChanged(): void {
+            u2f.checkAvail();
+        }
+
+        function onU2fModeChanged(): void {
+            if (root.lockSecured) {
+                u2f.abort();
+                u2fErrorRetry.running = false;
+                u2fPendingTimeout.running = false;
+                root.u2fPending = false;
+                root.u2fState = "";
+                u2f.checkAvail();
+            }
         }
     }
 }
