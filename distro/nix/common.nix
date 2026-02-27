@@ -11,6 +11,7 @@ in
 {
   packages = [
     dmsPkgs.dms-shell
+    cfg.quickshell.package
   ]
   ++ lib.optional cfg.enableSystemMonitoring cfg.dgop.package
   ++ lib.optionals cfg.enableVPN [
