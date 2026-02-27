@@ -17,15 +17,8 @@ func NewManager() (*Manager, error) {
 		return nil, fmt.Errorf("failed to connect to system bus: %w", err)
 	}
 
-	sessionID := os.Getenv("XDG_SESSION_ID")
-	if sessionID == "" {
-		sessionID = "self"
-	}
-
 	m := &Manager{
-		state: &SessionState{
-			SessionID: sessionID,
-		},
+		state:      &SessionState{},
 		stateMutex: sync.RWMutex{},
 
 		stopChan: make(chan struct{}),
@@ -60,12 +53,13 @@ func (m *Manager) initialize() error {
 
 	m.initializeFallbackDelay()
 
-	sessionPath, err := m.getSession(m.state.SessionID)
+	sessionID, sessionPath, err := m.discoverSession()
 	if err != nil {
 		return fmt.Errorf("failed to get session path: %w", err)
 	}
 
 	m.stateMutex.Lock()
+	m.state.SessionID = sessionID
 	m.state.SessionPath = string(sessionPath)
 	m.sessionPath = sessionPath
 	m.stateMutex.Unlock()
@@ -79,6 +73,41 @@ func (m *Manager) initialize() error {
 	return nil
 }
 
+func (m *Manager) discoverSession() (string, dbus.ObjectPath, error) {
+	// 1. Explicit XDG_SESSION_ID
+	if id := os.Getenv("XDG_SESSION_ID"); id != "" {
+		if path, err := m.getSession(id); err == nil {
+			fmt.Fprintf(os.Stderr, "loginctl: using XDG_SESSION_ID=%s\n", id)
+			return id, path, nil
+		}
+	}
+
+	// 2. PID-based lookup (works when caller is inside a session cgroup)
+	if id, path, err := m.getSessionByPID(uint32(os.Getpid())); err == nil {
+		fmt.Fprintf(os.Stderr, "loginctl: found session %s via PID\n", id)
+		return id, path, nil
+	}
+
+	// 3. User's primary display session (handles UWSM and similar)
+	if id, path, err := m.getUserDisplaySession(); err == nil {
+		fmt.Fprintf(os.Stderr, "loginctl: found session %s via User.Display\n", id)
+		return id, path, nil
+	}
+
+	// 4. Score all sessions for current UID
+	if id, path, err := m.findBestSession(); err == nil {
+		fmt.Fprintf(os.Stderr, "loginctl: found session %s via ListSessions scoring\n", id)
+		return id, path, nil
+	}
+
+	// 5. Last resort: "self"
+	path, err := m.getSession("self")
+	if err != nil {
+		return "", "", fmt.Errorf("%w", err)
+	}
+	return "self", path, nil
+}
+
 func (m *Manager) getSession(id string) (dbus.ObjectPath, error) {
 	var out dbus.ObjectPath
 	err := m.managerObj.Call(dbusManagerInterface+".GetSession", 0, id).Store(&out)
@@ -86,6 +115,166 @@ func (m *Manager) getSession(id string) (dbus.ObjectPath, error) {
 		return "", err
 	}
 	return out, nil
+}
+
+func (m *Manager) getSessionByPID(pid uint32) (string, dbus.ObjectPath, error) {
+	var path dbus.ObjectPath
+	if err := m.managerObj.Call(dbusManagerInterface+".GetSessionByPID", 0, pid).Store(&path); err != nil {
+		return "", "", err
+	}
+
+	sessionObj := m.conn.Object(dbusDest, path)
+	var id dbus.Variant
+	if err := sessionObj.Call(dbusPropsInterface+".Get", 0, dbusSessionInterface, "Id").Store(&id); err != nil {
+		return "", "", err
+	}
+	return id.Value().(string), path, nil
+}
+
+func (m *Manager) getUserDisplaySession() (string, dbus.ObjectPath, error) {
+	uid := uint32(os.Getuid())
+
+	var userPath dbus.ObjectPath
+	if err := m.managerObj.Call(dbusManagerInterface+".GetUser", 0, uid).Store(&userPath); err != nil {
+		return "", "", err
+	}
+
+	userObj := m.conn.Object(dbusDest, userPath)
+	var display dbus.Variant
+	if err := userObj.Call(dbusPropsInterface+".Get", 0, dbusUserInterface, "Display").Store(&display); err != nil {
+		return "", "", err
+	}
+
+	pair, ok := display.Value().([]any)
+	if !ok || len(pair) < 2 {
+		return "", "", fmt.Errorf("unexpected Display format")
+	}
+
+	sessionID, _ := pair[0].(string)
+	sessionPath, _ := pair[1].(dbus.ObjectPath)
+	if sessionID == "" || sessionPath == "" {
+		return "", "", fmt.Errorf("empty Display session")
+	}
+
+	return sessionID, sessionPath, nil
+}
+
+type sessionCandidate struct {
+	id   string
+	path dbus.ObjectPath
+}
+
+func (m *Manager) findBestSession() (string, dbus.ObjectPath, error) {
+	// ListSessions returns a(susso): [][]any where each entry is [id, uid, name, seat, path]
+	var raw [][]any
+	if err := m.managerObj.Call(dbusManagerInterface+".ListSessions", 0).Store(&raw); err != nil {
+		return "", "", err
+	}
+
+	uid := uint32(os.Getuid())
+	var candidates []sessionCandidate
+	for _, entry := range raw {
+		if len(entry) < 5 {
+			continue
+		}
+		entryUID, _ := entry[1].(uint32)
+		if entryUID != uid {
+			continue
+		}
+		id, _ := entry[0].(string)
+		path, _ := entry[4].(dbus.ObjectPath)
+		if id != "" && path != "" {
+			candidates = append(candidates, sessionCandidate{id: id, path: path})
+		}
+	}
+	if len(candidates) == 0 {
+		return "", "", fmt.Errorf("no sessions for uid %d", uid)
+	}
+
+	bestScore := -1
+	var best sessionCandidate
+	for _, c := range candidates {
+		score := m.scoreSession(c.path)
+		if score > bestScore {
+			bestScore = score
+			best = c
+		}
+	}
+	if bestScore < 0 {
+		return "", "", fmt.Errorf("no viable session found")
+	}
+	return best.id, best.path, nil
+}
+
+func (m *Manager) scoreSession(path dbus.ObjectPath) int {
+	obj := m.conn.Object(dbusDest, path)
+	var props map[string]dbus.Variant
+	if err := obj.Call(dbusPropsInterface+".GetAll", 0, dbusSessionInterface).Store(&props); err != nil {
+		return -1
+	}
+
+	getStr := func(key string) string {
+		if v, ok := props[key]; ok {
+			if s, ok := v.Value().(string); ok {
+				return s
+			}
+		}
+		return ""
+	}
+	getBool := func(key string) bool {
+		if v, ok := props[key]; ok {
+			if b, ok := v.Value().(bool); ok {
+				return b
+			}
+		}
+		return false
+	}
+	getUint32 := func(key string) uint32 {
+		if v, ok := props[key]; ok {
+			if u, ok := v.Value().(uint32); ok {
+				return u
+			}
+		}
+		return 0
+	}
+
+	class := getStr("Class")
+	if class != "user" {
+		return -1
+	}
+	if getBool("Remote") {
+		return -1
+	}
+
+	score := 0
+
+	if getBool("Active") {
+		score += 100
+	}
+
+	switch getStr("Type") {
+	case "wayland", "x11":
+		score += 80
+	case "tty":
+		score += 10
+	}
+
+	if v, ok := props["Seat"]; ok {
+		if seatArr, ok := v.Value().([]any); ok && len(seatArr) >= 1 {
+			if seat, ok := seatArr[0].(string); ok && seat != "" {
+				score += 40
+				if seat == "seat0" {
+					score += 10
+				}
+			}
+		}
+	}
+
+	if getUint32("VTNr") > 0 {
+		score += 20
+	}
+
+	return score
 }
 
 func (m *Manager) refreshSessionBinding() error {
