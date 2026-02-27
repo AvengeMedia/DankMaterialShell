@@ -33,7 +33,7 @@ Item {
     property list<real> animationExitCurve: Theme.expressiveCurves.emphasized
     property color backgroundColor: Theme.surfaceContainer
     property color borderColor: Theme.outlineMedium
-    property real borderWidth: 1
+    property real borderWidth: 0
     property real cornerRadius: Theme.cornerRadius
     property bool enableShadow: true
     property alias modalFocusScope: focusScope
@@ -143,7 +143,7 @@ Item {
         }
     }
 
-    readonly property real shadowBuffer: 24
+    readonly property real shadowBuffer: Theme.elevationBlurMax * 1.5 + 24
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
@@ -385,7 +385,6 @@ Item {
                         id: modalShadowLayer
                         anchors.fill: parent
                         layer.enabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-                        layer.smooth: false
 
                         layer.effect: MultiEffect {
                             autoPaddingEnabled: true
@@ -396,6 +395,7 @@ Item {
                             shadowScale: 1
                             shadowVerticalOffset: animatedContent.elev && animatedContent.elev.offsetY !== undefined ? animatedContent.elev.offsetY : 6
                             shadowHorizontalOffset: 0
+                            blurMax: Theme.elevationBlurMax
                             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                         }
 
@@ -406,13 +406,6 @@ Item {
                             border.color: root.borderColor
                             border.width: root.borderWidth
                         }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: root.cornerRadius
-                        color: Theme.surfaceTint
-                        opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
                     }
 
                     FocusScope {

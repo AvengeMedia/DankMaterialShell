@@ -76,7 +76,7 @@ Item {
             return Theme.primary;
         }
     }
-    readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 1
+    readonly property int borderWidth: SettingsData.dankLauncherV2BorderEnabled ? SettingsData.dankLauncherV2BorderThickness : 0
 
     signal dialogClosed
 
@@ -395,7 +395,6 @@ Item {
                 id: launcherShadowLayer
                 anchors.fill: parent
                 layer.enabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-                layer.smooth: false
                 layer.effect: MultiEffect {
                     autoPaddingEnabled: true
                     shadowEnabled: true
@@ -405,6 +404,7 @@ Item {
                     shadowScale: 1
                     shadowVerticalOffset: Theme.elevationLevel3.offsetY
                     shadowHorizontalOffset: 0
+                    blurMax: Theme.elevationBlurMax
                     shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                 }
 
@@ -415,13 +415,6 @@ Item {
                     border.width: root.borderWidth
                     radius: root.cornerRadius
                 }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: root.cornerRadius
-                color: Theme.surfaceTint
-                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
             }
 
             MouseArea {

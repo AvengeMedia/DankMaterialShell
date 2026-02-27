@@ -126,6 +126,15 @@ Item {
         return Theme.warning;
     }
 
+    function openM3ShadowColorPicker() {
+        PopoutService.colorPickerModal.selectedColor = SettingsData.m3ElevationCustomColor ?? "#000000";
+        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Shadow Color");
+        PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
+            SettingsData.set("m3ElevationCustomColor", color.toString());
+        };
+        PopoutService.colorPickerModal.show();
+    }
+
     function formatThemeAutoTime(isoString) {
         if (!isoString)
             return "";
@@ -1597,10 +1606,113 @@ Item {
                     tab: "theme"
                     tags: ["elevation", "shadow", "lift", "m3", "material"]
                     settingKey: "m3ElevationEnabled"
-                    text: I18n.tr("M3 Elevation & Shadows")
+                    text: I18n.tr("Shadows")
                     description: I18n.tr("Material Design 3 shadows and elevation on modals, popouts, and dialogs")
                     checked: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "intensity", "blur", "m3"]
+                    settingKey: "m3ElevationIntensity"
+                    text: I18n.tr("Shadow Intensity")
+                    description: I18n.tr("Controls the base blur radius and offset of shadows")
+                    value: SettingsData.m3ElevationIntensity ?? 12
+                    minimum: 0
+                    maximum: 100
+                    unit: "px"
+                    defaultValue: 12
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationIntensity", newValue)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "opacity", "transparency", "m3"]
+                    settingKey: "m3ElevationOpacity"
+                    text: I18n.tr("Shadow Opacity")
+                    description: I18n.tr("Controls the transparency of the shadow")
+                    value: SettingsData.m3ElevationOpacity ?? 30
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 30
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationOpacity", newValue)
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "color", "m3"]
+                    settingKey: "m3ElevationColorMode"
+                    text: I18n.tr("Shadow Color")
+                    description: I18n.tr("Base color for shadows (opacity is applied automatically)")
+                    options: [I18n.tr("Default (Black)", "shadow color option"), I18n.tr("Text Color", "shadow color option"), I18n.tr("Primary", "shadow color option"), I18n.tr("Surface Variant", "shadow color option"), I18n.tr("Custom", "shadow color option")]
+                    currentValue: {
+                        switch (SettingsData.m3ElevationColorMode) {
+                        case "text":
+                            return I18n.tr("Text Color", "shadow color option");
+                        case "primary":
+                            return I18n.tr("Primary", "shadow color option");
+                        case "surfaceVariant":
+                            return I18n.tr("Surface Variant", "shadow color option");
+                        case "custom":
+                            return I18n.tr("Custom", "shadow color option");
+                        default:
+                            return I18n.tr("Default (Black)", "shadow color option");
+                        }
+                    }
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Primary", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "primary");
+                        } else if (value === I18n.tr("Surface Variant", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "surfaceVariant");
+                        } else if (value === I18n.tr("Custom", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "custom");
+                            openM3ShadowColorPicker();
+                        } else if (value === I18n.tr("Text Color", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "text");
+                        } else {
+                            SettingsData.set("m3ElevationColorMode", "default");
+                        }
+                    }
+                }
+
+                Item {
+                    visible: (SettingsData.m3ElevationEnabled ?? true) && SettingsData.m3ElevationColorMode === "custom"
+                    width: parent.width
+                    implicitHeight: 36
+                    height: implicitHeight
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingM
+
+                        StyledText {
+                            text: I18n.tr("Custom Shadow Color")
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeMedium
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        Rectangle {
+                            width: 26
+                            height: 26
+                            radius: 13
+                            color: SettingsData.m3ElevationCustomColor ?? "#000000"
+                            border.color: Theme.outline
+                            border.width: 1
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: openM3ShadowColorPicker()
+                            }
+                        }
+                    }
                 }
 
                 SettingsToggleRow {

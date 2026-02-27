@@ -47,6 +47,10 @@ var SPEC = {
     modalCustomAnimationDuration: { def: 150 },
     enableRippleEffects: { def: true },
     m3ElevationEnabled: { def: true },
+    m3ElevationIntensity: { def: 12 },
+    m3ElevationOpacity: { def: 30 },
+    m3ElevationColorMode: { def: "default" },
+    m3ElevationCustomColor: { def: "#000000" },
     modalElevationEnabled: { def: true },
     popoutElevationEnabled: { def: true },
     wallpaperFillMode: { def: "Fill" },
@@ -428,7 +432,7 @@ var SPEC = {
             scrollYBehavior: "workspace",
             shadowIntensity: 0,
             shadowOpacity: 60,
-            shadowColorMode: "text",
+            shadowColorMode: "default",
             shadowCustomColor: "#000000",
             clickThrough: false
         }], onChange: "updateBarConfigs"

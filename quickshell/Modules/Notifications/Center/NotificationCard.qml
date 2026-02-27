@@ -96,12 +96,11 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return 2;
         }
-        return 1;
+        return 0;
     }
-    clip: true
+    clip: false
 
     layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-    layer.smooth: false
     layer.effect: MultiEffect {
         autoPaddingEnabled: true
         shadowEnabled: Theme.elevationEnabled
@@ -111,6 +110,7 @@ Rectangle {
         shadowScale: 1
         shadowVerticalOffset: Theme.elevationLevel1.offsetY
         shadowHorizontalOffset: 0
+        blurMax: Theme.elevationBlurMax
         shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
     }
 
@@ -434,9 +434,7 @@ Rectangle {
                         id: delegateRect
                         width: parent.width
 
-                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 &&
-                            (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 ||
-                             expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
+                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 && (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 || expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
                         readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? root.swipingNotificationOffset * 0.10 : 0
                         readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(root.swipingNotificationOffset) / width * 0.02 : 1.0
 

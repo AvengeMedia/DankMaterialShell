@@ -265,15 +265,9 @@ Item {
             layer.effect: MultiEffect {
                 shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
                 shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+                blurMax: Theme.elevationBlurMax
                 shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                 shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: Theme.surfaceTint
-                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel2) : 0
             }
 
             Column {

@@ -411,6 +411,7 @@ PanelWindow {
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel3 && Theme.elevationLevel3.offsetY !== undefined ? Theme.elevationLevel3.offsetY : 6
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined ? Theme.elevationLevel3.blurPx : 12) / Theme.elevationBlurMax)) : 0
+            blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
             shadowOpacity: Theme.elevationLevel3 && Theme.elevationLevel3.alpha !== undefined ? Theme.elevationLevel3.alpha : 0.3
         }

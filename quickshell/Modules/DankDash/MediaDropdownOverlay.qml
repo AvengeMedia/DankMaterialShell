@@ -95,6 +95,7 @@ Item {
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+            blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
         }
@@ -229,6 +230,7 @@ Item {
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+            blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
         }
@@ -379,6 +381,7 @@ Item {
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+            blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
         }

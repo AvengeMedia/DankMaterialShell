@@ -138,6 +138,7 @@ Rectangle {
             layer.enabled: Theme.elevationEnabled
             layer.effect: MultiEffect {
                 shadowEnabled: Theme.elevationEnabled
+                blurMax: Theme.elevationBlurMax
                 shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
                 shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
                 shadowHorizontalOffset: 0

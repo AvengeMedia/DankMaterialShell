@@ -59,7 +59,7 @@ Item {
     readonly property real shadowBlurPx: shadowIntensity * 0.2
     readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / blurMax))
     readonly property real shadowOpacity: (barConfig?.shadowOpacity ?? 60) / 100
-    readonly property string shadowColorMode: barConfig?.shadowColorMode ?? "text"
+    readonly property string shadowColorMode: barConfig?.shadowColorMode ?? "default"
     readonly property color shadowBaseColor: {
         switch (shadowColorMode) {
         case "surface":
@@ -71,7 +71,7 @@ Item {
         case "custom":
             return barConfig?.shadowCustomColor ?? "#000000";
         default:
-            return Theme.surfaceText;
+            return "#000000";
         }
     }
     readonly property color shadowColor: Theme.withAlpha(shadowBaseColor, shadowOpacity * barWindow._backgroundAlpha)

@@ -31,10 +31,9 @@ Rectangle {
     width: parent ? parent.width : 400
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
-    clip: true
+    clip: false
 
     layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-    layer.smooth: false
     layer.effect: MultiEffect {
         autoPaddingEnabled: true
         shadowEnabled: Theme.elevationEnabled
@@ -44,6 +43,7 @@ Rectangle {
         shadowScale: 1
         shadowVerticalOffset: Theme.elevationLevel1.offsetY
         shadowHorizontalOffset: 0
+        blurMax: Theme.elevationBlurMax
         shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
     }
 
@@ -64,7 +64,7 @@ Rectangle {
             return 1.5;
         if (historyItem.urgency === 2)
             return 2;
-        return 1;
+        return 0;
     }
 
     Behavior on border.color {

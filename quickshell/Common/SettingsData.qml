@@ -167,6 +167,14 @@ Singleton {
     onEnableRippleEffectsChanged: saveSettings()
     property bool m3ElevationEnabled: true
     onM3ElevationEnabledChanged: saveSettings()
+    property int m3ElevationIntensity: 12
+    onM3ElevationIntensityChanged: saveSettings()
+    property int m3ElevationOpacity: 30
+    onM3ElevationOpacityChanged: saveSettings()
+    property string m3ElevationColorMode: "default"
+    onM3ElevationColorModeChanged: saveSettings()
+    property string m3ElevationCustomColor: "#000000"
+    onM3ElevationCustomColorChanged: saveSettings()
     property bool modalElevationEnabled: true
     onModalElevationEnabledChanged: saveSettings()
     property bool popoutElevationEnabled: true
@@ -608,7 +616,7 @@ Singleton {
             "scrollYBehavior": "workspace",
             "shadowIntensity": 0,
             "shadowOpacity": 60,
-            "shadowColorMode": "text",
+            "shadowColorMode": "default",
             "shadowCustomColor": "#000000",
             "clickThrough": false
         }

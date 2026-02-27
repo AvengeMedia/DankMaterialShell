@@ -197,7 +197,7 @@ Item {
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
 
-    readonly property real shadowBuffer: 24
+    readonly property real shadowBuffer: Theme.elevationBlurMax * 1.5 + 24
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
 
@@ -501,7 +501,6 @@ Item {
                 readonly property int blurMax: Theme.elevationBlurMax
 
                 layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
-                layer.smooth: false
 
                 layer.effect: MultiEffect {
                     id: shadowFx
@@ -512,6 +511,7 @@ Item {
                     shadowBlur: Math.max(0, Math.min(1, shadowSource.shadowBlurPx / shadowSource.blurMax))
                     shadowScale: 1 + (2 * shadowSource.shadowSpreadPx) / Math.max(1, Math.min(shadowSource.width, shadowSource.height))
                     shadowVerticalOffset: parent.elev && parent.elev.offsetY !== undefined ? parent.elev.offsetY : 6
+                    blurMax: Theme.elevationBlurMax
                     shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                 }
             }
@@ -544,14 +544,7 @@ Item {
                     radius: Theme.cornerRadius
                     color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                     border.color: Theme.outlineMedium
-                    border.width: 1
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.cornerRadius
-                    color: Theme.surfaceTint
-                    opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
+                    border.width: 0
                 }
 
                 Loader {

@@ -185,8 +185,8 @@ PanelWindow {
 
     anchors.top: true
     anchors.bottom: true
-    anchors.left: SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom
-    anchors.right: SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Right
+    anchors.left: true
+    anchors.right: true
 
     mask: contentInputMask
 
@@ -205,10 +205,10 @@ PanelWindow {
     }
 
     margins {
-        top: _storedTopMargin
-        bottom: _storedBottomMargin
-        left: getLeftMargin()
-        right: getRightMargin()
+        top: 0
+        bottom: 0
+        left: 0
+        right: 0
     }
 
     function getBarInfo() {
@@ -282,13 +282,29 @@ PanelWindow {
     Item {
         id: content
 
-        x: Theme.snap((win.width - alignedWidth) / 2, dpr)
-        y: {
-            const isTop = isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left;
-            if (isTop) {
-                return Theme.snap(screenY, dpr);
+        x: {
+            const popupPos = SettingsData.notificationPopupPosition;
+            const barLeft = getLeftMargin();
+            const barRight = getRightMargin();
+
+            if (isCenterPosition) {
+                return Theme.snap((screen.width - alignedWidth) / 2, dpr);
+            } else if (popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom) {
+                return Theme.snap(barLeft, dpr);
             } else {
-                return Theme.snap(win.height - alignedHeight - screenY, dpr);
+                return Theme.snap(screen.width - alignedWidth - barRight, dpr);
+            }
+        }
+        y: {
+            const popupPos = SettingsData.notificationPopupPosition;
+            const barTop = getTopMargin();
+            const barBottom = getBottomMargin();
+
+            const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
+            if (isTop) {
+                return Theme.snap(barTop, dpr);
+            } else {
+                return Theme.snap(screen.height - alignedHeight - barBottom, dpr);
             }
         }
         width: alignedWidth
@@ -315,6 +331,8 @@ PanelWindow {
 
         readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
+        readonly property real cardInset: Theme.snap(4, win.dpr)
+        readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Theme.elevationBlurMax * 1.5 + 24, win.dpr) : 0
         property real shadowBlurPx: shadowsAllowed ? (elevLevel && elevLevel.blurPx !== undefined ? elevLevel.blurPx : 12) : 0
         property real shadowOffsetY: shadowsAllowed ? (elevLevel && elevLevel.offsetY !== undefined ? elevLevel.offsetY : 6) : 0
 
@@ -335,9 +353,8 @@ PanelWindow {
         Item {
             id: bgShadowLayer
             anchors.fill: parent
-            anchors.margins: Theme.snap(4, win.dpr)
-            layer.enabled: !win._isDestroying && win.screenValid
-            layer.smooth: false
+            anchors.margins: -content.shadowRenderPadding
+            layer.enabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -353,12 +370,16 @@ PanelWindow {
                 shadowScale: 1
                 shadowHorizontalOffset: 0
                 shadowVerticalOffset: content.shadowOffsetY
+                blurMax: Theme.elevationBlurMax
                 shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
             }
 
             Rectangle {
                 id: shadowShapeSource
-                anchors.fill: parent
+                x: content.shadowRenderPadding + content.cardInset
+                y: content.shadowRenderPadding + content.cardInset
+                width: Math.max(0, content.width - (content.cardInset * 2))
+                height: Math.max(0, content.height - (content.cardInset * 2))
                 radius: Theme.cornerRadius
                 color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
@@ -366,7 +387,10 @@ PanelWindow {
             }
 
             Rectangle {
-                anchors.fill: parent
+                x: shadowShapeSource.x
+                y: shadowShapeSource.y
+                width: shadowShapeSource.width
+                height: shadowShapeSource.height
                 radius: shadowShapeSource.radius
                 visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
                 opacity: 1
@@ -391,19 +415,12 @@ PanelWindow {
                     }
                 }
             }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: shadowShapeSource.radius
-                color: Theme.surfaceTint
-                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(content.elevLevel) : 0
-            }
         }
 
         Item {
             id: backgroundContainer
             anchors.fill: parent
-            anchors.margins: Theme.snap(4, win.dpr)
+            anchors.margins: content.cardInset
             clip: true
 
             HoverHandler {

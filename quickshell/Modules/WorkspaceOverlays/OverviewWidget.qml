@@ -17,59 +17,61 @@ Item {
 
     readonly property var allWorkspaces: Hyprland.workspaces?.values || []
     readonly property var allWorkspaceIds: {
-        const workspaces = allWorkspaces
-        if (!workspaces || workspaces.length === 0) return []
+        const workspaces = allWorkspaces;
+        if (!workspaces || workspaces.length === 0)
+            return [];
         try {
-            const ids = workspaces.map(ws => ws?.id).filter(id => id !== null && id !== undefined)
-            return ids.sort((a, b) => a - b)
+            const ids = workspaces.map(ws => ws?.id).filter(id => id !== null && id !== undefined);
+            return ids.sort((a, b) => a - b);
         } catch (e) {
-            return []
+            return [];
         }
     }
 
     readonly property var thisMonitorWorkspaceIds: {
-        const workspaces = allWorkspaces
-        const mon = monitor
-        if (!workspaces || workspaces.length === 0 || !mon) return []
+        const workspaces = allWorkspaces;
+        const mon = monitor;
+        if (!workspaces || workspaces.length === 0 || !mon)
+            return [];
         try {
-            const filtered = workspaces.filter(ws => ws?.monitor?.name === mon.name)
-            return filtered.map(ws => ws?.id).filter(id => id !== null && id !== undefined).sort((a, b) => a - b)
+            const filtered = workspaces.filter(ws => ws?.monitor?.name === mon.name);
+            return filtered.map(ws => ws?.id).filter(id => id !== null && id !== undefined).sort((a, b) => a - b);
         } catch (e) {
-            return []
+            return [];
         }
     }
 
     readonly property var displayedWorkspaceIds: {
         if (!allWorkspaceIds || allWorkspaceIds.length === 0) {
-            const result = []
+            const result = [];
             for (let i = 1; i <= workspacesShown; i++) {
-                result.push(i)
+                result.push(i);
             }
-            return result
+            return result;
         }
 
         try {
-            const maxExisting = Math.max(...allWorkspaceIds)
-            const totalNeeded = Math.max(workspacesShown, allWorkspaceIds.length)
-            const result = []
+            const maxExisting = Math.max(...allWorkspaceIds);
+            const totalNeeded = Math.max(workspacesShown, allWorkspaceIds.length);
+            const result = [];
 
             for (let i = 1; i <= maxExisting; i++) {
-                result.push(i)
+                result.push(i);
             }
 
-            let nextId = maxExisting + 1
+            let nextId = maxExisting + 1;
             while (result.length < totalNeeded) {
-                result.push(nextId)
-                nextId++
+                result.push(nextId);
+                nextId++;
             }
 
-            return result
+            return result;
         } catch (e) {
-            const result = []
+            const result = [];
             for (let i = 1; i <= workspacesShown; i++) {
-                result.push(i)
+                result.push(i);
             }
-            return result
+            return result;
         }
     }
 
@@ -81,24 +83,27 @@ Item {
     readonly property int effectiveRows: Math.max(SettingsData.overviewRows, Math.ceil(displayWorkspaceCount / effectiveColumns))
 
     function getWorkspaceMonitorName(workspaceId) {
-        if (!allWorkspaces || !workspaceId) return ""
+        if (!allWorkspaces || !workspaceId)
+            return "";
         try {
-            const ws = allWorkspaces.find(w => w?.id === workspaceId)
-            return ws?.monitor?.name ?? ""
+            const ws = allWorkspaces.find(w => w?.id === workspaceId);
+            return ws?.monitor?.name ?? "";
         } catch (e) {
-            return ""
+            return "";
         }
     }
 
     function workspaceHasWindows(workspaceId) {
-        if (!workspaceId) return false
+        if (!workspaceId)
+            return false;
         try {
-            const workspace = allWorkspaces.find(ws => ws?.id === workspaceId)
-            if (!workspace) return false
-            const toplevels = workspace?.toplevels?.values || []
-            return toplevels.length > 0
+            const workspace = allWorkspaces.find(ws => ws?.id === workspaceId);
+            if (!workspace)
+                return false;
+            const toplevels = workspace?.toplevels?.values || [];
+            return toplevels.length > 0;
         } catch (e) {
-            return false
+            return false;
         }
     }
 
@@ -124,16 +129,16 @@ Item {
     implicitHeight: overviewBackground.implicitHeight + Theme.spacingL * 2
 
     Component.onCompleted: {
-        Hyprland.refreshToplevels()
-        Hyprland.refreshWorkspaces()
-        Hyprland.refreshMonitors()
+        Hyprland.refreshToplevels();
+        Hyprland.refreshWorkspaces();
+        Hyprland.refreshMonitors();
     }
 
     onOverviewOpenChanged: {
         if (overviewOpen) {
-            Hyprland.refreshToplevels()
-            Hyprland.refreshWorkspaces()
-            Hyprland.refreshMonitors()
+            Hyprland.refreshToplevels();
+            Hyprland.refreshWorkspaces();
+            Hyprland.refreshMonitors();
         }
     }
 
@@ -154,9 +159,9 @@ Item {
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+            blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            blurMax: 32
         }
 
         ColumnLayout {
@@ -217,8 +222,8 @@ Item {
                                 acceptedButtons: Qt.LeftButton
                                 onClicked: {
                                     if (root.draggingTargetWorkspace === -1) {
-                                        root.overviewOpen = false
-                                        Hyprland.dispatch(`workspace ${workspaceValue}`)
+                                        root.overviewOpen = false;
+                                        Hyprland.dispatch(`workspace ${workspaceValue}`);
                                     }
                                 }
                             }
@@ -226,13 +231,15 @@ Item {
                             DropArea {
                                 anchors.fill: parent
                                 onEntered: {
-                                    root.draggingTargetWorkspace = workspaceValue
-                                    if (root.draggingFromWorkspace == root.draggingTargetWorkspace) return
-                                    hoveredWhileDragging = true
+                                    root.draggingTargetWorkspace = workspaceValue;
+                                    if (root.draggingFromWorkspace == root.draggingTargetWorkspace)
+                                        return;
+                                    hoveredWhileDragging = true;
                                 }
                                 onExited: {
-                                    hoveredWhileDragging = false
-                                    if (root.draggingTargetWorkspace == workspaceValue) root.draggingTargetWorkspace = -1
+                                    hoveredWhileDragging = false;
+                                    if (root.draggingTargetWorkspace == workspaceValue)
+                                        root.draggingTargetWorkspace = -1;
                                 }
                             }
                         }
@@ -250,27 +257,28 @@ Item {
             Repeater {
                 model: ScriptModel {
                     values: {
-                        const workspaces = root.allWorkspaces
-                        const minId = root.minWorkspaceId
-                        const maxId = root.maxWorkspaceId
+                        const workspaces = root.allWorkspaces;
+                        const minId = root.minWorkspaceId;
+                        const maxId = root.maxWorkspaceId;
 
-                        if (!workspaces || workspaces.length === 0) return []
+                        if (!workspaces || workspaces.length === 0)
+                            return [];
 
                         try {
-                            const result = []
+                            const result = [];
                             for (const workspace of workspaces) {
-                                const wsId = workspace?.id ?? -1
+                                const wsId = workspace?.id ?? -1;
                                 if (wsId >= minId && wsId <= maxId) {
-                                    const toplevels = workspace?.toplevels?.values || []
+                                    const toplevels = workspace?.toplevels?.values || [];
                                     for (const toplevel of toplevels) {
-                                        result.push(toplevel)
+                                        result.push(toplevel);
                                     }
                                 }
                             }
-                            return result
+                            return result;
                         } catch (e) {
-                            console.error("OverviewWidget filter error:", e)
-                            return []
+                            console.error("OverviewWidget filter error:", e);
+                            return [];
                         }
                     }
                 }
@@ -282,17 +290,19 @@ Item {
                     readonly property int windowWorkspaceId: modelData?.workspace?.id ?? -1
 
                     function getWorkspaceIndex() {
-                        if (!root.displayedWorkspaceIds || root.displayedWorkspaceIds.length === 0) return 0
-                        if (!windowWorkspaceId || windowWorkspaceId < 0) return 0
+                        if (!root.displayedWorkspaceIds || root.displayedWorkspaceIds.length === 0)
+                            return 0;
+                        if (!windowWorkspaceId || windowWorkspaceId < 0)
+                            return 0;
                         try {
                             for (let i = 0; i < root.displayedWorkspaceIds.length; i++) {
                                 if (root.displayedWorkspaceIds[i] === windowWorkspaceId) {
-                                    return i
+                                    return i;
                                 }
                             }
-                            return 0
+                            return 0;
                         } catch (e) {
-                            return 0
+                            return 0;
                         }
                     }
 
@@ -325,48 +335,48 @@ Item {
                         acceptedButtons: Qt.LeftButton | Qt.MiddleButton
                         drag.target: parent
 
-                        onPressed: (mouse) => {
-                            root.draggingFromWorkspace = windowData?.workspace.id
-                            window.pressed = true
-                            window.Drag.active = true
-                            window.Drag.source = window
-                            window.Drag.hotSpot.x = mouse.x
-                            window.Drag.hotSpot.y = mouse.y
+                        onPressed: mouse => {
+                            root.draggingFromWorkspace = windowData?.workspace.id;
+                            window.pressed = true;
+                            window.Drag.active = true;
+                            window.Drag.source = window;
+                            window.Drag.hotSpot.x = mouse.x;
+                            window.Drag.hotSpot.y = mouse.y;
                         }
 
                         onReleased: {
-                            const targetWorkspace = root.draggingTargetWorkspace
-                            window.pressed = false
-                            window.Drag.active = false
-                            root.draggingFromWorkspace = -1
-                            root.draggingTargetWorkspace = -1
+                            const targetWorkspace = root.draggingTargetWorkspace;
+                            window.pressed = false;
+                            window.Drag.active = false;
+                            root.draggingFromWorkspace = -1;
+                            root.draggingTargetWorkspace = -1;
 
                             if (targetWorkspace !== -1 && targetWorkspace !== windowData?.workspace.id) {
-                                Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace},address:${windowData?.address}`)
+                                Hyprland.dispatch(`movetoworkspacesilent ${targetWorkspace},address:${windowData?.address}`);
                                 Qt.callLater(() => {
-                                    Hyprland.refreshToplevels()
-                                    Hyprland.refreshWorkspaces()
+                                    Hyprland.refreshToplevels();
+                                    Hyprland.refreshWorkspaces();
                                     Qt.callLater(() => {
-                                        window.x = window.initX
-                                        window.y = window.initY
-                                    })
-                                })
+                                        window.x = window.initX;
+                                        window.y = window.initY;
+                                    });
+                                });
                             } else {
-                                window.x = window.initX
-                                window.y = window.initY
+                                window.x = window.initX;
+                                window.y = window.initY;
                             }
                         }
 
-                        onClicked: (event) => {
-                            if (!windowData || !windowData.address) return
-
+                        onClicked: event => {
+                            if (!windowData || !windowData.address)
+                                return;
                             if (event.button === Qt.LeftButton) {
-                                root.overviewOpen = false
-                                Hyprland.dispatch(`focuswindow address:${windowData.address}`)
-                                event.accepted = true
+                                root.overviewOpen = false;
+                                Hyprland.dispatch(`focuswindow address:${windowData.address}`);
+                                event.accepted = true;
                             } else if (event.button === Qt.MiddleButton) {
-                                Hyprland.dispatch(`closewindow address:${windowData.address}`)
-                                event.accepted = true
+                                Hyprland.dispatch(`closewindow address:${windowData.address}`);
+                                event.accepted = true;
                             }
                         }
                     }

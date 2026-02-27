@@ -264,7 +264,7 @@ Item {
 
                 width: ListView.view.width
                 height: historyCard.height
-                clip: true
+                clip: false
 
                 HistoryNotificationCard {
                     id: historyCard

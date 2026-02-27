@@ -270,7 +270,7 @@ PanelWindow {
             radius: Theme.cornerRadius
             color: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
             border.color: Theme.outlineMedium
-            border.width: 1
+            border.width: 0
             z: -1
         }
 
@@ -279,7 +279,6 @@ PanelWindow {
             anchors.fill: parent
             visible: osdContainer.popupSurfaceAlpha >= 0.95
             layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-            layer.smooth: false
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
@@ -293,6 +292,7 @@ PanelWindow {
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
+                blurMax: Theme.elevationBlurMax
                 shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
             }
 
@@ -302,13 +302,6 @@ PanelWindow {
                 color: Theme.surfaceContainer
                 border.color: Theme.outlineMedium
                 border.width: 1
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: Theme.surfaceTint
-                opacity: Theme.elevationEnabled ? Theme.elevationTintOpacity(Theme.elevationLevel3) : 0
             }
         }
 

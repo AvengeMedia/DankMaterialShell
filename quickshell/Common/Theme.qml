@@ -674,40 +674,74 @@ Singleton {
     property color shadowStrong: Qt.rgba(0, 0, 0, 0.3)
 
     readonly property bool elevationEnabled: typeof SettingsData !== "undefined" && (SettingsData.m3ElevationEnabled ?? true)
-    readonly property real elevationBlurMax: 16
+    readonly property real elevationBlurMax: typeof SettingsData !== "undefined" && SettingsData.m3ElevationIntensity !== undefined ? Math.min(128, Math.max(32, SettingsData.m3ElevationIntensity * 2)) : 64
+
+    readonly property real _elevMult: typeof SettingsData !== "undefined" && SettingsData.m3ElevationIntensity !== undefined ? SettingsData.m3ElevationIntensity / 12 : 1
+    readonly property real _opMult: typeof SettingsData !== "undefined" && SettingsData.m3ElevationOpacity !== undefined ? SettingsData.m3ElevationOpacity / 60 : 1
+
     readonly property var elevationLevel1: ({
-            blurPx: 4,
-            offsetY: 1,
+            blurPx: 4 * _elevMult,
+            offsetY: 1 * _elevMult,
             spreadPx: 0,
-            alpha: 0.2
+            alpha: 0.2 * _opMult
         })
     readonly property var elevationLevel2: ({
-            blurPx: 8,
-            offsetY: 4,
+            blurPx: 8 * _elevMult,
+            offsetY: 4 * _elevMult,
             spreadPx: 0,
-            alpha: 0.25
+            alpha: 0.25 * _opMult
         })
     readonly property var elevationLevel3: ({
-            blurPx: 12,
-            offsetY: 6,
+            blurPx: 12 * _elevMult,
+            offsetY: 6 * _elevMult,
             spreadPx: 0,
-            alpha: 0.3
+            alpha: 0.3 * _opMult
         })
     readonly property var elevationLevel4: ({
-            blurPx: 16,
-            offsetY: 8,
+            blurPx: 16 * _elevMult,
+            offsetY: 8 * _elevMult,
             spreadPx: 0,
-            alpha: 0.3
+            alpha: 0.3 * _opMult
         })
     readonly property var elevationLevel5: ({
-            blurPx: 20,
-            offsetY: 10,
+            blurPx: 20 * _elevMult,
+            offsetY: 10 * _elevMult,
             spreadPx: 0,
-            alpha: 0.3
+            alpha: 0.3 * _opMult
         })
+
     function elevationShadowColor(level) {
         const alpha = (level && level.alpha !== undefined) ? level.alpha : 0.3;
-        return Qt.rgba(0, 0, 0, alpha);
+        let r = 0;
+        let g = 0;
+        let b = 0;
+
+        if (typeof SettingsData !== "undefined") {
+            const mode = SettingsData.m3ElevationColorMode || "default";
+            if (mode === "default") {
+                r = 0;
+                g = 0;
+                b = 0;
+            } else if (mode === "text") {
+                r = surfaceText.r;
+                g = surfaceText.g;
+                b = surfaceText.b;
+            } else if (mode === "primary") {
+                r = primary.r;
+                g = primary.g;
+                b = primary.b;
+            } else if (mode === "surfaceVariant") {
+                r = surfaceVariant.r;
+                g = surfaceVariant.g;
+                b = surfaceVariant.b;
+            } else if (mode === "custom" && SettingsData.m3ElevationCustomColor) {
+                const c = Qt.color(SettingsData.m3ElevationCustomColor);
+                r = c.r;
+                g = c.g;
+                b = c.b;
+            }
+        }
+        return Qt.rgba(r, g, b, alpha);
     }
     function elevationTintOpacity(level) {
         if (!level)
