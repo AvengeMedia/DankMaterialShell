@@ -61,12 +61,13 @@ Singleton {
     signal appPickerRequested(var data)
     signal screensaverStateUpdate(var data)
     signal clipboardStateUpdate(var data)
+    signal geoclueStateUpdate(var data)
 
     property bool capsLockState: false
     property bool screensaverInhibited: false
     property var screensaverInhibitors: []
 
-    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard"]
+    property var activeSubscriptions: ["network", "network.credentials", "loginctl", "freedesktop", "freedesktop.screensaver", "gamma", "theme.auto", "bluetooth", "bluetooth.pairing", "dwl", "brightness", "wlroutput", "evdev", "browser", "dbus", "clipboard", "geoclue"]
 
     Component.onCompleted: {
         if (socketPath && socketPath.length > 0) {
@@ -284,7 +285,7 @@ Singleton {
 
     function removeSubscription(service) {
         if (activeSubscriptions.includes("all")) {
-            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace", "browser"];
+            const allServices = ["network", "loginctl", "freedesktop", "gamma", "bluetooth", "dwl", "brightness", "extworkspace", "browser", "geoclue"];
             const filtered = allServices.filter(s => s !== service);
             subscribe(filtered);
         } else {
@@ -306,7 +307,7 @@ Singleton {
             excludeServices = [excludeServices];
         }
 
-        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "extworkspace", "browser", "dbus"];
+        const allServices = ["network", "loginctl", "freedesktop", "gamma", "theme.auto", "bluetooth", "cups", "dwl", "brightness", "extworkspace", "browser", "dbus", "geoclue"];
         const filtered = allServices.filter(s => !excludeServices.includes(s));
         subscribe(filtered);
     }
@@ -395,6 +396,9 @@ Singleton {
             dbusSignalReceived(data.subscriptionId || "", data);
         } else if (service === "clipboard") {
             clipboardStateUpdate(data);
+        } else if (service === "geoclue") {
+            console.info("Geoclue", data);
+            geoclueStateUpdate(data);
         }
     }
 

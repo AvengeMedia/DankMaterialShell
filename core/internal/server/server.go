@@ -25,6 +25,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/geoclue"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
@@ -70,6 +71,7 @@ var clipboardManager *clipboard.Manager
 var dbusManager *serverDbus.Manager
 var wlContext *wlcontext.SharedContext
 var themeModeManager *thememode.Manager
+var geoclueManager *geoclue.Manager
 
 const dbusClientID = "dms-dbus-client"
 
@@ -390,6 +392,19 @@ func InitializeThemeModeManager() error {
 	return nil
 }
 
+func InitializeGeoClueManager() error {
+	manager, err := geoclue.NewManager()
+	if err != nil {
+		log.Warnf("Failed to initialize GeoClue2 manager: %v", err)
+		return err
+	}
+
+	geoclueManager = manager
+
+	log.Info("GeoClue2 manager initialized")
+	return nil
+}
+
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
@@ -535,6 +550,10 @@ func getServerInfo() ServerInfo {
 
 	if themeModeManager != nil {
 		caps = append(caps, "theme.auto")
+	}
+
+	if geoclueManager != nil {
+		caps = append(caps, "geoclue")
 	}
 
 	if dbusManager != nil {
@@ -1307,6 +1326,9 @@ func cleanupManagers() {
 	if wlContext != nil {
 		wlContext.Close()
 	}
+	if geoclueManager != nil {
+		geoclueManager.Close()
+	}
 }
 
 func Start(printDocs bool) error {
@@ -1488,6 +1510,9 @@ func Start(printDocs bool) error {
 		log.Info(" clipboard.getConfig                   - Get clipboard configuration")
 		log.Info(" clipboard.setConfig                   - Set configuration (params: maxHistory?, maxEntrySize?, autoClearDays?, clearAtStartup?)")
 		log.Info(" clipboard.subscribe                   - Subscribe to clipboard state changes (streaming)")
+		log.Info("GeoClue:")
+		log.Info(" geoclue.getState                      - Get current GeoClue state (location)")
+		log.Info(" geoclue.subscribe                     - Subscribe to GeoClue state changes (streaming)")
 		log.Info("")
 	}
 	log.Info("Initializing managers...")
@@ -1606,6 +1631,12 @@ func Start(printDocs bool) error {
 			}
 			themeModeManager.WatchLoginctl(loginctlManager)
 		}()
+	}
+
+	if err := InitializeGeoClueManager(); err != nil {
+		log.Warnf("GeoClue2 manager unavailable: %v", err)
+	} else {
+		notifyCapabilityChange()
 	}
 
 	fatalErrChan := make(chan error, 1)

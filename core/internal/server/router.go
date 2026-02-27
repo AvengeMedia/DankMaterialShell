@@ -15,6 +15,7 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/evdev"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/extworkspace"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/freedesktop"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/geoclue"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/network"
@@ -189,6 +190,15 @@ func RouteRequest(conn net.Conn, req models.Request) {
 			return
 		}
 		clipboard.HandleRequest(conn, req, clipboardManager)
+		return
+	}
+
+	if strings.HasPrefix(req.Method, "geoclue.") {
+		if geoclueManager == nil {
+			models.RespondError(conn, req.ID, "geoclue manager not initialized")
+			return
+		}
+		geoclue.HandleRequest(conn, req, geoclueManager)
 		return
 	}
 
