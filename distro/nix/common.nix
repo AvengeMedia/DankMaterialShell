@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  dmsPkgs,
   ...
 }:
 let
@@ -10,7 +9,7 @@ let
 in
 {
   packages = [
-    dmsPkgs.dms-shell
+    cfg.package
   ]
   ++ lib.optional cfg.enableSystemMonitoring cfg.dgop.package
   ++ lib.optionals cfg.enableVPN [
