@@ -56,8 +56,8 @@ Singleton {
     }
     readonly property bool isCharging: batteryAvailable && batteries.some(b => b.state === UPowerDeviceState.Charging)
 
-    // Is the system plugged in (none of the batteries are discharging or empty)
-    readonly property bool isPluggedIn: batteryAvailable && batteries.every(b => b.state !== UPowerDeviceState.Discharging)
+    // Is the system plugged in (Is not running on battery)
+    readonly property bool isPluggedIn: !UPower.onBattery
     readonly property bool isLowBattery: batteryAvailable && batteryLevel <= 20
 
     onIsPluggedInChanged: {
