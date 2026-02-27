@@ -137,6 +137,7 @@ Rectangle {
 
             layer.enabled: Theme.elevationEnabled
             layer.effect: MultiEffect {
+                autoPaddingEnabled: true
                 shadowEnabled: Theme.elevationEnabled
                 blurMax: Theme.elevationBlurMax
                 shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)

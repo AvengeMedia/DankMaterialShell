@@ -1607,7 +1607,7 @@ Item {
                     tags: ["elevation", "shadow", "lift", "m3", "material"]
                     settingKey: "m3ElevationEnabled"
                     text: I18n.tr("Shadows")
-                    description: I18n.tr("Material Design 3 shadows and elevation on modals, popouts, and dialogs")
+                    description: I18n.tr("Material inspired shadows and elevation on modals, popouts, and dialogs")
                     checked: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
                 }
@@ -1735,6 +1735,17 @@ Item {
                     checked: SettingsData.popoutElevationEnabled ?? true
                     visible: SettingsData.m3ElevationEnabled ?? true
                     onToggled: checked => SettingsData.set("popoutElevationEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "bar", "panel", "navigation", "m3"]
+                    settingKey: "barElevationEnabled"
+                    text: I18n.tr("Bar Shadows")
+                    description: I18n.tr("Shadow elevation on bars and panels")
+                    checked: SettingsData.barElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("barElevationEnabled", checked)
                 }
             }
 

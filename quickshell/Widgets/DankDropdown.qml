@@ -261,8 +261,11 @@ Item {
             border.width: 2
             radius: Theme.cornerRadius
 
-            layer.enabled: true
+            layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
             layer.effect: MultiEffect {
+                autoPaddingEnabled: true
+                blurEnabled: false
+                maskEnabled: false
                 shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
                 shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
                 blurMax: Theme.elevationBlurMax

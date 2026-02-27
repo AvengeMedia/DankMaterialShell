@@ -1045,7 +1045,7 @@ Item {
             SettingsCard {
                 id: shadowCard
                 iconName: "layers"
-                title: I18n.tr("Shadow", "bar shadow settings card")
+                title: I18n.tr("Shadow Override", "bar shadow settings card")
                 settingKey: "barShadow"
                 collapsible: true
                 expanded: true
@@ -1054,9 +1054,18 @@ Item {
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
 
+                StyledText {
+                    width: parent.width
+                    text: I18n.tr("Enable a custom override below to set per-bar shadow intensity, opacity, and color.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.surfaceVariantText
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignLeft
+                }
+
                 SettingsToggleRow {
-                    text: I18n.tr("Enable Shadow")
-                    description: I18n.tr("Toggle M3 baseline shadow on or off for this bar")
+                    text: I18n.tr("Custom Shadow Override")
+                    description: I18n.tr("Override the global shadow with per-bar settings")
                     checked: shadowCard.shadowActive
                     onToggled: checked => {
                         if (checked) {

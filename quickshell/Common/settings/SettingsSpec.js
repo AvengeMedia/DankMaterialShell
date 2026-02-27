@@ -53,6 +53,7 @@ var SPEC = {
     m3ElevationCustomColor: { def: "#000000" },
     modalElevationEnabled: { def: true },
     popoutElevationEnabled: { def: true },
+    barElevationEnabled: { def: true },
     wallpaperFillMode: { def: "Fill" },
     blurredWallpaperLayer: { def: false },
     blurWallpaperOnOverview: { def: false },

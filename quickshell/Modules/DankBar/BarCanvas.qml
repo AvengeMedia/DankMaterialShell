@@ -53,15 +53,19 @@ Item {
         }
     }
 
-    readonly property real shadowIntensity: barConfig?.shadowIntensity ?? 0
-    readonly property bool shadowEnabled: shadowIntensity > 0
-    readonly property int blurMax: 64
-    readonly property real shadowBlurPx: shadowIntensity * 0.2
-    readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / blurMax))
-    readonly property real shadowOpacity: (barConfig?.shadowOpacity ?? 60) / 100
-    readonly property string shadowColorMode: barConfig?.shadowColorMode ?? "default"
-    readonly property color shadowBaseColor: {
-        switch (shadowColorMode) {
+    // M3 elevation shadow — Level 2 baseline (navigation bar), with per-bar override support
+    readonly property bool hasPerBarOverride: (barConfig?.shadowIntensity ?? 0) > 0
+    readonly property var elevLevel: Theme.elevationLevel2
+    readonly property bool shadowEnabled: (Theme.elevationEnabled
+        && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false))
+        || hasPerBarOverride
+
+    // Per-bar override values (when barConfig.shadowIntensity > 0)
+    readonly property real overrideBlurPx: (barConfig?.shadowIntensity ?? 0) * 0.2
+    readonly property real overrideOpacity: (barConfig?.shadowOpacity ?? 60) / 100
+    readonly property string overrideColorMode: barConfig?.shadowColorMode ?? "default"
+    readonly property color overrideBaseColor: {
+        switch (overrideColorMode) {
         case "surface":
             return Theme.surface;
         case "primary":
@@ -74,7 +78,16 @@ Item {
             return "#000000";
         }
     }
-    readonly property color shadowColor: Theme.withAlpha(shadowBaseColor, shadowOpacity * barWindow._backgroundAlpha)
+
+    // Resolved values — per-bar override wins if set, otherwise use global M3 elevation
+    readonly property real shadowBlurPx: hasPerBarOverride ? overrideBlurPx : (elevLevel.blurPx ?? 8)
+    readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / Theme.elevationBlurMax))
+    readonly property color shadowColor: hasPerBarOverride
+        ? Theme.withAlpha(overrideBaseColor, overrideOpacity)
+        : Theme.elevationShadowColor(elevLevel)
+    readonly property real shadowOffsetY: hasPerBarOverride
+        ? overrideBlurPx * 0.5
+        : (elevLevel.offsetY ?? 4)
 
     readonly property string mainPath: generatePathForPosition(width, height)
     readonly property string borderFullPath: generateBorderFullPath(width, height)
@@ -133,9 +146,10 @@ Item {
             layer.effect: MultiEffect {
                 shadowEnabled: true
                 shadowBlur: root.shadowBlur
+                blurMax: Theme.elevationBlurMax
                 shadowColor: root.shadowColor
-                shadowVerticalOffset: root.isTop ? root.shadowBlurPx * 0.5 : (root.isBottom ? -root.shadowBlurPx * 0.5 : 0)
-                shadowHorizontalOffset: root.isLeft ? root.shadowBlurPx * 0.5 : (root.isRight ? -root.shadowBlurPx * 0.5 : 0)
+                shadowVerticalOffset: root.isTop ? root.shadowOffsetY : (root.isBottom ? -root.shadowOffsetY : 0)
+                shadowHorizontalOffset: root.isLeft ? root.shadowOffsetY : (root.isRight ? -root.shadowOffsetY : 0)
                 autoPaddingEnabled: true
             }
 

@@ -96,7 +96,7 @@ PanelWindow {
             }
         }
         radius: Theme.cornerRadius
-        layer.enabled: true
+        layer.enabled: Theme.elevationEnabled
         opacity: shouldBeVisible ? 1 : 0
 
         Column {
@@ -407,6 +407,7 @@ PanelWindow {
         }
 
         layer.effect: MultiEffect {
+            autoPaddingEnabled: true
             shadowEnabled: Theme.elevationEnabled
             shadowHorizontalOffset: 0
             shadowVerticalOffset: Theme.elevationLevel3 && Theme.elevationLevel3.offsetY !== undefined ? Theme.elevationLevel3.offsetY : 6

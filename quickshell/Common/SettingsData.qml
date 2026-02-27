@@ -179,6 +179,8 @@ Singleton {
     onModalElevationEnabledChanged: saveSettings()
     property bool popoutElevationEnabled: true
     onPopoutElevationEnabledChanged: saveSettings()
+    property bool barElevationEnabled: true
+    onBarElevationEnabledChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
