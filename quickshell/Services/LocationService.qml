@@ -10,12 +10,11 @@ Singleton {
     id: root
 
     readonly property bool geoclueAvailable: DMSService.isConnected && (DMSService.capabilities.length === 0 || DMSService.capabilities.includes("geoclue"))
-    
+
     property var latitude: 0.0
     property var longitude: 0.0
 
     signal locationChanged(var data)
-
 
     Component.onCompleted: {
         console.info("LocationService: Initializing...");
