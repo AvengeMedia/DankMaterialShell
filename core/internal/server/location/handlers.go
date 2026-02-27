@@ -1,4 +1,4 @@
-package geoclue
+package location
 
 import (
 	"encoding/json"
@@ -8,16 +8,16 @@ import (
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/models"
 )
 
-type GeoClueEvent struct {
+type LocationEvent struct {
 	Type string `json:"type"`
 	Data State  `json:"data"`
 }
 
 func HandleRequest(conn net.Conn, req models.Request, manager *Manager) {
 	switch req.Method {
-	case "geoclue.getState":
+	case "location.getState":
 		handleGetState(conn, req, manager)
-	case "geoclue.subscribe":
+	case "location.subscribe":
 		handleSubscribe(conn, req, manager)
 
 	default:
@@ -35,12 +35,12 @@ func handleSubscribe(conn net.Conn, req models.Request, manager *Manager) {
 	defer manager.Unsubscribe(clientID)
 
 	initialState := manager.GetState()
-	event := GeoClueEvent{
+	event := LocationEvent{
 		Type: "state_changed",
 		Data: initialState,
 	}
 
-	if err := json.NewEncoder(conn).Encode(models.Response[GeoClueEvent]{
+	if err := json.NewEncoder(conn).Encode(models.Response[LocationEvent]{
 		ID:     req.ID,
 		Result: &event,
 	}); err != nil {
@@ -48,11 +48,11 @@ func handleSubscribe(conn net.Conn, req models.Request, manager *Manager) {
 	}
 
 	for state := range stateChan {
-		event := GeoClueEvent{
+		event := LocationEvent{
 			Type: "state_changed",
 			Data: state,
 		}
-		if err := json.NewEncoder(conn).Encode(models.Response[GeoClueEvent]{
+		if err := json.NewEncoder(conn).Encode(models.Response[LocationEvent]{
 			Result: &event,
 		}); err != nil {
 			return

@@ -1,10 +1,10 @@
-package geoclue
+package location
 
 import (
 	"sync"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
-	"github.com/godbus/dbus/v5"
 )
 
 type State struct {
@@ -16,9 +16,7 @@ type Manager struct {
 	state      *State
 	stateMutex sync.RWMutex
 
-	dbusConn   *dbus.Conn
-	clientPath dbus.ObjectPath
-	signals    chan *dbus.Signal
+	client geolocation.Client
 
 	stopChan chan struct{}
 	sigWG    sync.WaitGroup

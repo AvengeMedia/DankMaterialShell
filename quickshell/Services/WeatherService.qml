@@ -480,7 +480,7 @@ Singleton {
         const cityName = SessionData.isGreeterMode ? GreetdSettings.weatherLocation : SettingsData.weatherLocation;
 
         if (useAuto) {
-            getLocationFromGeoClue();
+            getLocationFromService();
             return;
         }
 
@@ -511,7 +511,7 @@ Singleton {
         cityGeocodeFetcher.running = true;
     }
 
-    function getLocationFromGeoClue() {
+    function getLocationFromService() {
         getLocationFromCoords(LocationService.latitude, LocationService.longitude);
     }
 

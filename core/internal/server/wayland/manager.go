@@ -13,13 +13,14 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/errdefs"
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/proto/wlr_gamma_control"
 )
 
 const animKelvinStep = 25
 
-func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error) {
+func NewManager(display wlclient.WaylandDisplay, geoClient geolocation.Client, config Config) (*Manager, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -40,6 +41,7 @@ func NewManager(display wlclient.WaylandDisplay, config Config) (*Manager, error
 		updateTrigger: make(chan struct{}, 1),
 		dirty:         make(chan struct{}, 1),
 		dbusSignal:    make(chan *dbus.Signal, 16),
+		geoClient:     geoClient,
 	}
 
 	if err := m.setupRegistry(); err != nil {
@@ -437,15 +439,16 @@ func (m *Manager) getLocation() (*float64, *float64) {
 		}
 		m.locationMutex.RUnlock()
 
-		lat, lon, err := FetchIPLocation()
+		location, err := m.geoClient.GetLocation()
 		if err != nil {
 			return nil, nil
 		}
+
 		m.locationMutex.Lock()
-		m.cachedIPLat = lat
-		m.cachedIPLon = lon
+		m.cachedIPLat = &location.Latitude
+		m.cachedIPLon = &location.Longitude
 		m.locationMutex.Unlock()
-		return lat, lon
+		return m.cachedIPLat, m.cachedIPLon
 	}
 	return nil, nil
 }

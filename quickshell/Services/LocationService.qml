@@ -9,7 +9,7 @@ import qs.Common
 Singleton {
     id: root
 
-    readonly property bool geoclueAvailable: DMSService.isConnected && (DMSService.capabilities.length === 0 || DMSService.capabilities.includes("geoclue"))
+    readonly property bool locationAvailable: DMSService.isConnected && (DMSService.capabilities.length === 0 || DMSService.capabilities.includes("location"))
 
     property var latitude: 0.0
     property var longitude: 0.0
@@ -24,8 +24,8 @@ Singleton {
     Connections {
         target: DMSService
 
-        function onGeoclueStateUpdate(data) {
-            if (geoclueAvailable) {
+        function onLocationStateUpdate(data) {
+            if (locationAvailable) {
                 handleStateUpdate(data);
             }
         }
@@ -39,10 +39,10 @@ Singleton {
     }
 
     function getState() {
-        if (!geoclueAvailable)
+        if (!locationAvailable)
             return;
 
-        DMSService.sendRequest("geoclue.getState", null, response => {
+        DMSService.sendRequest("location.getState", null, response => {
             if (response.result) {
                 handleStateUpdate(response.result);
             }
