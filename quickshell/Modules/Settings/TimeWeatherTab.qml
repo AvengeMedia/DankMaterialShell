@@ -264,7 +264,7 @@ Item {
                     text: SettingsData.lockDateFormat
                     onTextChanged: {
                         if (visible && text)
-                        SettingsData.set("lockDateFormat", text);
+                            SettingsData.set("lockDateFormat", text);
                     }
                 }
 
