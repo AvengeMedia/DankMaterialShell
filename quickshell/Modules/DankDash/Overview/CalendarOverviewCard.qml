@@ -16,7 +16,7 @@ Rectangle {
 
     function weekStartQt() {
         if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0) {
-            SettingsData.set("firstDayOfWeek", Qt.locale().firstDayOfWeek);
+            return Qt.locale().firstDayOfWeek;
         }
         return SettingsData.firstDayOfWeek;
     }
