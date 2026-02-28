@@ -512,6 +512,8 @@ Singleton {
     }
 
     function getLocationFromService() {
+        if (!LocationService.valid)
+            return;
         getLocationFromCoords(LocationService.latitude, LocationService.longitude);
     }
 
@@ -829,9 +831,11 @@ Singleton {
         target: LocationService
 
         function onLocationChanged(data) {
-            if (SettingsData.useAutoLocation) {
-                root.getLocationFromCoords(data.latitude, data.longitude)
-            }
+            if (!SettingsData.useAutoLocation)
+                return;
+            if (data.latitude === 0 && data.longitude === 0)
+                return;
+            root.getLocationFromCoords(data.latitude, data.longitude);
         }
     }
 

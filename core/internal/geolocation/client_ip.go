@@ -31,10 +31,8 @@ func newIpClient() *IpClient {
 
 func (c *IpClient) Subscribe(id string) chan Location {
 	ch := make(chan Location, 1)
-	if location, err := c.GetLocation(); err != nil {
+	if location, err := c.GetLocation(); err == nil {
 		ch <- location
-	} else {
-		close(ch)
 	}
 
 	return ch

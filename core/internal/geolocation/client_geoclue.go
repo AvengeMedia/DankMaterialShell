@@ -222,6 +222,13 @@ func (c *GeoClueClient) notifySubscribers() {
 	})
 }
 
+func (c *GeoClueClient) SeedLocation(loc Location) {
+	c.locationMutex.Lock()
+	defer c.locationMutex.Unlock()
+	c.currLocation.Latitude = loc.Latitude
+	c.currLocation.Longitude = loc.Longitude
+}
+
 func (c *GeoClueClient) GetLocation() (Location, error) {
 	c.locationMutex.RLock()
 	defer c.locationMutex.RUnlock()

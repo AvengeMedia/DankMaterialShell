@@ -14,8 +14,9 @@ func NewManager(client geolocation.Client) (*Manager, error) {
 	}
 
 	m := &Manager{
-		client: client,
-		dirty:  make(chan struct{}),
+		client:   client,
+		dirty:    make(chan struct{}),
+		stopChan: make(chan struct{}),
 
 		state: &State{
 			Latitude:  currLocation.Latitude,
