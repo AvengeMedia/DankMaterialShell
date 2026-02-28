@@ -173,6 +173,8 @@ Singleton {
     onM3ElevationOpacityChanged: saveSettings()
     property string m3ElevationColorMode: "default"
     onM3ElevationColorModeChanged: saveSettings()
+    property string m3ElevationLightDirection: "top"
+    onM3ElevationLightDirectionChanged: saveSettings()
     property string m3ElevationCustomColor: "#000000"
     onM3ElevationCustomColorChanged: saveSettings()
     property bool modalElevationEnabled: true

@@ -292,6 +292,8 @@ PanelWindow {
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
+                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
+                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
                 blurMax: Theme.elevationBlurMax
                 shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
             }

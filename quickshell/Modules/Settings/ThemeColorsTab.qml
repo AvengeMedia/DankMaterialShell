@@ -1680,6 +1680,43 @@ Item {
                     }
                 }
 
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "direction", "light", "advanced", "m3"]
+                    settingKey: "m3ElevationLightDirection"
+                    text: I18n.tr("Light Direction")
+                    description: I18n.tr("Controls shadow cast direction for elevation layers")
+                    options: [I18n.tr("Auto (Bar-aware)", "shadow direction option"), I18n.tr("Top (Default)", "shadow direction option"), I18n.tr("Top Left", "shadow direction option"), I18n.tr("Top Right", "shadow direction option"), I18n.tr("Bottom", "shadow direction option")]
+                    currentValue: {
+                        switch (SettingsData.m3ElevationLightDirection) {
+                        case "autoBar":
+                            return I18n.tr("Auto (Bar-aware)", "shadow direction option");
+                        case "topLeft":
+                            return I18n.tr("Top Left", "shadow direction option");
+                        case "topRight":
+                            return I18n.tr("Top Right", "shadow direction option");
+                        case "bottom":
+                            return I18n.tr("Bottom", "shadow direction option");
+                        default:
+                            return I18n.tr("Top (Default)", "shadow direction option");
+                        }
+                    }
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Auto (Bar-aware)", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "autoBar");
+                        } else if (value === I18n.tr("Top Left", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "topLeft");
+                        } else if (value === I18n.tr("Top Right", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "topRight");
+                        } else if (value === I18n.tr("Bottom", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "bottom");
+                        } else {
+                            SettingsData.set("m3ElevationLightDirection", "top");
+                        }
+                    }
+                }
+
                 Item {
                     visible: (SettingsData.m3ElevationEnabled ?? true) && SettingsData.m3ElevationColorMode === "custom"
                     width: parent.width

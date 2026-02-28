@@ -402,8 +402,8 @@ Item {
                     maskEnabled: false
                     shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel3.blurPx / Theme.elevationBlurMax))
                     shadowScale: 1
-                    shadowVerticalOffset: Theme.elevationLevel3.offsetY
-                    shadowHorizontalOffset: 0
+                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
+                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
                     blurMax: Theme.elevationBlurMax
                     shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                 }

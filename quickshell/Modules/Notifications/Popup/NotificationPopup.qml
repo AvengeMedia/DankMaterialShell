@@ -185,8 +185,9 @@ PanelWindow {
     property bool isBottomCenter: SettingsData.notificationPopupPosition === SettingsData.Position.BottomCenter
     property bool isCenterPosition: isTopCenter || isBottomCenter
     readonly property real maxPopupShadowBlurPx: Math.max((Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined) ? Theme.elevationLevel3.blurPx : 12, (Theme.elevationLevel4 && Theme.elevationLevel4.blurPx !== undefined) ? Theme.elevationLevel4.blurPx : 16)
-    readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs((Theme.elevationLevel3 && Theme.elevationLevel3.offsetY !== undefined) ? Theme.elevationLevel3.offsetY : 6), Math.abs((Theme.elevationLevel4 && Theme.elevationLevel4.offsetY !== undefined) ? Theme.elevationLevel4.offsetY : 8))
-    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + maxPopupShadowOffsetYPx + 8), dpr) : 0
+    readonly property real maxPopupShadowOffsetXPx: Math.max(Math.abs(Theme.elevationOffsetX(Theme.elevationLevel3)), Math.abs(Theme.elevationOffsetX(Theme.elevationLevel4)))
+    readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
+    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
 
     anchors.top: true
     anchors.left: true
@@ -354,11 +355,19 @@ PanelWindow {
         readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
         readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
         readonly property real cardInset: Theme.snap(4, win.dpr)
-        readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.abs(shadowOffsetY) + 8), win.dpr) : 0
+        readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
         property real shadowBlurPx: shadowsAllowed ? (elevLevel && elevLevel.blurPx !== undefined ? elevLevel.blurPx : 12) : 0
-        property real shadowOffsetY: shadowsAllowed ? (elevLevel && elevLevel.offsetY !== undefined ? elevLevel.offsetY : 6) : 0
+        property real shadowOffsetX: shadowsAllowed ? Theme.elevationOffsetX(elevLevel) : 0
+        property real shadowOffsetY: shadowsAllowed ? Theme.elevationOffsetY(elevLevel, 6) : 0
 
         Behavior on shadowBlurPx {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        Behavior on shadowOffsetX {
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
@@ -390,7 +399,7 @@ PanelWindow {
                 maskEnabled: false
                 shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
                 shadowScale: 1
-                shadowHorizontalOffset: 0
+                shadowHorizontalOffset: content.shadowOffsetX
                 shadowVerticalOffset: content.shadowOffsetY
                 blurMax: Theme.elevationBlurMax
                 shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"

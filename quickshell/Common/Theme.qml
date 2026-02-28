@@ -678,37 +678,165 @@ Singleton {
 
     readonly property real _elevMult: typeof SettingsData !== "undefined" && SettingsData.m3ElevationIntensity !== undefined ? SettingsData.m3ElevationIntensity / 12 : 1
     readonly property real _opMult: typeof SettingsData !== "undefined" && SettingsData.m3ElevationOpacity !== undefined ? SettingsData.m3ElevationOpacity / 60 : 1
+    function normalizeElevationDirection(direction) {
+        switch (direction) {
+        case "top":
+        case "topLeft":
+        case "topRight":
+        case "bottom":
+        case "bottomLeft":
+        case "bottomRight":
+        case "left":
+        case "right":
+        case "autoBar":
+            return direction;
+        default:
+            return "top";
+        }
+    }
+
+    readonly property string elevationLightDirection: {
+        if (typeof SettingsData === "undefined" || !SettingsData.m3ElevationLightDirection)
+            return "top";
+        switch (SettingsData.m3ElevationLightDirection) {
+        case "autoBar":
+        case "top":
+        case "topLeft":
+        case "topRight":
+        case "bottom":
+            return SettingsData.m3ElevationLightDirection;
+        default:
+            return "top";
+        }
+    }
+    readonly property real _elevDiagRatio: 0.55
+    readonly property string _globalElevationDirForTokens: {
+        const normalized = normalizeElevationDirection(elevationLightDirection);
+        return normalized === "autoBar" ? "top" : normalized;
+    }
+    readonly property real _elevDirX: {
+        switch (_globalElevationDirForTokens) {
+        case "topLeft":
+        case "bottomLeft":
+        case "left":
+            return 1;
+        case "topRight":
+        case "bottomRight":
+        case "right":
+            return -1;
+        default:
+            return 0;
+        }
+    }
+    readonly property real _elevDirY: {
+        switch (_globalElevationDirForTokens) {
+        case "bottom":
+        case "bottomLeft":
+        case "bottomRight":
+            return -1;
+        case "left":
+        case "right":
+            return 0;
+        default:
+            return 1;
+        }
+    }
+    readonly property real _elevDirXScale: (_globalElevationDirForTokens === "left" || _globalElevationDirForTokens === "right") ? 1 : _elevDiagRatio
 
     readonly property var elevationLevel1: ({
             blurPx: 4 * _elevMult,
-            offsetY: 1 * _elevMult,
+            offsetX: 1 * _elevMult * _elevDirXScale * _elevDirX,
+            offsetY: 1 * _elevMult * _elevDirY,
             spreadPx: 0,
             alpha: 0.2 * _opMult
         })
     readonly property var elevationLevel2: ({
             blurPx: 8 * _elevMult,
-            offsetY: 4 * _elevMult,
+            offsetX: 4 * _elevMult * _elevDirXScale * _elevDirX,
+            offsetY: 4 * _elevMult * _elevDirY,
             spreadPx: 0,
             alpha: 0.25 * _opMult
         })
     readonly property var elevationLevel3: ({
             blurPx: 12 * _elevMult,
-            offsetY: 6 * _elevMult,
+            offsetX: 6 * _elevMult * _elevDirXScale * _elevDirX,
+            offsetY: 6 * _elevMult * _elevDirY,
             spreadPx: 0,
             alpha: 0.3 * _opMult
         })
     readonly property var elevationLevel4: ({
             blurPx: 16 * _elevMult,
-            offsetY: 8 * _elevMult,
+            offsetX: 8 * _elevMult * _elevDirXScale * _elevDirX,
+            offsetY: 8 * _elevMult * _elevDirY,
             spreadPx: 0,
             alpha: 0.3 * _opMult
         })
     readonly property var elevationLevel5: ({
             blurPx: 20 * _elevMult,
-            offsetY: 10 * _elevMult,
+            offsetX: 10 * _elevMult * _elevDirXScale * _elevDirX,
+            offsetY: 10 * _elevMult * _elevDirY,
             spreadPx: 0,
             alpha: 0.3 * _opMult
         })
+
+    function elevationOffsetMagnitude(level, fallback, direction) {
+        if (!level) {
+            return fallback !== undefined ? Math.abs(fallback) : 0;
+        }
+        const yMag = Math.abs(level.offsetY !== undefined ? level.offsetY : 0);
+        if (yMag > 0)
+            return yMag;
+        const xMag = Math.abs(level.offsetX !== undefined ? level.offsetX : 0);
+        if (xMag > 0) {
+            if (direction === "left" || direction === "right")
+                return xMag;
+            return xMag / _elevDiagRatio;
+        }
+        return fallback !== undefined ? Math.abs(fallback) : 0;
+    }
+
+    function elevationOffsetXFor(level, direction, fallback) {
+        const dir = normalizeElevationDirection(direction || elevationLightDirection);
+        const mag = elevationOffsetMagnitude(level, fallback, dir);
+        switch (dir) {
+        case "topLeft":
+        case "bottomLeft":
+            return mag * _elevDiagRatio;
+        case "topRight":
+        case "bottomRight":
+            return -mag * _elevDiagRatio;
+        case "left":
+            return mag;
+        case "right":
+            return -mag;
+        default:
+            return 0;
+        }
+    }
+
+    function elevationOffsetYFor(level, direction, fallback) {
+        const dir = normalizeElevationDirection(direction || elevationLightDirection);
+        const mag = elevationOffsetMagnitude(level, fallback, dir);
+        switch (dir) {
+        case "bottom":
+        case "bottomLeft":
+        case "bottomRight":
+            return -mag;
+        case "left":
+        case "right":
+            return 0;
+        default:
+            return mag;
+        }
+    }
+
+    function elevationOffsetX(level, fallback) {
+        return elevationOffsetXFor(level, elevationLightDirection, fallback);
+    }
+
+    function elevationOffsetY(level, fallback) {
+        return elevationOffsetYFor(level, elevationLightDirection, fallback);
+    }
 
     function elevationShadowColor(level) {
         const alpha = (level && level.alpha !== undefined) ? level.alpha : 0.3;

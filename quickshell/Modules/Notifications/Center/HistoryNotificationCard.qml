@@ -47,8 +47,8 @@ Rectangle {
             maskEnabled: false
             shadowBlur: Math.max(0, Math.min(1, ((Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined) ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax))
             shadowScale: 1
-            shadowVerticalOffset: (Theme.elevationLevel1 && Theme.elevationLevel1.offsetY !== undefined) ? Theme.elevationLevel1.offsetY : 1
-            shadowHorizontalOffset: 0
+            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
+            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
             blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
         }

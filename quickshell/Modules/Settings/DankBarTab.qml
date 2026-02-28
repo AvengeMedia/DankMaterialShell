@@ -140,6 +140,8 @@ Item {
             scrollYBehavior: defaultBar.scrollYBehavior ?? "workspace",
             shadowIntensity: defaultBar.shadowIntensity ?? 0,
             shadowOpacity: defaultBar.shadowOpacity ?? 60,
+            shadowDirectionMode: defaultBar.shadowDirectionMode ?? "inherit",
+            shadowDirection: defaultBar.shadowDirection ?? "top",
             shadowColorMode: defaultBar.shadowColorMode ?? "default",
             shadowCustomColor: defaultBar.shadowCustomColor ?? "#000000"
         };
@@ -1053,6 +1055,7 @@ Item {
 
                 readonly property bool shadowActive: (selectedBarConfig?.shadowIntensity ?? 0) > 0
                 readonly property bool isCustomColor: (selectedBarConfig?.shadowColorMode ?? "default") === "custom"
+                readonly property string directionSource: selectedBarConfig?.shadowDirectionMode ?? "inherit"
 
                 StyledText {
                     width: parent.width
@@ -1105,6 +1108,78 @@ Item {
                     onSliderValueChanged: newValue => SettingsData.updateBarConfig(selectedBarId, {
                             shadowOpacity: newValue
                         })
+                }
+
+                SettingsDropdownRow {
+                    visible: shadowCard.shadowActive
+                    text: I18n.tr("Direction Source", "bar shadow direction source")
+                    description: I18n.tr("Choose how this bar resolves shadow direction")
+                    settingKey: "barShadowDirectionSource"
+                    options: [I18n.tr("Inherit Global (Default)", "bar shadow direction source option"), I18n.tr("Auto (Bar-aware)", "bar shadow direction source option"), I18n.tr("Manual", "bar shadow direction source option")]
+                    currentValue: {
+                        switch (shadowCard.directionSource) {
+                        case "autoBar":
+                            return I18n.tr("Auto (Bar-aware)", "bar shadow direction source option");
+                        case "manual":
+                            return I18n.tr("Manual", "bar shadow direction source option");
+                        default:
+                            return I18n.tr("Inherit Global (Default)", "bar shadow direction source option");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Auto (Bar-aware)", "bar shadow direction source option")) {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirectionMode: "autoBar"
+                            });
+                        } else if (value === I18n.tr("Manual", "bar shadow direction source option")) {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirectionMode: "manual"
+                            });
+                        } else {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirectionMode: "inherit"
+                            });
+                        }
+                    }
+                }
+
+                SettingsDropdownRow {
+                    visible: shadowCard.shadowActive && shadowCard.directionSource === "manual"
+                    text: I18n.tr("Manual Direction", "bar manual shadow direction")
+                    description: I18n.tr("Use a fixed shadow direction for this bar")
+                    settingKey: "barShadowDirectionManual"
+                    options: [I18n.tr("Top", "shadow direction option"), I18n.tr("Top Left", "shadow direction option"), I18n.tr("Top Right", "shadow direction option"), I18n.tr("Bottom", "shadow direction option")]
+                    currentValue: {
+                        switch (selectedBarConfig?.shadowDirection) {
+                        case "topLeft":
+                            return I18n.tr("Top Left", "shadow direction option");
+                        case "topRight":
+                            return I18n.tr("Top Right", "shadow direction option");
+                        case "bottom":
+                            return I18n.tr("Bottom", "shadow direction option");
+                        default:
+                            return I18n.tr("Top", "shadow direction option");
+                        }
+                    }
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Top Left", "shadow direction option")) {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirection: "topLeft"
+                            });
+                        } else if (value === I18n.tr("Top Right", "shadow direction option")) {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirection: "topRight"
+                            });
+                        } else if (value === I18n.tr("Bottom", "shadow direction option")) {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirection: "bottom"
+                            });
+                        } else {
+                            SettingsData.updateBarConfig(selectedBarId, {
+                                shadowDirection: "top"
+                            });
+                        }
+                    }
                 }
 
                 Column {

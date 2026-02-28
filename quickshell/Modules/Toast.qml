@@ -409,8 +409,8 @@ PanelWindow {
         layer.effect: MultiEffect {
             autoPaddingEnabled: true
             shadowEnabled: Theme.elevationEnabled
-            shadowHorizontalOffset: 0
-            shadowVerticalOffset: Theme.elevationLevel3 && Theme.elevationLevel3.offsetY !== undefined ? Theme.elevationLevel3.offsetY : 6
+            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
+            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined ? Theme.elevationLevel3.blurPx : 12) / Theme.elevationBlurMax)) : 0
             blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)

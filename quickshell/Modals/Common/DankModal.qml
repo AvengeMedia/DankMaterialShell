@@ -393,8 +393,8 @@ Item {
                             maskEnabled: false
                             shadowBlur: animatedContent.shadowBlurNorm
                             shadowScale: 1
-                            shadowVerticalOffset: animatedContent.elev && animatedContent.elev.offsetY !== undefined ? animatedContent.elev.offsetY : 6
-                            shadowHorizontalOffset: 0
+                            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
+                            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
                             blurMax: Theme.elevationBlurMax
                             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                         }

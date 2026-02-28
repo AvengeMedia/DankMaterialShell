@@ -982,6 +982,8 @@ BasePill {
                     maskEnabled: false
                     shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / bgShadowLayer.blurMax))
                     shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
+                    shadowHorizontalOffset: Theme.elevationOffsetX(menuContainer.elev)
+                    shadowVerticalOffset: Theme.elevationOffsetY(menuContainer.elev, 4)
                     shadowColor: {
                         const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
                         return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
@@ -1454,6 +1456,8 @@ BasePill {
                             maskEnabled: false
                             shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / menuBgShadowLayer.blurMax))
                             shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(menuBgShadowLayer.width, menuBgShadowLayer.height))
+                            shadowHorizontalOffset: Theme.elevationOffsetX(menuContainer.elev)
+                            shadowVerticalOffset: Theme.elevationOffsetY(menuContainer.elev, 4)
                             shadowColor: {
                                 const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
                                 return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);

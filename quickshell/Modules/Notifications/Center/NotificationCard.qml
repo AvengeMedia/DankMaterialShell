@@ -45,7 +45,8 @@ Rectangle {
     readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
     readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
     property real shadowBlurPx: shadowsAllowed ? (baseShadowBlurPx + hoverShadowBlurBoost) : 0
-    property real shadowOffsetYPx: shadowsAllowed ? (1 + (cardHoverHandler.hovered ? 0.35 : 0)) : 0
+    property real shadowOffsetXPx: shadowsAllowed ? Theme.elevationOffsetX(shadowElevation) : 0
+    property real shadowOffsetYPx: shadowsAllowed ? (Theme.elevationOffsetY(shadowElevation, 1) + (cardHoverHandler.hovered ? 0.35 : 0)) : 0
     property bool __initialized: false
 
     Component.onCompleted: {
@@ -64,6 +65,13 @@ Rectangle {
     }
 
     Behavior on shadowBlurPx {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowOffsetXPx {
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -138,7 +146,7 @@ Rectangle {
             shadowBlur: Math.max(0, Math.min(1, root.shadowBlurPx / Theme.elevationBlurMax))
             shadowScale: 1
             shadowVerticalOffset: root.shadowOffsetYPx
-            shadowHorizontalOffset: 0
+            shadowHorizontalOffset: root.shadowOffsetXPx
             blurMax: Theme.elevationBlurMax
             shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
         }

@@ -277,7 +277,8 @@ Item {
                     shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
                     blurMax: Theme.elevationBlurMax
                     shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                    shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
+                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
                 }
 
                 Rectangle {

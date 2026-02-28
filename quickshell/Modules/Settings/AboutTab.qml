@@ -882,7 +882,8 @@ Item {
         layer.effect: MultiEffect {
             shadowEnabled: Theme.elevationEnabled
             shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
-            shadowVerticalOffset: Theme.elevationLevel1 && Theme.elevationLevel1.offsetY !== undefined ? Theme.elevationLevel1.offsetY : 1
+            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
+            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
             shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
             blurMax: Theme.elevationBlurMax
             shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)

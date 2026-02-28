@@ -50,6 +50,7 @@ var SPEC = {
     m3ElevationIntensity: { def: 12 },
     m3ElevationOpacity: { def: 30 },
     m3ElevationColorMode: { def: "default" },
+    m3ElevationLightDirection: { def: "top" },
     m3ElevationCustomColor: { def: "#000000" },
     modalElevationEnabled: { def: true },
     popoutElevationEnabled: { def: true },

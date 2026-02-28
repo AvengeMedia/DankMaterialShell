@@ -78,6 +78,38 @@ Item {
 
     property int effectiveBarPosition: 0
     property real effectiveBarBottomGap: 0
+    readonly property string autoBarShadowDirection: {
+        const section = triggerSection || "center";
+        switch (effectiveBarPosition) {
+        case SettingsData.Position.Top:
+            if (section === "left")
+                return "topLeft";
+            if (section === "right")
+                return "topRight";
+            return "top";
+        case SettingsData.Position.Bottom:
+            if (section === "left")
+                return "bottomLeft";
+            if (section === "right")
+                return "bottomRight";
+            return "bottom";
+        case SettingsData.Position.Left:
+            if (section === "left")
+                return "topLeft";
+            if (section === "right")
+                return "bottomLeft";
+            return "left";
+        case SettingsData.Position.Right:
+            if (section === "left")
+                return "topRight";
+            if (section === "right")
+                return "bottomRight";
+            return "right";
+        default:
+            return "top";
+        }
+    }
+    readonly property string effectiveShadowDirection: Theme.elevationLightDirection === "autoBar" ? autoBarShadowDirection : Theme.elevationLightDirection
 
     // Snapshot mask geometry to prevent background damage on bar updates
     property real _frozenMaskX: 0
@@ -507,6 +539,8 @@ Item {
                 property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 12
                 property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
                 property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.3
+                property real shadowOffsetX: Theme.elevationOffsetXFor(Theme.elevationLevel3, root.effectiveShadowDirection, 6)
+                property real shadowOffsetY: Theme.elevationOffsetYFor(Theme.elevationLevel3, root.effectiveShadowDirection, 6)
                 readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
                 readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
                 readonly property int blurMax: Theme.elevationBlurMax
@@ -521,7 +555,8 @@ Item {
                     maskEnabled: false
                     shadowBlur: Math.max(0, Math.min(1, shadowSource.shadowBlurPx / shadowSource.blurMax))
                     shadowScale: 1 + (2 * shadowSource.shadowSpreadPx) / Math.max(1, Math.min(shadowSource.width, shadowSource.height))
-                    shadowVerticalOffset: parent.elev && parent.elev.offsetY !== undefined ? parent.elev.offsetY : 6
+                    shadowHorizontalOffset: shadowSource.shadowOffsetX
+                    shadowVerticalOffset: shadowSource.shadowOffsetY
                     blurMax: Theme.elevationBlurMax
                     shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
                 }
