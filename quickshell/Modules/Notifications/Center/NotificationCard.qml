@@ -39,7 +39,7 @@ Rectangle {
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
-    scale: (cardHoverHandler.hovered ? 1.005 : 1.0) * listLevelAdjacentScaleInfluence
+    scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
     readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
     readonly property var shadowElevation: Theme.elevationLevel1
     readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
@@ -124,18 +124,32 @@ Rectangle {
         id: cardHoverHandler
     }
 
-    layer.enabled: root.shadowsAllowed
-    layer.effect: MultiEffect {
-        autoPaddingEnabled: true
-        shadowEnabled: root.shadowsAllowed
-        blurEnabled: false
-        maskEnabled: false
-        shadowBlur: Math.max(0, Math.min(1, root.shadowBlurPx / Theme.elevationBlurMax))
-        shadowScale: 1
-        shadowVerticalOffset: root.shadowOffsetYPx
-        shadowHorizontalOffset: 0
-        blurMax: Theme.elevationBlurMax
-        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
+    Item {
+        id: shadowLayer
+        anchors.fill: parent
+        z: -1
+
+        layer.enabled: root.shadowsAllowed
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: true
+            shadowEnabled: root.shadowsAllowed
+            blurEnabled: false
+            maskEnabled: false
+            shadowBlur: Math.max(0, Math.min(1, root.shadowBlurPx / Theme.elevationBlurMax))
+            shadowScale: 1
+            shadowVerticalOffset: root.shadowOffsetYPx
+            shadowHorizontalOffset: 0
+            blurMax: Theme.elevationBlurMax
+            shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: root.radius
+            color: root.color
+            border.color: root.border.color
+            border.width: root.border.width
+        }
     }
 
     Rectangle {

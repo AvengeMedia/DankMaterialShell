@@ -254,6 +254,8 @@ Item {
         }
 
         contentItem: Rectangle {
+            id: contentSurface
+
             LayoutMirroring.enabled: I18n.isRtl
             LayoutMirroring.childrenInherit: true
             color: Qt.rgba(Theme.surfaceContainer.r, Theme.surfaceContainer.g, Theme.surfaceContainer.b, 1)
@@ -261,16 +263,30 @@ Item {
             border.width: 2
             radius: Theme.cornerRadius
 
-            layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
-            layer.effect: MultiEffect {
-                autoPaddingEnabled: true
-                blurEnabled: false
-                maskEnabled: false
-                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
-                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-                blurMax: Theme.elevationBlurMax
-                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+            Item {
+                id: shadowLayer
+                anchors.fill: parent
+                z: -1
+
+                layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
+                layer.effect: MultiEffect {
+                    autoPaddingEnabled: true
+                    blurEnabled: false
+                    maskEnabled: false
+                    shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
+                    shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
+                    blurMax: Theme.elevationBlurMax
+                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
+                    shadowVerticalOffset: Theme.elevationLevel2 && Theme.elevationLevel2.offsetY !== undefined ? Theme.elevationLevel2.offsetY : 4
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: contentSurface.radius
+                    color: contentSurface.color
+                    border.color: contentSurface.border.color
+                    border.width: contentSurface.border.width
+                }
             }
 
             Column {

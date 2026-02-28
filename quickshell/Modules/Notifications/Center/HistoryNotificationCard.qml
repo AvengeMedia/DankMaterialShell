@@ -32,19 +32,34 @@ Rectangle {
     height: baseCardHeight + contentItem.extraHeight
     radius: Theme.cornerRadius
     clip: false
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
 
-    layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-    layer.effect: MultiEffect {
-        autoPaddingEnabled: true
-        shadowEnabled: Theme.elevationEnabled
-        blurEnabled: false
-        maskEnabled: false
-        shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel1.blurPx / Theme.elevationBlurMax))
-        shadowScale: 1
-        shadowVerticalOffset: Theme.elevationLevel1.offsetY
-        shadowHorizontalOffset: 0
-        blurMax: Theme.elevationBlurMax
-        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+    Item {
+        id: shadowLayer
+        anchors.fill: parent
+        z: -1
+
+        layer.enabled: root.shadowsAllowed
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: true
+            shadowEnabled: root.shadowsAllowed
+            blurEnabled: false
+            maskEnabled: false
+            shadowBlur: Math.max(0, Math.min(1, ((Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined) ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax))
+            shadowScale: 1
+            shadowVerticalOffset: (Theme.elevationLevel1 && Theme.elevationLevel1.offsetY !== undefined) ? Theme.elevationLevel1.offsetY : 1
+            shadowHorizontalOffset: 0
+            blurMax: Theme.elevationBlurMax
+            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+        }
+
+        Rectangle {
+            anchors.fill: parent
+            radius: root.radius
+            color: root.color
+            border.color: root.border.color
+            border.width: root.border.width
+        }
     }
 
     color: {
