@@ -1,6 +1,7 @@
 pragma ComponentBehavior: Bound
 
 import QtQuick
+import QtQuick.Controls
 import Quickshell.Hyprland
 import qs.Common
 import qs.Modals.Clipboard
@@ -46,6 +47,16 @@ DankModal {
     }
 
     property string mode: "history"
+    onModeChanged: {
+        if (mode !== "history") {
+            return;
+        }
+        Qt.callLater(function () {
+            if (contentLoader.item?.searchField) {
+                contentLoader.item.searchField.forceActiveFocus();
+            }
+        });
+    }
 
     function updateFilteredModel() {
         ClipboardService.updateFilteredModel();
@@ -239,6 +250,55 @@ DankModal {
                     });
                 }
 
+                function saveEntry(action) {
+                    const saveAction = action ?? "history";
+                    DMSService.sendRequest("clipboard.copy", {
+                        "text": editorView.editorText
+                    }, function (response) {
+                        if (response.error) {
+                            ToastService.showError(I18n.tr("Failed to update clipboard"));
+                            return;
+                        }
+                        if (saveAction === "history") {
+                            clipboardHistoryModal.mode = "history";
+                            clipboardHistoryModal.refreshClipboard();
+                            return;
+                        }
+                        if (saveAction === "close") {
+                            clipboardHistoryModal.hide();
+                            return;
+                        }
+                        if (saveAction === "paste") {
+                            ClipboardService.pasteClipboard(clipboardHistoryModal.hide);
+                        }
+                    });
+                }
+
+                function toggleSaveMenu() {
+                    if (saveMenu.visible) {
+                        saveMenu.close();
+                        return;
+                    }
+                    saveMenu.open();
+                    const pos = saveButton.mapToItem(Overlay.overlay, 0, 0);
+                    const popupW = saveMenu.width;
+                    const popupH = saveMenu.height;
+                    const overlayW = Overlay.overlay.width;
+                    const overlayH = Overlay.overlay.height;
+
+                    let x = pos.x + (saveButton.width - popupW) / 2;
+                    let y = pos.y + saveButton.height + 4;
+                    if (y + popupH > overlayH) {
+                        y = pos.y - popupH - 4;
+                    }
+
+                    x = Math.max(8, Math.min(x, overlayW - popupW - 8));
+                    y = Math.max(8, y);
+
+                    saveMenu.x = x;
+                    saveMenu.y = y;
+                }
+
                 Column {
                     anchors.fill: parent
                     anchors.margins: Theme.spacingM
@@ -350,22 +410,207 @@ DankModal {
                             onClicked: clipboardHistoryModal.mode = "history"
                         }
 
-                        DankButton {
+                        Item {
                             id: saveButton
-                            text: I18n.tr("Save")
-                            backgroundColor: Theme.primary
-                            textColor: Theme.onPrimary
-                            onClicked: {
-                                DMSService.sendRequest("clipboard.copy", {
-                                    "text": editorView.editorText
-                                }, function (response) {
-                                    if (response.error) {
-                                        ToastService.showError(I18n.tr("Failed to update clipboard"));
-                                        return;
+                            property int arrowWidth: 32
+                            property int horizontalPadding: Theme.spacingL
+                            width: cancelButton.width
+                            height: 40
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: Theme.cornerRadius
+                                color: Theme.primary
+                            }
+
+                            Item {
+                                id: saveMainArea
+                                anchors.left: parent.left
+                                anchors.right: saveArrowArea.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                            }
+
+                            StyledText {
+                                id: saveLabel
+                                text: I18n.tr("Save")
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.weight: Font.Medium
+                                color: Theme.onPrimary
+                                anchors.centerIn: saveMainArea
+                            }
+
+                            Item {
+                                id: saveArrowArea
+                                width: saveButton.arrowWidth
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                            }
+
+                            Rectangle {
+                                width: 1
+                                height: parent.height - Theme.spacingM
+                                color: Theme.withAlpha(Theme.onPrimary, 0.2)
+                                anchors.right: saveArrowArea.left
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            DankIcon {
+                                name: saveMenu.visible ? "expand_less" : "expand_more"
+                                size: Theme.iconSizeSmall
+                                color: Theme.onPrimary
+                                anchors.centerIn: saveArrowArea
+                            }
+
+                            StateLayer {
+                                anchors.fill: saveMainArea
+                                stateColor: Theme.onPrimary
+                                onClicked: editorView.saveEntry("history")
+                            }
+
+                            StateLayer {
+                                anchors.fill: saveArrowArea
+                                stateColor: Theme.onPrimary
+                                onClicked: editorView.toggleSaveMenu()
+                            }
+                        }
+                    }
+
+                    Popup {
+                        id: saveMenu
+                        parent: Overlay.overlay
+                        width: 220
+                        padding: Theme.spacingM
+                        modal: false
+                        focus: true
+                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+                        background: StyledRect {
+                            radius: Theme.cornerRadius
+                            color: Theme.surfaceContainer
+                            border.color: Theme.outlineMedium
+                            border.width: 1
+                        }
+
+                        contentItem: Column {
+                            id: saveMenuColumn
+                            spacing: Theme.spacingXS
+
+                            StyledRect {
+                                width: saveMenu.width - saveMenu.padding * 2
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: saveMenuSaveArea.containsMouse ? Theme.surfaceVariant : "transparent"
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingS
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        name: "save"
+                                        size: Theme.iconSizeSmall
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
                                     }
-                                    clipboardHistoryModal.mode = "history";
-                                    clipboardHistoryModal.refreshClipboard();
-                                });
+
+                                    StyledText {
+                                        text: I18n.tr("Save")
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: saveMenuSaveArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        saveMenu.close();
+                                        editorView.saveEntry("history");
+                                    }
+                                }
+                            }
+
+                            StyledRect {
+                                width: saveMenu.width - saveMenu.padding * 2
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: saveMenuCloseArea.containsMouse ? Theme.surfaceVariant : "transparent"
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingS
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        name: "close"
+                                        size: Theme.iconSizeSmall
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.tr("Save and close")
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: saveMenuCloseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: {
+                                        saveMenu.close();
+                                        editorView.saveEntry("close");
+                                    }
+                                }
+                            }
+
+                            StyledRect {
+                                width: saveMenu.width - saveMenu.padding * 2
+                                height: 32
+                                radius: Theme.cornerRadius
+                                color: saveMenuPasteArea.containsMouse ? Theme.surfaceVariant : "transparent"
+                                opacity: clipboardHistoryModal.wtypeAvailable ? 1 : 0.5
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.leftMargin: Theme.spacingS
+                                    spacing: Theme.spacingS
+
+                                    DankIcon {
+                                        name: "content_paste"
+                                        size: Theme.iconSizeSmall
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    StyledText {
+                                        text: I18n.tr("Save and paste")
+                                        font.pixelSize: Theme.fontSizeMedium
+                                        color: Theme.surfaceText
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                MouseArea {
+                                    id: saveMenuPasteArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    enabled: clipboardHistoryModal.wtypeAvailable
+                                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                                    onClicked: {
+                                        saveMenu.close();
+                                        editorView.saveEntry("paste");
+                                    }
+                                }
                             }
                         }
                     }
