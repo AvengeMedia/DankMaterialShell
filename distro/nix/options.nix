@@ -26,6 +26,9 @@ in
 
   options.programs.dank-material-shell = {
     enable = lib.mkEnableOption "DankMaterialShell";
+    package = lib.mkPackageOption dmsPkgs "dms-shell" {
+      extraDescription = "The DankMaterialShell package to use (defaults to be built from source)";
+    };
 
     systemd = {
       enable = lib.mkEnableOption "DankMaterialShell systemd startup";
