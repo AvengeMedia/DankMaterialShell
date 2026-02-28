@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  dmsPkgs,
   ...
 }@args:
 let
@@ -12,7 +11,6 @@ let
       config
       pkgs
       lib
-      dmsPkgs
       ;
   };
 in
@@ -36,7 +34,7 @@ in
       restartIfChanged = cfg.systemd.restartIfChanged;
 
       serviceConfig = {
-        ExecStart = lib.getExe dmsPkgs.dms-shell + " run --session";
+        ExecStart = lib.getExe cfg.package + " run --session";
         Restart = "on-failure";
       };
     };
