@@ -6,26 +6,27 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/AvengeMedia/DankMaterialShell/core/internal/log"
 )
 
 type IpClient struct {
 	currLocation *Location
 }
 
+type ipLocationResult struct {
+	Location
+	City string
+}
+
 type ipAPIResponse struct {
-	Lat  float64 `json:"lat"`
-	Lon  float64 `json:"lon"`
-	City string  `json:"city"`
+	Status string  `json:"status"`
+	Lat    float64 `json:"lat"`
+	Lon    float64 `json:"lon"`
+	City   string  `json:"city"`
 }
 
 func newIpClient() *IpClient {
 	return &IpClient{
-		currLocation: &Location{
-			Latitude:  0.0,
-			Longitude: 0.0,
-		},
+		currLocation: &Location{},
 	}
 }
 
@@ -34,55 +35,57 @@ func (c *IpClient) Subscribe(id string) chan Location {
 	if location, err := c.GetLocation(); err == nil {
 		ch <- location
 	}
-
 	return ch
 }
 
-func (c *IpClient) Unsubscribe(id string) {
-	// Stub
-}
+func (c *IpClient) Unsubscribe(id string) {}
 
-func (c *IpClient) Close() {
-	// Stub
-}
+func (c *IpClient) Close() {}
 
 func (c *IpClient) GetLocation() (Location, error) {
-	client := &http.Client{
-		Timeout: 10 * time.Second,
+	if c.currLocation.Latitude != 0 || c.currLocation.Longitude != 0 {
+		return *c.currLocation, nil
 	}
 
-	result := Location{
-		Latitude:  0.0,
-		Longitude: 0.0,
+	result, err := fetchIPLocation()
+	if err != nil {
+		return Location{}, err
 	}
+
+	c.currLocation.Latitude = result.Latitude
+	c.currLocation.Longitude = result.Longitude
+	return *c.currLocation, nil
+}
+
+func fetchIPLocation() (ipLocationResult, error) {
+	client := &http.Client{Timeout: 10 * time.Second}
 
 	resp, err := client.Get("http://ip-api.com/json/")
 	if err != nil {
-		return result, fmt.Errorf("failed to fetch IP location: %w", err)
+		return ipLocationResult{}, fmt.Errorf("failed to fetch IP location: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return result, fmt.Errorf("ip-api.com returned status %d", resp.StatusCode)
+		return ipLocationResult{}, fmt.Errorf("ip-api.com returned status %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return result, fmt.Errorf("failed to read response: %w", err)
+		return ipLocationResult{}, fmt.Errorf("failed to read response: %w", err)
 	}
 
 	var data ipAPIResponse
 	if err := json.Unmarshal(body, &data); err != nil {
-		return result, fmt.Errorf("failed to parse response: %w", err)
+		return ipLocationResult{}, fmt.Errorf("failed to parse response: %w", err)
 	}
 
-	if data.Lat == 0 && data.Lon == 0 {
-		return result, fmt.Errorf("missing location data in response")
+	if data.Status == "fail" || (data.Lat == 0 && data.Lon == 0) {
+		return ipLocationResult{}, fmt.Errorf("ip-api.com returned no location data")
 	}
 
-	log.Infof("Fetched IP-based location: %s (%.4f, %.4f)", data.City, data.Lat, data.Lon)
-	result.Latitude = data.Lat
-	result.Longitude = data.Lon
-
-	return result, nil
+	return ipLocationResult{
+		Location: Location{Latitude: data.Lat, Longitude: data.Lon},
+		City:     data.City,
+	}, nil
 }

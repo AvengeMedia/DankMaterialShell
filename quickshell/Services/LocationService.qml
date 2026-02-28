@@ -17,11 +17,9 @@ Singleton {
 
     signal locationChanged(var data)
 
-    readonly property var lowPriorityCmd: ["nice", "-n", "19", "ionice", "-c3"]
-    readonly property var curlBaseCmd: ["curl", "-sS", "--fail", "--connect-timeout", "3", "--max-time", "6", "--limit-rate", "100k", "--compressed"]
-
-    Component.onCompleted: {
-        getState();
+    onLocationAvailableChanged: {
+        if (locationAvailable && !valid)
+            getState();
     }
 
     Connections {
@@ -46,50 +44,12 @@ Singleton {
     }
 
     function getState() {
-        if (!locationAvailable) {
-            fetchIPLocation();
+        if (!locationAvailable)
             return;
-        }
 
         DMSService.sendRequest("location.getState", null, response => {
-            if (response.result && (response.result.latitude !== 0 || response.result.longitude !== 0)) {
+            if (response.result)
                 handleStateUpdate(response.result);
-                return;
-            }
-            fetchIPLocation();
         });
-    }
-
-    function fetchIPLocation() {
-        if (root.valid)
-            return;
-        ipLocationFetcher.running = true;
-    }
-
-    Process {
-        id: ipLocationFetcher
-        command: root.lowPriorityCmd.concat(root.curlBaseCmd).concat(["http://ip-api.com/json/"])
-        running: false
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const raw = text.trim();
-                if (!raw || raw[0] !== "{")
-                    return;
-
-                try {
-                    const data = JSON.parse(raw);
-                    if (data.status === "fail")
-                        return;
-
-                    const lat = parseFloat(data.lat);
-                    const lon = parseFloat(data.lon);
-                    if (isNaN(lat) || isNaN(lon) || (lat === 0 && lon === 0))
-                        return;
-
-                    root.handleStateUpdate({ latitude: lat, longitude: lon });
-                } catch (e) {}
-            }
-        }
     }
 }
