@@ -31,6 +31,7 @@ Item {
     property bool backgroundInteractive: true
     property bool contentHandlesKeys: false
     property bool fullHeightSurface: false
+    property bool _primeContent: false
     property bool _resizeActive: false
     property real _surfaceMarginLeft: 0
     property real _surfaceW: 0
@@ -87,6 +88,14 @@ Item {
     function setBarContext(position, bottomGap) {
         effectiveBarPosition = position !== undefined ? position : 0;
         effectiveBarBottomGap = bottomGap !== undefined ? bottomGap : 0;
+    }
+
+    function primeContent() {
+        _primeContent = true;
+    }
+
+    function clearPrimedContent() {
+        _primeContent = false;
     }
 
     function setTriggerPosition(x, y, width, section, targetScreen, barPosition, barThickness, barSpacing, barConfig) {
@@ -152,6 +161,7 @@ Item {
 
     function close() {
         shouldBeVisible = false;
+        _primeContent = false;
         PopoutManager.popoutChanged();
         closeTimer.restart();
     }
@@ -257,29 +267,30 @@ Item {
             }
         })(), dpr)
 
+    readonly property real triggeringBarLeftExclusion: (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? Math.max(0, barX + barWidth) : 0
+    readonly property real triggeringBarTopExclusion: (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? Math.max(0, barY + barHeight) : 0
+    readonly property real triggeringBarRightExclusion: (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? Math.max(0, screenWidth - barX) : 0
+    readonly property real triggeringBarBottomExclusion: (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? Math.max(0, screenHeight - barY) : 0
+
     readonly property real maskX: {
-        const triggeringBarX = (effectiveBarPosition === SettingsData.Position.Left && barWidth > 0) ? barWidth : 0;
         const adjacentLeftBar = adjacentBarInfo?.leftBar ?? 0;
-        return Math.max(triggeringBarX, adjacentLeftBar);
+        return Math.max(triggeringBarLeftExclusion, adjacentLeftBar);
     }
 
     readonly property real maskY: {
-        const triggeringBarY = (effectiveBarPosition === SettingsData.Position.Top && barHeight > 0) ? barHeight : 0;
         const adjacentTopBar = adjacentBarInfo?.topBar ?? 0;
-        return Math.max(triggeringBarY, adjacentTopBar);
+        return Math.max(triggeringBarTopExclusion, adjacentTopBar);
     }
 
     readonly property real maskWidth: {
-        const triggeringBarRight = (effectiveBarPosition === SettingsData.Position.Right && barWidth > 0) ? barWidth : 0;
         const adjacentRightBar = adjacentBarInfo?.rightBar ?? 0;
-        const rightExclusion = Math.max(triggeringBarRight, adjacentRightBar);
+        const rightExclusion = Math.max(triggeringBarRightExclusion, adjacentRightBar);
         return Math.max(100, screenWidth - maskX - rightExclusion);
     }
 
     readonly property real maskHeight: {
-        const triggeringBarBottom = (effectiveBarPosition === SettingsData.Position.Bottom && barHeight > 0) ? barHeight : 0;
         const adjacentBottomBar = adjacentBarInfo?.bottomBar ?? 0;
-        const bottomExclusion = Math.max(triggeringBarBottom, adjacentBottomBar);
+        const bottomExclusion = Math.max(triggeringBarBottomExclusion, adjacentBottomBar);
         return Math.max(100, screenHeight - maskY - bottomExclusion);
     }
 
@@ -395,7 +406,7 @@ Item {
         implicitWidth: useBackgroundWindow ? root._surfaceW : 0
         implicitHeight: (useBackgroundWindow && !_fullHeight) ? (root.alignedHeight + shadowBuffer * 2) : 0
 
-        mask: (useBackgroundWindow && _fullHeight) ? contentInputMask : null
+        mask: useBackgroundWindow ? contentInputMask : null
 
         Region {
             id: contentInputMask
@@ -405,10 +416,10 @@ Item {
         Item {
             id: contentMaskRect
             visible: false
-            x: contentContainer.x - root.shadowBuffer
-            y: contentContainer.y - root.shadowBuffer
-            width: root.alignedWidth + root.shadowBuffer * 2
-            height: root.alignedHeight + root.shadowBuffer * 2
+            x: contentContainer.x
+            y: contentContainer.y
+            width: root.alignedWidth
+            height: root.alignedHeight
         }
 
         MouseArea {
@@ -486,7 +497,7 @@ Item {
                 width: parent.width
                 height: parent.height
                 radius: Theme.cornerRadius
-                color: "black"
+                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 opacity: contentWrapper.opacity
                 scale: contentWrapper.scale
                 x: contentWrapper.x
@@ -550,7 +561,7 @@ Item {
                 Loader {
                     id: contentLoader
                     anchors.fill: parent
-                    active: shouldBeVisible || contentWindow.visible
+                    active: root._primeContent || shouldBeVisible || contentWindow.visible
                     asynchronous: false
                 }
             }

@@ -2294,10 +2294,38 @@ Item {
 
             SettingsCard {
                 tab: "theme"
+                tags: ["icon", "theme", "system"]
+                title: I18n.tr("Icon Theme")
+                settingKey: "iconTheme"
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "system"]
+                    settingKey: "iconTheme"
+                    text: I18n.tr("Icon Theme")
+                    description: I18n.tr("DankShell & System Icons (requires restart)")
+                    currentValue: SettingsData.iconTheme
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconTheme(value);
+                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
                 tags: ["matugen", "templates", "theming"]
                 title: I18n.tr("Matugen Templates")
                 settingKey: "matugenTemplates"
                 iconName: "auto_awesome"
+                collapsible: true
+                expanded: false
                 visible: Theme.matugenAvailable
 
                 SettingsToggleRow {
@@ -2598,32 +2626,6 @@ Item {
                         wrapMode: Text.WordWrap
                         width: parent.width - Theme.iconSizeSmall - Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["icon", "theme", "system"]
-                title: I18n.tr("Icon Theme")
-                settingKey: "iconTheme"
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "system"]
-                    settingKey: "iconTheme"
-                    text: I18n.tr("Icon Theme")
-                    description: I18n.tr("DankShell & System Icons (requires restart)")
-                    currentValue: SettingsData.iconTheme
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 236
-                    options: cachedIconThemes
-                    onValueChanged: value => {
-                        SettingsData.setIconTheme(value);
-                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
-                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
-                        }
                     }
                 }
             }

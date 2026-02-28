@@ -226,6 +226,25 @@ function migrateToVersion(obj, targetVersion) {
         settings.configVersion = 5;
     }
 
+    if (currentVersion < 6) {
+        console.info("Migrating settings from version", currentVersion, "to version 6");
+
+        if (settings.barElevationEnabled === undefined) {
+            var legacyBars = Array.isArray(settings.barConfigs) ? settings.barConfigs : [];
+            var hadLegacyBarShadowEnabled = false;
+            for (var j = 0; j < legacyBars.length; j++) {
+                var legacyIntensity = Number(legacyBars[j] && legacyBars[j].shadowIntensity);
+                if (!isNaN(legacyIntensity) && legacyIntensity > 0) {
+                    hadLegacyBarShadowEnabled = true;
+                    break;
+                }
+            }
+            settings.barElevationEnabled = hadLegacyBarShadowEnabled;
+        }
+
+        settings.configVersion = 6;
+    }
+
     return settings;
 }
 

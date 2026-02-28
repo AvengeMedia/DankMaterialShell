@@ -134,15 +134,15 @@ Item {
     Loader {
         id: shadowLoader
         anchors.fill: parent
-        active: root.shadowEnabled && mainPathCorrectShape && Theme.elevationEnabled
+        active: root.shadowEnabled && mainPathCorrectShape && (Theme.elevationEnabled || root.hasPerBarOverride)
         asynchronous: false
         sourceComponent: Item {
             anchors.fill: parent
 
             layer.enabled: true
             layer.smooth: true
-            layer.samples: 8
-            layer.textureSize: Qt.size(Math.round(width * barWindow._dpr * 2), Math.round(height * barWindow._dpr * 2))
+            layer.samples: barWindow._dpr > 1.5 ? 4 : 2
+            layer.textureSize: Qt.size(Math.round(width * barWindow._dpr), Math.round(height * barWindow._dpr))
             layer.effect: MultiEffect {
                 shadowEnabled: true
                 shadowBlur: root.shadowBlur

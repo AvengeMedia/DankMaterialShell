@@ -39,7 +39,13 @@ Rectangle {
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
-    scale: (cardHoverHandler.hovered ? 1.01 : 1.0) * listLevelAdjacentScaleInfluence
+    scale: (cardHoverHandler.hovered ? 1.005 : 1.0) * listLevelAdjacentScaleInfluence
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    readonly property var shadowElevation: Theme.elevationLevel1
+    readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
+    readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
+    property real shadowBlurPx: shadowsAllowed ? (baseShadowBlurPx + hoverShadowBlurBoost) : 0
+    property real shadowOffsetYPx: shadowsAllowed ? (1 + (cardHoverHandler.hovered ? 0.35 : 0)) : 0
     property bool __initialized: false
 
     Component.onCompleted: {
@@ -51,6 +57,20 @@ Rectangle {
 
     Behavior on scale {
         enabled: listLevelScaleAnimationsEnabled
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowBlurPx {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowOffsetYPx {
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -100,22 +120,22 @@ Rectangle {
     }
     clip: false
 
-    layer.enabled: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-    layer.effect: MultiEffect {
-        autoPaddingEnabled: true
-        shadowEnabled: Theme.elevationEnabled
-        blurEnabled: false
-        maskEnabled: false
-        shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel1.blurPx / Theme.elevationBlurMax))
-        shadowScale: 1
-        shadowVerticalOffset: Theme.elevationLevel1.offsetY
-        shadowHorizontalOffset: 0
-        blurMax: Theme.elevationBlurMax
-        shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
-    }
-
     HoverHandler {
         id: cardHoverHandler
+    }
+
+    layer.enabled: root.shadowsAllowed
+    layer.effect: MultiEffect {
+        autoPaddingEnabled: true
+        shadowEnabled: root.shadowsAllowed
+        blurEnabled: false
+        maskEnabled: false
+        shadowBlur: Math.max(0, Math.min(1, root.shadowBlurPx / Theme.elevationBlurMax))
+        shadowScale: 1
+        shadowVerticalOffset: root.shadowOffsetYPx
+        shadowHorizontalOffset: 0
+        blurMax: Theme.elevationBlurMax
+        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
     }
 
     Rectangle {

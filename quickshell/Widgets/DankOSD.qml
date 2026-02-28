@@ -270,7 +270,7 @@ PanelWindow {
             radius: Theme.cornerRadius
             color: Theme.withAlpha(Theme.surfaceContainer, osdContainer.popupSurfaceAlpha)
             border.color: Theme.outlineMedium
-            border.width: 0
+            border.width: 1
             z: -1
         }
 

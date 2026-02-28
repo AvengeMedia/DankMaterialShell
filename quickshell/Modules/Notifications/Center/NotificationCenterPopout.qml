@@ -13,9 +13,16 @@ DankPopout {
     property var triggerScreen: null
     property real stablePopupHeight: 400
     property real _lastAlignedContentHeight: -1
+    property bool _pendingSizedOpen: false
 
     function updateStablePopupHeight() {
         const item = contentLoader.item;
+        if (item && !root.shouldBeVisible) {
+            const notificationList = findChild(item, "notificationList");
+            if (notificationList && typeof notificationList.forceLayout === "function") {
+                notificationList.forceLayout();
+            }
+        }
         const target = item ? Theme.px(item.implicitHeight, dpr) : 400;
         if (Math.abs(target - _lastAlignedContentHeight) < 0.5)
             return;
@@ -26,7 +33,7 @@ DankPopout {
     NotificationKeyboardController {
         id: keyboardController
         listView: null
-        isOpen: notificationHistoryVisible
+        isOpen: root.shouldBeVisible
         onClose: () => {
             notificationHistoryVisible = false;
         }
@@ -40,10 +47,30 @@ DankPopout {
     suspendShadowWhileResizing: false
 
     screen: triggerScreen
-    shouldBeVisible: notificationHistoryVisible
 
     function toggle() {
         notificationHistoryVisible = !notificationHistoryVisible;
+    }
+
+    function openSized() {
+        if (!notificationHistoryVisible)
+            return;
+
+        primeContent();
+        if (contentLoader.item) {
+            updateStablePopupHeight();
+            _pendingSizedOpen = false;
+            Qt.callLater(() => {
+                if (!notificationHistoryVisible)
+                    return;
+                updateStablePopupHeight();
+                open();
+                clearPrimedContent();
+            });
+            return;
+        }
+
+        _pendingSizedOpen = true;
     }
 
     onBackgroundClicked: {
@@ -52,8 +79,10 @@ DankPopout {
 
     onNotificationHistoryVisibleChanged: {
         if (notificationHistoryVisible) {
-            open();
+            openSized();
         } else {
+            _pendingSizedOpen = false;
+            clearPrimedContent();
             close();
         }
     }
@@ -82,6 +111,17 @@ DankPopout {
         target: contentLoader
         function onLoaded() {
             root.updateStablePopupHeight();
+            if (root._pendingSizedOpen && root.notificationHistoryVisible) {
+                Qt.callLater(() => {
+                    if (!root._pendingSizedOpen || !root.notificationHistoryVisible)
+                        return;
+                    root.updateStablePopupHeight();
+                    root._pendingSizedOpen = false;
+                    root.open();
+                    root.clearPrimedContent();
+                });
+                return;
+            }
             if (root.shouldBeVisible)
                 Qt.callLater(root.setupKeyboardNavigation);
         }
@@ -139,7 +179,8 @@ DankPopout {
                 baseHeight += Theme.spacingM * 2;
 
                 const settingsHeight = notificationSettings.expanded ? notificationSettings.contentHeight : 0;
-                let listHeight = notificationHeader.currentTab === 0 ? notificationList.stableContentHeight : Math.max(200, NotificationService.historyList.length * 80);
+                const currentListHeight = root.shouldBeVisible ? notificationList.stableContentHeight : notificationList.listContentHeight;
+                let listHeight = notificationHeader.currentTab === 0 ? currentListHeight : Math.max(200, NotificationService.historyList.length * 80);
                 if (notificationHeader.currentTab === 0 && NotificationService.groupedNotifications.length === 0) {
                     listHeight = 200;
                 }
@@ -233,13 +274,21 @@ DankPopout {
                         expanded: notificationHeader.showSettings
                     }
 
-                    KeyboardNavigatedNotificationList {
-                        id: notificationList
-                        objectName: "notificationList"
+                    Item {
                         visible: notificationHeader.currentTab === 0
                         width: parent.width
                         height: parent.height - notificationContent.cachedHeaderHeight - notificationSettings.height - contentColumnInner.spacing * 2
-                        cardAnimateExpansion: true
+
+                        KeyboardNavigatedNotificationList {
+                            id: notificationList
+                            objectName: "notificationList"
+                            anchors.fill: parent
+                            anchors.leftMargin: -shadowHorizontalGutter
+                            anchors.rightMargin: -shadowHorizontalGutter
+                            anchors.topMargin: -(shadowVerticalGutter + delegateShadowGutter / 2)
+                            anchors.bottomMargin: -(shadowVerticalGutter + delegateShadowGutter / 2)
+                            cardAnimateExpansion: true
+                        }
                     }
 
                     HistoryNotificationList {

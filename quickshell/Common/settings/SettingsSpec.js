@@ -21,7 +21,7 @@ var SPEC = {
     widgetColorMode: { def: "default" },
     controlCenterTileColorMode: { def: "primary" },
     buttonColorMode: { def: "primary" },
-    cornerRadius: { def: 12, onChange: "updateCompositorLayout" },
+    cornerRadius: { def: 16, onChange: "updateCompositorLayout" },
     niriLayoutGapsOverride: { def: -1, onChange: "updateCompositorLayout" },
     niriLayoutRadiusOverride: { def: -1, onChange: "updateCompositorLayout" },
     niriLayoutBorderSize: { def: -1, onChange: "updateCompositorLayout" },
