@@ -321,8 +321,8 @@ PanelWindow {
 
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
-    readonly property real alignedWidth: Theme.px(contentImplicitWidth, dpr)
-    readonly property real alignedHeight: Theme.px(contentImplicitHeight, dpr)
+    readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
+    readonly property real alignedHeight: Theme.px(Math.max(0, implicitHeight - (windowShadowPad * 2)), dpr)
 
     Item {
         id: content

@@ -339,8 +339,13 @@ Rectangle {
 
                         onClicked: mouse => {
                             if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
+                                root.userInitiatedExpansion = true;
                                 const messageId = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : "";
                                 NotificationService.toggleMessageExpansion(messageId);
+                                Qt.callLater(() => {
+                                    if (root && !root.isAnimating)
+                                        root.userInitiatedExpansion = false;
+                                });
                             }
                         }
 
@@ -638,7 +643,12 @@ Rectangle {
 
                                             onClicked: mouse => {
                                                 if (!parent.hoveredLink && (bodyText.hasMoreText || messageExpanded)) {
+                                                    root.userInitiatedExpansion = true;
                                                     NotificationService.toggleMessageExpansion(modelData?.notification?.id || "");
+                                                    Qt.callLater(() => {
+                                                        if (root && !root.isAnimating)
+                                                            root.userInitiatedExpansion = false;
+                                                    });
                                                 }
                                             }
 
