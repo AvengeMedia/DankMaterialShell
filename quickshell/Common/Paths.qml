@@ -78,6 +78,10 @@ Singleton {
 
         const moddedId = moddedAppId(appId);
         if (moddedId !== appId) {
+            if (moddedId.startsWith("~") || moddedId.startsWith("/"))
+                return toFileUrl(expandTilde(moddedId));
+            if (moddedId.startsWith("file://"))
+                return moddedId;
             return Quickshell.iconPath(moddedId, true);
         }
 
