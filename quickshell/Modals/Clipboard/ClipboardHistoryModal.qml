@@ -164,8 +164,37 @@ DankModal {
     borderColor: Theme.outlineMedium
     borderWidth: 1
     enableShadow: true
+    closeOnEscapeKey: mode !== "editor"
     onBackgroundClicked: hide()
     modalFocusScope.Keys.onPressed: function (event) {
+        if (mode === "history" && (event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)) {
+            activeTab = activeTab === "recents" ? "saved" : "recents";
+            event.accepted = true;
+            return;
+        }
+        if (mode === "history" && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_S) {
+            const entries = activeTab === "saved" ? pinnedEntries : unpinnedEntries;
+            if (entries && entries.length > 0) {
+                const index = ClipboardService.selectedIndex >= 0 && ClipboardService.selectedIndex < entries.length ? ClipboardService.selectedIndex : 0;
+                const entry = entries[index];
+                if (activeTab === "saved") {
+                    unpinEntry(entry);
+                } else {
+                    pinEntry(entry);
+                }
+            }
+            event.accepted = true;
+            return;
+        }
+        if (mode === "history" && (event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_E) {
+            const entries = activeTab === "saved" ? pinnedEntries : unpinnedEntries;
+            if (entries && entries.length > 0) {
+                const index = ClipboardService.selectedIndex >= 0 && ClipboardService.selectedIndex < entries.length ? ClipboardService.selectedIndex : 0;
+                editEntry(entries[index]);
+            }
+            event.accepted = true;
+            return;
+        }
         keyboardController.handleKey(event);
     }
     content: clipboardContent
@@ -233,6 +262,13 @@ DankModal {
                 scale: 0.98
                 visible: opacity > 0.01
                 enabled: clipboardHistoryModal.mode === "editor"
+                focus: clipboardHistoryModal.mode === "editor"
+
+                Shortcut {
+                    sequences: ["Escape"]
+                    enabled: clipboardHistoryModal.mode === "editor"
+                    onActivated: clipboardHistoryModal.mode = "history"
+                }
 
                 property var entry: null
                 property string editorText: ""
@@ -373,9 +409,20 @@ DankModal {
                             selectByMouse: true
                             Keys.forwardTo: [clipboardHistoryModal.modalFocusScope]
                             onTextChanged: editorView.editorText = text
-                            Keys.onEscapePressed: function (event) {
-                                clipboardHistoryModal.mode = "history";
-                                event.accepted = true;
+                            Keys.onPressed: function (event) {
+                                const hasCtrl = (event.modifiers & Qt.ControlModifier) !== 0;
+                                const hasShift = (event.modifiers & Qt.ShiftModifier) !== 0;
+
+                                if (hasCtrl && event.key === Qt.Key_S) {
+                                    editorView.saveEntry(hasShift ? "close" : "history");
+                                    event.accepted = true;
+                                    return;
+                                }
+                                if (hasCtrl && hasShift && event.key === Qt.Key_V) {
+                                    editorView.saveEntry("paste");
+                                    event.accepted = true;
+                                    return;
+                                }
                             }
                         }
 
