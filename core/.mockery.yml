@@ -28,6 +28,12 @@ packages:
       outpkg: mocks_brightness
     interfaces:
       DBusConn:
+  github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation:
+    config:
+      dir: "internal/mocks/geolocation"
+      outpkg: mocks_geolocation
+    interfaces:
+      Client:
   github.com/AvengeMedia/DankMaterialShell/core/internal/server/network:
     config:
       dir: "internal/mocks/network"

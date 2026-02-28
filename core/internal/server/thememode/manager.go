@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/AvengeMedia/DankMaterialShell/core/internal/geolocation"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/loginctl"
 	"github.com/AvengeMedia/DankMaterialShell/core/internal/server/wayland"
 	"github.com/AvengeMedia/DankMaterialShell/core/pkg/syncmap"
@@ -32,12 +33,14 @@ type Manager struct {
 	cachedIPLat   *float64
 	cachedIPLon   *float64
 
+	geoClient geolocation.Client
+
 	stopChan      chan struct{}
 	updateTrigger chan struct{}
 	wg            sync.WaitGroup
 }
 
-func NewManager() *Manager {
+func NewManager(geoClient geolocation.Client) *Manager {
 	m := &Manager{
 		config: Config{
 			Enabled:           false,
@@ -51,6 +54,7 @@ func NewManager() *Manager {
 		},
 		stopChan:      make(chan struct{}),
 		updateTrigger: make(chan struct{}, 1),
+		geoClient:     geoClient,
 	}
 
 	m.updateState(time.Now())
@@ -327,17 +331,17 @@ func (m *Manager) getLocation(config Config) (*float64, *float64) {
 	}
 	m.locationMutex.RUnlock()
 
-	lat, lon, err := wayland.FetchIPLocation()
+	location, err := m.geoClient.GetLocation()
 	if err != nil {
 		return nil, nil
 	}
 
 	m.locationMutex.Lock()
-	m.cachedIPLat = lat
-	m.cachedIPLon = lon
+	m.cachedIPLat = &location.Latitude
+	m.cachedIPLon = &location.Longitude
 	m.locationMutex.Unlock()
 
-	return lat, lon
+	return m.cachedIPLat, m.cachedIPLon
 }
 
 func statesEqual(a, b *State) bool {
