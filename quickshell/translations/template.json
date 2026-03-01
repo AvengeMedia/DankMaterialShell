@@ -770,6 +770,13 @@
     "comment": ""
   },
   {
+    "term": "Add by Address",
+    "translation": "",
+    "context": "Toggle button to manually add a printer by IP or hostname",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Adjust the number of columns in grid view mode.",
     "translation": "",
     "context": "",
@@ -1995,6 +2002,13 @@
     "comment": ""
   },
   {
+    "term": "Caps Lock is on",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Center Section",
     "translation": "",
     "context": "",
@@ -2831,6 +2845,13 @@
     "term": "Connecting...",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Connection failed",
+    "translation": "",
+    "context": "Status message when test connection to printer fails",
     "reference": "",
     "comment": ""
   },
@@ -3839,6 +3860,13 @@
     "term": "Disconnected from WiFi",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Discover Devices",
+    "translation": "",
+    "context": "Toggle button to scan for printers via mDNS/Avahi",
     "reference": "",
     "comment": ""
   },
@@ -5712,6 +5740,13 @@
     "comment": ""
   },
   {
+    "term": "Got It",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Goth Corner Radius",
     "translation": "",
     "context": "",
@@ -6146,6 +6181,13 @@
     "comment": ""
   },
   {
+    "term": "Host",
+    "translation": "",
+    "context": "Label for printer IP address or hostname input field",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Hostname",
     "translation": "",
     "context": "system info label",
@@ -6233,6 +6275,13 @@
     "term": "IP Address:",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "IP address or hostname",
+    "translation": "",
+    "context": "Placeholder text for manual printer address input",
     "reference": "",
     "comment": ""
   },
@@ -9639,6 +9688,13 @@
     "comment": ""
   },
   {
+    "term": "Port",
+    "translation": "",
+    "context": "Label for printer port number input field",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Portal",
     "translation": "",
     "context": "wallpaper transition option",
@@ -9898,6 +9954,13 @@
     "comment": ""
   },
   {
+    "term": "Printer reachable",
+    "translation": "",
+    "context": "Status message when test connection to printer succeeds",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Printers",
     "translation": "",
     "context": "",
@@ -10123,6 +10186,20 @@
   },
   {
     "term": "Rate",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Read Full Release Notes",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Read Full Release Notes",
     "translation": "",
     "context": "",
     "reference": "",
@@ -12572,6 +12649,13 @@
     "comment": ""
   },
   {
+    "term": "Test Connection",
+    "translation": "",
+    "context": "Button to test connection to a printer by IP address",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "Test Page",
     "translation": "",
     "context": "",
@@ -12582,6 +12666,13 @@
     "term": "Test page sent to printer",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "Testing...",
+    "translation": "",
+    "context": "Button state while testing printer connection",
     "reference": "",
     "comment": ""
   },
@@ -13923,6 +14014,13 @@
     "comment": ""
   },
   {
+    "term": "What's New",
+    "translation": "",
+    "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
     "term": "When enabled, apps are sorted alphabetically. When disabled, apps are sorted by usage frequency.",
     "translation": "",
     "context": "",
@@ -14728,51 +14826,16 @@
     "comment": ""
   },
   {
-    "term": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
-    "translation": "",
-    "context": "Keyboard hints when enter-to-paste is enabled",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "What's New",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Read Full Release Notes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Read Full Release Notes",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Got It",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
-    "term": "Caps Lock is on",
-    "translation": "",
-    "context": "",
-    "reference": "",
-    "comment": ""
-  },
-  {
     "term": "↑/↓: Nav • Space: Expand • Enter: Action/Expand • E: Text",
     "translation": "",
     "context": "",
+    "reference": "",
+    "comment": ""
+  },
+  {
+    "term": "↑/↓: Navigate • Enter: Paste • Del: Delete • F10: Help",
+    "translation": "",
+    "context": "Keyboard hints when enter-to-paste is enabled",
     "reference": "",
     "comment": ""
   }
