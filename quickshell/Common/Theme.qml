@@ -1620,6 +1620,23 @@ Singleton {
         }
     }
 
+    // Returns numeric fillMode value for shader use (matches shader calculateUV logic)
+    function getShaderFillMode(modeName) {
+        switch (modeName) {
+        case "Stretch": return 0;
+        case "Fit":
+        case "PreserveAspectFit": return 1;
+        case "Fill":
+        case "PreserveAspectCrop": return 2;
+        case "Tile": return 3;
+        case "TileVertically": return 4;
+        case "TileHorizontally": return 5;
+        case "Pad": return 6;
+        case "Scrolling": return 7;
+        default: return 2;
+        }
+    }
+
     function snap(value, dpr) {
         const s = dpr || 1;
         return Math.round(value * s) / s;

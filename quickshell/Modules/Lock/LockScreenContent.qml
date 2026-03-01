@@ -159,20 +159,50 @@ Item {
     }
 
     Image {
-        id: wallpaperBackground
-
+        id: wallpaperSource
+        visible: false
         anchors.fill: parent
         source: {
             var currentWallpaper = SessionData.getMonitorWallpaper(screenName);
             return (currentWallpaper && !currentWallpaper.startsWith("#")) ? encodeFileUrl(currentWallpaper) : "";
         }
-        fillMode: Theme.getFillMode(SessionData.getMonitorWallpaperFillMode(screenName))
-        smooth: true
         asynchronous: false
         cache: true
-        visible: source !== ""
-        layer.enabled: true
+    }
 
+    ShaderEffectSource {
+        id: srcWallpaper
+        sourceItem: wallpaperSource
+        hideSource: true
+        live: false
+    }
+
+    ShaderEffect {
+        id: wallpaperBackground
+        anchors.fill: parent
+        visible: wallpaperSource.source !== ""
+
+        property variant source1: srcWallpaper
+        property variant source2: srcWallpaper  // Same source for lock screen (no transition)
+        property real progress: 0.0
+
+        readonly property string fillModeName: SessionData.getMonitorWallpaperFillMode(screenName)
+        readonly property var scrollPos: SessionData.getMonitorScrollPosition(screenName)
+
+        property real fillMode: Theme.getShaderFillMode(fillModeName)
+        property real scrollX: scrollPos.scrollX
+        property real scrollY: scrollPos.scrollY
+        property real imageWidth1: wallpaperSource.implicitWidth > 0 ? wallpaperSource.implicitWidth : 1
+        property real imageHeight1: wallpaperSource.implicitHeight > 0 ? wallpaperSource.implicitHeight : 1
+        property real imageWidth2: wallpaperSource.implicitWidth > 0 ? wallpaperSource.implicitWidth : 1
+        property real imageHeight2: wallpaperSource.implicitHeight > 0 ? wallpaperSource.implicitHeight : 1
+        property real screenWidth: width > 0 ? width : 1
+        property real screenHeight: height > 0 ? height : 1
+        property vector4d fillColor: Qt.vector4d(0, 0, 0, 1)
+
+        fragmentShader: Qt.resolvedUrl("../../Shaders/qsb/wp_fade.frag.qsb")
+
+        layer.enabled: true
         layer.effect: MultiEffect {
             autoPaddingEnabled: false
             blurEnabled: true
