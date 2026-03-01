@@ -18,258 +18,329 @@ Singleton {
         target: DMSService
 
         function onCapabilitiesReceived() {
-            checkCapabilities()
+            checkCapabilities();
         }
 
         function onConnectionStateChanged() {
             if (DMSService.isConnected) {
-                checkCapabilities()
-                return
+                checkCapabilities();
+                return;
             }
-            wlrOutputAvailable = false
+            wlrOutputAvailable = false;
         }
 
         function onWlrOutputStateUpdate(data) {
             if (!wlrOutputAvailable) {
-                return
+                return;
             }
-            handleStateUpdate(data)
+            handleStateUpdate(data);
         }
     }
 
     Component.onCompleted: {
         if (!DMSService.dmsAvailable) {
-            return
+            return;
         }
-        checkCapabilities()
+        checkCapabilities();
     }
 
     function checkCapabilities() {
         if (!DMSService.capabilities || !Array.isArray(DMSService.capabilities)) {
-            wlrOutputAvailable = false
-            return
+            wlrOutputAvailable = false;
+            return;
         }
 
-        const hasWlrOutput = DMSService.capabilities.includes("wlroutput")
+        const hasWlrOutput = DMSService.capabilities.includes("wlroutput");
         if (hasWlrOutput && !wlrOutputAvailable) {
-            wlrOutputAvailable = true
-            console.info("WlrOutputService: wlr-output-management capability detected")
-            requestState()
-            return
+            wlrOutputAvailable = true;
+            console.info("WlrOutputService: wlr-output-management capability detected");
+            requestState();
+            return;
         }
 
         if (!hasWlrOutput) {
-            wlrOutputAvailable = false
+            wlrOutputAvailable = false;
         }
     }
 
     function requestState() {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
-            return
+            return;
         }
 
         DMSService.sendRequest("wlroutput.getState", null, response => {
             if (!response.result) {
-                return
+                return;
             }
-            handleStateUpdate(response.result)
-        })
+            handleStateUpdate(response.result);
+        });
     }
 
     function handleStateUpdate(state) {
-        outputs = state.outputs || []
-        serial = state.serial || 0
+        outputs = state.outputs || [];
+        serial = state.serial || 0;
 
         if (outputs.length === 0) {
-            console.warn("WlrOutputService: Received empty outputs list")
+            console.warn("WlrOutputService: Received empty outputs list");
         } else {
-            console.log("WlrOutputService: Updated with", outputs.length, "outputs, serial:", serial)
+            console.log("WlrOutputService: Updated with", outputs.length, "outputs, serial:", serial);
             outputs.forEach((output, index) => {
-                console.log("WlrOutputService: Output", index, "-", output.name,
-                           "enabled:", output.enabled,
-                           "mode:", output.currentMode ?
-                           output.currentMode.width + "x" + output.currentMode.height + "@" +
-                           (output.currentMode.refresh / 1000) + "Hz" : "none")
-            })
+                console.log("WlrOutputService: Output", index, "-", output.name, "enabled:", output.enabled, "mode:", output.currentMode ? output.currentMode.width + "x" + output.currentMode.height + "@" + (output.currentMode.refresh / 1000) + "Hz" : "none");
+            });
         }
-        stateChanged()
+        stateChanged();
     }
 
     function getOutput(name) {
         for (const output of outputs) {
             if (output.name === name) {
-                return output
+                return output;
             }
         }
-        return null
+        return null;
     }
 
     function getEnabledOutputs() {
-        return outputs.filter(output => output.enabled)
+        return outputs.filter(output => output.enabled);
     }
 
     function applyConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected")
+                callback(false, "Not connected");
             }
-            return
+            return;
         }
 
-        console.log("WlrOutputService: Applying configuration for", heads.length, "outputs")
+        console.log("WlrOutputService: Applying configuration for", heads.length, "outputs");
         heads.forEach((head, index) => {
-            console.log("WlrOutputService: Head", index, "- name:", head.name,
-                       "enabled:", head.enabled,
-                       "modeId:", head.modeId,
-                       "customMode:", JSON.stringify(head.customMode),
-                       "position:", JSON.stringify(head.position),
-                       "scale:", head.scale,
-                       "transform:", head.transform,
-                       "adaptiveSync:", head.adaptiveSync)
-        })
+            console.log("WlrOutputService: Head", index, "- name:", head.name, "enabled:", head.enabled, "modeId:", head.modeId, "customMode:", JSON.stringify(head.customMode), "position:", JSON.stringify(head.position), "scale:", head.scale, "transform:", head.transform, "adaptiveSync:", head.adaptiveSync);
+        });
 
         DMSService.sendRequest("wlroutput.applyConfiguration", {
             "heads": heads
         }, response => {
-            const success = !response.error
-            const message = response.error || response.result?.message || ""
+            const success = !response.error;
+            const message = response.error || response.result?.message || "";
 
             if (response.error) {
-                console.warn("WlrOutputService: applyConfiguration error:", response.error)
+                console.warn("WlrOutputService: applyConfiguration error:", response.error);
             } else {
-                console.log("WlrOutputService: Configuration applied successfully")
+                console.log("WlrOutputService: Configuration applied successfully");
             }
 
-            configurationApplied(success, message)
+            configurationApplied(success, message);
             if (callback) {
-                callback(success, message)
+                callback(success, message);
             }
-        })
+        });
     }
 
     function testConfiguration(heads, callback) {
         if (!DMSService.isConnected || !wlrOutputAvailable) {
             if (callback) {
-                callback(false, "Not connected")
+                callback(false, "Not connected");
             }
-            return
+            return;
         }
 
-        console.log("WlrOutputService: Testing configuration for", heads.length, "outputs")
+        console.log("WlrOutputService: Testing configuration for", heads.length, "outputs");
 
         DMSService.sendRequest("wlroutput.testConfiguration", {
             "heads": heads
         }, response => {
-            const success = !response.error
-            const message = response.error || response.result?.message || ""
+            const success = !response.error;
+            const message = response.error || response.result?.message || "";
 
             if (response.error) {
-                console.warn("WlrOutputService: testConfiguration error:", response.error)
+                console.warn("WlrOutputService: testConfiguration error:", response.error);
             } else {
-                console.log("WlrOutputService: Configuration test passed")
+                console.log("WlrOutputService: Configuration test passed");
             }
 
             if (callback) {
-                callback(success, message)
+                callback(success, message);
             }
-        })
+        });
     }
 
     function setOutputEnabled(outputName, enabled, callback) {
-        const output = getOutput(outputName)
+        const output = getOutput(outputName);
         if (!output) {
-            console.warn("WlrOutputService: Output not found:", outputName)
+            console.warn("WlrOutputService: Output not found:", outputName);
             if (callback) {
-                callback(false, "Output not found")
+                callback(false, "Output not found");
             }
-            return
+            return;
         }
 
-        const heads = [{
-            "name": outputName,
-            "enabled": enabled
-        }]
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": enabled
+            }
+        ];
 
         if (enabled && output.currentMode) {
-            heads[0].modeId = output.currentMode.id
+            heads[0].modeId = output.currentMode.id;
         }
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputMode(outputName, modeId, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "modeId": modeId
-        }]
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "modeId": modeId
+            }
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputCustomMode(outputName, width, height, refresh, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "customMode": {
-                "width": width,
-                "height": height,
-                "refresh": refresh
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "customMode": {
+                    "width": width,
+                    "height": height,
+                    "refresh": refresh
+                }
             }
-        }]
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputPosition(outputName, x, y, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "position": {
-                "x": x,
-                "y": y
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "position": {
+                    "x": x,
+                    "y": y
+                }
             }
-        }]
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputScale(outputName, scale, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "scale": scale
-        }]
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "scale": scale
+            }
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputTransform(outputName, transform, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "transform": transform
-        }]
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "transform": transform
+            }
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function setOutputAdaptiveSync(outputName, state, callback) {
-        const heads = [{
-            "name": outputName,
-            "enabled": true,
-            "adaptiveSync": state
-        }]
+        const heads = [
+            {
+                "name": outputName,
+                "enabled": true,
+                "adaptiveSync": state
+            }
+        ];
 
-        applyConfiguration(heads, callback)
+        applyConfiguration(heads, callback);
     }
 
     function configureOutput(config, callback) {
-        const heads = [config]
-        applyConfiguration(heads, callback)
+        const heads = [config];
+        applyConfiguration(heads, callback);
     }
 
     function configureMultipleOutputs(configs, callback) {
-        applyConfiguration(configs, callback)
+        applyConfiguration(configs, callback);
+    }
+
+    // High-level apply matching the generateOutputsConfig() pattern used by
+    // NiriService, HyprlandService and DwlService.  Instead of writing a
+    // config file, the changes are applied directly via the
+    // wlr-output-management protocol.
+    function applyOutputsConfig(outputsData, connectedOutputs) {
+        if (!wlrOutputAvailable)
+            return;
+        const heads = [];
+        for (const name in outputsData) {
+            if (!connectedOutputs[name])
+                continue;
+            const output = outputsData[name];
+            const mode = (output.modes && output.current_mode >= 0) ? output.modes[output.current_mode] : null;
+            const enabled = !!mode;
+            const head = {
+                "name": name,
+                "enabled": enabled
+            };
+
+            if (enabled) {
+                if (mode.id !== undefined)
+                    head.modeId = mode.id;
+                else
+                    head.customMode = {
+                        "width": mode.width,
+                        "height": mode.height,
+                        "refresh": mode.refresh_rate
+                    };
+
+                if (output.logical) {
+                    head.position = {
+                        "x": output.logical.x ?? 0,
+                        "y": output.logical.y ?? 0
+                    };
+                    head.scale = output.logical.scale ?? 1.0;
+                    head.transform = transformFromName(output.logical.transform);
+                }
+            }
+            heads.push(head);
+        }
+
+        if (heads.length > 0)
+            applyConfiguration(heads);
+    }
+
+    function transformFromName(name) {
+        switch (name) {
+        case "Normal":
+            return 0;
+        case "90":
+            return 1;
+        case "180":
+            return 2;
+        case "270":
+            return 3;
+        case "Flipped":
+            return 4;
+        case "Flipped90":
+            return 5;
+        case "Flipped180":
+            return 6;
+        case "Flipped270":
+            return 7;
+        default:
+            return 0;
+        }
     }
 }
