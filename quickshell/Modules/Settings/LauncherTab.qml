@@ -897,7 +897,19 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: {
+                                        const icon = modelData.icon;
+                                        if (!icon) return "image://icon/application-x-executable";
+                                        const moddedIcon = Paths.moddedAppId(icon);
+                                        if (moddedIcon !== icon) {
+                                            if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                                                return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                                            if (moddedIcon.startsWith("file://"))
+                                                return moddedIcon;
+                                            return "image://icon/" + moddedIcon;
+                                        }
+                                        return "image://icon/" + icon;
+                                    }
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit
@@ -1008,7 +1020,19 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: {
+                                        const icon = modelData.icon;
+                                        if (!icon) return "image://icon/application-x-executable";
+                                        const moddedIcon = Paths.moddedAppId(icon);
+                                        if (moddedIcon !== icon) {
+                                            if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                                                return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                                            if (moddedIcon.startsWith("file://"))
+                                                return moddedIcon;
+                                            return "image://icon/" + moddedIcon;
+                                        }
+                                        return "image://icon/" + icon;
+                                    }
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit
@@ -1154,7 +1178,19 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: {
+                                        const icon = modelData.icon;
+                                        if (!icon) return "image://icon/application-x-executable";
+                                        const moddedIcon = Paths.moddedAppId(icon);
+                                        if (moddedIcon !== icon) {
+                                            if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                                                return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                                            if (moddedIcon.startsWith("file://"))
+                                                return moddedIcon;
+                                            return "image://icon/" + moddedIcon;
+                                        }
+                                        return "image://icon/" + icon;
+                                    }
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit

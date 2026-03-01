@@ -220,6 +220,14 @@ Rectangle {
                     return appIcon;
                 if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
                     return "";
+                const moddedIcon = Paths.moddedAppId(appIcon);
+                if (moddedIcon !== appIcon) {
+                    if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                        return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                    if (moddedIcon.startsWith("file://"))
+                        return moddedIcon;
+                    return Quickshell.iconPath(moddedIcon, true);
+                }
                 return Quickshell.iconPath(appIcon, true);
             }
 
@@ -557,6 +565,14 @@ Rectangle {
                                         return appIcon;
                                     if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
                                         return "";
+                                    const moddedIcon = Paths.moddedAppId(appIcon);
+                                    if (moddedIcon !== appIcon) {
+                                        if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                                            return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                                        if (moddedIcon.startsWith("file://"))
+                                            return moddedIcon;
+                                        return Quickshell.iconPath(moddedIcon, true);
+                                    }
                                     return Quickshell.iconPath(appIcon, true);
                                 }
 

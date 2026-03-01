@@ -273,7 +273,18 @@ PanelWindow {
 
                             IconImage {
                                 anchors.fill: parent
-                                source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
+                                source: {
+                                    if (!modelData.icon) return "";
+                                    const moddedIcon = Paths.moddedAppId(modelData.icon);
+                                    if (moddedIcon !== modelData.icon) {
+                                        if (moddedIcon.startsWith("~") || moddedIcon.startsWith("/"))
+                                            return Paths.toFileUrl(Paths.expandTilde(moddedIcon));
+                                        if (moddedIcon.startsWith("file://"))
+                                            return moddedIcon;
+                                        return Quickshell.iconPath(moddedIcon, true);
+                                    }
+                                    return Quickshell.iconPath(modelData.icon, true);
+                                }
                                 smooth: true
                                 asynchronous: true
                                 visible: status === Image.Ready
