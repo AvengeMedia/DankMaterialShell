@@ -479,7 +479,7 @@ PanelWindow {
                             return "";
                         const appIcon = notificationData.appIcon;
                         if (!appIcon)
-                            return iconFromImage ? "image://icon/" + iconFromImage : "";
+                            return iconFromImage ? Paths.resolveIconUrl(iconFromImage) : "";
                         if (appIcon.startsWith("file://") || appIcon.startsWith("http://") || appIcon.startsWith("https://") || appIcon.includes("/"))
                             return appIcon;
                         if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
