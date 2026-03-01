@@ -9,14 +9,20 @@ import qs.Modules.Settings.Widgets
 Item {
     id: root
 
+    readonly property string _systemDefaultLabel: I18n.tr("System Default")
+
     function weekStartQt() {
-        if (SettingsData.firstDayOfWeek >= 7 || SettingsData.firstDayOfWeek < 0) {
+        if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
             return Qt.locale().firstDayOfWeek;
-        }
         return SettingsData.firstDayOfWeek;
     }
+
     function weekStartJs() {
         return weekStartQt() % 7;
+    }
+
+    function _dayNames() {
+        return Array(7).fill(0).map((_, i) => new Date(Date.UTC(2026, 2, 1 + i, 0, 0, 0)).toLocaleDateString(I18n.locale(), "dddd")).map(d => d[0].toUpperCase() + d.slice(1));
     }
 
     DankFlickable {
@@ -84,20 +90,18 @@ Item {
                     tags: ["first", "day", "week"]
                     settingKey: "firstDayOfWeek"
                     text: I18n.tr("First Day of Week")
-                    // Days from Sunday to Saturday in the selected language
-                    // 1st of February 2026 is a Sunday, any Sunday works
-                    options: {
-                        return Array(7).fill(0).map(
-                            (_, i) => new Date(Date.UTC(2026, 2, 1 + i, 0, 0, 0)).toLocaleDateString(
-                                I18n.locale(), "dddd"
-                            )
-                        ).map(
-                            d => d[0].toUpperCase() + d.slice(1)
-                        );
+                    options: [root._systemDefaultLabel].concat(root._dayNames())
+                    currentValue: {
+                        if (SettingsData.firstDayOfWeek < 0 || SettingsData.firstDayOfWeek >= 7)
+                            return root._systemDefaultLabel;
+                        return root._dayNames()[root.weekStartJs()];
                     }
-                    currentValue: options[root.weekStartJs()]
                     onValueChanged: value => {
-                        SettingsData.set("firstDayOfWeek", options.indexOf(value));
+                        if (value === root._systemDefaultLabel) {
+                            SettingsData.set("firstDayOfWeek", -1);
+                            return;
+                        }
+                        SettingsData.set("firstDayOfWeek", root._dayNames().indexOf(value));
                     }
                 }
 
