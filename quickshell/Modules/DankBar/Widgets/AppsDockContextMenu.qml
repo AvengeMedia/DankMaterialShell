@@ -273,7 +273,7 @@ PanelWindow {
 
                             IconImage {
                                 anchors.fill: parent
-                                source: modelData.icon ? Quickshell.iconPath(modelData.icon, true) : ""
+                                source: modelData.icon ? Paths.resolveIconPath(modelData.icon) : ""
                                 smooth: true
                                 asynchronous: true
                                 visible: status === Image.Ready
