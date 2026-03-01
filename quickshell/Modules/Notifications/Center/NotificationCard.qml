@@ -132,32 +132,21 @@ Rectangle {
         id: cardHoverHandler
     }
 
-    Item {
+    ElevationShadow {
         id: shadowLayer
         anchors.fill: parent
         z: -1
-
-        layer.enabled: root.shadowsAllowed
-        layer.effect: MultiEffect {
-            autoPaddingEnabled: true
-            shadowEnabled: root.shadowsAllowed
-            blurEnabled: false
-            maskEnabled: false
-            shadowBlur: Math.max(0, Math.min(1, root.shadowBlurPx / Theme.elevationBlurMax))
-            shadowScale: 1
-            shadowVerticalOffset: root.shadowOffsetYPx
-            shadowHorizontalOffset: root.shadowOffsetXPx
-            blurMax: Theme.elevationBlurMax
-            shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            radius: root.radius
-            color: root.color
-            border.color: root.border.color
-            border.width: root.border.width
-        }
+        level: root.shadowElevation
+        targetRadius: root.radius
+        targetColor: root.color
+        borderColor: root.border.color
+        borderWidth: root.border.width
+        shadowBlurPx: root.shadowBlurPx
+        shadowSpreadPx: 0
+        shadowOffsetX: root.shadowOffsetXPx
+        shadowOffsetY: root.shadowOffsetYPx
+        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
+        shadowEnabled: root.shadowsAllowed
     }
 
     Rectangle {

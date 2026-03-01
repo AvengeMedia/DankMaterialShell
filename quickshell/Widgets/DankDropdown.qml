@@ -1,7 +1,6 @@
 import "../Common/fzf.js" as Fzf
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Effects
 import Quickshell
 import qs.Common
 import qs.Widgets
@@ -263,31 +262,17 @@ Item {
             border.width: 2
             radius: Theme.cornerRadius
 
-            Item {
+            ElevationShadow {
                 id: shadowLayer
                 anchors.fill: parent
                 z: -1
-
-                layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
-                layer.effect: MultiEffect {
-                    autoPaddingEnabled: true
-                    blurEnabled: false
-                    maskEnabled: false
-                    shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
-                    shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-                    blurMax: Theme.elevationBlurMax
-                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
-                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: contentSurface.radius
-                    color: contentSurface.color
-                    border.color: contentSurface.border.color
-                    border.width: contentSurface.border.width
-                }
+                level: Theme.elevationLevel2
+                fallbackOffset: 4
+                targetRadius: contentSurface.radius
+                targetColor: contentSurface.color
+                borderColor: contentSurface.border.color
+                borderWidth: contentSurface.border.width
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled
             }
 
             Column {

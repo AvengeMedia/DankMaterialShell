@@ -838,6 +838,18 @@ Singleton {
         return elevationOffsetYFor(level, elevationLightDirection, fallback);
     }
 
+    function elevationRenderPadding(level, direction, fallbackOffset, extraPadding, minPadding) {
+        const dir = direction !== undefined ? direction : elevationLightDirection;
+        const blur = (level && level.blurPx !== undefined) ? Math.max(0, level.blurPx) : 0;
+        const spread = (level && level.spreadPx !== undefined) ? Math.max(0, level.spreadPx) : 0;
+        const fallback = fallbackOffset !== undefined ? fallbackOffset : 0;
+        const extra = extraPadding !== undefined ? extraPadding : 8;
+        const minPad = minPadding !== undefined ? minPadding : 16;
+        const offsetX = Math.abs(elevationOffsetXFor(level, dir, fallback));
+        const offsetY = Math.abs(elevationOffsetYFor(level, dir, fallback));
+        return Math.max(minPad, blur + spread + Math.max(offsetX, offsetY) + extra);
+    }
+
     function elevationShadowColor(level) {
         const alpha = (level && level.alpha !== undefined) ? level.alpha : 0.3;
         let r = 0;

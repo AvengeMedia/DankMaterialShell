@@ -391,30 +391,16 @@ Item {
                 }
             }
 
-            Item {
+            ElevationShadow {
                 id: launcherShadowLayer
                 anchors.fill: parent
-                layer.enabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-                layer.effect: MultiEffect {
-                    autoPaddingEnabled: true
-                    shadowEnabled: true
-                    blurEnabled: false
-                    maskEnabled: false
-                    shadowBlur: Math.max(0, Math.min(1, Theme.elevationLevel3.blurPx / Theme.elevationBlurMax))
-                    shadowScale: 1
-                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
-                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
-                    blurMax: Theme.elevationBlurMax
-                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: root.backgroundColor
-                    border.color: root.borderColor
-                    border.width: root.borderWidth
-                    radius: root.cornerRadius
-                }
+                level: Theme.elevationLevel3
+                fallbackOffset: 6
+                targetColor: root.backgroundColor
+                borderColor: root.borderColor
+                borderWidth: root.borderWidth
+                targetRadius: root.cornerRadius
+                shadowEnabled: Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             }
 
             MouseArea {

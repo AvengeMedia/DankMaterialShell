@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -257,12 +256,7 @@ PanelWindow {
         scale: shouldBeVisible ? 1 : 0.9
 
         property bool childHovered: false
-        readonly property var elev: Theme.elevationLevel3
-        property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 12
-        property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
-        property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.3
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-        readonly property real effectiveShadowAlpha: shouldBeVisible ? Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha)) : 0
 
         Rectangle {
             id: background
@@ -274,37 +268,20 @@ PanelWindow {
             z: -1
         }
 
-        Item {
+        ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
             visible: osdContainer.popupSurfaceAlpha >= 0.95
-            layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+            z: -1
+            level: Theme.elevationLevel3
+            fallbackOffset: 6
+            targetRadius: Theme.cornerRadius
+            targetColor: Theme.surfaceContainer
+            borderColor: Theme.outlineMedium
+            borderWidth: 1
+            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
-
-            readonly property int blurMax: Theme.elevationBlurMax
-
-            layer.effect: MultiEffect {
-                id: shadowFx
-                autoPaddingEnabled: true
-                shadowEnabled: true
-                blurEnabled: false
-                maskEnabled: false
-                shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
-                shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
-                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
-                blurMax: Theme.elevationBlurMax
-                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: Theme.surfaceContainer
-                border.color: Theme.outlineMedium
-                border.width: 1
-            }
         }
 
         MouseArea {

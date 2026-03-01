@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -143,7 +142,11 @@ Item {
         }
     }
 
-    readonly property real shadowBuffer: Theme.elevationBlurMax * 1.5 + 24
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, Theme.elevationLightDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowMotionPadding: animationType === "slide" ? 30 : Math.max(0, animationOffset)
+    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(modalWidth, dpr)
     readonly property real alignedHeight: Theme.px(modalHeight, dpr)
 
@@ -378,34 +381,16 @@ Item {
                         }
                     }
 
-                    readonly property var elev: Theme.elevationLevel3
-                    readonly property real shadowBlurNorm: Math.max(0, Math.min(1, (elev && elev.blurPx !== undefined ? elev.blurPx : 12) / Theme.elevationBlurMax))
-
-                    Item {
+                    ElevationShadow {
                         id: modalShadowLayer
                         anchors.fill: parent
-                        layer.enabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-
-                        layer.effect: MultiEffect {
-                            autoPaddingEnabled: true
-                            shadowEnabled: true
-                            blurEnabled: false
-                            maskEnabled: false
-                            shadowBlur: animatedContent.shadowBlurNorm
-                            shadowScale: 1
-                            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel3, 6)
-                            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel3)
-                            blurMax: Theme.elevationBlurMax
-                            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: root.cornerRadius
-                            color: root.backgroundColor
-                            border.color: root.borderColor
-                            border.width: root.borderWidth
-                        }
+                        level: root.shadowLevel
+                        fallbackOffset: root.shadowFallbackOffset
+                        targetRadius: root.cornerRadius
+                        targetColor: root.backgroundColor
+                        borderColor: root.borderColor
+                        borderWidth: root.borderWidth
+                        shadowEnabled: root.enableShadow && Theme.elevationEnabled && SettingsData.modalElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
                     }
 
                     FocusScope {

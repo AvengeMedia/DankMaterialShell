@@ -529,15 +529,15 @@ Item {
                                     onClicked: activePlayer && activePlayer.togglePlaying()
                                 }
 
-                                layer.enabled: Theme.elevationEnabled
-                                layer.effect: MultiEffect {
-                                    shadowEnabled: Theme.elevationEnabled
-                                    shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
-                                    shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
-                                    shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
-                                    blurMax: Theme.elevationBlurMax
-                                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+                                ElevationShadow {
+                                    anchors.fill: parent
+                                    z: -1
+                                    level: Theme.elevationLevel1
+                                    fallbackOffset: 1
+                                    targetRadius: parent.radius
+                                    targetColor: parent.color
                                     shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
+                                    shadowEnabled: Theme.elevationEnabled
                                 }
                             }
                         }

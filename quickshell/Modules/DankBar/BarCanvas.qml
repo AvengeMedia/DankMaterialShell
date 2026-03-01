@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Shapes
 import qs.Common
 import qs.Services
@@ -105,7 +104,6 @@ Item {
 
     // Resolved values — per-bar override wins if set, otherwise use global M3 elevation
     readonly property real shadowBlurPx: hasPerBarOverride ? overrideBlurPx : (elevLevel.blurPx ?? 8)
-    readonly property real shadowBlur: Math.max(0, Math.min(1, shadowBlurPx / Theme.elevationBlurMax))
     readonly property color shadowColor: hasPerBarOverride ? Theme.withAlpha(overrideBaseColor, overrideOpacity) : Theme.elevationShadowColor(elevLevel)
     readonly property real shadowOffsetMagnitude: hasPerBarOverride ? (overrideBlurPx * 0.5) : Theme.elevationOffsetMagnitude(elevLevel, 4, effectiveShadowDirection)
     readonly property real shadowOffsetX: Theme.elevationOffsetXFor(hasPerBarOverride ? null : elevLevel, effectiveShadowDirection, shadowOffsetMagnitude)
@@ -153,43 +151,28 @@ Item {
         }
     }
 
-    Loader {
-        id: shadowLoader
-        anchors.fill: parent
-        active: root.shadowEnabled && mainPathCorrectShape && (Theme.elevationEnabled || root.hasPerBarOverride)
-        asynchronous: false
-        sourceComponent: Item {
-            anchors.fill: parent
+    ElevationShadow {
+        id: barShadow
+        visible: root.shadowEnabled && root.width > 0 && root.height > 0
 
-            layer.enabled: true
-            layer.smooth: true
-            layer.samples: barWindow._dpr > 1.5 ? 4 : 2
-            layer.textureSize: Qt.size(Math.round(width * barWindow._dpr), Math.round(height * barWindow._dpr))
-            layer.effect: MultiEffect {
-                shadowEnabled: true
-                shadowBlur: root.shadowBlur
-                blurMax: Theme.elevationBlurMax
-                shadowColor: root.shadowColor
-                shadowVerticalOffset: root.shadowOffsetY
-                shadowHorizontalOffset: root.shadowOffsetX
-                autoPaddingEnabled: true
-            }
+        // Size to the bar's rectangular body, excluding gothic wing extensions
+        x: root.isRight ? root.wing : 0
+        y: root.isBottom ? root.wing : 0
+        width: axis.isVertical ? (parent.width - root.wing) : parent.width
+        height: axis.isVertical ? parent.height : (parent.height - root.wing)
 
-            Shape {
-                anchors.fill: parent
-                preferredRendererType: Shape.CurveRenderer
+        shadowEnabled: root.shadowEnabled
+        level: root.hasPerBarOverride ? null : root.elevLevel
+        direction: root.effectiveShadowDirection
+        fallbackOffset: 4
+        targetRadius: root.rt
+        targetColor: barWindow._bgColor
 
-                ShapePath {
-                    fillColor: barWindow._bgColor
-                    strokeColor: "transparent"
-                    strokeWidth: 0
-
-                    PathSvg {
-                        path: root.mainPath
-                    }
-                }
-            }
-        }
+        shadowBlurPx: root.shadowBlurPx
+        shadowOffsetX: root.shadowOffsetX
+        shadowOffsetY: root.shadowOffsetY
+        shadowColor: root.shadowColor
+        blurMax: Theme.elevationBlurMax
     }
 
     Loader {

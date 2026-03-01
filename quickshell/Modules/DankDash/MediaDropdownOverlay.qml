@@ -89,30 +89,18 @@ Item {
             }
         }
 
-        Item {
+        ElevationShadow {
             id: volumeShadowLayer
             anchors.fill: parent
             z: -1
-
-            layer.enabled: Theme.elevationEnabled
-            layer.effect: MultiEffect {
-                autoPaddingEnabled: true
-                shadowEnabled: Theme.elevationEnabled
-                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
-                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
-                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-                blurMax: Theme.elevationBlurMax
-                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: volumePanel.radius
-                color: volumePanel.color
-                border.color: volumePanel.border.color
-                border.width: volumePanel.border.width
-            }
+            level: Theme.elevationLevel2
+            fallbackOffset: 4
+            targetRadius: volumePanel.radius
+            targetColor: volumePanel.color
+            borderColor: volumePanel.border.color
+            borderWidth: volumePanel.border.width
+            shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
+            shadowEnabled: Theme.elevationEnabled
         }
 
         MouseArea {
@@ -239,30 +227,18 @@ Item {
             }
         }
 
-        Item {
+        ElevationShadow {
             id: audioDevicesShadowLayer
             anchors.fill: parent
             z: -1
-
-            layer.enabled: Theme.elevationEnabled
-            layer.effect: MultiEffect {
-                autoPaddingEnabled: true
-                shadowEnabled: Theme.elevationEnabled
-                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
-                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
-                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-                blurMax: Theme.elevationBlurMax
-                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: audioDevicesPanel.radius
-                color: audioDevicesPanel.color
-                border.color: audioDevicesPanel.border.color
-                border.width: audioDevicesPanel.border.width
-            }
+            level: Theme.elevationLevel2
+            fallbackOffset: 4
+            targetRadius: audioDevicesPanel.radius
+            targetColor: audioDevicesPanel.color
+            borderColor: audioDevicesPanel.border.color
+            borderWidth: audioDevicesPanel.border.width
+            shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
+            shadowEnabled: Theme.elevationEnabled
         }
 
         Column {
@@ -405,30 +381,18 @@ Item {
             }
         }
 
-        Item {
+        ElevationShadow {
             id: playersShadowLayer
             anchors.fill: parent
             z: -1
-
-            layer.enabled: Theme.elevationEnabled
-            layer.effect: MultiEffect {
-                autoPaddingEnabled: true
-                shadowEnabled: Theme.elevationEnabled
-                shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
-                shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
-                shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-                blurMax: Theme.elevationBlurMax
-                shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
-                shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: playersPanel.radius
-                color: playersPanel.color
-                border.color: playersPanel.border.color
-                border.width: playersPanel.border.width
-            }
+            level: Theme.elevationLevel2
+            fallbackOffset: 4
+            targetRadius: playersPanel.radius
+            targetColor: playersPanel.color
+            borderColor: playersPanel.border.color
+            borderWidth: playersPanel.border.width
+            shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
+            shadowEnabled: Theme.elevationEnabled
         }
 
         Column {

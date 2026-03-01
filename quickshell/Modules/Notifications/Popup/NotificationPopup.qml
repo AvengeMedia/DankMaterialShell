@@ -381,48 +381,36 @@ PanelWindow {
             }
         }
 
-        Item {
+        ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
             anchors.margins: -content.shadowRenderPadding
-            layer.enabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
+            level: content.elevLevel
+            fallbackOffset: 6
+            shadowBlurPx: content.shadowBlurPx
+            shadowOffsetX: content.shadowOffsetX
+            shadowOffsetY: content.shadowOffsetY
+            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            readonly property int blurMax: Theme.elevationBlurMax
-
-            layer.effect: MultiEffect {
-                id: shadowFx
-                autoPaddingEnabled: true
-                shadowEnabled: content.shadowsAllowed
-                blurEnabled: false
-                maskEnabled: false
-                shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
-                shadowScale: 1
-                shadowHorizontalOffset: content.shadowOffsetX
-                shadowVerticalOffset: content.shadowOffsetY
-                blurMax: Theme.elevationBlurMax
-                shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
-            }
+            sourceRect.anchors.fill: undefined
+            sourceRect.x: content.shadowRenderPadding + content.cardInset
+            sourceRect.y: content.shadowRenderPadding + content.cardInset
+            sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
+            sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
+            sourceRect.radius: Theme.cornerRadius
+            sourceRect.color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
 
             Rectangle {
-                id: shadowShapeSource
-                x: content.shadowRenderPadding + content.cardInset
-                y: content.shadowRenderPadding + content.cardInset
-                width: Math.max(0, content.width - (content.cardInset * 2))
-                height: Math.max(0, content.height - (content.cardInset * 2))
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-                border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
-            }
-
-            Rectangle {
-                x: shadowShapeSource.x
-                y: shadowShapeSource.y
-                width: shadowShapeSource.width
-                height: shadowShapeSource.height
-                radius: shadowShapeSource.radius
+                x: bgShadowLayer.sourceRect.x
+                y: bgShadowLayer.sourceRect.y
+                width: bgShadowLayer.sourceRect.width
+                height: bgShadowLayer.sourceRect.height
+                radius: bgShadowLayer.sourceRect.radius
                 visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
                 opacity: 1
                 clip: true

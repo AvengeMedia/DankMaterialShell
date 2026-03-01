@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
@@ -153,15 +152,15 @@ Item {
         radius: Theme.cornerRadius
         color: Theme.surfaceContainer
 
-        layer.enabled: Theme.elevationEnabled
-        layer.effect: MultiEffect {
-            shadowEnabled: Theme.elevationEnabled
-            shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel2 && Theme.elevationLevel2.blurPx !== undefined ? Theme.elevationLevel2.blurPx : 8) / Theme.elevationBlurMax)) : 0
-            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel2)
-            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel2, 4)
-            blurMax: Theme.elevationBlurMax
-            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel2)
+        ElevationShadow {
+            anchors.fill: parent
+            z: -1
+            level: Theme.elevationLevel2
+            fallbackOffset: 4
+            targetRadius: Theme.cornerRadius
+            targetColor: Theme.surfaceContainer
             shadowOpacity: Theme.elevationLevel2 && Theme.elevationLevel2.alpha !== undefined ? Theme.elevationLevel2.alpha : 0.25
+            shadowEnabled: Theme.elevationEnabled
         }
 
         ColumnLayout {

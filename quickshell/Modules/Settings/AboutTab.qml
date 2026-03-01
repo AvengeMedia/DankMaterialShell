@@ -878,15 +878,17 @@ Item {
         x: hoveredButton ? hoveredButton.mapToItem(aboutTab, hoveredButton.width / 2, 0).x - width / 2 : 0
         y: hoveredButton ? communityIcons.mapToItem(aboutTab, 0, 0).y - height - 8 : 0
 
-        layer.enabled: Theme.elevationEnabled
-        layer.effect: MultiEffect {
-            shadowEnabled: Theme.elevationEnabled
+        ElevationShadow {
+            anchors.fill: parent
+            z: -1
+            level: Theme.elevationLevel1
+            fallbackOffset: 1
+            targetRadius: communityTooltip.radius
+            targetColor: communityTooltip.color
+            borderColor: communityTooltip.border.color
+            borderWidth: communityTooltip.border.width
             shadowOpacity: Theme.elevationLevel1 && Theme.elevationLevel1.alpha !== undefined ? Theme.elevationLevel1.alpha : 0.2
-            shadowHorizontalOffset: Theme.elevationOffsetX(Theme.elevationLevel1)
-            shadowVerticalOffset: Theme.elevationOffsetY(Theme.elevationLevel1, 1)
-            shadowBlur: Theme.elevationEnabled ? Math.max(0, Math.min(1, (Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined ? Theme.elevationLevel1.blurPx : 4) / Theme.elevationBlurMax)) : 0
-            blurMax: Theme.elevationBlurMax
-            shadowColor: Theme.elevationShadowColor(Theme.elevationLevel1)
+            shadowEnabled: Theme.elevationEnabled
         }
 
         StyledText {

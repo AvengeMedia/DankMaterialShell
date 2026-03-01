@@ -964,39 +964,26 @@ BasePill {
                 }
             }
 
-            Item {
+            ElevationShadow {
                 id: bgShadowLayer
                 anchors.fill: parent
-                layer.enabled: Theme.elevationEnabled
+                level: menuContainer.elev
+                fallbackOffset: 4
+                shadowBlurPx: menuContainer.shadowBlurPx
+                shadowSpreadPx: menuContainer.shadowSpreadPx
+                shadowColor: {
+                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
+                    return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
+                }
+                targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                targetRadius: Theme.cornerRadius
+                sourceRect.antialiasing: true
+                sourceRect.smooth: true
+                shadowEnabled: Theme.elevationEnabled
                 layer.smooth: true
                 layer.textureSize: Qt.size(Math.round(width * overflowMenu.dpr * 2), Math.round(height * overflowMenu.dpr * 2))
                 layer.textureMirroring: ShaderEffectSource.MirrorVertically
                 layer.samples: 4
-
-                readonly property int blurMax: 64
-
-                layer.effect: MultiEffect {
-                    autoPaddingEnabled: true
-                    shadowEnabled: true
-                    blurEnabled: false
-                    maskEnabled: false
-                    shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / bgShadowLayer.blurMax))
-                    shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                    shadowHorizontalOffset: Theme.elevationOffsetX(menuContainer.elev)
-                    shadowVerticalOffset: Theme.elevationOffsetY(menuContainer.elev, 4)
-                    shadowColor: {
-                        const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                        return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
-                    }
-                }
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                    radius: Theme.cornerRadius
-                    antialiasing: true
-                    smooth: true
-                }
             }
 
             Grid {
@@ -1439,37 +1426,24 @@ BasePill {
                         }
                     }
 
-                    Item {
+                    ElevationShadow {
                         id: menuBgShadowLayer
                         anchors.fill: parent
-                        layer.enabled: Theme.elevationEnabled
+                        level: menuContainer.elev
+                        fallbackOffset: 4
+                        shadowBlurPx: menuContainer.shadowBlurPx
+                        shadowSpreadPx: menuContainer.shadowSpreadPx
+                        shadowColor: {
+                            const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
+                            return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
+                        }
+                        targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                        targetRadius: Theme.cornerRadius
+                        sourceRect.antialiasing: true
+                        shadowEnabled: Theme.elevationEnabled
                         layer.smooth: true
                         layer.textureSize: Qt.size(Math.round(width * menuWindow.dpr), Math.round(height * menuWindow.dpr))
                         layer.textureMirroring: ShaderEffectSource.MirrorVertically
-
-                        readonly property int blurMax: 64
-
-                        layer.effect: MultiEffect {
-                            autoPaddingEnabled: true
-                            shadowEnabled: true
-                            blurEnabled: false
-                            maskEnabled: false
-                            shadowBlur: Math.max(0, Math.min(1, menuContainer.shadowBlurPx / menuBgShadowLayer.blurMax))
-                            shadowScale: 1 + (2 * menuContainer.shadowSpreadPx) / Math.max(1, Math.min(menuBgShadowLayer.width, menuBgShadowLayer.height))
-                            shadowHorizontalOffset: Theme.elevationOffsetX(menuContainer.elev)
-                            shadowVerticalOffset: Theme.elevationOffsetY(menuContainer.elev, 4)
-                            shadowColor: {
-                                const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                                return Theme.withAlpha(baseColor, menuContainer.effectiveShadowAlpha);
-                            }
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                            radius: Theme.cornerRadius
-                            antialiasing: true
-                        }
                     }
 
                     QsMenuAnchor {

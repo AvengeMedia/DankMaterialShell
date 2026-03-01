@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -239,7 +238,11 @@ Item {
     readonly property real screenHeight: screen ? screen.height : 0
     readonly property real dpr: screen ? screen.devicePixelRatio : 1
 
-    readonly property real shadowBuffer: Theme.elevationBlurMax * 1.5 + 24
+    readonly property var shadowLevel: Theme.elevationLevel3
+    readonly property real shadowFallbackOffset: 6
+    readonly property real shadowRenderPadding: (Theme.elevationEnabled && SettingsData.popoutElevationEnabled) ? Theme.elevationRenderPadding(shadowLevel, effectiveShadowDirection, shadowFallbackOffset, 8, 16) : 0
+    readonly property real shadowMotionPadding: Math.max(0, animationOffset)
+    readonly property real shadowBuffer: Theme.snap(shadowRenderPadding + shadowMotionPadding, dpr)
     readonly property real alignedWidth: Theme.px(popupWidth, dpr)
     readonly property real alignedHeight: Theme.px(popupHeight, dpr)
 
@@ -523,43 +526,20 @@ Item {
                 }
             }
 
-            Rectangle {
+            ElevationShadow {
                 id: shadowSource
-                anchors.centerIn: parent
                 width: parent.width
                 height: parent.height
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
                 opacity: contentWrapper.opacity
                 scale: contentWrapper.scale
                 x: contentWrapper.x
                 y: contentWrapper.y
-
-                readonly property var elev: Theme.elevationLevel3
-                property real shadowBlurPx: elev && elev.blurPx !== undefined ? elev.blurPx : 12
-                property real shadowSpreadPx: elev && elev.spreadPx !== undefined ? elev.spreadPx : 0
-                property real shadowBaseAlpha: elev && elev.alpha !== undefined ? elev.alpha : 0.3
-                property real shadowOffsetX: Theme.elevationOffsetXFor(Theme.elevationLevel3, root.effectiveShadowDirection, 6)
-                property real shadowOffsetY: Theme.elevationOffsetYFor(Theme.elevationLevel3, root.effectiveShadowDirection, 6)
-                readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-                readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
-                readonly property int blurMax: Theme.elevationBlurMax
-
-                layer.enabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
-
-                layer.effect: MultiEffect {
-                    id: shadowFx
-                    autoPaddingEnabled: true
-                    shadowEnabled: true
-                    blurEnabled: false
-                    maskEnabled: false
-                    shadowBlur: Math.max(0, Math.min(1, shadowSource.shadowBlurPx / shadowSource.blurMax))
-                    shadowScale: 1 + (2 * shadowSource.shadowSpreadPx) / Math.max(1, Math.min(shadowSource.width, shadowSource.height))
-                    shadowHorizontalOffset: shadowSource.shadowOffsetX
-                    shadowVerticalOffset: shadowSource.shadowOffsetY
-                    blurMax: Theme.elevationBlurMax
-                    shadowColor: Theme.elevationShadowColor(Theme.elevationLevel3)
-                }
+                level: root.shadowLevel
+                direction: root.effectiveShadowDirection
+                fallbackOffset: root.shadowFallbackOffset
+                targetRadius: Theme.cornerRadius
+                targetColor: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+                shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1" && !(root.suspendShadowWhileResizing && root._resizeActive)
             }
 
             Item {
