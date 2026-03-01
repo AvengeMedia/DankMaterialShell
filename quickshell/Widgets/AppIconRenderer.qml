@@ -49,6 +49,14 @@ Item {
     readonly property string iconPath: {
         if (hasSpecialPrefix || !iconValue)
             return "";
+        const moddedId = Paths.moddedAppId(iconValue);
+        if (moddedId !== iconValue) {
+            if (moddedId.startsWith("~") || moddedId.startsWith("/"))
+                return Paths.toFileUrl(Paths.expandTilde(moddedId));
+            if (moddedId.startsWith("file://"))
+                return moddedId;
+            return Quickshell.iconPath(moddedId, true);
+        }
         return Quickshell.iconPath(iconValue, true) || DesktopService.resolveIconPath(iconValue);
     }
 
