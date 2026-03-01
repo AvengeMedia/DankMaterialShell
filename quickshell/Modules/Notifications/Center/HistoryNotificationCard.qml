@@ -127,7 +127,7 @@ Rectangle {
                     return appIcon;
                 if (appIcon.startsWith("material:") || appIcon.startsWith("svg:") || appIcon.startsWith("unicode:") || appIcon.startsWith("image:"))
                     return "";
-                return Quickshell.iconPath(appIcon, true);
+                return Paths.resolveIconPath(appIcon);
             }
 
             hasImage: hasNotificationImage

@@ -897,7 +897,7 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit
@@ -1008,7 +1008,7 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit
@@ -1154,7 +1154,7 @@ Item {
                                 Image {
                                     width: 24
                                     height: 24
-                                    source: modelData.icon ? "image://icon/" + modelData.icon : "image://icon/application-x-executable"
+                                    source: Paths.resolveIconUrl(modelData.icon || "application-x-executable")
                                     sourceSize.width: 24
                                     sourceSize.height: 24
                                     fillMode: Image.PreserveAspectFit

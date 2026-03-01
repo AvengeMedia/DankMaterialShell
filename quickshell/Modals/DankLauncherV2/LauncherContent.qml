@@ -643,7 +643,7 @@ FocusScope {
                 Image {
                     width: 40
                     height: 40
-                    source: editingApp?.icon ? "image://icon/" + editingApp.icon : "image://icon/application-x-executable"
+                    source: Paths.resolveIconUrl(editingApp?.icon || "application-x-executable")
                     sourceSize.width: 40
                     sourceSize.height: 40
                     fillMode: Image.PreserveAspectFit
