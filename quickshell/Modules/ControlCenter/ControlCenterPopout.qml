@@ -12,7 +12,7 @@ DankPopout {
     id: root
 
     layerNamespace: "dms:control-center"
-    fullHeightSurface: true
+    fullHeightSurface: false
 
     property string expandedSection: ""
     property var triggerScreen: null

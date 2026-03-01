@@ -232,6 +232,11 @@ Item {
             height: parent.height - filterChips.height - Theme.spacingS
             clip: true
             spacing: Theme.spacingS
+            readonly property real horizontalShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
+            readonly property real verticalShadowGutter: Theme.snap(Math.max(Theme.spacingS, 8), 1)
+            readonly property real delegateShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
+            topMargin: verticalShadowGutter
+            bottomMargin: verticalShadowGutter
 
             model: ScriptModel {
                 id: historyModel
@@ -263,13 +268,14 @@ Item {
                 }
 
                 width: ListView.view.width
-                height: historyCard.height
-                clip: true
+                height: historyCard.height + historyListView.delegateShadowGutter
+                clip: false
 
                 HistoryNotificationCard {
                     id: historyCard
-                    width: parent.width
-                    x: delegateRoot.swipeOffset
+                    width: Math.max(0, parent.width - (historyListView.horizontalShadowGutter * 2))
+                    y: historyListView.delegateShadowGutter / 2
+                    x: historyListView.horizontalShadowGutter + delegateRoot.swipeOffset
                     historyItem: modelData
                     isSelected: root.keyboardActive && root.selectedIndex === index
                     keyboardNavigationActive: root.keyboardActive

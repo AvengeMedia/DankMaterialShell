@@ -81,6 +81,8 @@ Rectangle {
         mipmap: true
         cache: true
         visible: false
+        sourceSize.width: Math.max(width * 2, 128)
+        sourceSize.height: Math.max(height * 2, 128)
         source: !root.shouldProbe ? root.imageSource : ""
     }
 

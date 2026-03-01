@@ -14,7 +14,7 @@ import "settings/SettingsStore.js" as Store
 Singleton {
     id: root
 
-    readonly property int settingsConfigVersion: 5
+    readonly property int settingsConfigVersion: 6
 
     readonly property bool isGreeterMode: Quickshell.env("DMS_RUN_GREETER") === "1" || Quickshell.env("DMS_RUN_GREETER") === "true"
 
@@ -166,6 +166,24 @@ Singleton {
     property int modalCustomAnimationDuration: 150
     property bool enableRippleEffects: true
     onEnableRippleEffectsChanged: saveSettings()
+    property bool m3ElevationEnabled: true
+    onM3ElevationEnabledChanged: saveSettings()
+    property int m3ElevationIntensity: 12
+    onM3ElevationIntensityChanged: saveSettings()
+    property int m3ElevationOpacity: 30
+    onM3ElevationOpacityChanged: saveSettings()
+    property string m3ElevationColorMode: "default"
+    onM3ElevationColorModeChanged: saveSettings()
+    property string m3ElevationLightDirection: "top"
+    onM3ElevationLightDirectionChanged: saveSettings()
+    property string m3ElevationCustomColor: "#000000"
+    onM3ElevationCustomColorChanged: saveSettings()
+    property bool modalElevationEnabled: true
+    onModalElevationEnabledChanged: saveSettings()
+    property bool popoutElevationEnabled: true
+    onPopoutElevationEnabledChanged: saveSettings()
+    property bool barElevationEnabled: true
+    onBarElevationEnabledChanged: saveSettings()
     property string wallpaperFillMode: "Fill"
     property bool blurredWallpaperLayer: false
     property bool blurWallpaperOnOverview: false
@@ -609,7 +627,7 @@ Singleton {
             "scrollYBehavior": "workspace",
             "shadowIntensity": 0,
             "shadowOpacity": 60,
-            "shadowColorMode": "text",
+            "shadowColorMode": "default",
             "shadowCustomColor": "#000000",
             "clickThrough": false
         }

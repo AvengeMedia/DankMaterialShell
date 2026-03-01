@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 import qs.Common
@@ -257,11 +256,7 @@ PanelWindow {
         scale: shouldBeVisible ? 1 : 0.9
 
         property bool childHovered: false
-        property real shadowBlurPx: 10
-        property real shadowSpreadPx: 0
-        property real shadowBaseAlpha: 0.60
         readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-        readonly property real effectiveShadowAlpha: shouldBeVisible ? Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha)) : 0
 
         Rectangle {
             id: background
@@ -273,38 +268,20 @@ PanelWindow {
             z: -1
         }
 
-        Item {
+        ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
             visible: osdContainer.popupSurfaceAlpha >= 0.95
-            layer.enabled: Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
-            layer.smooth: false
+            z: -1
+            level: Theme.elevationLevel3
+            fallbackOffset: 6
+            targetRadius: Theme.cornerRadius
+            targetColor: Theme.surfaceContainer
+            borderColor: Theme.outlineMedium
+            borderWidth: 1
+            shadowEnabled: Theme.elevationEnabled && SettingsData.popoutElevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
             layer.textureSize: Qt.size(Math.round(width * root.dpr), Math.round(height * root.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
-
-            readonly property int blurMax: 64
-
-            layer.effect: MultiEffect {
-                id: shadowFx
-                autoPaddingEnabled: true
-                shadowEnabled: true
-                blurEnabled: false
-                maskEnabled: false
-                shadowBlur: Math.max(0, Math.min(1, osdContainer.shadowBlurPx / bgShadowLayer.blurMax))
-                shadowScale: 1 + (2 * osdContainer.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: {
-                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                    return Theme.withAlpha(baseColor, osdContainer.effectiveShadowAlpha);
-                }
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: Theme.surfaceContainer
-                border.color: Theme.outlineMedium
-                border.width: 1
-            }
         }
 
         MouseArea {

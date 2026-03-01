@@ -118,8 +118,8 @@ PanelWindow {
     WlrLayershell.exclusiveZone: -1
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
     color: "transparent"
-    implicitWidth: screen ? Math.min(400, Math.max(320, screen.width * 0.23)) : 380
-    implicitHeight: {
+    readonly property real contentImplicitWidth: screen ? Math.min(400, Math.max(320, screen.width * 0.23)) : 380
+    readonly property real contentImplicitHeight: {
         if (SettingsData.notificationPopupPrivacyMode && !descriptionExpanded)
             return basePopupHeightPrivacy;
         if (!descriptionExpanded)
@@ -130,6 +130,8 @@ PanelWindow {
             return basePopupHeight + bodyTextHeight - collapsedBodyHeight;
         return basePopupHeight;
     }
+    implicitWidth: contentImplicitWidth + (windowShadowPad * 2)
+    implicitHeight: contentImplicitHeight + (windowShadowPad * 2)
 
     Behavior on implicitHeight {
         enabled: !exiting && !_isDestroying
@@ -182,11 +184,15 @@ PanelWindow {
     property bool isTopCenter: SettingsData.notificationPopupPosition === -1
     property bool isBottomCenter: SettingsData.notificationPopupPosition === SettingsData.Position.BottomCenter
     property bool isCenterPosition: isTopCenter || isBottomCenter
+    readonly property real maxPopupShadowBlurPx: Math.max((Theme.elevationLevel3 && Theme.elevationLevel3.blurPx !== undefined) ? Theme.elevationLevel3.blurPx : 12, (Theme.elevationLevel4 && Theme.elevationLevel4.blurPx !== undefined) ? Theme.elevationLevel4.blurPx : 16)
+    readonly property real maxPopupShadowOffsetXPx: Math.max(Math.abs(Theme.elevationOffsetX(Theme.elevationLevel3)), Math.abs(Theme.elevationOffsetX(Theme.elevationLevel4)))
+    readonly property real maxPopupShadowOffsetYPx: Math.max(Math.abs(Theme.elevationOffsetY(Theme.elevationLevel3, 6)), Math.abs(Theme.elevationOffsetY(Theme.elevationLevel4, 8)))
+    readonly property real windowShadowPad: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled ? Theme.snap(Math.max(16, maxPopupShadowBlurPx + Math.max(maxPopupShadowOffsetXPx, maxPopupShadowOffsetYPx) + 8), dpr) : 0
 
     anchors.top: true
-    anchors.bottom: true
-    anchors.left: SettingsData.notificationPopupPosition === SettingsData.Position.Left || SettingsData.notificationPopupPosition === SettingsData.Position.Bottom
-    anchors.right: SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Right
+    anchors.left: true
+    anchors.bottom: false
+    anchors.right: false
 
     mask: contentInputMask
 
@@ -205,10 +211,10 @@ PanelWindow {
     }
 
     margins {
-        top: _storedTopMargin
-        bottom: _storedBottomMargin
-        left: getLeftMargin()
-        right: getRightMargin()
+        top: getWindowTopMargin()
+        bottom: 0
+        left: getWindowLeftMargin()
+        right: 0
     }
 
     function getBarInfo() {
@@ -250,7 +256,7 @@ PanelWindow {
 
     function getLeftMargin() {
         if (isCenterPosition)
-            return screen ? (screen.width - implicitWidth) / 2 : 0;
+            return screen ? (screen.width - alignedWidth) / 2 : 0;
 
         const popupPos = SettingsData.notificationPopupPosition;
         const isLeft = popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom;
@@ -274,23 +280,56 @@ PanelWindow {
         return barInfo.rightBar > 0 ? barInfo.rightBar : Theme.popupDistance;
     }
 
+    function getContentX() {
+        if (!screen)
+            return 0;
+
+        const popupPos = SettingsData.notificationPopupPosition;
+        const barLeft = getLeftMargin();
+        const barRight = getRightMargin();
+
+        if (isCenterPosition)
+            return Theme.snap((screen.width - alignedWidth) / 2, dpr);
+        if (popupPos === SettingsData.Position.Left || popupPos === SettingsData.Position.Bottom)
+            return Theme.snap(barLeft, dpr);
+        return Theme.snap(screen.width - alignedWidth - barRight, dpr);
+    }
+
+    function getContentY() {
+        if (!screen)
+            return 0;
+
+        const popupPos = SettingsData.notificationPopupPosition;
+        const barTop = getTopMargin();
+        const barBottom = getBottomMargin();
+        const isTop = isTopCenter || popupPos === SettingsData.Position.Top || popupPos === SettingsData.Position.Left;
+        if (isTop)
+            return Theme.snap(barTop, dpr);
+        return Theme.snap(screen.height - alignedHeight - barBottom, dpr);
+    }
+
+    function getWindowLeftMargin() {
+        if (!screen)
+            return 0;
+        return Theme.snap(getContentX() - windowShadowPad, dpr);
+    }
+
+    function getWindowTopMargin() {
+        if (!screen)
+            return 0;
+        return Theme.snap(getContentY() - windowShadowPad, dpr);
+    }
+
     readonly property bool screenValid: win.screen && !_isDestroying
     readonly property real dpr: screenValid ? CompositorService.getScreenScale(win.screen) : 1
-    readonly property real alignedWidth: Theme.px(implicitWidth, dpr)
-    readonly property real alignedHeight: Theme.px(implicitHeight, dpr)
+    readonly property real alignedWidth: Theme.px(Math.max(0, implicitWidth - (windowShadowPad * 2)), dpr)
+    readonly property real alignedHeight: Theme.px(Math.max(0, implicitHeight - (windowShadowPad * 2)), dpr)
 
     Item {
         id: content
 
-        x: Theme.snap((win.width - alignedWidth) / 2, dpr)
-        y: {
-            const isTop = isTopCenter || SettingsData.notificationPopupPosition === SettingsData.Position.Top || SettingsData.notificationPopupPosition === SettingsData.Position.Left;
-            if (isTop) {
-                return Theme.snap(screenY, dpr);
-            } else {
-                return Theme.snap(win.height - alignedHeight - screenY, dpr);
-            }
-        }
+        x: Theme.snap(windowShadowPad, dpr)
+        y: Theme.snap(windowShadowPad, dpr)
         width: alignedWidth
         height: alignedHeight
         visible: !win._finalized
@@ -313,12 +352,13 @@ PanelWindow {
         readonly property bool swipeActive: swipeDragHandler.active
         property bool swipeDismissing: false
 
-        readonly property real radiusForShadow: Theme.cornerRadius
-        property real shadowBlurPx: SettingsData.notificationPopupShadowEnabled ? ((2 + radiusForShadow * 0.2) * (cardHoverHandler.hovered ? 1.2 : 1)) : 0
-        property real shadowSpreadPx: SettingsData.notificationPopupShadowEnabled ? (radiusForShadow * (cardHoverHandler.hovered ? 0.06 : 0)) : 0
-        property real shadowBaseAlpha: 0.35
-        readonly property real popupSurfaceAlpha: SettingsData.popupTransparency
-        readonly property real effectiveShadowAlpha: Math.max(0, Math.min(1, shadowBaseAlpha * popupSurfaceAlpha))
+        readonly property bool shadowsAllowed: Theme.elevationEnabled && SettingsData.notificationPopupShadowEnabled
+        readonly property var elevLevel: cardHoverHandler.hovered ? Theme.elevationLevel4 : Theme.elevationLevel3
+        readonly property real cardInset: Theme.snap(4, win.dpr)
+        readonly property real shadowRenderPadding: shadowsAllowed ? Theme.snap(Math.max(16, shadowBlurPx + Math.max(Math.abs(shadowOffsetX), Math.abs(shadowOffsetY)) + 8), win.dpr) : 0
+        property real shadowBlurPx: shadowsAllowed ? (elevLevel && elevLevel.blurPx !== undefined ? elevLevel.blurPx : 12) : 0
+        property real shadowOffsetX: shadowsAllowed ? Theme.elevationOffsetX(elevLevel) : 0
+        property real shadowOffsetY: shadowsAllowed ? Theme.elevationOffsetY(elevLevel, 6) : 0
 
         Behavior on shadowBlurPx {
             NumberAnimation {
@@ -327,50 +367,50 @@ PanelWindow {
             }
         }
 
-        Behavior on shadowSpreadPx {
+        Behavior on shadowOffsetX {
             NumberAnimation {
                 duration: Theme.shortDuration
                 easing.type: Theme.standardEasing
             }
         }
 
-        Item {
+        Behavior on shadowOffsetY {
+            NumberAnimation {
+                duration: Theme.shortDuration
+                easing.type: Theme.standardEasing
+            }
+        }
+
+        ElevationShadow {
             id: bgShadowLayer
             anchors.fill: parent
-            anchors.margins: Theme.snap(4, win.dpr)
-            layer.enabled: !win._isDestroying && win.screenValid
-            layer.smooth: false
+            anchors.margins: -content.shadowRenderPadding
+            level: content.elevLevel
+            fallbackOffset: 6
+            shadowBlurPx: content.shadowBlurPx
+            shadowOffsetX: content.shadowOffsetX
+            shadowOffsetY: content.shadowOffsetY
+            shadowColor: content.shadowsAllowed && content.elevLevel ? Theme.elevationShadowColor(content.elevLevel) : "transparent"
+            shadowEnabled: !win._isDestroying && win.screenValid && content.shadowsAllowed
             layer.textureSize: Qt.size(Math.round(width * win.dpr), Math.round(height * win.dpr))
             layer.textureMirroring: ShaderEffectSource.MirrorVertically
 
-            readonly property int blurMax: 64
-
-            layer.effect: MultiEffect {
-                id: shadowFx
-                autoPaddingEnabled: true
-                shadowEnabled: SettingsData.notificationPopupShadowEnabled
-                blurEnabled: false
-                maskEnabled: false
-                shadowBlur: Math.max(0, Math.min(1, content.shadowBlurPx / bgShadowLayer.blurMax))
-                shadowScale: 1 + (2 * content.shadowSpreadPx) / Math.max(1, Math.min(bgShadowLayer.width, bgShadowLayer.height))
-                shadowColor: {
-                    const baseColor = Theme.isLightMode ? Qt.rgba(0, 0, 0, 1) : Theme.surfaceContainerHighest;
-                    return Theme.withAlpha(baseColor, content.effectiveShadowAlpha);
-                }
-            }
+            sourceRect.anchors.fill: undefined
+            sourceRect.x: content.shadowRenderPadding + content.cardInset
+            sourceRect.y: content.shadowRenderPadding + content.cardInset
+            sourceRect.width: Math.max(0, content.width - (content.cardInset * 2))
+            sourceRect.height: Math.max(0, content.height - (content.cardInset * 2))
+            sourceRect.radius: Theme.cornerRadius
+            sourceRect.color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
+            sourceRect.border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
+            sourceRect.border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
 
             Rectangle {
-                id: shadowShapeSource
-                anchors.fill: parent
-                radius: Theme.cornerRadius
-                color: Theme.withAlpha(Theme.surfaceContainer, Theme.popupTransparency)
-                border.color: notificationData && notificationData.urgency === NotificationUrgency.Critical ? Theme.withAlpha(Theme.primary, 0.3) : Theme.withAlpha(Theme.outline, 0.08)
-                border.width: notificationData && notificationData.urgency === NotificationUrgency.Critical ? 2 : 0
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: shadowShapeSource.radius
+                x: bgShadowLayer.sourceRect.x
+                y: bgShadowLayer.sourceRect.y
+                width: bgShadowLayer.sourceRect.width
+                height: bgShadowLayer.sourceRect.height
+                radius: bgShadowLayer.sourceRect.radius
                 visible: notificationData && notificationData.urgency === NotificationUrgency.Critical
                 opacity: 1
                 clip: true
@@ -399,7 +439,7 @@ PanelWindow {
         Item {
             id: backgroundContainer
             anchors.fill: parent
-            anchors.margins: Theme.snap(4, win.dpr)
+            anchors.margins: content.cardInset
             clip: true
 
             HoverHandler {

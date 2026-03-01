@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.Notifications
 import qs.Common
@@ -38,7 +39,14 @@ Rectangle {
     height: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     readonly property real targetHeight: expanded ? (expandedContent.height + cardPadding * 2) : (baseCardHeight + collapsedContent.extraHeight)
     radius: Theme.cornerRadius
-    scale: (cardHoverHandler.hovered ? 1.01 : 1.0) * listLevelAdjacentScaleInfluence
+    scale: (cardHoverHandler.hovered ? 1.004 : 1.0) * listLevelAdjacentScaleInfluence
+    readonly property bool shadowsAllowed: Theme.elevationEnabled && Quickshell.env("DMS_DISABLE_LAYER") !== "true" && Quickshell.env("DMS_DISABLE_LAYER") !== "1"
+    readonly property var shadowElevation: Theme.elevationLevel1
+    readonly property real baseShadowBlurPx: (shadowElevation && shadowElevation.blurPx !== undefined) ? shadowElevation.blurPx : 4
+    readonly property real hoverShadowBlurBoost: cardHoverHandler.hovered ? Math.min(2, baseShadowBlurPx * 0.25) : 0
+    property real shadowBlurPx: shadowsAllowed ? (baseShadowBlurPx + hoverShadowBlurBoost) : 0
+    property real shadowOffsetXPx: shadowsAllowed ? Theme.elevationOffsetX(shadowElevation) : 0
+    property real shadowOffsetYPx: shadowsAllowed ? (Theme.elevationOffsetY(shadowElevation, 1) + (cardHoverHandler.hovered ? 0.35 : 0)) : 0
     property bool __initialized: false
 
     Component.onCompleted: {
@@ -50,6 +58,27 @@ Rectangle {
 
     Behavior on scale {
         enabled: listLevelScaleAnimationsEnabled
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowBlurPx {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowOffsetXPx {
+        NumberAnimation {
+            duration: Theme.shortDuration
+            easing.type: Theme.standardEasing
+        }
+    }
+
+    Behavior on shadowOffsetYPx {
         NumberAnimation {
             duration: Theme.shortDuration
             easing.type: Theme.standardEasing
@@ -95,12 +124,29 @@ Rectangle {
         if (notificationGroup?.latestNotification?.urgency === NotificationUrgency.Critical) {
             return 2;
         }
-        return 1;
+        return 0;
     }
-    clip: true
+    clip: false
 
     HoverHandler {
         id: cardHoverHandler
+    }
+
+    ElevationShadow {
+        id: shadowLayer
+        anchors.fill: parent
+        z: -1
+        level: root.shadowElevation
+        targetRadius: root.radius
+        targetColor: root.color
+        borderColor: root.border.color
+        borderWidth: root.border.width
+        shadowBlurPx: root.shadowBlurPx
+        shadowSpreadPx: 0
+        shadowOffsetX: root.shadowOffsetXPx
+        shadowOffsetY: root.shadowOffsetYPx
+        shadowColor: root.shadowElevation ? Theme.elevationShadowColor(root.shadowElevation) : "transparent"
+        shadowEnabled: root.shadowsAllowed
     }
 
     Rectangle {
@@ -304,8 +350,13 @@ Rectangle {
 
                         onClicked: mouse => {
                             if (!parent.hoveredLink && (parent.hasMoreText || descriptionExpanded)) {
+                                root.userInitiatedExpansion = true;
                                 const messageId = (notificationGroup && notificationGroup.latestNotification && notificationGroup.latestNotification.notification && notificationGroup.latestNotification.notification.id) ? (notificationGroup.latestNotification.notification.id + "_desc") : "";
                                 NotificationService.toggleMessageExpansion(messageId);
+                                Qt.callLater(() => {
+                                    if (root && !root.isAnimating)
+                                        root.userInitiatedExpansion = false;
+                                });
                             }
                         }
 
@@ -419,9 +470,7 @@ Rectangle {
                         id: delegateRect
                         width: parent.width
 
-                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 &&
-                            (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 ||
-                             expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
+                        readonly property bool isAdjacentToSwipe: root.swipingNotificationIndex !== -1 && (expandedDelegateWrapper.index === root.swipingNotificationIndex - 1 || expandedDelegateWrapper.index === root.swipingNotificationIndex + 1)
                         readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? root.swipingNotificationOffset * 0.10 : 0
                         readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(root.swipingNotificationOffset) / width * 0.02 : 1.0
 
@@ -605,7 +654,12 @@ Rectangle {
 
                                             onClicked: mouse => {
                                                 if (!parent.hoveredLink && (bodyText.hasMoreText || messageExpanded)) {
+                                                    root.userInitiatedExpansion = true;
                                                     NotificationService.toggleMessageExpansion(modelData?.notification?.id || "");
+                                                    Qt.callLater(() => {
+                                                        if (root && !root.isAnimating)
+                                                            root.userInitiatedExpansion = false;
+                                                    });
                                                 }
                                             }
 

@@ -18,6 +18,10 @@ DankListView {
     property real swipingCardOffset: 0
     property real __pendingStableHeight: 0
     property real __heightUpdateThreshold: 20
+    readonly property real shadowBlurPx: Theme.elevationEnabled ? ((Theme.elevationLevel1 && Theme.elevationLevel1.blurPx !== undefined) ? Theme.elevationLevel1.blurPx : 4) : 0
+    readonly property real shadowHorizontalGutter: Theme.snap(Math.max(Theme.spacingS, Math.min(32, shadowBlurPx * 1.5 + 6)), 1)
+    readonly property real shadowVerticalGutter: Theme.snap(Math.max(Theme.spacingXS, 6), 1)
+    readonly property real delegateShadowGutter: Theme.snap(Math.max(Theme.spacingXS, 4), 1)
 
     Component.onCompleted: {
         Qt.callLater(() => {
@@ -56,21 +60,26 @@ DankListView {
             let delta = 0;
             for (let i = 0; i < count; i++) {
                 const item = itemAtIndex(i);
-                if (item && item.children[0] && item.children[0].isAnimating)
-                    delta += item.children[0].targetHeight - item.height;
+                if (item && item.children[0] && item.children[0].isAnimating) {
+                    const targetDelegateHeight = item.children[0].targetHeight + listView.delegateShadowGutter;
+                    delta += targetDelegateHeight - item.height;
+                }
             }
             const targetHeight = contentHeight + delta;
             // During expansion, always update immediately without threshold check
             stableContentHeight = targetHeight;
         } else {
             __pendingStableHeight = contentHeight;
-            heightUpdateDebounce.restart();
+            heightUpdateDebounce.stop();
+            stableContentHeight = __pendingStableHeight;
         }
     }
 
     clip: true
     model: NotificationService.groupedNotifications
     spacing: Theme.spacingL
+    topMargin: shadowVerticalGutter
+    bottomMargin: shadowVerticalGutter
 
     onIsUserScrollingChanged: {
         if (isUserScrolling && keyboardController && keyboardController.keyboardNavigationActive) {
@@ -134,8 +143,7 @@ DankListView {
         readonly property real dismissThreshold: width * 0.35
         property bool __delegateInitialized: false
 
-        readonly property bool isAdjacentToSwipe: listView.count >= 2 && listView.swipingCardIndex !== -1 &&
-            (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
+        readonly property bool isAdjacentToSwipe: listView.count >= 2 && listView.swipingCardIndex !== -1 && (index === listView.swipingCardIndex - 1 || index === listView.swipingCardIndex + 1)
         readonly property real adjacentSwipeInfluence: isAdjacentToSwipe ? listView.swipingCardOffset * 0.10 : 0
         readonly property real adjacentScaleInfluence: isAdjacentToSwipe ? 1.0 - Math.abs(listView.swipingCardOffset) / width * 0.02 : 1.0
         readonly property real swipeFadeStartOffset: width * 0.75
@@ -149,13 +157,14 @@ DankListView {
         }
 
         width: ListView.view.width
-        height: notificationCard.height
-        clip: notificationCard.isAnimating
+        height: notificationCard.height + listView.delegateShadowGutter
+        clip: false
 
         NotificationCard {
             id: notificationCard
-            width: parent.width
-            x: delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
+            width: Math.max(0, parent.width - (listView.shadowHorizontalGutter * 2))
+            y: listView.delegateShadowGutter / 2
+            x: listView.shadowHorizontalGutter + delegateRoot.swipeOffset + delegateRoot.adjacentSwipeInfluence
             listLevelAdjacentScaleInfluence: delegateRoot.adjacentScaleInfluence
             listLevelScaleAnimationsEnabled: listView.swipingCardIndex === -1 || !delegateRoot.isAdjacentToSwipe
             notificationGroup: modelData

@@ -140,6 +140,20 @@ PanelWindow {
     }
     readonly property real _dpr: CompositorService.getScreenScale(barWindow.screen)
 
+    // Shadow buffer: extra window space for shadow to render beyond bar bounds
+    readonly property bool _shadowActive: (Theme.elevationEnabled && (typeof SettingsData !== "undefined" ? (SettingsData.barElevationEnabled ?? true) : false)) || (barConfig?.shadowIntensity ?? 0) > 0
+    readonly property real _shadowBuffer: {
+        if (!_shadowActive)
+            return 0;
+        const hasOverride = (barConfig?.shadowIntensity ?? 0) > 0;
+        if (hasOverride) {
+            const blur = (barConfig.shadowIntensity ?? 0) * 0.2;
+            const offset = blur * 0.5;
+            return Theme.snap(Math.max(16, blur + offset + 8), _dpr);
+        }
+        return Theme.snap(Theme.elevationRenderPadding(Theme.elevationLevel2, "top", 4, 8, 16), _dpr);
+    }
+
     property string screenName: modelData.name
 
     property bool hasMaximizedToplevel: false
@@ -354,8 +368,8 @@ PanelWindow {
     }
 
     screen: modelData
-    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) : 0
-    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) : 0
+    implicitHeight: !isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
+    implicitWidth: isVertical ? Theme.px(effectiveBarThickness + effectiveSpacing + ((barConfig?.gothCornersEnabled ?? false) && !hasMaximizedToplevel ? _wingR : 0), _dpr) + _shadowBuffer : 0
     color: "transparent"
 
     property var nativeInhibitor: null

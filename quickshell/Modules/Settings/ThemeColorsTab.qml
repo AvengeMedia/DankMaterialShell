@@ -126,6 +126,15 @@ Item {
         return Theme.warning;
     }
 
+    function openM3ShadowColorPicker() {
+        PopoutService.colorPickerModal.selectedColor = SettingsData.m3ElevationCustomColor ?? "#000000";
+        PopoutService.colorPickerModal.pickerTitle = I18n.tr("Shadow Color");
+        PopoutService.colorPickerModal.onColorSelectedCallback = function (color) {
+            SettingsData.set("m3ElevationCustomColor", color.toString());
+        };
+        PopoutService.colorPickerModal.show();
+    }
+
     function formatThemeAutoTime(isoString) {
         if (!isoString)
             return "";
@@ -1592,6 +1601,189 @@ Item {
                     defaultValue: 12
                     onSliderValueChanged: newValue => SettingsData.setCornerRadius(newValue)
                 }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "lift", "m3", "material"]
+                    settingKey: "m3ElevationEnabled"
+                    text: I18n.tr("Shadows")
+                    description: I18n.tr("Material inspired shadows and elevation on modals, popouts, and dialogs")
+                    checked: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("m3ElevationEnabled", checked)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "intensity", "blur", "m3"]
+                    settingKey: "m3ElevationIntensity"
+                    text: I18n.tr("Shadow Intensity")
+                    description: I18n.tr("Controls the base blur radius and offset of shadows")
+                    value: SettingsData.m3ElevationIntensity ?? 12
+                    minimum: 0
+                    maximum: 100
+                    unit: "px"
+                    defaultValue: 12
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationIntensity", newValue)
+                }
+
+                SettingsSliderRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "opacity", "transparency", "m3"]
+                    settingKey: "m3ElevationOpacity"
+                    text: I18n.tr("Shadow Opacity")
+                    description: I18n.tr("Controls the transparency of the shadow")
+                    value: SettingsData.m3ElevationOpacity ?? 30
+                    minimum: 0
+                    maximum: 100
+                    unit: "%"
+                    defaultValue: 30
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onSliderValueChanged: newValue => SettingsData.set("m3ElevationOpacity", newValue)
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "color", "m3"]
+                    settingKey: "m3ElevationColorMode"
+                    text: I18n.tr("Shadow Color")
+                    description: I18n.tr("Base color for shadows (opacity is applied automatically)")
+                    options: [I18n.tr("Default (Black)", "shadow color option"), I18n.tr("Text Color", "shadow color option"), I18n.tr("Primary", "shadow color option"), I18n.tr("Surface Variant", "shadow color option"), I18n.tr("Custom", "shadow color option")]
+                    currentValue: {
+                        switch (SettingsData.m3ElevationColorMode) {
+                        case "text":
+                            return I18n.tr("Text Color", "shadow color option");
+                        case "primary":
+                            return I18n.tr("Primary", "shadow color option");
+                        case "surfaceVariant":
+                            return I18n.tr("Surface Variant", "shadow color option");
+                        case "custom":
+                            return I18n.tr("Custom", "shadow color option");
+                        default:
+                            return I18n.tr("Default (Black)", "shadow color option");
+                        }
+                    }
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Primary", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "primary");
+                        } else if (value === I18n.tr("Surface Variant", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "surfaceVariant");
+                        } else if (value === I18n.tr("Custom", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "custom");
+                            openM3ShadowColorPicker();
+                        } else if (value === I18n.tr("Text Color", "shadow color option")) {
+                            SettingsData.set("m3ElevationColorMode", "text");
+                        } else {
+                            SettingsData.set("m3ElevationColorMode", "default");
+                        }
+                    }
+                }
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "direction", "light", "advanced", "m3"]
+                    settingKey: "m3ElevationLightDirection"
+                    text: I18n.tr("Light Direction")
+                    description: I18n.tr("Controls shadow cast direction for elevation layers")
+                    options: [I18n.tr("Auto (Bar-aware)", "shadow direction option"), I18n.tr("Top (Default)", "shadow direction option"), I18n.tr("Top Left", "shadow direction option"), I18n.tr("Top Right", "shadow direction option"), I18n.tr("Bottom", "shadow direction option")]
+                    currentValue: {
+                        switch (SettingsData.m3ElevationLightDirection) {
+                        case "autoBar":
+                            return I18n.tr("Auto (Bar-aware)", "shadow direction option");
+                        case "topLeft":
+                            return I18n.tr("Top Left", "shadow direction option");
+                        case "topRight":
+                            return I18n.tr("Top Right", "shadow direction option");
+                        case "bottom":
+                            return I18n.tr("Bottom", "shadow direction option");
+                        default:
+                            return I18n.tr("Top (Default)", "shadow direction option");
+                        }
+                    }
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onValueChanged: value => {
+                        if (value === I18n.tr("Auto (Bar-aware)", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "autoBar");
+                        } else if (value === I18n.tr("Top Left", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "topLeft");
+                        } else if (value === I18n.tr("Top Right", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "topRight");
+                        } else if (value === I18n.tr("Bottom", "shadow direction option")) {
+                            SettingsData.set("m3ElevationLightDirection", "bottom");
+                        } else {
+                            SettingsData.set("m3ElevationLightDirection", "top");
+                        }
+                    }
+                }
+
+                Item {
+                    visible: (SettingsData.m3ElevationEnabled ?? true) && SettingsData.m3ElevationColorMode === "custom"
+                    width: parent.width
+                    implicitHeight: 36
+                    height: implicitHeight
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.spacingM
+
+                        StyledText {
+                            text: I18n.tr("Custom Shadow Color")
+                            color: Theme.surfaceText
+                            font.pixelSize: Theme.fontSizeMedium
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        Rectangle {
+                            width: 26
+                            height: 26
+                            radius: 13
+                            color: SettingsData.m3ElevationCustomColor ?? "#000000"
+                            border.color: Theme.outline
+                            border.width: 1
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: openM3ShadowColorPicker()
+                            }
+                        }
+                    }
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "modal", "dialog", "m3"]
+                    settingKey: "modalElevationEnabled"
+                    text: I18n.tr("Modal Shadows")
+                    description: I18n.tr("Shadow elevation on modals and dialogs")
+                    checked: SettingsData.modalElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("modalElevationEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "popout", "popup", "osd", "dropdown", "m3"]
+                    settingKey: "popoutElevationEnabled"
+                    text: I18n.tr("Popout Shadows")
+                    description: I18n.tr("Shadow elevation on popouts, OSDs, and dropdowns")
+                    checked: SettingsData.popoutElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("popoutElevationEnabled", checked)
+                }
+
+                SettingsToggleRow {
+                    tab: "theme"
+                    tags: ["elevation", "shadow", "bar", "panel", "navigation", "m3"]
+                    settingKey: "barElevationEnabled"
+                    text: I18n.tr("Bar Shadows")
+                    description: I18n.tr("Shadow elevation on bars and panels")
+                    checked: SettingsData.barElevationEnabled ?? true
+                    visible: SettingsData.m3ElevationEnabled ?? true
+                    onToggled: checked => SettingsData.set("barElevationEnabled", checked)
+                }
             }
 
             SettingsCard {
@@ -2140,10 +2332,39 @@ Item {
 
             SettingsCard {
                 tab: "theme"
+                tags: ["icon", "theme", "system"]
+                title: I18n.tr("Icon Theme")
+                settingKey: "iconTheme"
+                iconName: "interests"
+
+                SettingsDropdownRow {
+                    tab: "theme"
+                    tags: ["icon", "theme", "system"]
+                    settingKey: "iconTheme"
+                    text: I18n.tr("Icon Theme")
+                    description: I18n.tr("DankShell & System Icons (requires restart)")
+                    currentValue: SettingsData.iconTheme
+                    enableFuzzySearch: true
+                    popupWidthOffset: 100
+                    maxPopupHeight: 236
+                    options: cachedIconThemes
+                    onValueChanged: value => {
+                        SettingsData.setIconTheme(value);
+                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
+                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
+                        }
+                    }
+                }
+            }
+
+            SettingsCard {
+                tab: "theme"
                 tags: ["matugen", "templates", "theming"]
                 title: I18n.tr("Matugen Templates")
                 settingKey: "matugenTemplates"
                 iconName: "auto_awesome"
+                collapsible: true
+                expanded: false
                 visible: Theme.matugenAvailable
 
                 SettingsToggleRow {
@@ -2444,33 +2665,6 @@ Item {
                         wrapMode: Text.WordWrap
                         width: parent.width - Theme.iconSizeSmall - Theme.spacingM
                         anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-
-            SettingsCard {
-                tab: "theme"
-                tags: ["icon", "theme", "system"]
-                title: I18n.tr("Icon Theme")
-                settingKey: "iconTheme"
-                iconName: "interests"
-
-                SettingsDropdownRow {
-                    tab: "theme"
-                    tags: ["icon", "theme", "system"]
-                    settingKey: "iconTheme"
-                    text: I18n.tr("Icon Theme")
-                    description: I18n.tr("DankShell & System Icons (requires restart)")
-                    currentValue: SettingsData.iconTheme
-                    enableFuzzySearch: true
-                    popupWidthOffset: 100
-                    maxPopupHeight: 236
-                    options: cachedIconThemes
-                    onValueChanged: value => {
-                        SettingsData.setIconTheme(value);
-                        if (Quickshell.env("QT_QPA_PLATFORMTHEME") != "gtk3" && Quickshell.env("QT_QPA_PLATFORMTHEME") != "qt6ct" && Quickshell.env("QT_QPA_PLATFORMTHEME_QT6") != "qt6ct") {
-                            ToastService.showError(I18n.tr("Missing Environment Variables", "qt theme env error title"), I18n.tr("You need to set either:\nQT_QPA_PLATFORMTHEME=gtk3 OR\nQT_QPA_PLATFORMTHEME=qt6ct\nas environment variables, and then restart the shell.\n\nqt6ct requires qt6ct-kde to be installed.", "qt theme env error body"));
-                        }
                     }
                 }
             }

@@ -2417,6 +2417,74 @@
     "description": "0 = square corners"
   },
   {
+    "section": "m3ElevationEnabled",
+    "label": "M3 Elevation & Shadows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "appearance",
+      "elevation",
+      "lift",
+      "material",
+      "m3",
+      "shadow",
+      "shadows",
+      "theme"
+    ],
+    "description": "Material Design 3 shadows and elevation on modals, popouts, and dialogs"
+  },
+  {
+    "section": "modalElevationEnabled",
+    "label": "Modal Shadows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "dialog",
+      "elevation",
+      "m3",
+      "material",
+      "modal",
+      "shadow",
+      "shadows"
+    ],
+    "description": "Shadow elevation on modals and dialogs"
+  },
+  {
+    "section": "popoutElevationEnabled",
+    "label": "Popout Shadows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "dropdown",
+      "elevation",
+      "m3",
+      "material",
+      "osd",
+      "popout",
+      "popup",
+      "shadow",
+      "shadows"
+    ],
+    "description": "Shadow elevation on popouts, OSDs, and dropdowns"
+  },
+  {
+    "section": "barElevationEnabled",
+    "label": "Bar Shadows",
+    "tabIndex": 10,
+    "category": "Theme & Colors",
+    "keywords": [
+      "bar",
+      "elevation",
+      "m3",
+      "material",
+      "navigation",
+      "panel",
+      "shadow",
+      "shadows"
+    ],
+    "description": "Shadow elevation on bars and panels"
+  },
+  {
     "section": "cursorSize",
     "label": "Cursor Size",
     "tabIndex": 10,
